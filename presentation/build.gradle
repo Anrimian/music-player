@@ -29,6 +29,10 @@ ext {
 
     dependencies {
         compile fileTree(dir: 'libs', include: ['*.jar'])
+
+        compile project(':domain')
+        compile project(':data')
+
         compile "com.android.support:appcompat-v7:$supportLibraryVersion"
         compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
