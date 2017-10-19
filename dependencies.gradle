@@ -1,0 +1,50 @@
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
+    }
+}
+
+ext {
+    //Android
+    androidBuildToolsVersion = "26.0.2"
+    androidMinSdkVersion = 15
+    androidTargetSdkVersion = 26
+    androidCompileSdkVersion = 26
+
+    //Libraries
+    supportLibraryVersion = "26.1.0"
+    rxJavaVersion = "2.1.5"
+
+    //Testing
+    jUnitVersion = '4.12'
+    espressoVersion = '2.0'
+
+    presentationDependencies = [
+            supportLibrary:     "com.android.support:appcompat-v7:$supportLibraryVersion",
+            constraintLayout:   'com.android.support.constraint:constraint-layout:1.0.2',
+            rxAndroid:          'io.reactivex.rxjava2:rxandroid:2.0.1',
+    ]
+
+    presentationTestDependencies = [
+            espresso:           "com.android.support.test.espresso:espresso-core:${espressoVersion}",
+    ]
+
+    domainDependencies = [
+            rxJava:             "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
+    ]
+
+    domainTestDependencies = [
+            junit:              "junit:junit:${jUnitVersion}",
+    ]
+
+    dataDependencies = [
+    ]
+
+    dataTestDependencies = [
+            junit:              "junit:junit:${jUnitVersion}",
+    ]
+
+}

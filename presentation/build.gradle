@@ -1,17 +1,24 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
+    buildToolsVersion globalConfiguration["androidBuildToolsVersion"]
+
     defaultConfig {
-        applicationId "com.github.anrimian.simplemusicplayer"
-        minSdkVersion 15
-        targetSdkVersion 26
-        versionCode 1
-        versionName "dev"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        minSdkVersion globalConfiguration["androidMinSdkVersion"]
+        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+
+        applicationId globalConfiguration["androidApplicationId"]
+        versionCode globalConfiguration["androidVersionCode"]
+        versionName globalConfiguration["androidVersionName"]
+        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+        testApplicationId globalConfiguration["testApplicationId"]
         setProperty("archivesBaseName", applicationId + "-v" + versionCode + "(" + versionName + ")")
     }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -19,28 +26,28 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-
+            minifyEnabled false
+            shrinkResources false
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
-ext {
-    supportLibraryVersion = "26.1.0"
 
-    dependencies {
-        compile fileTree(dir: 'libs', include: ['*.jar'])
+dependencies {
+    compile project(':domain')
+    compile project(':data')
 
-        compile project(':domain')
-        compile project(':data')
+    def presentationDependencies = rootProject.ext.presentationDependencies
+    def presentationTestDependencies = rootProject.ext.presentationTestDependencies
 
-        compile "com.android.support:appcompat-v7:$supportLibraryVersion"
-        compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile presentationDependencies.supportLibrary
+    compile presentationDependencies.constraintLayout
+    compile presentationDependencies.rxAndroid
 
-
-        androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-            exclude group: 'com.android.support', module: 'support-annotations'
-        })
-
-        testCompile 'junit:junit:4.12'
-    }
+    androidTestCompile presentationTestDependencies.espresso
 }

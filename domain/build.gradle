@@ -1,8 +1,17 @@
 apply plugin: 'java'
+apply plugin: 'me.tatarka.retrolambda'
+
+//noinspection GroovyUnusedAssignment
+sourceCompatibility = 1.8
+//noinspection GroovyUnusedAssignment
+targetCompatibility = 1.8
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    def domainDependencies = rootProject.ext.domainDependencies
+    def domainTestDependencies = rootProject.ext.domainTestDependencies
+
+    compile domainDependencies.rxJava
+
+    testCompile domainTestDependencies.junit
 }
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"

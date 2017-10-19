@@ -1,11 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply from: 'dependencies.gradle'
+apply plugin: 'me.tatarka.retrolambda'
 
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'me.tatarka:gradle-retrolambda:3.2.3'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -13,20 +17,12 @@ buildscript {
 }
 
 allprojects {
-//    ext {
-//        appId "com.github.anrimian.simplemusicplayer"
-//        minSdkVersion 15
-//        targetSdkVersion 26
-//        versionCode 1
-//        versionName "dev"
-//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-//    }
-
-    repositories {
-        jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
+    ext {
+        androidApplicationId = 'com.github.anrimian.simplemusicplayer'
+        androidVersionCode = 1
+        androidVersionName = "dev"
+        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testApplicationId = 'com.github.anrimian.simplemusicplayer.test'
     }
 }
 

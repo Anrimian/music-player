@@ -10,6 +10,10 @@ import com.github.anrimian.simplemusicplayer.domain.TextRepository;
 public class TestPresenter {
 
     public TestPresenter(TestInteractor testInteractor) {
+        testInteractor.getSomeData().subscribe(this::onSomeDataLoaded);
+    }
 
+    private void onSomeDataLoaded(String data) {
+        System.out.println(data);
     }
 }
