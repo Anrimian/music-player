@@ -46,6 +46,7 @@ dependencies {
     def presentationTestDependencies = rootProject.ext.presentationTestDependencies
 
     compile presentationDependencies.supportLibrary
+    compile presentationDependencies.supportLibraryDesign
     compile presentationDependencies.constraintLayout
     compile presentationDependencies.rxAndroid
     compile presentationDependencies.rxPermissions

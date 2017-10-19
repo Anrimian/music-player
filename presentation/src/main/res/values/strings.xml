@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Simple Music Player</string>
+    <string name="useless_image">Ничего не значащая картинка</string>
+    <string name="try_again">Попробовать снова</string>
+    <string name="can_not_work_without_file_permission">Приложение не может работать без разрешения на доступ к файлам</string>
 </resources>
