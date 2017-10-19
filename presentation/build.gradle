@@ -48,6 +48,10 @@ dependencies {
     compile presentationDependencies.supportLibrary
     compile presentationDependencies.constraintLayout
     compile presentationDependencies.rxAndroid
+    compile presentationDependencies.rxPermissions
+
+    compile presentationDependencies.moxy
+    annotationProcessor presentationDependencies.moxyCompiler
 
     androidTestCompile presentationTestDependencies.espresso
 }
