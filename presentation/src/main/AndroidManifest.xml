@@ -14,8 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:fullBackupContent="false"
+        android:name=".App"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:allowBackup">
+
+        <activity android:name=".utils.acra.AcraReportDialog"/>
 
         <activity android:name=".ui.main.MainActivity">
             <intent-filter>

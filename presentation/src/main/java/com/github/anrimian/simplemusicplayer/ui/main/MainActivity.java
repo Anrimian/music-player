@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.main;
 import android.Manifest;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.anrimian.simplemusicplayer.R;
@@ -17,19 +18,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState == null) {
-            if (hasFilePermissions()) {//TODO maybe some unexpected behavior when user revokes permission
-                goToMainScreen();
-            } else {
-                goToStartScreen();
-            }
+        if (hasFilePermissions()) {//TODO maybe some unexpected behavior when user revokes permission
+            goToMainScreen();
+        } else {
+            goToStartScreen();
         }
     }
 
     private boolean hasFilePermissions() {
         RxPermissions rxPermissions = new RxPermissions(this);
-        return rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                && !rxPermissions.isRevoked(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        return rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     private void goToStartScreen() {
@@ -41,9 +39,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.main_activity_container, fragment)
-                .commit();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment existFragment = fragmentManager.findFragmentById(R.id.main_activity_container);
+        if (existFragment == null || existFragment.getClass() != fragment.getClass()) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_activity_container, fragment)
+                    .commit();
+        }
     }
 }

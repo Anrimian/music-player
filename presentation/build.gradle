@@ -47,9 +47,14 @@ dependencies {
 
     compile presentationDependencies.supportLibrary
     compile presentationDependencies.supportLibraryDesign
+    compile presentationDependencies.cardView
+    compile presentationDependencies.recyclerView
     compile presentationDependencies.constraintLayout
+
     compile presentationDependencies.rxAndroid
     compile presentationDependencies.rxPermissions
+
+    compile presentationDependencies.acra
 
     compile presentationDependencies.moxy
     annotationProcessor presentationDependencies.moxyCompiler
