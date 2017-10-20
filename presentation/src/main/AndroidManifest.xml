@@ -20,7 +20,8 @@
 
         <activity android:name=".utils.acra.AcraReportDialog"/>
 
-        <activity android:name=".ui.main.MainActivity">
+        <activity android:name=".ui.main.MainActivity"
+            android:theme="@style/AppTheme.Drawer">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

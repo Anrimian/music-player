@@ -18,6 +18,7 @@ ext {
     supportLibraryVersion = "26.1.0"
     rxJavaVersion = "2.1.5"
     moxyVersion = "1.5.3"
+    butterKnifeVersion = "8.8.1"
 
     //Testing
     jUnitVersion = '4.12'
@@ -34,6 +35,8 @@ ext {
             moxyCompiler:       "com.arello-mobile:moxy-compiler:$moxyVersion",
             rxPermissions:      "com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar",
             acra:               'ch.acra:acra:4.9.0',
+            butterKnife:        "com.jakewharton:butterknife:$butterKnifeVersion",
+            butterKnifeCompiler: "com.jakewharton:butterknife-compiler:$butterKnifeVersion",
     ]
 
     presentationTestDependencies = [

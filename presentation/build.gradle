@@ -59,5 +59,8 @@ dependencies {
     compile presentationDependencies.moxy
     annotationProcessor presentationDependencies.moxyCompiler
 
+    compile presentationDependencies.butterKnife
+    annotationProcessor presentationDependencies.butterKnifeCompiler
+
     androidTestCompile presentationTestDependencies.espresso
 }
