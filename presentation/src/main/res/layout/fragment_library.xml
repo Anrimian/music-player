@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#00ff00">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-</FrameLayout>
+    <FrameLayout
+        android:id="@+id/map_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#00ff00"
+        android:layout_marginBottom="?attr/actionBarSize"/>
+
+    <FrameLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/windowBackground"
+        app:behavior_peekHeight="?attr/actionBarSize"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+        <include layout="@layout/partial_detailed_music"/>
+
+    </FrameLayout>
+
+</android.support.design.widget.CoordinatorLayout>
