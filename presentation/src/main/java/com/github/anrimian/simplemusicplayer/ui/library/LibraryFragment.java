@@ -1,13 +1,11 @@
 package com.github.anrimian.simplemusicplayer.ui.library;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -27,6 +25,9 @@ public class LibraryFragment extends Fragment {
 
     @BindView(R.id.bottom_sheet)
     FrameLayout bottomSheet;
+
+    @BindView(R.id.appbarlayout)
+    AppBarLayout appBarLayout;
 
     private BottomSheetBehavior<FrameLayout> behavior;
 
@@ -49,6 +50,29 @@ public class LibraryFragment extends Fragment {
         if (savedInstanceState != null) {
             bottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
         }
+
+        float appBarStartY = appBarLayout.getY();
+        /*behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                Log.d("LibraryFragment", "slideOffset: " + slideOffset);
+                if (slideOffset > 0F && slideOffset < 1f) {
+                    int contentHeight = view.getMeasuredHeight() - behavior.getPeekHeight();
+                    int appBarHeight = appBarLayout.getMeasuredHeight();
+                    //int expandedHeight = (int) ((float) contentHeight) * slideOffset;
+                    float appBarY = appBarStartY - (appBarHeight * slideOffset);
+                    Log.d("LibraryFragment", "appBarStartY: " + appBarStartY + ", appBarY: " + appBarY);
+                    appBarLayout.setY(appBarY);
+                    appBarLayout.setAlpha(1 - slideOffset);
+                }
+                //appBarLayout.setY();
+            }
+        });*/
         behavior.setState(bottomSheetState);
     }
 

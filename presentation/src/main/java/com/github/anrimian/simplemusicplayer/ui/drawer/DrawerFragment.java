@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.ui.drawer;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -21,7 +22,9 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
+import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.utils.view_pager.FragmentCreator;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,6 +67,14 @@ public class DrawerFragment extends MvpAppCompatFragment {
         super.onViewCreated(view, savedInstanceState);
         setHasOptionsMenu(true);
         ButterKnife.bind(this, view);
+
+        RxPermissions rxPermissions = new RxPermissions(getActivity());
+        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_activity_container, new StartFragment())
+                    .commit();
+        }
 
         Toolbar toolbar = view.findViewById(R.id.toolbar);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -111,11 +122,6 @@ public class DrawerFragment extends MvpAppCompatFragment {
         } else {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
         }
-
-//        RxPermissions rxPermissions = new RxPermissions(getActivity());
-//        if (BuildConfig.DEBUG && !rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//            throw new RuntimeException("on music screen withour permission");
-//        }
     }
 
     @Override

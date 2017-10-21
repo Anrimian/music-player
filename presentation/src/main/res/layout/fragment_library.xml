@@ -4,11 +4,22 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.github.anrimian.simplemusicplayer.utils.behavior.HidingViewWithBottomSheetBehavior">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"/>
+    </android.support.design.widget.AppBarLayout>
+
     <FrameLayout
-        android:id="@+id/map_fragment_container"
+        android:id="@+id/library_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#00ff00"
         android:layout_marginBottom="?attr/actionBarSize"/>
 
     <FrameLayout
