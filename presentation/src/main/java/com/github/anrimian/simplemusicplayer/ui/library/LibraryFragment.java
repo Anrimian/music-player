@@ -2,15 +2,18 @@ package com.github.anrimian.simplemusicplayer.ui.library;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.ui.player.music_info.MusicInfoFragment;
+import com.github.anrimian.simplemusicplayer.ui.player.play_queue.PlayQueueFragment;
+import com.github.anrimian.simplemusicplayer.utils.view_pager.ViewPagerAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,14 +25,20 @@ import butterknife.ButterKnife;
 public class LibraryFragment extends Fragment {
 
     private static final String BOTTOM_SHEET_STATE = "bottom_sheet_state";
+    private static final String TOOLBAR_Y = "toolbar_y";
+    private static final String TOOLBAR_START_Y = "toolbar_start_y";
 
     @BindView(R.id.bottom_sheet)
-    FrameLayout bottomSheet;
+    CoordinatorLayout bottomSheet;
 
-    @BindView(R.id.appbarlayout)
-    AppBarLayout appBarLayout;
+    @BindView(R.id.view_pager)
+    ViewPager viewPager;
 
-    private BottomSheetBehavior<FrameLayout> behavior;
+    private View toolbar;
+
+    private BottomSheetBehavior<CoordinatorLayout> behavior;
+
+//    private float appBarStartY;
 
     @Nullable
     @Override
@@ -42,17 +51,21 @@ public class LibraryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-
         behavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheet.setClickable(true);//save map from clicks
+
+
+        toolbar = getActivity().findViewById(R.id.toolbar);
 
         int bottomSheetState = BottomSheetBehavior.STATE_COLLAPSED;
         if (savedInstanceState != null) {
             bottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
+            toolbar.setY(savedInstanceState.getFloat(TOOLBAR_Y));
         }
 
-        float appBarStartY = appBarLayout.getY();
-        /*behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+
+        /*appBarStartY = toolbar.getY();
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
 
@@ -63,22 +76,36 @@ public class LibraryFragment extends Fragment {
                 Log.d("LibraryFragment", "slideOffset: " + slideOffset);
                 if (slideOffset > 0F && slideOffset < 1f) {
                     int contentHeight = view.getMeasuredHeight() - behavior.getPeekHeight();
-                    int appBarHeight = appBarLayout.getMeasuredHeight();
+                    int appBarHeight = toolbar.getMeasuredHeight();
                     //int expandedHeight = (int) ((float) contentHeight) * slideOffset;
                     float appBarY = appBarStartY - (appBarHeight * slideOffset);
                     Log.d("LibraryFragment", "appBarStartY: " + appBarStartY + ", appBarY: " + appBarY);
-                    appBarLayout.setY(appBarY);
-                    appBarLayout.setAlpha(1 - slideOffset);
+                    toolbar.setY(appBarY);
+                    toolbar.setAlpha(1 - slideOffset);
                 }
                 //appBarLayout.setY();
             }
         });*/
         behavior.setState(bottomSheetState);
+
+        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
+        pagerAdapter.addFragment(MusicInfoFragment::new);
+        pagerAdapter.addFragment(PlayQueueFragment::new);
+        viewPager.setAdapter(pagerAdapter);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+//        toolbar.setY(appBarStartY);
+//        toolbar.setAlpha(1);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(BOTTOM_SHEET_STATE, behavior.getState());
+//        outState.putFloat(TOOLBAR_Y, toolbar.getY());
+//        outState.putFloat(TOOLBAR_START_Y, appBarStartY);
     }
 }

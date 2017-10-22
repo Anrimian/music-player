@@ -4,25 +4,13 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbarlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior="com.github.anrimian.simplemusicplayer.utils.behavior.HidingViewWithBottomSheetBehavior">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
-    </android.support.design.widget.AppBarLayout>
-
     <FrameLayout
         android:id="@+id/library_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="?attr/actionBarSize"/>
 
-    <FrameLayout
+    <android.support.design.widget.CoordinatorLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -30,8 +18,9 @@
         app:behavior_peekHeight="?attr/actionBarSize"
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
-        <include layout="@layout/partial_detailed_music"/>
+        <include layout="@layout/partial_detailed_music"
+            app:layout_behavior="android.support.design.widget.NestedScrollingBehavior"/>
 
-    </FrameLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
 </android.support.design.widget.CoordinatorLayout>
