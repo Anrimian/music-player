@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
+import com.github.anrimian.simplemusicplayer.ui.library.main.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.utils.view_pager.FragmentCreator;

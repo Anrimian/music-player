@@ -1,5 +1,7 @@
-package com.github.anrimian.simplemusicplayer.ui.library;
+package com.github.anrimian.simplemusicplayer.ui.library.main;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -11,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.ui.drawer.DrawerFragment;
+import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
+import com.github.anrimian.simplemusicplayer.utils.fragments.FragmentCoordinatorDelegate;
 import com.github.anrimian.simplemusicplayer.ui.player.music_info.MusicInfoFragment;
 import com.github.anrimian.simplemusicplayer.ui.player.play_queue.PlayQueueFragment;
 import com.github.anrimian.simplemusicplayer.utils.view_pager.ViewPagerAdapter;
@@ -39,6 +44,15 @@ public class LibraryFragment extends Fragment {
     private BottomSheetBehavior<CoordinatorLayout> behavior;
 
 //    private float appBarStartY;
+
+    private FragmentCoordinatorDelegate coordinatorDelegate;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        coordinatorDelegate = new FragmentCoordinatorDelegate(getActivity(), R.id.drawer_fragment_container);
+        coordinatorDelegate.onAttach();
+    }
 
     @Nullable
     @Override
@@ -92,6 +106,12 @@ public class LibraryFragment extends Fragment {
         pagerAdapter.addFragment(MusicInfoFragment::new);
         pagerAdapter.addFragment(PlayQueueFragment::new);
         viewPager.setAdapter(pagerAdapter);
+
+        getFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
+                .replace(R.id.library_fragment_container, new StorageLibraryFragment())
+                .commit();
     }
 
     @Override
@@ -107,5 +127,11 @@ public class LibraryFragment extends Fragment {
         outState.putInt(BOTTOM_SHEET_STATE, behavior.getState());
 //        outState.putFloat(TOOLBAR_Y, toolbar.getY());
 //        outState.putFloat(TOOLBAR_START_Y, appBarStartY);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        coordinatorDelegate.onDetach();
     }
 }
