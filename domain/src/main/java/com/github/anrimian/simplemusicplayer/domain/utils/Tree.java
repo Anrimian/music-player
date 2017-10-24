@@ -22,7 +22,7 @@ public class Tree<T> implements Visitable<T> {
         }
     }
 
-    Tree child(T data) {
+    public Tree child(T data) {
         for (Tree child: children ) {
             if (child.data.equals(data)) {
                 return child;
