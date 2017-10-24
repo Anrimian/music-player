@@ -1,0 +1,16 @@
+package com.github.anrimian.simplemusicplayer.domain.repositories;
+
+import com.github.anrimian.simplemusicplayer.domain.Composition;
+
+import java.util.List;
+
+import io.reactivex.Single;
+
+/**
+ * Created on 24.10.2017.
+ */
+
+public interface MusicProviderRepository {
+
+    Single<List<Composition>> getAllCompositions();
+}

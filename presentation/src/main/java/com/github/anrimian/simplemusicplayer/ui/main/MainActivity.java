@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.data.TestRepositoryImpl;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.ui.drawer.DrawerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             goToStartScreen();
         }
-        TestRepositoryImpl.parseAllAudio(this);
+        new MusicProviderRepositoryImpl(this).getAllCompositions().subscribe();
     }
 
     private boolean hasFilePermissions() {
