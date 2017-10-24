@@ -25,7 +25,5 @@ dependencies {
     def dataDependencies = rootProject.ext.dataDependencies
     def testDependencies = rootProject.ext.dataTestDependencies
 
-    compile dataDependencies.javaxAnnotation
-
     testCompile testDependencies.junit
 }

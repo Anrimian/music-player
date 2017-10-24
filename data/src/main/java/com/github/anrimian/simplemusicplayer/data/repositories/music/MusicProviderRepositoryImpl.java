@@ -12,6 +12,7 @@ import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRe
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -73,31 +74,34 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                     int titleKeyColumn = cursor.getColumnIndex(Audio.Media.TITLE_KEY);
                     int trackColumn = cursor.getColumnIndex(Audio.Media.TRACK);
                     int yearColumn = cursor.getColumnIndex(Audio.Media.YEAR);
+                    //MediaStore.Audio.Albums.ALBUM_ART
+
 
                     String artist = cursor.getString(artistColumn);
                     String title = cursor.getString(titleColumn);
                     String album = cursor.getString(albumColumn);
                     String filePath = cursor.getString(filePathColumn);
-
-                    long albumId = cursor.getLong(albumIdColumn);
                     String albumKey = cursor.getString(albumKeyColumn);
+                    String composer = cursor.getString(composerColumn);
+                    String displayName = cursor.getString(displayNameColumn);
+                    String mimeType = cursor.getString(mimeTypeColumn);
+
+                    long duration = cursor.getLong(durationColumn);
+                    long size = cursor.getLong(sizeColumn);
+                    long id = cursor.getLong(idColumn);
                     long artistId = cursor.getLong(artistIdColumn);
                     long bookmark = cursor.getLong(bookmarkColumn);
-                    String composer = cursor.getString(composerColumn);
+                    long albumId = cursor.getLong(albumIdColumn);
                     long dateAdded = cursor.getLong(dateAddedColumn);
                     long dateModified = cursor.getLong(dateModifiedColumn);
-                    String displayName = cursor.getString(displayNameColumn);
+
                     boolean isAlarm = cursor.getInt(isAlarmColumn) == 1;
                     boolean isMusic = cursor.getInt(isMusicColumn) == 1;
                     boolean isNotification = cursor.getInt(isNotificationColumn) == 1;
                     boolean isPodcast = cursor.getInt(isPodcastColumn) == 1;
                     boolean isRingtone = cursor.getInt(isRingtoneColumn) == 1;
-                    String mimeType = cursor.getString(mimeTypeColumn);
-                    @Nullable int year = cursor.getInt(yearColumn);
 
-                    long duration = cursor.getLong(durationColumn);
-                    long size = cursor.getLong(sizeColumn);
-                    long id = cursor.getLong(idColumn);
+                    @Nullable Integer year = cursor.getInt(yearColumn);
 
                     Log.d("MusicProviderRepository", "new composition----------");
                     Log.d("MusicProviderRepository", "artist: " + artist);
@@ -130,6 +134,26 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
                     Composition composition = new Composition();
                     //composition
+                    composition.setArtist(artist);
+                    composition.setTitle(title);
+                    composition.setAlbum(album);
+                    composition.setFilePath(filePath);
+                    composition.setComposer(composer);
+                    composition.setDisplayName(displayName);
+
+                    composition.setDuration(duration);
+                    composition.setSize(size);
+                    composition.setId(id);
+                    composition.setDateAdded(new Date(dateAdded * 1000L));
+                    composition.setDateModified(new Date(dateModified * 1000L));
+
+                    composition.setAlarm(isAlarm);
+                    composition.setMusic(isMusic);
+                    composition.setNotification(isNotification);
+                    composition.setPodcast(isPodcast);
+                    composition.setRingtone(isRingtone);
+
+                    composition.setYear(year);
                     compositions.add(composition);
                 }
                 Log.d("MusicProviderRepository", "compositions:" + compositions.size());

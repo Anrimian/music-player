@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             goToStartScreen();
         }
-        new MusicProviderRepositoryImpl(this).getAllCompositions().subscribe();
+        new MusicProviderRepositoryImpl(this).getAllCompositions().subscribe(compositions -> compositions.forEach(System.out::println));
     }
 
     private boolean hasFilePermissions() {
