@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.domain;
+package com.github.anrimian.simplemusicplayer.domain.models;
 
 import java.util.Date;
 

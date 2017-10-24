@@ -2,12 +2,11 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.music.exceptions.MusicNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
-import com.github.anrimian.simplemusicplayer.domain.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 

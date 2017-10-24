@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.repositories;
 
-import com.github.anrimian.simplemusicplayer.domain.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 
 import java.util.List;
 
