@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.data.TestRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
+import com.github.anrimian.simplemusicplayer.domain.business.music.MusicProviderInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.music.MusicProviderInteractorImpl;
+import com.github.anrimian.simplemusicplayer.domain.utils.PrintIndentedVisitor;
 import com.github.anrimian.simplemusicplayer.ui.drawer.DrawerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -20,12 +23,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (hasFilePermissions()) {//TODO maybe some unexpected behavior when user revokes permission
+        if (hasFilePermissions()) {
             goToMainScreen();
         } else {
             goToStartScreen();
         }
-        new MusicProviderRepositoryImpl(this).getAllCompositions().subscribe(compositions -> compositions.forEach(System.out::println));
+        new MusicProviderInteractorImpl(new MusicProviderRepositoryImpl(this))
+                .getAllMusicInPath(null)
+                .subscribe(musicFileTree -> {
+                    musicFileTree.accept(new PrintIndentedVisitor(0));
+//                    compositions.forEach(System.out::println)
+                });
     }
 
     private boolean hasFilePermissions() {

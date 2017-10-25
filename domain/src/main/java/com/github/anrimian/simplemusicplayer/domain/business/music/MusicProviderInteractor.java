@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.business.music;
 
 import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.utils.FileTree;
 
 import javax.annotation.Nullable;
 
@@ -12,5 +13,5 @@ import io.reactivex.Single;
 
 public interface MusicProviderInteractor {
 
-    Single<MusicFileSource> getAllMusicInPath(@Nullable String path);
+    Single<FileTree<MusicFileSource>> getAllMusicInPath(@Nullable String path);
 }

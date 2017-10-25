@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.models;
 
+import javax.annotation.Nullable;
+
 /**
  * Created on 24.10.2017.
  */
@@ -7,7 +9,9 @@ package com.github.anrimian.simplemusicplayer.domain.models;
 public class MusicFileSource {
 
     private String path;
-    private String composition;
+
+    @Nullable
+    private Composition composition;
 
     public String getPath() {
         return path;
@@ -17,11 +21,12 @@ public class MusicFileSource {
         this.path = path;
     }
 
-    public String getComposition() {
+    @Nullable
+    public Composition getComposition() {
         return composition;
     }
 
-    public void setComposition(String composition) {
+    public void setComposition(@Nullable Composition composition) {
         this.composition = composition;
     }
 }

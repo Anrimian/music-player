@@ -5,7 +5,7 @@ package com.github.anrimian.simplemusicplayer.domain.utils;
  */
 
 public interface Visitor<T> {
-    Visitor<T> visitTree(Tree<T> tree);
+    Visitor<T> visitTree(FileTree<T> tree);
 
-    void visitData(Tree<T> parent, T data);
+    void visitData(FileTree<T> parent, T data);
 }
