@@ -1,13 +1,17 @@
 package com.github.anrimian.simplemusicplayer.domain.utils;
 
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
+
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
 public class FileTree<T> implements Visitable<T> {
 
-    private final Set<FileTree> children = new LinkedHashSet<>();
+    private final LinkedList<FileTree<T>> children = new LinkedList<>();
     private T data;
     private final String path;
 
@@ -25,6 +29,14 @@ public class FileTree<T> implements Visitable<T> {
 
     public String getPath() {
         return path;
+    }
+
+    public int getChildCount() {
+        return children.size();
+    }
+
+    public FileTree<T> getFirstChild() {
+        return children.getFirst();
     }
 
     @SuppressWarnings("unchecked")
@@ -60,5 +72,10 @@ public class FileTree<T> implements Visitable<T> {
         return child;
     }
 
-
+    @Override
+    public String toString() {
+        return "FileTree{" +
+                "\n path='" + path + '\'' +
+                '}';
+    }
 }

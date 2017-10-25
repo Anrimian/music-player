@@ -16,7 +16,7 @@ import io.reactivex.Single;
 public class MusicProviderInteractorImpl implements MusicProviderInteractor {
 
     @Nullable
-    private FileTree<MusicFileSource> musicFileThree;
+    private FileTree<MusicFileSource> musicFileTree;
 
     private MusicProviderRepository musicProviderRepository;
 
@@ -30,25 +30,34 @@ public class MusicProviderInteractorImpl implements MusicProviderInteractor {
     }
 
     private Single<FileTree<MusicFileSource>> getMusicFileTree() {
-        if (musicFileThree == null) {
+        if (musicFileTree == null) {
             return createMusicFileTree();
         } else {
-            return Single.just(musicFileThree);
+            return Single.just(musicFileTree);
         }
     }
 
     private Single<FileTree<MusicFileSource>> createMusicFileTree() {
         return musicProviderRepository.getAllCompositions()
                 .map(compositions -> {
-                    musicFileThree = new FileTree<>(null);
+                    musicFileTree = new FileTree<>(null);
 
                     for (Composition composition: compositions) {
                         String filePath = composition.getFilePath();
                         MusicFileSource musicFileSource = new MusicFileSource();
                         musicFileSource.setComposition(composition);
-                        musicFileThree.addFile(musicFileSource, filePath);
+                        musicFileTree.addFile(musicFileSource, filePath);
                     }
-                    return musicFileThree;
-                });
+                    return musicFileTree;
+                })
+                .map(this::removeUnusedRootComponents);
+    }
+
+    private FileTree<MusicFileSource> removeUnusedRootComponents(FileTree<MusicFileSource> tree) {
+        FileTree<MusicFileSource> root = tree;
+        while (root.getData() == null && root.getChildCount() <= 1) {
+            root = root.getFirstChild();
+        }
+        return root;
     }
 }

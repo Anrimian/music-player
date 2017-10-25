@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(musicFileTree -> {
                     musicFileTree.accept(new PrintIndentedVisitor(0));
 //                    compositions.forEach(System.out::println)
-                });
+                }, Throwable::printStackTrace);
     }
 
     private boolean hasFilePermissions() {
