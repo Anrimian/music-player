@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.domain.business.music;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.FileTree;
 
@@ -26,7 +27,16 @@ public class MusicProviderInteractorImpl implements MusicProviderInteractor {
 
     @Override
     public Single<FileTree<MusicFileSource>> getAllMusicInPath(@Nullable String path) {
-        return getMusicFileTree();
+        return getMusicFileTree()
+                .map(tree -> findNodeByPath(tree, path));
+    }
+
+    private FileTree<MusicFileSource> findNodeByPath(FileTree<MusicFileSource> tree, @Nullable String path) {
+        FileTree<MusicFileSource> result = tree.findNodeByPath(path);
+        if (result == null) {
+            throw new FileNodeNotFoundException();
+        }
+        return result;
     }
 
     private Single<FileTree<MusicFileSource>> getMusicFileTree() {
