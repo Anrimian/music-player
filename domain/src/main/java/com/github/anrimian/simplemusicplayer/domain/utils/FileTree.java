@@ -1,11 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.utils;
 
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
-
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -57,17 +52,38 @@ public class FileTree<T> implements Visitable<T> {
         target.setData(data);
     }
 
-    @SuppressWarnings("unchecked")
-    private FileTree<T> findNodeToInsert(String partialPath, FileTree<T> target) {
-        for (FileTree child: target.children ) {
+    @Nullable
+    public FileTree<T> findNodeByPath(String fullPath) {
+        FileTree<T> target = this;
+        for (String partialPath: fullPath.split("/")) {
+            FileTree<T> result = findNode(partialPath, target);
+            if (result == null) {
+                return null;
+            }
+        }
+        return target;
+    }
+
+//    @SuppressWarnings("unchecked")
+    @Nullable
+    private FileTree<T> findNode(String partialPath, FileTree<T> target) {
+        for (FileTree<T> child: target.children ) {
             if (child.path.equals(partialPath)) {
                 return child;
             }
         }
-        return target.addChild(new FileTree<>(partialPath));
+        return null;
     }
 
-    private FileTree addChild(FileTree<T> child) {
+    private FileTree<T> findNodeToInsert(String partialPath, FileTree<T> target) {
+        FileTree<T> child = findNode(partialPath, target);
+        if (child == null) {
+            return target.addChild(new FileTree<>(partialPath));
+        }
+        return child;
+    }
+
+    private FileTree<T> addChild(FileTree<T> child) {
         children.add(child);
         return child;
     }
