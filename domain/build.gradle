@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'me.tatarka.retrolambda'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = 1.8
