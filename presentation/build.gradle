@@ -38,28 +38,28 @@ android {
 
 
 dependencies {
-    compile project(':domain')
-    compile project(':data')
+    implementation project(':domain')
+    implementation project(':data')
 
     def presentationDependencies = rootProject.ext.presentationDependencies
     def presentationTestDependencies = rootProject.ext.presentationTestDependencies
 
-    compile presentationDependencies.supportLibrary
-    compile presentationDependencies.supportLibraryDesign
-    compile presentationDependencies.cardView
-    compile presentationDependencies.recyclerView
-    compile presentationDependencies.constraintLayout
+    implementation presentationDependencies.supportLibrary
+    implementation presentationDependencies.supportLibraryDesign
+    implementation presentationDependencies.cardView
+    implementation presentationDependencies.recyclerView
+    implementation presentationDependencies.constraintLayout
 
-    compile presentationDependencies.rxAndroid
-    compile presentationDependencies.rxPermissions
+    implementation presentationDependencies.rxAndroid
+    implementation presentationDependencies.rxPermissions
 
-    compile presentationDependencies.acra
+    implementation presentationDependencies.acra
 
-    compile presentationDependencies.moxy
+    implementation presentationDependencies.moxy
     annotationProcessor presentationDependencies.moxyCompiler
 
-    compile presentationDependencies.butterKnife
+    implementation presentationDependencies.butterKnife
     annotationProcessor presentationDependencies.butterKnifeCompiler
 
-    androidTestCompile presentationTestDependencies.espresso
+    androidTestImplementation presentationTestDependencies.espresso
 }

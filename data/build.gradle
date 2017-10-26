@@ -19,10 +19,13 @@ android {
 }
 
 dependencies {
-    compile project(':domain')
+    implementation project(':domain')
 
     def dataDependencies = rootProject.ext.dataDependencies
     def testDependencies = rootProject.ext.dataTestDependencies
 
-    testCompile testDependencies.junit
+    implementation dataDependencies.rxJava
+    implementation dataDependencies.javaxAnnotation
+
+    testImplementation testDependencies.junit
 }

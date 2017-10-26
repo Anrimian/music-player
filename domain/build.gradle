@@ -9,9 +9,9 @@ dependencies {
     def domainDependencies = rootProject.ext.domainDependencies
     def domainTestDependencies = rootProject.ext.domainTestDependencies
 
-    compile domainDependencies.rxJava
-    compile domainDependencies.javaxAnnotation
+    implementation domainDependencies.rxJava
+    implementation domainDependencies.javaxAnnotation
 
-    testCompile domainTestDependencies.junit
+    testImplementation domainTestDependencies.junit
 }
 
