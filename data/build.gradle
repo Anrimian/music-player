@@ -25,7 +25,7 @@ dependencies {
     def testDependencies = rootProject.ext.dataTestDependencies
 
     implementation dataDependencies.rxJava
-    implementation dataDependencies.javaxAnnotation
+    compileOnly dataDependencies.javaxAnnotation
 
     testImplementation testDependencies.junit
 }
