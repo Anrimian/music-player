@@ -1,10 +1,9 @@
 package com.github.anrimian.simplemusicplayer.domain.business.music;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
-import com.github.anrimian.simplemusicplayer.domain.utils.FileTree;
+import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 
 import javax.annotation.Nullable;
 
@@ -17,7 +16,7 @@ import io.reactivex.Single;
 public class MusicProviderInteractorImpl implements MusicProviderInteractor {
 
     @Nullable
-    private FileTree<MusicFileSource> musicFileTree;
+    private FileTree<Composition> musicFileTree;
 
     private MusicProviderRepository musicProviderRepository;
 
@@ -26,20 +25,23 @@ public class MusicProviderInteractorImpl implements MusicProviderInteractor {
     }
 
     @Override
-    public Single<FileTree<MusicFileSource>> getAllMusicInPath(@Nullable String path) {
+    public Single<FileTree<Composition>> getAllMusicInPath(@Nullable String path) {
         return getMusicFileTree()
                 .map(tree -> findNodeByPath(tree, path));
     }
 
-    private FileTree<MusicFileSource> findNodeByPath(FileTree<MusicFileSource> tree, @Nullable String path) {
-        FileTree<MusicFileSource> result = tree.findNodeByPath(path);
+    private FileTree<Composition> findNodeByPath(FileTree<Composition> tree, @Nullable String path) {
+        if (path == null) {
+            return tree;
+        }
+        FileTree<Composition> result = tree.findNodeByPath(path);
         if (result == null) {
             throw new FileNodeNotFoundException();
         }
         return result;
     }
 
-    private Single<FileTree<MusicFileSource>> getMusicFileTree() {
+    private Single<FileTree<Composition>> getMusicFileTree() {
         if (musicFileTree == null) {
             return createMusicFileTree();
         } else {
@@ -47,24 +49,22 @@ public class MusicProviderInteractorImpl implements MusicProviderInteractor {
         }
     }
 
-    private Single<FileTree<MusicFileSource>> createMusicFileTree() {
+    private Single<FileTree<Composition>> createMusicFileTree() {
         return musicProviderRepository.getAllCompositions()
                 .map(compositions -> {
                     musicFileTree = new FileTree<>(null);
 
                     for (Composition composition: compositions) {
                         String filePath = composition.getFilePath();
-                        MusicFileSource musicFileSource = new MusicFileSource();
-                        musicFileSource.setComposition(composition);
-                        musicFileTree.addFile(musicFileSource, filePath);
+                        musicFileTree.addFile(composition, filePath);
                     }
                     return musicFileTree;
                 })
                 .map(this::removeUnusedRootComponents);
     }
 
-    private FileTree<MusicFileSource> removeUnusedRootComponents(FileTree<MusicFileSource> tree) {
-        FileTree<MusicFileSource> root = tree;
+    private FileTree<Composition> removeUnusedRootComponents(FileTree<Composition> tree) {
+        FileTree<Composition> root = tree;
         while (root.getData() == null && root.getChildCount() <= 1) {
             root = root.getFirstChild();
         }

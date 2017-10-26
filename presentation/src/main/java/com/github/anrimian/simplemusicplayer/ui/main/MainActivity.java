@@ -7,11 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.data.TestRepositoryImpl;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
-import com.github.anrimian.simplemusicplayer.domain.business.music.MusicProviderInteractor;
-import com.github.anrimian.simplemusicplayer.domain.business.music.MusicProviderInteractorImpl;
-import com.github.anrimian.simplemusicplayer.domain.utils.PrintIndentedVisitor;
 import com.github.anrimian.simplemusicplayer.ui.drawer.DrawerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -28,12 +23,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             goToStartScreen();
         }
-        new MusicProviderInteractorImpl(new MusicProviderRepositoryImpl(this))
-                .getAllMusicInPath(null)
-                .subscribe(musicFileTree -> {
-                    musicFileTree.accept(new PrintIndentedVisitor(0));
-//                    compositions.forEach(System.out::println)
-                }, Throwable::printStackTrace);
     }
 
     private boolean hasFilePermissions() {

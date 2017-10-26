@@ -1,7 +1,10 @@
-package com.github.anrimian.simplemusicplayer.domain.utils;
+package com.github.anrimian.simplemusicplayer.domain.utils.tree;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class FileTree<T> implements Visitable<T> {
@@ -34,6 +37,14 @@ public class FileTree<T> implements Visitable<T> {
         return children.getFirst();
     }
 
+    public List<T> getDirectDataList() {
+        List<T> dataList = new ArrayList<>();
+        for (FileTree<T> tree : children) {
+            dataList.add(tree.getData());
+        }
+        return dataList;
+    }
+
     @SuppressWarnings("unchecked")
     public void accept(Visitor<T> visitor) {
         visitor.visitData(this, data);
@@ -53,11 +64,14 @@ public class FileTree<T> implements Visitable<T> {
     }
 
     @Nullable
-    public FileTree<T> findNodeByPath(String fullPath) {
+    public FileTree<T> findNodeByPath(@Nonnull String fullPath) {
         FileTree<T> target = this;
         for (String partialPath: fullPath.split("/")) {
-            FileTree<T> result = findNode(partialPath, target);
-            if (result == null) {
+            if (partialPath.equals(target.path)) {
+                return target;
+            }
+            target = findNode(partialPath, target);
+            if (target == null) {
                 return null;
             }
         }
@@ -91,7 +105,8 @@ public class FileTree<T> implements Visitable<T> {
     @Override
     public String toString() {
         return "FileTree{" +
-                "\n path='" + path + '\'' +
+                "children=" + children +
+                ", path='" + path + '\'' +
                 '}';
     }
 }
