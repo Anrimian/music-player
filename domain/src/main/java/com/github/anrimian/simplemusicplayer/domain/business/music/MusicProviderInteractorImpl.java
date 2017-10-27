@@ -59,15 +59,6 @@ public class MusicProviderInteractorImpl implements MusicProviderInteractor {
                         musicFileTree.addFile(composition, filePath);
                     }
                     return musicFileTree;
-                })
-                .map(this::removeUnusedRootComponents);
-    }
-
-    private FileTree<Composition> removeUnusedRootComponents(FileTree<Composition> tree) {
-        FileTree<Composition> root = tree;
-        while (root.getData() == null && root.getChildCount() <= 1) {
-            root = root.getFirstChild();
-        }
-        return root;
+                });
     }
 }

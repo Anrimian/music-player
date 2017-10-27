@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.business.music;
 
+import com.github.anrimian.simplemusicplayer.domain.business.music.utils.FakeMusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
@@ -60,19 +61,13 @@ public class MusicProviderInteractorTest {
 
     @Test
     public void testPathTreeFilter() {
-        List<Composition> collection = getListFromTree("old");
-        assertEquals(2, collection.size());
-    }
-
-    @Test
-    public void testFullPathTreeFilter() {
         List<Composition> collection = getListFromTree("root/music/old");
         assertEquals(2, collection.size());
     }
 
     @Test
     public void testLastItemTreeFilter() {
-        List<Composition> collection = getListFromTree("four");
+        List<Composition> collection = getListFromTree("root/music/old/to delete");
         assertEquals(1, collection.size());
         assertThat(collection.get(0).getFilePath(), containsString("four"));
     }
@@ -81,7 +76,7 @@ public class MusicProviderInteractorTest {
     public void testItemNotFoundTreeFilter() {
         TestObserver<FileTree<Composition>> subscriber = new TestObserver<>();
 
-        musicProviderInteractor.getAllMusicInPath("unknown")
+        musicProviderInteractor.getAllMusicInPath("root/music/unknown")
                 .subscribe(subscriber);
 
         //noinspection unchecked

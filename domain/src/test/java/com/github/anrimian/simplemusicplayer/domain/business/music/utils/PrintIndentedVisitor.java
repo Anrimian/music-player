@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.domain.business.music;
+package com.github.anrimian.simplemusicplayer.domain.business.music.utils;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;

@@ -67,10 +67,7 @@ public class FileTree<T> implements Visitable<T> {
     public FileTree<T> findNodeByPath(@Nonnull String fullPath) {
         FileTree<T> target = this;
         for (String partialPath: fullPath.split("/")) {
-            if (partialPath.equals(target.path)) {
-                return target;
-            }
-            target = findNode(partialPath, target);
+            target = findChildNode(partialPath, target);
             if (target == null) {
                 return null;
             }
@@ -80,7 +77,7 @@ public class FileTree<T> implements Visitable<T> {
 
 //    @SuppressWarnings("unchecked")
     @Nullable
-    private FileTree<T> findNode(String partialPath, FileTree<T> target) {
+    private FileTree<T> findChildNode(String partialPath, FileTree<T> target) {
         for (FileTree<T> child: target.children ) {
             if (child.path.equals(partialPath)) {
                 return child;
@@ -90,7 +87,7 @@ public class FileTree<T> implements Visitable<T> {
     }
 
     private FileTree<T> findNodeToInsert(String partialPath, FileTree<T> target) {
-        FileTree<T> child = findNode(partialPath, target);
+        FileTree<T> child = findChildNode(partialPath, target);
         if (child == null) {
             return target.addChild(new FileTree<>(partialPath));
         }
