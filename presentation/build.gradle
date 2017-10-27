@@ -61,5 +61,8 @@ dependencies {
     implementation presentationDependencies.butterKnife
     annotationProcessor presentationDependencies.butterKnifeCompiler
 
+    implementation presentationDependencies.dagger
+    annotationProcessor presentationDependencies.daggerCompiler
+
     androidTestImplementation presentationTestDependencies.espresso
 }

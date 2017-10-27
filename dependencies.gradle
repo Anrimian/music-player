@@ -19,6 +19,7 @@ ext {
     rxJavaVersion = "2.1.5"
     moxyVersion = "1.5.3"
     butterKnifeVersion = "8.8.1"
+    daggerVersion = "2.12"
 
     //Testing
     jUnitVersion = '4.12'
@@ -37,6 +38,8 @@ ext {
             acra:               'ch.acra:acra:4.9.0',
             butterKnife:        "com.jakewharton:butterknife:$butterKnifeVersion",
             butterKnifeCompiler: "com.jakewharton:butterknife-compiler:$butterKnifeVersion",
+            dagger:              "com.google.dagger:dagger:$daggerVersion",
+            daggerCompiler:      "com.google.dagger:dagger-compiler:$daggerVersion",
     ]
 
     presentationTestDependencies = [
