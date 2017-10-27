@@ -1,8 +1,6 @@
-package com.github.anrimian.simplemusicplayer.di.app.components;
+package com.github.anrimian.simplemusicplayer.di.app;
 
 
-
-import com.github.anrimian.simplemusicplayer.di.app.modules.AppModule;
 
 import javax.inject.Singleton;
 

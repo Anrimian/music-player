@@ -3,9 +3,9 @@ package com.github.anrimian.simplemusicplayer.di;
 
 import android.content.Context;
 
-import com.github.anrimian.simplemusicplayer.di.app.components.AppComponent;
+import com.github.anrimian.simplemusicplayer.di.app.AppComponent;
 import com.github.anrimian.simplemusicplayer.di.app.components.DaggerAppComponent;
-import com.github.anrimian.simplemusicplayer.di.app.modules.AppModule;
+import com.github.anrimian.simplemusicplayer.di.app.AppModule;
 
 
 /**

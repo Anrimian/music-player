@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.di.app.modules;
+package com.github.anrimian.simplemusicplayer.di.app;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
