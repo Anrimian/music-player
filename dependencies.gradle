@@ -23,7 +23,7 @@ ext {
 
     //Testing
     jUnitVersion = '4.12'
-    espressoVersion = '2.0'
+    espressoVersion = '3.0.1'
 
     presentationDependencies = [
             supportLibrary:     "com.android.support:appcompat-v7:$supportLibraryVersion",
@@ -62,6 +62,8 @@ ext {
 
     dataTestDependencies = [
             junit:              "junit:junit:${jUnitVersion}",
+            espresso:           "com.android.support.test.espresso:espresso-core:${espressoVersion}",
+            supportTest:        "com.android.support.test:runner:1.0.1"
     ]
 
 }
