@@ -6,6 +6,8 @@ import android.content.Context;
 import com.github.anrimian.simplemusicplayer.di.app.AppComponent;
 import com.github.anrimian.simplemusicplayer.di.app.AppModule;
 import com.github.anrimian.simplemusicplayer.di.app.DaggerAppComponent;
+import com.github.anrimian.simplemusicplayer.di.library.LibraryComponent;
+import com.github.anrimian.simplemusicplayer.di.library.LibraryModule;
 
 
 /**
@@ -17,6 +19,7 @@ public class Components {
     private static Components instance;
 
     private AppComponent appComponent;
+    private LibraryComponent libraryComponent;
 
     public static void init(Context appContext) {
         instance = new Components(appContext);
@@ -35,6 +38,17 @@ public class Components {
 
     public static AppComponent getAppComponent() {
         return getInstance().appComponent;
+    }
+
+    public static LibraryComponent getLibraryComponent() {
+        return getInstance().buildLibraryComponent();
+    }
+
+    private LibraryComponent buildLibraryComponent() {
+        if (libraryComponent == null) {
+            libraryComponent = getAppComponent().libraryComponent(new LibraryModule());
+        }
+        return libraryComponent;
     }
 
     private AppComponent buildAppComponent(Context appContext) {

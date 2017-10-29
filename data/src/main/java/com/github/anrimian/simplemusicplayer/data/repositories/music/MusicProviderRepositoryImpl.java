@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
 import static android.provider.MediaStore.*;
@@ -27,14 +28,16 @@ import static android.provider.MediaStore.*;
 public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     private Context context;
+    private Scheduler scheduler;
 
-    public MusicProviderRepositoryImpl(Context context) {
+    public MusicProviderRepositoryImpl(Context context, Scheduler scheduler) {
         this.context = context;
+        this.scheduler = scheduler;
     }
 
     @Override
     public Single<List<Composition>> getAllCompositions() {
-        return Single.create(emitter -> {
+        return Single.<List<Composition>>create(emitter -> {
             Cursor cursor = null;
             try {
                 cursor = context.getContentResolver().query(
@@ -160,6 +163,6 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
             } finally {
                 IOUtils.closeSilently(cursor);
             }
-        });
+        }).subscribeOn(scheduler);
     }
 }

@@ -8,4 +8,7 @@
     <string name="close">Закрыть</string>
     <string name="library">Библиотека</string>
     <string name="settings">Настройки</string>
+    <string name="internal_app_error">Внутренняя ошибка приложения</string>
+    <string name="unexpected_error">Необработанная ошибка</string>
+    <string name="file_not_found">Файл не найден</string>
 </resources>

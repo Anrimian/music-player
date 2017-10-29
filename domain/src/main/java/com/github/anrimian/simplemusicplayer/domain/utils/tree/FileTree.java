@@ -1,8 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.utils.tree;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,12 +35,12 @@ public class FileTree<T> implements Visitable<T> {
         return children.getFirst();
     }
 
-    public List<T> getDirectDataList() {
-        List<T> dataList = new ArrayList<>();
-        for (FileTree<T> tree : children) {
-            dataList.add(tree.getData());
-        }
-        return dataList;
+    public LinkedList<FileTree<T>> getChildren() {
+        return children;
+    }
+
+    public boolean isEmpty() {
+        return children.isEmpty();
     }
 
     @SuppressWarnings("unchecked")

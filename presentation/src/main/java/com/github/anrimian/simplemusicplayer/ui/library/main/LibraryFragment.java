@@ -1,6 +1,5 @@
 package com.github.anrimian.simplemusicplayer.ui.library.main;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,9 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.ui.drawer.DrawerFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
-import com.github.anrimian.simplemusicplayer.utils.fragments.FragmentCoordinatorDelegate;
 import com.github.anrimian.simplemusicplayer.ui.player.music_info.MusicInfoFragment;
 import com.github.anrimian.simplemusicplayer.ui.player.play_queue.PlayQueueFragment;
 import com.github.anrimian.simplemusicplayer.utils.view_pager.ViewPagerAdapter;
@@ -45,13 +42,13 @@ public class LibraryFragment extends Fragment {
 
 //    private float appBarStartY;
 
-    private FragmentCoordinatorDelegate coordinatorDelegate;
+//    private FragmentCoordinatorDelegate coordinatorDelegate;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        coordinatorDelegate = new FragmentCoordinatorDelegate(getActivity(), R.id.drawer_fragment_container);
-        coordinatorDelegate.onAttach();
+//        coordinatorDelegate = new FragmentCoordinatorDelegate(getActivity(), R.id.drawer_fragment_container);
+//        coordinatorDelegate.onAttach();
     }
 
     @Nullable
@@ -132,6 +129,6 @@ public class LibraryFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        coordinatorDelegate.onDetach();
+//        coordinatorDelegate.onDetach();
     }
 }

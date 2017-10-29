@@ -64,5 +64,8 @@ dependencies {
     implementation presentationDependencies.dagger
     annotationProcessor presentationDependencies.daggerCompiler
 
+    compileOnly presentationDependencies.javaxAnnotation
+
+    testImplementation presentationTestDependencies.junit
     androidTestImplementation presentationTestDependencies.espresso
 }

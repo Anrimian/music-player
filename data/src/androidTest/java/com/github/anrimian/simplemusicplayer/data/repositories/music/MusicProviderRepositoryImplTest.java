@@ -19,6 +19,8 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created on 28.10.2017.
  */
@@ -33,7 +35,7 @@ public class MusicProviderRepositoryImplTest {
     @Before
     public void before() {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        musicProviderRepository = new MusicProviderRepositoryImpl(appContext);
+        musicProviderRepository = new MusicProviderRepositoryImpl(appContext, Schedulers.io());
     }
 
     @Test
