@@ -39,7 +39,8 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     @Override
     public Single<List<MusicFileSource>> getMusicInPath(@Nullable String path) {
         return getAllMusicInPath(path)
-                .map(this::getFilesOnTop);
+                .map(this::getFilesOnTop)
+                .map(this::applyOrder);
     }
 
     @Override
@@ -50,6 +51,20 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     private Single<FileTree<Composition>> getAllMusicInPath(@Nullable String path) {
         return getMusicFileTree()
                 .map(tree -> findNodeByPath(tree, path));
+    }
+
+    private List<MusicFileSource> applyOrder(List<MusicFileSource> musicFileSources) {
+        List<MusicFileSource> sortedList = new ArrayList<>();
+        List<MusicFileSource> musicList = new ArrayList<>();
+        for (MusicFileSource musicFileSource: musicFileSources) {
+            if (musicFileSource.getComposition() == null) {
+                sortedList.add(musicFileSource);
+            } else {
+                musicList.add(musicFileSource);
+            }
+        }
+        sortedList.addAll(musicList);
+        return sortedList;
     }
 
     private List<Composition> toList(FileTree<Composition> compositionFileTree) {

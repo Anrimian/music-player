@@ -60,14 +60,15 @@ public class StorageLibraryInteractorTest {
     public void testFullTreeRootFilter() {
         List<MusicFileSource> collection = getListMusicListInPath(null);
         assertEquals(3, collection.size());
-        assertEquals("one", collection.get(0).getPath());
-        assertEquals("root/music/one", collection.get(0).getComposition().getFilePath());
+        MusicFileSource old = collection.get(0);
+        assertEquals("old", old.getPath());
 
-        String path = collection.get(2).getPath();
+        String path = old.getPath();
         List<MusicFileSource> oldCollection = getListMusicListInPath(path);
-        assertEquals("three", oldCollection.get(0).getPath());
+        MusicFileSource toDelete = oldCollection.get(0);
+        assertEquals("to delete", toDelete.getPath());
 
-        path += "/" + oldCollection.get(1).getPath();
+        path += "/" + toDelete.getPath();
         List<MusicFileSource> toDeleteCollection = getListMusicListInPath(path);
         assertEquals("four", toDeleteCollection.get(0).getPath());
         assertEquals("root/music/old/to delete/four", toDeleteCollection.get(0).getComposition().getFilePath());
@@ -78,8 +79,8 @@ public class StorageLibraryInteractorTest {
         List<MusicFileSource> collection = getListMusicListInPath("old");
         testCorrectCollection(collection);
         assertEquals(2, collection.size());
-        assertNotNull(collection.get(0).getComposition());
-        assertNull(collection.get(1).getComposition());
+        assertNotNull(collection.get(1).getComposition());
+        assertNull(collection.get(0).getComposition());
     }
 
     @Test
