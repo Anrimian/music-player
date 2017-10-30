@@ -3,7 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
-import com.github.anrimian.simplemusicplayer.ui.library.storage.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.moxy.SingleStateByTagStrategy;
 

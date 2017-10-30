@@ -10,7 +10,7 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.ui.library.storage.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 
 import java.util.List;

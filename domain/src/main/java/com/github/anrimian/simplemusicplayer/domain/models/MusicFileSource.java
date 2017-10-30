@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.library.storage.models;
+package com.github.anrimian.simplemusicplayer.domain.models;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 

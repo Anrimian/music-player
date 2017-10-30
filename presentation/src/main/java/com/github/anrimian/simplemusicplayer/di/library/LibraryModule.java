@@ -3,8 +3,8 @@ package com.github.anrimian.simplemusicplayer.di.library;
 import android.content.Context;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
-import com.github.anrimian.simplemusicplayer.domain.business.music.MusicProviderInteractor;
-import com.github.anrimian.simplemusicplayer.domain.business.music.MusicProviderInteractorImpl;
+import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractorImpl;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 import javax.annotation.Nonnull;
@@ -32,7 +32,7 @@ public class LibraryModule {
     @Provides
     @Nonnull
     @LibraryScope
-    MusicProviderInteractor provideMusicProviderInteractor(MusicProviderRepository musicProviderRepository) {
-        return new MusicProviderInteractorImpl(musicProviderRepository);
+    StorageLibraryInteractor provideMusicProviderInteractor(MusicProviderRepository musicProviderRepository) {
+        return new StorageLibraryInteractorImpl(musicProviderRepository);
     }
 }

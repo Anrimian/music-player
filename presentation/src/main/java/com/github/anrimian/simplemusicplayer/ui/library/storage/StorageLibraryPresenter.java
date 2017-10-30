@@ -3,10 +3,10 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.di.Components;
-import com.github.anrimian.simplemusicplayer.domain.business.music.MusicProviderInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
-import com.github.anrimian.simplemusicplayer.ui.library.storage.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
 
@@ -29,7 +29,7 @@ import static com.github.anrimian.simplemusicplayer.di.app.ErrorModule.STORAGE_E
 public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
     @Inject
-    MusicProviderInteractor interactor;
+    StorageLibraryInteractor interactor;
 
     @Inject
     @Named(STORAGE_ERROR_PARSER)
@@ -57,28 +57,25 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         if (musicFileSource.getComposition() == null) {
             getViewState().goToMusicStorageScreen(musicFileSource.getPath());
         } else {
-            //TODO start playing music
+            interactor.playMusic(musicFileSource);
         }
+    }
+
+    void onPlayAllButtonClicked() {
+        interactor.playAllMusicInPath(path);
     }
 
     private void loadMusic() {
         getViewState().showLoading();
-        interactor.getAllMusicInPath(path)
+        interactor.getMusicInPath(path)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onMusicLoaded, this::onMusicLoadingError);
     }
 
-    private void onMusicLoaded(FileTree<Composition> compositionFileTree) {
-        if (compositionFileTree.isEmpty()) {
+    private void onMusicLoaded(List<MusicFileSource> musicList) {
+        if (musicList.isEmpty()) {
             getViewState().showEmptyList();
             return;
-        }
-        List<MusicFileSource> musicList = new ArrayList<>();//TODO maybe move this to interactor?
-        for (FileTree<Composition> node : compositionFileTree.getChildren()) {
-            MusicFileSource musicFileSource = new MusicFileSource();
-            musicFileSource.setComposition(node.getData());
-            musicFileSource.setPath(node.getPath());
-            musicList.add(musicFileSource);
         }
         getViewState().showMusicList(musicList);
     }

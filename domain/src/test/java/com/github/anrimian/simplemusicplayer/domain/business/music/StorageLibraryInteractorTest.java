@@ -24,10 +24,10 @@ import static org.junit.Assert.assertThat;
 /**
  * Created on 25.10.2017.
  */
-public class MusicProviderInteractorTest {
+public class StorageLibraryInteractorTest {
 
     private MusicProviderRepository musicProviderRepository;
-    private MusicProviderInteractor musicProviderInteractor;
+    private StorageLibraryInteractor storageLibraryInteractor;
 
     private List<Composition> fakeCompositions = new ArrayList<>();
 
@@ -50,7 +50,7 @@ public class MusicProviderInteractorTest {
         fakeCompositions.add(four);
 
         musicProviderRepository = new FakeMusicProviderRepository(fakeCompositions);
-        musicProviderInteractor = new MusicProviderInteractorImpl(musicProviderRepository);
+        storageLibraryInteractor = new StorageLibraryInteractorImpl(musicProviderRepository);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class MusicProviderInteractorTest {
     public void testItemNotFoundTreeFilter() {
         TestObserver<FileTree<Composition>> subscriber = new TestObserver<>();
 
-        musicProviderInteractor.getAllMusicInPath("root/music/unknown")
+        storageLibraryInteractor.getAllMusicInPath("root/music/unknown")
                 .subscribe(subscriber);
 
         //noinspection unchecked
@@ -85,7 +85,7 @@ public class MusicProviderInteractorTest {
 
     private List<Composition> getListFromTree(String path) {
         List<Composition> collection = new LinkedList<>();
-        musicProviderInteractor.getAllMusicInPath(path)
+        storageLibraryInteractor.getAllMusicInPath(path)
                 .blockingGet()
                 .accept(new CollectVisitor<>(collection));
         return collection;
