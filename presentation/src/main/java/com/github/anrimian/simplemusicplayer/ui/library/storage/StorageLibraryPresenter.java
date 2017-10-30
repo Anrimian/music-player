@@ -55,7 +55,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
     void onMusicSourceClicked(MusicFileSource musicFileSource) {
         if (musicFileSource.getComposition() == null) {
-            getViewState().goToMusicStorageScreen(musicFileSource.getPath());
+            getViewState().goToMusicStorageScreen(path + musicFileSource.getPath());
         } else {
             interactor.playMusic(musicFileSource);
         }

@@ -75,7 +75,7 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
         }
         FileTree<Composition> result = tree.findNodeByPath(path);
         if (result == null) {
-            throw new FileNodeNotFoundException();
+            throw new FileNodeNotFoundException("node not found for path: " + path);
         }
         return result;
     }

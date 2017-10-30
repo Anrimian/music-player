@@ -5,4 +5,10 @@ package com.github.anrimian.simplemusicplayer.domain.models.exceptions;
  */
 
 public class FileNodeNotFoundException extends RuntimeException {
+    public FileNodeNotFoundException() {
+    }
+
+    public FileNodeNotFoundException(String s) {
+        super(s);
+    }
 }
