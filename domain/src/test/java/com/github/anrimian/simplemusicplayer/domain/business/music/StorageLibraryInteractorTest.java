@@ -57,27 +57,25 @@ public class StorageLibraryInteractorTest {
     }
 
     @Test
-    public void testFullTreeFilter() {
+    public void testFullTreeRootFilter() {
         List<MusicFileSource> collection = getListMusicListInPath(null);
-        testCorrectCollection(collection);
-        assertEquals(1, collection.size());
-        String path = collection.get(0).getPath();
-        assertEquals("root", path);
+        assertEquals(3, collection.size());
+        assertEquals("one", collection.get(0).getPath());
+        assertEquals("root/music/one", collection.get(0).getComposition().getFilePath());
 
-        List<MusicFileSource> collectionInRoot = getListMusicListInPath(path);
-        assertEquals(1, collectionInRoot.size());
-        path += "/" + collectionInRoot.get(0).getPath();
-        assertEquals("root/music", path);
+        String path = collection.get(2).getPath();
+        List<MusicFileSource> oldCollection = getListMusicListInPath(path);
+        assertEquals("three", oldCollection.get(0).getPath());
 
-        List<MusicFileSource> collectionInMusic = getListMusicListInPath(path);
-        assertEquals(3, collectionInMusic.size());
-        assertEquals("one", collectionInMusic.get(0).getPath());
-        assertEquals("root/music/one", collectionInMusic.get(0).getComposition().getFilePath());
+        path += "/" + oldCollection.get(1).getPath();
+        List<MusicFileSource> toDeleteCollection = getListMusicListInPath(path);
+        assertEquals("four", toDeleteCollection.get(0).getPath());
+        assertEquals("root/music/old/to delete/four", toDeleteCollection.get(0).getComposition().getFilePath());
     }
 
     @Test
     public void testPathTreeFilter() {
-        List<MusicFileSource> collection = getListMusicListInPath("root/music/old");
+        List<MusicFileSource> collection = getListMusicListInPath("old");
         testCorrectCollection(collection);
         assertEquals(2, collection.size());
         assertNotNull(collection.get(0).getComposition());
@@ -86,7 +84,7 @@ public class StorageLibraryInteractorTest {
 
     @Test
     public void testLastItemTreeFilter() {
-        List<MusicFileSource> collection = getListMusicListInPath("root/music/old/to delete");
+        List<MusicFileSource> collection = getListMusicListInPath("old/to delete");
         assertEquals(1, collection.size());
         assertEquals("four", collection.get(0).getPath());
         assertEquals("root/music/old/to delete/four", collection.get(0).getComposition().getFilePath());

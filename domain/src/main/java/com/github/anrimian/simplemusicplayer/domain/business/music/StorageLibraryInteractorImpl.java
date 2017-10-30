@@ -82,7 +82,7 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
 
     private Single<FileTree<Composition>> getMusicFileTree() {
         if (musicFileTree == null) {
-            return createMusicFileTree();
+            return createMusicFileTree().doOnSuccess(musicFileTree -> this.musicFileTree = musicFileTree);
         } else {
             return Single.just(musicFileTree);
         }
@@ -91,13 +91,23 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     private Single<FileTree<Composition>> createMusicFileTree() {
         return musicProviderRepository.getAllCompositions()
                 .map(compositions -> {
-                    musicFileTree = new FileTree<>(null);
+                    FileTree<Composition> musicFileTree = new FileTree<>(null);
 
                     for (Composition composition: compositions) {
                         String filePath = composition.getFilePath();
                         musicFileTree.addFile(composition, filePath);
                     }
+
                     return musicFileTree;
-                });
+                })
+                .map(this::removeUnusedRootComponents);
+    }
+
+    private FileTree<Composition> removeUnusedRootComponents(FileTree<Composition> tree) {
+        FileTree<Composition> root = tree;
+        while (root.getData() == null && root.getChildCount() <= 1) {
+            root = root.getFirstChild();
+        }
+        return root;
     }
 }
