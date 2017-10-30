@@ -31,12 +31,6 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     }
 
     @Override
-    public Single<FileTree<Composition>> getAllMusicInPath(@Nullable String path) {//TODO rewrite tests and remove
-        return getMusicFileTree()
-                .map(tree -> findNodeByPath(tree, path));
-    }
-
-    @Override
     public void playAllMusicInPath(@Nullable String path) {
         getAllMusicInPath(path).map(this::toList);
         //TODO play music
@@ -51,6 +45,11 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     @Override
     public void playMusic(MusicFileSource musicFileSource) {
         //TODO play music
+    }
+
+    private Single<FileTree<Composition>> getAllMusicInPath(@Nullable String path) {
+        return getMusicFileTree()
+                .map(tree -> findNodeByPath(tree, path));
     }
 
     private List<Composition> toList(FileTree<Composition> compositionFileTree) {

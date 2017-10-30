@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.domain.business.music;
 
 import com.github.anrimian.simplemusicplayer.domain.business.music.utils.FakeMusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
@@ -19,6 +20,8 @@ import io.reactivex.observers.TestObserver;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -55,40 +58,47 @@ public class StorageLibraryInteractorTest {
 
     @Test
     public void testFullTreeFilter() {
-        List<Composition> collection = getListFromTree(null);
-        assertEquals(fakeCompositions.size(), collection.size());
+        List<MusicFileSource> collection = getListMusicListInPath(null);
+        testCorrectCollection(collection);
+        assertEquals(1, collection.size());
+        assertEquals(collection.get(0).getPath(), "root");
     }
 
     @Test
     public void testPathTreeFilter() {
-        List<Composition> collection = getListFromTree("root/music/old");
+        List<MusicFileSource> collection = getListMusicListInPath("root/music/old");
+        testCorrectCollection(collection);
         assertEquals(2, collection.size());
+        assertNotNull(collection.get(0).getComposition());
+        assertNull(collection.get(1).getComposition());
     }
 
     @Test
     public void testLastItemTreeFilter() {
-        List<Composition> collection = getListFromTree("root/music/old/to delete");
+        List<MusicFileSource> collection = getListMusicListInPath("root/music/old/to delete");
         assertEquals(1, collection.size());
-        assertThat(collection.get(0).getFilePath(), containsString("four"));
+        assertEquals(collection.get(0).getPath(), "four");
     }
 
     @Test
     public void testItemNotFoundTreeFilter() {
-        TestObserver<FileTree<Composition>> subscriber = new TestObserver<>();
+        TestObserver<List<MusicFileSource>> subscriber = new TestObserver<>();
 
-        storageLibraryInteractor.getAllMusicInPath("root/music/unknown")
+        storageLibraryInteractor.getMusicInPath("root/music/unknown")
                 .subscribe(subscriber);
 
         //noinspection unchecked
         subscriber.assertFailure(FileNodeNotFoundException.class);
     }
 
-    private List<Composition> getListFromTree(String path) {
-        List<Composition> collection = new LinkedList<>();
-        storageLibraryInteractor.getAllMusicInPath(path)
-                .blockingGet()
-                .accept(new CollectVisitor<>(collection));
-        return collection;
+    private void testCorrectCollection(List<MusicFileSource> collection) {
+        for (MusicFileSource musicFileSource: collection) {
+            assertNotNull(musicFileSource.getPath());
+        }
+    }
+
+    private List<MusicFileSource> getListMusicListInPath(String path) {
+        return storageLibraryInteractor.getMusicInPath(path).blockingGet();
     }
 
     @After
