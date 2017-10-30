@@ -67,5 +67,6 @@ dependencies {
     compileOnly presentationDependencies.javaxAnnotation
 
     testImplementation presentationTestDependencies.junit
+    testImplementation presentationTestDependencies.mockito
     androidTestImplementation presentationTestDependencies.espresso
 }
