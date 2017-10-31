@@ -3,7 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
 
@@ -12,7 +12,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created on 23.10.2017.
@@ -54,7 +53,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         loadMusic();
     }
 
-    void onMusicSourceClicked(MusicFileSource musicFileSource) {
+    void onMusicSourceClicked(MusicFileSourceOld musicFileSource) {
         if (musicFileSource.getComposition() == null) {
             StringBuilder sbPath = new StringBuilder();
             if (path != null) {
@@ -83,7 +82,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
                 .subscribe(this::onMusicLoaded, this::onMusicLoadingError);
     }
 
-    private void onMusicLoaded(List<MusicFileSource> musicList) {
+    private void onMusicLoaded(List<MusicFileSourceOld> musicList) {
         if (musicList.isEmpty()) {
             getViewState().showEmptyList();
             return;

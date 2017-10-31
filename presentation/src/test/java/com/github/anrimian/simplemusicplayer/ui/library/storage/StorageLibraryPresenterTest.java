@@ -2,14 +2,12 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 
 import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +35,11 @@ public class StorageLibraryPresenterTest {
 
     @Before
     public void setUp() throws Exception {
-        List<MusicFileSource> musicFileSources = new ArrayList<>();
-        musicFileSources.add(new MusicFileSource());
-        musicFileSources.add(new MusicFileSource());
-        musicFileSources.add(new MusicFileSource());
-        musicFileSources.add(new MusicFileSource());
+        List<MusicFileSourceOld> musicFileSources = new ArrayList<>();
+        musicFileSources.add(new MusicFileSourceOld());
+        musicFileSources.add(new MusicFileSourceOld());
+        musicFileSources.add(new MusicFileSourceOld());
+        musicFileSources.add(new MusicFileSourceOld());
 
         view = mock(StorageLibraryView.class);
 
@@ -60,7 +58,7 @@ public class StorageLibraryPresenterTest {
         verify(view).hideBackPathButton();
         verify(view).showLoading();
         verify(view, never()).showEmptyList();
-        verify(view).showMusicList(anyListOf(MusicFileSource.class));
+        verify(view).showMusicList(anyListOf(MusicFileSourceOld.class));
     }
 
     @Test
@@ -74,7 +72,7 @@ public class StorageLibraryPresenterTest {
         verify(view).hideBackPathButton();
         verify(view).showLoading();
         verify(view).showEmptyList();
-        verify(view, never()).showMusicList(anyListOf(MusicFileSource.class));
+        verify(view, never()).showMusicList(anyListOf(MusicFileSourceOld.class));
     }
 
     @Test
@@ -95,7 +93,7 @@ public class StorageLibraryPresenterTest {
         StorageLibraryPresenter presenter = new StorageLibraryPresenter(null, interactor, errorParser, uiScheduler);
         presenter.attachView(view);
 
-        MusicFileSource musicFileSource = new MusicFileSource();
+        MusicFileSourceOld musicFileSource = new MusicFileSourceOld();
         musicFileSource.setComposition(new Composition());
         presenter.onMusicSourceClicked(musicFileSource);
         verify(interactor).playMusic(eq(musicFileSource));

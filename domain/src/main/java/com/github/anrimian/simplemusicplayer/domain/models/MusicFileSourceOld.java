@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
  * Created on 29.10.2017.
  */
 
-public class MusicFileSource {
+public class MusicFileSourceOld {
 
     @Nullable
     private String path;

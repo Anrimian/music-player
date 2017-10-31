@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.business.music;
 
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 
 import java.util.List;
 
@@ -14,9 +15,9 @@ import io.reactivex.Single;
 
 public interface StorageLibraryInteractor {
 
-    Single<List<MusicFileSource>> getMusicInPath(@Nullable String path);
+    Single<List<FileSource>> getMusicInPath(@Nullable String path);
 
     void playAllMusicInPath(@Nullable String path);
 
-    void playMusic(MusicFileSource musicFileSource);
+    void playMusic(Composition composition);
 }

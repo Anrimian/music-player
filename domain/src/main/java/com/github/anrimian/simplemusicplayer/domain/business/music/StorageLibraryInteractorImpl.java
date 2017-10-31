@@ -1,8 +1,10 @@
 package com.github.anrimian.simplemusicplayer.domain.business.music;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors.CollectVisitor;
@@ -37,14 +39,14 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     }
 
     @Override
-    public Single<List<MusicFileSource>> getMusicInPath(@Nullable String path) {
+    public Single<List<FileSource>> getMusicInPath(@Nullable String path) {
         return getAllMusicInPath(path)
                 .map(this::getFilesOnTop)
                 .map(this::applyOrder);
     }
 
     @Override
-    public void playMusic(MusicFileSource musicFileSource) {
+    public void playMusic(Composition FileSource) {
         //TODO play music
     }
 
@@ -53,14 +55,14 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
                 .map(tree -> findNodeByPath(tree, path));
     }
 
-    private List<MusicFileSource> applyOrder(List<MusicFileSource> musicFileSources) {
-        List<MusicFileSource> sortedList = new ArrayList<>();
-        List<MusicFileSource> musicList = new ArrayList<>();
-        for (MusicFileSource musicFileSource: musicFileSources) {
-            if (musicFileSource.getComposition() == null) {
-                sortedList.add(musicFileSource);
+    private List<FileSource> applyOrder(List<FileSource> FileSources) {
+        List<FileSource> sortedList = new ArrayList<>();
+        List<FileSource> musicList = new ArrayList<>();
+        for (FileSource fileSource: FileSources) {
+            if (fileSource instanceof FolderFileSource) {
+                sortedList.add(fileSource);
             } else {
-                musicList.add(musicFileSource);
+                musicList.add(fileSource);
             }
         }
         sortedList.addAll(musicList);
@@ -73,13 +75,17 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
         return compositions;
     }
 
-    private List<MusicFileSource> getFilesOnTop(FileTree<Composition> compositionFileTree) {
-        List<MusicFileSource> musicList = new ArrayList<>();
+    private List<FileSource> getFilesOnTop(FileTree<Composition> compositionFileTree) {
+        List<FileSource> musicList = new ArrayList<>();
         for (FileTree<Composition> node : compositionFileTree.getChildren()) {
-            MusicFileSource musicFileSource = new MusicFileSource();
-            musicFileSource.setComposition(node.getData());
-            musicFileSource.setPath(node.getPath());
-            musicList.add(musicFileSource);
+            FileSource fileSource;
+            Composition data = node.getData();
+            if (data == null) {
+                fileSource = new FolderFileSource(node.getPath());
+            } else {
+                fileSource = new MusicFileSource(data);
+            }
+            musicList.add(fileSource);
         }
         return musicList;
     }

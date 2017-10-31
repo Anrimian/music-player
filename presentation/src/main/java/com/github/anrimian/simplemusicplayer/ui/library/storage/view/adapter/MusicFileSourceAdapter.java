@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
 import com.github.anrimian.simplemusicplayer.utils.recycler_view.HeaderFooterRecyclerViewAdapter;
 
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private static final int TYPE_MUSIC = 1;
     private static final int TYPE_FILE = 2;
 
-    private List<MusicFileSource> musicList = new ArrayList<>();
+    private List<MusicFileSourceOld> musicList = new ArrayList<>();
 
-    public void setMusicList(List<MusicFileSource> musicList) {
+    public void setMusicList(List<MusicFileSourceOld> musicList) {
         this.musicList = musicList;
     }
 
@@ -45,7 +45,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
 
     @Override
     public void bindVH(RecyclerView.ViewHolder holder, int position) {
-        MusicFileSource musicFileSource = musicList.get(position);
+        MusicFileSourceOld musicFileSource = musicList.get(position);
         switch (holder.getItemViewType()) {
             case TYPE_MUSIC: {
                 MusicViewHolder musicViewHolder = (MusicViewHolder) holder;
@@ -67,7 +67,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
 
     @Override
     protected int getItemType(int position) {
-        MusicFileSource source = musicList.get(position);
+        MusicFileSourceOld source = musicList.get(position);
         if (source.getComposition() == null) {
             return TYPE_FILE;
         } else {

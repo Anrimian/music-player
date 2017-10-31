@@ -13,20 +13,16 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.constants.Arguments;
 import com.github.anrimian.simplemusicplayer.di.Components;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import dagger.Lazy;
 
 import static com.github.anrimian.simplemusicplayer.constants.Arguments.PATH;
 
@@ -99,7 +95,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     }
 
     @Override
-    public void showMusicList(List<MusicFileSource> musicList) {
+    public void showMusicList(List<MusicFileSourceOld> musicList) {
         adapter.setMusicList(musicList);
         adapter.notifyItemRangeInserted(0, musicList.size());
     }
