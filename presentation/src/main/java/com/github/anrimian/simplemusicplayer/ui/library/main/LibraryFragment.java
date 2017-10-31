@@ -107,7 +107,7 @@ public class LibraryFragment extends Fragment {
         getFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                .replace(R.id.library_fragment_container, new StorageLibraryFragment())
+                .replace(R.id.library_fragment_container, StorageLibraryFragment.newInstance(null))
                 .commit();
     }
 

@@ -41,7 +41,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
 
-    public StorageLibraryFragment newInstance(@Nullable String path) {
+    public static StorageLibraryFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
         args.putString(PATH, path);
         StorageLibraryFragment fragment = new StorageLibraryFragment();
@@ -77,6 +77,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new MusicFileSourceAdapter();
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -91,11 +92,13 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @Override
     public void showEmptyList() {
+        progressViewWrapper.hideAll();
         progressViewWrapper.showMessage(R.string.there_is_nothing_here, false);
     }
 
     @Override
     public void showMusicList(List<FileSource> musicList) {
+        progressViewWrapper.hideAll();
         adapter.setMusicList(musicList);
         adapter.notifyItemRangeInserted(0, musicList.size());
     }
@@ -107,6 +110,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @Override
     public void showError(ErrorCommand errorCommand) {
+        progressViewWrapper.hideAll();
         progressViewWrapper.showMessage(errorCommand.getMessage(), true);//TODO add default handler
     }
 
