@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.library.storage;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +42,12 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     }
 
     @Override
-    public void showBackPathButton(String path) {
+    public void showBackPathButton(@NonNull String path) {
+
+    }
+
+    @Override
+    public void hideBackPathButton() {
 
     }
 

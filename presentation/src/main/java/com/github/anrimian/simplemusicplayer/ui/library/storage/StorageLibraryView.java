@@ -10,6 +10,7 @@ import com.github.anrimian.simplemusicplayer.utils.moxy.SingleStateByTagStrategy
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -19,6 +20,7 @@ import javax.annotation.Nullable;
 interface StorageLibraryView extends MvpView {
 
     String LIST_STATE = "list_state";
+    String BACK_PATH_BUTTON_STATE = "back_path_button_state";
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
@@ -35,6 +37,9 @@ interface StorageLibraryView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goToMusicStorageScreen(String path);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showBackPathButton(@Nullable String path);
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BACK_PATH_BUTTON_STATE)
+    void showBackPathButton(@Nonnull String path);
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BACK_PATH_BUTTON_STATE)
+    void hideBackPathButton();
 }

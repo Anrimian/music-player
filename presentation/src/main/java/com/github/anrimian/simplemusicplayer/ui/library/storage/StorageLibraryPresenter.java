@@ -41,7 +41,11 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().showBackPathButton(path);
+        if (path == null) {
+            getViewState().hideBackPathButton();
+        } else {
+            getViewState().showBackPathButton(path);
+        }
 
         loadMusic();
     }

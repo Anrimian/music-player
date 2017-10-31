@@ -57,7 +57,7 @@ public class StorageLibraryPresenterTest {
         StorageLibraryPresenter presenter = new StorageLibraryPresenter(null, interactor, errorParser, uiScheduler);
         presenter.attachView(view);
 
-        verify(view).showBackPathButton(null);
+        verify(view).hideBackPathButton();
         verify(view).showLoading();
         verify(view, never()).showEmptyList();
         verify(view).showMusicList(anyListOf(MusicFileSource.class));
@@ -71,7 +71,7 @@ public class StorageLibraryPresenterTest {
         StorageLibraryPresenter presenter = new StorageLibraryPresenter(null, interactor, errorParser, uiScheduler);
         presenter.attachView(view);
 
-        verify(view).showBackPathButton(null);
+        verify(view).hideBackPathButton();
         verify(view).showLoading();
         verify(view).showEmptyList();
         verify(view, never()).showMusicList(anyListOf(MusicFileSource.class));
@@ -85,7 +85,7 @@ public class StorageLibraryPresenterTest {
         StorageLibraryPresenter presenter = new StorageLibraryPresenter(null, interactor, errorParser, uiScheduler);
         presenter.attachView(view);
 
-        verify(view).showBackPathButton(null);
+        verify(view).hideBackPathButton();
         verify(view).showLoading();
         verify(view).showError(any(ErrorCommand.class));
     }
@@ -112,6 +112,7 @@ public class StorageLibraryPresenterTest {
         musicFileSource.setComposition(null);
         musicFileSource.setPath("some2");
         presenter.onMusicSourceClicked(musicFileSource);
+        verify(view).showBackPathButton("some");
         verify(view).goToMusicStorageScreen(eq("some/some2"));
     }
 
