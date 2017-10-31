@@ -3,7 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.moxy.SingleStateByTagStrategy;
 
@@ -24,7 +24,7 @@ interface StorageLibraryView extends MvpView {
     void showEmptyList();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showMusicList(List<MusicFileSourceOld> musicList);
+    void showMusicList(List<FileSource> musicList);
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();

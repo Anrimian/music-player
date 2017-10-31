@@ -2,7 +2,6 @@ package com.github.anrimian.simplemusicplayer.domain.business.music;
 
 import com.github.anrimian.simplemusicplayer.domain.business.music.utils.FakeMusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;

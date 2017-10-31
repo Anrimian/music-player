@@ -14,7 +14,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
@@ -71,7 +71,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         ButterKnife.bind(this, view);
 
         progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgaintButtonClicked());
+        progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -95,7 +95,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     }
 
     @Override
-    public void showMusicList(List<MusicFileSourceOld> musicList) {
+    public void showMusicList(List<FileSource> musicList) {
         adapter.setMusicList(musicList);
         adapter.notifyItemRangeInserted(0, musicList.size());
     }

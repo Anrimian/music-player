@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.utils.recycler_view.HeaderFooterRecyclerViewAdapter;
 
 import java.util.ArrayList;
@@ -21,9 +23,9 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private static final int TYPE_MUSIC = 1;
     private static final int TYPE_FILE = 2;
 
-    private List<MusicFileSourceOld> musicList = new ArrayList<>();
+    private List<FileSource> musicList = new ArrayList<>();
 
-    public void setMusicList(List<MusicFileSourceOld> musicList) {
+    public void setMusicList(List<FileSource> musicList) {
         this.musicList = musicList;
     }
 
@@ -45,16 +47,18 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
 
     @Override
     public void bindVH(RecyclerView.ViewHolder holder, int position) {
-        MusicFileSourceOld musicFileSource = musicList.get(position);
+        FileSource fileSource = musicList.get(position);
         switch (holder.getItemViewType()) {
             case TYPE_MUSIC: {
                 MusicViewHolder musicViewHolder = (MusicViewHolder) holder;
+                MusicFileSource musicFileSource = (MusicFileSource) fileSource;
                 musicViewHolder.bind(musicFileSource.getComposition());
                 break;
             }
             case TYPE_FILE: {
                 FolderViewHolder folderViewHolder = (FolderViewHolder) holder;
-                folderViewHolder.bind(musicFileSource.getPath());
+                FolderFileSource folderFileSource = (FolderFileSource) fileSource;
+                folderViewHolder.bind(folderFileSource.getPath());
                 break;
             }
         }
@@ -67,8 +71,8 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
 
     @Override
     protected int getItemType(int position) {
-        MusicFileSourceOld source = musicList.get(position);
-        if (source.getComposition() == null) {
+        FileSource source = musicList.get(position);
+        if (source instanceof FolderFileSource) {
             return TYPE_FILE;
         } else {
             return TYPE_MUSIC;

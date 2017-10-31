@@ -3,12 +3,14 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSourceOld;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
@@ -49,22 +51,22 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         loadMusic();
     }
 
-    void onTryAgaintButtonClicked() {
+    void onTryAgainButtonClicked() {
         loadMusic();
     }
 
-    void onMusicSourceClicked(MusicFileSourceOld musicFileSource) {
-        if (musicFileSource.getComposition() == null) {
-            StringBuilder sbPath = new StringBuilder();
-            if (path != null) {
-                sbPath.append(path);
-                sbPath.append("/");
-            }
-            sbPath.append(musicFileSource.getPath());
-            getViewState().goToMusicStorageScreen(sbPath.toString());
-        } else {
-            interactor.playMusic(musicFileSource);
+    void onFolderClicked(@Nonnull String filePath) {
+        StringBuilder sbPath = new StringBuilder();
+        if (path != null) {
+            sbPath.append(path);
+            sbPath.append("/");
         }
+        sbPath.append(filePath);
+        getViewState().goToMusicStorageScreen(sbPath.toString());
+    }
+
+    void onCompositionClicked(Composition composition) {
+        interactor.playMusic(composition);
     }
 
     void onPlayAllButtonClicked() {
@@ -82,7 +84,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
                 .subscribe(this::onMusicLoaded, this::onMusicLoadingError);
     }
 
-    private void onMusicLoaded(List<MusicFileSourceOld> musicList) {
+    private void onMusicLoaded(List<FileSource> musicList) {
         if (musicList.isEmpty()) {
             getViewState().showEmptyList();
             return;
