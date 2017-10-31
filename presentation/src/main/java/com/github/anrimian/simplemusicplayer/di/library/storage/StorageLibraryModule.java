@@ -10,8 +10,10 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Scheduler;
 
 import static com.github.anrimian.simplemusicplayer.di.app.ErrorModule.STORAGE_ERROR_PARSER;
+import static com.github.anrimian.simplemusicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 31.10.2017.
@@ -30,7 +32,8 @@ public class StorageLibraryModule {
     @Provides
     @Nonnull
     StorageLibraryPresenter provideStorageLibraryPresenter(StorageLibraryInteractor interactor,
-                                                           @Named(STORAGE_ERROR_PARSER) ErrorParser errorParser) {
-        return new StorageLibraryPresenter(path, interactor, errorParser);
+                                                           @Named(STORAGE_ERROR_PARSER) ErrorParser errorParser,
+                                                           @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+        return new StorageLibraryPresenter(path, interactor, errorParser, uiScheduler);
     }
 }

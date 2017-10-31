@@ -7,6 +7,7 @@ import javax.inject.Named;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -16,12 +17,20 @@ import io.reactivex.schedulers.Schedulers;
 @Module
 public class SchedulerModule {
 
-    public static final String IO_SCHEDULER = "network_scheduler";
+    public static final String IO_SCHEDULER = "io_scheduler";
+    public static final String UI_SCHEDULER = "ui_scheduler";
 
     @Provides
     @NonNull
     @Named(IO_SCHEDULER)
     Scheduler provideIOScheduler() {
         return Schedulers.io();
+    }
+
+    @Provides
+    @NonNull
+    @Named(UI_SCHEDULER)
+    Scheduler provideUiScheduler() {
+        return AndroidSchedulers.mainThread();
     }
 }

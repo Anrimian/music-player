@@ -2,24 +2,17 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
-import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
 
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-
-import static com.github.anrimian.simplemusicplayer.di.app.ErrorModule.STORAGE_ERROR_PARSER;
 
 /**
  * Created on 23.10.2017.
@@ -30,23 +23,27 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
     private StorageLibraryInteractor interactor;
     private ErrorParser errorParser;
+    private Scheduler uiScheduler;
 
     @Nullable
     private String path;
 
     public StorageLibraryPresenter(@Nullable String path,
                                    StorageLibraryInteractor interactor,
-                                   ErrorParser errorParser) {
+                                   ErrorParser errorParser,
+                                   Scheduler uiScheduler) {
         this.path = path;
         this.interactor = interactor;
         this.errorParser = errorParser;
+        this.uiScheduler = uiScheduler;
     }
 
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        loadMusic();
         getViewState().showBackPathButton(path);
+
+        loadMusic();
     }
 
     void onTryAgaintButtonClicked() {
@@ -55,7 +52,13 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
     void onMusicSourceClicked(MusicFileSource musicFileSource) {
         if (musicFileSource.getComposition() == null) {
-            getViewState().goToMusicStorageScreen(path + musicFileSource.getPath());
+            StringBuilder sbPath = new StringBuilder();
+            if (path != null) {
+                sbPath.append(path);
+                sbPath.append("/");
+            }
+            sbPath.append(musicFileSource.getPath());
+            getViewState().goToMusicStorageScreen(sbPath.toString());
         } else {
             interactor.playMusic(musicFileSource);
         }
@@ -72,7 +75,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
     private void loadMusic() {
         getViewState().showLoading();
         interactor.getMusicInPath(path)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(uiScheduler)
                 .subscribe(this::onMusicLoaded, this::onMusicLoadingError);
     }
 
