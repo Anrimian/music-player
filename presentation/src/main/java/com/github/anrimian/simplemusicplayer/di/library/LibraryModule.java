@@ -32,7 +32,7 @@ public class LibraryModule {
     @Provides
     @Nonnull
     @LibraryScope
-    StorageLibraryInteractor provideMusicProviderInteractor(MusicProviderRepository musicProviderRepository) {
+    StorageLibraryInteractor provideStorageLibraryInteractor(MusicProviderRepository musicProviderRepository) {
         return new StorageLibraryInteractorImpl(musicProviderRepository);
     }
 }

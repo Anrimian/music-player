@@ -10,10 +10,15 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 
 import java.util.List;
+
+import javax.inject.Inject;
+
+import dagger.Lazy;
 
 /**
  * Created on 23.10.2017.
@@ -26,13 +31,18 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @ProvidePresenter
     StorageLibraryPresenter providePresenter() {
-        return new StorageLibraryPresenter(null);
+        return Components.getStorageLibraryComponent(null).storageLibraryPresenter();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_library_storage, container, false);
+    }
+
+    @Override
+    public void showBackPathButton(String path) {
+
     }
 
     @Override

@@ -8,6 +8,10 @@ import com.github.anrimian.simplemusicplayer.di.app.AppModule;
 import com.github.anrimian.simplemusicplayer.di.app.DaggerAppComponent;
 import com.github.anrimian.simplemusicplayer.di.library.LibraryComponent;
 import com.github.anrimian.simplemusicplayer.di.library.LibraryModule;
+import com.github.anrimian.simplemusicplayer.di.library.storage.StorageLibraryComponent;
+import com.github.anrimian.simplemusicplayer.di.library.storage.StorageLibraryModule;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -42,6 +46,10 @@ public class Components {
 
     public static LibraryComponent getLibraryComponent() {
         return getInstance().buildLibraryComponent();
+    }
+
+    public static StorageLibraryComponent getStorageLibraryComponent(@Nullable String path) {
+        return getLibraryComponent().storageLibraryComponent(new StorageLibraryModule(path));
     }
 
     private LibraryComponent buildLibraryComponent() {

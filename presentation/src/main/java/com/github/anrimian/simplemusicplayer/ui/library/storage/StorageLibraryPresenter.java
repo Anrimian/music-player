@@ -28,25 +28,25 @@ import static com.github.anrimian.simplemusicplayer.di.app.ErrorModule.STORAGE_E
 @InjectViewState
 public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
-    @Inject
-    StorageLibraryInteractor interactor;
-
-    @Inject
-    @Named(STORAGE_ERROR_PARSER)
-    ErrorParser errorParser;
+    private StorageLibraryInteractor interactor;
+    private ErrorParser errorParser;
 
     @Nullable
     private String path;
 
-    public StorageLibraryPresenter(@Nullable String path) {
-        Components.getLibraryComponent().inject(this);
+    public StorageLibraryPresenter(@Nullable String path,
+                                   StorageLibraryInteractor interactor,
+                                   ErrorParser errorParser) {
         this.path = path;
+        this.interactor = interactor;
+        this.errorParser = errorParser;
     }
 
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         loadMusic();
+        getViewState().showBackPathButton(path);
     }
 
     void onTryAgaintButtonClicked() {
@@ -63,6 +63,10 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
     void onPlayAllButtonClicked() {
         interactor.playAllMusicInPath(path);
+    }
+
+    void onBackButtonClicked() {
+
     }
 
     private void loadMusic() {

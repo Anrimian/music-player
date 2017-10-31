@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.di.library;
 
+import com.github.anrimian.simplemusicplayer.di.library.storage.StorageLibraryComponent;
+import com.github.anrimian.simplemusicplayer.di.library.storage.StorageLibraryModule;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryPresenter;
 
 import dagger.Subcomponent;
@@ -12,5 +14,5 @@ import dagger.Subcomponent;
 @Subcomponent(modules = LibraryModule.class)
 public interface LibraryComponent {
 
-    void inject(StorageLibraryPresenter storageLibraryPresenter);
+    StorageLibraryComponent storageLibraryComponent(StorageLibraryModule storageLibraryModule);
 }
