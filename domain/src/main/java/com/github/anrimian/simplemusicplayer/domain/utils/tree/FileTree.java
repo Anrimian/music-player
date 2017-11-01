@@ -86,7 +86,7 @@ public class FileTree<T> implements Visitable<T> {
         return found;
     }
 
-    public String getFullPathOfNode(FileTree<T> node) {//TODO finish this
+    public String getFullPathOfNode(FileTree<T> node) {
         String fullPath = node.getFullPath();
 
         StringBuilder sbPath = new StringBuilder();
