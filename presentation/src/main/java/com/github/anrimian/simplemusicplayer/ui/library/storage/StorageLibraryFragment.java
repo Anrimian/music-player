@@ -82,7 +82,11 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @Override
     public void showBackPathButton(@NonNull String path) {
-
+        /*String targetPath = path;
+        int lastSlashIndex = path.lastIndexOf('/');
+        if (lastSlashIndex != -1) {
+            targetPath = path.substring(lastSlashIndex, path.length());
+        }*/
     }
 
     @Override

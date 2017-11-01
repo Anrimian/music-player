@@ -109,11 +109,28 @@ public class StorageLibraryPresenterTest {
 
         presenter = new StorageLibraryPresenter("some", interactor, errorParser, uiScheduler);
         presenter.attachView(view);
-
-        path = "some2";
-        presenter.onFolderClicked(path);
         verify(view).showBackPathButton("some");
+
+        path = "some/some2";
+        presenter.onFolderClicked(path);
         verify(view).goToMusicStorageScreen(eq("some/some2"));
+    }
+
+    @Test
+    public void testShowBackPathButton() {
+        StorageLibraryPresenter presenter = new StorageLibraryPresenter("root/some/some2", interactor, errorParser, uiScheduler);
+        presenter.attachView(view);
+
+        verify(view).showBackPathButton("root/some/some2");
+    }
+
+    @Test
+    public void testBackPathButtonClicked() {
+        StorageLibraryPresenter presenter = new StorageLibraryPresenter("root/some/some2", interactor, errorParser, uiScheduler);
+        presenter.attachView(view);
+
+        presenter.onBackPathButtonClicked();
+        verify(view).goToMusicStorageScreen("root/some");
     }
 
     @Test

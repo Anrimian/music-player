@@ -56,13 +56,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
     }
 
     void onFolderClicked(@Nonnull String filePath) {
-        StringBuilder sbPath = new StringBuilder();
-        if (path != null) {
-            sbPath.append(path);
-            sbPath.append("/");
-        }
-        sbPath.append(filePath);
-        getViewState().goToMusicStorageScreen(sbPath.toString());
+        getViewState().goToMusicStorageScreen(filePath);
     }
 
     void onCompositionClicked(Composition composition) {
@@ -73,8 +67,16 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         interactor.playAllMusicInPath(path);
     }
 
-    void onBackButtonClicked() {
-
+    void onBackPathButtonClicked() {
+        if (path == null) {
+            throw new IllegalStateException("can not go back in root screen");
+        }
+        String targetPath = null;
+        int lastSlashIndex = path.lastIndexOf('/');
+        if (lastSlashIndex != -1) {
+            targetPath = path.substring(0, lastSlashIndex);
+        }
+        getViewState().goToMusicStorageScreen(targetPath);
     }
 
     private void loadMusic() {
