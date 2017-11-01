@@ -17,7 +17,6 @@ import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -60,7 +59,7 @@ public class StorageLibraryPresenterTest {
         verify(view).hideBackPathButton();
         verify(view).showLoading();
         verify(view, never()).showEmptyList();
-        verify(view).showMusicList(anyListOf(FileSource.class));
+        verify(view).showList();
     }
 
     @Test
@@ -74,7 +73,7 @@ public class StorageLibraryPresenterTest {
         verify(view).hideBackPathButton();
         verify(view).showLoading();
         verify(view).showEmptyList();
-        verify(view, never()).showMusicList(anyListOf(FileSource.class));
+        verify(view, never()).showList();
     }
 
     @Test

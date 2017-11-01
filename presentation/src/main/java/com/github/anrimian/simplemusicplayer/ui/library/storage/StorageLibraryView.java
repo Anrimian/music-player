@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.library.storage;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
@@ -20,11 +21,14 @@ interface StorageLibraryView extends MvpView {
     String LIST_STATE = "list_state";
     String BACK_PATH_BUTTON_STATE = "back_path_button_state";
 
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void bindList(List<FileSource> musicList);
+
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showMusicList(List<FileSource> musicList);
+    void showList();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();
@@ -43,4 +47,7 @@ interface StorageLibraryView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goBackToMusicStorageScreen(String targetPath);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void notifyItemsLoaded(int start, int size);
 }

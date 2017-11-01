@@ -8,6 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -29,6 +30,8 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
     @Nullable
     private String path;
 
+    private List<FileSource> sourceList = new ArrayList<>();
+
     public StorageLibraryPresenter(@Nullable String path,
                                    StorageLibraryInteractor interactor,
                                    ErrorParser errorParser,
@@ -47,6 +50,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         } else {
             getViewState().showBackPathButton(path);
         }
+        getViewState().bindList(sourceList);
 
         loadMusic();
     }
@@ -92,7 +96,9 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
             getViewState().showEmptyList();
             return;
         }
-        getViewState().showMusicList(musicList);
+        sourceList.addAll(musicList);
+        getViewState().showList();
+        getViewState().notifyItemsLoaded(0, musicList.size());
     }
 
     private void onMusicLoadingError(Throwable throwable) {

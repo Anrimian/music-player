@@ -29,7 +29,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private OnItemClickListener<Composition> onCompositionClickListener;
     private OnItemClickListener<String> onFolderClickListener;
 
-    public void setMusicList(List<FileSource> musicList) {
+    public MusicFileSourceAdapter(List<FileSource> musicList) {
         this.musicList = musicList;
     }
 

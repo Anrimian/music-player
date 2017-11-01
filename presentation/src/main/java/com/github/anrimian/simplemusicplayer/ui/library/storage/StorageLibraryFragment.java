@@ -43,6 +43,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
     private HeaderViewWrapper headerViewWrapper;
+    private View headerView;
 
     public static StorageLibraryFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
@@ -79,11 +80,14 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        View headerView = View.inflate(getContext(), R.layout.partial_storage_header, null);
+        headerView = View.inflate(getContext(), R.layout.partial_storage_header, null);
         headerViewWrapper = new HeaderViewWrapper(headerView);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
+    }
 
-        adapter = new MusicFileSourceAdapter();
+    @Override
+    public void bindList(List<FileSource> musicList) {
+        adapter = new MusicFileSourceAdapter(musicList);
         adapter.addHeader(headerView);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(presenter::onFolderClicked);
@@ -108,10 +112,13 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     }
 
     @Override
-    public void showMusicList(List<FileSource> musicList) {
+    public void notifyItemsLoaded(int start, int size) {
+        adapter.notifyItemRangeInserted(++start, size);
+    }
+
+    @Override
+    public void showList() {
         progressViewWrapper.hideAll();
-        adapter.setMusicList(musicList);
-        adapter.notifyItemRangeInserted(0, musicList.size());
     }
 
     @Override
