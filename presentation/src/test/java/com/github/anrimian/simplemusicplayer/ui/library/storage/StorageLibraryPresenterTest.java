@@ -16,7 +16,9 @@ import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -130,7 +132,7 @@ public class StorageLibraryPresenterTest {
         presenter.attachView(view);
 
         presenter.onBackPathButtonClicked();
-        verify(view).goToMusicStorageScreen("root/some");
+        verify(view).goBackToMusicStorageScreen("root/some");
     }
 
     @Test

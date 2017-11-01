@@ -77,7 +77,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         if (lastSlashIndex != -1 && firstSlashIndex != lastSlashIndex) {
             targetPath = path.substring(0, lastSlashIndex);
         }
-        getViewState().goToMusicStorageScreen(targetPath);
+        getViewState().goBackToMusicStorageScreen(targetPath);
     }
 
     private void loadMusic() {

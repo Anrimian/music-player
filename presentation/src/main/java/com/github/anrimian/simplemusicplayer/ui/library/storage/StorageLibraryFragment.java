@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -130,6 +131,20 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
                 .beginTransaction()
                 .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
                 .replace(R.id.library_fragment_container, StorageLibraryFragment.newInstance(path))
+                .addToBackStack(path)
                 .commit();
+    }
+
+    @Override
+    public void goBackToMusicStorageScreen(String path) {
+        FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStack();
+        } else {
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
+                    .replace(R.id.library_fragment_container, StorageLibraryFragment.newInstance(path))
+                    .commit();
+        }
     }
 }

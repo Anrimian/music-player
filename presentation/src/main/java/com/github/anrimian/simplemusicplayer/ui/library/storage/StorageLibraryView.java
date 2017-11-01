@@ -40,4 +40,7 @@ interface StorageLibraryView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BACK_PATH_BUTTON_STATE)
     void hideBackPathButton();
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void goBackToMusicStorageScreen(String targetPath);
 }
