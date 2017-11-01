@@ -67,13 +67,14 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         interactor.playAllMusicInPath(path);
     }
 
-    void onBackPathButtonClicked() {//TODO we don't know filtered root path, fix this
+    void onBackPathButtonClicked() {
         if (path == null) {
             throw new IllegalStateException("can not go back in root screen");
         }
         String targetPath = null;
         int lastSlashIndex = path.lastIndexOf('/');
-        if (lastSlashIndex != -1) {
+        int firstSlashIndex = path.indexOf("/");
+        if (lastSlashIndex != -1 && firstSlashIndex != lastSlashIndex) {
             targetPath = path.substring(0, lastSlashIndex);
         }
         getViewState().goToMusicStorageScreen(targetPath);
