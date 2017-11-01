@@ -60,22 +60,20 @@ public class StorageLibraryInteractorTest {
     public void testFullTreeRootFilter() {
         List<FileSource> collection = getListMusicListInPath(null);
         assertEquals(3, collection.size());
-        FileSource old = collection.get(0);
-        assertEquals("old", ((FolderFileSource) old).getPath());
+        FolderFileSource old = (FolderFileSource) collection.get(0);
+        assertEquals("root/music/old", old.getPath());
 
-        String path = ((FolderFileSource) old).getPath();
-        List<FileSource> oldCollection = getListMusicListInPath(path);
+        List<FileSource> oldCollection = getListMusicListInPath(old.getPath());
         FolderFileSource toDelete = (FolderFileSource) oldCollection.get(0);
-        assertEquals("to delete", toDelete.getPath());
+        assertEquals("root/music/old/to delete", toDelete.getPath());
 
-        path += "/" + toDelete.getPath();
-        List<FileSource> toDeleteCollection = getListMusicListInPath(path);
+        List<FileSource> toDeleteCollection = getListMusicListInPath(toDelete.getPath());
         assertEquals("root/music/old/to delete/four", ((MusicFileSource) toDeleteCollection.get(0)).getComposition().getFilePath());
     }
 
     @Test
     public void testPathTreeFilter() {
-        List<FileSource> collection = getListMusicListInPath("old");
+        List<FileSource> collection = getListMusicListInPath("root/music/old");
         testCorrectCollection(collection);
         assertEquals(2, collection.size());
         assertThat(collection.get(0), instanceOf(FolderFileSource.class));
@@ -84,7 +82,7 @@ public class StorageLibraryInteractorTest {
 
     @Test
     public void testLastItemTreeFilter() {
-        List<FileSource> collection = getListMusicListInPath("old/to delete");
+        List<FileSource> collection = getListMusicListInPath("root/music/old/to delete");
         assertEquals(1, collection.size());
         assertEquals("root/music/old/to delete/four", ((MusicFileSource) collection.get(0)).getComposition().getFilePath());
     }

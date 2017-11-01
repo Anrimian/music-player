@@ -21,4 +21,11 @@ public class MusicFileSource implements FileSource {
     public Composition getComposition() {
         return composition;
     }
+
+    @Override
+    public String toString() {
+        return "MusicFileSource{" +
+                "composition=" + composition +
+                '}';
+    }
 }

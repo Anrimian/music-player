@@ -20,4 +20,11 @@ public class FolderFileSource implements FileSource {
     public String getPath() {
         return path;
     }
+
+    @Override
+    public String toString() {
+        return "FolderFileSource{" +
+                "path='" + path + '\'' +
+                '}';
+    }
 }

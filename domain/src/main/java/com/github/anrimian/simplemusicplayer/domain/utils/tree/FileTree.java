@@ -10,9 +10,11 @@ public class FileTree<T> implements Visitable<T> {
     private final LinkedList<FileTree<T>> children = new LinkedList<>();
     private T data;
     private final String path;
+    private final String fullPath;
 
-    public FileTree(String path) {
+    public FileTree(String path, String fullPath) {
         this.path = path;
+        this.fullPath = fullPath;
     }
 
     public T getData() {
@@ -39,6 +41,10 @@ public class FileTree<T> implements Visitable<T> {
         return children;
     }
 
+    public String getFullPath() {
+        return fullPath;
+    }
+
     public boolean isEmpty() {
         return children.isEmpty();
     }
@@ -62,15 +68,19 @@ public class FileTree<T> implements Visitable<T> {
     }
 
     @Nullable
-    public FileTree<T> findNodeByPath(@Nonnull String fullPath) {
+    public FileTree<T> findNodeByPath(@Nullable String fullPath) {
+        if (fullPath == null) {
+            return this;
+        }
         FileTree<T> target = this;
+        FileTree<T> found = null;
         for (String partialPath: fullPath.split("/")) {
-            target = findChildNode(partialPath, target);
-            if (target == null) {
-                return null;
+            found = findChildNode(partialPath, target);
+            if (found != null) {
+                target = found;
             }
         }
-        return target;
+        return found;
     }
 
 //    @SuppressWarnings("unchecked")
@@ -87,7 +97,14 @@ public class FileTree<T> implements Visitable<T> {
     private FileTree<T> findNodeToInsert(String partialPath, FileTree<T> target) {
         FileTree<T> child = findChildNode(partialPath, target);
         if (child == null) {
-            return target.addChild(new FileTree<>(partialPath));
+            StringBuilder sbFullPath = new StringBuilder();
+            String parentPath = target.getFullPath();
+            if (parentPath != null) {
+                sbFullPath.append(parentPath);
+                sbFullPath.append("/");
+            }
+            sbFullPath.append(partialPath);
+            return target.addChild(new FileTree<>(partialPath, sbFullPath.toString()));
         }
         return child;
     }
@@ -100,8 +117,10 @@ public class FileTree<T> implements Visitable<T> {
     @Override
     public String toString() {
         return "FileTree{" +
-                "children=" + children +
-                ", path='" + path + '\'' +
+                "path='" + path + '\'' +
+                "fullPath='" + fullPath + '\'' +
+                "\nchildren=" + children +
                 '}';
     }
+
 }

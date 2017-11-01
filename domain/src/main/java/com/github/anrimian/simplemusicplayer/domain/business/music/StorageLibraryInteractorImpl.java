@@ -8,6 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors.CollectVisitor;
+import com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors.PrintIndentedVisitor;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -41,7 +42,7 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     @Override
     public Single<List<FileSource>> getMusicInPath(@Nullable String path) {
         return getAllMusicInPath(path)
-                .map(this::getFilesOnTop)
+                .map(this::getFilesListOnTop)
                 .map(this::applyOrder);
     }
 
@@ -75,13 +76,13 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
         return compositions;
     }
 
-    private List<FileSource> getFilesOnTop(FileTree<Composition> compositionFileTree) {
+    private List<FileSource> getFilesListOnTop(FileTree<Composition> compositionFileTree) {
         List<FileSource> musicList = new ArrayList<>();
         for (FileTree<Composition> node : compositionFileTree.getChildren()) {
             FileSource fileSource;
             Composition data = node.getData();
             if (data == null) {
-                fileSource = new FolderFileSource(node.getPath());
+                fileSource = new FolderFileSource(node.getFullPath());
             } else {
                 fileSource = new MusicFileSource(data);
             }
@@ -91,9 +92,6 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     }
 
     private FileTree<Composition> findNodeByPath(FileTree<Composition> tree, @Nullable String path) {
-        if (path == null) {
-            return tree;
-        }
         FileTree<Composition> result = tree.findNodeByPath(path);
         if (result == null) {
             throw new FileNodeNotFoundException("node not found for path: " + path);
@@ -112,13 +110,11 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     private Single<FileTree<Composition>> createMusicFileTree() {
         return musicProviderRepository.getAllCompositions()
                 .map(compositions -> {
-                    FileTree<Composition> musicFileTree = new FileTree<>(null);
-
+                    FileTree<Composition> musicFileTree = new FileTree<>(null, null);
                     for (Composition composition: compositions) {
                         String filePath = composition.getFilePath();
                         musicFileTree.addFile(composition, filePath);
                     }
-
                     return musicFileTree;
                 })
                 .map(this::removeUnusedRootComponents);
