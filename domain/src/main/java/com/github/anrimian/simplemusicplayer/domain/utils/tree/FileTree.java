@@ -2,7 +2,6 @@ package com.github.anrimian.simplemusicplayer.domain.utils.tree;
 
 import java.util.LinkedList;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class FileTree<T> implements Visitable<T> {
@@ -12,9 +11,13 @@ public class FileTree<T> implements Visitable<T> {
     private final String path;
     private final String fullPath;
 
-    public FileTree(String path, String fullPath) {
+    private FileTree(String path, String fullPath) {
         this.path = path;
         this.fullPath = fullPath;
+    }
+
+    public FileTree(String path) {
+        this(path, null);
     }
 
     public T getData() {
@@ -29,6 +32,10 @@ public class FileTree<T> implements Visitable<T> {
         return path;
     }
 
+    private String getFullPath() {
+        return fullPath;
+    }
+
     public int getChildCount() {
         return children.size();
     }
@@ -39,10 +46,6 @@ public class FileTree<T> implements Visitable<T> {
 
     public LinkedList<FileTree<T>> getChildren() {
         return children;
-    }
-
-    public String getFullPath() {
-        return fullPath;
     }
 
     public boolean isEmpty() {
@@ -83,6 +86,30 @@ public class FileTree<T> implements Visitable<T> {
         return found;
     }
 
+    public String getFullPathOfNode(FileTree<T> node) {//TODO finish this
+        String fullPath = node.getFullPath();
+
+        StringBuilder sbPath = new StringBuilder();
+
+        FileTree<T> target = this;
+        FileTree<T> found = null;
+        for (String partialPath: fullPath.split("/")) {
+            found = findChildNode(partialPath, target);
+            if (found != null) {
+                if (sbPath.length() != 0) {
+                    sbPath.append("/");
+                }
+                sbPath.append(target.getPath());
+                target = found;
+            }
+        }
+        if (found != null) {
+            sbPath.append("/");
+            sbPath.append(found.getPath());
+        }
+        return sbPath.toString();
+    }
+
 //    @SuppressWarnings("unchecked")
     @Nullable
     private FileTree<T> findChildNode(String partialPath, FileTree<T> target) {
@@ -118,9 +145,9 @@ public class FileTree<T> implements Visitable<T> {
     public String toString() {
         return "FileTree{" +
                 "path='" + path + '\'' +
-                "fullPath='" + fullPath + '\'' +
                 "\nchildren=" + children +
                 '}';
     }
+
 
 }

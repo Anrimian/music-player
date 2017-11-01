@@ -20,8 +20,6 @@ import io.reactivex.observers.TestObserver;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -58,22 +56,22 @@ public class StorageLibraryInteractorTest {
 
     @Test
     public void testFullTreeRootFilter() {
-        List<FileSource> collection = getListMusicListInPath(null);
+        List<FileSource> collection = getMusicListInPath(null);
         assertEquals(3, collection.size());
         FolderFileSource old = (FolderFileSource) collection.get(0);
-        assertEquals("root/music/old", old.getPath());
+        assertEquals("music/old", old.getPath());
 
-        List<FileSource> oldCollection = getListMusicListInPath(old.getPath());
+        List<FileSource> oldCollection = getMusicListInPath(old.getPath());
         FolderFileSource toDelete = (FolderFileSource) oldCollection.get(0);
-        assertEquals("root/music/old/to delete", toDelete.getPath());
+        assertEquals("music/old/to delete", toDelete.getPath());
 
-        List<FileSource> toDeleteCollection = getListMusicListInPath(toDelete.getPath());
+        List<FileSource> toDeleteCollection = getMusicListInPath(toDelete.getPath());
         assertEquals("root/music/old/to delete/four", ((MusicFileSource) toDeleteCollection.get(0)).getComposition().getFilePath());
     }
 
     @Test
     public void testPathTreeFilter() {
-        List<FileSource> collection = getListMusicListInPath("root/music/old");
+        List<FileSource> collection = getMusicListInPath("root/music/old");
         testCorrectCollection(collection);
         assertEquals(2, collection.size());
         assertThat(collection.get(0), instanceOf(FolderFileSource.class));
@@ -82,7 +80,7 @@ public class StorageLibraryInteractorTest {
 
     @Test
     public void testLastItemTreeFilter() {
-        List<FileSource> collection = getListMusicListInPath("root/music/old/to delete");
+        List<FileSource> collection = getMusicListInPath("root/music/old/to delete");
         assertEquals(1, collection.size());
         assertEquals("root/music/old/to delete/four", ((MusicFileSource) collection.get(0)).getComposition().getFilePath());
     }
@@ -111,7 +109,7 @@ public class StorageLibraryInteractorTest {
         }
     }
 
-    private List<FileSource> getListMusicListInPath(String path) {
+    private List<FileSource> getMusicListInPath(String path) {
         return storageLibraryInteractor.getMusicInPath(path).blockingGet();
     }
 

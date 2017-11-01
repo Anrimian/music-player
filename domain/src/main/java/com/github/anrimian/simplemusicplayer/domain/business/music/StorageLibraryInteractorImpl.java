@@ -8,7 +8,6 @@ import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors.CollectVisitor;
-import com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors.PrintIndentedVisitor;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -35,14 +34,14 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
 
     @Override
     public void playAllMusicInPath(@Nullable String path) {
-        getAllMusicInPath(path).map(this::toList);
+//        getAllMusicInPath(path).map(this::toList);
         //TODO play music
     }
 
     @Override
     public Single<List<FileSource>> getMusicInPath(@Nullable String path) {
-        return getAllMusicInPath(path)
-                .map(this::getFilesListOnTop)
+        return getMusicFileTree()
+                .map(tree -> getFilesListByPath(tree, path))
                 .map(this::applyOrder);
     }
 
@@ -51,10 +50,10 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
         //TODO play music
     }
 
-    private Single<FileTree<Composition>> getAllMusicInPath(@Nullable String path) {
-        return getMusicFileTree()
-                .map(tree -> findNodeByPath(tree, path));
-    }
+//    private Single<FileTree<Composition>> getAllMusicInPath(@Nullable String path) {
+//        return getMusicFileTree()
+//                .map(tree -> findNodeByPath(tree, path));
+//    }
 
     private List<FileSource> applyOrder(List<FileSource> FileSources) {
         List<FileSource> sortedList = new ArrayList<>();
@@ -76,7 +75,26 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
         return compositions;
     }
 
-    private List<FileSource> getFilesListOnTop(FileTree<Composition> compositionFileTree) {
+    private List<FileSource> getFilesListByPath(FileTree<Composition> tree, @Nullable String path) {
+        FileTree<Composition> compositionFileTree = tree.findNodeByPath(path);
+        if (compositionFileTree == null) {
+            throw new FileNodeNotFoundException("node not found for path: " + path);
+        }
+        List<FileSource> musicList = new ArrayList<>();
+        for (FileTree<Composition> node : compositionFileTree.getChildren()) {
+            FileSource fileSource;
+            Composition data = node.getData();
+            if (data == null) {
+                fileSource = new FolderFileSource(tree.getFullPathOfNode(node));
+            } else {
+                fileSource = new MusicFileSource(data);
+            }
+            musicList.add(fileSource);
+        }
+        return musicList;
+    }
+
+    /*private List<FileSource> getFilesListOnTop(FileTree<Composition> compositionFileTree) {
         List<FileSource> musicList = new ArrayList<>();
         for (FileTree<Composition> node : compositionFileTree.getChildren()) {
             FileSource fileSource;
@@ -97,7 +115,7 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
             throw new FileNodeNotFoundException("node not found for path: " + path);
         }
         return result;
-    }
+    }*/
 
     private Single<FileTree<Composition>> getMusicFileTree() {
         if (musicFileTree == null) {
@@ -110,7 +128,7 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     private Single<FileTree<Composition>> createMusicFileTree() {
         return musicProviderRepository.getAllCompositions()
                 .map(compositions -> {
-                    FileTree<Composition> musicFileTree = new FileTree<>(null, null);
+                    FileTree<Composition> musicFileTree = new FileTree<>(null);
                     for (Composition composition: compositions) {
                         String filePath = composition.getFilePath();
                         musicFileTree.addFile(composition, filePath);
