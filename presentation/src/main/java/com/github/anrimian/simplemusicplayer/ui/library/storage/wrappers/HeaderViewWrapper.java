@@ -9,7 +9,9 @@ import com.github.anrimian.simplemusicplayer.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.view.View.*;
+import static android.view.View.GONE;
+import static android.view.View.OnClickListener;
+import static android.view.View.VISIBLE;
 
 /**
  * Created on 01.11.2017.
@@ -28,12 +30,12 @@ public class HeaderViewWrapper {
     }
 
     public void bind(@NonNull String path) {
-        String targetPath = path;
+        String displayPath = path;
         int lastSlashIndex = path.lastIndexOf('/');
         if (lastSlashIndex != -1) {
-            targetPath = path.substring(lastSlashIndex, path.length());
+            displayPath = path.substring(++lastSlashIndex, path.length());
         }
-        tvParentPath.setText(targetPath);
+        tvParentPath.setText(displayPath);
     }
 
     public void setOnClickListener(OnClickListener listener) {

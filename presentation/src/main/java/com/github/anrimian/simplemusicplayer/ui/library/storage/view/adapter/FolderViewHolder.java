@@ -33,6 +33,11 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
 
     void bind(@Nonnull String path) {
         this.path = path;
-        tvPath.setText(path);
+        String displayPath = path;
+        int lastSlashIndex = path.lastIndexOf('/');
+        if (lastSlashIndex != -1) {
+            displayPath = path.substring(++lastSlashIndex, path.length());
+        }
+        tvPath.setText(displayPath);
     }
 }
