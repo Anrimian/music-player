@@ -42,8 +42,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment existFragment = fragmentManager.findFragmentById(R.id.main_activity_container);
         if (existFragment == null || existFragment.getClass() != fragment.getClass()) {
-            getSupportFragmentManager()
-                    .beginTransaction()
+            fragmentManager.beginTransaction()
                     .replace(R.id.main_activity_container, fragment)
                     .commit();
         }

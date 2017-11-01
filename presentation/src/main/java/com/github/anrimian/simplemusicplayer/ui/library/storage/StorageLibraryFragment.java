@@ -16,6 +16,7 @@ import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter.MusicFileSourceAdapter;
+import com.github.anrimian.simplemusicplayer.ui.library.storage.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
@@ -40,6 +41,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
+    private HeaderViewWrapper headerViewWrapper;
 
     public static StorageLibraryFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
@@ -76,22 +78,26 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        View headerView = View.inflate(getContext(), R.layout.partial_storage_header, null);
+        headerViewWrapper = new HeaderViewWrapper(headerView);
+        headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
+
         adapter = new MusicFileSourceAdapter();
+        adapter.addHeader(headerView);
+        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
+        adapter.setOnFolderClickListener(presenter::onFolderClicked);
         recyclerView.setAdapter(adapter);
     }
 
     @Override
     public void showBackPathButton(@NonNull String path) {
-        /*String targetPath = path;
-        int lastSlashIndex = path.lastIndexOf('/');
-        if (lastSlashIndex != -1) {
-            targetPath = path.substring(lastSlashIndex, path.length());
-        }*/
+        headerViewWrapper.setVisible(true);
+        headerViewWrapper.bind(path);
     }
 
     @Override
     public void hideBackPathButton() {
-
+        headerViewWrapper.setVisible(false);
     }
 
     @Override
@@ -120,6 +126,10 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @Override
     public void goToMusicStorageScreen(String path) {
-
+        getFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
+                .replace(R.id.library_fragment_container, StorageLibraryFragment.newInstance(path))
+                .commit();
     }
 }

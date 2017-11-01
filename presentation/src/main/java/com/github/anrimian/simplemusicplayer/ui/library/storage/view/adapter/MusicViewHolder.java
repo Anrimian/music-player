@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
 
 import javax.annotation.Nonnull;
 
@@ -21,12 +22,18 @@ class MusicViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.tv_music_name)
     TextView tvMusicName;
 
-    MusicViewHolder(View itemView) {
+    private Composition composition;
+
+    MusicViewHolder(View itemView, OnItemClickListener<Composition> onCompositionClickListener) {
         super(itemView);
         ButterKnife.bind(this, itemView);
+        if (onCompositionClickListener != null) {
+            itemView.setOnClickListener(v -> onCompositionClickListener.onItemClick(composition));
+        }
     }
 
     void bind(@Nonnull Composition composition) {
+        this.composition = composition;
         tvMusicName.setText(composition.getDisplayName());
     }
 }

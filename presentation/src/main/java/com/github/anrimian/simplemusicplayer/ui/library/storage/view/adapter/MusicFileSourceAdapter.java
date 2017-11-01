@@ -6,9 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
 import com.github.anrimian.simplemusicplayer.utils.recycler_view.HeaderFooterRecyclerViewAdapter;
 
 import java.util.ArrayList;
@@ -24,9 +26,19 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private static final int TYPE_FILE = 2;
 
     private List<FileSource> musicList = new ArrayList<>();
+    private OnItemClickListener<Composition> onCompositionClickListener;
+    private OnItemClickListener<String> onFolderClickListener;
 
     public void setMusicList(List<FileSource> musicList) {
         this.musicList = musicList;
+    }
+
+    public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
+        this.onCompositionClickListener = onCompositionClickListener;
+    }
+
+    public void setOnFolderClickListener(OnItemClickListener<String> onFolderClickListener) {
+        this.onFolderClickListener = onFolderClickListener;
     }
 
     @Override
@@ -35,11 +47,11 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         switch (type) {
             case TYPE_MUSIC: {
                 View view = inflater.inflate(R.layout.item_storage_music, parent, false);
-                return new MusicViewHolder(view);
+                return new MusicViewHolder(view, onCompositionClickListener);
             }
             case TYPE_FILE: {
                 View view = inflater.inflate(R.layout.item_storage_folder, parent, false);
-                return new FolderViewHolder(view);
+                return new FolderViewHolder(view, onFolderClickListener);
             }
             default: throw new IllegalStateException("unexpected item type: " + type);
         }

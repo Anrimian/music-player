@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,11 +105,7 @@ public class LibraryFragment extends Fragment {
         pagerAdapter.addFragment(PlayQueueFragment::new);
         viewPager.setAdapter(pagerAdapter);
 
-        getFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                .replace(R.id.library_fragment_container, StorageLibraryFragment.newInstance(null))
-                .commit();
+        startFragment(StorageLibraryFragment.newInstance(null));
     }
 
     @Override
@@ -130,5 +127,16 @@ public class LibraryFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 //        coordinatorDelegate.onDetach();
+    }
+
+    private void startFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getChildFragmentManager();
+        Fragment existFragment = fragmentManager.findFragmentById(R.id.library_fragment_container);
+        if (existFragment == null || existFragment.getClass() != fragment.getClass()) {
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
+                    .replace(R.id.library_fragment_container, fragment)
+                    .commit();
+        }
     }
 }

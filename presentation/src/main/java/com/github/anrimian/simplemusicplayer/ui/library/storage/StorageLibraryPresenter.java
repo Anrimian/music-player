@@ -67,7 +67,7 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         interactor.playAllMusicInPath(path);
     }
 
-    void onBackPathButtonClicked() {
+    void onBackPathButtonClicked() {//TODO we don't know filtered root path, fix this
         if (path == null) {
             throw new IllegalStateException("can not go back in root screen");
         }
