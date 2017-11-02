@@ -7,6 +7,7 @@ import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibr
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractorImpl;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.simplemusicplayer.ui.library.main.LibraryPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -16,6 +17,7 @@ import dagger.Provides;
 import io.reactivex.Scheduler;
 
 import static com.github.anrimian.simplemusicplayer.di.app.SchedulerModule.IO_SCHEDULER;
+import static com.github.anrimian.simplemusicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 29.10.2017.
@@ -36,5 +38,12 @@ public class LibraryModule {
     StorageLibraryInteractor provideStorageLibraryInteractor(MusicProviderRepository musicProviderRepository,
                                                              MusicPlayerInteractor musicPlayerInteractor) {
         return new StorageLibraryInteractorImpl(musicProviderRepository, musicPlayerInteractor);
+    }
+
+    @Provides
+    @Nonnull
+    LibraryPresenter provideLibraryPresenter(MusicPlayerInteractor musicPlayerInteractor,
+                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+        return new LibraryPresenter(musicPlayerInteractor, uiScheduler);
     }
 }

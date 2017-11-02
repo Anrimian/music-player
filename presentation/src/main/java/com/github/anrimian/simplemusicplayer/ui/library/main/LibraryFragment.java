@@ -11,8 +11,13 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.arellomobile.mvp.MvpAppCompatFragment;
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.player.music_info.MusicInfoFragment;
 import com.github.anrimian.simplemusicplayer.ui.player.play_queue.PlayQueueFragment;
@@ -25,17 +30,26 @@ import butterknife.ButterKnife;
  * Created on 19.10.2017.
  */
 
-public class LibraryFragment extends Fragment {
+public class LibraryFragment extends MvpAppCompatFragment implements LibraryView {
 
     private static final String BOTTOM_SHEET_STATE = "bottom_sheet_state";
     private static final String TOOLBAR_Y = "toolbar_y";
     private static final String TOOLBAR_START_Y = "toolbar_start_y";
+
+    @InjectPresenter
+    LibraryPresenter presenter;
 
     @BindView(R.id.bottom_sheet)
     CoordinatorLayout bottomSheet;
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
+
+    @BindView(R.id.btn_play)
+    Button btnPlay;
+
+    @BindView(R.id.btn_stop)
+    Button btnStop;
 
     private View toolbar;
 
@@ -50,6 +64,11 @@ public class LibraryFragment extends Fragment {
         super.onAttach(context);
 //        coordinatorDelegate = new FragmentCoordinatorDelegate(getActivity(), R.id.drawer_fragment_container);
 //        coordinatorDelegate.onAttach();
+    }
+
+    @ProvidePresenter
+    LibraryPresenter providePresenter() {
+        return Components.getLibraryComponent().libraryPresenter();
     }
 
     @Nullable
@@ -106,6 +125,9 @@ public class LibraryFragment extends Fragment {
         viewPager.setAdapter(pagerAdapter);
 
         startFragment(StorageLibraryFragment.newInstance(null));
+
+        btnStop.setOnClickListener(v -> presenter.onStopPlayButtonClicked());
+        btnPlay.setOnClickListener(v -> presenter.onStartPlayButtonClicked());
     }
 
     @Override
@@ -127,6 +149,18 @@ public class LibraryFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 //        coordinatorDelegate.onDetach();
+    }
+
+    @Override
+    public void showStopState() {
+        btnPlay.setEnabled(true);
+        btnStop.setEnabled(false);
+    }
+
+    @Override
+    public void showPlayState() {
+        btnPlay.setEnabled(false);
+        btnStop.setEnabled(true);
     }
 
     private void startFragment(Fragment fragment) {
