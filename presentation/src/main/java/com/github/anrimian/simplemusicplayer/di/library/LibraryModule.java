@@ -3,8 +3,8 @@ package com.github.anrimian.simplemusicplayer.di.library;
 import android.content.Context;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
-import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractor;
-import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractorImpl;
+import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractorImpl;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 import javax.annotation.Nonnull;

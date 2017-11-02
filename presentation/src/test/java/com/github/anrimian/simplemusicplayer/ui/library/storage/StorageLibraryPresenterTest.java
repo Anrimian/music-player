@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.ui.library.storage;
 
-import com.github.anrimian.simplemusicplayer.domain.business.music.StorageLibraryInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;

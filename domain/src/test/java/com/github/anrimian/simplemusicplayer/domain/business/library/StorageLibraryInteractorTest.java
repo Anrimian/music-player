@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.domain.business.music;
+package com.github.anrimian.simplemusicplayer.domain.business.library;
 
 import com.github.anrimian.simplemusicplayer.domain.business.music.utils.FakeMusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
