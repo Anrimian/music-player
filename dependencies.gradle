@@ -60,6 +60,7 @@ ext {
 
     domainTestDependencies = [
             junit:              "junit:junit:${jUnitVersion}",
+            mockito:            "org.mockito:mockito-core:${mockitoVersion}",
     ]
 
     dataDependencies = [
@@ -70,7 +71,8 @@ ext {
     dataTestDependencies = [
             junit:              "junit:junit:${jUnitVersion}",
             espresso:           "com.android.support.test.espresso:espresso-core:${espressoVersion}",
-            supportTest:        "com.android.support.test:runner:1.0.1"
+            supportTest:        "com.android.support.test:runner:1.0.1",
+            mockito:            "org.mockito:mockito-core:${mockitoVersion}",
     ]
 
 }

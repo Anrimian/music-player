@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.business.library;
 
 import com.github.anrimian.simplemusicplayer.domain.business.music.utils.FakeMusicProviderRepository;
+import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
@@ -11,6 +12,7 @@ import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRe
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created on 25.10.2017.
@@ -29,6 +33,7 @@ public class StorageLibraryInteractorTest {
 
     private MusicProviderRepository musicProviderRepository;
     private StorageLibraryInteractor storageLibraryInteractor;
+    private MusicPlayerInteractor musicPlayerInteractor;
 
     private List<Composition> fakeCompositions = new ArrayList<>();
 
@@ -50,8 +55,10 @@ public class StorageLibraryInteractorTest {
         four.setFilePath("root/music/old/to delete/four");
         fakeCompositions.add(four);
 
+        musicPlayerInteractor = mock(MusicPlayerInteractor.class);
+
         musicProviderRepository = new FakeMusicProviderRepository(fakeCompositions);
-        storageLibraryInteractor = new StorageLibraryInteractorImpl(musicProviderRepository);
+        storageLibraryInteractor = new StorageLibraryInteractorImpl(musicProviderRepository, musicPlayerInteractor);
     }
 
     @Test
@@ -94,6 +101,15 @@ public class StorageLibraryInteractorTest {
 
         //noinspection unchecked
         subscriber.assertFailure(FileNodeNotFoundException.class);
+    }
+
+    @Test
+    public void playAllMusicInPathTest() {
+        storageLibraryInteractor.playAllMusicInPath(null);
+
+        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+        verify(musicPlayerInteractor).startPlaying(captor.capture());
+        assertEquals(4, captor.getValue().size());
     }
 
     private void testCorrectCollection(List<FileSource> collection) {

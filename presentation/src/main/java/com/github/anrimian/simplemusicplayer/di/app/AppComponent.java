@@ -13,7 +13,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = { AppModule.class, SchedulerModule.class, ErrorModule.class })
+@Component(modules = { AppModule.class, SchedulerModule.class, ErrorModule.class, MusicModule.class })
 public interface AppComponent {
 
     LibraryComponent libraryComponent(LibraryModule libraryModule);

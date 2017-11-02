@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
+import com.github.anrimian.simplemusicplayer.utils.recycler_view.HideFabScrollListener;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
@@ -39,6 +41,9 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
 
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
@@ -79,10 +84,13 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnScrollListener(new HideFabScrollListener(fab));
 
         headerView = View.inflate(getContext(), R.layout.partial_storage_header, null);
         headerViewWrapper = new HeaderViewWrapper(headerView);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
+
+        fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
     }
 
     @Override

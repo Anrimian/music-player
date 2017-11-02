@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.business.library;
 
+import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
@@ -27,15 +28,19 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     private FileTree<Composition> musicFileTree;
 
     private MusicProviderRepository musicProviderRepository;
+    private MusicPlayerInteractor musicPlayerInteractor;
 
-    public StorageLibraryInteractorImpl(MusicProviderRepository musicProviderRepository) {
+    public StorageLibraryInteractorImpl(MusicProviderRepository musicProviderRepository,
+                                        MusicPlayerInteractor musicPlayerInteractor) {
         this.musicProviderRepository = musicProviderRepository;
+        this.musicPlayerInteractor = musicPlayerInteractor;
     }
 
     @Override
     public void playAllMusicInPath(@Nullable String path) {
-//        getAllMusicInPath(path).map(this::toList);
-        //TODO play music
+            getMusicFileTree().map(tree -> findNodeByPath(tree, path))
+                    .map(this::getAllCompositions)
+                    .subscribe(musicPlayerInteractor::startPlaying);
     }
 
     @Override
@@ -46,14 +51,9 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
     }
 
     @Override
-    public void playMusic(Composition FileSource) {
-        //TODO play music
+    public void playMusic(Composition composition) {
+        musicPlayerInteractor.startPlaying(composition);
     }
-
-//    private Single<FileTree<Composition>> getAllMusicInPath(@Nullable String path) {
-//        return getMusicFileTree()
-//                .map(tree -> findNodeByPath(tree, path));
-//    }
 
     private List<FileSource> applyOrder(List<FileSource> FileSources) {
         List<FileSource> sortedList = new ArrayList<>();
@@ -69,17 +69,14 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
         return sortedList;
     }
 
-    private List<Composition> toList(FileTree<Composition> compositionFileTree) {
+    private List<Composition> getAllCompositions(FileTree<Composition> compositionFileTree) {
         List<Composition> compositions = new LinkedList<>();
         compositionFileTree.accept(new CollectVisitor<>(compositions));
         return compositions;
     }
 
     private List<FileSource> getFilesListByPath(FileTree<Composition> tree, @Nullable String path) {
-        FileTree<Composition> compositionFileTree = tree.findNodeByPath(path);
-        if (compositionFileTree == null) {
-            throw new FileNodeNotFoundException("node not found for path: " + path);
-        }
+        FileTree<Composition> compositionFileTree = findNodeByPath(tree, path);
         List<FileSource> musicList = new ArrayList<>();
         for (FileTree<Composition> node : compositionFileTree.getChildren()) {
             FileSource fileSource;
@@ -94,28 +91,13 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
         return musicList;
     }
 
-    /*private List<FileSource> getFilesListOnTop(FileTree<Composition> compositionFileTree) {
-        List<FileSource> musicList = new ArrayList<>();
-        for (FileTree<Composition> node : compositionFileTree.getChildren()) {
-            FileSource fileSource;
-            Composition data = node.getData();
-            if (data == null) {
-                fileSource = new FolderFileSource(node.getFullPath());
-            } else {
-                fileSource = new MusicFileSource(data);
-            }
-            musicList.add(fileSource);
-        }
-        return musicList;
-    }
-
     private FileTree<Composition> findNodeByPath(FileTree<Composition> tree, @Nullable String path) {
         FileTree<Composition> result = tree.findNodeByPath(path);
         if (result == null) {
             throw new FileNodeNotFoundException("node not found for path: " + path);
         }
         return result;
-    }*/
+    }
 
     private Single<FileTree<Composition>> getMusicFileTree() {
         if (musicFileTree == null) {

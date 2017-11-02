@@ -14,5 +14,6 @@ dependencies {
     compileOnly domainDependencies.javaxAnnotation
 
     testImplementation domainTestDependencies.junit
+    testImplementation domainTestDependencies.mockito
 }
 
