@@ -25,6 +25,7 @@ ext {
     jUnitVersion = '4.12'
     espressoVersion = '3.0.1'
     mockitoVersion = '1.9.5'
+    dexmakerVersion = '1.0'
 
     presentationDependencies = [
             supportLibrary:     "com.android.support:appcompat-v7:$supportLibraryVersion",
@@ -45,6 +46,8 @@ ext {
     ]
 
     presentationTestDependencies = [
+            dexmaker:           "com.google.dexmaker:dexmaker:${dexmakerVersion}",
+            dexmakerMockito:    "com.google.dexmaker:dexmaker-mockito:${dexmakerVersion}",
             junit:              "junit:junit:${jUnitVersion}",
             espresso:           "com.android.support.test.espresso:espresso-core:${espressoVersion}",
             mockito:            "org.mockito:mockito-core:${mockitoVersion}",

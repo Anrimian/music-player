@@ -68,6 +68,9 @@ dependencies {
 
     testImplementation presentationTestDependencies.junit
     testImplementation presentationTestDependencies.mockito
+
+    androidTestImplementation presentationTestDependencies.dexmaker
+    androidTestImplementation presentationTestDependencies.dexmakerMockito
     androidTestImplementation presentationTestDependencies.mockito
     androidTestImplementation presentationTestDependencies.espresso
 }
