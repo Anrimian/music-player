@@ -66,6 +66,7 @@ ext {
     dataDependencies = [
             rxJava:             "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
             javaxAnnotation:    'com.google.code.findbugs:jsr305:2.0.1',
+            supportMedia:       "com.android.support:support-media-compat:$supportLibraryVersion"
     ]
 
     dataTestDependencies = [
