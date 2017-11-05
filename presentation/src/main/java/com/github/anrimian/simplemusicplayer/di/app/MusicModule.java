@@ -1,10 +1,13 @@
 package com.github.anrimian.simplemusicplayer.di.app;
 
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractorImpl;
+import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
+import com.github.anrimian.simplemusicplayer.infrastructure.MusicPlayerControllerImpl;
 
 import javax.inject.Singleton;
 
@@ -16,12 +19,19 @@ import dagger.Provides;
  */
 
 @Module
-public class MusicModule {
+class MusicModule {
 
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerInteractor provideMusicPlayerInteractor() {
-        return new MusicPlayerInteractorImpl();
+    MusicPlayerInteractor provideMusicPlayerInteractor(MusicPlayerController musicPlayerController) {
+        return new MusicPlayerInteractorImpl(musicPlayerController);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    MusicPlayerController provideMusicPlayerController(Context context) {
+        return new MusicPlayerControllerImpl(context);
     }
 }

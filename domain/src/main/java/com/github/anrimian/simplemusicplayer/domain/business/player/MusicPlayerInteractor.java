@@ -13,8 +13,6 @@ import io.reactivex.Observable;
 
 public interface MusicPlayerInteractor {
 
-    void startPlaying(Composition composition);
-
     void startPlaying(List<Composition> compositions);
 
     void stopPlaying();

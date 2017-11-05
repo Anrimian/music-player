@@ -52,7 +52,9 @@ public class StorageLibraryInteractorImpl implements StorageLibraryInteractor {
 
     @Override
     public void playMusic(Composition composition) {
-        musicPlayerInteractor.startPlaying(composition);
+        List<Composition> list = new ArrayList<>();
+        list.add(composition);
+        musicPlayerInteractor.startPlaying(list);
     }
 
     private List<FileSource> applyOrder(List<FileSource> FileSources) {

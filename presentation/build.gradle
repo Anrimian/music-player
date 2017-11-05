@@ -49,6 +49,8 @@ dependencies {
     implementation presentationDependencies.cardView
     implementation presentationDependencies.recyclerView
     implementation presentationDependencies.constraintLayout
+    implementation presentationDependencies.supportMedia
+    implementation presentationDependencies.exoPlayerCore
 
     implementation presentationDependencies.rxAndroid
     implementation presentationDependencies.rxPermissions
