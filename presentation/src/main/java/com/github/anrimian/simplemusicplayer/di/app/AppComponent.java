@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.di.app;
 
 import com.github.anrimian.simplemusicplayer.di.library.LibraryComponent;
 import com.github.anrimian.simplemusicplayer.di.library.LibraryModule;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
 
 import javax.inject.Singleton;
 
@@ -18,4 +19,5 @@ public interface AppComponent {
 
     LibraryComponent libraryComponent(LibraryModule libraryModule);
 
+    void inject(MusicService musicService);
 }

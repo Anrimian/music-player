@@ -1,23 +1,21 @@
 package com.github.anrimian.simplemusicplayer.infrastructure.service;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 
-import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.data.utils.rx_receivers.RxReceivers;
+import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController;
 
 import java.util.List;
+
+import javax.inject.Inject;
+
+import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController.FOREGROUND_NOTIFICATION_DELETED;
+import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController.FOREGROUND_NOTIFICATION_ID;
 
 /**
  * Created on 03.11.2017.
@@ -25,23 +23,18 @@ import java.util.List;
 
 public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
-    public static final String CHANNEL_ID = "la-la-la";
-    public static final String CHANNEL_NAME = "EXPRESS TAXI";
-
-    private NotificationManager notificationManager;
+    @Inject
+    NotificationsController notificationsController;
 
     private MusicServiceBinder musicServiceBinder = new MusicServiceBinder(this);
 
     @Override
     public void onCreate() {
         super.onCreate();
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-            notificationManager.createNotificationChannel(channel);
-        }
+        Components.getAppComponent().inject(this);
+        RxReceivers.from(FOREGROUND_NOTIFICATION_DELETED, this)
+                .firstOrError()//TODO check for crashes, maybe we don't need it
+                .subscribe(o -> stopSelf());
     }
 
     @Nullable
@@ -49,18 +42,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     public IBinder onBind(Intent intent) {
         return musicServiceBinder;
     }
-
-    private static final String NOTIFICATION_DELETED_ACTION = "NOTIFICATION_DELETED";
-
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            stopSelf();
-        }
-    };
-
-
-
 
 /*    @Nullable
     @Override
@@ -105,23 +86,11 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void startForeground() {
-        startForeground(2, buildForegroundNotification(false));
-        registerReceiver(receiver, new IntentFilter(NOTIFICATION_DELETED_ACTION));
+        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification());
     }
 
     private void stopForeground() {
         stopForeground(false);
-        notificationManager.notify(2, buildForegroundNotification(true));
-    }
-
-    private Notification buildForegroundNotification(boolean stub) {
-        Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("test, stub: " + stub)
-                .setSmallIcon(R.drawable.ic_menu)
-                .setOngoing(false)
-                .setDeleteIntent(pendingIntent);
-        return b.build();
+        notificationsController.displayStubForegroundNotification();
     }
 }
