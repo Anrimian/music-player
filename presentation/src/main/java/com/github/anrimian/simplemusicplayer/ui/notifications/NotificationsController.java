@@ -22,7 +22,7 @@ public class NotificationsController {
     private static final String FOREGROUND_CHANNEL_ID = "0";
 
     public static final int FOREGROUND_NOTIFICATION_ID = 1;
-    public static final String FOREGROUND_NOTIFICATION_DELETED = "foreground_notification_deleted";
+//    public static final String FOREGROUND_NOTIFICATION_DELETED = "foreground_notification_deleted";
 
     private NotificationManager notificationManager;
 
@@ -36,9 +36,9 @@ public class NotificationsController {
             NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
                     getString(R.string.foreground_channel_id),
                     NotificationManager.IMPORTANCE_DEFAULT);
-            channel.enableLights(false);
-            channel.setVibrationPattern(new long[]{0, 0, 0, 0, 0, 0, 0, 0, 0});//bug in system
-            channel.enableVibration(false);
+//            channel.enableLights(false);
+//            channel.setVibrationPattern(new long[]{0, 0, 0, 0, 0, 0, 0, 0, 0});//bug in system
+//            channel.enableVibration(false);
             notificationManager.createNotificationChannel(channel);
         }
     }
@@ -47,13 +47,15 @@ public class NotificationsController {
         return getDefaultMusicNotification().build();
     }
 
-    public void displayStubForegroundNotification() {
+/*    public void displayStubForegroundNotification() {
         Intent intent = new Intent(FOREGROUND_NOTIFICATION_DELETED);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        getDefaultMusicNotification()
+        Notification notification = getDefaultMusicNotification()
                 .setOngoing(false)
-                .setDeleteIntent(pendingIntent);
-    }
+                .setDeleteIntent(pendingIntent)
+                .build();
+        notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
+    }*/
 
     private NotificationCompat.Builder getDefaultMusicNotification() {
         Intent intent = new Intent(context, MainActivity.class);

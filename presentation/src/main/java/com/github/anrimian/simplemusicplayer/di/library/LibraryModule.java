@@ -6,6 +6,7 @@ import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProvid
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractorImpl;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.player.state.PlayerStateInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.ui.library.main.LibraryPresenter;
 
@@ -43,7 +44,8 @@ public class LibraryModule {
     @Provides
     @Nonnull
     LibraryPresenter provideLibraryPresenter(MusicPlayerInteractor musicPlayerInteractor,
+                                             PlayerStateInteractor playerStateInteractor,
                                              @Named(UI_SCHEDULER) Scheduler uiScheduler) {
-        return new LibraryPresenter(musicPlayerInteractor, uiScheduler);
+        return new LibraryPresenter(musicPlayerInteractor, playerStateInteractor, uiScheduler);
     }
 }

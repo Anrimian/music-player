@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractorImpl;
+import com.github.anrimian.simplemusicplayer.domain.business.player.state.PlayerStateInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.player.state.PlayerStateInteractorImpl;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.infrastructure.MusicPlayerControllerImpl;
 
@@ -33,5 +35,12 @@ class MusicModule {
     @Singleton
     MusicPlayerController provideMusicPlayerController(Context context) {
         return new MusicPlayerControllerImpl(context);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    PlayerStateInteractor providePlayerStateInteractor() {
+        return new PlayerStateInteractorImpl();
     }
 }
