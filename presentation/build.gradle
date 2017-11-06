@@ -16,6 +16,7 @@ android {
         testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
         testApplicationId globalConfiguration["testApplicationId"]
         setProperty("archivesBaseName", applicationId + "-v" + versionCode + "(" + versionName + ")")
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {

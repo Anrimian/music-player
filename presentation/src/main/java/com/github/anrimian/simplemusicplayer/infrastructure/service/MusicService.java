@@ -33,6 +33,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.disposables.CompositeDisposable;
+
 import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController.FOREGROUND_NOTIFICATION_ID;
 
 /**
@@ -40,6 +42,9 @@ import static com.github.anrimian.simplemusicplayer.ui.notifications.Notificatio
  */
 
 public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
+
+    public static final String REQUEST_CODE = "request_code";
+    public static final int PLAY_PAUSE = 1;
 
     @Inject
     NotificationsController notificationsController;
@@ -51,13 +56,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private SimpleExoPlayer player;
 
+    private CompositeDisposable serviceDisposable = new CompositeDisposable();
+
     @Override
     public void onCreate() {
         super.onCreate();
         Components.getAppComponent().inject(this);
-//        RxReceivers.from(FOREGROUND_NOTIFICATION_DELETED, this)
-//                .firstOrError()//TODO check for crashes, maybe we don't need it
-//                .subscribe(o -> stopSelf());
         player = ExoPlayerFactory.newSimpleInstance(
                 new DefaultRenderersFactory(this),
                 new DefaultTrackSelector(),
@@ -80,7 +84,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-//                Player.STA
                 if (playWhenReady) {
                     musicPlayerInteractor.notifyResume();
                 } else {
@@ -110,12 +113,34 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         });
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
+        switch (requestCode) {
+            case PLAY_PAUSE: {
+                if (player.getPlayWhenReady()) {
+                    pause();
+                } else {
+                    resume();
+                }
+                break;
+            }
+        }
+
+        return START_NOT_STICKY;
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return musicServiceBinder;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        serviceDisposable.dispose();
+    }
 /*    @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
@@ -127,21 +152,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     }*/
 
-    private void initializePlayer() {
-//        Uri uri = Uri.parse(getString(R.string.media_url_mp3));
-//        MediaSource mediaSource = buildMediaSource(uri);
-//        player.prepare(mediaSource, true, false);
-
-
-
-//        playerView.setPlayer(player);
-
-//        player.setPlayWhenReady(true);
-//        player.seekTo(currentWindow, playbackPosition);
-    }
-
     public void play(List<Composition> compositions) {
-        System.out.println(compositions);
         startForeground();
         Uri uri = Uri.fromFile(new File(compositions.get(compositions.size() - 1).getFilePath()));
         DataSpec dataSpec = new DataSpec(uri);
@@ -153,37 +164,41 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             musicPlayerInteractor.notifyPause();//TODO implement error behavior
         }
 
-        DataSource.Factory factory = new DataSource.Factory() {
-            @Override
-            public DataSource createDataSource() {
-                return fileDataSource;
-            }
-        };
+        DataSource.Factory factory = () -> fileDataSource;
         MediaSource audioSource = new ExtractorMediaSource(fileDataSource.getUri(),
-                factory, new DefaultExtractorsFactory(), null, null);
+                factory,
+                new DefaultExtractorsFactory(),
+                null,
+                null);
 
         player.prepare(audioSource);
         player.setPlayWhenReady(true);
     }
 
     public void pause() {
-        System.out.println("pause");
         stopForeground();
         player.setPlayWhenReady(false);
     }
 
     public void resume() {
-        System.out.println("resume");
         startForeground();
         player.setPlayWhenReady(true);
     }
 
     private void startForeground() {
-        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification());
+        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(true));
     }
 
     private void stopForeground() {
         stopForeground(false);
-//        notificationsController.displayStubForegroundNotification();
+        notificationsController.updateForegroundNotification(false);
+    }
+
+    private void onPlayPauseButtonClicked() {
+        if (player.getPlayWhenReady()) {
+            pause();
+        } else {
+            resume();
+        }
     }
 }

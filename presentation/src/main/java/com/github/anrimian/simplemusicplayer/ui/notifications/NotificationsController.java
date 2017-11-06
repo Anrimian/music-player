@@ -9,9 +9,15 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
+import android.widget.RemoteViews;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
+
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PLAY_PAUSE;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.REQUEST_CODE;
+
 
 /**
  * Created on 05.11.2017.
@@ -22,7 +28,6 @@ public class NotificationsController {
     private static final String FOREGROUND_CHANNEL_ID = "0";
 
     public static final int FOREGROUND_NOTIFICATION_ID = 1;
-//    public static final String FOREGROUND_NOTIFICATION_DELETED = "foreground_notification_deleted";
 
     private NotificationManager notificationManager;
 
@@ -36,32 +41,34 @@ public class NotificationsController {
             NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
                     getString(R.string.foreground_channel_id),
                     NotificationManager.IMPORTANCE_DEFAULT);
-//            channel.enableLights(false);
-//            channel.setVibrationPattern(new long[]{0, 0, 0, 0, 0, 0, 0, 0, 0});//bug in system
-//            channel.enableVibration(false);
             notificationManager.createNotificationChannel(channel);
         }
     }
 
-    public Notification getForegroundNotification() {
-        return getDefaultMusicNotification().build();
+    public Notification getForegroundNotification(boolean play) {
+        return getDefaultMusicNotification(play).build();
     }
 
-/*    public void displayStubForegroundNotification() {
-        Intent intent = new Intent(FOREGROUND_NOTIFICATION_DELETED);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        Notification notification = getDefaultMusicNotification()
-                .setOngoing(false)
-                .setDeleteIntent(pendingIntent)
+    public void updateForegroundNotification(boolean play) {
+        Notification notification = getDefaultMusicNotification(play)
                 .build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
-    }*/
+    }
 
-    private NotificationCompat.Builder getDefaultMusicNotification() {
+    private NotificationCompat.Builder getDefaultMusicNotification(boolean play) {
+        RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_music);
+        contentView.setImageViewResource(R.id.iv_play_stop, play? R.drawable.ic_pause : R.drawable.ic_play);
+
+        Intent intentPlayPause = new Intent(context, MusicService.class);
+        intentPlayPause.putExtra(REQUEST_CODE, PLAY_PAUSE);
+        PendingIntent pIntentPlayPause = PendingIntent.getService(context, PLAY_PAUSE, intentPlayPause, PendingIntent.FLAG_CANCEL_CURRENT);
+        contentView.setOnClickPendingIntent(R.id.iv_play_stop, pIntentPlayPause);
+
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
+                .setContent(contentView)
                 .setContentTitle("test")
                 .setSmallIcon(R.drawable.ic_menu)
                 .setContentIntent(pIntent);

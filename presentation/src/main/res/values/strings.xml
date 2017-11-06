@@ -13,4 +13,5 @@
     <string name="file_not_found">Файл не найден</string>
     <string name="there_is_nothing_here">Здесь ничего нет</string>
     <string name="foreground_channel_id">Уведомления о проигрывании музыки</string>
+    <string name="play_stop">Играть или остановить</string>
 </resources>
