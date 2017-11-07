@@ -21,11 +21,15 @@ public class MusicServiceBinder extends Binder {
         musicService.play(compositions);
     }
 
-    public void pause() {
-        musicService.pause();
+    public void changePlayState() {
+        musicService.changePlayState();
     }
 
-    public void resume() {
-        musicService.resume();
+    public void skipToPrevious() {
+        musicService.skipToPrevious();
+    }
+
+    public void skipToNext() {
+        musicService.skipToNext();
     }
 }

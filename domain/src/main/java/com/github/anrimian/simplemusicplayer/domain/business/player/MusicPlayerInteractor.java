@@ -12,7 +12,10 @@ public interface MusicPlayerInteractor {
 
     void startPlaying(List<Composition> compositions);
 
-    void stopPlaying();
+    void changePlayState();
 
-    void resumePlaying();
+    void skipToPrevious();
+
+    void skipToNext();
+
 }

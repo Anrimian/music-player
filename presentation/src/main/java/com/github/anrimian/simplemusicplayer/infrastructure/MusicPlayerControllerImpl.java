@@ -28,14 +28,17 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public void pause() {
-        serviceWrapper.call(MusicServiceBinder::pause);
+    public void changePlayState() {
+        serviceWrapper.call(MusicServiceBinder::changePlayState);
     }
 
     @Override
-    public void resume() {
-        serviceWrapper.call(MusicServiceBinder::resume);
+    public void skipToPrevious() {
+        serviceWrapper.call(MusicServiceBinder::skipToPrevious);
     }
 
-
+    @Override
+    public void skipToNext() {
+        serviceWrapper.call(MusicServiceBinder::skipToNext);
+    }
 }

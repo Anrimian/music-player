@@ -17,6 +17,8 @@ import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PLAY_PAUSE;
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.REQUEST_CODE;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.SKIP_TO_NEXT;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.SKIP_TO_PREVIOUS;
 
 
 /**
@@ -63,6 +65,16 @@ public class NotificationsController {
         intentPlayPause.putExtra(REQUEST_CODE, PLAY_PAUSE);
         PendingIntent pIntentPlayPause = PendingIntent.getService(context, PLAY_PAUSE, intentPlayPause, PendingIntent.FLAG_CANCEL_CURRENT);
         contentView.setOnClickPendingIntent(R.id.iv_play_stop, pIntentPlayPause);
+
+        Intent intentSkipToPrevious = new Intent(context, MusicService.class);
+        intentSkipToPrevious.putExtra(REQUEST_CODE, SKIP_TO_PREVIOUS);
+        PendingIntent pIntentSkipToPrevious = PendingIntent.getService(context, SKIP_TO_PREVIOUS, intentSkipToPrevious, PendingIntent.FLAG_CANCEL_CURRENT);
+        contentView.setOnClickPendingIntent(R.id.iv_skip_to_previous, pIntentSkipToPrevious);
+
+        Intent intentSkipToNext = new Intent(context, MusicService.class);
+        intentSkipToNext.putExtra(REQUEST_CODE, SKIP_TO_NEXT);
+        PendingIntent pIntentSkipToNext = PendingIntent.getService(context, SKIP_TO_NEXT, intentSkipToNext, PendingIntent.FLAG_CANCEL_CURRENT);
+        contentView.setOnClickPendingIntent(R.id.iv_skip_to_next, pIntentSkipToNext);
 
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

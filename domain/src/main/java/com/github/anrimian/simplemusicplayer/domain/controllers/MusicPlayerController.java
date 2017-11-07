@@ -12,8 +12,9 @@ public interface MusicPlayerController {
 
     void play(List<Composition> compositions);
 
-    void pause();
+    void changePlayState();
 
-    void resume();
+    void skipToPrevious();
 
+    void skipToNext();
 }

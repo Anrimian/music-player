@@ -11,7 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -45,11 +45,14 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     @BindView(R.id.view_pager)
     ViewPager viewPager;
 
-    @BindView(R.id.btn_play)
-    Button btnPlay;
+    @BindView(R.id.iv_play_pause)
+    ImageView ivPlayPause;
 
-    @BindView(R.id.btn_stop)
-    Button btnStop;
+    @BindView(R.id.iv_skip_to_previous)
+    ImageView ivSkipToPrevious;
+
+    @BindView(R.id.iv_skip_to_next)
+    ImageView ivSkipToNext;
 
     private View toolbar;
 
@@ -126,8 +129,9 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
         startFragment(StorageLibraryFragment.newInstance(null));
 
-        btnStop.setOnClickListener(v -> presenter.onStopPlayButtonClicked());
-        btnPlay.setOnClickListener(v -> presenter.onStartPlayButtonClicked());
+        ivPlayPause.setOnClickListener(v -> presenter.onPlayPauseButtonClicked());
+        ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
+        ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
     }
 
     @Override
@@ -153,14 +157,12 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
     @Override
     public void showStopState() {
-        btnPlay.setEnabled(true);
-        btnStop.setEnabled(false);
+        ivPlayPause.setImageResource(R.drawable.ic_play);
     }
 
     @Override
     public void showPlayState() {
-        btnPlay.setEnabled(false);
-        btnStop.setEnabled(true);
+        ivPlayPause.setImageResource(R.drawable.ic_pause);
     }
 
     private void startFragment(Fragment fragment) {

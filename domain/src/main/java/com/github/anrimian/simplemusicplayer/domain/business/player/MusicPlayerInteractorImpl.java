@@ -19,19 +19,21 @@ public class MusicPlayerInteractorImpl implements MusicPlayerInteractor {
 
     @Override
     public void startPlaying(List<Composition> compositions) {
-//        setState(PLAYING);
         musicPlayerController.play(compositions);
     }
 
     @Override
-    public void stopPlaying() {
-//        setState(STOP);
-        musicPlayerController.pause();
+    public void changePlayState() {
+        musicPlayerController.changePlayState();
     }
 
     @Override
-    public void resumePlaying() {
-//        setState(PLAYING);
-        musicPlayerController.resume();
+    public void skipToPrevious() {
+        musicPlayerController.skipToPrevious();
+    }
+
+    @Override
+    public void skipToNext() {
+        musicPlayerController.skipToNext();
     }
 }

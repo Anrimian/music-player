@@ -45,6 +45,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     public static final String REQUEST_CODE = "request_code";
     public static final int PLAY_PAUSE = 1;
+    public static final int SKIP_TO_NEXT = 2;
+    public static final int SKIP_TO_PREVIOUS = 3;
 
     @Inject
     NotificationsController notificationsController;
@@ -118,11 +120,15 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         switch (requestCode) {
             case PLAY_PAUSE: {
-                if (player.getPlayWhenReady()) {
-                    pause();
-                } else {
-                    resume();
-                }
+                changePlayState();
+                break;
+            }
+            case SKIP_TO_NEXT: {
+                skipToNext();
+                break;
+            }
+            case SKIP_TO_PREVIOUS: {
+                skipToPrevious();
                 break;
             }
         }
@@ -153,7 +159,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }*/
 
     public void play(List<Composition> compositions) {
-        startForeground();
+        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(true));
         Uri uri = Uri.fromFile(new File(compositions.get(compositions.size() - 1).getFilePath()));
         DataSpec dataSpec = new DataSpec(uri);
         final FileDataSource fileDataSource = new FileDataSource();
@@ -175,30 +181,30 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         player.setPlayWhenReady(true);
     }
 
-    public void pause() {
-        stopForeground();
-        player.setPlayWhenReady(false);
-    }
-
-    public void resume() {
-        startForeground();
-        player.setPlayWhenReady(true);
-    }
-
-    private void startForeground() {
-        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(true));
-    }
-
-    private void stopForeground() {
-        stopForeground(false);
-        notificationsController.updateForegroundNotification(false);
-    }
-
-    private void onPlayPauseButtonClicked() {
+    public void changePlayState() {
         if (player.getPlayWhenReady()) {
             pause();
         } else {
             resume();
         }
+    }
+
+    public void skipToPrevious() {
+
+    }
+
+    public void skipToNext() {
+
+    }
+
+    private void pause() {
+        stopForeground(false);
+        notificationsController.updateForegroundNotification(false);
+        player.setPlayWhenReady(false);
+    }
+
+    private void resume() {
+        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(true));
+        player.setPlayWhenReady(true);
     }
 }

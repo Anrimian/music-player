@@ -16,4 +16,7 @@
     <dimen name="margin_large">24dp</dimen>
     <dimen name="margin_xlarge">32dp</dimen>
 
+    <dimen name="top_control_button_size">48dp</dimen>
+    <dimen name="bottom_sheet_height">80dp</dimen>
+
 </resources>
