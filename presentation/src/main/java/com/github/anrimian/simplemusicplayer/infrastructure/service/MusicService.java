@@ -19,6 +19,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -160,24 +161,30 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     public void play(List<Composition> compositions) {
         startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(true));
-        Uri uri = Uri.fromFile(new File(compositions.get(compositions.size() - 1).getFilePath()));
-        DataSpec dataSpec = new DataSpec(uri);
-        final FileDataSource fileDataSource = new FileDataSource();
-        try {
-            fileDataSource.open(dataSpec);
-        } catch (FileDataSource.FileDataSourceException e) {
-            e.printStackTrace();
-            musicPlayerInteractor.notifyPause();//TODO implement error behavior
+        MediaSource[] mediaSources = new MediaSource[compositions.size()];
+        for (int i = 0; i < compositions.size(); i++) {
+            Composition composition = compositions.get(i);
+            Uri uri = Uri.fromFile(new File(composition.getFilePath()));
+            DataSpec dataSpec = new DataSpec(uri);
+            final FileDataSource fileDataSource = new FileDataSource();
+            try {
+                fileDataSource.open(dataSpec);
+            } catch (FileDataSource.FileDataSourceException e) {
+                e.printStackTrace();
+                musicPlayerInteractor.notifyPause();//TODO implement error behavior
+            }
+
+            DataSource.Factory factory = () -> fileDataSource;
+            MediaSource audioSource = new ExtractorMediaSource(fileDataSource.getUri(),
+                    factory,
+                    new DefaultExtractorsFactory(),
+                    null,
+                    null);
+            mediaSources[i] = audioSource;
         }
 
-        DataSource.Factory factory = () -> fileDataSource;
-        MediaSource audioSource = new ExtractorMediaSource(fileDataSource.getUri(),
-                factory,
-                new DefaultExtractorsFactory(),
-                null,
-                null);
-
-        player.prepare(audioSource);
+        ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource(mediaSources);
+        player.prepare(concatenatingMediaSource);
         player.setPlayWhenReady(true);
     }
 
@@ -190,11 +197,10 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     public void skipToPrevious() {
-
+//        player.
     }
 
     public void skipToNext() {
-
     }
 
     private void pause() {
