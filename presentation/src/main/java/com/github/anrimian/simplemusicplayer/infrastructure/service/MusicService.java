@@ -10,6 +10,8 @@ import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.state.PlayerStateInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController;
+import com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState;
+import com.github.anrimian.simplemusicplayer.utils.exo_player.PlayerStateRxWrapper;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -34,9 +36,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.BiFunction;
 
 import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController.FOREGROUND_NOTIFICATION_ID;
+import static com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState.ENDED;
 
 /**
  * Created on 03.11.2017.
@@ -61,6 +68,9 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private CompositeDisposable serviceDisposable = new CompositeDisposable();
 
+    private PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
+    private Observable<ExoPlayerState> stateObservable = playerStateRxWrapper.getStateObservable();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -69,6 +79,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 new DefaultRenderersFactory(this),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
+        player.addListener(playerStateRxWrapper);
         player.addListener(new Player.EventListener() {
             @Override
             public void onTimelineChanged(Timeline timeline, Object manifest) {
@@ -186,6 +197,47 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource(mediaSources);
         player.prepare(concatenatingMediaSource);
         player.setPlayWhenReady(true);
+    }
+
+    private void play2(List<Composition> compositions) {
+        Observable.fromIterable(compositions)
+                .zipWith(stateObservable.filter(state -> state.equals(ENDED)), (composition, exoPlayerState) -> composition)
+                .flatMap(this::prepareMediaSource)
+                .zipWith(stateObservable, new BiFunction<MediaSource, ExoPlayerState, Object>() {
+                    @Override
+                    public Object apply(MediaSource mediaSource, ExoPlayerState exoPlayerState) throws Exception {
+                        return null;
+                    }
+                });
+    }
+
+    private Observable<MediaSource> prepareMediaSource(Composition composition) {
+        return Observable.create(emitter -> {
+            Uri uri = Uri.fromFile(new File(composition.getFilePath()));
+            DataSpec dataSpec = new DataSpec(uri);
+            final FileDataSource fileDataSource = new FileDataSource();
+            try {
+                fileDataSource.open(dataSpec);
+            } catch (FileDataSource.FileDataSourceException e) {
+                emitter.onError(e);
+//                e.printStackTrace();
+//                musicPlayerInteractor.notifyPause();//TODO implement error behavior
+            }
+
+            DataSource.Factory factory = () -> fileDataSource;
+            MediaSource audioSource = new ExtractorMediaSource(fileDataSource.getUri(),
+                    factory,
+                    new DefaultExtractorsFactory(),
+                    null,
+                    null);
+            emitter.onNext(audioSource);
+        });
+    }
+
+    private Flowable test() {
+        return Flowable.create(emitter -> {
+//            em
+        }, BackpressureStrategy.BUFFER);
     }
 
     public void changePlayState() {
