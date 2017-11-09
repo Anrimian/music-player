@@ -21,7 +21,6 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -32,18 +31,15 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.FileDataSource;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.BiFunction;
 
 import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController.FOREGROUND_NOTIFICATION_ID;
-import static com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState.ENDED;
 
 /**
  * Created on 03.11.2017.
@@ -70,6 +66,9 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
     private Observable<ExoPlayerState> stateObservable = playerStateRxWrapper.getStateObservable();
+
+    private List<Composition> currentPlayList = new ArrayList<>();
+    private int currentPlayPosition;
 
     @Override
     public void onCreate() {
@@ -99,6 +98,10 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 if (playWhenReady) {
+                    if (playbackState == Player.STATE_ENDED) {
+                        currentPlayPosition++;
+                        playPosition();
+                    }
                     musicPlayerInteractor.notifyResume();
                 } else {
                     musicPlayerInteractor.notifyPause();
@@ -172,42 +175,25 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     public void play(List<Composition> compositions) {
         startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(true));
-        MediaSource[] mediaSources = new MediaSource[compositions.size()];
-        for (int i = 0; i < compositions.size(); i++) {
-            Composition composition = compositions.get(i);
-            Uri uri = Uri.fromFile(new File(composition.getFilePath()));
-            DataSpec dataSpec = new DataSpec(uri);
-            final FileDataSource fileDataSource = new FileDataSource();
-            try {
-                fileDataSource.open(dataSpec);
-            } catch (FileDataSource.FileDataSourceException e) {
-                e.printStackTrace();
-                musicPlayerInteractor.notifyPause();//TODO implement error behavior
-            }
-
-            DataSource.Factory factory = () -> fileDataSource;
-            MediaSource audioSource = new ExtractorMediaSource(fileDataSource.getUri(),
-                    factory,
-                    new DefaultExtractorsFactory(),
-                    null,
-                    null);
-            mediaSources[i] = audioSource;
-        }
-
-        ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource(mediaSources);
-        player.prepare(concatenatingMediaSource);
+        currentPlayList.clear();
+        currentPlayList.addAll(compositions);
+        currentPlayPosition = 0;
+        playPosition();
         player.setPlayWhenReady(true);
     }
 
-    private void play2(List<Composition> compositions) {
-        Observable.fromIterable(compositions)
-                .zipWith(stateObservable.filter(state -> state.equals(ENDED)), (composition, exoPlayerState) -> composition)
-                .flatMap(this::prepareMediaSource)
-                .zipWith(stateObservable, new BiFunction<MediaSource, ExoPlayerState, Object>() {
-                    @Override
-                    public Object apply(MediaSource mediaSource, ExoPlayerState exoPlayerState) throws Exception {
-                        return null;
-                    }
+    private void playPosition() {
+        if (currentPlayPosition >= currentPlayList.size() || currentPlayPosition < 0) {
+            currentPlayPosition = 0;
+        }
+        Composition composition = currentPlayList.get(currentPlayPosition);
+
+        prepareMediaSource(composition)
+                .subscribe(mediaSource -> {
+                    player.prepare(mediaSource);
+                }, throwable -> {
+                    currentPlayPosition++;//TODO case for only 1 element
+                    playPosition();
                 });
     }
 
@@ -220,8 +206,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 fileDataSource.open(dataSpec);
             } catch (FileDataSource.FileDataSourceException e) {
                 emitter.onError(e);
-//                e.printStackTrace();
-//                musicPlayerInteractor.notifyPause();//TODO implement error behavior
             }
 
             DataSource.Factory factory = () -> fileDataSource;
@@ -234,12 +218,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         });
     }
 
-    private Flowable test() {
-        return Flowable.create(emitter -> {
-//            em
-        }, BackpressureStrategy.BUFFER);
-    }
-
     public void changePlayState() {
         if (player.getPlayWhenReady()) {
             pause();
@@ -249,10 +227,13 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     public void skipToPrevious() {
-//        player.
+        currentPlayPosition--;
+        playPosition();
     }
 
     public void skipToNext() {
+        currentPlayPosition++;
+        playPosition();
     }
 
     private void pause() {
