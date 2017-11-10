@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.utils.exo_player;
 
+import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -10,10 +11,10 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
-import static com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState.BUFFERING;
-import static com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState.ENDED;
-import static com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState.IDLE;
-import static com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState.READY;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState.BUFFERING;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState.ENDED;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState.IDLE;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState.READY;
 
 /**
  * Created on 08.11.2017.
@@ -21,9 +22,9 @@ import static com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerSt
 
 public class PlayerStateRxWrapper implements Player.EventListener {
 
-    private BehaviorSubject<ExoPlayerState> subject = BehaviorSubject.create();
+    private BehaviorSubject<InternalPlayerState> subject = BehaviorSubject.create();
 
-    public Observable<ExoPlayerState> getStateObservable() {
+    public Observable<InternalPlayerState> getStateObservable() {
         return subject;
     }
 

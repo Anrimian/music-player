@@ -17,6 +17,8 @@ import org.mockito.ArgumentCaptor;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.observers.TestObserver;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -59,6 +61,15 @@ public class StorageLibraryInteractorTest {
 
         musicProviderRepository = new FakeMusicProviderRepository(fakeCompositions);
         storageLibraryInteractor = new StorageLibraryInteractorImpl(musicProviderRepository, musicPlayerInteractor);
+    }
+
+    @Test
+    public void testRx() {
+        Completable.complete()
+                .andThen(Maybe.just(1).flatMapCompletable(o -> Completable.complete()))
+        .subscribe(() -> {
+            System.out.println();
+        });
     }
 
     @Test

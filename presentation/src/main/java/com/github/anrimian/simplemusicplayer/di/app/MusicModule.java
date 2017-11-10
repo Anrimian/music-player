@@ -6,10 +6,10 @@ import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractorImpl;
-import com.github.anrimian.simplemusicplayer.domain.business.player.state.PlayerStateInteractor;
-import com.github.anrimian.simplemusicplayer.domain.business.player.state.PlayerStateInteractorImpl;
-import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerControllerOld;
-import com.github.anrimian.simplemusicplayer.infrastructure.MusicPlayerControllerOldImpl;
+import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
+import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceController;
+import com.github.anrimian.simplemusicplayer.infrastructure.MusicPlayerControllerImpl;
+import com.github.anrimian.simplemusicplayer.infrastructure.MusicServiceControllerImpl;
 
 import javax.inject.Singleton;
 
@@ -26,21 +26,22 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerInteractor provideMusicPlayerInteractor(MusicPlayerControllerOld musicPlayerController) {
-        return new MusicPlayerInteractorImpl(musicPlayerController);
+    MusicPlayerInteractor provideMusicPlayerInteractor(MusicPlayerController musicPlayerController,
+                                                       MusicServiceController musicServiceController) {
+        return new MusicPlayerInteractorImpl(musicPlayerController, musicServiceController);
     }
 
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerControllerOld provideMusicPlayerController(Context context) {
-        return new MusicPlayerControllerOldImpl(context);
+    MusicPlayerController provideMusicPlayerController(Context context) {
+        return new MusicPlayerControllerImpl(context);
     }
 
     @Provides
     @NonNull
     @Singleton
-    PlayerStateInteractor providePlayerStateInteractor() {
-        return new PlayerStateInteractorImpl();
+    MusicServiceController provideMusicServiceController(Context context) {
+        return new MusicServiceControllerImpl(context);
     }
 }

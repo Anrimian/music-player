@@ -5,7 +5,7 @@ import android.net.Uri;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.utils.exo_player.PlayerStateRxWrapper;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -32,7 +32,6 @@ import io.reactivex.Single;
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
-    private Observable<ExoPlayerState> stateObservable = playerStateRxWrapper.getStateObservable();
 
     private SimpleExoPlayer player;
 
@@ -48,19 +47,22 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public Completable play(Composition composition) {
         return prepareMediaSource(composition)
                 .doOnSuccess(this::playMediaSource)
-                .toCompletable()
-                .concatWith(stateObservable.filter(state -> state.equals(ExoPlayerState.ENDED))
-                        .flatMapCompletable(o -> Completable.complete()));
+                .toCompletable();
     }
 
     @Override
     public void stop() {
-        player.setPlayWhenReady(true);
+        player.setPlayWhenReady(false);
     }
 
     @Override
     public void resume() {
-        player.setPlayWhenReady(false);
+        player.setPlayWhenReady(true);
+    }
+
+    @Override
+    public Observable<InternalPlayerState> getPlayerStateObservable() {
+        return playerStateRxWrapper.getStateObservable();
     }
 
     private void playMediaSource(MediaSource mediaSource) {

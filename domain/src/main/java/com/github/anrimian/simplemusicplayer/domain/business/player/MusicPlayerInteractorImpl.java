@@ -1,9 +1,9 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
-import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerControllerOld;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAYING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 
@@ -22,20 +23,22 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 
 public class MusicPlayerInteractorImpl implements MusicPlayerInteractor {
 
-    private MusicPlayerControllerOld musicPlayerControllerOld;
-
     private MusicPlayerController musicPlayerController;
     private MusicServiceController musicServiceController;
 
-    private BehaviorSubject<PlayerState> playerStateSubject = BehaviorSubject.createDefault(IDLE);
+    private PlayerState playerState = IDLE;
+    private BehaviorSubject<PlayerState> playerStateSubject = BehaviorSubject.createDefault(playerState);
 
     private List<Composition> currentPlayList = new ArrayList<>();
     private int currentPlayPosition;
 
     private boolean repeat = false;//TODO move to preferences
 
-    public MusicPlayerInteractorImpl(MusicPlayerControllerOld musicPlayerControllerOld) {
-        this.musicPlayerControllerOld = musicPlayerControllerOld;
+    public MusicPlayerInteractorImpl(MusicPlayerController musicPlayerController,
+                                     MusicServiceController musicServiceController) {
+        this.musicPlayerController = musicPlayerController;
+        this.musicServiceController = musicServiceController;
+        subscribeOnInternalPlayerState();
     }
 
     @Override
@@ -49,8 +52,7 @@ public class MusicPlayerInteractorImpl implements MusicPlayerInteractor {
 
     @Override
     public void changePlayState() {
-        if (playerStateSubject.getValue() == PLAYING) {
-            musicServiceController.stop();
+        if (playerState == PLAYING) {
             musicPlayerController.stop();
             setState(STOP);
         } else {
@@ -62,16 +64,12 @@ public class MusicPlayerInteractorImpl implements MusicPlayerInteractor {
 
     @Override
     public void skipToPrevious() {
-        currentPlayPosition--;
-        playPosition();
-//        musicPlayerControllerOld.skipToPrevious();
+        playPrevious();
     }
 
     @Override
     public void skipToNext() {
-        currentPlayPosition++;
-        playPosition();
-//        musicPlayerControllerOld.skipToNext();
+        playNext();
     }
 
     @Override
@@ -79,29 +77,58 @@ public class MusicPlayerInteractorImpl implements MusicPlayerInteractor {
         return playerStateSubject;
     }
 
+    private void subscribeOnInternalPlayerState() {
+        musicPlayerController.getPlayerStateObservable()
+                .subscribe(this::onInternalPlayerStateChanged);
+    }
+
+    private void onInternalPlayerStateChanged(InternalPlayerState state) {
+        switch (state) {
+            case ENDED: {
+                if (playerState != STOP) {
+                    playNext();
+                }
+            }
+        }
+    }
+
     private void setState(PlayerState playerState) {
+        this.playerState = playerState;
         playerStateSubject.onNext(playerState);
     }
 
-    private void playPosition() {
+    private void playNext() {
+        currentPlayPosition++;
+
+        if (currentPlayPosition >= currentPlayList.size()) {
+            if (repeat) {
+                currentPlayPosition = 0;
+            } else {
+                musicPlayerController.stop();
+                setState(STOP);
+                return;
+            }
+        }
+
+        playPosition();
+    }
+
+    private void playPrevious() {
+        currentPlayPosition--;
         if (currentPlayPosition < 0) {
             currentPlayPosition = 0;
         }
-        if (currentPlayPosition >= currentPlayList.size() && repeat) {
-            currentPlayPosition = 0;
-        } else {
-            musicPlayerController.stop();
-            setState(STOP);
-        }
-        Composition composition = currentPlayList.get(currentPlayPosition);
+        playPosition();
+    }
 
+    private void playPosition() {
+        setState(LOADING);
+        Composition composition = currentPlayList.get(currentPlayPosition);
         musicPlayerController.play(composition)
                 .subscribe(() -> {
-                    currentPlayPosition++;
-                    playPosition();
+                    setState(PLAYING);
                 }, throwable -> {
-                    currentPlayPosition++;
-                    playPosition();
+                    playNext();
                 });
     }
 }
