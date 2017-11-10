@@ -1,44 +1,92 @@
 package com.github.anrimian.simplemusicplayer.infrastructure;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicServiceBinder;
-import com.github.anrimian.simplemusicplayer.utils.services.BoundServiceWrapper;
+import com.github.anrimian.simplemusicplayer.utils.exo_player.ExoPlayerState;
+import com.github.anrimian.simplemusicplayer.utils.exo_player.PlayerStateRxWrapper;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.FileDataSource;
 
-import java.util.List;
+import java.io.File;
+
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
- * Created on 03.11.2017.
+ * Created on 10.11.2017.
  */
 
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
-    private BoundServiceWrapper<MusicServiceBinder> serviceWrapper;
+    private PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
+    private Observable<ExoPlayerState> stateObservable = playerStateRxWrapper.getStateObservable();
+
+    private SimpleExoPlayer player;
 
     public MusicPlayerControllerImpl(Context context) {
-        serviceWrapper = new BoundServiceWrapper<>(context, MusicService.class, Context.BIND_AUTO_CREATE);
+        player = ExoPlayerFactory.newSimpleInstance(
+                new DefaultRenderersFactory(context),
+                new DefaultTrackSelector(),
+                new DefaultLoadControl());
+        player.addListener(playerStateRxWrapper);
     }
 
     @Override
-    public void play(List<Composition> compositions) {
-        serviceWrapper.call(binder -> binder.play(compositions));
+    public Completable play(Composition composition) {
+        return prepareMediaSource(composition)
+                .doOnSuccess(this::playMediaSource)
+                .toCompletable()
+                .concatWith(stateObservable.filter(state -> state.equals(ExoPlayerState.ENDED))
+                        .flatMapCompletable(o -> Completable.complete()));
     }
 
     @Override
-    public void changePlayState() {
-        serviceWrapper.call(MusicServiceBinder::changePlayState);
+    public void stop() {
+        player.setPlayWhenReady(true);
     }
 
     @Override
-    public void skipToPrevious() {
-        serviceWrapper.call(MusicServiceBinder::skipToPrevious);
+    public void resume() {
+        player.setPlayWhenReady(false);
     }
 
-    @Override
-    public void skipToNext() {
-        serviceWrapper.call(MusicServiceBinder::skipToNext);
+    private void playMediaSource(MediaSource mediaSource) {
+        player.prepare(mediaSource);
+        player.setPlayWhenReady(true);
     }
+
+    private Single<MediaSource> prepareMediaSource(Composition composition) {
+        return Single.create(emitter -> {
+            Uri uri = Uri.fromFile(new File(composition.getFilePath()));
+            DataSpec dataSpec = new DataSpec(uri);
+            final FileDataSource fileDataSource = new FileDataSource();
+            try {
+                fileDataSource.open(dataSpec);
+            } catch (FileDataSource.FileDataSourceException e) {
+                emitter.onError(e);
+            }
+
+            DataSource.Factory factory = () -> fileDataSource;
+            MediaSource audioSource = new ExtractorMediaSource(fileDataSource.getUri(),
+                    factory,
+                    new DefaultExtractorsFactory(),
+                    null,
+                    null);
+            emitter.onSuccess(audioSource);
+        });
+    }
+
 }

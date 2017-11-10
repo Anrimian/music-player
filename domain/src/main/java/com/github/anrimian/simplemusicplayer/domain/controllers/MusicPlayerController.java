@@ -2,19 +2,17 @@ package com.github.anrimian.simplemusicplayer.domain.controllers;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 
-import java.util.List;
+import io.reactivex.Completable;
 
 /**
- * Created on 03.11.2017.
+ * Created on 10.11.2017.
  */
 
 public interface MusicPlayerController {
 
-    void play(List<Composition> compositions);
+    Completable play(Composition composition);
 
-    void changePlayState();
+    void stop();
 
-    void skipToPrevious();
-
-    void skipToNext();
+    void resume();
 }
