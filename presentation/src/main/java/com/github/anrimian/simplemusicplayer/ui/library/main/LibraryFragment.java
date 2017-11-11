@@ -54,6 +54,9 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     @BindView(R.id.iv_skip_to_next)
     ImageView ivSkipToNext;
 
+    @BindView(R.id.library_fragment_container)
+    ViewGroup fragmentContainer;
+
     private View toolbar;
 
     private BottomSheetBehavior<CoordinatorLayout> behavior;
@@ -157,12 +160,27 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
     @Override
     public void showStopState() {
+        setContentBottomHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height));
         ivPlayPause.setImageResource(R.drawable.ic_play);
     }
 
     @Override
     public void showPlayState() {
+        setContentBottomHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height));
         ivPlayPause.setImageResource(R.drawable.ic_pause);
+    }
+
+    @Override
+    public void hideMusicControls() {
+        setContentBottomHeight(0);
+    }
+
+    private void setContentBottomHeight(int heightInPixels) {
+        behavior.setPeekHeight(heightInPixels);
+
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fragmentContainer.getLayoutParams();
+        layoutParams.bottomMargin = heightInPixels;
+        fragmentContainer.setLayoutParams(layoutParams);
     }
 
     private void startFragment(Fragment fragment) {

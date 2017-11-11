@@ -17,4 +17,7 @@ public interface LibraryView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
     void showPlayState();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
+    void hideMusicControls();
 }

@@ -45,7 +45,6 @@ ext {
             dagger:              "com.google.dagger:dagger:$daggerVersion",
             daggerCompiler:      "com.google.dagger:dagger-compiler:$daggerVersion",
             javaxAnnotation:    'com.google.code.findbugs:jsr305:2.0.1',
-            exoPlayerCore:      "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
     ]
 
     presentationTestDependencies = [
@@ -69,6 +68,7 @@ ext {
     dataDependencies = [
             rxJava:             "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
             javaxAnnotation:    'com.google.code.findbugs:jsr305:2.0.1',
+            exoPlayerCore:      "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
     ]
 
     dataTestDependencies = [

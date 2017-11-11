@@ -26,6 +26,7 @@ dependencies {
     def testDependencies = rootProject.ext.dataTestDependencies
 
     implementation dataDependencies.rxJava
+    implementation dataDependencies.exoPlayerCore
     compileOnly dataDependencies.javaxAnnotation
 
     testImplementation testDependencies.junit

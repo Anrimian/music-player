@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.exo_player;
+package com.github.anrimian.simplemusicplayer.data.utils.exo_player;
 
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.google.android.exoplayer2.ExoPlaybackException;

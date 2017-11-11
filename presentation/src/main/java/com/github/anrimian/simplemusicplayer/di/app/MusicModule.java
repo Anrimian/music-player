@@ -8,7 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerI
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractorImpl;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceController;
-import com.github.anrimian.simplemusicplayer.infrastructure.MusicPlayerControllerImpl;
+import com.github.anrimian.simplemusicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.simplemusicplayer.infrastructure.MusicServiceControllerImpl;
 
 import javax.inject.Singleton;

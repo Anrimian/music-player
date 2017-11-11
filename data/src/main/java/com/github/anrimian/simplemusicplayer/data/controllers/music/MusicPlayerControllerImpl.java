@@ -1,12 +1,12 @@
-package com.github.anrimian.simplemusicplayer.infrastructure;
+package com.github.anrimian.simplemusicplayer.data.controllers.music;
 
 import android.content.Context;
 import android.net.Uri;
 
+import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerStateRxWrapper;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
-import com.github.anrimian.simplemusicplayer.utils.exo_player.PlayerStateRxWrapper;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;

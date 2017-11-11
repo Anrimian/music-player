@@ -58,6 +58,10 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
                 getViewState().showPlayState();
                 return;
             }
+            case IDLE: {
+                getViewState().hideMusicControls();
+                return;
+            }
             default: {
                 getViewState().showStopState();
             }

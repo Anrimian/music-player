@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?android:attr/windowBackground"
+        app:behavior_hideable="false"
         app:behavior_peekHeight="@dimen/bottom_sheet_height"
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
