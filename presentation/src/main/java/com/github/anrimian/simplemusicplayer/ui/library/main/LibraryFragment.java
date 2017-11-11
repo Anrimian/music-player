@@ -12,12 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.player.music_info.MusicInfoFragment;
 import com.github.anrimian.simplemusicplayer.ui.player.play_queue.PlayQueueFragment;
@@ -56,6 +58,9 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
     @BindView(R.id.library_fragment_container)
     ViewGroup fragmentContainer;
+
+    @BindView(R.id.tv_description)
+    TextView tvDescription;
 
     private View toolbar;
 
@@ -173,6 +178,11 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     @Override
     public void hideMusicControls() {
         setContentBottomHeight(0);
+    }
+
+    @Override
+    public void showCurrentComposition(Composition composition) {
+        tvDescription.setText(composition.getDisplayName());
     }
 
     private void setContentBottomHeight(int heightInPixels) {

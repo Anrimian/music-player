@@ -22,4 +22,6 @@ public interface MusicPlayerInteractor {
     void skipToNext();
 
     Observable<PlayerState> getPlayerStateObservable();
+
+    Observable<Composition> getCurrentCompositionObservable();
 }

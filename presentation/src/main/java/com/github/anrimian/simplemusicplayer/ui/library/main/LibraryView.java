@@ -1,7 +1,9 @@
 package com.github.anrimian.simplemusicplayer.ui.library.main;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.utils.moxy.SingleStateByTagStrategy;
 
 /**
@@ -20,4 +22,7 @@ public interface LibraryView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
     void hideMusicControls();
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showCurrentComposition(Composition composition);
 }

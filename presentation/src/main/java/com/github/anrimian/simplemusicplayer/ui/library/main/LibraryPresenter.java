@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.library.main;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 
 import io.reactivex.Scheduler;
@@ -29,9 +30,8 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        presenterDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateChanged));
+        subscribeOnPlayerStateChanges();
+        subscribeOnCurrentCompositionChanging();
     }
 
     @Override
@@ -50,6 +50,22 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
 
     void onSkipToNextButtonClicked() {
         musicPlayerInteractor.skipToNext();
+    }
+
+    private void subscribeOnCurrentCompositionChanging() {
+        presenterDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onCurrentCompositionChanged));
+    }
+
+    private void onCurrentCompositionChanged(Composition composition) {
+        getViewState().showCurrentComposition(composition);
+    }
+
+    private void subscribeOnPlayerStateChanges() {
+        presenterDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onPlayerStateChanged));
     }
 
     private void onPlayerStateChanged(PlayerState playerState) {
