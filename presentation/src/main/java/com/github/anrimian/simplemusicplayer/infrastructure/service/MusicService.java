@@ -1,13 +1,23 @@
 package com.github.anrimian.simplemusicplayer.infrastructure.service;
 
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaButtonReceiver;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.models.NotificationPlayerInfo;
+import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController;
 
 import javax.inject.Inject;
@@ -34,14 +44,43 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Inject
     MusicPlayerInteractor musicPlayerInteractor;
 
-    private MusicServiceBinder musicServiceBinder = new MusicServiceBinder(this);
+    public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
+    public PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
+            .setActions(PlaybackStateCompat.ACTION_PLAY
+                    | PlaybackStateCompat.ACTION_STOP
+                    | PlaybackStateCompat.ACTION_PAUSE
+                    | PlaybackStateCompat.ACTION_PLAY_PAUSE
+                    | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                    | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
 
+    private AudioManager audioManager;
+    private MediaSessionCompat mediaSession;
+    private AudioFocusChangeListener audioFocusChangeListener = new AudioFocusChangeListener();
+    private MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
+    private MusicServiceBinder musicServiceBinder = new MusicServiceBinder(this, mediaSession);
     private CompositeDisposable serviceDisposable = new CompositeDisposable();
 
     @Override
     public void onCreate() {
         super.onCreate();
         Components.getAppComponent().inject(this);
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        mediaSession = new MediaSessionCompat(this, "PlayerService");//remove
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        mediaSession.setCallback(mediaSessionCallback);
+
+        Intent activityIntent = new Intent(this, MainActivity.class);
+        PendingIntent pActivityIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
+        mediaSession.setSessionActivity(pActivityIntent);
+
+        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
+        PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
+        mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
+
         subscribeOnPlayerActions();
     }
 
@@ -62,6 +101,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 break;
             }
         }
+        MediaButtonReceiver.handleIntent(mediaSession, intent);
         return START_NOT_STICKY;
     }
 
@@ -74,6 +114,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mediaSession.release();
         serviceDisposable.dispose();
     }
 /*    @Nullable
@@ -98,13 +139,95 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         notificationsController.updateForegroundNotification(info);
         switch (info.getState()) {
             case PLAYING: {
+                int audioFocusResult = audioManager.requestAudioFocus(
+                        audioFocusChangeListener,
+                        AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN);
+//                if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+//                    return;//TODO we can not handle result here
+//                }
+
+                registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+
+                mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
+                        PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
+                mediaSession.setActive(true);
                 startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(info));
                 break;
             }
             case STOP: {
+                unregisterReceiver(becomingNoisyReceiver);
+
+                mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                        PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
+
+//                mediaSession.setPlaybackState(
+//                        stateBuilder.setState(PlaybackStateCompat.STATE_STOPPED,
+//                                PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
+
+                mediaSession.setActive(false);
+                audioManager.abandonAudioFocus(audioFocusChangeListener);
                 stopForeground(false);
                 break;
             }
         }
     }
+
+    private class AudioFocusChangeListener implements AudioManager.OnAudioFocusChangeListener {
+
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_GAIN: {
+                    mediaSessionCallback.onPlay();
+                    break;
+                }
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK: {
+                    mediaSessionCallback.onPause();
+                    break;
+                }
+                default: {
+                    mediaSessionCallback.onPause();
+                    break;
+                }
+            }
+        }
+    }
+
+    private class MediaSessionCallback extends MediaSessionCompat.Callback {
+
+        @Override
+        public void onPlay() {
+            /*
+            MediaMetadataCompat metadata = metadataBuilder
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
+                            BitmapFactory.decodeResource(getResources(), track.getBitmapResId()));
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, track.getTitle());
+            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, track.getArtist());
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, track.getArtist());
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, track.getDuration())
+                    .build();
+            mediaSession.setMetadata(metadata);*/
+            musicPlayerInteractor.changePlayState();
+        }
+
+        @Override
+        public void onPause() {
+            musicPlayerInteractor.changePlayState();
+        }
+
+        @Override
+        public void onStop() {
+            musicPlayerInteractor.changePlayState();
+        }
+    }
+
+    private final BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                mediaSessionCallback.onPause();
+            }
+        }
+    };
 }
