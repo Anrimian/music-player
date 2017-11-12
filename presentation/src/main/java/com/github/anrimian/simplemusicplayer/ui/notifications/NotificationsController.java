@@ -12,7 +12,10 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.models.NotificationPlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PLAY_PAUSE;
@@ -47,19 +50,24 @@ public class NotificationsController {
         }
     }
 
-    public Notification getForegroundNotification(boolean play) {
-        return getDefaultMusicNotification(play).build();
+    public Notification getForegroundNotification(NotificationPlayerInfo info) {
+        return getDefaultMusicNotification(info).build();
     }
 
-    public void updateForegroundNotification(boolean play) {
-        Notification notification = getDefaultMusicNotification(play)
+    public void updateForegroundNotification(NotificationPlayerInfo info) {
+        Notification notification = getDefaultMusicNotification(info)
                 .build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
-    private NotificationCompat.Builder getDefaultMusicNotification(boolean play) {
+    private NotificationCompat.Builder getDefaultMusicNotification(NotificationPlayerInfo info) {
+        boolean play = info.getState() == PlayerState.PLAYING;
+        Composition composition = info.getComposition();
+
         RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_music);
         contentView.setImageViewResource(R.id.iv_play_stop, play? R.drawable.ic_pause : R.drawable.ic_play);
+
+        contentView.setTextViewText(R.id.tv_description, composition.getDisplayName());
 
         Intent intentPlayPause = new Intent(context, MusicService.class);
         intentPlayPause.putExtra(REQUEST_CODE, PLAY_PAUSE);

@@ -7,11 +7,12 @@ import android.support.annotation.Nullable;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.models.NotificationPlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController.FOREGROUND_NOTIFICATION_ID;
@@ -87,19 +88,21 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }*/
 
     private void subscribeOnPlayerActions() {
-        musicPlayerInteractor.getPlayerStateObservable()
-                .subscribe(this::onPlayerStateChanged);
+        Observable.combineLatest(musicPlayerInteractor.getPlayerStateObservable(),
+                musicPlayerInteractor.getCurrentCompositionObservable(),
+                NotificationPlayerInfo::new)
+                .subscribe(this::onNotificationInfoChanged);
     }
 
-    private void onPlayerStateChanged(PlayerState state) {
-        switch (state) {
+    private void onNotificationInfoChanged(NotificationPlayerInfo info) {
+        notificationsController.updateForegroundNotification(info);
+        switch (info.getState()) {
             case PLAYING: {
-                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(true));
+                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(info));
                 break;
             }
             case STOP: {
                 stopForeground(false);
-                notificationsController.updateForegroundNotification(false);
                 break;
             }
         }
