@@ -1,6 +1,5 @@
 package com.github.anrimian.simplemusicplayer.domain.business.library;
 
-import com.github.anrimian.simplemusicplayer.domain.business.music.utils.FakeMusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
@@ -17,8 +16,7 @@ import org.mockito.ArgumentCaptor;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -27,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created on 25.10.2017.
@@ -59,17 +58,10 @@ public class StorageLibraryInteractorTest {
 
         musicPlayerInteractor = mock(MusicPlayerInteractor.class);
 
-        musicProviderRepository = new FakeMusicProviderRepository(fakeCompositions);
-        storageLibraryInteractor = new StorageLibraryInteractorImpl(musicProviderRepository, musicPlayerInteractor);
-    }
+        musicProviderRepository = mock(MusicProviderRepository.class);
+        when(musicProviderRepository.getAllCompositions()).thenReturn(Single.just(fakeCompositions));
 
-    @Test
-    public void testRx() {
-        Completable.complete()
-                .andThen(Maybe.just(1).flatMapCompletable(o -> Completable.complete()))
-        .subscribe(() -> {
-            System.out.println();
-        });
+        storageLibraryInteractor = new StorageLibraryInteractor(musicProviderRepository, musicPlayerInteractor);
     }
 
     @Test

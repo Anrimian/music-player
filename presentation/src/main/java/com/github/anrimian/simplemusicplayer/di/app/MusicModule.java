@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractorImpl;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceController;
 import com.github.anrimian.simplemusicplayer.data.controllers.music.MusicPlayerControllerImpl;
@@ -28,7 +27,7 @@ class MusicModule {
     @Singleton
     MusicPlayerInteractor provideMusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                                        MusicServiceController musicServiceController) {
-        return new MusicPlayerInteractorImpl(musicPlayerController, musicServiceController);
+        return new MusicPlayerInteractor(musicPlayerController, musicServiceController);
     }
 
     @Provides
