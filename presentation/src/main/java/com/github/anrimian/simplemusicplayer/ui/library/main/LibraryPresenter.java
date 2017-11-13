@@ -6,6 +6,9 @@ import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerI
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -21,6 +24,8 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
 
     private CompositeDisposable presenterDisposable = new CompositeDisposable();
 
+    private List<Composition> currentPlayList = new ArrayList<>();
+
     public LibraryPresenter(MusicPlayerInteractor musicPlayerInteractor,
                             Scheduler uiScheduler) {
         this.musicPlayerInteractor = musicPlayerInteractor;
@@ -30,8 +35,11 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
+        getViewState().bindPlayList(currentPlayList);
+
         subscribeOnPlayerStateChanges();
         subscribeOnCurrentCompositionChanging();
+        subscribeOnCurrentPlaylistChanging();
     }
 
     @Override
@@ -82,5 +90,17 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
                 getViewState().showStopState();
             }
         }
+    }
+
+    private void subscribeOnCurrentPlaylistChanging() {
+        presenterDisposable.add(musicPlayerInteractor.getCurrentPlayListObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onPlayListChanged));
+    }
+
+    private void onPlayListChanged(List<Composition> newPlayList) {
+        currentPlayList.clear();
+        currentPlayList.addAll(newPlayList);
+        getViewState().updatePlayList();
     }
 }

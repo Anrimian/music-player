@@ -7,7 +7,8 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +21,10 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.ui.library.main.view.adapter.PlayListAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
-import com.github.anrimian.simplemusicplayer.ui.player.music_info.MusicInfoFragment;
-import com.github.anrimian.simplemusicplayer.ui.player.play_queue.PlayQueueFragment;
-import com.github.anrimian.simplemusicplayer.utils.view_pager.ViewPagerAdapter;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,8 +45,11 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     @BindView(R.id.bottom_sheet)
     CoordinatorLayout bottomSheet;
 
-    @BindView(R.id.view_pager)
-    ViewPager viewPager;
+//    @BindView(R.id.view_pager)
+//    ViewPager viewPager;
+
+    @BindView(R.id.rv_playlist)
+    RecyclerView rvPlayList;
 
     @BindView(R.id.iv_play_pause)
     ImageView ivPlayPause;
@@ -65,6 +69,8 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     private View toolbar;
 
     private BottomSheetBehavior<CoordinatorLayout> behavior;
+
+    private PlayListAdapter playListAdapter;
 
 //    private float appBarStartY;
 
@@ -130,16 +136,18 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
         });*/
         behavior.setState(bottomSheetState);
 
-        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
-        pagerAdapter.addFragment(MusicInfoFragment::new);
-        pagerAdapter.addFragment(PlayQueueFragment::new);
-        viewPager.setAdapter(pagerAdapter);
+//        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
+//        pagerAdapter.addFragment(MusicInfoFragment::new);
+//        pagerAdapter.addFragment(PlayQueueFragment::new);
+//        viewPager.setAdapter(pagerAdapter);
 
         startFragment(StorageLibraryFragment.newInstance(null));
 
         ivPlayPause.setOnClickListener(v -> presenter.onPlayPauseButtonClicked());
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
+
+        rvPlayList.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     @Override
@@ -183,6 +191,17 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     @Override
     public void showCurrentComposition(Composition composition) {
         tvDescription.setText(composition.getDisplayName());
+    }
+
+    @Override
+    public void bindPlayList(List<Composition> currentPlayList) {
+        playListAdapter = new PlayListAdapter(currentPlayList);
+        rvPlayList.setAdapter(playListAdapter);
+    }
+
+    @Override
+    public void updatePlayList() {
+        playListAdapter.notifyDataSetChanged();
     }
 
     private void setContentBottomHeight(int heightInPixels) {

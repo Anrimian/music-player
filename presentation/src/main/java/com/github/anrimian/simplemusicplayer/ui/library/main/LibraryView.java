@@ -2,9 +2,12 @@ package com.github.anrimian.simplemusicplayer.ui.library.main;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.utils.moxy.SingleStateByTagStrategy;
+
+import java.util.List;
 
 /**
  * Created on 02.11.2017.
@@ -25,4 +28,10 @@ public interface LibraryView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showCurrentComposition(Composition composition);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void bindPlayList(List<Composition> currentPlayList);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void updatePlayList();
 }
