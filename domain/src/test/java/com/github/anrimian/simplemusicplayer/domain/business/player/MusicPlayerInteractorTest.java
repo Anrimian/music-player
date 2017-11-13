@@ -18,7 +18,8 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
-import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAYING;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -81,18 +82,27 @@ public class MusicPlayerInteractorTest {
     public void startPlaying() throws Exception {
         musicPlayerInteractor.startPlaying(fakeCompositions);
         verify(musicServiceController).start();
-        playerStateTestObserver.assertValues(IDLE, LOADING, PLAYING);
+        playerStateTestObserver.assertValues(IDLE, LOADING, PLAY);
         currentCompositionTestObserver.assertValues(one);
         currentPlayListTestObserver.assertValue(fakeCompositions);
         verify(musicPlayerController).play(eq(one));
     }
 
     @Test
-    public void changePlayStateStart() throws Exception {
-        musicPlayerInteractor.changePlayState();
+    public void play() throws Exception {
+        musicPlayerInteractor.play();
+
         verify(musicServiceController).start();
         verify(musicPlayerController).resume();
-        playerStateTestObserver.assertValues(IDLE, PLAYING);
+        playerStateTestObserver.assertValues(IDLE, PLAY);
+    }
+
+    @Test
+    public void stop() throws Exception {
+        musicPlayerInteractor.stop();
+
+        verify(musicPlayerController).stop();
+        playerStateTestObserver.assertValues(IDLE, STOP);
     }
 
     @Test

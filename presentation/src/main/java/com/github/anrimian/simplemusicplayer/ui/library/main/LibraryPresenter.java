@@ -48,8 +48,12 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
         presenterDisposable.dispose();
     }
 
-    void onPlayPauseButtonClicked() {
-        musicPlayerInteractor.changePlayState();
+    void onPlayButtonClicked() {
+        musicPlayerInteractor.play();
+    }
+
+    void onStopButtonClicked() {
+        musicPlayerInteractor.stop();
     }
 
     void onSkipToPreviousButtonClicked() {
@@ -78,7 +82,7 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
 
     private void onPlayerStateChanged(PlayerState playerState) {
         switch (playerState) {
-            case PLAYING: {
+            case PLAY: {
                 getViewState().showPlayState();
                 return;
             }

@@ -60,10 +60,17 @@ public class LibraryPresenterTest {
     }
 
     @Test
-    public void onPlayPauseButtonClicked() {
-        libraryPresenter.onPlayPauseButtonClicked();
+    public void onPlayButtonClicked() {
+        libraryPresenter.onPlayButtonClicked();
 
-        verify(musicPlayerInteractor).changePlayState();
+        verify(musicPlayerInteractor).play();
+    }
+
+    @Test
+    public void onPauseButtonClicked() {
+        libraryPresenter.onStopButtonClicked();
+
+        verify(musicPlayerInteractor).stop();
     }
 
     @Test

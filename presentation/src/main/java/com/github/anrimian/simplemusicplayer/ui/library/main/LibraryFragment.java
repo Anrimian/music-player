@@ -143,7 +143,6 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
         startFragment(StorageLibraryFragment.newInstance(null));
 
-        ivPlayPause.setOnClickListener(v -> presenter.onPlayPauseButtonClicked());
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
 
@@ -175,12 +174,14 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     public void showStopState() {
         setContentBottomHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height));
         ivPlayPause.setImageResource(R.drawable.ic_play);
+        ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
     }
 
     @Override
     public void showPlayState() {
         setContentBottomHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height));
         ivPlayPause.setImageResource(R.drawable.ic_pause);
+        ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
     }
 
     @Override

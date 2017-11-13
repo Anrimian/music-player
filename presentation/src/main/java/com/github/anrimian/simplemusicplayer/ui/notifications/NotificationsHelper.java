@@ -19,7 +19,8 @@ import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService
 import com.github.anrimian.simplemusicplayer.infrastructure.service.models.NotificationPlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 
-import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PLAY_PAUSE;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PAUSE;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PLAY;
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.REQUEST_CODE;
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.SKIP_TO_NEXT;
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.SKIP_TO_PREVIOUS;
@@ -62,7 +63,7 @@ public class NotificationsHelper {
 
     private NotificationCompat.Builder getDefaultMusicNotification(NotificationPlayerInfo info,
                                                                    MediaSessionCompat mediaSession) {
-        boolean play = info.getState() == PlayerState.PLAYING;
+        boolean play = info.getState() == PlayerState.PLAY;
         Composition composition = info.getComposition();
 
         RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_music);
@@ -70,9 +71,10 @@ public class NotificationsHelper {
 
         contentView.setTextViewText(R.id.tv_description, composition.getDisplayName());
 
+        int requestCode = play? PAUSE : PLAY;
         Intent intentPlayPause = new Intent(context, MusicService.class);
-        intentPlayPause.putExtra(REQUEST_CODE, PLAY_PAUSE);
-        PendingIntent pIntentPlayPause = PendingIntent.getService(context, PLAY_PAUSE, intentPlayPause, PendingIntent.FLAG_CANCEL_CURRENT);
+        intentPlayPause.putExtra(REQUEST_CODE, requestCode);
+        PendingIntent pIntentPlayPause = PendingIntent.getService(context, requestCode, intentPlayPause, PendingIntent.FLAG_CANCEL_CURRENT);
         contentView.setOnClickPendingIntent(R.id.iv_play_stop, pIntentPlayPause);
 
         Intent intentSkipToPrevious = new Intent(context, MusicService.class);

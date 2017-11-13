@@ -34,9 +34,10 @@ import static com.github.anrimian.simplemusicplayer.ui.notifications.Notificatio
 public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     public static final String REQUEST_CODE = "request_code";
-    public static final int PLAY_PAUSE = 1;
-    public static final int SKIP_TO_NEXT = 2;
-    public static final int SKIP_TO_PREVIOUS = 3;
+    public static final int PLAY = 1;
+    public static final int PAUSE = 2;
+    public static final int SKIP_TO_NEXT = 3;
+    public static final int SKIP_TO_PREVIOUS = 4;
 
     @Inject
     NotificationsHelper notificationsHelper;
@@ -67,7 +68,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        mediaSession = new MediaSessionCompat(this, "PlayerService");//remove
+        mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                 | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
@@ -88,8 +89,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     public int onStartCommand(Intent intent, int flags, int startId) {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         switch (requestCode) {
-            case PLAY_PAUSE: {
-                musicPlayerInteractor.changePlayState();
+            case PLAY: {
+                musicPlayerInteractor.play();
+                break;
+            }
+            case PAUSE: {
+                musicPlayerInteractor.stop();
                 break;
             }
             case SKIP_TO_NEXT: {
@@ -145,14 +150,15 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private void onNotificationInfoChanged(NotificationPlayerInfo info) {
         notificationsHelper.updateForegroundNotification(info, mediaSession);
         switch (info.getState()) {
-            case PLAYING: {
+            case PLAY: {
                 int audioFocusResult = audioManager.requestAudioFocus(
                         audioFocusChangeListener,
                         AudioManager.STREAM_MUSIC,
                         AudioManager.AUDIOFOCUS_GAIN);
-//                if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-//                    return;//TODO we can not handle result here, call stop directly?
-//                }
+                if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                    musicPlayerInteractor.stop();
+                    return;
+                }
 
                 registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
@@ -168,6 +174,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                         PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
 
+                //what we need here?
 //                mediaSession.setPlaybackState(
 //                        stateBuilder.setState(PlaybackStateCompat.STATE_STOPPED,
 //                                PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
@@ -215,17 +222,17 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, track.getDuration())
                     .build();
             mediaSession.setMetadata(metadata);*/
-            musicPlayerInteractor.changePlayState();
+            musicPlayerInteractor.play();
         }
 
         @Override
         public void onPause() {
-            musicPlayerInteractor.changePlayState();
+            musicPlayerInteractor.stop();
         }
 
         @Override
         public void onStop() {
-            musicPlayerInteractor.changePlayState();
+            musicPlayerInteractor.stop();
         }
     }
 
