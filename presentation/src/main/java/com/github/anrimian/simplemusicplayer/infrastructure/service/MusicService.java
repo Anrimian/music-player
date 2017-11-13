@@ -18,14 +18,14 @@ import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.models.NotificationPlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
-import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController;
+import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsHelper;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController.FOREGROUND_NOTIFICATION_ID;
+import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsHelper.FOREGROUND_NOTIFICATION_ID;
 
 /**
  * Created on 03.11.2017.
@@ -39,7 +39,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     public static final int SKIP_TO_PREVIOUS = 3;
 
     @Inject
-    NotificationsController notificationsController;
+    NotificationsHelper notificationsHelper;
 
     @Inject
     MusicPlayerInteractor musicPlayerInteractor;
@@ -128,6 +128,13 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     }*/
 
+/* .doOnNext(composition -> {
+        MediaMetadataCompat metadata = metadataBuilder
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, composition.getTitle())
+                .build();
+        mediaSession.setMetadata(metadata);
+    })*/
+
     private void subscribeOnPlayerActions() {
         Observable.combineLatest(musicPlayerInteractor.getPlayerStateObservable(),
                 musicPlayerInteractor.getCurrentCompositionObservable(),
@@ -136,7 +143,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void onNotificationInfoChanged(NotificationPlayerInfo info) {
-        notificationsController.updateForegroundNotification(info);
+        notificationsHelper.updateForegroundNotification(info, mediaSession);
         switch (info.getState()) {
             case PLAYING: {
                 int audioFocusResult = audioManager.requestAudioFocus(
@@ -144,7 +151,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                         AudioManager.STREAM_MUSIC,
                         AudioManager.AUDIOFOCUS_GAIN);
 //                if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-//                    return;//TODO we can not handle result here
+//                    return;//TODO we can not handle result here, call stop directly?
 //                }
 
                 registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
@@ -152,7 +159,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                         PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
                 mediaSession.setActive(true);
-                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsController.getForegroundNotification(info));
+                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsHelper.getForegroundNotification(info, mediaSession));
                 break;
             }
             case STOP: {

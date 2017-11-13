@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 
-import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsController;
+import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
@@ -34,7 +34,7 @@ public class AppModule {
     @Provides
     @Nonnull
     @Singleton
-    NotificationsController provideNotificationsController(Context context) {
-        return new NotificationsController(context);
+    NotificationsHelper provideNotificationsController(Context context) {
+        return new NotificationsHelper(context);
     }
 }

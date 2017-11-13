@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.widget.RemoteViews;
 
 import com.github.anrimian.simplemusicplayer.R;
@@ -28,7 +29,7 @@ import static com.github.anrimian.simplemusicplayer.infrastructure.service.Music
  * Created on 05.11.2017.
  */
 
-public class NotificationsController {
+public class NotificationsHelper {
 
     private static final String FOREGROUND_CHANNEL_ID = "0";
 
@@ -38,7 +39,7 @@ public class NotificationsController {
 
     private Context context;
 
-    public NotificationsController(Context context) {
+    public NotificationsHelper(Context context) {
         this.context = context;
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -50,17 +51,17 @@ public class NotificationsController {
         }
     }
 
-    public Notification getForegroundNotification(NotificationPlayerInfo info) {
-        return getDefaultMusicNotification(info).build();
+    public Notification getForegroundNotification(NotificationPlayerInfo info, MediaSessionCompat mediaSession) {
+        return getDefaultMusicNotification(info, mediaSession).build();
     }
 
-    public void updateForegroundNotification(NotificationPlayerInfo info) {
-        Notification notification = getDefaultMusicNotification(info)
-                .build();
+    public void updateForegroundNotification(NotificationPlayerInfo info, MediaSessionCompat mediaSession) {
+        Notification notification = getDefaultMusicNotification(info, mediaSession).build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
-    private NotificationCompat.Builder getDefaultMusicNotification(NotificationPlayerInfo info) {
+    private NotificationCompat.Builder getDefaultMusicNotification(NotificationPlayerInfo info,
+                                                                   MediaSessionCompat mediaSession) {
         boolean play = info.getState() == PlayerState.PLAYING;
         Composition composition = info.getComposition();
 
@@ -87,11 +88,19 @@ public class NotificationsController {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+//        NotificationCompat.Style style = new android.support.v4.media.app.NotificationCompat.MediaStyle()
+//                .setMediaSession(mediaSession.getSessionToken());
+
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .setContent(contentView)
                 .setContentTitle("test")
                 .setSmallIcon(R.drawable.ic_menu)
-                .setContentIntent(pIntent);
+                .setContentIntent(pIntent)
+//                .setStyle(style)
+//                .setShowWhen(false)
+//                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
     }
 
     private String getString(@StringRes int resId) {
