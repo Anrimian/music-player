@@ -23,10 +23,4 @@ public class MusicServiceControllerImpl implements MusicServiceController {
         Intent intent = new Intent(context, MusicService.class);
         context.startService(intent);
     }
-
-    @Override
-    public void stop() {
-        Intent intent = new Intent(context, MusicService.class);
-        context.stopService(intent);
-    }
 }

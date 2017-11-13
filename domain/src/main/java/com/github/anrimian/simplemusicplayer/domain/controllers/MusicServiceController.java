@@ -7,6 +7,4 @@ package com.github.anrimian.simplemusicplayer.domain.controllers;
 public interface MusicServiceController {
 
     void start();
-
-    void stop();
 }

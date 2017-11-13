@@ -95,7 +95,7 @@ public class MusicPlayerInteractor {
     private void onInternalPlayerStateChanged(InternalPlayerState state) {
         switch (state) {
             case ENDED: {
-                if (playerState != STOP) {
+                if (playerState == PLAY) {
                     playNext();
                 }
             }
@@ -114,8 +114,7 @@ public class MusicPlayerInteractor {
             if (repeat) {
                 currentPlayPosition = 0;
             } else {
-                musicPlayerController.stop();
-                setState(STOP);
+                stop();
                 return;
             }
         }

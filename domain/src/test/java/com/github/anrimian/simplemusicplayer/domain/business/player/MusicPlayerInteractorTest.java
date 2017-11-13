@@ -115,4 +115,21 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.skipToPrevious();
         verify(musicPlayerController, times(2)).play(eq(one));
     }
+
+    @Test
+    public void testMultipleSkipToNext() throws Exception {
+        musicPlayerInteractor.startPlaying(fakeCompositions);
+
+        musicPlayerInteractor.skipToNext();
+        musicPlayerInteractor.skipToNext();
+        musicPlayerInteractor.skipToNext();
+        musicPlayerInteractor.skipToNext();
+        musicPlayerInteractor.skipToNext();
+        musicPlayerInteractor.skipToNext();
+
+//        verify(musicPlayerController).play(eq(two));
+
+//        musicPlayerInteractor.skipToPrevious();
+        verify(musicPlayerController, times(4)).play(any());
+    }
 }
