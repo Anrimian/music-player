@@ -29,6 +29,7 @@ public class MusicPlayerInteractor {
     private PlayerState playerState = IDLE;
     private BehaviorSubject<PlayerState> playerStateSubject = BehaviorSubject.createDefault(playerState);
     private BehaviorSubject<Composition> currentCompositionSubject = BehaviorSubject.create();
+    private BehaviorSubject<List<Composition>> currentPlayListSubject = BehaviorSubject.create();
 
     private List<Composition> currentPlayList = new ArrayList<>();
     private int currentPlayPosition;
@@ -46,6 +47,7 @@ public class MusicPlayerInteractor {
         musicServiceController.start();
         currentPlayList.clear();
         currentPlayList.addAll(compositions);
+        currentPlayListSubject.onNext(currentPlayList);
         currentPlayPosition = 0;
         playPosition();
     }
@@ -75,6 +77,10 @@ public class MusicPlayerInteractor {
 
     public Observable<Composition> getCurrentCompositionObservable() {
         return currentCompositionSubject;
+    }
+
+    public Observable<List<Composition>> getCurrentPlayListObservable() {
+        return currentPlayListSubject;
     }
 
     private void subscribeOnInternalPlayerState() {

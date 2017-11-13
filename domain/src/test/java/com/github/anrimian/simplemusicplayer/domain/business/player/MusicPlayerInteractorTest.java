@@ -37,6 +37,7 @@ public class MusicPlayerInteractorTest {
 
     private TestObserver<PlayerState> playerStateTestObserver = new TestObserver<>();
     private TestObserver<Composition> currentCompositionTestObserver = new TestObserver<>();
+    private TestObserver<List<Composition>> currentPlayListTestObserver = new TestObserver<>();
 
     private Composition one = new Composition();
     private Composition two = new Composition();
@@ -73,6 +74,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController, musicServiceController);
         musicPlayerInteractor.getPlayerStateObservable().subscribe(playerStateTestObserver);
         musicPlayerInteractor.getCurrentCompositionObservable().subscribe(currentCompositionTestObserver);
+        musicPlayerInteractor.getCurrentPlayListObservable().subscribe(currentPlayListTestObserver);
     }
 
     @Test
@@ -81,6 +83,7 @@ public class MusicPlayerInteractorTest {
         verify(musicServiceController).start();
         playerStateTestObserver.assertValues(IDLE, LOADING, PLAYING);
         currentCompositionTestObserver.assertValues(one);
+        currentPlayListTestObserver.assertValue(fakeCompositions);
         verify(musicPlayerController).play(eq(one));
     }
 
