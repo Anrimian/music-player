@@ -96,7 +96,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 break;
             }
             case PAUSE: {
-                musicPlayerInteractor.stop();
+                musicPlayerInteractor.pause();
                 break;
             }
             case SKIP_TO_NEXT: {
@@ -159,7 +159,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                         AudioManager.STREAM_MUSIC,
                         AudioManager.AUDIOFOCUS_GAIN);
                 if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    musicPlayerInteractor.stop();
+                    musicPlayerInteractor.pause();
                     return;
                 }
 
@@ -226,7 +226,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         @Override
         public void onPause() {
-            musicPlayerInteractor.stop();
+            musicPlayerInteractor.pause();
         }
 
         @Override

@@ -55,7 +55,7 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
     }
 
     void onStopButtonClicked() {
-        musicPlayerInteractor.stop();
+        musicPlayerInteractor.pause();
     }
 
     void onSkipToPreviousButtonClicked() {

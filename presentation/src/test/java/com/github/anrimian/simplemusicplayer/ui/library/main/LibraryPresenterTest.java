@@ -70,7 +70,7 @@ public class LibraryPresenterTest {
     public void onPauseButtonClicked() {
         libraryPresenter.onStopButtonClicked();
 
-        verify(musicPlayerInteractor).stop();
+        verify(musicPlayerInteractor).pause();
     }
 
     @Test

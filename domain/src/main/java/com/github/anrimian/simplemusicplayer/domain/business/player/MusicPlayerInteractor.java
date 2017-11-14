@@ -15,6 +15,7 @@ import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 
@@ -55,10 +56,30 @@ public class MusicPlayerInteractor {
     }
 
     public void play() {
-        if (playerState != PLAY) {
-            musicServiceController.start();
+        if (playerState == PLAY) {
+            return;
+        }
+        musicServiceController.start();
+        if (playerState == PAUSE) {
             musicPlayerController.resume();
             setState(PLAY);
+            return;
+        }
+        if (playerState == STOP) {
+            if (currentPlayPosition > 0) {
+                currentPlayPosition = 0;
+            }
+            if (currentPlayPosition >= currentPlayList.size()) {
+                currentPlayPosition = currentPlayList.size() - 1;
+            }
+            playPosition();
+        }
+    }
+
+    public void pause() {
+        if (playerState != PAUSE) {
+            musicPlayerController.stop();
+            setState(PAUSE);
         }
     }
 
