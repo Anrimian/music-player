@@ -8,6 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerI
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceController;
 import com.github.anrimian.simplemusicplayer.data.controllers.music.MusicPlayerControllerImpl;
+import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.infrastructure.MusicServiceControllerImpl;
 
 import javax.inject.Singleton;
@@ -26,8 +27,9 @@ class MusicModule {
     @NonNull
     @Singleton
     MusicPlayerInteractor provideMusicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                                       MusicServiceController musicServiceController) {
-        return new MusicPlayerInteractor(musicPlayerController, musicServiceController);
+                                                       MusicServiceController musicServiceController,
+                                                       SettingsRepository settingsRepository) {
+        return new MusicPlayerInteractor(musicPlayerController, musicServiceController, settingsRepository);
     }
 
     @Provides

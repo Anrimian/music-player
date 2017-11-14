@@ -4,6 +4,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 
+import com.github.anrimian.simplemusicplayer.data.repositories.settings.Preferences;
+import com.github.anrimian.simplemusicplayer.data.repositories.settings.SettingsRepositoryImpl;
+import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsHelper;
 
 import javax.annotation.Nonnull;
@@ -36,5 +39,19 @@ public class AppModule {
     @Singleton
     NotificationsHelper provideNotificationsController(Context context) {
         return new NotificationsHelper(context);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    Preferences providePrefenreces(Context context) {
+        return new Preferences(context);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    SettingsRepository provideSettingsRepository(Preferences preferences) {
+        return new SettingsRepositoryImpl(preferences);
     }
 }

@@ -5,6 +5,7 @@ import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceCont
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class MusicPlayerInteractor {
 
     private MusicPlayerController musicPlayerController;
     private MusicServiceController musicServiceController;
+    private SettingsRepository settingsRepository;
 
     private PlayerState playerState = IDLE;
     private BehaviorSubject<PlayerState> playerStateSubject = BehaviorSubject.createDefault(playerState);
@@ -34,12 +36,12 @@ public class MusicPlayerInteractor {
     private List<Composition> currentPlayList = new ArrayList<>();
     private int currentPlayPosition;
 
-    private boolean repeat = false;//TODO move to preferences
-
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                 MusicServiceController musicServiceController) {
+                                 MusicServiceController musicServiceController,
+                                 SettingsRepository settingsRepository) {
         this.musicPlayerController = musicPlayerController;
         this.musicServiceController = musicServiceController;
+        this.settingsRepository = settingsRepository;
         subscribeOnInternalPlayerState();
     }
 
@@ -72,7 +74,7 @@ public class MusicPlayerInteractor {
     }
 
     public void skipToNext() {
-        playNext();
+        playNext(true);
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
@@ -96,7 +98,7 @@ public class MusicPlayerInteractor {
         switch (state) {
             case ENDED: {
                 if (playerState == PLAY) {
-                    playNext();
+                    playNext(false);
                 }
             }
         }
@@ -107,18 +109,17 @@ public class MusicPlayerInteractor {
         playerStateSubject.onNext(playerState);
     }
 
-    private void playNext() {
-        currentPlayPosition++;
-
-        if (currentPlayPosition >= currentPlayList.size()) {
-            if (repeat) {
+    private void playNext(boolean canScrollToFirst) {
+        if (currentPlayPosition >= currentPlayList.size() - 1) {
+            if (canScrollToFirst || settingsRepository.isInfinitePlayingEnabled()) {
                 currentPlayPosition = 0;
             } else {
                 stop();
                 return;
             }
+        } else {
+            currentPlayPosition++;
         }
-
         playPosition();
     }
 
@@ -138,7 +139,7 @@ public class MusicPlayerInteractor {
                 .subscribe(() -> {
                     setState(PLAY);
                 }, throwable -> {
-                    playNext();
+                    playNext(false);
                 });
     }
 }

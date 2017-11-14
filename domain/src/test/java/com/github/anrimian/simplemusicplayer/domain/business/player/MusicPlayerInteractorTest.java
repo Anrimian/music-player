@@ -5,6 +5,7 @@ import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceCont
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +36,8 @@ public class MusicPlayerInteractorTest {
     private MusicPlayerInteractor musicPlayerInteractor;
     private MusicPlayerController musicPlayerController;
     private MusicServiceController musicServiceController;
+
+    private SettingsRepository settingsRepository;
 
     private TestObserver<PlayerState> playerStateTestObserver = new TestObserver<>();
     private TestObserver<Composition> currentCompositionTestObserver = new TestObserver<>();
@@ -72,7 +75,11 @@ public class MusicPlayerInteractorTest {
         when(musicPlayerController.play(any())).thenReturn(Completable.complete());
         musicServiceController = mock(MusicServiceController.class);
 
-        musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController, musicServiceController);
+        settingsRepository = mock(SettingsRepository.class);
+        when(settingsRepository.isInfinitePlayingEnabled()).thenReturn(false);
+        when(settingsRepository.isRandomPlayingEnabled()).thenReturn(false);
+
+        musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController, musicServiceController, settingsRepository);
         musicPlayerInteractor.getPlayerStateObservable().subscribe(playerStateTestObserver);
         musicPlayerInteractor.getCurrentCompositionObservable().subscribe(currentCompositionTestObserver);
         musicPlayerInteractor.getCurrentPlayListObservable().subscribe(currentPlayListTestObserver);
@@ -120,12 +127,13 @@ public class MusicPlayerInteractorTest {
     public void testMultipleSkipToNext() throws Exception {
         musicPlayerInteractor.startPlaying(fakeCompositions);
 
-        musicPlayerInteractor.skipToNext();
-        musicPlayerInteractor.skipToNext();
-        musicPlayerInteractor.skipToNext();
-        musicPlayerInteractor.skipToNext();
-        musicPlayerInteractor.skipToNext();
-        musicPlayerInteractor.skipToNext();
+        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
+        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
+        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
+        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
+        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
+        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
+        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
 
 //        verify(musicPlayerController).play(eq(two));
 
