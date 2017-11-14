@@ -169,6 +169,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 startForeground(FOREGROUND_NOTIFICATION_ID, notificationsHelper.getForegroundNotification(info, mediaSession));
                 break;
             }
+            case PAUSE:
             case STOP: {
                 mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                         PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());

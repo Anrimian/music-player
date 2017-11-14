@@ -8,6 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -34,8 +35,10 @@ public class MusicPlayerInteractor {
     private BehaviorSubject<Composition> currentCompositionSubject = BehaviorSubject.create();
     private BehaviorSubject<List<Composition>> currentPlayListSubject = BehaviorSubject.create();
 
+    private List<Composition> initialPlayList;
     private List<Composition> currentPlayList = new ArrayList<>();
     private int currentPlayPosition;
+    private Composition currentComposition;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  MusicServiceController musicServiceController,
@@ -48,11 +51,30 @@ public class MusicPlayerInteractor {
 
     public void startPlaying(List<Composition> compositions) {
         musicServiceController.start();
-        currentPlayList.clear();
-        currentPlayList.addAll(compositions);
-        currentPlayListSubject.onNext(currentPlayList);
+        initialPlayList = compositions;
+        shufflePlayList();
         currentPlayPosition = 0;
         playPosition();
+    }
+
+    private void shufflePlayList() {
+        currentPlayList.clear();
+        if (settingsRepository.isRandomPlayingEnabled()) {
+            List<Composition> playListToShuffle = new ArrayList<>(initialPlayList);
+            if (currentComposition != null) {
+                playListToShuffle.remove(currentPlayPosition);
+                currentPlayList.add(currentComposition);
+            }
+            Collections.shuffle(playListToShuffle);
+            currentPlayList.addAll(playListToShuffle);
+        } else {
+            currentPlayList.addAll(initialPlayList);
+        }
+        if (currentComposition != null) {
+            currentPlayPosition = currentPlayList.indexOf(currentComposition);
+        }
+
+        currentPlayListSubject.onNext(currentPlayList);
     }
 
     public void play() {
@@ -120,6 +142,7 @@ public class MusicPlayerInteractor {
 
     public void setRandomPlayingEnabled(boolean enabled) {
         settingsRepository.setRandomPlayingEnabled(enabled);
+        shufflePlayList();
     }
 
     public void setInfinitePlayingEnabled(boolean enabled) {
@@ -172,9 +195,9 @@ public class MusicPlayerInteractor {
 
     private void playPosition() {
         setState(LOADING);
-        Composition composition = currentPlayList.get(currentPlayPosition);
-        currentCompositionSubject.onNext(composition);
-        musicPlayerController.play(composition)
+        currentComposition = currentPlayList.get(currentPlayPosition);
+        currentCompositionSubject.onNext(currentComposition);
+        musicPlayerController.play(currentComposition)
                 .subscribe(() -> {
                     setState(PLAY);
                 }, throwable -> {

@@ -24,6 +24,7 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -100,8 +101,8 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.play();
 
         verify(musicServiceController).start();
-        verify(musicPlayerController).resume();
-        playerStateTestObserver.assertValues(IDLE, PLAY);
+        verify(musicPlayerController, never()).resume();
+        playerStateTestObserver.assertValues(IDLE);
     }
 
     @Test
@@ -140,4 +141,17 @@ public class MusicPlayerInteractorTest {
 //        musicPlayerInteractor.skipToPrevious();
         verify(musicPlayerController, times(4)).play(any());
     }
+
+    @Test
+    public void testRandomPlaying() throws Exception {
+        musicPlayerInteractor.startPlaying(fakeCompositions);
+
+        when(settingsRepository.isRandomPlayingEnabled()).thenReturn(true);
+        musicPlayerInteractor.setRandomPlayingEnabled(true);
+
+        musicPlayerInteractor.skipToNext();
+        musicPlayerInteractor.skipToPrevious();
+        verify(musicPlayerController, times(2)).play(eq(one));
+    }
+
 }
