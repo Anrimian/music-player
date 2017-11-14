@@ -234,6 +234,16 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         public void onStop() {
             musicPlayerInteractor.stop();
         }
+
+        @Override
+        public void onSkipToNext() {
+            musicPlayerInteractor.skipToNext();
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            musicPlayerInteractor.skipToPrevious();
+        }
     }
 
     private final BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
