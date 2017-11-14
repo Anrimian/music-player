@@ -52,6 +52,7 @@ public class MusicPlayerInteractor {
     public void startPlaying(List<Composition> compositions) {
         musicServiceController.start();
         initialPlayList = compositions;
+        currentComposition = null;
         shufflePlayList();
         currentPlayPosition = 0;
         playPosition();
@@ -73,7 +74,6 @@ public class MusicPlayerInteractor {
         if (currentComposition != null) {
             currentPlayPosition = currentPlayList.indexOf(currentComposition);
         }
-
         currentPlayListSubject.onNext(currentPlayList);
     }
 
