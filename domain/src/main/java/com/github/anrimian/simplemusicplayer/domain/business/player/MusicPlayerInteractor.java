@@ -89,6 +89,22 @@ public class MusicPlayerInteractor {
         return currentPlayListSubject;
     }
 
+    public boolean isInfinitePlayingEnabled() {
+        return settingsRepository.isInfinitePlayingEnabled();
+    }
+
+    public boolean isRandomPlayingEnabled() {
+        return settingsRepository.isRandomPlayingEnabled();
+    }
+
+    public void setRandomPlayingEnabled(boolean enabled) {
+        settingsRepository.setRandomPlayingEnabled(enabled);
+    }
+
+    public void setInfinitePlayingEnabled(boolean enabled) {
+        settingsRepository.setInfinitePlayingEnabled(enabled);
+    }
+
     private void subscribeOnInternalPlayerState() {
         musicPlayerController.getPlayerStateObservable()
                 .subscribe(this::onInternalPlayerStateChanged);
@@ -105,8 +121,10 @@ public class MusicPlayerInteractor {
     }
 
     private void setState(PlayerState playerState) {
-        this.playerState = playerState;
-        playerStateSubject.onNext(playerState);
+//        if (this.playerState != playerState) {
+            this.playerState = playerState;
+            playerStateSubject.onNext(playerState);
+//        }
     }
 
     private void playNext(boolean canScrollToFirst) {
@@ -126,7 +144,7 @@ public class MusicPlayerInteractor {
     private void playPrevious() {
         currentPlayPosition--;
         if (currentPlayPosition < 0) {
-            currentPlayPosition = 0;
+            currentPlayPosition = currentPlayList.size() - 1;
         }
         playPosition();
     }

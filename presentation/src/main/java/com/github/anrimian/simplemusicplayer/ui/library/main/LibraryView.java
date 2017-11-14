@@ -34,4 +34,10 @@ public interface LibraryView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void updatePlayList();
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showInfinitePlayingButton(boolean active);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showRandomPlayingButton(boolean active);
 }

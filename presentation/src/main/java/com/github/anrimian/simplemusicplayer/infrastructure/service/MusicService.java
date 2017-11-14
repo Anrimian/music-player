@@ -82,6 +82,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
 
+        registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+
         subscribeOnPlayerActions();
     }
 
@@ -119,6 +121,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(becomingNoisyReceiver);
         mediaSession.release();
         serviceDisposable.dispose();
     }
@@ -160,8 +163,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                     return;
                 }
 
-                registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-
                 mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                         PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
                 mediaSession.setActive(true);
@@ -169,8 +170,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 break;
             }
             case STOP: {
-                unregisterReceiver(becomingNoisyReceiver);
-
                 mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                         PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
 

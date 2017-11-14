@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -65,6 +66,12 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
     @BindView(R.id.tv_description)
     TextView tvDescription;
+
+    @BindView(R.id.btn_infinite_play)
+    Button btnInfinitePlay;
+
+    @BindView(R.id.btn_random_play)
+    Button btnRandomPlay;
 
     private View toolbar;
 
@@ -145,6 +152,8 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
+        btnInfinitePlay.setOnClickListener(v -> presenter.onInfinitePlayingButtonClicked(!v.isSelected()));
+        btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(!v.isSelected()));
 
         rvPlayList.setLayoutManager(new LinearLayoutManager(getContext()));
     }
@@ -203,6 +212,20 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     @Override
     public void updatePlayList() {
         playListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showInfinitePlayingButton(boolean active) {
+        btnInfinitePlay.setSelected(active);
+        btnInfinitePlay.setPressed(active);
+        btnInfinitePlay.setText(active? "INFINITE(ON)": "INFINITE(OFF)");
+    }
+
+    @Override
+    public void showRandomPlayingButton(boolean active) {
+        btnRandomPlay.setSelected(active);
+        btnRandomPlay.setPressed(active);
+        btnRandomPlay.setText(active? "RANDOM(ON)": "RANDOM(OFF)");
     }
 
     private void setContentBottomHeight(int heightInPixels) {

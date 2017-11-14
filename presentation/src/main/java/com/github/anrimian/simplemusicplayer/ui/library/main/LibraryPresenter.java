@@ -36,6 +36,8 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         getViewState().bindPlayList(currentPlayList);
+        getViewState().showInfinitePlayingButton(musicPlayerInteractor.isInfinitePlayingEnabled());
+        getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
 
         subscribeOnPlayerStateChanges();
         subscribeOnCurrentCompositionChanging();
@@ -62,6 +64,16 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
 
     void onSkipToNextButtonClicked() {
         musicPlayerInteractor.skipToNext();
+    }
+
+    void onInfinitePlayingButtonClicked(boolean enabled) {
+        musicPlayerInteractor.setInfinitePlayingEnabled(enabled);
+        getViewState().showInfinitePlayingButton(enabled);
+    }
+
+    void onRandomPlayingButtonClicked(boolean enabled) {
+        musicPlayerInteractor.setRandomPlayingEnabled(enabled);
+        getViewState().showRandomPlayingButton(enabled);
     }
 
     private void subscribeOnCurrentCompositionChanging() {
