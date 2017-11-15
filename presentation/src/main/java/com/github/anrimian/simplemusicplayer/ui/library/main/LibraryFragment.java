@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
@@ -29,6 +30,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.anrimian.simplemusicplayer.utils.format.FormatUtils.formatMilliseconds;
 
 /**
  * Created on 19.10.2017.
@@ -72,6 +75,12 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
     @BindView(R.id.btn_random_play)
     Button btnRandomPlay;
+
+    @BindView(R.id.tv_played_time)
+    TextView tvPlayedTime;
+
+    @BindView(R.id.pb_track_state)
+    ProgressBar pbTrackState;
 
     private View toolbar;
 
@@ -226,6 +235,13 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
         btnRandomPlay.setSelected(active);
         btnRandomPlay.setPressed(active);
         btnRandomPlay.setText(active? "RANDOM(ON)": "RANDOM(OFF)");
+    }
+
+    @Override
+    public void showTrackState(long currentPosition, long duration) {
+        int progress = (int) (currentPosition * 100 / duration);
+        pbTrackState.setProgress(progress);
+        tvPlayedTime.setText(formatMilliseconds(currentPosition));
     }
 
     private void setContentBottomHeight(int heightInPixels) {

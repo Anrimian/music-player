@@ -40,4 +40,7 @@ public interface LibraryView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showRandomPlayingButton(boolean active);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showTrackState(long currentPosition, long duration);
 }

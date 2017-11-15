@@ -7,6 +7,7 @@ import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerStateRx
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -20,10 +21,12 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.FileDataSource;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Created on 10.11.2017.
@@ -32,6 +35,7 @@ import io.reactivex.Single;
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
+    private BehaviorSubject<TrackState> trackStateSubject = BehaviorSubject.create();
 
     private SimpleExoPlayer player;
 
@@ -41,6 +45,9 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
         player.addListener(playerStateRxWrapper);
+
+        Observable.interval(0, 1, TimeUnit.SECONDS)
+                .subscribe(o -> player.getContentPosition());
     }
 
     @Override
@@ -63,6 +70,17 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public Observable<InternalPlayerState> getPlayerStateObservable() {
         return playerStateRxWrapper.getStateObservable();
+    }
+
+    @Override
+    public Observable<TrackState> getTrackStateObservable() {
+        return Observable.interval(0, 1, TimeUnit.SECONDS)
+                .map(o -> getTrackState());
+    }
+
+    private TrackState getTrackState() {
+        long currentPosition = player.getCurrentPosition();
+        return new TrackState(currentPosition);
     }
 
     private void playMediaSource(MediaSource mediaSource) {

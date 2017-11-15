@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.domain.controllers;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -19,4 +20,6 @@ public interface MusicPlayerController {
     void resume();
 
     Observable<InternalPlayerState> getPlayerStateObservable();
+
+    Observable<TrackState> getTrackStateObservable();
 }

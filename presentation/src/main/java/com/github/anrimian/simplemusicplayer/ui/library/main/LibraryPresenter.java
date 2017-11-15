@@ -5,12 +5,14 @@ import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created on 02.11.2017.
@@ -23,8 +25,10 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
     private Scheduler uiScheduler;
 
     private CompositeDisposable presenterDisposable = new CompositeDisposable();
+    private Disposable trackStateDisposable;
 
     private List<Composition> currentPlayList = new ArrayList<>();
+    private Composition currentComposition;
 
     public LibraryPresenter(MusicPlayerInteractor musicPlayerInteractor,
                             Scheduler uiScheduler) {
@@ -48,6 +52,9 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
     public void onDestroy() {
         super.onDestroy();
         presenterDisposable.dispose();
+        if (trackStateDisposable != null) {
+            trackStateDisposable.dispose();
+        }
     }
 
     void onPlayButtonClicked() {
@@ -83,7 +90,14 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
     }
 
     private void onCurrentCompositionChanged(Composition composition) {
+        currentComposition = composition;
+        if (trackStateDisposable != null) {
+            trackStateDisposable.dispose();
+            trackStateDisposable = null;
+        }
         getViewState().showCurrentComposition(composition);
+        getViewState().showTrackState(0, composition.getDuration());
+        subscribeOnTrackStateChanging();
     }
 
     private void subscribeOnPlayerStateChanges() {
@@ -118,5 +132,17 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
         currentPlayList.clear();
         currentPlayList.addAll(newPlayList);
         getViewState().updatePlayList();
+    }
+
+    private void subscribeOnTrackStateChanging() {
+        trackStateDisposable = musicPlayerInteractor.getTrackStateObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onTrackStateChanged);
+    }
+
+    private void onTrackStateChanged(TrackState trackState) {
+        long currentPosition = trackState.getCurrentPosition();
+        long duration = currentComposition.getDuration();
+        getViewState().showTrackState(currentPosition, duration);
     }
 }

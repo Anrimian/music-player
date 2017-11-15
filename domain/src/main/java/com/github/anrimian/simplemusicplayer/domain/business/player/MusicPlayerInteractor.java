@@ -5,6 +5,7 @@ import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceCont
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class MusicPlayerInteractor {
         currentComposition = null;
         shufflePlayList();
         currentPlayPosition = 0;
+        moveToPosition();
         playPosition();
     }
 
@@ -94,6 +96,7 @@ public class MusicPlayerInteractor {
             if (currentPlayPosition >= currentPlayList.size()) {
                 currentPlayPosition = currentPlayList.size() - 1;
             }
+            moveToPosition();
             playPosition();
         }
     }
@@ -149,6 +152,10 @@ public class MusicPlayerInteractor {
         settingsRepository.setInfinitePlayingEnabled(enabled);
     }
 
+    public Observable<TrackState> getTrackStateObservable() {
+        return musicPlayerController.getTrackStateObservable();
+    }
+
     private void subscribeOnInternalPlayerState() {
         musicPlayerController.getPlayerStateObservable()
                 .subscribe(this::onInternalPlayerStateChanged);
@@ -165,10 +172,8 @@ public class MusicPlayerInteractor {
     }
 
     private void setState(PlayerState playerState) {
-//        if (this.playerState != playerState) {
-            this.playerState = playerState;
-            playerStateSubject.onNext(playerState);
-//        }
+        this.playerState = playerState;
+        playerStateSubject.onNext(playerState);
     }
 
     private void playNext(boolean canScrollToFirst) {
@@ -182,7 +187,10 @@ public class MusicPlayerInteractor {
         } else {
             currentPlayPosition++;
         }
-        playPosition();
+        moveToPosition();
+        if (playerState == PLAY) {
+            playPosition();
+        }
     }
 
     private void playPrevious() {
@@ -190,13 +198,19 @@ public class MusicPlayerInteractor {
         if (currentPlayPosition < 0) {
             currentPlayPosition = currentPlayList.size() - 1;
         }
-        playPosition();
+        moveToPosition();
+        if (playerState == PLAY) {
+            playPosition();
+        }
+    }
+
+    private void moveToPosition() {
+        currentComposition = currentPlayList.get(currentPlayPosition);
+        currentCompositionSubject.onNext(currentComposition);
     }
 
     private void playPosition() {
         setState(LOADING);
-        currentComposition = currentPlayList.get(currentPlayPosition);
-        currentCompositionSubject.onNext(currentComposition);
         musicPlayerController.play(currentComposition)
                 .subscribe(() -> {
                     setState(PLAY);
