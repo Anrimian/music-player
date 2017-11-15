@@ -84,7 +84,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
-        subscribeOnPlayerActions();
+        subscribeOnPlayingInfoChanges();
+        subscribeOnPlayerStateChanges();
     }
 
     @Override
@@ -143,15 +144,14 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         mediaSession.setMetadata(metadata);
     })*/
 
-    private void subscribeOnPlayerActions() {
-        Observable.combineLatest(musicPlayerInteractor.getPlayerStateObservable(),
-                musicPlayerInteractor.getCurrentCompositionObservable(),
-                NotificationPlayerInfo::new)
-                .subscribe(this::onNotificationInfoChanged);
+    private void subscribeOnPlayerStateChanges() {
+        serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+            .distinctUntilChanged()
+            .withLatestFrom(musicPlayerInteractor.getCurrentCompositionObservable(), NotificationPlayerInfo::new)
+            .subscribe(this::onPlayerStateChanged));
     }
 
-    private void onNotificationInfoChanged(NotificationPlayerInfo info) {
-        notificationsHelper.updateForegroundNotification(info, mediaSession);
+    private void onPlayerStateChanged(NotificationPlayerInfo info) {
         switch (info.getState()) {
             case PLAY: {
                 int audioFocusResult = audioManager.requestAudioFocus(
@@ -185,6 +185,18 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 break;
             }
         }
+    }
+
+    private void subscribeOnPlayingInfoChanges() {
+        serviceDisposable.add(Observable.combineLatest(
+                musicPlayerInteractor.getPlayerStateObservable(),
+                musicPlayerInteractor.getCurrentCompositionObservable(),
+                NotificationPlayerInfo::new)
+                .subscribe(this::onNotificationInfoChanged));
+    }
+
+    private void onNotificationInfoChanged(NotificationPlayerInfo info) {
+        notificationsHelper.updateForegroundNotification(info, mediaSession);
     }
 
     private class AudioFocusChangeListener implements AudioManager.OnAudioFocusChangeListener {

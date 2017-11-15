@@ -60,25 +60,6 @@ public class MusicPlayerInteractor {
         playPosition();
     }
 
-    private void shufflePlayList() {
-        currentPlayList.clear();
-        if (settingsRepository.isRandomPlayingEnabled()) {
-            List<Composition> playListToShuffle = new ArrayList<>(initialPlayList);
-            if (currentComposition != null) {
-                playListToShuffle.remove(currentPlayPosition);
-                currentPlayList.add(currentComposition);
-            }
-            Collections.shuffle(playListToShuffle);
-            currentPlayList.addAll(playListToShuffle);
-        } else {
-            currentPlayList.addAll(initialPlayList);
-        }
-        if (currentComposition != null) {
-            currentPlayPosition = currentPlayList.indexOf(currentComposition);
-        }
-        currentPlayListSubject.onNext(currentPlayList);
-    }
-
     public void play() {
         if (playerState == PLAY) {
             return;
@@ -161,6 +142,25 @@ public class MusicPlayerInteractor {
                 .subscribe(this::onInternalPlayerStateChanged);
     }
 
+    private void shufflePlayList() {
+        currentPlayList.clear();
+        if (settingsRepository.isRandomPlayingEnabled()) {
+            List<Composition> playListToShuffle = new ArrayList<>(initialPlayList);
+            if (currentComposition != null) {
+                playListToShuffle.remove(currentPlayPosition);
+                currentPlayList.add(currentComposition);
+            }
+            Collections.shuffle(playListToShuffle);
+            currentPlayList.addAll(playListToShuffle);
+        } else {
+            currentPlayList.addAll(initialPlayList);
+        }
+        if (currentComposition != null) {
+            currentPlayPosition = currentPlayList.indexOf(currentComposition);
+        }
+        currentPlayListSubject.onNext(currentPlayList);
+    }
+
     private void onInternalPlayerStateChanged(InternalPlayerState state) {
         switch (state) {
             case ENDED: {
@@ -190,6 +190,8 @@ public class MusicPlayerInteractor {
         moveToPosition();
         if (playerState == PLAY) {
             playPosition();
+        } else {
+            setState(STOP);//TODO fix moving in stop state
         }
     }
 
@@ -201,6 +203,8 @@ public class MusicPlayerInteractor {
         moveToPosition();
         if (playerState == PLAY) {
             playPosition();
+        } else {
+            setState(STOP);//TODO fix moving in stop state
         }
     }
 
