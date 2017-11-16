@@ -13,7 +13,7 @@ import io.reactivex.Observable;
 
 public interface MusicPlayerController {
 
-    Completable play(Composition composition);
+    Completable prepareToPlay(Composition composition);
 
     void stop();
 

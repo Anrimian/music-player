@@ -78,7 +78,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerController = mock(MusicPlayerController.class);
         when(musicPlayerController.getPlayerStateObservable()).thenReturn(internalPlayerStateObservable);
         when(musicPlayerController.getTrackStateObservable()).thenReturn(trackStateObservable);
-        when(musicPlayerController.play(any())).thenReturn(Completable.complete());
+        when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
         musicServiceController = mock(MusicServiceController.class);
 
         settingsRepository = mock(SettingsRepository.class);
@@ -100,7 +100,7 @@ public class MusicPlayerInteractorTest {
         playerStateTestObserver.assertValues(IDLE, LOADING, PLAY);
         currentCompositionTestObserver.assertValues(one);
         currentPlayListTestObserver.assertValue(fakeCompositions);
-        verify(musicPlayerController).play(eq(one));
+        verify(musicPlayerController).prepareToPlay(eq(one));
     }
 
     @Test
@@ -119,7 +119,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.play();
 
         verify(musicServiceController, times(2)).start();
-        verify(musicPlayerController).resume();
+        verify(musicPlayerController, times(2)).resume();
         playerStateTestObserver.assertValues(IDLE, LOADING, PLAY, PAUSE, PLAY);
     }
 
@@ -130,7 +130,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.play();
 
         verify(musicServiceController, times(2)).start();
-        verify(musicPlayerController, times(2)).play(eq(one));
+        verify(musicPlayerController, times(2)).prepareToPlay(eq(one));
         playerStateTestObserver.assertValues(IDLE, LOADING, PLAY, STOP, LOADING, PLAY);
     }
 
@@ -157,7 +157,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.startPlaying(fakeCompositions);
 
         musicPlayerInteractor.skipToNext();
-        verify(musicPlayerController).play(eq(two));
+        verify(musicPlayerController).prepareToPlay(eq(two));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.startPlaying(fakeCompositions);
 
         musicPlayerInteractor.skipToPrevious();
-        verify(musicPlayerController).play(eq(four));
+        verify(musicPlayerController).prepareToPlay(eq(four));
     }
 
     @Test
@@ -175,7 +175,8 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.skipToNext();
         musicPlayerInteractor.play();
 
-        verify(musicPlayerController).play(eq(two));
+        verify(musicPlayerController).prepareToPlay(eq(two));
+        playerStateTestObserver.assertValues(IDLE, LOADING, PLAY, PAUSE, LOADING, PLAY);
     }
 
     @Test
@@ -190,7 +191,7 @@ public class MusicPlayerInteractorTest {
         internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
         internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
 
-        verify(musicPlayerController, times(4)).play(any());
+        verify(musicPlayerController, times(4)).prepareToPlay(any());
     }
 
     @Test
@@ -202,7 +203,7 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.skipToNext();
         musicPlayerInteractor.skipToPrevious();
-        verify(musicPlayerController, times(2)).play(eq(one));
+        verify(musicPlayerController, times(2)).prepareToPlay(eq(one));
     }
 
 }

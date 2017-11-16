@@ -51,9 +51,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public Completable play(Composition composition) {
+    public Completable prepareToPlay(Composition composition) {
         return prepareMediaSource(composition)
-                .doOnSuccess(this::playMediaSource)
                 .toCompletable();
     }
 
@@ -83,11 +82,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         return new TrackState(currentPosition);
     }
 
-    private void playMediaSource(MediaSource mediaSource) {
-        player.prepare(mediaSource);
-        player.setPlayWhenReady(true);
-    }
-
     private Single<MediaSource> prepareMediaSource(Composition composition) {
         return Single.create(emitter -> {
             Uri uri = Uri.fromFile(new File(composition.getFilePath()));
@@ -100,12 +94,13 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
             }
 
             DataSource.Factory factory = () -> fileDataSource;
-            MediaSource audioSource = new ExtractorMediaSource(fileDataSource.getUri(),
+            MediaSource mediaSource = new ExtractorMediaSource(fileDataSource.getUri(),
                     factory,
                     new DefaultExtractorsFactory(),
                     null,
                     null);
-            emitter.onSuccess(audioSource);
+            player.prepare(mediaSource);
+            emitter.onSuccess(mediaSource);
         });
     }
 

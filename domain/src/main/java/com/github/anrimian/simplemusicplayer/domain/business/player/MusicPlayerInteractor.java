@@ -55,34 +55,28 @@ public class MusicPlayerInteractor {
         if (compositions == null || compositions.isEmpty()) {
             return;
         }
-        musicServiceController.start();
         initialPlayList = compositions;
         currentComposition = null;
         shufflePlayList();
         currentPlayPosition = 0;
-        moveToPosition();
-        playPosition();
+        prepareToPlayPosition(true);
     }
 
     public void play() {
-        if (playerState == PLAY || playerState == IDLE) {
-            return;
-        }
-        musicServiceController.start();
-        if (playerState == PAUSE) {
-            musicPlayerController.resume();
-            setState(PLAY);
-            return;
-        }
-        if (playerState == STOP) {
-            if (currentPlayPosition < 0) {
-                currentPlayPosition = 0;
+        switch (playerState) {
+            case IDLE:
+            case PLAY: {
+                return;
             }
-            if (currentPlayPosition >= currentPlayList.size()) {
-                currentPlayPosition = currentPlayList.size() - 1;
+            case STOP: {
+                prepareToPlay(true);
+                return;
             }
-            moveToPosition();
-            playPosition();
+            default: {
+                musicServiceController.start();
+                musicPlayerController.resume();
+                setState(PLAY);
+            }
         }
     }
 
@@ -101,11 +95,13 @@ public class MusicPlayerInteractor {
     }
 
     public void skipToPrevious() {
-        playPrevious();
+        moveToPrevious();
+        prepareToPlayPosition(playerState == PLAY);
     }
 
     public void skipToNext() {
-        playNext(true);
+        moveToNext();
+        prepareToPlayPosition(playerState == PLAY);
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
@@ -169,7 +165,10 @@ public class MusicPlayerInteractor {
         switch (state) {
             case ENDED: {
                 if (playerState == PLAY) {
-                    playNext(false);
+                    boolean playAfter = (currentPlayPosition < currentPlayList.size() - 2)
+                            || settingsRepository.isInfinitePlayingEnabled();
+                    moveToNext();
+                    prepareToPlayPosition(playAfter);
                     break;
                 }
             }
@@ -181,36 +180,24 @@ public class MusicPlayerInteractor {
         playerStateSubject.onNext(playerState);
     }
 
-    private void playNext(boolean canMoveToStart) {
+    private void moveToNext() {
         if (currentPlayPosition >= currentPlayList.size() - 1) {
-            if (canMoveToStart || settingsRepository.isInfinitePlayingEnabled()) {
-                currentPlayPosition = 0;
-            } else {
-                stop();
-                return;
-            }
+            currentPlayPosition = 0;
         } else {
             currentPlayPosition++;
         }
-        moveToPosition();
-        if (playerState == PLAY) {
-            playPosition();
-        } else {
-            setState(STOP);
-        }
     }
 
-    private void playPrevious() {
+    private void moveToPrevious() {
         currentPlayPosition--;
         if (currentPlayPosition < 0) {
             currentPlayPosition = currentPlayList.size() - 1;
         }
+    }
+
+    private void prepareToPlayPosition(boolean playAfter) {
         moveToPosition();
-        if (playerState == PLAY) {
-            playPosition();
-        } else {
-            setState(STOP);
-        }
+        prepareToPlay(playAfter);
     }
 
     private void moveToPosition() {
@@ -218,13 +205,16 @@ public class MusicPlayerInteractor {
         currentCompositionSubject.onNext(currentComposition);
     }
 
-    private void playPosition() {
+    private void prepareToPlay(boolean playAfter) {
         setState(LOADING);
-        musicPlayerController.play(currentComposition)
+        musicPlayerController.prepareToPlay(currentComposition)
                 .subscribe(() -> {
-                    setState(PLAY);
+                    if (playAfter) {
+                        play();
+                    }
                 }, throwable -> {
-                    playNext(false);
+                    moveToNext();
+                    prepareToPlayPosition(playAfter);
                 });
     }
 }
