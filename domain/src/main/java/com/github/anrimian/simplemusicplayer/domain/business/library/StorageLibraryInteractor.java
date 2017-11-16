@@ -108,15 +108,28 @@ public class StorageLibraryInteractor {
 
     private Single<FileTree<Composition>> createMusicFileTree() {
         return musicProviderRepository.getAllCompositions()
-                .map(compositions -> {
-                    FileTree<Composition> musicFileTree = new FileTree<>(null);
-                    for (Composition composition: compositions) {
-                        String filePath = composition.getFilePath();
-                        musicFileTree.addFile(composition, filePath);
-                    }
-                    return musicFileTree;
-                })
+                .map(this::filterCorruptedCompositions)
+                .map(this::createTree)
                 .map(this::removeUnusedRootComponents);
+    }
+
+    private List<Composition> filterCorruptedCompositions(List<Composition> compositions) {
+        for (Composition composition: new ArrayList<>(compositions)) {
+            if (composition.getDuration() <= 0) {
+                System.out.println("corrupted composition: " + composition);//TODO another tracking for this
+                compositions.remove(composition);
+            }
+        }
+        return compositions;
+    }
+
+    private FileTree<Composition> createTree(List<Composition> compositions) {
+        FileTree<Composition> musicFileTree = new FileTree<>(null);
+        for (Composition composition: compositions) {
+            String filePath = composition.getFilePath();
+            musicFileTree.addFile(composition, filePath);
+        }
+        return musicFileTree;
     }
 
     private FileTree<Composition> removeUnusedRootComponents(FileTree<Composition> tree) {
