@@ -6,7 +6,6 @@ package com.github.anrimian.simplemusicplayer.domain.models.player;
 
 public enum PlayerState {
     IDLE,
-    LOADING,
     PLAY,
     PAUSE,
     STOP

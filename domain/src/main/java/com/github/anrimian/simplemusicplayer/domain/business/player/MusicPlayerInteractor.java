@@ -7,6 +7,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayer
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +17,6 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
-import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
@@ -30,6 +30,7 @@ public class MusicPlayerInteractor {
     private MusicPlayerController musicPlayerController;
     private MusicServiceController musicServiceController;
     private SettingsRepository settingsRepository;
+    private UiStateRepository uiStateRepository;
 
     private PlayerState playerState = IDLE;
     private BehaviorSubject<PlayerState> playerStateSubject = BehaviorSubject.createDefault(playerState);
@@ -44,10 +45,12 @@ public class MusicPlayerInteractor {
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  MusicServiceController musicServiceController,
-                                 SettingsRepository settingsRepository) {
+                                 SettingsRepository settingsRepository,
+                                 UiStateRepository uiStateRepository) {
         this.musicPlayerController = musicPlayerController;
         this.musicServiceController = musicServiceController;
         this.settingsRepository = settingsRepository;
+        this.uiStateRepository = uiStateRepository;
         subscribeOnInternalPlayerState();
     }
 
@@ -63,19 +66,21 @@ public class MusicPlayerInteractor {
     }
 
     public void play() {
+        if (currentPlayList == null || currentPlayList.isEmpty()) {
+            return;
+        }
+
         switch (playerState) {
             case IDLE:
-            case PLAY: {
+            case PLAY:
+            case PAUSE: {
+                musicServiceController.start();
+                musicPlayerController.resume();
+                setState(PLAY);
                 return;
             }
             case STOP: {
                 prepareToPlay(true);
-                return;
-            }
-            default: {
-                musicServiceController.start();
-                musicPlayerController.resume();
-                setState(PLAY);
             }
         }
     }
@@ -176,8 +181,10 @@ public class MusicPlayerInteractor {
     }
 
     private void setState(PlayerState playerState) {
-        this.playerState = playerState;
-        playerStateSubject.onNext(playerState);
+        if (this.playerState != playerState) {
+            this.playerState = playerState;
+            playerStateSubject.onNext(playerState);
+        }
     }
 
     private void moveToNext() {
@@ -206,11 +213,13 @@ public class MusicPlayerInteractor {
     }
 
     private void prepareToPlay(boolean playAfter) {
-        setState(LOADING);
         musicPlayerController.prepareToPlay(currentComposition)
                 .subscribe(() -> {
                     if (playAfter) {
+                        setState(PLAY);
                         play();
+                    } else {
+                        pause();
                     }
                 }, throwable -> {
                     moveToNext();
