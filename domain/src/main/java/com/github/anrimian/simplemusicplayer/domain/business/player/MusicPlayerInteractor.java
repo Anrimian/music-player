@@ -38,6 +38,7 @@ public class MusicPlayerInteractor {
 
     private List<Composition> initialPlayList;
     private List<Composition> currentPlayList = new ArrayList<>();
+
     private int currentPlayPosition;
     private Composition currentComposition;
 
@@ -51,6 +52,9 @@ public class MusicPlayerInteractor {
     }
 
     public void startPlaying(List<Composition> compositions) {
+        if (compositions == null || compositions.isEmpty()) {
+            return;
+        }
         musicServiceController.start();
         initialPlayList = compositions;
         currentComposition = null;
@@ -61,7 +65,7 @@ public class MusicPlayerInteractor {
     }
 
     public void play() {
-        if (playerState == PLAY) {
+        if (playerState == PLAY || playerState == IDLE) {
             return;
         }
         musicServiceController.start();
@@ -71,7 +75,7 @@ public class MusicPlayerInteractor {
             return;
         }
         if (playerState == STOP) {
-            if (currentPlayPosition > 0) {
+            if (currentPlayPosition < 0) {
                 currentPlayPosition = 0;
             }
             if (currentPlayPosition >= currentPlayList.size()) {
@@ -166,6 +170,7 @@ public class MusicPlayerInteractor {
             case ENDED: {
                 if (playerState == PLAY) {
                     playNext(false);
+                    break;
                 }
             }
         }
@@ -176,9 +181,9 @@ public class MusicPlayerInteractor {
         playerStateSubject.onNext(playerState);
     }
 
-    private void playNext(boolean canScrollToFirst) {
+    private void playNext(boolean canMoveToStart) {
         if (currentPlayPosition >= currentPlayList.size() - 1) {
-            if (canScrollToFirst || settingsRepository.isInfinitePlayingEnabled()) {
+            if (canMoveToStart || settingsRepository.isInfinitePlayingEnabled()) {
                 currentPlayPosition = 0;
             } else {
                 stop();
@@ -191,7 +196,7 @@ public class MusicPlayerInteractor {
         if (playerState == PLAY) {
             playPosition();
         } else {
-            setState(STOP);//TODO fix moving in stop state
+            setState(STOP);
         }
     }
 
@@ -204,7 +209,7 @@ public class MusicPlayerInteractor {
         if (playerState == PLAY) {
             playPosition();
         } else {
-            setState(STOP);//TODO fix moving in stop state
+            setState(STOP);
         }
     }
 

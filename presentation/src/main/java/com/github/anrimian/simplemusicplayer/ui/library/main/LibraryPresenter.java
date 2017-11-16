@@ -96,7 +96,7 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
             trackStateDisposable = null;
         }
         getViewState().showCurrentComposition(composition);
-        getViewState().showTrackState(0, composition.getDuration());
+        getViewState().showTrackState(0, composition.getDuration());//TODO fix emitting in stop state
         subscribeOnTrackStateChanging();
     }
 
