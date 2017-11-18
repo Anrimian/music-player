@@ -21,6 +21,7 @@ ext {
     butterKnifeVersion = "8.8.1"
     daggerVersion = "2.12"
     exoPlayerVersion = "r2.5.4"
+    roomVersion = "1.0.0"
 
     //Testing
     jUnitVersion = '4.12'
@@ -68,7 +69,10 @@ ext {
     dataDependencies = [
             rxJava:             "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
             javaxAnnotation:    'com.google.code.findbugs:jsr305:2.0.1',
-            exoPlayerCore:      "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
+            exoPlayerCore:      "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion",
+            room:               "android.arch.persistence.room:runtime:$roomVersion",
+            roomCompiler:       "android.arch.persistence.room:compiler:$roomVersion",
+            roomRx:             "android.arch.persistence.room:rxjava2:$roomVersion"
     ]
 
     dataTestDependencies = [

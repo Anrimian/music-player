@@ -29,6 +29,10 @@ dependencies {
     implementation dataDependencies.exoPlayerCore
     compileOnly dataDependencies.javaxAnnotation
 
+    implementation dataDependencies.room
+    annotationProcessor dataDependencies.roomCompiler
+    implementation dataDependencies.roomRx
+
     testImplementation testDependencies.junit
     androidTestImplementation testDependencies.supportTest
     androidTestImplementation testDependencies.espresso
