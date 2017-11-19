@@ -8,21 +8,19 @@ import com.github.anrimian.simplemusicplayer.data.database.models.CompositionEnt
 
 import java.util.List;
 
-import io.reactivex.Single;
-
 /**
  * Created on 18.11.2017.
  */
 
 @Dao
-public interface PlayQueueDao {
+public interface CompositionsDao {
 
-    @Query("SELECT * FROM CURRENT_PLAY_LIST")
-    Single<List<CompositionEntity>> getCurrentPlayList();
+    @Query("SELECT * FROM compositions")
+    List<CompositionEntity> getCurrentPlayList();
 
     @Insert
-    void insertAll(CompositionEntity... compositions);
+    void insertAll(List<CompositionEntity> compositions);
 
-    @Query("DELETE FROM CURRENT_PLAY_LIST")
+    @Query("DELETE FROM compositions")
     void deleteCurrentPlayList();
 }

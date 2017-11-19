@@ -22,6 +22,7 @@ ext {
     daggerVersion = "2.12"
     exoPlayerVersion = "r2.5.4"
     roomVersion = "1.0.0"
+    mapStructVersion = "1.2.0.Final"
 
     //Testing
     jUnitVersion = '4.12'
@@ -72,7 +73,9 @@ ext {
             exoPlayerCore:      "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion",
             room:               "android.arch.persistence.room:runtime:$roomVersion",
             roomCompiler:       "android.arch.persistence.room:compiler:$roomVersion",
-            roomRx:             "android.arch.persistence.room:rxjava2:$roomVersion"
+            roomRx:             "android.arch.persistence.room:rxjava2:$roomVersion",
+            mapStruct:          "org.mapstruct:mapstruct:$mapStructVersion",
+            mapStructCompiler:  "org.mapstruct:mapstruct-processor:$mapStructVersion"
     ]
 
     dataTestDependencies = [

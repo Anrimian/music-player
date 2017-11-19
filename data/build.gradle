@@ -16,6 +16,12 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 }
 
@@ -32,6 +38,9 @@ dependencies {
     implementation dataDependencies.room
     annotationProcessor dataDependencies.roomCompiler
     implementation dataDependencies.roomRx
+
+    implementation dataDependencies.mapStruct
+    annotationProcessor dataDependencies.mapStructCompiler
 
     testImplementation testDependencies.junit
     androidTestImplementation testDependencies.supportTest
