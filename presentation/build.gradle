@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 
-
 android {
     def globalConfiguration = rootProject.extensions.getByName("ext")
 
@@ -37,15 +36,16 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-apply from: "$rootDir/dependencies.gradle"
+
 
 dependencies {
-//    network()
-
     implementation project(':domain')
     implementation project(':data')
 
-/*    implementation presentationDependencies.supportLibrary
+    def presentationDependencies = rootProject.ext.presentationDependencies
+    def presentationTestDependencies = rootProject.ext.presentationTestDependencies
+
+    implementation presentationDependencies.supportLibrary
     implementation presentationDependencies.supportLibraryDesign
     implementation presentationDependencies.cardView
     implementation presentationDependencies.recyclerView
@@ -66,8 +66,16 @@ dependencies {
     implementation presentationDependencies.dagger
     annotationProcessor presentationDependencies.daggerCompiler
 
-    compileOnly presentationDependencies.javaxAnnotation*/
+    implementation presentationDependencies.room
+    annotationProcessor presentationDependencies.roomCompiler
 
-//    rootProject.ext.presentationDependencies2()
-//    rootProject.ext.presentationTestDependencies()
+    compileOnly presentationDependencies.javaxAnnotation
+
+    testImplementation presentationTestDependencies.junit
+    testImplementation presentationTestDependencies.mockito
+
+    androidTestImplementation presentationTestDependencies.dexmaker
+    androidTestImplementation presentationTestDependencies.dexmakerMockito
+    androidTestImplementation presentationTestDependencies.mockito
+    androidTestImplementation presentationTestDependencies.espresso
 }
