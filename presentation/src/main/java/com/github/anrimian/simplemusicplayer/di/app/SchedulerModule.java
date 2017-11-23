@@ -19,6 +19,7 @@ public class SchedulerModule {
 
     public static final String IO_SCHEDULER = "io_scheduler";
     public static final String UI_SCHEDULER = "ui_scheduler";
+    public static final String DB_SCHEDULER = "db_scheduler";
 
     @Provides
     @NonNull
@@ -32,5 +33,12 @@ public class SchedulerModule {
     @Named(UI_SCHEDULER)
     Scheduler provideUiScheduler() {
         return AndroidSchedulers.mainThread();
+    }
+
+    @Provides
+    @NonNull
+    @Named(DB_SCHEDULER)
+    Scheduler provideDBScheduler() {
+        return Schedulers.computation();
     }
 }

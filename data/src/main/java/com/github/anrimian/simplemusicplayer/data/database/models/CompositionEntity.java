@@ -14,6 +14,9 @@ import static com.github.anrimian.simplemusicplayer.data.database.AppDatabase.CO
 @Entity(tableName = COMPOSITIONS)
 public class CompositionEntity {
 
+    @PrimaryKey(autoGenerate = true)
+    private int dbId;
+
     private String artist;
     private String title;
     private String album;
@@ -21,7 +24,6 @@ public class CompositionEntity {
     private String composer;
     private String displayName;
 
-    @PrimaryKey
     private long id;
     private long duration;
     private long size;
@@ -37,6 +39,14 @@ public class CompositionEntity {
 
     @Nullable
     private Integer year;
+
+    public int getDbId() {
+        return dbId;
+    }
+
+    public void setDbId(int dbId) {
+        this.dbId = dbId;
+    }
 
     public String getArtist() {
         return artist;

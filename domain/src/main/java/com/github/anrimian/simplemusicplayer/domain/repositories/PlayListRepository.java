@@ -1,8 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.repositories;
 
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-
-import java.util.List;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -13,7 +11,7 @@ import io.reactivex.Single;
 
 public interface PlayListRepository {
 
-    Completable setCurrentPlayList(List<Composition> playList);
+    Completable setCurrentPlayList(CurrentPlayListInfo currentPlayListInfo);
 
-    Single<List<Composition>> getCurrentPlayList();
+    Single<CurrentPlayListInfo> getCurrentPlayList();
 }

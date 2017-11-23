@@ -5,6 +5,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionEntity;
+import com.github.anrimian.simplemusicplayer.data.database.models.CompositionItemEntity;
 
 import java.util.List;
 
@@ -16,11 +17,20 @@ import java.util.List;
 public interface CompositionsDao {
 
     @Query("SELECT * FROM compositions")
-    List<CompositionEntity> getCurrentPlayList();
+    List<CompositionEntity> getCompositions();
+
+    @Query("SELECT * FROM current_play_list")
+    List<CompositionItemEntity> getCurrentPlayList();
 
     @Insert
-    void insertAll(List<CompositionEntity> compositions);
+    void insertCompositions(List<CompositionEntity> compositions);
+
+    @Insert
+    void insertCompositionItem(CompositionItemEntity compositionItemEntity);
 
     @Query("DELETE FROM compositions")
+    void deleteCompositions();
+
+    @Query("DELETE FROM current_play_list")
     void deleteCurrentPlayList();
 }

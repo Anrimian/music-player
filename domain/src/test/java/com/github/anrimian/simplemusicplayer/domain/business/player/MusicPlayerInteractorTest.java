@@ -6,6 +6,8 @@ import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
+import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
 
@@ -24,6 +26,7 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
+import static io.reactivex.Single.just;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -43,6 +46,7 @@ public class MusicPlayerInteractorTest {
 
     private SettingsRepository settingsRepository;
     private UiStateRepository uiStateRepository;
+    private PlayListRepository playListRepository;
 
     private TestObserver<PlayerState> playerStateTestObserver = new TestObserver<>();
     private TestObserver<Composition> currentCompositionTestObserver = new TestObserver<>();
@@ -91,7 +95,15 @@ public class MusicPlayerInteractorTest {
         when(uiStateRepository.getPlayListPosition()).thenReturn(0);
         when(uiStateRepository.getTrackPosition()).thenReturn(0L);
 
-        musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController, musicServiceController, settingsRepository, uiStateRepository);
+        playListRepository = mock(PlayListRepository.class);
+        when(playListRepository.getCurrentPlayList()).thenReturn(just(new CurrentPlayListInfo(new ArrayList<>(), new ArrayList<>())));
+        when(playListRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
+
+        musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
+                musicServiceController,
+                settingsRepository,
+                uiStateRepository,
+                playListRepository);
         musicPlayerInteractor.getPlayerStateObservable().subscribe(playerStateTestObserver);
         musicPlayerInteractor.getCurrentCompositionObservable().subscribe(currentCompositionTestObserver);
         musicPlayerInteractor.getCurrentPlayListObservable().subscribe(currentPlayListTestObserver);
@@ -223,5 +235,7 @@ public class MusicPlayerInteractorTest {
         verify(musicPlayerController, times(2)).prepareToPlay(eq(one));
         playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY);
     }
+
+
 
 }

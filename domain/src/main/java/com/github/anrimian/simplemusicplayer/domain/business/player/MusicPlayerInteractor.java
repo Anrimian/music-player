@@ -6,6 +6,8 @@ import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
+import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
 
@@ -17,6 +19,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
@@ -31,6 +34,7 @@ public class MusicPlayerInteractor {
     private MusicServiceController musicServiceController;
     private SettingsRepository settingsRepository;
     private UiStateRepository uiStateRepository;
+    private PlayListRepository playListRepository;
 
     private PlayerState playerState = IDLE;
     private BehaviorSubject<PlayerState> playerStateSubject = BehaviorSubject.createDefault(playerState);
@@ -41,17 +45,19 @@ public class MusicPlayerInteractor {
     private List<Composition> currentPlayList = new ArrayList<>();
 
     private int currentPlayPosition;
-    private Composition currentComposition;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  MusicServiceController musicServiceController,
                                  SettingsRepository settingsRepository,
-                                 UiStateRepository uiStateRepository) {
+                                 UiStateRepository uiStateRepository,
+                                 PlayListRepository playListRepository) {
         this.musicPlayerController = musicPlayerController;
         this.musicServiceController = musicServiceController;
         this.settingsRepository = settingsRepository;
         this.uiStateRepository = uiStateRepository;
+        this.playListRepository = playListRepository;
         subscribeOnInternalPlayerState();
+        restorePlaylistState();
     }
 
     public void startPlaying(List<Composition> compositions) {
@@ -59,8 +65,11 @@ public class MusicPlayerInteractor {
             return;
         }
         initialPlayList = compositions;
-        currentComposition = null;
+        currentPlayList.clear();
+        currentPlayList.addAll(compositions);
         shufflePlayList();
+        saveCurrentPlayList();
+
         currentPlayPosition = 0;
         prepareToPlayPosition(true);
     }
@@ -80,7 +89,7 @@ public class MusicPlayerInteractor {
                 return;
             }
             case STOP: {
-                prepareToPlay(true);
+                prepareToPlayPosition(true);
             }
         }
     }
@@ -132,6 +141,8 @@ public class MusicPlayerInteractor {
     public void setRandomPlayingEnabled(boolean enabled) {
         settingsRepository.setRandomPlayingEnabled(enabled);
         shufflePlayList();
+        saveCurrentPlayList();
+        uiStateRepository.setPlayListPosition(currentPlayPosition);
     }
 
     public void setInfinitePlayingEnabled(boolean enabled) {
@@ -142,28 +153,56 @@ public class MusicPlayerInteractor {
         return musicPlayerController.getTrackStateObservable();
     }
 
+    private void restorePlaylistState() {
+        setState(LOADING);
+        playListRepository.getCurrentPlayList()
+                .subscribe(this::onPlayListRestored);
+    }
+
+    private void onPlayListRestored(CurrentPlayListInfo currentPlayListInfo) {
+        List<Composition> initialPlayList = currentPlayListInfo.getInitialPlayList();
+        List<Composition> currentPlayList = currentPlayListInfo.getCurrentPlayList();
+        if (initialPlayList.isEmpty()) {
+            setState(IDLE);
+            return;
+        }
+        this.initialPlayList = initialPlayList;
+        this.currentPlayList.clear();
+        this.currentPlayList.addAll(currentPlayList);
+        currentPlayListSubject.onNext(this.currentPlayList);
+        currentPlayPosition = uiStateRepository.getPlayListPosition();
+        prepareToPlayPosition(false);
+    }
+
     private void subscribeOnInternalPlayerState() {
         musicPlayerController.getPlayerStateObservable()
                 .subscribe(this::onInternalPlayerStateChanged);
     }
 
     private void shufflePlayList() {
+        Composition currentComposition = currentPlayList.get(currentPlayPosition);
+
         currentPlayList.clear();
         if (settingsRepository.isRandomPlayingEnabled()) {
             List<Composition> playListToShuffle = new ArrayList<>(initialPlayList);
-            if (currentComposition != null) {
-                playListToShuffle.remove(currentPlayPosition);
-                currentPlayList.add(currentComposition);
-            }
+
+            playListToShuffle.remove(currentPlayPosition);
+            currentPlayList.add(currentComposition);
+
             Collections.shuffle(playListToShuffle);
             currentPlayList.addAll(playListToShuffle);
         } else {
             currentPlayList.addAll(initialPlayList);
         }
-        if (currentComposition != null) {
-            currentPlayPosition = currentPlayList.indexOf(currentComposition);
-        }
+        currentPlayPosition = currentPlayList.indexOf(currentComposition);
         currentPlayListSubject.onNext(currentPlayList);
+    }
+
+    private void saveCurrentPlayList() {
+        CurrentPlayListInfo currentPlayListInfo = new CurrentPlayListInfo(initialPlayList, currentPlayList);
+        playListRepository.setCurrentPlayList(currentPlayListInfo)
+                .onErrorComplete()
+                .subscribe();
     }
 
     private void onInternalPlayerStateChanged(InternalPlayerState state) {
@@ -203,16 +242,9 @@ public class MusicPlayerInteractor {
     }
 
     private void prepareToPlayPosition(boolean playAfter) {
-        moveToPosition();
-        prepareToPlay(playAfter);
-    }
-
-    private void moveToPosition() {
-        currentComposition = currentPlayList.get(currentPlayPosition);
+        Composition currentComposition = currentPlayList.get(currentPlayPosition);
         currentCompositionSubject.onNext(currentComposition);
-    }
-
-    private void prepareToPlay(boolean playAfter) {
+        uiStateRepository.setPlayListPosition(currentPlayPosition);
         musicPlayerController.prepareToPlay(currentComposition)
                 .subscribe(() -> {
                     if (playAfter) {
