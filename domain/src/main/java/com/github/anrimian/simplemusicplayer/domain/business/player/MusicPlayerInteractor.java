@@ -201,7 +201,6 @@ public class MusicPlayerInteractor {
     private void saveCurrentPlayList() {
         CurrentPlayListInfo currentPlayListInfo = new CurrentPlayListInfo(initialPlayList, currentPlayList);
         playListRepository.setCurrentPlayList(currentPlayListInfo)
-                .onErrorComplete()
                 .subscribe();
     }
 

@@ -2,6 +2,8 @@ package com.github.anrimian.simplemusicplayer.di.app;
 
 import android.support.annotation.NonNull;
 
+import java.util.concurrent.Executors;
+
 import javax.inject.Named;
 
 import dagger.Module;
@@ -39,6 +41,6 @@ public class SchedulerModule {
     @NonNull
     @Named(DB_SCHEDULER)
     Scheduler provideDBScheduler() {
-        return Schedulers.computation();
+        return Schedulers.from(Executors.newSingleThreadExecutor());
     }
 }

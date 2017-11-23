@@ -11,6 +11,7 @@ import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListReposit
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -53,9 +54,10 @@ public class PlayListRepositoryImpl implements PlayListRepository {
                 compositionItemEntity.setComposition(compositionEntity);
                 compositionItemEntity.setInitialPosition(i);
                 compositionItemEntity.setShuffledPosition(currentPlayList.getPositionForIndex(i));
-                compositionsDao.insertCompositionItem(compositionItemEntity);
+                compositionsDao.setCurrentPlayList(compositionItemEntity);
             }*/
 
+            List<CompositionItemEntity> itemEntities = new ArrayList<>();
             for (int i = 0; i < initialPlayList.size(); i++) {
                 Composition composition = initialPlayList.get(i);
                 CompositionEntity compositionEntity = compositionsMapper.toCompositionEntity(composition);
@@ -63,8 +65,9 @@ public class PlayListRepositoryImpl implements PlayListRepository {
                 compositionItemEntity.setComposition(compositionEntity);
                 compositionItemEntity.setInitialPosition(initialPlayList.indexOf(composition));
                 compositionItemEntity.setShuffledPosition(currentPlayList.indexOf(composition));
-                compositionsDao.insertCompositionItem(compositionItemEntity);
+                itemEntities.add(compositionItemEntity);
             }
+            compositionsDao.setCurrentPlayList(itemEntities);
         }).subscribeOn(dbScheduler);
     }
 
@@ -78,6 +81,7 @@ public class PlayListRepositoryImpl implements PlayListRepository {
                 Composition composition = compositionsMapper.toComposition(compositionItem.getComposition());
                 initialPlayListArray[compositionItem.getInitialPosition()] = composition;
                 currentPlayListArray[compositionItem.getShuffledPosition()] = composition;
+                System.out.println("get composition entity: " + compositionItem);
             }
             List<Composition> initialPlayList = asList(initialPlayListArray);
             List<Composition> currentPlayList = asList(currentPlayListArray);

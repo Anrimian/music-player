@@ -14,10 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.observers.TestObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.schedulers.TestScheduler;
 
 import static org.junit.Assert.assertEquals;
@@ -31,54 +31,49 @@ public class PlayListRepositoryImplTest {
 
     private TestScheduler testScheduler = new TestScheduler();
 
-    private Composition one = new Composition();
+    /*private Composition one = new Composition();
     private Composition two = new Composition();
     private Composition three = new Composition();
-    private Composition four = new Composition();
+    private Composition four = new Composition();*/
     private List<Composition> fakeCompositions = new ArrayList<>();
-    private List<Composition> shuffledCompositions = new ArrayList<>();
+    private List<Composition> shuffledCompositions;
 
     private CurrentPlayListInfo currentPlayListInfo;
 
     @Before
     public void setUp() throws Exception {
-        one.setFilePath("root/music/one");
-        one.setId(1);
-        fakeCompositions.add(one);
+        for (int i = 0; i < 100000; i++) {
+            Composition composition = new Composition();
 
-        two.setFilePath("root/music/two");
-        two.setId(2);
-        fakeCompositions.add(two);
+            composition.setFilePath("music-" + i);
+            composition.setId(i);
+            fakeCompositions.add(composition);
+        }
+        shuffledCompositions = new ArrayList<>(fakeCompositions);
+        Collections.shuffle(shuffledCompositions);
 
-        three.setFilePath("root/music/old/three");
-        three.setId(3);
-        fakeCompositions.add(three);
-
-        four.setFilePath("root/music/old/to delete/four");
-        four.setId(4);
-        fakeCompositions.add(four);
-
-        shuffledCompositions.add(four);
-        shuffledCompositions.add(three);
-        shuffledCompositions.add(two);
-        shuffledCompositions.add(one);
         currentPlayListInfo = new CurrentPlayListInfo(fakeCompositions, shuffledCompositions);
 
         Context appContext = InstrumentationRegistry.getTargetContext();
-        AppDatabase appDatabase = Room.inMemoryDatabaseBuilder(appContext, AppDatabase.class).build();
+        AppDatabase appDatabase = Room.databaseBuilder(appContext, AppDatabase.class, "test_db").build();
 
-        playListRepository = new PlayListRepositoryImpl(appDatabase, testScheduler);
+        playListRepository = new PlayListRepositoryImpl(appDatabase, Schedulers.computation());
     }
 
     @Test
     public void currentPlayListTest() throws Exception {
-        TestObserver<CurrentPlayListInfo> testObserver = playListRepository.setCurrentPlayList(currentPlayListInfo)
+        /*TestObserver<CurrentPlayListInfo> testObserver =*/ playListRepository.setCurrentPlayList(currentPlayListInfo)
                 .andThen(playListRepository.getCurrentPlayList())
                 .flatMapCompletable(compositions -> playListRepository.setCurrentPlayList(currentPlayListInfo))
                 .andThen(playListRepository.getCurrentPlayList())
-                .test();
+                .subscribe(currentPlayListInfo -> {
+                    List<Composition> initialPlayList = currentPlayListInfo.getInitialPlayList();
+                    List<Composition> currentPlayList = currentPlayListInfo.getCurrentPlayList();
+                    assertEquals(fakeCompositions, initialPlayList);
+                    assertEquals(shuffledCompositions, currentPlayList);
+                });
 
-        testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+/*        testScheduler.advanceTimeBy(60, TimeUnit.SECONDS);
 
         testObserver.assertNoErrors();
         testObserver.assertValue(currentPlayListInfo -> {
@@ -87,6 +82,6 @@ public class PlayListRepositoryImplTest {
             assertEquals(fakeCompositions, initialPlayList);
             assertEquals(shuffledCompositions, currentPlayList);
             return true;
-        });
+        });*/
     }
 }

@@ -53,4 +53,14 @@ public class CompositionItemEntity {
     public void setShuffledPosition(int shuffledPosition) {
         this.shuffledPosition = shuffledPosition;
     }
+
+    @Override
+    public String toString() {
+        return "CompositionItemEntity{" +
+                "id=" + id +
+                ", composition=" + composition +
+                ", initialPosition=" + initialPosition +
+                ", shuffledPosition=" + shuffledPosition +
+                '}';
+    }
 }

@@ -236,6 +236,26 @@ public class MusicPlayerInteractorTest {
         playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY);
     }
 
+    @Test
+    public void testShuffleInitialPlayList() throws Exception {
+        when(playListRepository.getCurrentPlayList()).thenReturn(just(new CurrentPlayListInfo(fakeCompositions, fakeCompositions)));
+        when(playListRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
 
+        when(settingsRepository.isRandomPlayingEnabled()).thenReturn(true);
+
+        musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
+                musicServiceController,
+                settingsRepository,
+                uiStateRepository,
+                playListRepository);
+        TestObserver<PlayerState> playerStateTestObserver = musicPlayerInteractor.getPlayerStateObservable().test();
+
+        musicPlayerInteractor.setRandomPlayingEnabled(true);
+
+        musicPlayerInteractor.play();
+        verify(musicPlayerController).prepareToPlay(eq(one));
+
+        playerStateTestObserver.assertValues(PAUSE, PLAY);
+    }
 
 }
