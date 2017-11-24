@@ -7,7 +7,6 @@ import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerStateRx
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
-import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -35,7 +34,7 @@ import io.reactivex.subjects.BehaviorSubject;
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
-    private BehaviorSubject<TrackState> trackStateSubject = BehaviorSubject.create();
+    private BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
 
     private SimpleExoPlayer player;
 
@@ -45,20 +44,34 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
         player.addListener(playerStateRxWrapper);
-
         Observable.interval(0, 1, TimeUnit.SECONDS)
-                .subscribe(o -> player.getContentPosition());
+                .map(o -> player.getCurrentPosition())
+                .filter(o -> player.getPlayWhenReady())
+                .subscribe(trackPositionSubject::onNext);
     }
 
     @Override
     public Completable prepareToPlay(Composition composition) {
         return prepareMediaSource(composition)
-                .toCompletable();
+                .toCompletable()
+                .doOnComplete(() -> trackPositionSubject.onNext(0L));
     }
 
     @Override
     public void stop() {
         player.setPlayWhenReady(false);
+        seekTo(0);
+    }
+
+    @Override
+    public void pause() {
+        player.setPlayWhenReady(false);
+    }
+
+    @Override
+    public void seekTo(long position) {
+        player.seekTo(position);
+        trackPositionSubject.onNext(position);
     }
 
     @Override
@@ -72,14 +85,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public Observable<TrackState> getTrackStateObservable() {
-        return Observable.interval(0, 1, TimeUnit.SECONDS)
-                .map(o -> getTrackState());
-    }
-
-    private TrackState getTrackState() {
-        long currentPosition = player.getCurrentPosition();
-        return new TrackState(currentPosition);
+    public Observable<Long> getTrackPositionObservable() {
+        return trackPositionSubject;
     }
 
     private Single<MediaSource> prepareMediaSource(Composition composition) {

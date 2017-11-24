@@ -5,7 +5,6 @@ import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceCont
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
@@ -51,7 +50,7 @@ public class MusicPlayerInteractorTest {
     private TestObserver<PlayerState> playerStateTestObserver = new TestObserver<>();
     private TestObserver<Composition> currentCompositionTestObserver = new TestObserver<>();
     private TestObserver<List<Composition>> currentPlayListTestObserver = new TestObserver<>();
-    private TestObserver<TrackState> trackStateTestObserver = new TestObserver<>();
+    private TestObserver<Long> trackStateTestObserver = new TestObserver<>();
 
     private Composition one = new Composition();
     private Composition two = new Composition();
@@ -61,7 +60,7 @@ public class MusicPlayerInteractorTest {
     private List<Composition> fakeCompositions = new ArrayList<>();
 
     private PublishSubject<InternalPlayerState> internalPlayerStateObservable = PublishSubject.create();
-    private PublishSubject<TrackState> trackStateObservable = PublishSubject.create();
+    private PublishSubject<Long> trackStateObservable = PublishSubject.create();
 
     @Before
     public void setUp() throws Exception {
@@ -83,7 +82,7 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerController = mock(MusicPlayerController.class);
         when(musicPlayerController.getPlayerStateObservable()).thenReturn(internalPlayerStateObservable);
-        when(musicPlayerController.getTrackStateObservable()).thenReturn(trackStateObservable);
+        when(musicPlayerController.getTrackPositionObservable()).thenReturn(trackStateObservable);
         when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
         musicServiceController = mock(MusicServiceController.class);
 
@@ -107,7 +106,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.getPlayerStateObservable().subscribe(playerStateTestObserver);
         musicPlayerInteractor.getCurrentCompositionObservable().subscribe(currentCompositionTestObserver);
         musicPlayerInteractor.getCurrentPlayListObservable().subscribe(currentPlayListTestObserver);
-        musicPlayerInteractor.getTrackStateObservable().subscribe(trackStateTestObserver);
+        musicPlayerInteractor.getTrackPositionObservable().subscribe(trackStateTestObserver);
     }
 
     @Test
@@ -166,7 +165,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.startPlaying(fakeCompositions);
         musicPlayerInteractor.pause();
 
-        verify(musicPlayerController).stop();
+        verify(musicPlayerController).pause();
         playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE);
     }
 

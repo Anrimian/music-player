@@ -5,7 +5,6 @@ import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +96,7 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
         }
         getViewState().showCurrentComposition(composition);
         getViewState().showTrackState(0, composition.getDuration());//TODO fix emitting in stop state
-        subscribeOnTrackStateChanging();
+        subscribeOnTrackPositionChanging();
     }
 
     private void subscribeOnPlayerStateChanges() {
@@ -134,14 +133,13 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
         getViewState().updatePlayList();
     }
 
-    private void subscribeOnTrackStateChanging() {
-        trackStateDisposable = musicPlayerInteractor.getTrackStateObservable()
+    private void subscribeOnTrackPositionChanging() {
+        trackStateDisposable = musicPlayerInteractor.getTrackPositionObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onTrackStateChanged);
+                .subscribe(this::onTrackPositionChanged);
     }
 
-    private void onTrackStateChanged(TrackState trackState) {
-        long currentPosition = trackState.getCurrentPosition();
+    private void onTrackPositionChanged(Long currentPosition) {
         long duration = currentComposition.getDuration();
         getViewState().showTrackState(currentPosition, duration);
     }

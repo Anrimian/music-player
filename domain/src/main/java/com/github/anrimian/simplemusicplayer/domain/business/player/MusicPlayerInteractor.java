@@ -5,7 +5,6 @@ import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceCont
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.domain.models.player.TrackState;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
@@ -98,7 +97,7 @@ public class MusicPlayerInteractor {
 
     public void pause() {
         if (playerState != PAUSE) {
-            musicPlayerController.stop();
+            musicPlayerController.pause();
             setState(PAUSE);
         }
     }
@@ -151,8 +150,9 @@ public class MusicPlayerInteractor {
         settingsRepository.setInfinitePlayingEnabled(enabled);
     }
 
-    public Observable<TrackState> getTrackStateObservable() {
-        return musicPlayerController.getTrackStateObservable();
+    public Observable<Long> getTrackPositionObservable() {
+        return musicPlayerController.getTrackPositionObservable()
+                .doOnNext(uiStateRepository::setTrackPosition);
     }
 
     private void restorePlaylistState() {
@@ -173,7 +173,8 @@ public class MusicPlayerInteractor {
         this.currentPlayList.addAll(currentPlayList);
         currentPlayListSubject.onNext(this.currentPlayList);
         currentPlayPosition = uiStateRepository.getPlayListPosition();
-        prepareToPlayPosition(false);
+        long trackPosition = uiStateRepository.getTrackPosition();
+        prepareToPlayPosition(false, trackPosition);
     }
 
     private void subscribeOnInternalPlayerState() {
@@ -251,11 +252,16 @@ public class MusicPlayerInteractor {
     }
 
     private void prepareToPlayPosition(boolean playAfter) {
+        prepareToPlayPosition(playAfter, 0L);
+    }
+
+    private void prepareToPlayPosition(boolean playAfter, long fromPosition) {
         Composition currentComposition = currentPlayList.get(currentPlayPosition);
         currentCompositionSubject.onNext(currentComposition);
         uiStateRepository.setPlayListPosition(currentPlayPosition);
         musicPlayerController.prepareToPlay(currentComposition)
                 .subscribe(() -> {
+                    musicPlayerController.seekTo(fromPosition);
                     if (playAfter) {
                         setState(PLAY);
                         play();
@@ -263,8 +269,9 @@ public class MusicPlayerInteractor {
                         pause();
                     }
                 }, throwable -> {
+                    throwable.printStackTrace();//TODO save errors about compositions
                     moveToNext();
-                    prepareToPlayPosition(playAfter);
+                    prepareToPlayPosition(playAfter, fromPosition);
                 });
     }
 }
