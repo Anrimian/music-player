@@ -30,6 +30,8 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 
 public class MusicPlayerInteractor {
 
+    private static final int NO_POSITION = -1;
+
     private MusicPlayerController musicPlayerController;
     private MusicServiceController musicServiceController;
     private SettingsRepository settingsRepository;
@@ -44,7 +46,7 @@ public class MusicPlayerInteractor {
     private List<Composition> initialPlayList;
     private List<Composition> currentPlayList = new ArrayList<>();
 
-    private int currentPlayPosition;
+    private int currentPlayPosition = NO_POSITION;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  MusicServiceController musicServiceController,
@@ -67,7 +69,7 @@ public class MusicPlayerInteractor {
         initialPlayList = compositions;
         currentPlayList.clear();
         currentPlayList.addAll(compositions);
-        shufflePlayList();
+        shufflePlayList(false);
         saveCurrentPlayList();
 
         currentPlayPosition = 0;
@@ -140,7 +142,7 @@ public class MusicPlayerInteractor {
 
     public void setRandomPlayingEnabled(boolean enabled) {
         settingsRepository.setRandomPlayingEnabled(enabled);
-        shufflePlayList();
+        shufflePlayList(true);
         saveCurrentPlayList();
         uiStateRepository.setPlayListPosition(currentPlayPosition);
     }
@@ -179,22 +181,30 @@ public class MusicPlayerInteractor {
                 .subscribe(this::onInternalPlayerStateChanged);
     }
 
-    private void shufflePlayList() {
-        Composition currentComposition = currentPlayList.get(currentPlayPosition);
+    private void shufflePlayList(boolean keepPosition) {
+        Composition currentComposition = null;
+        if (keepPosition) {
+            currentComposition = currentPlayList.get(currentPlayPosition);
+        }
 
         currentPlayList.clear();
         if (settingsRepository.isRandomPlayingEnabled()) {
             List<Composition> playListToShuffle = new ArrayList<>(initialPlayList);
 
-            playListToShuffle.remove(currentPlayPosition);
-            currentPlayList.add(currentComposition);
+            if (currentComposition != null) {
+                playListToShuffle.remove(currentPlayPosition);
+                currentPlayList.add(currentComposition);
+            }
 
             Collections.shuffle(playListToShuffle);
             currentPlayList.addAll(playListToShuffle);
         } else {
             currentPlayList.addAll(initialPlayList);
         }
-        currentPlayPosition = currentPlayList.indexOf(currentComposition);
+
+        if (currentComposition != null) {
+            currentPlayPosition = currentPlayList.indexOf(currentComposition);
+        }
         currentPlayListSubject.onNext(currentPlayList);
     }
 

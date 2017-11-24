@@ -81,7 +81,6 @@ public class PlayListRepositoryImpl implements PlayListRepository {
                 Composition composition = compositionsMapper.toComposition(compositionItem.getComposition());
                 initialPlayListArray[compositionItem.getInitialPosition()] = composition;
                 currentPlayListArray[compositionItem.getShuffledPosition()] = composition;
-                System.out.println("get composition entity: " + compositionItem);
             }
             List<Composition> initialPlayList = asList(initialPlayListArray);
             List<Composition> currentPlayList = asList(currentPlayListArray);

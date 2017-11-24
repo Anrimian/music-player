@@ -105,34 +105,34 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
                     @Nullable Integer year = cursor.getInt(yearColumn);
 
-                    Log.d("MusicProviderRepository", "new composition----------");
-                    Log.d("MusicProviderRepository", "artist: " + artist);
-                    Log.d("MusicProviderRepository", "title: " + title);
-                    Log.d("MusicProviderRepository", "album: " + album);
-                    Log.d("MusicProviderRepository", "duration: " + duration);
-                    Log.d("MusicProviderRepository", "id: " + id);
-                    Log.d("MusicProviderRepository", "size: " + size);
-                    Log.d("MusicProviderRepository", "filePath: " + filePath);
-
-//                    Log.d("MusicProviderRepository", "count: " + count);
-                    Log.d("MusicProviderRepository", "albumId: " + albumId);
-                    Log.d("MusicProviderRepository", "albumKey: " + albumKey);
-                    Log.d("MusicProviderRepository", "artistId: " + artistId);
-//                    Log.d("MusicProviderRepository", "artistKey: " + artistKey);
-                    Log.d("MusicProviderRepository", "bookmark: " + bookmark);
-                    Log.d("MusicProviderRepository", "composer: " + composer);
-                    Log.d("MusicProviderRepository", "dateAdded: " + dateAdded);
-                    Log.d("MusicProviderRepository", "dateModified: " + dateModified);
-                    Log.d("MusicProviderRepository", "displayName: " + displayName);
-                    Log.d("MusicProviderRepository", "isAlarm: " + isAlarm);
-                    Log.d("MusicProviderRepository", "isMusic: " + isMusic);
-                    Log.d("MusicProviderRepository", "isNotification: " + isNotification);
-                    Log.d("MusicProviderRepository", "isPodcast: " + isPodcast);
-                    Log.d("MusicProviderRepository", "isRingtone: " + isRingtone);
-                    Log.d("MusicProviderRepository", "mimeType: " + mimeType);
-//                    Log.d("MusicProviderRepository", "titleKey: " + titleKey);
-//                    Log.d("MusicProviderRepository", "track: " + track);
-                    Log.d("MusicProviderRepository", "year: " + year);
+//                    Log.d("MusicProviderRepository", "new composition----------");
+//                    Log.d("MusicProviderRepository", "artist: " + artist);
+//                    Log.d("MusicProviderRepository", "title: " + title);
+//                    Log.d("MusicProviderRepository", "album: " + album);
+//                    Log.d("MusicProviderRepository", "duration: " + duration);
+//                    Log.d("MusicProviderRepository", "id: " + id);
+//                    Log.d("MusicProviderRepository", "size: " + size);
+//                    Log.d("MusicProviderRepository", "filePath: " + filePath);
+//
+////                    Log.d("MusicProviderRepository", "count: " + count);
+//                    Log.d("MusicProviderRepository", "albumId: " + albumId);
+//                    Log.d("MusicProviderRepository", "albumKey: " + albumKey);
+//                    Log.d("MusicProviderRepository", "artistId: " + artistId);
+////                    Log.d("MusicProviderRepository", "artistKey: " + artistKey);
+//                    Log.d("MusicProviderRepository", "bookmark: " + bookmark);
+//                    Log.d("MusicProviderRepository", "composer: " + composer);
+//                    Log.d("MusicProviderRepository", "dateAdded: " + dateAdded);
+//                    Log.d("MusicProviderRepository", "dateModified: " + dateModified);
+//                    Log.d("MusicProviderRepository", "displayName: " + displayName);
+//                    Log.d("MusicProviderRepository", "isAlarm: " + isAlarm);
+//                    Log.d("MusicProviderRepository", "isMusic: " + isMusic);
+//                    Log.d("MusicProviderRepository", "isNotification: " + isNotification);
+//                    Log.d("MusicProviderRepository", "isPodcast: " + isPodcast);
+//                    Log.d("MusicProviderRepository", "isRingtone: " + isRingtone);
+//                    Log.d("MusicProviderRepository", "mimeType: " + mimeType);
+////                    Log.d("MusicProviderRepository", "titleKey: " + titleKey);
+////                    Log.d("MusicProviderRepository", "track: " + track);
+//                    Log.d("MusicProviderRepository", "year: " + year);
 
                     Composition composition = new Composition();
                     //composition

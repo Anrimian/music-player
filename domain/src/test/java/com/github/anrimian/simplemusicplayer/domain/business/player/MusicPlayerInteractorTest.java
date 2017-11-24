@@ -258,4 +258,20 @@ public class MusicPlayerInteractorTest {
         playerStateTestObserver.assertValues(PAUSE, PLAY);
     }
 
+    @Test
+    public void testPlayCompositionWhenPlayingList() throws Exception {
+        when(settingsRepository.isRandomPlayingEnabled()).thenReturn(true);
+
+        musicPlayerInteractor.startPlaying(fakeCompositions);
+
+        musicPlayerInteractor.skipToNext();
+        musicPlayerInteractor.skipToNext();
+
+        musicPlayerInteractor.startPlaying(Collections.singletonList(one));
+
+        playerStateTestObserver.assertValues(IDLE, PLAY);
+        verify(musicPlayerController, times(4)).prepareToPlay(any());
+
+    }
+
 }
