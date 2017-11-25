@@ -268,10 +268,16 @@ public class MusicPlayerInteractor {
                     } else {
                         pause();
                     }
-                }, throwable -> {
-                    throwable.printStackTrace();//TODO save errors about compositions
-                    moveToNext();
-                    prepareToPlayPosition(playAfter, fromPosition);
-                });
+                }, throwable -> onPlayCompositionError(throwable, playAfter));
+    }
+
+    private void onPlayCompositionError(Throwable throwable, boolean playAfter) {
+        if (currentPlayList.size() == 1) {
+            stop();
+        } else {
+            throwable.printStackTrace();//TODO save errors about compositions
+            moveToNext();
+            prepareToPlayPosition(playAfter);
+        }
     }
 }
