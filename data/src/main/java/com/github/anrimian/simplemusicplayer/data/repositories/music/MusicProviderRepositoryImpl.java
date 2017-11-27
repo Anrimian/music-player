@@ -2,13 +2,11 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.music.exceptions.MusicNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
-
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +17,8 @@ import javax.annotation.Nullable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
-import static android.provider.MediaStore.*;
+import static android.provider.MediaStore.Audio;
+import static android.provider.MediaStore.Images;
 
 /**
  * Created on 24.10.2017.
@@ -78,6 +77,10 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                     int yearColumn = cursor.getColumnIndex(Audio.Media.YEAR);
                     //MediaStore.Audio.Albums.ALBUM_ART
 
+//                    Uri mediaPath = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.song_name);
+//                    MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+//                    mmr.setDataSource(this, mediaPath);
+//                    mmr.extractMetadata(MediaMetadataRetriever.)
 
                     String artist = cursor.getString(artistColumn);
                     String title = cursor.getString(titleColumn);
@@ -158,7 +161,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                     composition.setYear(year);
                     compositions.add(composition);
                 }
-                Log.d("MusicProviderRepository", "compositions:" + compositions.size());
+//                Log.d("MusicProviderRepository", "compositions:" + compositions.size());
                 emitter.onSuccess(compositions);
             } finally {
                 IOUtils.closeSilently(cursor);

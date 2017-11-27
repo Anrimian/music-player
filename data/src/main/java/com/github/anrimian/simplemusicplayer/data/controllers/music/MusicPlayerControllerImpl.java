@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -38,16 +39,14 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private SimpleExoPlayer player;
 
+    private Disposable trackPositionDisposable;
+
     public MusicPlayerControllerImpl(Context context) {
         player = ExoPlayerFactory.newSimpleInstance(
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
         player.addListener(playerStateRxWrapper);
-        Observable.interval(0, 1, TimeUnit.SECONDS)
-                .map(o -> player.getCurrentPosition())
-                .filter(o -> player.getPlayWhenReady())
-                .subscribe(trackPositionSubject::onNext);
     }
 
     @Override
@@ -61,11 +60,13 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public void stop() {
         player.setPlayWhenReady(false);
         seekTo(0);
+        stopTracingTrackPosition();
     }
 
     @Override
     public void pause() {
         player.setPlayWhenReady(false);
+        stopTracingTrackPosition();
     }
 
     @Override
@@ -77,6 +78,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public void resume() {
         player.setPlayWhenReady(true);
+        startTracingTrackPosition();
     }
 
     @Override
@@ -87,6 +89,18 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public Observable<Long> getTrackPositionObservable() {
         return trackPositionSubject;
+    }
+
+    private void startTracingTrackPosition() {
+        trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
+                .map(o -> player.getCurrentPosition())
+                .subscribe(trackPositionSubject::onNext);
+    }
+
+    private void stopTracingTrackPosition() {
+        if (trackPositionDisposable != null) {
+            trackPositionDisposable.dispose();
+        }
     }
 
     private Single<MediaSource> prepareMediaSource(Composition composition) {
