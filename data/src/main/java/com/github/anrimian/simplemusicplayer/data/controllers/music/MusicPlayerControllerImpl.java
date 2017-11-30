@@ -53,7 +53,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public Completable prepareToPlay(Composition composition) {
         return prepareMediaSource(composition)
                 .toCompletable()//on error can be: com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException: java.io.FileNotFoundException
-                .doOnComplete(() -> trackPositionSubject.onNext(0L));
+                .doOnEvent(t -> trackPositionSubject.onNext(0L));
     }
 
     @Override

@@ -16,9 +16,13 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.models.NotificationPlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsHelper;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -149,6 +153,62 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             .distinctUntilChanged()
             .withLatestFrom(musicPlayerInteractor.getCurrentCompositionObservable(), NotificationPlayerInfo::new)
             .subscribe(this::onPlayerStateChanged));
+    }
+
+    public void startPlaying(List<Composition> compositions) {
+        musicPlayerInteractor.startPlaying(compositions);
+    }
+
+    public void play() {
+        musicPlayerInteractor.play();
+    }
+
+    public void pause() {
+        musicPlayerInteractor.pause();
+    }
+
+    public void stop() {
+        musicPlayerInteractor.stop();
+    }
+
+    public void skipToPrevious() {
+        musicPlayerInteractor.skipToPrevious();
+    }
+
+    public void skipToNext() {
+        musicPlayerInteractor.skipToNext();
+    }
+
+    public Observable<PlayerState> getPlayerStateObservable() {
+        return musicPlayerInteractor.getPlayerStateObservable();
+    }
+
+    public Observable<Composition> getCurrentCompositionObservable() {
+        return musicPlayerInteractor.getCurrentCompositionObservable();
+    }
+
+    public Observable<List<Composition>> getCurrentPlayListObservable() {
+        return musicPlayerInteractor.getCurrentPlayListObservable();
+    }
+
+    public Observable<Long> getTrackPositionObservable() {
+        return musicPlayerInteractor.getTrackPositionObservable();
+    }
+
+    public boolean isInfinitePlayingEnabled() {
+        return musicPlayerInteractor.isInfinitePlayingEnabled();
+    }
+
+    public boolean isRandomPlayingEnabled() {
+        return musicPlayerInteractor.isRandomPlayingEnabled();
+    }
+
+    public void setRandomPlayingEnabled(boolean enabled) {
+        musicPlayerInteractor.setRandomPlayingEnabled(enabled);
+    }
+
+    public void setInfinitePlayingEnabled(boolean enabled) {
+        musicPlayerInteractor.setInfinitePlayingEnabled(enabled);
     }
 
     private void onPlayerStateChanged(NotificationPlayerInfo info) {
