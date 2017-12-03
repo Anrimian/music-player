@@ -23,6 +23,12 @@ android {
             }
         }
     }
+
+    buildTypes {
+        QA {
+            initWith release
+        }
+    }
 }
 
 dependencies {

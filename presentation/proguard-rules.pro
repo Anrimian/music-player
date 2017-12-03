@@ -24,6 +24,16 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+#default rules
+-useuniqueclassmembernames
+-keepattributes *Annotation*,SourceFile,LineNumberTable
+
+#don't remember why
 -dontwarn java.lang.invoke**
+
+#RxJava2
+-dontwarn io.reactivex**
+
+-keep public class com.github.anrimian.simplemusicplayer.data.mappers.**
 
 
