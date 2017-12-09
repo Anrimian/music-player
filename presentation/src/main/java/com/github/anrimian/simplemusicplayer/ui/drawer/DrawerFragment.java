@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.drawer;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
 import com.github.anrimian.simplemusicplayer.ui.library.main.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
@@ -122,6 +124,9 @@ public class DrawerFragment extends MvpAppCompatFragment {
         } else {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
         }
+
+        Intent intent = new Intent(getActivity(), MusicService.class);
+        getActivity().startService(intent);
     }
 
     @Override

@@ -148,13 +148,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         mediaSession.setMetadata(metadata);
     })*/
 
-    private void subscribeOnPlayerStateChanges() {
-        serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
-            .distinctUntilChanged()
-            .withLatestFrom(musicPlayerInteractor.getCurrentCompositionObservable(), NotificationPlayerInfo::new)
-            .subscribe(this::onPlayerStateChanged));
-    }
-
     public void startPlaying(List<Composition> compositions) {
         musicPlayerInteractor.startPlaying(compositions);
     }
@@ -209,6 +202,18 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     public void setInfinitePlayingEnabled(boolean enabled) {
         musicPlayerInteractor.setInfinitePlayingEnabled(enabled);
+    }
+
+    private void subscribeOnPlayerChanges() {
+        Observable<PlayerState> playerStateObservable = musicPlayerInteractor.getPlayerStateObservable();
+        Observable<Composition> compositionObservable = musicPlayerInteractor.getCurrentCompositionObservable();
+    }
+
+    private void subscribeOnPlayerStateChanges() {
+        serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+            .distinctUntilChanged()
+            .withLatestFrom(musicPlayerInteractor.getCurrentCompositionObservable(), NotificationPlayerInfo::new)
+            .subscribe(this::onPlayerStateChanged));
     }
 
     private void onPlayerStateChanged(NotificationPlayerInfo info) {

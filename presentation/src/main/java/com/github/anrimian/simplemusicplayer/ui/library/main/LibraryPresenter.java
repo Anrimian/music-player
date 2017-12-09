@@ -42,15 +42,23 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
         getViewState().showInfinitePlayingButton(musicPlayerInteractor.isInfinitePlayingEnabled());
         getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
 
-        subscribeOnPlayerStateChanges();
-        subscribeOnCurrentCompositionChanging();
-        subscribeOnCurrentPlaylistChanging();
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenterDisposable.dispose();
+
+    }
+
+    void onStart() {
+        subscribeOnPlayerStateChanges();
+        subscribeOnCurrentCompositionChanging();
+        subscribeOnCurrentPlaylistChanging();
+    }
+
+    void onStop() {
+        presenterDisposable.clear();
         if (trackStateDisposable != null) {
             trackStateDisposable.dispose();
         }
@@ -95,7 +103,7 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
             trackStateDisposable = null;
         }
         getViewState().showCurrentComposition(composition);
-        getViewState().showTrackState(0, composition.getDuration());//TODO fix emitting in stop state
+        getViewState().showTrackState(0, composition.getDuration());
         subscribeOnTrackPositionChanging();
     }
 

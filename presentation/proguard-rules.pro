@@ -26,7 +26,9 @@
 
 #default rules
 -useuniqueclassmembernames
+-renamesourcefileattribute SourceFile
 -keepattributes *Annotation*,SourceFile,LineNumberTable
+-printmapping out.map
 
 #don't remember why
 -dontwarn java.lang.invoke**
@@ -34,6 +36,11 @@
 #RxJava2
 -dontwarn io.reactivex**
 
+#mapstruct
 -keep public class com.github.anrimian.simplemusicplayer.data.mappers.**
+
+#not working, keep search
+#-keep public class * implements @org.mapstruct.Mapper interface {}
+
 
 

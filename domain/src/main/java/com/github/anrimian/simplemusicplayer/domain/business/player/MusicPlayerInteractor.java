@@ -1,7 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
-import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
@@ -32,7 +31,6 @@ public class MusicPlayerInteractor {
     private static final int NO_POSITION = -1;
 
     private MusicPlayerController musicPlayerController;
-    private MusicServiceController musicServiceController;
     private SettingsRepository settingsRepository;
     private UiStateRepository uiStateRepository;
     private PlayListRepository playListRepository;
@@ -48,12 +46,10 @@ public class MusicPlayerInteractor {
     private int currentPlayPosition = NO_POSITION;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                 MusicServiceController musicServiceController,
                                  SettingsRepository settingsRepository,
                                  UiStateRepository uiStateRepository,
                                  PlayListRepository playListRepository) {
         this.musicPlayerController = musicPlayerController;
-        this.musicServiceController = musicServiceController;
         this.settingsRepository = settingsRepository;
         this.uiStateRepository = uiStateRepository;
         this.playListRepository = playListRepository;
@@ -84,7 +80,6 @@ public class MusicPlayerInteractor {
             case IDLE:
             case PLAY:
             case PAUSE: {
-                musicServiceController.start();
                 musicPlayerController.resume();
                 setState(PLAY);
                 return;

@@ -1,7 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
-import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
@@ -41,7 +40,6 @@ public class MusicPlayerInteractorTest {
 
     private MusicPlayerInteractor musicPlayerInteractor;
     private MusicPlayerController musicPlayerController;
-    private MusicServiceController musicServiceController;
 
     private SettingsRepository settingsRepository;
     private UiStateRepository uiStateRepository;
@@ -84,7 +82,6 @@ public class MusicPlayerInteractorTest {
         when(musicPlayerController.getPlayerStateObservable()).thenReturn(internalPlayerStateObservable);
         when(musicPlayerController.getTrackPositionObservable()).thenReturn(trackStateObservable);
         when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
-        musicServiceController = mock(MusicServiceController.class);
 
         settingsRepository = mock(SettingsRepository.class);
         when(settingsRepository.isInfinitePlayingEnabled()).thenReturn(false);
@@ -99,7 +96,6 @@ public class MusicPlayerInteractorTest {
         when(playListRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
 
         musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
-                musicServiceController,
                 settingsRepository,
                 uiStateRepository,
                 playListRepository);
@@ -113,7 +109,6 @@ public class MusicPlayerInteractorTest {
     public void startPlayingTest() throws Exception {
         musicPlayerInteractor.startPlaying(fakeCompositions);
 
-        verify(musicServiceController).start();
         playerStateTestObserver.assertValues(IDLE, PLAY);
         currentCompositionTestObserver.assertValues(one);
         currentPlayListTestObserver.assertValue(fakeCompositions);
@@ -124,7 +119,6 @@ public class MusicPlayerInteractorTest {
     public void emptyPlayTest() throws Exception {
         musicPlayerInteractor.play();
 
-        verify(musicServiceController, never()).start();
         verify(musicPlayerController, never()).resume();
         playerStateTestObserver.assertValues(IDLE);
     }
@@ -135,7 +129,6 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.pause();
         musicPlayerInteractor.play();
 
-        verify(musicServiceController, times(2)).start();
         verify(musicPlayerController, times(2)).resume();
         playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY);
     }
@@ -146,7 +139,6 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.stop();
         musicPlayerInteractor.play();
 
-        verify(musicServiceController, times(2)).start();
         verify(musicPlayerController, times(2)).prepareToPlay(eq(one));
         playerStateTestObserver.assertValues(IDLE, PLAY, STOP, PLAY);
     }
@@ -243,7 +235,6 @@ public class MusicPlayerInteractorTest {
         when(settingsRepository.isRandomPlayingEnabled()).thenReturn(true);
 
         musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
-                musicServiceController,
                 settingsRepository,
                 uiStateRepository,
                 playListRepository);

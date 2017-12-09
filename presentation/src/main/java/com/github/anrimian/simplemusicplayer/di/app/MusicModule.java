@@ -9,11 +9,9 @@ import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
 import com.github.anrimian.simplemusicplayer.data.repositories.playlist.PlayListRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
-import com.github.anrimian.simplemusicplayer.domain.controllers.MusicServiceController;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
-import com.github.anrimian.simplemusicplayer.infrastructure.MusicServiceControllerImpl;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -35,12 +33,10 @@ class MusicModule {
     @NonNull
     @Singleton
     MusicPlayerInteractor provideMusicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                                       MusicServiceController musicServiceController,
                                                        SettingsRepository settingsRepository,
                                                        UiStateRepository uiStateRepository,
                                                        PlayListRepository playListRepository) {
         return new MusicPlayerInteractor(musicPlayerController,
-                musicServiceController,
                 settingsRepository,
                 uiStateRepository,
                 playListRepository);
@@ -51,13 +47,6 @@ class MusicModule {
     @Singleton
     MusicPlayerController provideMusicPlayerController(Context context) {
         return new MusicPlayerControllerImpl(context);
-    }
-
-    @Provides
-    @NonNull
-    @Singleton
-    MusicServiceController provideMusicServiceController(Context context) {
-        return new MusicServiceControllerImpl(context);
     }
 
     @Provides

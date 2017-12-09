@@ -168,6 +168,18 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
 //        toolbar.setY(appBarStartY);
