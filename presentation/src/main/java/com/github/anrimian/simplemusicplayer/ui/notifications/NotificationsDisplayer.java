@@ -10,13 +10,13 @@ import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.RemoteViews;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.models.NotificationPlayerInfo;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.models.PlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PAUSE;
@@ -30,17 +30,16 @@ import static com.github.anrimian.simplemusicplayer.infrastructure.service.Music
  * Created on 05.11.2017.
  */
 
-public class NotificationsHelper {
-
-    private static final String FOREGROUND_CHANNEL_ID = "0";
+public class NotificationsDisplayer {
 
     public static final int FOREGROUND_NOTIFICATION_ID = 1;
 
-    private NotificationManager notificationManager;
+    private static final String FOREGROUND_CHANNEL_ID = "0";
 
+    private NotificationManager notificationManager;
     private Context context;
 
-    public NotificationsHelper(Context context) {
+    public NotificationsDisplayer(Context context) {
         this.context = context;
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -52,18 +51,18 @@ public class NotificationsHelper {
         }
     }
 
-    public Notification getForegroundNotification(NotificationPlayerInfo info, MediaSessionCompat mediaSession) {
+    public Notification getForegroundNotification(PlayerInfo info, MediaSessionCompat mediaSession) {
         return getDefaultMusicNotification(info, mediaSession).build();
     }
 
-    public void updateForegroundNotification(NotificationPlayerInfo info, MediaSessionCompat mediaSession) {
+    public void updateForegroundNotification(PlayerInfo info, MediaSessionCompat mediaSession) {
         Notification notification = getDefaultMusicNotification(info, mediaSession).build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
-    private NotificationCompat.Builder getDefaultMusicNotification(NotificationPlayerInfo info,
+    private NotificationCompat.Builder getDefaultMusicNotification(PlayerInfo info,
                                                                    MediaSessionCompat mediaSession) {
-        boolean play = info.getState() == PlayerState.PLAY;
+        boolean play = info.getState() == PlaybackStateCompat.STATE_PLAYING;
         Composition composition = info.getComposition();
 
         RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_music);
@@ -95,7 +94,7 @@ public class NotificationsHelper {
 
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .setContent(contentView)
-                .setContentTitle("test")
+//                .setContentTitle("test")
                 .setSmallIcon(R.drawable.ic_menu)
                 .setContentIntent(pIntent)
 //                .setStyle(style)

@@ -8,5 +8,6 @@ public enum PlayerState {
     IDLE,
     PLAY,
     PAUSE,
-    LOADING, STOP
+    STOP,
+    LOADING
 }

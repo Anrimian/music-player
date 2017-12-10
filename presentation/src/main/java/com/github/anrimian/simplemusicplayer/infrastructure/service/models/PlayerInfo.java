@@ -1,23 +1,22 @@
 package com.github.anrimian.simplemusicplayer.infrastructure.service.models;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 
 /**
  * Created on 11.11.2017.
  */
 
-public class NotificationPlayerInfo {
+public class PlayerInfo {
 
-    private PlayerState state;
+    private int state;
     private Composition composition;
 
-    public NotificationPlayerInfo(PlayerState state, Composition composition) {
+    public PlayerInfo(int state, Composition composition) {
         this.state = state;
         this.composition = composition;
     }
 
-    public PlayerState getState() {
+    public int getState() {
         return state;
     }
 

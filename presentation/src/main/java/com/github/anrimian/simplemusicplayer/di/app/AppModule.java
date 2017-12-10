@@ -7,7 +7,7 @@ import com.github.anrimian.simplemusicplayer.data.repositories.settings.Settings
 import com.github.anrimian.simplemusicplayer.data.repositories.ui_state.UiStateRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
-import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsHelper;
+import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
@@ -37,8 +37,8 @@ public class AppModule {
     @Provides
     @Nonnull
     @Singleton
-    NotificationsHelper provideNotificationsController(Context context) {
-        return new NotificationsHelper(context);
+    NotificationsDisplayer provideNotificationsController(Context context) {
+        return new NotificationsDisplayer(context);
     }
 
     @Provides

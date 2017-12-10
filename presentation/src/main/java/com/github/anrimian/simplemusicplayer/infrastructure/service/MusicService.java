@@ -12,15 +12,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.models.NotificationPlayerInfo;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.models.PlayerInfo;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.models.TrackInfo;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.models.mappers.PlayerStateMapper;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
-import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsHelper;
+import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
 
 import java.util.List;
 
@@ -29,7 +30,17 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsHelper.FOREGROUND_NOTIFICATION_ID;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP;
+import static android.support.v4.media.session.PlaybackStateCompat.Builder;
+import static android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED;
+import static android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING;
+import static android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED;
+import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
  * Created on 03.11.2017.
@@ -44,19 +55,19 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     public static final int SKIP_TO_PREVIOUS = 4;
 
     @Inject
-    NotificationsHelper notificationsHelper;
+    NotificationsDisplayer notificationsDisplayer;
 
     @Inject
     MusicPlayerInteractor musicPlayerInteractor;
 
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
-    public PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
-            .setActions(PlaybackStateCompat.ACTION_PLAY
-                    | PlaybackStateCompat.ACTION_STOP
-                    | PlaybackStateCompat.ACTION_PAUSE
-                    | PlaybackStateCompat.ACTION_PLAY_PAUSE
-                    | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-                    | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+    public Builder stateBuilder = new Builder()
+            .setActions(ACTION_PLAY
+                    | ACTION_STOP
+                    | ACTION_PAUSE
+                    | ACTION_PLAY_PAUSE
+                    | ACTION_SKIP_TO_NEXT
+                    | ACTION_SKIP_TO_PREVIOUS);
 
     private AudioManager audioManager;
     private MediaSessionCompat mediaSession;
@@ -64,6 +75,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private MusicServiceBinder musicServiceBinder = new MusicServiceBinder(this, mediaSession);
     private CompositeDisposable serviceDisposable = new CompositeDisposable();
+
+    private boolean firstLaunch = true;
 
     @Override
     public void onCreate() {
@@ -88,8 +101,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
-        subscribeOnPlayingInfoChanges();
-        subscribeOnPlayerStateChanges();
+        subscribeOnPlayerChanges();
     }
 
     @Override
@@ -205,21 +217,46 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayerChanges() {
-        Observable<PlayerState> playerStateObservable = musicPlayerInteractor.getPlayerStateObservable();
-        Observable<Composition> compositionObservable = musicPlayerInteractor.getCurrentCompositionObservable();
+        Observable<Integer> playerStateObservable = musicPlayerInteractor.getPlayerStateObservable()
+                .map(PlayerStateMapper::toMediaState);
+        Observable<Composition> compositionObservable = musicPlayerInteractor.getCurrentCompositionObservable()
+                .doOnNext(this::onCurrentCompositionChanged);
+        Observable<Long> trackPositionObservable = musicPlayerInteractor.getTrackPositionObservable();
+
+        serviceDisposable.add(Observable.combineLatest(playerStateObservable, trackPositionObservable, TrackInfo::new)
+                .subscribe(this::onCurrentTrackInfoChanged));
+
+        serviceDisposable.add(Observable.combineLatest(playerStateObservable, compositionObservable, PlayerInfo::new)
+                .subscribe(this::onPlayerStateChanged));
     }
 
-    private void subscribeOnPlayerStateChanges() {
-        serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
-            .distinctUntilChanged()
-            .withLatestFrom(musicPlayerInteractor.getCurrentCompositionObservable(), NotificationPlayerInfo::new)
-            .subscribe(this::onPlayerStateChanged));
+    //TODO can be invalid position in new track(new track emits first), fix later. Maybe don't emit position so often, save on pause/stop?
+    private void onCurrentTrackInfoChanged(TrackInfo info) {
+        stateBuilder.setState(info.getState(), info.getTrackPosition(), 1);
+        mediaSession.setPlaybackState(stateBuilder.build());
     }
 
-    private void onPlayerStateChanged(NotificationPlayerInfo info) {
+    private void onCurrentCompositionChanged(Composition composition) {
+        MediaMetadataCompat metadata = metadataBuilder
+//                .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
+//                        BitmapFactory.decodeResource(getResources(), track.getBitmapResId()))
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, composition.getTitle())
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, composition.getAlbum())
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, composition.getArtist())
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.getDuration())
+                .build();
+        mediaSession.setMetadata(metadata);
+    }
+
+    private void onPlayerStateChanged(PlayerInfo info) {
+        if (!firstLaunch) {
+            notificationsDisplayer.updateForegroundNotification(info, mediaSession);
+        }
+        firstLaunch = false;
+
         switch (info.getState()) {
-            case PLAY: {
-                int audioFocusResult = audioManager.requestAudioFocus(
+            case STATE_PLAYING: {
+                int audioFocusResult = audioManager.requestAudioFocus(//TODO request focus BEFORE playing
                         audioFocusChangeListener,
                         AudioManager.STREAM_MUSIC,
                         AudioManager.AUDIOFOCUS_GAIN);
@@ -227,41 +264,18 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                     musicPlayerInteractor.pause();
                     return;
                 }
-
-                mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
-                        PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
                 mediaSession.setActive(true);
-                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsHelper.getForegroundNotification(info, mediaSession));
+                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(info, mediaSession));
                 break;
             }
-            case PAUSE:
-            case STOP: {
-                mediaSession.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
-                        PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
-
-                //what we need here?
-//                mediaSession.setPlaybackState(
-//                        stateBuilder.setState(PlaybackStateCompat.STATE_STOPPED,
-//                                PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1).build());
-
+            case STATE_STOPPED:
+            case STATE_PAUSED: {
                 mediaSession.setActive(false);
                 audioManager.abandonAudioFocus(audioFocusChangeListener);
                 stopForeground(false);
                 break;
             }
         }
-    }
-
-    private void subscribeOnPlayingInfoChanges() {
-        serviceDisposable.add(Observable.combineLatest(
-                musicPlayerInteractor.getPlayerStateObservable(),
-                musicPlayerInteractor.getCurrentCompositionObservable(),
-                NotificationPlayerInfo::new)
-                .subscribe(this::onNotificationInfoChanged));
-    }
-
-    private void onNotificationInfoChanged(NotificationPlayerInfo info) {
-        notificationsHelper.updateForegroundNotification(info, mediaSession);
     }
 
     private class AudioFocusChangeListener implements AudioManager.OnAudioFocusChangeListener {
@@ -289,16 +303,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         @Override
         public void onPlay() {
-            /*
-            MediaMetadataCompat metadata = metadataBuilder
-                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
-                            BitmapFactory.decodeResource(getResources(), track.getBitmapResId()));
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, track.getTitle());
-            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, track.getArtist());
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, track.getArtist());
-            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, track.getDuration())
-                    .build();
-            mediaSession.setMetadata(metadata);*/
             musicPlayerInteractor.play();
         }
 
