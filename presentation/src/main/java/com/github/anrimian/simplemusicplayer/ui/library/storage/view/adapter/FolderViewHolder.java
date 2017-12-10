@@ -18,8 +18,14 @@ import butterknife.ButterKnife;
 
 class FolderViewHolder extends RecyclerView.ViewHolder {
 
-    @BindView(R.id.tv_path)
-    TextView tvPath;
+    @BindView(R.id.clickable_item)
+    View clickableItemView;
+
+    @BindView(R.id.tv_folder_name)
+    TextView tvFolderName;
+
+    @BindView(R.id.tv_compositions_count)
+    TextView tvCompositionsCount;
 
     private String path;
 
@@ -27,7 +33,7 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         ButterKnife.bind(this, itemView);
         if (onFolderClickListener != null) {
-            itemView.setOnClickListener(v -> onFolderClickListener.onItemClick(path));
+            clickableItemView.setOnClickListener(v -> onFolderClickListener.onItemClick(path));
         }
     }
 
@@ -38,6 +44,8 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
         if (lastSlashIndex != -1) {
             displayPath = path.substring(++lastSlashIndex, path.length());
         }
-        tvPath.setText(displayPath);
+        tvFolderName.setText(displayPath);
+
+        tvCompositionsCount.setText("unknown");
     }
 }

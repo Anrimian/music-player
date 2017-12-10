@@ -16,4 +16,5 @@
     <string name="play_stop">Играть или остановить</string>
     <string name="previous_track">Предыдущий трек</string>
     <string name="next_track">Следующий трек</string>
+    <string name="folder">Папка</string>
 </resources>
