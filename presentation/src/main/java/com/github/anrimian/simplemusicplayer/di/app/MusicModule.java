@@ -5,10 +5,12 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.data.controllers.music.MusicPlayerControllerImpl;
+import com.github.anrimian.simplemusicplayer.data.controllers.music.SystemMusicControllerImpl;
 import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
 import com.github.anrimian.simplemusicplayer.data.repositories.playlist.PlayListRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
+import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
@@ -33,13 +35,22 @@ class MusicModule {
     @NonNull
     @Singleton
     MusicPlayerInteractor provideMusicPlayerInteractor(MusicPlayerController musicPlayerController,
+                                                       SystemMusicController systemMusicController,
                                                        SettingsRepository settingsRepository,
                                                        UiStateRepository uiStateRepository,
                                                        PlayListRepository playListRepository) {
         return new MusicPlayerInteractor(musicPlayerController,
+                systemMusicController,
                 settingsRepository,
                 uiStateRepository,
                 playListRepository);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    SystemMusicController provideSystemMusicController(Context context) {
+        return new SystemMusicControllerImpl(context);
     }
 
     @Provides

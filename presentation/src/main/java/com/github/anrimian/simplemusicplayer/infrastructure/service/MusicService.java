@@ -69,9 +69,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                     | ACTION_SKIP_TO_NEXT
                     | ACTION_SKIP_TO_PREVIOUS);
 
-    private AudioManager audioManager;
     private MediaSessionCompat mediaSession;
-    private AudioFocusChangeListener audioFocusChangeListener = new AudioFocusChangeListener();
     private MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private MusicServiceBinder musicServiceBinder = new MusicServiceBinder(this, mediaSession);
     private CompositeDisposable serviceDisposable = new CompositeDisposable();
@@ -82,8 +80,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     public void onCreate() {
         super.onCreate();
         Components.getAppComponent().inject(this);
-
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
@@ -224,14 +220,14 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Observable<Long> trackPositionObservable = musicPlayerInteractor.getTrackPositionObservable();
 
         serviceDisposable.add(Observable.combineLatest(playerStateObservable, trackPositionObservable, TrackInfo::new)
-                .subscribe(this::onCurrentTrackInfoChanged));
+                .subscribe(this::onTrackInfoChanged));
 
         serviceDisposable.add(Observable.combineLatest(playerStateObservable, compositionObservable, PlayerInfo::new)
                 .subscribe(this::onPlayerStateChanged));
     }
 
     //TODO can be invalid position in new track(new track emits first), fix later. Maybe don't emit position so often, save on pause/stop?
-    private void onCurrentTrackInfoChanged(TrackInfo info) {
+    private void onTrackInfoChanged(TrackInfo info) {
         stateBuilder.setState(info.getState(), info.getTrackPosition(), 1);
         mediaSession.setPlaybackState(stateBuilder.build());
     }
@@ -256,14 +252,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         switch (info.getState()) {
             case STATE_PLAYING: {
-                int audioFocusResult = audioManager.requestAudioFocus(//TODO request focus BEFORE playing
-                        audioFocusChangeListener,
-                        AudioManager.STREAM_MUSIC,
-                        AudioManager.AUDIOFOCUS_GAIN);
-                if (audioFocusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    musicPlayerInteractor.pause();
-                    return;
-                }
                 mediaSession.setActive(true);
                 startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(info, mediaSession));
                 break;
@@ -271,30 +259,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             case STATE_STOPPED:
             case STATE_PAUSED: {
                 mediaSession.setActive(false);
-                audioManager.abandonAudioFocus(audioFocusChangeListener);
                 stopForeground(false);
                 break;
-            }
-        }
-    }
-
-    private class AudioFocusChangeListener implements AudioManager.OnAudioFocusChangeListener {
-
-        @Override
-        public void onAudioFocusChange(int focusChange) {
-            switch (focusChange) {
-                case AudioManager.AUDIOFOCUS_GAIN: {
-                    mediaSessionCallback.onPlay();
-                    break;
-                }
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK: {
-                    mediaSessionCallback.onPause();
-                    break;
-                }
-                default: {
-                    mediaSessionCallback.onPause();
-                    break;
-                }
             }
         }
     }
@@ -330,8 +296,9 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private final BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                mediaSessionCallback.onPause();
+            String action = intent.getAction();
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                musicPlayerInteractor.onAudioBecomingNoisy();
             }
         }
     };

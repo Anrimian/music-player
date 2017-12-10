@@ -1,7 +1,9 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
+import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
@@ -31,6 +33,7 @@ public class MusicPlayerInteractor {
     private static final int NO_POSITION = -1;
 
     private MusicPlayerController musicPlayerController;
+    private SystemMusicController systemMusicController;
     private SettingsRepository settingsRepository;
     private UiStateRepository uiStateRepository;
     private PlayListRepository playListRepository;
@@ -46,13 +49,17 @@ public class MusicPlayerInteractor {
     private int currentPlayPosition = NO_POSITION;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
+                                 SystemMusicController systemMusicController,
                                  SettingsRepository settingsRepository,
                                  UiStateRepository uiStateRepository,
                                  PlayListRepository playListRepository) {
         this.musicPlayerController = musicPlayerController;
+        this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
         this.uiStateRepository = uiStateRepository;
         this.playListRepository = playListRepository;
+
+        subscribeOnAudioFocusChanges();
         subscribeOnInternalPlayerState();
         restorePlaylistState();
     }
@@ -80,8 +87,10 @@ public class MusicPlayerInteractor {
             case IDLE:
             case PLAY:
             case PAUSE: {
-                musicPlayerController.resume();
-                setState(PLAY);
+                if (systemMusicController.requestAudioFocus()) {
+                    musicPlayerController.resume();
+                    setState(PLAY);
+                }
                 return;
             }
             case STOP: {
@@ -93,6 +102,7 @@ public class MusicPlayerInteractor {
     public void pause() {
         if (playerState != PAUSE) {
             musicPlayerController.pause();
+            systemMusicController.abandonAudioFocus();
             setState(PAUSE);
         }
     }
@@ -100,6 +110,7 @@ public class MusicPlayerInteractor {
     public void stop() {
         if (playerState != STOP) {
             musicPlayerController.stop();
+            systemMusicController.abandonAudioFocus();
             setState(STOP);
         }
     }
@@ -130,6 +141,10 @@ public class MusicPlayerInteractor {
         return settingsRepository.isInfinitePlayingEnabled();
     }
 
+    public void onAudioBecomingNoisy() {
+        pause();
+    }
+
     public boolean isRandomPlayingEnabled() {
         return settingsRepository.isRandomPlayingEnabled();
     }
@@ -148,6 +163,25 @@ public class MusicPlayerInteractor {
     public Observable<Long> getTrackPositionObservable() {
         return musicPlayerController.getTrackPositionObservable()
                 .doOnNext(uiStateRepository::setTrackPosition);
+    }
+
+    private void subscribeOnAudioFocusChanges() {
+        systemMusicController.getAudioFocusObservable()
+                .subscribe(this::onAudioFocusChanged);
+    }
+
+    private void onAudioFocusChanged(AudioFocusEvent event) {
+        switch (event) {
+            case GAIN: {
+                play();
+                break;
+            }
+            case LOSS_SHORTLY:
+            case LOSS: {
+                pause();
+                break;
+            }
+        }
     }
 
     private void restorePlaylistState() {
