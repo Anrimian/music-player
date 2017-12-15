@@ -110,6 +110,18 @@ public class FileTree<T> implements Visitable<T> {
         return sbPath.toString();
     }
 
+    public int getDataChildCount() {
+        int count = 0;
+        for (FileTree<T> child: children ) {
+            if (child.getData() == null) {
+                count += child.getDataChildCount();
+            } else {
+                count++;
+            }
+        }
+        return count;
+    }
+
 //    @SuppressWarnings("unchecked")
     @Nullable
     private FileTree<T> findChildNode(String partialPath, FileTree<T> target) {

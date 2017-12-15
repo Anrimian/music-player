@@ -42,18 +42,22 @@ public class StorageLibraryInteractorTest {
     public void setUp() throws Exception {
         Composition one = new Composition();
         one.setFilePath("root/music/one");
+        one.setDuration(100);
         fakeCompositions.add(one);
 
         Composition two = new Composition();
         two.setFilePath("root/music/two");
+        two.setDuration(100);
         fakeCompositions.add(two);
 
         Composition three = new Composition();
         three.setFilePath("root/music/old/three");
+        three.setDuration(100);
         fakeCompositions.add(three);
 
         Composition four = new Composition();
         four.setFilePath("root/music/old/to delete/four");
+        four.setDuration(100);
         fakeCompositions.add(four);
 
         musicPlayerInteractor = mock(MusicPlayerInteractor.class);
@@ -70,6 +74,7 @@ public class StorageLibraryInteractorTest {
         assertEquals(3, collection.size());
         FolderFileSource old = (FolderFileSource) collection.get(0);
         assertEquals("music/old", old.getPath());
+        assertEquals(2, old.getFilesCount());
 
         List<FileSource> oldCollection = getMusicListInPath(old.getPath());
         FolderFileSource toDelete = (FolderFileSource) oldCollection.get(0);

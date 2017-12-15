@@ -1,10 +1,12 @@
 package com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
 
 import javax.annotation.Nonnull;
@@ -37,8 +39,8 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    void bind(@Nonnull String path) {
-        this.path = path;
+    void bind(@Nonnull FolderFileSource folderFileSource) {
+        this.path = folderFileSource.getPath();
         String displayPath = path;
         int lastSlashIndex = path.lastIndexOf('/');
         if (lastSlashIndex != -1) {
@@ -46,6 +48,12 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
         }
         tvFolderName.setText(displayPath);
 
-        tvCompositionsCount.setText("unknown");
+        int filesCount = folderFileSource.getFilesCount();
+        String text = getContext().getResources().getQuantityString(R.plurals.compositions_count, filesCount, filesCount);
+        tvCompositionsCount.setText(text);
+    }
+
+    private Context getContext() {
+        return itemView.getContext();
     }
 }

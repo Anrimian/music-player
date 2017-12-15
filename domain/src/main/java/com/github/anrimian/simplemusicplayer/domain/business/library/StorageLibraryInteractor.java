@@ -81,7 +81,7 @@ public class StorageLibraryInteractor {
             FileSource fileSource;
             Composition data = node.getData();
             if (data == null) {
-                fileSource = new FolderFileSource(tree.getFullPathOfNode(node));
+                fileSource = new FolderFileSource(tree.getFullPathOfNode(node), node.getDataChildCount());
             } else {
                 fileSource = new MusicFileSource(data);
             }

@@ -70,7 +70,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
             case TYPE_FILE: {
                 FolderViewHolder folderViewHolder = (FolderViewHolder) holder;
                 FolderFileSource folderFileSource = (FolderFileSource) fileSource;
-                folderViewHolder.bind(folderFileSource.getPath());
+                folderViewHolder.bind(folderFileSource);
                 break;
             }
         }

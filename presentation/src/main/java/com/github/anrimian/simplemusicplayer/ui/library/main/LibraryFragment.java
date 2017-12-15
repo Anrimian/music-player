@@ -1,7 +1,10 @@
 package com.github.anrimian.simplemusicplayer.ui.library.main;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
@@ -23,6 +26,7 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
 import com.github.anrimian.simplemusicplayer.ui.library.main.view.adapter.PlayListAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
 
@@ -88,6 +92,7 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
     private PlayListAdapter playListAdapter;
 
+    private MusicServiceConnection musicServiceConnection = new MusicServiceConnection();
 //    private float appBarStartY;
 
 //    private FragmentCoordinatorDelegate coordinatorDelegate;
@@ -171,11 +176,15 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     public void onStart() {
         super.onStart();
         presenter.onStart();
+        Intent intent = new Intent(getActivity(), MusicService.class);
+        getActivity().startService(intent);
+        getActivity().bindService(intent, musicServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        getActivity().unbindService(musicServiceConnection);
         presenter.onStop();
     }
 
@@ -272,6 +281,19 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
                     .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
                     .replace(R.id.library_fragment_container, fragment)
                     .commit();
+        }
+    }
+
+    private class MusicServiceConnection implements android.content.ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
         }
     }
 }

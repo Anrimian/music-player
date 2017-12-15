@@ -17,4 +17,11 @@
     <string name="previous_track">Предыдущий трек</string>
     <string name="next_track">Следующий трек</string>
     <string name="folder">Папка</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s композиция</item>
+        <item quantity="few">%1$s композиции</item>
+        <item quantity="many">%1$s композиций</item>
+        <item quantity="other">%1$s композиций</item>
+    </plurals>
 </resources>
