@@ -11,7 +11,8 @@ import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
-import com.github.anrimian.simplemusicplayer.utils.recycler_view.HeaderFooterRecyclerViewAdapter;
+import com.github.anrimian.simplemusicplayer.utils.recycler_view.OnTransitionItemClickListener;
+import com.github.anrimian.simplemusicplayer.utils.recycler_view.endless_scrolling.HeaderFooterRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
 
     private List<FileSource> musicList = new ArrayList<>();
     private OnItemClickListener<Composition> onCompositionClickListener;
-    private OnItemClickListener<String> onFolderClickListener;
+    private OnTransitionItemClickListener<String> onFolderClickListener;
 
     public MusicFileSourceAdapter(List<FileSource> musicList) {
         this.musicList = musicList;
@@ -37,7 +38,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
-    public void setOnFolderClickListener(OnItemClickListener<String> onFolderClickListener) {
+    public void setOnFolderClickListener(OnTransitionItemClickListener<String> onFolderClickListener) {
         this.onFolderClickListener = onFolderClickListener;
     }
 

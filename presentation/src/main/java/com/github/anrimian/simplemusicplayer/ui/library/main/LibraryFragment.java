@@ -29,6 +29,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
 import com.github.anrimian.simplemusicplayer.ui.library.main.view.adapter.PlayListAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
+import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ import static com.github.anrimian.simplemusicplayer.utils.format.FormatUtils.for
  * Created on 19.10.2017.
  */
 
-public class LibraryFragment extends MvpAppCompatFragment implements LibraryView {
+public class LibraryFragment extends MvpAppCompatFragment implements LibraryView, BackButtonListener {
 
     private static final String BOTTOM_SHEET_STATE = "bottom_sheet_state";
     private static final String TOOLBAR_Y = "toolbar_y";
@@ -263,6 +264,12 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
         int progress = (int) (currentPosition * 100 / duration);
         pbTrackState.setProgress(progress);
         tvPlayedTime.setText(formatMilliseconds(currentPosition));
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.library_fragment_container);
+        return fragment instanceof BackButtonListener && ((BackButtonListener) fragment).onBackPressed();
     }
 
     private void setContentBottomHeight(int heightInPixels) {

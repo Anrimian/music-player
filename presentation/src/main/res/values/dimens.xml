@@ -21,7 +21,9 @@
     <dimen name="top_control_button_size">48dp</dimen>
     <dimen name="bottom_sheet_height">80dp</dimen>
 
-    <!--lists-->
-    <dimen name="list_item_horizontal_margin">16dp</dimen>
+    <dimen name="content_horizontal_margin">16dp</dimen>
+    <dimen name="content_vertical_margin">16dp</dimen>
+    <dimen name="content_margin">16dp</dimen>
+    <dimen name="subtitle_height">48dp</dimen>
 
 </resources>

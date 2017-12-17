@@ -1,12 +1,15 @@
 package com.github.anrimian.simplemusicplayer.ui.library.storage;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +23,9 @@ import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
-import com.github.anrimian.simplemusicplayer.utils.recycler_view.HideFabScrollListener;
+import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
+import com.github.anrimian.simplemusicplayer.utils.recycler_view.TransitionElement;
+import com.github.anrimian.simplemusicplayer.utils.recycler_view.endless_scrolling.HideFabScrollListener;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
@@ -34,7 +39,7 @@ import static com.github.anrimian.simplemusicplayer.constants.Arguments.PATH;
  * Created on 23.10.2017.
  */
 
-public class StorageLibraryFragment extends MvpAppCompatFragment implements StorageLibraryView {
+public class StorageLibraryFragment extends MvpAppCompatFragment implements StorageLibraryView, BackButtonListener {
 
     @InjectPresenter
     StorageLibraryPresenter presenter;
@@ -98,7 +103,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         adapter = new MusicFileSourceAdapter(musicList);
         adapter.addHeader(headerView);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-        adapter.setOnFolderClickListener(presenter::onFolderClicked);
+        adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
         recyclerView.setAdapter(adapter);
     }
 
@@ -141,16 +146,6 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     }
 
     @Override
-    public void goToMusicStorageScreen(String path) {
-        getFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                .replace(R.id.library_fragment_container, StorageLibraryFragment.newInstance(path))
-                .addToBackStack(path)
-                .commit();
-    }
-
-    @Override
     public void goBackToMusicStorageScreen(String path) {
         FragmentManager fragmentManager = getFragmentManager();
         if (fragmentManager.getBackStackEntryCount() > 0) {
@@ -161,5 +156,70 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
                     .replace(R.id.library_fragment_container, StorageLibraryFragment.newInstance(path))
                     .commit();
         }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (getPath() != null) {
+            presenter.onBackPathButtonClicked();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Object getEnterTransition() {
+        return super.getEnterTransition();
+    }
+
+    @Override
+    public Object getReturnTransition() {
+        return super.getReturnTransition();
+    }
+
+    @Override
+    public Object getExitTransition() {
+        return super.getExitTransition();
+    }
+
+    @Override
+    public Object getReenterTransition() {
+        return super.getReenterTransition();
+    }
+
+    @Override
+    public Object getSharedElementEnterTransition() {
+        return super.getSharedElementEnterTransition();
+    }
+
+    @Override
+    public Object getSharedElementReturnTransition() {
+        return super.getSharedElementReturnTransition();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+        }
+    }
+
+    private void goToMusicStorageScreen(String path, TransitionElement transitionElement) {
+//        setSharedElementReturnTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+//        setExitTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+
+        Fragment fragment = StorageLibraryFragment.newInstance(path);
+//        fragment.setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+//        fragment.setEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+
+        getFragmentManager()
+                .beginTransaction()
+//                .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
+
+                .addSharedElement(transitionElement.getView(), transitionElement.getName())
+                .replace(R.id.library_fragment_container, fragment)
+                .addToBackStack(path)
+                .commit();
     }
 }

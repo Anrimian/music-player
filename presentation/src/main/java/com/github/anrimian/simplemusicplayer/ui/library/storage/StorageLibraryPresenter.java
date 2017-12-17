@@ -11,7 +11,6 @@ import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
@@ -57,10 +56,6 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
     void onTryAgainButtonClicked() {
         loadMusic();
-    }
-
-    void onFolderClicked(@Nonnull String filePath) {
-        getViewState().goToMusicStorageScreen(filePath);
     }
 
     void onCompositionClicked(Composition composition) {

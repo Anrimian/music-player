@@ -23,6 +23,7 @@ import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.ui.library.main.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
+import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.utils.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -33,7 +34,7 @@ import butterknife.ButterKnife;
  * Created on 19.10.2017.
  */
 
-public class DrawerFragment extends MvpAppCompatFragment {
+public class DrawerFragment extends MvpAppCompatFragment implements BackButtonListener {
 
     private static final int NO_ITEM = -1;
     private static final String SELECTED_DRAWER_ITEM = "selected_drawer_item";
@@ -134,6 +135,12 @@ public class DrawerFragment extends MvpAppCompatFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SELECTED_DRAWER_ITEM, selectedDrawerItemId);//maybe another solution?
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.drawer_fragment_container);
+        return fragment instanceof BackButtonListener && ((BackButtonListener) fragment).onBackPressed();
     }
 
     private void showLibraryScreen() {

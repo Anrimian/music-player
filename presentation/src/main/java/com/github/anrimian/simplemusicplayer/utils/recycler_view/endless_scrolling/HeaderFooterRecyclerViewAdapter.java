@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.recycler_view;
+package com.github.anrimian.simplemusicplayer.utils.recycler_view.endless_scrolling;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

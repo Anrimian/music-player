@@ -22,6 +22,9 @@ public class HeaderViewWrapper {
     @BindView(R.id.tv_parent_path)
     TextView tvParentPath;
 
+    @BindView(R.id.clickable_item)
+    View clickableItem;
+
     private View view;
 
     public HeaderViewWrapper(View view) {
@@ -35,11 +38,13 @@ public class HeaderViewWrapper {
         if (lastSlashIndex != -1) {
             displayPath = path.substring(++lastSlashIndex, path.length());
         }
+//        int firstSlashIndex = path.indexOf('/');
+//        displayPath = path.substring(++firstSlashIndex, path.length());
         tvParentPath.setText(displayPath);
     }
 
     public void setOnClickListener(OnClickListener listener) {
-        view.setOnClickListener(listener);
+        clickableItem.setOnClickListener(listener);
     }
 
     public void setVisible(boolean visible) {

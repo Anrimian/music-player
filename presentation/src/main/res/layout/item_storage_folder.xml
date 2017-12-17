@@ -11,8 +11,8 @@
         android:layout_height="40dp"
         android:padding="@dimen/padding_small"
         android:background="@drawable/bg_folder_round"
-        android:layout_marginRight="@dimen/list_item_horizontal_margin"
-        android:layout_marginLeft="@dimen/list_item_horizontal_margin"
+        android:layout_marginRight="@dimen/content_horizontal_margin"
+        android:layout_marginLeft="@dimen/content_horizontal_margin"
         android:contentDescription="@string/folder"
         app:layout_constraintRight_toLeftOf="@+id/tv_folder_name"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,17 +21,19 @@
 
     <TextView
         android:id="@+id/tv_folder_name"
+        android:transitionName="@string/path_transition_element"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         style="@style/Base.TextAppearance.AppCompat.Body1"
         android:layout_marginBottom="@dimen/margin_normal"
-        android:layout_marginEnd="@dimen/list_item_horizontal_margin"
-        android:layout_marginRight="@dimen/list_item_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginRight="@dimen/content_horizontal_margin"
         android:layout_marginTop="@dimen/margin_normal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/iv_folder_icon"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="path" />
+        tools:text="path"
+        tools:targetApi="lollipop" />
 
     <TextView
         android:id="@+id/tv_compositions_count"
