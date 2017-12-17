@@ -35,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    @Override
+    public void setTitle(int titleId) {
+        super.setTitle(titleId);
+    }
+
     private boolean hasFilePermissions() {
         RxPermissions rxPermissions = new RxPermissions(this);
         return rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE);

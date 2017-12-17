@@ -50,10 +50,12 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     @BindView(R.id.fab)
     FloatingActionButton fab;
 
+    @BindView(R.id.header_container)
+    View headerContainer;
+
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
     private HeaderViewWrapper headerViewWrapper;
-    private View headerView;
 
     public static StorageLibraryFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
@@ -91,8 +93,8 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnScrollListener(new HideFabScrollListener(fab));
 
-        headerView = View.inflate(getContext(), R.layout.partial_storage_header, null);
-        headerViewWrapper = new HeaderViewWrapper(headerView);
+//        headerView = View.inflate(getContext(), R.layout.partial_storage_header, null);
+        headerViewWrapper = new HeaderViewWrapper(headerContainer);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
@@ -101,7 +103,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     @Override
     public void bindList(List<FileSource> musicList) {
         adapter = new MusicFileSourceAdapter(musicList);
-        adapter.addHeader(headerView);
+//        adapter.addHeader(headerView);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
         recyclerView.setAdapter(adapter);

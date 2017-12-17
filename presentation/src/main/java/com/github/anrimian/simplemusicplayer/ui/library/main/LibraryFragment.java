@@ -121,8 +121,10 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        getActivity().setTitle(R.string.library);
+
         behavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheet.setClickable(true);//save map from clicks
+        bottomSheet.setClickable(true);
 
 
         toolbar = getActivity().findViewById(R.id.toolbar);
