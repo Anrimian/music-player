@@ -21,7 +21,6 @@
 
     <TextView
         android:id="@+id/tv_folder_name"
-        android:transitionName="@string/path_transition_element"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         style="@style/Base.TextAppearance.AppCompat.Body1"

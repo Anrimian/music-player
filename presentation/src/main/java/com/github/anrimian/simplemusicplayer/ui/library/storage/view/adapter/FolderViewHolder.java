@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter;
 
 import android.content.Context;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -8,7 +9,6 @@ import android.widget.TextView;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.utils.recycler_view.OnTransitionItemClickListener;
-import com.github.anrimian.simplemusicplayer.utils.recycler_view.TransitionElement;
 
 import javax.annotation.Nonnull;
 
@@ -36,8 +36,10 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         ButterKnife.bind(this, itemView);
         if (onFolderClickListener != null) {
-            TransitionElement transitionElement = new TransitionElement(tvFolderName, R.string.path_transition_element);
-            clickableItemView.setOnClickListener(v -> onFolderClickListener.onItemClick(path, transitionElement));
+            clickableItemView.setOnClickListener(v -> {
+                ViewCompat.setTransitionName(itemView, getContext().getString(R.string.path_transition_element));
+                onFolderClickListener.onItemClick(path, itemView);
+            });
         }
     }
 

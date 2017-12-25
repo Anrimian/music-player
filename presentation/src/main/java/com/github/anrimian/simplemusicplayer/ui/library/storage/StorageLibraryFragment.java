@@ -1,15 +1,16 @@
 package com.github.anrimian.simplemusicplayer.ui.library.storage;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+import android.support.transition.AutoTransition;
+import android.support.transition.Transition;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,6 @@ import com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter.Mus
 import com.github.anrimian.simplemusicplayer.ui.library.storage.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
-import com.github.anrimian.simplemusicplayer.utils.recycler_view.TransitionElement;
 import com.github.anrimian.simplemusicplayer.utils.recycler_view.endless_scrolling.HideFabScrollListener;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
@@ -169,58 +169,19 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         return false;
     }
 
-    @Override
-    public Object getEnterTransition() {
-        return super.getEnterTransition();
-    }
+    private void goToMusicStorageScreen(String path, View... sharedViews) {
+        StorageLibraryFragment fragment = StorageLibraryFragment.newInstance(path);
+        headerViewWrapper.setTransitionInfo(null);
+        Transition transition = new AutoTransition();
+//        transition.setDuration(1000);
+        fragment.setSharedElementEnterTransition(transition);
+        fragment.setSharedElementReturnTransition(transition);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
-    @Override
-    public Object getReturnTransition() {
-        return super.getReturnTransition();
-    }
-
-    @Override
-    public Object getExitTransition() {
-        return super.getExitTransition();
-    }
-
-    @Override
-    public Object getReenterTransition() {
-        return super.getReenterTransition();
-    }
-
-    @Override
-    public Object getSharedElementEnterTransition() {
-        return super.getSharedElementEnterTransition();
-    }
-
-    @Override
-    public Object getSharedElementReturnTransition() {
-        return super.getSharedElementReturnTransition();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+        for (View sharedView: sharedViews) {
+            transaction.addSharedElement(sharedView, ViewCompat.getTransitionName(sharedView));
         }
-    }
-
-    private void goToMusicStorageScreen(String path, TransitionElement transitionElement) {
-//        setSharedElementReturnTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
-//        setExitTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
-
-        Fragment fragment = StorageLibraryFragment.newInstance(path);
-//        fragment.setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
-//        fragment.setEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
-
-        getFragmentManager()
-                .beginTransaction()
-//                .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-
-                .addSharedElement(transitionElement.getView(), transitionElement.getName())
-                .replace(R.id.library_fragment_container, fragment)
+        transaction.replace(R.id.library_fragment_container, fragment, path)
                 .addToBackStack(path)
                 .commit();
     }

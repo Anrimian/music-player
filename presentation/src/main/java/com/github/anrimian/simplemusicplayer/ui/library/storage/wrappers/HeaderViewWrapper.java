@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.library.storage.wrappers;
 
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.view.View;
 import android.widget.TextView;
 
@@ -49,5 +50,9 @@ public class HeaderViewWrapper {
 
     public void setVisible(boolean visible) {
         view.setVisibility(visible? VISIBLE: GONE);
+    }
+
+    public void setTransitionInfo(String path) {
+        ViewCompat.setTransitionName(view, path);
     }
 }
