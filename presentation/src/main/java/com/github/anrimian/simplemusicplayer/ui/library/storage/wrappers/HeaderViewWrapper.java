@@ -52,7 +52,11 @@ public class HeaderViewWrapper {
         view.setVisibility(visible? VISIBLE: GONE);
     }
 
-    public void setTransitionInfo(String path) {
-        ViewCompat.setTransitionName(view, path);
+    public void restoreTransitionInfo() {
+        ViewCompat.setTransitionName(tvParentPath, tvParentPath.getContext().getString(R.string.path_transition_element));
+    }
+
+    public void clearTransitionInfo() {
+        ViewCompat.setTransitionName(tvParentPath, null);
     }
 }

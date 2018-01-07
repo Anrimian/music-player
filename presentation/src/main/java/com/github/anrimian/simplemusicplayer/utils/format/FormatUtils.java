@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.utils.format;
 
 import java.util.Locale;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -13,9 +14,22 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class FormatUtils {
 
     public static String formatMilliseconds(long millis) {
-        return String.format(Locale.getDefault(), "%02d:%02d:%02d",
-                MILLISECONDS.toHours(millis),
-                MILLISECONDS.toMinutes(millis) - HOURS.toMinutes(MILLISECONDS.toHours(millis)),
-                MILLISECONDS.toSeconds(millis) - MINUTES.toSeconds(MILLISECONDS.toMinutes(millis)));
+        StringBuilder sb = new StringBuilder();
+
+        long hours = MILLISECONDS.toHours(millis);
+        if (hours != 0) {
+            sb.append(format(Locale.getDefault(), "%02d", hours));
+            sb.append(":");
+        }
+
+        long minutes = MILLISECONDS.toMinutes(millis) - HOURS.toMinutes(hours);
+        if (minutes != 0 || hours != 0) {
+            sb.append(format(Locale.getDefault(), "%02d", minutes));
+            sb.append(":");
+        }
+
+        long seconds = MILLISECONDS.toSeconds(millis) - MINUTES.toSeconds(MILLISECONDS.toMinutes(millis));
+        sb.append(format(Locale.getDefault(), "%02d", seconds));
+        return sb.toString();
     }
 }

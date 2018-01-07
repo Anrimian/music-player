@@ -1,26 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <ImageView
+        android:id="@+id/iv_music_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="@dimen/padding_small"
+        android:background="@drawable/bg_folder_round"
+        android:layout_marginRight="@dimen/content_horizontal_margin"
+        android:layout_marginLeft="@dimen/content_horizontal_margin"
+        android:contentDescription="@string/folder"
+        app:layout_constraintRight_toLeftOf="@+id/tv_composition_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_composition_name"
+        app:srcCompat="@drawable/ic_music_circle" />
 
     <TextView
-        android:id="@+id/tv_music_name"
+        android:id="@+id/tv_composition_name"
+        style="@style/Base.TextAppearance.AppCompat.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="?android:attr/textColorPrimary"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        tools:text="Music name"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginRight="@dimen/content_horizontal_margin"
+        android:layout_marginTop="@dimen/margin_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:targetApi="lollipop"
+        tools:text="cocompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositionmposition"/>
+
+    <TextView
+        android:id="@+id/tv_additional_info"
+        style="@style/Base.TextAppearance.AppCompat.Caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="@dimen/margin_small"
+        android:lineSpacingExtra="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/divider"
+        app:layout_constraintEnd_toEndOf="@+id/tv_composition_name"
+        app:layout_constraintStart_toStartOf="@+id/tv_composition_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_composition_name"
+        tools:text="auauthorauthorauthorauthorauthorauthorauthorauthorauthorauthorauthorthor" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="?android:attr/dividerVertical"
+        android:layout_marginTop="@dimen/margin_normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_additional_info" />
 
+    <FrameLayout
+        android:id="@+id/clickable_item"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foreground="?selectableItemBackground"
+        app:layout_constraintBottom_toTopOf="@id/divider"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

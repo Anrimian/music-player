@@ -4,11 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.transition.AutoTransition;
+import android.support.transition.Slide;
 import android.support.transition.Transition;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -65,6 +64,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         return fragment;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Nullable
     private String getPath() {
         return getArguments().getString(PATH);
@@ -77,12 +77,13 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        postponeEnterTransition();
         return inflater.inflate(R.layout.fragment_library_storage, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
@@ -102,11 +103,12 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @Override
     public void bindList(List<FileSource> musicList) {
-        adapter = new MusicFileSourceAdapter(musicList);
+            adapter = new MusicFileSourceAdapter(musicList);
 //        adapter.addHeader(headerView);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
         recyclerView.setAdapter(adapter);
+        startPostponedEnterTransition();
     }
 
     @Override
@@ -150,7 +152,9 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     @Override
     public void goBackToMusicStorageScreen(String path) {
         FragmentManager fragmentManager = getFragmentManager();
+        //noinspection ConstantConditions
         if (fragmentManager.getBackStackEntryCount() > 0) {
+            headerViewWrapper.restoreTransitionInfo();
             fragmentManager.popBackStack();
         } else {
             fragmentManager.beginTransaction()
@@ -171,16 +175,18 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     private void goToMusicStorageScreen(String path, View... sharedViews) {
         StorageLibraryFragment fragment = StorageLibraryFragment.newInstance(path);
-        headerViewWrapper.setTransitionInfo(null);
-        Transition transition = new AutoTransition();
-//        transition.setDuration(1000);
+        headerViewWrapper.clearTransitionInfo();
+        Transition transition = new Slide();
+        transition.setDuration(1000);
         fragment.setSharedElementEnterTransition(transition);
         fragment.setSharedElementReturnTransition(transition);
+        //noinspection ConstantConditions
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
-        for (View sharedView: sharedViews) {
-            transaction.addSharedElement(sharedView, ViewCompat.getTransitionName(sharedView));
-        }
+//        transaction.addSharedElement(recyclerView, ViewCompat.getTransitionName(recyclerView));
+//        for (View sharedView: sharedViews) {
+//            transaction.addSharedElement(sharedView, ViewCompat.getTransitionName(sharedView));
+//        }
         transaction.replace(R.id.library_fragment_container, fragment, path)
                 .addToBackStack(path)
                 .commit();

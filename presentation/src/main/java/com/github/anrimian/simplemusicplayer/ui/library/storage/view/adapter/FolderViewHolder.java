@@ -37,8 +37,8 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
         if (onFolderClickListener != null) {
             clickableItemView.setOnClickListener(v -> {
-                ViewCompat.setTransitionName(itemView, getContext().getString(R.string.path_transition_element));
-                onFolderClickListener.onItemClick(path, itemView);
+                ViewCompat.setTransitionName(tvFolderName, getContext().getString(R.string.path_transition_element));
+                onFolderClickListener.onItemClick(path, tvFolderName);
             });
         }
     }
