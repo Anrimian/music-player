@@ -42,6 +42,7 @@ public class MusicProviderRepositoryImplTest {
     public void testRepositoryReturnValues() {
         List<Composition> compositions = musicProviderRepository.getAllCompositions().blockingGet();
         for (Composition composition: compositions) {
+            System.out.println(composition);
             Assert.assertNotNull(composition.getFilePath());
         }
     }

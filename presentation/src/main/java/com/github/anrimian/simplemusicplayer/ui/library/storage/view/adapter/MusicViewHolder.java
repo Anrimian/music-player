@@ -43,7 +43,7 @@ class MusicViewHolder extends RecyclerView.ViewHolder {
 
     void bind(@Nonnull Composition composition) {
         this.composition = composition;
-        tvMusicName.setText(composition.getDisplayName());
+        tvMusicName.setText(composition.getTitle());
         showAdditionalInfo();
     }
 

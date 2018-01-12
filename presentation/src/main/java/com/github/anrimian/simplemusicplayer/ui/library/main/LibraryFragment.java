@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
@@ -135,6 +136,19 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
             toolbar.setY(savedInstanceState.getFloat(TOOLBAR_Y));
         }
 
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                if (slideOffset > 0F && slideOffset < 1f) {
+//                    LibraryFragment.this.onSlide(bottomSheet, slideOffset);
+                }
+            }
+        });
 
         /*appBarStartY = toolbar.getY();
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -272,6 +286,26 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     public boolean onBackPressed() {
         Fragment fragment = getChildFragmentManager().findFragmentById(R.id.library_fragment_container);
         return fragment instanceof BackButtonListener && ((BackButtonListener) fragment).onBackPressed();
+    }
+
+    private static final float UNDEFINED = -1;
+
+    private float btnPlayStartX = UNDEFINED;
+    private float btnPlayStartY = UNDEFINED;
+    private float btnPlayEndX = UNDEFINED;
+    private float btnPlayEndY = UNDEFINED;
+
+    private void onSlide(@NonNull View bottomSheet, float slideOffset) {
+        if (btnPlayStartX == UNDEFINED) {
+            btnPlayStartX = ivPlayPause.getX();
+            btnPlayStartY = ivPlayPause.getY();
+            btnPlayEndX = btnRandomPlay.getX();
+            btnPlayEndY = btnRandomPlay.getY();
+        }
+        float deltaX = btnPlayEndX - btnPlayStartX;
+        float deltaY = btnPlayEndY - btnPlayStartY;
+        ivPlayPause.setX(btnPlayStartX + (deltaX * slideOffset));
+        ivPlayPause.setY(btnPlayStartY + (deltaY * slideOffset));
     }
 
     private void setContentBottomHeight(int heightInPixels) {
