@@ -24,7 +24,7 @@ import com.github.anrimian.simplemusicplayer.ui.library.storage.view.adapter.Mus
 import com.github.anrimian.simplemusicplayer.ui.library.storage.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
-import com.github.anrimian.simplemusicplayer.utils.recycler_view.endless_scrolling.HideFabScrollListener;
+import com.github.anrimian.simplemusicplayer.utils.views.recycler_view.endless_scrolling.HideFabScrollListener;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;

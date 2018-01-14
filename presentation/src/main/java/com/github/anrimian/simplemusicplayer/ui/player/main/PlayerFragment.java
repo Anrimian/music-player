@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.library.main;
+package com.github.anrimian.simplemusicplayer.ui.player.main;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,9 +28,11 @@ import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
-import com.github.anrimian.simplemusicplayer.ui.library.main.view.adapter.PlayListAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
+import com.github.anrimian.simplemusicplayer.ui.player.main.view.adapter.PlayListAdapter;
 import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.BottomSheetDelegateManager;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.TargetViewBottomSheetDelegate;
 
 import java.util.List;
 
@@ -43,14 +45,14 @@ import static com.github.anrimian.simplemusicplayer.utils.format.FormatUtils.for
  * Created on 19.10.2017.
  */
 
-public class LibraryFragment extends MvpAppCompatFragment implements LibraryView, BackButtonListener {
+public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, BackButtonListener {
 
     private static final String BOTTOM_SHEET_STATE = "bottom_sheet_state";
     private static final String TOOLBAR_Y = "toolbar_y";
     private static final String TOOLBAR_START_Y = "toolbar_start_y";
 
     @InjectPresenter
-    LibraryPresenter presenter;
+    PlayerPresenter presenter;
 
     @BindView(R.id.bottom_sheet)
     CoordinatorLayout bottomSheet;
@@ -69,6 +71,15 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
 
     @BindView(R.id.iv_skip_to_next)
     ImageView ivSkipToNext;
+
+    @BindView(R.id.iv_play_pause_expanded)
+    ImageView ivPlayPauseExpanded;
+
+    @BindView(R.id.iv_skip_to_previous_expanded)
+    ImageView ivSkipToPreviousExpanded;
+
+    @BindView(R.id.iv_skip_to_next_expanded)
+    ImageView ivSkipToNextExpanded;
 
     @BindView(R.id.library_fragment_container)
     ViewGroup fragmentContainer;
@@ -95,57 +106,54 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     private PlayListAdapter playListAdapter;
 
     private MusicServiceConnection musicServiceConnection = new MusicServiceConnection();
-//    private float appBarStartY;
-
-//    private FragmentCoordinatorDelegate coordinatorDelegate;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-//        coordinatorDelegate = new FragmentCoordinatorDelegate(getActivity(), R.id.drawer_fragment_container);
-//        coordinatorDelegate.onAttach();
-    }
+    private BottomSheetDelegateManager bottomSheetDelegateManager = new BottomSheetDelegateManager();
 
     @ProvidePresenter
-    LibraryPresenter providePresenter() {
+    PlayerPresenter providePresenter() {
         return Components.getLibraryComponent().libraryPresenter();
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_library, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        //noinspection ConstantConditions
         getActivity().setTitle(R.string.library);
+
+        bottomSheetDelegateManager.addDelegate(new TargetViewBottomSheetDelegate(ivPlayPause, ivPlayPauseExpanded))
+                .addDelegate(new TargetViewBottomSheetDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
+                .addDelegate(new TargetViewBottomSheetDelegate(ivSkipToNext, ivSkipToNextExpanded));
 
         behavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheet.setClickable(true);
-
 
         toolbar = getActivity().findViewById(R.id.toolbar);
 
         int bottomSheetState = BottomSheetBehavior.STATE_COLLAPSED;
         if (savedInstanceState != null) {
             bottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
-            toolbar.setY(savedInstanceState.getFloat(TOOLBAR_Y));
+            if (bottomSheetState == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetDelegateManager.onSlide(1f);
+            }
+//            toolbar.setY(savedInstanceState.getFloat(TOOLBAR_Y));
         }
-
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
+                System.out.println(newState);
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 if (slideOffset > 0F && slideOffset < 1f) {
-//                    LibraryFragment.this.onSlide(bottomSheet, slideOffset);
+                    bottomSheetDelegateManager.onSlide(slideOffset);
                 }
             }
         });
@@ -196,6 +204,11 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
         Intent intent = new Intent(getActivity(), MusicService.class);
         getActivity().startService(intent);
         getActivity().bindService(intent, musicServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -295,12 +308,12 @@ public class LibraryFragment extends MvpAppCompatFragment implements LibraryView
     private float btnPlayEndX = UNDEFINED;
     private float btnPlayEndY = UNDEFINED;
 
-    private void onSlide(@NonNull View bottomSheet, float slideOffset) {
+    private void onSlide(float slideOffset) {
         if (btnPlayStartX == UNDEFINED) {
             btnPlayStartX = ivPlayPause.getX();
             btnPlayStartY = ivPlayPause.getY();
-            btnPlayEndX = btnRandomPlay.getX();
-            btnPlayEndY = btnRandomPlay.getY();
+            btnPlayEndX = ivPlayPauseExpanded.getX();
+            btnPlayEndY = ivPlayPauseExpanded.getY();
         }
         float deltaX = btnPlayEndX - btnPlayStartX;
         float deltaY = btnPlayEndY - btnPlayStartY;

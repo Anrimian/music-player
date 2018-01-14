@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.library.main;
+package com.github.anrimian.simplemusicplayer.ui.player.main;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
@@ -13,7 +13,7 @@ import java.util.List;
  * Created on 02.11.2017.
  */
 
-public interface LibraryView extends MvpView {
+public interface PlayerView extends MvpView {
 
     String PLAYER_STATE = "player_state";
 

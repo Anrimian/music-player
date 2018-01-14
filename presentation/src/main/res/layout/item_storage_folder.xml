@@ -31,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/iv_folder_icon"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="path"
+        tools:text="pathpathpathpathpathpathpathpathpathpathpapathpathpath"
         tools:targetApi="lollipop" />
 
     <TextView
@@ -51,7 +51,6 @@
         android:layout_height="1dp"
         android:background="?android:attr/dividerVertical"
         android:layout_marginTop="@dimen/margin_normal"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_compositions_count" />

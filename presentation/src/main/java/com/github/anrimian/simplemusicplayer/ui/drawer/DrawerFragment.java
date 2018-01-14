@@ -20,11 +20,11 @@ import android.view.ViewGroup;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.ui.library.main.LibraryFragment;
+import com.github.anrimian.simplemusicplayer.ui.player.main.PlayerFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
-import com.github.anrimian.simplemusicplayer.utils.view_pager.FragmentCreator;
+import com.github.anrimian.simplemusicplayer.utils.views.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import butterknife.BindView;
@@ -42,7 +42,7 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
     private static final SparseArray<FragmentCreator> fragmentIdMap = new SparseArray<>();
 
     static {
-        fragmentIdMap.put(R.id.menu_library, LibraryFragment::new);
+        fragmentIdMap.put(R.id.menu_library, PlayerFragment::new);
         fragmentIdMap.put(R.id.menu_settings, SettingsFragment::new);
     }
 
@@ -146,7 +146,7 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void showLibraryScreen() {
         selectedDrawerItemId = R.id.menu_library;
         navigationView.setCheckedItem(selectedDrawerItemId);
-        startFragment(new LibraryFragment());
+        startFragment(new PlayerFragment());
     }
 
     private void startFragment(Fragment fragment) {

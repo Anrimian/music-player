@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.library.main;
+package com.github.anrimian.simplemusicplayer.ui.player.main;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
@@ -22,17 +22,17 @@ import static org.mockito.Mockito.when;
 /**
  * Created on 13.11.2017.
  */
-public class LibraryPresenterTest {
+public class PlayerPresenterTest {
 
     private MusicPlayerInteractor musicPlayerInteractor;
     private Scheduler uiScheduler = Schedulers.single();
-    private LibraryView libraryView;
+    private PlayerView playerView;
 
     private BehaviorSubject<PlayerState> playerStateSubject;
     private BehaviorSubject<Composition> currentCompositionSubject;
     private BehaviorSubject<List<Composition>> currentPlayListSubject;
 
-    private LibraryPresenter libraryPresenter;
+    private PlayerPresenter playerPresenter;
 
     @Before
     public void setUp() throws Exception {
@@ -45,44 +45,44 @@ public class LibraryPresenterTest {
         when(musicPlayerInteractor.getCurrentPlayListObservable()).thenReturn(currentPlayListSubject);
         when(musicPlayerInteractor.getPlayerStateObservable()).thenReturn(playerStateSubject);
 
-        libraryView = mock(LibraryView.class);
+        playerView = mock(PlayerView.class);
 
-        libraryPresenter = new LibraryPresenter(musicPlayerInteractor, uiScheduler);
-        libraryPresenter.attachView(libraryView);
+        playerPresenter = new PlayerPresenter(musicPlayerInteractor, uiScheduler);
+        playerPresenter.attachView(playerView);
 
-        verify(libraryView).hideMusicControls();
-        verify(libraryView).bindPlayList(any());
+        verify(playerView).hideMusicControls();
+        verify(playerView).bindPlayList(any());
     }
 
     @After
     public void tearDown() throws Exception {
-        libraryPresenter.detachView(libraryView);
+        playerPresenter.detachView(playerView);
     }
 
     @Test
     public void onPlayButtonClicked() {
-        libraryPresenter.onPlayButtonClicked();
+        playerPresenter.onPlayButtonClicked();
 
         verify(musicPlayerInteractor).play();
     }
 
     @Test
     public void onPauseButtonClicked() {
-        libraryPresenter.onStopButtonClicked();
+        playerPresenter.onStopButtonClicked();
 
         verify(musicPlayerInteractor).pause();
     }
 
     @Test
     public void onSkipToPreviousButtonClicked() {
-        libraryPresenter.onSkipToPreviousButtonClicked();
+        playerPresenter.onSkipToPreviousButtonClicked();
 
         verify(musicPlayerInteractor).skipToPrevious();
     }
 
     @Test
     public void onSkipToNextButtonClicked() {
-        libraryPresenter.onSkipToNextButtonClicked();
+        playerPresenter.onSkipToNextButtonClicked();
 
         verify(musicPlayerInteractor).skipToNext();
     }

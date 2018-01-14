@@ -100,24 +100,6 @@ public class StorageLibraryPresenterTest {
     }
 
     @Test
-    public void testOnFolderClicked() {
-        StorageLibraryPresenter presenter = new StorageLibraryPresenter(null, interactor, errorParser, uiScheduler);
-        presenter.attachView(view);
-
-        String path = "some";
-        presenter.onFolderClicked(path);
-        verify(view).goToMusicStorageScreen(eq(path));
-
-        presenter = new StorageLibraryPresenter("some", interactor, errorParser, uiScheduler);
-        presenter.attachView(view);
-        verify(view).showBackPathButton("some");
-
-        path = "some/some2";
-        presenter.onFolderClicked(path);
-        verify(view).goToMusicStorageScreen(eq("some/some2"));
-    }
-
-    @Test
     public void testShowBackPathButton() {
         StorageLibraryPresenter presenter = new StorageLibraryPresenter("root/some/some2", interactor, errorParser, uiScheduler);
         presenter.attachView(view);

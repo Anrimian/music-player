@@ -43,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="@+id/tv_composition_name"
         app:layout_constraintStart_toStartOf="@+id/tv_composition_name"
         app:layout_constraintTop_toBottomOf="@+id/tv_composition_name"
-        tools:text="auauthorauthorauthorauthorauthorauthorauthorauthorauthorauthorauthorthor" />
+        tools:text="auauthorauthorauthorauthorauthofffffffffffthorauthorauthorauthorthor" />
 
     <View
         android:id="@+id/divider"
@@ -51,7 +51,6 @@
         android:layout_height="1dp"
         android:background="?android:attr/dividerVertical"
         android:layout_marginTop="@dimen/margin_normal"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_additional_info" />

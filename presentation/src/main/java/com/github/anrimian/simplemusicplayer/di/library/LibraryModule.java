@@ -6,7 +6,7 @@ import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProvid
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
-import com.github.anrimian.simplemusicplayer.ui.library.main.LibraryPresenter;
+import com.github.anrimian.simplemusicplayer.ui.player.main.PlayerPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -41,8 +41,8 @@ public class LibraryModule {
 
     @Provides
     @Nonnull
-    LibraryPresenter provideLibraryPresenter(MusicPlayerInteractor musicPlayerInteractor,
-                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
-        return new LibraryPresenter(musicPlayerInteractor, uiScheduler);
+    PlayerPresenter provideLibraryPresenter(MusicPlayerInteractor musicPlayerInteractor,
+                                            @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+        return new PlayerPresenter(musicPlayerInteractor, uiScheduler);
     }
 }

@@ -24,40 +24,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/iv_skip_to_previous"/>
 
-    <ImageView
-        android:id="@+id/iv_skip_to_previous"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
-        android:contentDescription="@string/previous_track"
-        android:padding="@dimen/margin_small"
-        app:srcCompat="@drawable/ic_skip_previous"
-        app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
-        app:layout_constraintTop_toTopOf="@+id/iv_play_pause"/>
-
-    <ImageView
-        android:id="@+id/iv_play_pause"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
-        android:contentDescription="@string/play_stop"
-        android:padding="@dimen/margin_small"
-        app:srcCompat="@drawable/ic_pause"
-        app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
-        app:layout_constraintTop_toTopOf="@+id/iv_skip_to_next"/>
-
-    <ImageView
-        android:id="@+id/iv_skip_to_next"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="@dimen/margin_normal"
-        android:layout_marginRight="@dimen/margin_normal"
-        android:contentDescription="@string/next_track"
-        android:padding="@dimen/margin_small"
-        app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_skip_next" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_playlist"
         android:layout_width="0dp"
@@ -116,6 +82,78 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottom" />
+
+    <ImageView
+        android:id="@+id/iv_skip_to_previous"
+        android:layout_width="@dimen/top_control_button_size"
+        android:layout_height="@dimen/top_control_button_size"
+        android:contentDescription="@string/previous_track"
+        android:padding="@dimen/margin_small"
+        app:srcCompat="@drawable/ic_skip_previous"
+        app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
+        app:layout_constraintTop_toTopOf="@+id/iv_play_pause"/>
+
+    <ImageView
+        android:id="@+id/iv_play_pause"
+        android:layout_width="@dimen/top_control_button_size"
+        android:layout_height="@dimen/top_control_button_size"
+        android:contentDescription="@string/play_stop"
+        android:padding="@dimen/margin_small"
+        app:srcCompat="@drawable/ic_pause"
+        app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
+        app:layout_constraintTop_toTopOf="@+id/iv_skip_to_next"/>
+
+    <ImageView
+        android:id="@+id/iv_skip_to_next"
+        android:layout_width="@dimen/top_control_button_size"
+        android:layout_height="@dimen/top_control_button_size"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginRight="@dimen/margin_normal"
+        android:contentDescription="@string/next_track"
+        android:padding="@dimen/margin_small"
+        app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_skip_next" />
+
+    <ImageView
+        android:id="@+id/iv_skip_to_previous_expanded"
+        android:layout_width="@dimen/top_control_button_size"
+        android:layout_height="@dimen/top_control_button_size"
+        android:contentDescription="@string/previous_track"
+        android:padding="@dimen/margin_small"
+        tools:srcCompat="@drawable/ic_skip_previous"
+        app:layout_constraintEnd_toStartOf="@+id/iv_play_pause_expanded"
+        app:layout_constraintTop_toTopOf="@+id/iv_play_pause_expanded"/>
+
+    <ImageView
+        android:id="@+id/iv_play_pause_expanded"
+        android:layout_width="@dimen/top_control_button_size"
+        android:layout_height="@dimen/top_control_button_size"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/play_stop"
+        android:padding="@dimen/margin_small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pb_track_state"
+        tools:srcCompat="@drawable/ic_pause" />
+
+    <ImageView
+        android:id="@+id/iv_skip_to_next_expanded"
+        android:layout_width="@dimen/top_control_button_size"
+        android:layout_height="@dimen/top_control_button_size"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginRight="@dimen/margin_normal"
+        android:contentDescription="@string/next_track"
+        android:padding="@dimen/margin_small"
+        app:layout_constraintStart_toEndOf="@+id/iv_play_pause_expanded"
+        app:layout_constraintTop_toTopOf="@+id/iv_play_pause_expanded"
+        tools:srcCompat="@drawable/ic_skip_next" />
 
 
 </android.support.constraint.ConstraintLayout>

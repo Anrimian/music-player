@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.library.main;
+package com.github.anrimian.simplemusicplayer.ui.player.main;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
@@ -18,7 +18,7 @@ import io.reactivex.disposables.Disposable;
  */
 
 @InjectViewState
-public class LibraryPresenter extends MvpPresenter<LibraryView> {
+public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private MusicPlayerInteractor musicPlayerInteractor;
     private Scheduler uiScheduler;
@@ -29,8 +29,8 @@ public class LibraryPresenter extends MvpPresenter<LibraryView> {
     private List<Composition> currentPlayList = new ArrayList<>();
     private Composition currentComposition;
 
-    public LibraryPresenter(MusicPlayerInteractor musicPlayerInteractor,
-                            Scheduler uiScheduler) {
+    public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
+                           Scheduler uiScheduler) {
         this.musicPlayerInteractor = musicPlayerInteractor;
         this.uiScheduler = uiScheduler;
     }
