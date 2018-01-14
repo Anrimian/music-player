@@ -6,7 +6,7 @@ import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProvid
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
-import com.github.anrimian.simplemusicplayer.ui.player.main.PlayerPresenter;
+import com.github.anrimian.simplemusicplayer.ui.drawer.PlayerPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;

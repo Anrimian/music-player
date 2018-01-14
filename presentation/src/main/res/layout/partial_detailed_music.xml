@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/top"
+    <View
+        android:id="@+id/top_panel"
         android:layout_width="0dp"
         android:layout_height="@dimen/bottom_sheet_height"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -15,20 +15,32 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_description"
+        android:id="@+id/tv_current_composition"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        tools:text="testtesttststststtst"
+        android:layout_margin="@dimen/margin_normal"
+        android:ellipsize="end"
+        android:lines="2"
+        style="@style/Base.TextAppearance.AppCompat.Body1"
+        app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
         app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_previous"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_skip_to_previous"/>
+        tools:text="testtesttststststtst" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="7dp"
+        android:background="@drawable/bg_shadow_bottom"
+        app:layout_constraintTop_toBottomOf="@id/top_panel"
+        app:layout_constraintLeft_toLeftOf="@id/top_panel"
+        app:layout_constraintRight_toRightOf="@id/top_panel"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_playlist"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/top"
+        app:layout_constraintTop_toBottomOf="@+id/top_panel"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/bottom"/>
@@ -89,6 +101,7 @@
         android:layout_height="@dimen/top_control_button_size"
         android:contentDescription="@string/previous_track"
         android:padding="@dimen/margin_small"
+        android:foreground="?selectableItemBackground"
         app:srcCompat="@drawable/ic_skip_previous"
         app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
         app:layout_constraintTop_toTopOf="@+id/iv_play_pause"/>
@@ -99,6 +112,7 @@
         android:layout_height="@dimen/top_control_button_size"
         android:contentDescription="@string/play_stop"
         android:padding="@dimen/margin_small"
+        android:foreground="?selectableItemBackground"
         app:srcCompat="@drawable/ic_pause"
         app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
         app:layout_constraintTop_toTopOf="@+id/iv_skip_to_next"/>
@@ -107,15 +121,15 @@
         android:id="@+id/iv_skip_to_next"
         android:layout_width="@dimen/top_control_button_size"
         android:layout_height="@dimen/top_control_button_size"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="@dimen/margin_normal"
         android:layout_marginRight="@dimen/margin_normal"
         android:contentDescription="@string/next_track"
+        android:foreground="?selectableItemBackground"
         android:padding="@dimen/margin_small"
         app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_skip_next" />
+        app:srcCompat="@drawable/ic_skip_next"/>
 
     <ImageView
         android:id="@+id/iv_skip_to_previous_expanded"

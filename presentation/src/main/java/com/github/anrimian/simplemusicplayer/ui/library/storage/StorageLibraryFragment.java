@@ -87,6 +87,8 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        getActivity().setTitle(R.string.library);
+
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
 
@@ -159,7 +161,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         } else {
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                    .replace(R.id.library_fragment_container, StorageLibraryFragment.newInstance(path))
+                    .replace(R.id.drawer_fragment_container, StorageLibraryFragment.newInstance(path))
                     .commit();
         }
     }
@@ -187,7 +189,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 //        for (View sharedView: sharedViews) {
 //            transaction.addSharedElement(sharedView, ViewCompat.getTransitionName(sharedView));
 //        }
-        transaction.replace(R.id.library_fragment_container, fragment, path)
+        transaction.replace(R.id.drawer_fragment_container, fragment, path)
                 .addToBackStack(path)
                 .commit();
     }

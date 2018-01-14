@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.di.library;
 
 import com.github.anrimian.simplemusicplayer.di.library.storage.StorageLibraryComponent;
 import com.github.anrimian.simplemusicplayer.di.library.storage.StorageLibraryModule;
-import com.github.anrimian.simplemusicplayer.ui.player.main.PlayerPresenter;
+import com.github.anrimian.simplemusicplayer.ui.drawer.PlayerPresenter;
 
 import dagger.Subcomponent;
 

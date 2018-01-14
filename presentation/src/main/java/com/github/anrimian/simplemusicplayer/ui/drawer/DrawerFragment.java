@@ -1,8 +1,15 @@
 package com.github.anrimian.simplemusicplayer.ui.drawer;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,6 +17,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -17,34 +26,56 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.ui.player.main.PlayerFragment;
+import com.github.anrimian.simplemusicplayer.di.Components;
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
+import com.github.anrimian.simplemusicplayer.ui.library.storage.StorageLibraryFragment;
+import com.github.anrimian.simplemusicplayer.ui.player.main.view.adapter.PlayListAdapter;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.BottomSheetDelegateManager;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.TargetViewBottomSheetDelegate;
 import com.github.anrimian.simplemusicplayer.utils.views.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static com.github.anrimian.simplemusicplayer.utils.format.FormatUtils.formatMilliseconds;
 
 /**
  * Created on 19.10.2017.
  */
 
-public class DrawerFragment extends MvpAppCompatFragment implements BackButtonListener {
+public class DrawerFragment extends MvpAppCompatFragment implements BackButtonListener, PlayerView {
 
     private static final int NO_ITEM = -1;
     private static final String SELECTED_DRAWER_ITEM = "selected_drawer_item";
+    private static final String BOTTOM_SHEET_STATE = "bottom_sheet_state";
 
     private static final SparseArray<FragmentCreator> fragmentIdMap = new SparseArray<>();
 
     static {
-        fragmentIdMap.put(R.id.menu_library, PlayerFragment::new);
         fragmentIdMap.put(R.id.menu_settings, SettingsFragment::new);
     }
+
+
+    @InjectPresenter
+    PlayerPresenter presenter;
 
     @BindView(R.id.drawer)
     DrawerLayout drawer;
@@ -52,19 +83,79 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.navigation_view)
     NavigationView navigationView;
 
+    @BindView(R.id.bottom_sheet)
+    CoordinatorLayout bottomSheet;
+
+    @BindView(R.id.rv_playlist)
+    RecyclerView rvPlayList;
+
+    @BindView(R.id.iv_play_pause)
+    ImageView ivPlayPause;
+
+    @BindView(R.id.iv_skip_to_previous)
+    ImageView ivSkipToPrevious;
+
+    @BindView(R.id.iv_skip_to_next)
+    ImageView ivSkipToNext;
+
+    @BindView(R.id.iv_play_pause_expanded)
+    ImageView ivPlayPauseExpanded;
+
+    @BindView(R.id.iv_skip_to_previous_expanded)
+    ImageView ivSkipToPreviousExpanded;
+
+    @BindView(R.id.iv_skip_to_next_expanded)
+    ImageView ivSkipToNextExpanded;
+
+    @BindView(R.id.drawer_fragment_container)
+    ViewGroup fragmentContainer;
+
+    @BindView(R.id.tv_current_composition)
+    TextView tvCurrentComposition;
+
+    @BindView(R.id.btn_infinite_play)
+    Button btnInfinitePlay;
+
+    @BindView(R.id.btn_random_play)
+    Button btnRandomPlay;
+
+    @BindView(R.id.tv_played_time)
+    TextView tvPlayedTime;
+
+    @BindView(R.id.pb_track_state)
+    ProgressBar pbTrackState;
+
+    @BindView(R.id.bottom_sheet_top_shadow)
+    View bottomSheetTopShadow;
+
+    @BindView(R.id.top_panel)
+    View topBottomSheetPanel;
+
+    private BottomSheetBehavior<CoordinatorLayout> behavior;
+
+    private PlayListAdapter playListAdapter;
+
+    private MusicServiceConnection musicServiceConnection = new MusicServiceConnection();
+    private BottomSheetDelegateManager bottomSheetDelegateManager = new BottomSheetDelegateManager();
+
     private ActionBarDrawerToggle drawerToggle;
 
     private int selectedDrawerItemId = NO_ITEM;
     private int itemIdToStart = NO_ITEM;
 
+    @ProvidePresenter
+    PlayerPresenter providePresenter() {
+        return Components.getLibraryComponent().libraryPresenter();
+    }
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_drawer, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setHasOptionsMenu(true);
         ButterKnife.bind(this, view);
@@ -75,6 +166,7 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
                     .beginTransaction()
                     .replace(R.id.main_activity_container, new StartFragment())
                     .commit();
+            return;
         }
 
         Toolbar toolbar = view.findViewById(R.id.toolbar);
@@ -91,11 +183,11 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
         navigationView.setNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (selectedDrawerItemId != itemId) {
-                    selectedDrawerItemId = itemId;
-                    itemIdToStart = itemId;
-                    clearFragment();
-                }
-                drawer.closeDrawer(Gravity.START);
+                selectedDrawerItemId = itemId;
+                itemIdToStart = itemId;
+                clearFragment();
+            }
+            drawer.closeDrawer(Gravity.START);
 
             return true;
         });
@@ -108,14 +200,72 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 if (itemIdToStart != NO_ITEM) {
-                    FragmentCreator fragmentCreator = fragmentIdMap.get(itemIdToStart);
-                    startFragment(fragmentCreator.createFragment());
+                    switch (itemIdToStart) {
+                        case R.id.menu_library : {
+                            startFragment(StorageLibraryFragment.newInstance(null));
+                            break;
+                        }
+                        default: {
+                            FragmentCreator fragmentCreator = fragmentIdMap.get(itemIdToStart);
+                            startFragment(fragmentCreator.createFragment());
+                        }
+                    }
                     itemIdToStart = NO_ITEM;
                 }
             }
         });
 
-        //View headerView = navigationView.getHeaderView(0);
+        bottomSheetDelegateManager.addDelegate(new TargetViewBottomSheetDelegate(ivPlayPause, ivPlayPauseExpanded))
+                .addDelegate(new TargetViewBottomSheetDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
+                .addDelegate(new TargetViewBottomSheetDelegate(ivSkipToNext, ivSkipToNextExpanded));
+
+        behavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheet.setClickable(true);
+
+        int bottomSheetState = STATE_COLLAPSED;
+        if (savedInstanceState != null) {
+            bottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
+            if (bottomSheetState == STATE_EXPANDED) {
+                bottomSheetDelegateManager.onSlide(1f);
+            }
+        }
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case STATE_COLLAPSED: {
+                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                        bottomSheetDelegateManager.onSlide(0f);
+                        return;
+                    }
+                    case STATE_EXPANDED: {
+                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                        bottomSheetDelegateManager.onSlide(1f);
+                    }
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                if (slideOffset > 0F && slideOffset < 1f) {
+                    bottomSheetDelegateManager.onSlide(slideOffset);
+                }
+            }
+        });
+
+        behavior.setState(bottomSheetState);
+
+        ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
+        ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
+        btnInfinitePlay.setOnClickListener(v -> presenter.onInfinitePlayingButtonClicked(!v.isSelected()));
+        btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(!v.isSelected()));
+        topBottomSheetPanel.setOnClickListener(v -> {
+            if (behavior.getState() == STATE_COLLAPSED) {
+                behavior.setState(STATE_EXPANDED);
+            }
+        });
+
+        rvPlayList.setLayoutManager(new LinearLayoutManager(getContext()));
 
         Fragment currentFragment = getFragmentManager().findFragmentById(R.id.drawer_fragment_container);
         if (currentFragment == null || savedInstanceState == null) {
@@ -134,7 +284,8 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(SELECTED_DRAWER_ITEM, selectedDrawerItemId);//maybe another solution?
+        outState.putInt(SELECTED_DRAWER_ITEM, selectedDrawerItemId);
+        outState.putInt(BOTTOM_SHEET_STATE, behavior.getState());
     }
 
     @Override
@@ -143,18 +294,101 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
         return fragment instanceof BackButtonListener && ((BackButtonListener) fragment).onBackPressed();
     }
 
-    private void showLibraryScreen() {
-        selectedDrawerItemId = R.id.menu_library;
-        navigationView.setCheckedItem(selectedDrawerItemId);
-        startFragment(new PlayerFragment());
+    @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+        Intent intent = new Intent(getActivity(), MusicService.class);
+        getActivity().startService(intent);
+        getActivity().bindService(intent, musicServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getActivity().unbindService(musicServiceConnection);
+        presenter.onStop();
+    }
+
+    @Override
+    public void showStopState() {
+        setContentBottomHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height));
+        ivPlayPause.setImageResource(R.drawable.ic_play);
+        ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
+    }
+
+    @Override
+    public void showPlayState() {
+        setContentBottomHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height));
+        ivPlayPause.setImageResource(R.drawable.ic_pause);
+        ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
+    }
+
+    @Override
+    public void hideMusicControls() {
+        setContentBottomHeight(0);
+    }
+
+    @Override
+    public void showCurrentComposition(Composition composition) {
+        tvCurrentComposition.setText(composition.getTitle());
+    }
+
+    @Override
+    public void bindPlayList(List<Composition> currentPlayList) {
+        playListAdapter = new PlayListAdapter(currentPlayList);
+        rvPlayList.setAdapter(playListAdapter);
+    }
+
+    @Override
+    public void updatePlayList() {
+        playListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showInfinitePlayingButton(boolean active) {
+        btnInfinitePlay.setSelected(active);
+        btnInfinitePlay.setPressed(active);
+        btnInfinitePlay.setText(active? "INFINITE(ON)": "INFINITE(OFF)");
+    }
+
+    @Override
+    public void showRandomPlayingButton(boolean active) {
+        btnRandomPlay.setSelected(active);
+        btnRandomPlay.setPressed(active);
+        btnRandomPlay.setText(active? "RANDOM(ON)": "RANDOM(OFF)");
+    }
+
+    @Override
+    public void showTrackState(long currentPosition, long duration) {
+        int progress = (int) (currentPosition * 100 / duration);
+        pbTrackState.setProgress(progress);
+        tvPlayedTime.setText(formatMilliseconds(currentPosition));
+    }
+
+    private void setContentBottomHeight(int heightInPixels) {
+        behavior.setPeekHeight(heightInPixels);
+
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fragmentContainer.getLayoutParams();
+        layoutParams.bottomMargin = heightInPixels;
+        fragmentContainer.setLayoutParams(layoutParams);
     }
 
     private void startFragment(Fragment fragment) {
-        getFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                .replace(R.id.drawer_fragment_container, fragment)
-                .commit();
+        FragmentManager fragmentManager = getChildFragmentManager();
+        Fragment existFragment = fragmentManager.findFragmentById(R.id.drawer_fragment_container);
+        if (existFragment == null || existFragment.getClass() != fragment.getClass()) {
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
+                    .replace(R.id.drawer_fragment_container, fragment)
+                    .commit();
+        }
+    }
+
+    private void showLibraryScreen() {
+        selectedDrawerItemId = R.id.menu_library;
+        navigationView.setCheckedItem(selectedDrawerItemId);
+        startFragment(StorageLibraryFragment.newInstance(null));
     }
 
     private void clearFragment() {
@@ -164,6 +398,19 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
             fm.beginTransaction()
                     .remove(currentFragment)
                     .commit();
+        }
+    }
+
+    private class MusicServiceConnection implements android.content.ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
         }
     }
 }

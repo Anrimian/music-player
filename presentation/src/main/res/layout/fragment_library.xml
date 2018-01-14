@@ -10,6 +10,13 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="@dimen/bottom_sheet_height"/>
 
+    <View
+        android:id="@+id/bottom_sheet_top_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:background="@drawable/bg_shadow_top"
+        app:layout_anchor="@id/bottom_sheet"/>
+
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
