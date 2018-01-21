@@ -44,7 +44,11 @@ import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.BottomSheetDelegateManager;
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.TargetViewBottomSheetDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.BoundValuesDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.ChangeTitleDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.ExpandViewDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.TargetViewDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.VisibilityDelegate;
 import com.github.anrimian.simplemusicplayer.utils.views.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -131,6 +135,12 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.top_panel)
     View topBottomSheetPanel;
 
+    @BindView(R.id.bottom_sheet_bottom_shadow)
+    View bottomSheetBottomShadow;
+
+    @BindView(R.id.iv_music_icon)
+    ImageView ivMusicIcon;
+
     private BottomSheetBehavior<CoordinatorLayout> behavior;
 
     private PlayListAdapter playListAdapter;
@@ -215,9 +225,13 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
             }
         });
 
-        bottomSheetDelegateManager.addDelegate(new TargetViewBottomSheetDelegate(ivPlayPause, ivPlayPauseExpanded))
-                .addDelegate(new TargetViewBottomSheetDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
-                .addDelegate(new TargetViewBottomSheetDelegate(ivSkipToNext, ivSkipToNextExpanded));
+        bottomSheetDelegateManager.addDelegate(new TargetViewDelegate(ivPlayPause, ivPlayPauseExpanded))
+                .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
+                .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
+                .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
+                .addDelegate(new ChangeTitleDelegate(tvCurrentComposition))
+                .addDelegate(new BoundValuesDelegate(0.1f, 0.2f, new VisibilityDelegate(bottomSheetBottomShadow)))
+                .addDelegate(new BoundValuesDelegate(0.9f, 1.0f, new VisibilityDelegate(rvPlayList)));
 
         behavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheet.setClickable(true);
@@ -225,10 +239,9 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
         int bottomSheetState = STATE_COLLAPSED;
         if (savedInstanceState != null) {
             bottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
-            if (bottomSheetState == STATE_EXPANDED) {
-                bottomSheetDelegateManager.onSlide(1f);
-            }
         }
+        bottomSheetDelegateManager.onSlide(bottomSheetState == STATE_COLLAPSED ? 0f : 1f);
+
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {

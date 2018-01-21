@@ -7,7 +7,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -29,8 +28,6 @@ public class HidingViewWithBottomSheetBehavior extends AppBarLayout.ScrollingVie
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-        Log.d("behavior", "layoutDependsOn: " + dependency.getClass().getSimpleName());
-
         return getBottomSheetBehavior(dependency) != null;
     }
 
@@ -63,19 +60,6 @@ public class HidingViewWithBottomSheetBehavior extends AppBarLayout.ScrollingVie
         CoordinatorLayout.Behavior behavior = params.getBehavior();
         if (behavior instanceof BottomSheetBehavior) {
             return (BottomSheetBehavior) behavior;
-        }
-        return null;
-    }
-
-    @Nullable
-    private BottomSheetBehavior findBottomSheetBehavior(@NonNull CoordinatorLayout coordinatorLayout) {
-        for (int i = 0; i < coordinatorLayout.getChildCount(); i++) {
-            View child = coordinatorLayout.getChildAt(i);
-            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) child.getLayoutParams();
-            CoordinatorLayout.Behavior behavior = params.getBehavior();
-            if (behavior instanceof BottomSheetBehavior) {
-                return (BottomSheetBehavior) behavior;
-            }
         }
         return null;
     }

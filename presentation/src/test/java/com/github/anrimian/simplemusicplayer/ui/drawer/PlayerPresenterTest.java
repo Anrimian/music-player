@@ -1,10 +1,8 @@
-package com.github.anrimian.simplemusicplayer.ui.player.main;
+package com.github.anrimian.simplemusicplayer.ui.drawer;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.ui.drawer.PlayerPresenter;
-import com.github.anrimian.simplemusicplayer.ui.drawer.PlayerView;
 
 import org.junit.After;
 import org.junit.Before;

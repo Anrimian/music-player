@@ -8,7 +8,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 13.01.2018.
  */
 
-public class TargetViewBottomSheetDelegate implements BottomSheetDelegate {
+public class TargetViewDelegate implements BottomSheetDelegate {
 
     private static final float UNDEFINED = -1;
 
@@ -20,7 +20,7 @@ public class TargetViewBottomSheetDelegate implements BottomSheetDelegate {
     private View view;
     private View targetView;
 
-    public TargetViewBottomSheetDelegate(View view, View targetView) {
+    public TargetViewDelegate(View view, View targetView) {
         this.view = view;
         this.targetView = targetView;
     }

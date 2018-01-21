@@ -8,7 +8,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 14.01.2018.
  */
 
-public class CollapseViewBottomSheetDelegate implements BottomSheetDelegate {
+public class MoveOutViewDelegate implements BottomSheetDelegate {
 
     private static final float UNDEFINED = -1;
 
@@ -16,7 +16,7 @@ public class CollapseViewBottomSheetDelegate implements BottomSheetDelegate {
 
     private View view;
 
-    public CollapseViewBottomSheetDelegate(View view) {
+    public MoveOutViewDelegate(View view) {
         this.view = view;
     }
 
