@@ -43,4 +43,7 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showTrackState(long currentPosition, long duration);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showShareMusicDialog(String filePath);
 }

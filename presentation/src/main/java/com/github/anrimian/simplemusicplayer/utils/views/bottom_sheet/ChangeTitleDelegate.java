@@ -1,8 +1,10 @@
 package com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet;
 
 import android.support.constraint.ConstraintLayout;
-import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import static android.support.v4.view.ViewCompat.isLaidOut;
 
 /**
  * Created on 21.01.2018.
@@ -13,16 +15,29 @@ public class ChangeTitleDelegate implements BottomSheetDelegate {
     private static final int UNDEFINED = -1;
 
     private int expandLeftMargin = UNDEFINED;
-    private int expandRightMargin = UNDEFINED;
+    private int collapseRightMargin = UNDEFINED;
+    private int baseRightMargin;
 
     private TextView tvTitle;
+    private ImageView btnActionsMenu;
+    private ImageView ivSkipToPrevious;
 
-    public ChangeTitleDelegate(TextView tvTitle) {
+    public ChangeTitleDelegate(TextView tvTitle, ImageView btnActionsMenu, ImageView ivSkipToPrevious) {
         this.tvTitle = tvTitle;
+        this.btnActionsMenu = btnActionsMenu;
+        this.ivSkipToPrevious = ivSkipToPrevious;
     }
 
     @Override
     public void onSlide(float slideOffset) {
+        if (isLaidOut(tvTitle) || isLaidOut(btnActionsMenu) || isLaidOut(ivSkipToPrevious)) {
+            moveView(slideOffset);
+        } else {
+            tvTitle.post(() -> moveView(slideOffset));
+        }
+    }
+
+    private void moveView(float slideOffset) {
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) tvTitle.getLayoutParams();
 
         int leftMargin = params.leftMargin;
@@ -30,14 +45,17 @@ public class ChangeTitleDelegate implements BottomSheetDelegate {
             expandLeftMargin = leftMargin;
         }
         params.leftMargin = expandLeftMargin * (int) (slideOffset * 100) / 100;
-        Log.d("KEK", "leftMargin: " + params.leftMargin);
-        int rightMargin = params.rightMargin;
-        if (expandRightMargin == UNDEFINED) {
-            expandRightMargin = rightMargin;
+
+        if (collapseRightMargin == UNDEFINED) {
+            collapseRightMargin = getCollapseRightMargin();
+            baseRightMargin = params.rightMargin;
         }
-        params.rightMargin = expandRightMargin * (int) (slideOffset * 100) / 100;
-        Log.d("KEK", "rightMargin: " + params.rightMargin);
+        params.rightMargin = (collapseRightMargin * (int) ((1 - slideOffset) * 100) / 100) + baseRightMargin;
 
         tvTitle.setLayoutParams(params);
+    }
+
+    private int getCollapseRightMargin() {
+        return (int) (btnActionsMenu.getX() - ivSkipToPrevious.getX());
     }
 }

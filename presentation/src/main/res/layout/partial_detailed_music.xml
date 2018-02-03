@@ -39,16 +39,32 @@
         android:id="@+id/tv_current_composition"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_normal"
         android:ellipsize="end"
         android:lines="2"
         android:gravity="center_vertical"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         style="@style/Base.TextAppearance.AppCompat.Body1"
         app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
-        app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_previous"
+        app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
         app:layout_constraintLeft_toRightOf="@id/music_icon_wrapper"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="testtesttststststtst" />
+
+    <ImageView
+        android:id="@+id/btn_actions_menu"
+        style="@style/Toolbar.Button"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/content_description_menu"
+        app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
+        app:layout_constraintEnd_toEndOf="@+id/top_panel"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_dots_vertical" />
 
     <View
         android:id="@+id/bottom_sheet_bottom_shadow"

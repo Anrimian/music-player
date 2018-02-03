@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -13,11 +14,13 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
@@ -52,6 +55,7 @@ import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.Visibility
 import com.github.anrimian.simplemusicplayer.utils.views.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -141,6 +145,9 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
+    @BindView(R.id.btn_actions_menu)
+    ImageView btnActionsMenu;
+
     private BottomSheetBehavior<CoordinatorLayout> behavior;
 
     private PlayListAdapter playListAdapter;
@@ -229,7 +236,8 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
                 .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
-                .addDelegate(new ChangeTitleDelegate(tvCurrentComposition))
+                .addDelegate(new ChangeTitleDelegate(tvCurrentComposition, btnActionsMenu, ivSkipToPrevious))
+                .addDelegate(new BoundValuesDelegate(0.2f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
                 .addDelegate(new BoundValuesDelegate(0.1f, 0.2f, new VisibilityDelegate(bottomSheetBottomShadow)))
                 .addDelegate(new BoundValuesDelegate(0.9f, 1.0f, new VisibilityDelegate(rvPlayList)));
 
@@ -286,6 +294,8 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
         } else {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
         }
+
+        btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked);
     }
 
     @Override
@@ -379,6 +389,17 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
         tvPlayedTime.setText(formatMilliseconds(currentPosition));
     }
 
+    @Override
+    public void showShareMusicDialog(String filePath) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("audio/*");
+        Uri fileUri = FileProvider.getUriForFile(getContext(), getString(R.string.file_provider_authorities), new File(filePath));
+        intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(Intent.createChooser(intent, getString(R.string.share)));
+    }
+
     private void setContentBottomHeight(int heightInPixels) {
         behavior.setPeekHeight(heightInPixels);
 
@@ -412,6 +433,21 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
                     .remove(currentFragment)
                     .commit();
         }
+    }
+
+    private void onCompositionMenuClicked(View view) {
+        PopupMenu popup = new PopupMenu(getContext(), view);
+        popup.inflate(R.menu.composition_full_actions_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_share: {
+                    presenter.onShareCompositionButtonClicked();
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
     }
 
     private class MusicServiceConnection implements android.content.ServiceConnection {

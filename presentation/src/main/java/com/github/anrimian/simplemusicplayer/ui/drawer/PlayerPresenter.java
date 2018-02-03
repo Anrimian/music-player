@@ -90,6 +90,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showRandomPlayingButton(enabled);
     }
 
+    void onShareCompositionButtonClicked() {
+        getViewState().showShareMusicDialog(currentComposition.getFilePath());
+    }
+
     private void subscribeOnCurrentCompositionChanging() {
         presenterDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
