@@ -3,8 +3,8 @@ package com.github.anrimian.simplemusicplayer.ui.library.storage;
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
-import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
-import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
+import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
 import org.junit.Before;
 import org.junit.Test;

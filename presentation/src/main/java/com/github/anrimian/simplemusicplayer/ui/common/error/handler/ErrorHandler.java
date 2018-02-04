@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.error.handler;
+package com.github.anrimian.simplemusicplayer.ui.common.error.handler;
 
 /**
  * Created on 29.10.2017.

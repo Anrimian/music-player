@@ -29,7 +29,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -46,12 +45,12 @@ import com.github.anrimian.simplemusicplayer.ui.player.main.view.adapter.PlayLis
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.BottomSheetDelegateManager;
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.BoundValuesDelegate;
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.ChangeTitleDelegate;
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.ExpandViewDelegate;
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.TargetViewDelegate;
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.VisibilityDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate.BottomSheetDelegateManager;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate.BoundValuesDelegate;
+import com.github.anrimian.simplemusicplayer.ui.drawer.view.delegate.ChangeTitleDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate.ExpandViewDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate.TargetViewDelegate;
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate.VisibilityDelegate;
 import com.github.anrimian.simplemusicplayer.utils.views.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -63,7 +62,8 @@ import butterknife.ButterKnife;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
-import static com.github.anrimian.simplemusicplayer.utils.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.simplemusicplayer.utils.AndroidUtils.getColorFromAttr;
 
 /**
  * Created on 19.10.2017.
@@ -122,13 +122,16 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
     TextView tvCurrentComposition;
 
     @BindView(R.id.btn_infinite_play)
-    Button btnInfinitePlay;
+    ImageView btnInfinitePlay;
 
     @BindView(R.id.btn_random_play)
-    Button btnRandomPlay;
+    ImageView btnRandomPlay;
 
     @BindView(R.id.tv_played_time)
     TextView tvPlayedTime;
+
+    @BindView(R.id.tv_total_time)
+    TextView tvTotalTime;
 
     @BindView(R.id.pb_track_state)
     ProgressBar pbTrackState;
@@ -147,6 +150,12 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @BindView(R.id.btn_actions_menu)
     ImageView btnActionsMenu;
+
+    @BindView(R.id.play_actions_top_shadow)
+    View playActionsTopShadow;
+
+    @BindView(R.id.bottom_panel)
+    View bottomPanel;
 
     private BottomSheetBehavior<CoordinatorLayout> behavior;
 
@@ -239,7 +248,9 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new ChangeTitleDelegate(tvCurrentComposition, btnActionsMenu, ivSkipToPrevious))
                 .addDelegate(new BoundValuesDelegate(0.2f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
                 .addDelegate(new BoundValuesDelegate(0.1f, 0.2f, new VisibilityDelegate(bottomSheetBottomShadow)))
-                .addDelegate(new BoundValuesDelegate(0.9f, 1.0f, new VisibilityDelegate(rvPlayList)));
+                .addDelegate(new BoundValuesDelegate(0.9f, 1.0f, new VisibilityDelegate(rvPlayList)))
+                .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(pbTrackState)))
+                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(playActionsTopShadow)));
 
         behavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheet.setClickable(true);
@@ -278,13 +289,7 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
-        btnInfinitePlay.setOnClickListener(v -> presenter.onInfinitePlayingButtonClicked(!v.isSelected()));
-        btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(!v.isSelected()));
-        topBottomSheetPanel.setOnClickListener(v -> {
-            if (behavior.getState() == STATE_COLLAPSED) {
-                behavior.setState(STATE_EXPANDED);
-            }
-        });
+
 
         rvPlayList.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -296,6 +301,8 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked);
+        bottomPanel.setOnClickListener(v -> onBottomPanelClicked());
+        topBottomSheetPanel.setOnClickListener(v -> onTopPanelClicked());
     }
 
     @Override
@@ -355,6 +362,7 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showCurrentComposition(Composition composition) {
         tvCurrentComposition.setText(composition.getTitle());
+        tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
     }
 
     @Override
@@ -370,16 +378,26 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showInfinitePlayingButton(boolean active) {
-        btnInfinitePlay.setSelected(active);
-        btnInfinitePlay.setPressed(active);
-        btnInfinitePlay.setText(active? "INFINITE(ON)": "INFINITE(OFF)");
+        if (active) {
+            int selectedColor = getColorFromAttr(getContext(), R.attr.colorAccent);
+            btnInfinitePlay.setColorFilter(selectedColor);
+            btnInfinitePlay.setOnClickListener(v -> presenter.onDisableInfinitePlayingButtonClicked());
+        } else {
+            btnInfinitePlay.clearColorFilter();
+            btnInfinitePlay.setOnClickListener(v -> presenter.onEnableInfinitePlayingButtonClicked());
+        }
     }
 
     @Override
     public void showRandomPlayingButton(boolean active) {
-        btnRandomPlay.setSelected(active);
-        btnRandomPlay.setPressed(active);
-        btnRandomPlay.setText(active? "RANDOM(ON)": "RANDOM(OFF)");
+        if (active) {
+            int selectedColor = getColorFromAttr(getContext(), R.attr.colorAccent);
+            btnRandomPlay.setColorFilter(selectedColor);
+            btnRandomPlay.setOnClickListener(v -> presenter.onDisableRandomPlayingButtonClicked());
+        } else {
+            btnRandomPlay.clearColorFilter();
+            btnRandomPlay.setOnClickListener(v -> presenter.onEnableRandomPlayingButtonClicked());
+        }
     }
 
     @Override
@@ -398,6 +416,18 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         startActivity(Intent.createChooser(intent, getString(R.string.share)));
+    }
+
+    private void onBottomPanelClicked() {
+        if (behavior.getState() == STATE_EXPANDED) {
+            behavior.setState(STATE_COLLAPSED);
+        }
+    }
+
+    private void onTopPanelClicked() {
+        if (behavior.getState() == STATE_COLLAPSED) {
+            behavior.setState(STATE_EXPANDED);
+        }
     }
 
     private void setContentBottomHeight(int heightInPixels) {

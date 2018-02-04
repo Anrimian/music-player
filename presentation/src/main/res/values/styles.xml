@@ -24,9 +24,33 @@
         <item name="android:background">?actionBarItemBackground</item>
     </style>
 
+    <style name="Content.Button" parent="AppTheme">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:background">?actionBarItemBackground</item>
+    </style>
+
     <style name="Content.Button.Main" parent="AppTheme">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
+        <item name="android:padding">11dp</item>
+        <item name="android:foreground">?selectableItemBackground</item>
+    </style>
+
+    <style name="Content.Text" parent="@style/Base.TextAppearance.AppCompat.Body1">
+
+    </style>
+
+    <style name="Content.Text.Small">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="Content.Button.Main.Expanded">
+        <!--<item name="android:layout_width">48dp</item>-->
+        <!--<item name="android:layout_height">48dp</item>-->
+        <item name="android:padding">8dp</item>
+        <!--<item name="android:foreground">?selectableItemBackground</item>-->
     </style>
 
     <style name="Content.Image" parent="AppTheme">

@@ -21,6 +21,8 @@
     <string name="folder">Папка</string>
     <string name="content_description_menu">Открыть меню текущей композиции</string>
     <string name="share">Поделиться</string>
+    <string name="content_description_infinite_play">Проигрывать бесконечно</string>
+    <string name="content_description_shuffle">Перемешать композиции</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.error;
+package com.github.anrimian.simplemusicplayer.ui.common.error;
 
 import javax.annotation.Nonnull;
 

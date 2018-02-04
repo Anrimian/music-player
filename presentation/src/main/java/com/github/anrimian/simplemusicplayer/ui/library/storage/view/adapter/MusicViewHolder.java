@@ -14,7 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.text.TextUtils.isEmpty;
-import static com.github.anrimian.simplemusicplayer.utils.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 
 /**
  * Created on 31.10.2017.

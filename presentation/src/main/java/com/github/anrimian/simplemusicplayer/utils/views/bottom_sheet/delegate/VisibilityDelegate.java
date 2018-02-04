@@ -1,8 +1,10 @@
-package com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet;
+package com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate;
 
 import android.view.View;
 
 import static android.support.v4.view.ViewCompat.isLaidOut;
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
 /**
  * Created on 21.01.2018.
@@ -26,6 +28,7 @@ public class VisibilityDelegate implements BottomSheetDelegate {
     }
 
     private void makeVisible(float slideOffset) {
+        view.setVisibility(slideOffset == 0 ? INVISIBLE : VISIBLE);
         view.setAlpha(slideOffset);
     }
 }

@@ -48,7 +48,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        style="@style/Base.TextAppearance.AppCompat.Body1"
+        style="@style/Content.Text.Small"
         app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
         app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
         app:layout_constraintLeft_toRightOf="@id/music_icon_wrapper"
@@ -58,8 +58,6 @@
     <ImageView
         android:id="@+id/btn_actions_menu"
         style="@style/Toolbar.Button"
-        android:layout_marginRight="8dp"
-        android:layout_marginEnd="8dp"
         android:contentDescription="@string/content_description_menu"
         app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
         app:layout_constraintEnd_toEndOf="@+id/top_panel"
@@ -82,131 +80,141 @@
         app:layout_constraintTop_toBottomOf="@+id/top_panel"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottom"/>
+        app:layout_constraintBottom_toBottomOf="@+id/play_actions_top_shadow"/>
 
-    <TextView
-        android:id="@+id/bottom"
+    <View
+        android:id="@+id/play_actions_top_shadow"
         android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:background="#8cf1cf"
+        android:layout_height="6dp"
+        android:background="@drawable/bg_shadow_top"
+        android:layout_marginBottom="@dimen/content_vertical_margin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/bottom_panel" />
 
-    <Button
-        android:id="@+id/btn_infinite_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="Repeat"
+    <View
+        android:id="@+id/bottom_panel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/btn_random_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:text="Random"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/pb_track_state"/>
 
     <TextView
         android:id="@+id/tv_played_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="trackState"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pb_track_state" />
+        style="@style/Content.Text"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_random_play"
+        app:layout_constraintStart_toStartOf="@+id/btn_random_play"
+        tools:text="00:11"/>
+
+    <TextView
+        android:id="@+id/tv_total_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Content.Text"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_infinite_play"
+        app:layout_constraintEnd_toEndOf="@+id/btn_infinite_play"
+        tools:text="00:11"/>
 
     <ProgressBar
         android:id="@+id/pb_track_state"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_total_time"
+        app:layout_constraintStart_toStartOf="@+id/tv_played_time"
+        app:layout_constraintBottom_toTopOf="@+id/tv_total_time"/>
+
+    <ImageView
+        android:id="@+id/btn_infinite_play"
+        style="@style/Content.Button"
+        android:layout_marginBottom="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginRight="@dimen/content_horizontal_margin"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:contentDescription="@string/content_description_infinite_play"
+        app:srcCompat="@drawable/ic_repeat"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/btn_random_play"
+        style="@style/Content.Button"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginLeft="@dimen/content_horizontal_margin"
+        android:contentDescription="@string/content_description_shuffle"
+        app:srcCompat="@drawable/ic_shuffle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <ImageView
+        android:id="@+id/iv_skip_to_previous_expanded"
+        style="@style/Content.Button.Main.Expanded"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/bottom" />
+        android:contentDescription="@string/previous_track"
+        app:layout_constraintEnd_toStartOf="@+id/iv_play_pause_expanded"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/btn_random_play"
+        app:layout_constraintTop_toTopOf="@+id/iv_play_pause_expanded"
+        tools:srcCompat="@drawable/ic_skip_previous" />
+
+    <ImageView
+        android:id="@+id/iv_play_pause_expanded"
+        style="@style/Content.Button.Main.Expanded"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/play_stop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next_expanded"
+        app:layout_constraintStart_toEndOf="@+id/iv_skip_to_previous_expanded"
+        tools:srcCompat="@drawable/ic_pause" />
+
+    <ImageView
+        android:id="@+id/iv_skip_to_next_expanded"
+        style="@style/Content.Button.Main.Expanded"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/next_track"
+        app:layout_constraintEnd_toStartOf="@+id/btn_infinite_play"
+        app:layout_constraintStart_toEndOf="@+id/iv_play_pause_expanded"
+        app:layout_constraintTop_toTopOf="@+id/iv_play_pause_expanded"
+        tools:srcCompat="@drawable/ic_skip_next" />
 
     <ImageView
         android:id="@+id/iv_skip_to_previous"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
+        style="@style/Content.Button.Main"
         android:contentDescription="@string/previous_track"
-        android:padding="@dimen/margin_small"
-        android:foreground="?selectableItemBackground"
         app:srcCompat="@drawable/ic_skip_previous"
         app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
         app:layout_constraintTop_toTopOf="@+id/iv_play_pause"/>
 
     <ImageView
         android:id="@+id/iv_play_pause"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
+        style="@style/Content.Button.Main"
         android:contentDescription="@string/play_stop"
-        android:padding="@dimen/margin_small"
-        android:foreground="?selectableItemBackground"
         app:srcCompat="@drawable/ic_pause"
         app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
         app:layout_constraintTop_toTopOf="@+id/iv_skip_to_next"/>
 
     <ImageView
         android:id="@+id/iv_skip_to_next"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
-        android:layout_marginEnd="@dimen/margin_normal"
-        android:layout_marginRight="@dimen/margin_normal"
+        style="@style/Content.Button.Main"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:contentDescription="@string/next_track"
-        android:foreground="?selectableItemBackground"
-        android:padding="@dimen/margin_small"
         app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_skip_next"/>
-
-    <ImageView
-        android:id="@+id/iv_skip_to_previous_expanded"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
-        android:contentDescription="@string/previous_track"
-        android:padding="@dimen/margin_small"
-        tools:srcCompat="@drawable/ic_skip_previous"
-        app:layout_constraintEnd_toStartOf="@+id/iv_play_pause_expanded"
-        app:layout_constraintTop_toTopOf="@+id/iv_play_pause_expanded"/>
-
-    <ImageView
-        android:id="@+id/iv_play_pause_expanded"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:contentDescription="@string/play_stop"
-        android:padding="@dimen/margin_small"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/bottom"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pb_track_state"
-        tools:srcCompat="@drawable/ic_pause" />
-
-    <ImageView
-        android:id="@+id/iv_skip_to_next_expanded"
-        android:layout_width="@dimen/top_control_button_size"
-        android:layout_height="@dimen/top_control_button_size"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="@dimen/margin_normal"
-        android:layout_marginRight="@dimen/margin_normal"
-        android:contentDescription="@string/next_track"
-        android:padding="@dimen/margin_small"
-        app:layout_constraintStart_toEndOf="@+id/iv_play_pause_expanded"
-        app:layout_constraintTop_toTopOf="@+id/iv_play_pause_expanded"
-        tools:srcCompat="@drawable/ic_skip_next" />
-
+        app:srcCompat="@drawable/ic_skip_next" />
 
 </android.support.constraint.ConstraintLayout>

@@ -2,9 +2,9 @@ package com.github.anrimian.simplemusicplayer.di.app;
 
 import android.content.Context;
 
-import com.github.anrimian.simplemusicplayer.utils.error.parser.DefaultErrorParser;
-import com.github.anrimian.simplemusicplayer.utils.error.parser.ErrorParser;
-import com.github.anrimian.simplemusicplayer.utils.error.parser.StorageErrorParser;
+import com.github.anrimian.simplemusicplayer.ui.common.error.parser.DefaultErrorParser;
+import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.simplemusicplayer.ui.common.error.parser.StorageErrorParser;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;

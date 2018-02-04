@@ -1,8 +1,10 @@
-package com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet;
+package com.github.anrimian.simplemusicplayer.ui.drawer.view.delegate;
 
 import android.support.constraint.ConstraintLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate.BottomSheetDelegate;
 
 import static android.support.v4.view.ViewCompat.isLaidOut;
 

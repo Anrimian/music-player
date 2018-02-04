@@ -1,11 +1,11 @@
-package com.github.anrimian.simplemusicplayer.utils.error.parser;
+package com.github.anrimian.simplemusicplayer.ui.common.error.parser;
 
 import android.content.Context;
 import android.support.annotation.StringRes;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
-import com.github.anrimian.simplemusicplayer.utils.error.ErrorCommand;
+import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 
 /**
  * Created on 29.10.2017.

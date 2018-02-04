@@ -80,14 +80,24 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.skipToNext();
     }
 
-    void onInfinitePlayingButtonClicked(boolean enabled) {
-        musicPlayerInteractor.setInfinitePlayingEnabled(enabled);
-        getViewState().showInfinitePlayingButton(enabled);
+    void onEnableInfinitePlayingButtonClicked() {
+        musicPlayerInteractor.setInfinitePlayingEnabled(true);
+        getViewState().showInfinitePlayingButton(true);
     }
 
-    void onRandomPlayingButtonClicked(boolean enabled) {
-        musicPlayerInteractor.setRandomPlayingEnabled(enabled);
-        getViewState().showRandomPlayingButton(enabled);
+    void onDisableInfinitePlayingButtonClicked() {
+        musicPlayerInteractor.setInfinitePlayingEnabled(false);
+        getViewState().showInfinitePlayingButton(false);
+    }
+
+    void onEnableRandomPlayingButtonClicked() {
+        musicPlayerInteractor.setRandomPlayingEnabled(true);
+        getViewState().showRandomPlayingButton(true);
+    }
+
+    void onDisableRandomPlayingButtonClicked() {
+        musicPlayerInteractor.setRandomPlayingEnabled(false);
+        getViewState().showRandomPlayingButton(false);
     }
 
     void onShareCompositionButtonClicked() {

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--specific sizes-->
+    <dimen name="play_actions_panel_height">120dp</dimen>
+    <dimen name="bottom_sheet_height">60dp</dimen>
+
     <dimen name="text_size_xxsmall">12sp</dimen>
     <dimen name="text_size_xsmall">13sp</dimen>
     <dimen name="text_size_small">14sp</dimen>
@@ -19,12 +23,13 @@
     <dimen name="padding_small">8dp</dimen>
 
     <dimen name="top_control_button_size">48dp</dimen>
-    <dimen name="bottom_sheet_height">70dp</dimen>
 
     <dimen name="content_horizontal_margin">16dp</dimen>
     <dimen name="content_vertical_margin">16dp</dimen>
     <dimen name="content_margin">16dp</dimen>
     <dimen name="subtitle_height">48dp</dimen>
     <dimen name="music_icon_size">40dp</dimen>
+
+    <!--specific sizes-->
 
 </resources>

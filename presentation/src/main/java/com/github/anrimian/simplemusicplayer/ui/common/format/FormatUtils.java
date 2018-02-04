@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.format;
+package com.github.anrimian.simplemusicplayer.ui.common.format;
 
 import java.util.Locale;
 
@@ -25,8 +25,11 @@ public class FormatUtils {
         long minutes = MILLISECONDS.toMinutes(millis) - HOURS.toMinutes(hours);
         if (minutes != 0 || hours != 0) {
             sb.append(format(Locale.getDefault(), "%02d", minutes));
-            sb.append(":");
+
+        } else {
+            sb.append("00");
         }
+        sb.append(":");
 
         long seconds = MILLISECONDS.toSeconds(millis) - MINUTES.toSeconds(MILLISECONDS.toMinutes(millis));
         sb.append(format(Locale.getDefault(), "%02d", seconds));
