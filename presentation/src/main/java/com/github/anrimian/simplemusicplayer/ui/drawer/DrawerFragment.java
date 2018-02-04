@@ -246,8 +246,8 @@ public class DrawerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
                 .addDelegate(new ChangeTitleDelegate(tvCurrentComposition, btnActionsMenu, ivSkipToPrevious))
-                .addDelegate(new BoundValuesDelegate(0.2f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
-                .addDelegate(new BoundValuesDelegate(0.1f, 0.2f, new VisibilityDelegate(bottomSheetBottomShadow)))
+                .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
+                .addDelegate(new BoundValuesDelegate(0.4f, 0.6f, new VisibilityDelegate(bottomSheetBottomShadow)))
                 .addDelegate(new BoundValuesDelegate(0.9f, 1.0f, new VisibilityDelegate(rvPlayList)))
                 .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(pbTrackState)))
                 .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(playActionsTopShadow)));
