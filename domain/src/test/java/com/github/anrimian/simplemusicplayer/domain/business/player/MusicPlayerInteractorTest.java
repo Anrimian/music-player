@@ -342,4 +342,12 @@ public class MusicPlayerInteractorTest {
         playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY, PAUSE, PLAY);
     }
 
+    @Test
+    public void moveToComposition() throws Exception {
+        musicPlayerInteractor.startPlaying(fakeCompositions);
+
+        musicPlayerInteractor.moveToComposition(three);
+        verify(musicPlayerController).prepareToPlay(eq(three));
+    }
+
 }

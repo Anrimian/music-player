@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.ui.drawer.DrawerFragment;
+import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToMainScreen() {
-        startFragment(new DrawerFragment());
+        startFragment(new PlayerFragment());
     }
 
     private void startFragment(Fragment fragment) {

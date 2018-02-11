@@ -165,6 +165,15 @@ public class MusicPlayerInteractor {
                 .doOnNext(uiStateRepository::setTrackPosition);
     }
 
+    public void moveToComposition(Composition composition) {
+        currentPlayPosition = currentPlayList.indexOf(composition);
+        if (currentPlayPosition == -1) {
+            throw new IllegalStateException("can not find composition in play queue: " + composition);
+        }
+        currentCompositionSubject.onNext(composition);
+        prepareToPlayPosition(true);
+    }
+
     private void subscribeOnAudioFocusChanges() {
         systemMusicController.getAudioFocusObservable()
                 .subscribe(this::onAudioFocusChanged);
