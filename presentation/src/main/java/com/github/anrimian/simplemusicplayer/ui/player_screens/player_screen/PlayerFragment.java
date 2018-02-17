@@ -62,6 +62,7 @@ import butterknife.ButterKnife;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.simplemusicplayer.utils.AndroidUtils.getColorFromAttr;
 
@@ -369,10 +370,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showCurrentComposition(Composition composition, int position) {
-        tvCurrentComposition.setText(composition.getTitle());
+        tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
         rvPlayList.scrollToPosition(position);
-        playQueueAdapter.onCurrentCompositionChanged(composition, position);
+        playQueueAdapter.onCurrentCompositionChanged(composition);
     }
 
     @Override

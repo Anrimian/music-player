@@ -137,6 +137,10 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 ////                    Log.d("MusicProviderRepository", "track: " + track);
 //                    Log.d("MusicProviderRepository", "year: " + year);
 
+                    if (artist.equals("<unknown>")) {
+                        artist = null;
+                    }
+
                     Composition composition = new Composition();
                     //composition
                     composition.setArtist(artist);

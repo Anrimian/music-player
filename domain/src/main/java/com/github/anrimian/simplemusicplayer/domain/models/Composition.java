@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 public class Composition {
 
+    @Nullable
     private String artist;
     private String title;
     private String album;
@@ -33,11 +34,12 @@ public class Composition {
     @Nullable
     private Integer year;
 
+    @Nullable
     public String getArtist() {
         return artist;
     }
 
-    public void setArtist(String artist) {
+    public void setArtist(@Nullable String artist) {
         this.artist = artist;
     }
 

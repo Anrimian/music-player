@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter;
 
-import android.support.v7.util.DiffUtil;
+import android.support.v7.util.DiffUtil.DiffResult;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +9,13 @@ import android.view.ViewGroup;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
+import com.github.anrimian.simplemusicplayer.utils.views.recycler_view.SimpleDiffCallback;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
+
+import static android.support.v7.util.DiffUtil.calculateDiff;
 
 /**
  * Created on 31.10.2017.
@@ -66,13 +69,13 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         return musicList.size();
     }
 
-    public void onCurrentCompositionChanged(Composition composition, int position) {
+    public void onCurrentCompositionChanged(Composition composition) {
         int oldPosition = musicList.indexOf(currentComposition);
         currentComposition = composition;
         if (oldPosition != -1) {
             notifyItemChanged(oldPosition, CURRENT_COMPOSITION_CHANGED);
         }
-        notifyItemChanged(position, CURRENT_COMPOSITION_CHANGED);
+        notifyItemChanged(musicList.indexOf(composition), CURRENT_COMPOSITION_CHANGED);
 
     }
 
@@ -80,28 +83,8 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
-    public void updatePlayList(List<Composition> playList, List<Composition> newPlayList) {
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-            @Override
-            public int getOldListSize() {
-                return playList.size();
-            }
-
-            @Override
-            public int getNewListSize() {
-                return newPlayList.size();
-            }
-
-            @Override
-            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                return playList.get(oldItemPosition).equals(newPlayList.get(newItemPosition));
-            }
-
-            @Override
-            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                return playList.get(oldItemPosition).equals(newPlayList.get(newItemPosition));
-            }
-        });
+    public void updatePlayList(List<Composition> oldPlayList, List<Composition> newPlayList) {
+        DiffResult result = calculateDiff(new SimpleDiffCallback(oldPlayList, newPlayList), false);
         result.dispatchUpdatesTo(this);
     }
 }

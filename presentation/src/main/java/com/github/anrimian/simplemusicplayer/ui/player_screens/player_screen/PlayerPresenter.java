@@ -155,11 +155,17 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (currentCompositionDisposable != null) {
             currentCompositionDisposable.dispose();
             currentCompositionDisposable = null;
+            currentComposition = null;
+        }
+        if (trackStateDisposable != null) {
+            trackStateDisposable.dispose();
+            trackStateDisposable = null;
         }
 
+        List<Composition> oldPlayList = new ArrayList<>(currentPlayList);
         currentPlayList.clear();
         currentPlayList.addAll(newPlayList);
-        getViewState().updatePlayList(currentPlayList, newPlayList);
+        getViewState().updatePlayList(oldPlayList, currentPlayList);
 
         subscribeOnCurrentCompositionChanging();
     }

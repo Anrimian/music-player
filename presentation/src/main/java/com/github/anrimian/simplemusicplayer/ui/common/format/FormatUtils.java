@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.common.format;
 
+import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+
 import java.util.Locale;
 
 import static java.lang.String.format;
@@ -12,6 +14,11 @@ import static java.util.concurrent.TimeUnit.MINUTES;
  */
 
 public class FormatUtils {
+
+    public static String formatCompositionName(Composition composition) {
+        String name = composition.getDisplayName();
+        return name.substring(0, name.lastIndexOf('.'));
+    }
 
     public static String formatMilliseconds(long millis) {
         StringBuilder sb = new StringBuilder();
