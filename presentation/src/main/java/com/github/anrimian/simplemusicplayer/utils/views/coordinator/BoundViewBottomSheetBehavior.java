@@ -10,19 +10,19 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Created on 21.10.2017.
+ * Created on 25.02.2018.
  */
 
-public class HidingViewWithBottomSheetBehavior extends AppBarLayout.ScrollingViewBehavior {
+public class BoundViewBottomSheetBehavior extends AppBarLayout.ScrollingViewBehavior {
 
     private static final float NOT_DEFINED = Float.MAX_VALUE;
 
     private float childStartY = NOT_DEFINED;
 
-    public HidingViewWithBottomSheetBehavior() {
+    public BoundViewBottomSheetBehavior() {
     }
 
-    public HidingViewWithBottomSheetBehavior(Context context, AttributeSet attrs) {
+    public BoundViewBottomSheetBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -43,7 +43,11 @@ public class HidingViewWithBottomSheetBehavior extends AppBarLayout.ScrollingVie
             float expandY = parentHeight - sheetHeight;
             float deltaY = collapseY - expandY;
 
-            float slideOffset = (parentHeight - peekHeight - sheetY) / deltaY;
+            float slideOffset = 1 - (parentHeight - peekHeight - sheetY) / deltaY;
+
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) child.getLayoutParams();
+            params.height = parentHeight - sheetHeight;
+            child.setLayoutParams(params);
 
 //            child.setAlpha(1 - slideOffset);
 

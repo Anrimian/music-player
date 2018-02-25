@@ -2,124 +2,96 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <View
         android:id="@+id/top_panel"
         android:layout_width="0dp"
         android:layout_height="@dimen/bottom_sheet_height"
+        app:layout_constraintBottom_toTopOf="@id/pb_track_state"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintRight_toRightOf="parent" />
 
     <FrameLayout
         android:id="@+id/music_icon_wrapper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="@dimen/content_horizontal_margin"
         android:layout_marginLeft="@dimen/content_horizontal_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/rv_playlist">
+        android:layout_marginRight="@dimen/content_horizontal_margin"
+        app:layout_constraintBottom_toBottomOf="@+id/top_panel"
+        app:layout_constraintStart_toStartOf="@+id/top_panel"
+        app:layout_constraintTop_toTopOf="@+id/top_panel">
 
         <ImageView
             android:id="@+id/iv_music_icon"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:padding="@dimen/padding_small"
             android:background="@drawable/bg_folder_round"
             android:contentDescription="@string/folder"
+            android:padding="@dimen/padding_small"
             app:srcCompat="@drawable/ic_music_circle" />
 
     </FrameLayout>
 
     <TextView
         android:id="@+id/tv_current_composition"
+        style="@style/Content.Text.Small"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:ellipsize="end"
-        android:lines="2"
-        android:gravity="center_vertical"
-        android:layout_marginRight="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
         android:layout_marginStart="16dp"
-        style="@style/Content.Text.Small"
-        app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="2"
+        app:layout_constraintBottom_toBottomOf="@+id/top_panel"
         app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
         app:layout_constraintLeft_toRightOf="@id/music_icon_wrapper"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/top_panel"
         tools:text="testtesttststststtst" />
 
     <ImageView
         android:id="@+id/btn_actions_menu"
         style="@style/Toolbar.Button"
         android:contentDescription="@string/content_description_menu"
-        app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
+        app:layout_constraintBottom_toBottomOf="@id/top_panel"
         app:layout_constraintEnd_toEndOf="@+id/top_panel"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_dots_vertical" />
 
     <View
-        android:id="@+id/bottom_sheet_bottom_shadow"
-        android:layout_width="0dp"
-        android:layout_height="7dp"
-        android:background="@drawable/bg_shadow_bottom"
-        app:layout_constraintLeft_toLeftOf="@id/top_panel"
-        app:layout_constraintRight_toRightOf="@id/top_panel"
-        app:layout_constraintTop_toBottomOf="@id/top_panel" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_playlist"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/top_panel"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/play_actions_top_shadow"/>
-
-    <View
-        android:id="@+id/play_actions_top_shadow"
-        android:layout_width="0dp"
-        android:layout_height="6dp"
-        android:background="@drawable/bg_shadow_top"
-        android:layout_marginBottom="@dimen/content_vertical_margin"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_panel" />
-
-    <View
         android:id="@+id/bottom_panel"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/pb_track_state"/>
+        app:layout_constraintTop_toTopOf="@+id/pb_track_state" />
 
     <TextView
         android:id="@+id/tv_played_time"
+        style="@style/Content.Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Content.Text"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_random_play"
         app:layout_constraintStart_toStartOf="@+id/btn_random_play"
-        tools:text="00:11"/>
+        tools:text="00:11" />
 
     <TextView
         android:id="@+id/tv_total_time"
+        style="@style/Content.Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Content.Text"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_infinite_play"
         app:layout_constraintEnd_toEndOf="@+id/btn_infinite_play"
-        tools:text="00:11"/>
+        tools:text="00:11" />
 
     <ProgressBar
         android:id="@+id/pb_track_state"
@@ -127,35 +99,35 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_total_time"
         app:layout_constraintEnd_toEndOf="@+id/tv_total_time"
-        app:layout_constraintStart_toStartOf="@+id/tv_played_time"
-        app:layout_constraintBottom_toTopOf="@+id/tv_total_time"/>
+        app:layout_constraintStart_toStartOf="@+id/tv_played_time" />
 
     <ImageView
         android:id="@+id/btn_infinite_play"
         style="@style/Content.Button"
         android:layout_marginBottom="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="@dimen/content_horizontal_margin"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:contentDescription="@string/content_description_infinite_play"
-        app:srcCompat="@drawable/ic_repeat"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_repeat" />
 
     <ImageView
         android:id="@+id/btn_random_play"
         style="@style/Content.Button"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginLeft="@dimen/content_horizontal_margin"
         android:layout_marginRight="8dp"
         android:layout_marginStart="@dimen/content_horizontal_margin"
-        android:layout_marginLeft="@dimen/content_horizontal_margin"
         android:contentDescription="@string/content_description_shuffle"
-        app:srcCompat="@drawable/ic_shuffle"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_shuffle" />
 
     <ImageView
         android:id="@+id/iv_skip_to_previous_expanded"
@@ -194,17 +166,17 @@
         android:id="@+id/iv_skip_to_previous"
         style="@style/Content.Button.Main"
         android:contentDescription="@string/previous_track"
-        app:srcCompat="@drawable/ic_skip_previous"
         app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
-        app:layout_constraintTop_toTopOf="@+id/iv_play_pause"/>
+        app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
+        app:srcCompat="@drawable/ic_skip_previous" />
 
     <ImageView
         android:id="@+id/iv_play_pause"
         style="@style/Content.Button.Main"
         android:contentDescription="@string/play_stop"
-        app:srcCompat="@drawable/ic_pause"
         app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
-        app:layout_constraintTop_toTopOf="@+id/iv_skip_to_next"/>
+        app:layout_constraintTop_toTopOf="@+id/iv_skip_to_next"
+        app:srcCompat="@drawable/ic_pause" />
 
     <ImageView
         android:id="@+id/iv_skip_to_next"
@@ -212,7 +184,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:contentDescription="@string/next_track"
-        app:layout_constraintBottom_toTopOf="@+id/rv_playlist"
+        app:layout_constraintBottom_toBottomOf="@id/top_panel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_skip_next" />
