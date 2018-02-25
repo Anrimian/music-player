@@ -42,6 +42,11 @@
 
     </style>
 
+    <style name="Content.Text.Subtitle" parent="Content.Text">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="Content.Text.Small">
         <item name="android:textSize">13sp</item>
     </style>
@@ -58,10 +63,28 @@
         <item name="android:layout_height">48dp</item>
     </style>
 
+    <style name="Content.Image.Small" parent="Content.Image">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+    </style>
+
     <style name="ToolbarStyle" parent="AppTheme">
         <item name="colorControlNormal">?android:attr/textColorPrimaryInverse</item>
         <item name="android:editTextColor">?android:attr/textColorPrimaryInverse</item>
         <item name="editTextColor">?android:attr/textColorPrimaryInverse</item>
     </style>
 
+    <style name="Divider" parent="AppTheme">
+        <item name="android:background">?android:attr/dividerHorizontal</item>
+    </style>
+
+    <style name="Divider.Horizontal" parent="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1px</item>
+    </style>
+
+    <style name="Divider.Vertical" parent="Divider">
+        <item name="android:layout_width">1px</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
 </resources>

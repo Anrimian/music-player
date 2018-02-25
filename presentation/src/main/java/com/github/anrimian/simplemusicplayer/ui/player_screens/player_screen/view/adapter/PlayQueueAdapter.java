@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter;
 
-import android.support.v7.util.DiffUtil.DiffResult;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,7 +84,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     }
 
     public void updatePlayList(List<Composition> oldPlayList, List<Composition> newPlayList) {
-        DiffResult result = calculateDiff(new SimpleDiffCallback(oldPlayList, newPlayList), false);
+        DiffUtil.DiffResult result = calculateDiff(new SimpleDiffCallback(oldPlayList, newPlayList), false);
         result.dispatchUpdatesTo(this);
     }
 }

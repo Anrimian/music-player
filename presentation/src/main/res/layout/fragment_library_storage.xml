@@ -47,5 +47,14 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:background="@drawable/bg_shadow_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_container" />
+
 </android.support.constraint.ConstraintLayout>
 
