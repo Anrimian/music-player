@@ -14,7 +14,14 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = { AppModule.class, SchedulerModule.class, ErrorModule.class, MusicModule.class, DbModule.class })
+@Component(modules = {
+        AppModule.class,
+        SchedulerModule.class,
+        ErrorModule.class,
+        MusicModule.class,
+        DbModule.class,
+        StorageModule.class
+})
 public interface AppComponent {
 
     LibraryComponent libraryComponent(LibraryModule libraryModule);
