@@ -1,10 +1,13 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
+import android.Manifest;
 import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.GrantPermissionRule;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
@@ -14,6 +17,9 @@ import io.reactivex.observers.TestObserver;
 import static org.junit.Assert.*;
 
 public class TestFileObserverTest {
+
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
     private File testDirectory;
     private TestFileObserver testFileObserver;
