@@ -51,16 +51,14 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     @Override
     public void onBindViewHolder(MusicViewHolder holder, int position, List<Object> payloads) {
-        boolean updated = false;
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position);
+        }
         for (Object payload: payloads) {
             if (payload == CURRENT_COMPOSITION_CHANGED) {
                 Composition composition = musicList.get(position);
                 holder.showAsPlayingComposition(composition.equals(currentComposition));
-                updated = true;
             }
-        }
-        if (!updated) {
-            super.onBindViewHolder(holder, position, payloads);
         }
     }
 

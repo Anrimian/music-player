@@ -3,11 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/data/data.iml" filepath="$PROJECT_DIR$/data/data.iml" />
-      <module fileurl="file://C:\Users\VLADISLAV\StudioProjects\simple-music-player\data\data.iml" filepath="C:\Users\VLADISLAV\StudioProjects\simple-music-player\data\data.iml" />
       <module fileurl="file://$PROJECT_DIR$/domain/domain.iml" filepath="$PROJECT_DIR$/domain/domain.iml" />
-      <module fileurl="file://C:\Users\VLADISLAV\StudioProjects\simple-music-player\domain\domain.iml" filepath="C:\Users\VLADISLAV\StudioProjects\simple-music-player\domain\domain.iml" />
       <module fileurl="file://$PROJECT_DIR$/presentation/presentation.iml" filepath="$PROJECT_DIR$/presentation/presentation.iml" />
-      <module fileurl="file://C:\Users\VLADISLAV\StudioProjects\simple-music-player\presentation\presentation.iml" filepath="C:\Users\VLADISLAV\StudioProjects\simple-music-player\presentation\presentation.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/simple-music-player.iml" filepath="$PROJECT_DIR$/.idea/simple-music-player.iml" />
       <module fileurl="file://C:\Users\VLADISLAV\StudioProjects\simple-music-player\simple-music-player.iml" filepath="C:\Users\VLADISLAV\StudioProjects\simple-music-player\simple-music-player.iml" />
     </modules>
