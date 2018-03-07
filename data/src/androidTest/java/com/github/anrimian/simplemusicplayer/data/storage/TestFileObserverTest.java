@@ -45,6 +45,6 @@ public class TestFileObserverTest {
 
     @After
     public void tearDown() throws Exception {
-//        testDirectory.delete();
+        testDirectory.delete();
     }
 }
