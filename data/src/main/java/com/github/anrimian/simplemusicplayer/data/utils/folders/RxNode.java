@@ -1,22 +1,8 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import by.mrsoft.mrdoc.domain.models.common.change.Change;
-import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
-
-import static by.mrsoft.mrdoc.domain.models.common.change.ChangeType.DELETED;
-import static by.mrsoft.mrdoc.domain.models.common.change.ChangeType.MODIFY;
-import static by.mrsoft.mrdoc.domain.models.common.change.ChangeType.NEW;
-
 public class RxNode<K, T> {
 
-    private final PublishSubject<Change<RxNode<K, T>>> changeSubject = PublishSubject.create();
+    /*private final PublishSubject<Change<RxNode<K, T>>> changeSubject = PublishSubject.create();
     private final List<RxNode<K, T>> nodes = new LinkedList<>();
 
     @Nonnull
@@ -103,7 +89,7 @@ public class RxNode<K, T> {
         if (parent != null) {
             parent.updateBranch();
         }
-    }
+    }*/
 
 
 }

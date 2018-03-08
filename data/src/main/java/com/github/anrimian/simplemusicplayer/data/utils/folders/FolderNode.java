@@ -1,11 +1,9 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
-import javax.annotation.Nonnull;
-
 @SuppressWarnings("NullableProblems")
 public class FolderNode {
 
-    @Nonnull
+/*    @Nonnull
     private Folder folder;
 
     private boolean hasChildren;
@@ -40,5 +38,5 @@ public class FolderNode {
     @Override
     public int hashCode() {
         return folder.hashCode();
-    }
+    }*/
 }

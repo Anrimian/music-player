@@ -249,7 +249,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
                 .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
 //                .addDelegate(new VisibilityDelegate(rvPlayList))
-                .addDelegate(new ReverseDelegate(new VisibilityDelegate(fragmentContainer)))
+                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
                 .addDelegate(new ChangeTitleDelegate(tvCurrentComposition, btnActionsMenu, ivSkipToPrevious))
                 .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))

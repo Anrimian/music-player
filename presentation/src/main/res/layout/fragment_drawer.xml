@@ -40,11 +40,22 @@
                 android:background="@drawable/bg_shadow_top"
                 app:layout_anchor="@id/bottom_sheet"/>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_playlist"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="com.github.anrimian.simplemusicplayer.utils.views.coordinator.BoundViewBottomSheetBehavior"/>
+                android:orientation="vertical"
+                app:layout_behavior="com.github.anrimian.simplemusicplayer.utils.views.coordinator.BoundViewBottomSheetBehavior">
+
+                <include
+                    android:id="@+id/play_queue_toolbar"
+                    layout="@layout/partial_toolbar"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_playlist"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </LinearLayout>
 
             <android.support.design.widget.CoordinatorLayout
                 android:id="@+id/bottom_sheet"

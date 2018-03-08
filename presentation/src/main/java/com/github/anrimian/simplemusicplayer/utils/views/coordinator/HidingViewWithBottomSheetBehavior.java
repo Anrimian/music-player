@@ -1,10 +1,6 @@
 package com.github.anrimian.simplemusicplayer.utils.views.coordinator;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
@@ -13,11 +9,11 @@ import android.view.View;
  * Created on 21.10.2017.
  */
 
-public class HidingViewWithBottomSheetBehavior extends AppBarLayout.ScrollingViewBehavior {
+public class HidingViewWithBottomSheetBehavior extends LinkedBottomSheetBehavior {
 
-    private static final float NOT_DEFINED = Float.MAX_VALUE;
+    private static final float UNDEFINED = Float.MAX_VALUE;
 
-    private float childStartY = NOT_DEFINED;
+    private float childStartY = UNDEFINED;
 
     public HidingViewWithBottomSheetBehavior() {
     }
@@ -27,44 +23,16 @@ public class HidingViewWithBottomSheetBehavior extends AppBarLayout.ScrollingVie
     }
 
     @Override
-    public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-        return getBottomSheetBehavior(dependency) != null;
-    }
-
-    @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        BottomSheetBehavior bottomSheetBehavior = getBottomSheetBehavior(dependency);
-        if (bottomSheetBehavior != null) {
-            int parentHeight = parent.getMeasuredHeight();
-            float sheetY = dependency.getY();
-            int peekHeight = bottomSheetBehavior.getPeekHeight();
-            int sheetHeight = dependency.getHeight();
-            float collapseY = parentHeight - peekHeight;
-            float expandY = parentHeight - sheetHeight;
-            float deltaY = collapseY - expandY;
-
-            float slideOffset = (parentHeight - peekHeight - sheetY) / deltaY;
-
-//            child.setAlpha(1 - slideOffset);
-
-            if (childStartY == NOT_DEFINED) {
-                childStartY = child.getY();
-            }
-
-            int childHeight = child.getMeasuredHeight();
-            float childY = childStartY - (childHeight * slideOffset);
-            child.setY(childY);
+    protected void onDependentViewChanged(CoordinatorLayout parent,
+                                          View child,
+                                          View dependency,
+                                          float slideOffset) {
+        if (childStartY == UNDEFINED) {
+            childStartY = child.getY();
         }
-        return true;
-    }
 
-    @Nullable
-    private BottomSheetBehavior getBottomSheetBehavior(@NonNull View view) {
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) view.getLayoutParams();
-        CoordinatorLayout.Behavior behavior = params.getBehavior();
-        if (behavior instanceof BottomSheetBehavior) {
-            return (BottomSheetBehavior) behavior;
-        }
-        return null;
+        int childHeight = child.getMeasuredHeight();
+        float childY = childStartY - (childHeight * slideOffset);
+        child.setY(childY);
     }
 }

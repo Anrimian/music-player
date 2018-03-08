@@ -1,19 +1,8 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import by.mrsoft.mrdoc.data.database.dao.folders.FolderDataSource;
-import by.mrsoft.mrdoc.data.models.mappers.folder.FolderTreeMapper;
-import by.mrsoft.mrdoc.domain.models.common.change.Change;
-import by.mrsoft.mrdoc.domain.models.folder.Folder;
-import io.reactivex.Single;
-
 public class FolderTree {
 
-    private static final Long ROOT_NODE_ID = 0L;
+    /*private static final Long ROOT_NODE_ID = 0L;
 
     private final FolderTreeMapper folderTreeMapper = new FolderTreeMapper();
     private final FolderDataSource folderDataSource;
@@ -150,5 +139,5 @@ public class FolderTree {
             }
         }
         return null;
-    }
+    }*/
 }
