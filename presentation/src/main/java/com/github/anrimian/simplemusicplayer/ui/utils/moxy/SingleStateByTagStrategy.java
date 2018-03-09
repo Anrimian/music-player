@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.moxy;
+package com.github.anrimian.simplemusicplayer.ui.utils.moxy;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.ViewCommand;

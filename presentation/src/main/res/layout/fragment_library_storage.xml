@@ -41,7 +41,7 @@
             app:layout_anchor="@id/recycler_view"
             app:layout_anchorGravity="bottom|right|end"
             app:srcCompat="@drawable/ic_play"
-            app:layout_behavior="com.github.anrimian.simplemusicplayer.utils.views.coordinator.ScrollAwareFABBehavior"/>
+            app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.ScrollAwareFABBehavior"/>
 
         <include layout="@layout/partial_progress_state"/>
 

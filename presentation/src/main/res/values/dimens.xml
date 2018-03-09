@@ -28,7 +28,8 @@
     <dimen name="content_vertical_margin">16dp</dimen>
     <dimen name="content_margin">16dp</dimen>
     <dimen name="subtitle_height">48dp</dimen>
-    <dimen name="music_icon_size">40dp</dimen>
+    <dimen name="music_icon_size">48dp</dimen>
+    <dimen name="target_title_text_size">15sp</dimen>
 
     <!--specific sizes-->
 

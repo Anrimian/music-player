@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
-import com.github.anrimian.simplemusicplayer.utils.views.recycler_view.SimpleDiffCallback;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.SimpleDiffCallback;
 
 import java.util.List;
 

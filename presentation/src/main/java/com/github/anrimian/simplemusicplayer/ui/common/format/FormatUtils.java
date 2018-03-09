@@ -1,9 +1,13 @@
 package com.github.anrimian.simplemusicplayer.ui.common.format;
 
+import android.content.Context;
+
+import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 
 import java.util.Locale;
 
+import static android.text.TextUtils.isEmpty;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -18,6 +22,18 @@ public class FormatUtils {
     public static String formatCompositionName(Composition composition) {
         String name = composition.getDisplayName();
         return name.substring(0, name.lastIndexOf('.'));
+    }
+
+    public static StringBuilder formatCompositionAuthor(Composition composition, Context context) {
+        String author = composition.getArtist();
+
+        StringBuilder sb = new StringBuilder();
+        if (!isEmpty(author)) {
+            sb.append(author);
+        } else {
+            sb.append(context.getString(R.string.unknown_author));
+        }
+        return sb;
     }
 
     public static String formatMilliseconds(long millis) {

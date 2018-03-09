@@ -40,6 +40,7 @@ import static android.support.v4.media.session.PlaybackStateCompat.Builder;
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED;
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING;
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED;
+import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
@@ -238,7 +239,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 //                        BitmapFactory.decodeResource(getResources(), track.getBitmapResId()))
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, composition.getTitle())
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, composition.getAlbum())
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, composition.getArtist())
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.getDuration())
                 .build();
         mediaSession.setMetadata(metadata);

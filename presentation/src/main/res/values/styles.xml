@@ -34,7 +34,7 @@
     <style name="Content.Button.Main" parent="AppTheme">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="android:padding">11dp</item>
+        <item name="android:padding">10dp</item>
         <item name="android:foreground">?selectableItemBackground</item>
     </style>
 
@@ -52,9 +52,9 @@
     </style>
 
     <style name="Content.Button.Main.Expanded">
-        <!--<item name="android:layout_width">48dp</item>-->
-        <!--<item name="android:layout_height">48dp</item>-->
-        <item name="android:padding">8dp</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">7dp</item>
         <!--<item name="android:foreground">?selectableItemBackground</item>-->
     </style>
 

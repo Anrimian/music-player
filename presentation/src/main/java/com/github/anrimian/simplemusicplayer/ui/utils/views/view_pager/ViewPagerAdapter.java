@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.views.view_pager;
+package com.github.anrimian.simplemusicplayer.ui.utils.views.view_pager;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

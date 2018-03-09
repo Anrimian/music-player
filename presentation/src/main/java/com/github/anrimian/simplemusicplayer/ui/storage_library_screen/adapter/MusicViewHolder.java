@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 
@@ -51,14 +51,7 @@ class MusicViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void showAdditionalInfo() {
-        String author = composition.getArtist();
-
-        StringBuilder sb = new StringBuilder();
-        if (!isEmpty(author)) {
-            sb.append(author);
-        } else {
-            sb.append(getString(R.string.unknown_author));
-        }
+        StringBuilder sb = formatCompositionAuthor(composition, getContext());
         sb.append(" ● ");//TODO split problem
         sb.append(formatMilliseconds(composition.getDuration()));
         tvAdditionalInfo.setText(sb.toString());

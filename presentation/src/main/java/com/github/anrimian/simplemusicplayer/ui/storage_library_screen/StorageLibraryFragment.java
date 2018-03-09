@@ -23,7 +23,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.wrappers.HeaderViewWrapper;
-import com.github.anrimian.simplemusicplayer.utils.fragments.BackButtonListener;
+import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;

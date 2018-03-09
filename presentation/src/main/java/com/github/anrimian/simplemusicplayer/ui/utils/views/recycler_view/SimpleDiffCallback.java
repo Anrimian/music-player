@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.views.recycler_view;
+package com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view;
 
 import android.support.v7.util.DiffUtil;
 

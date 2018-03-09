@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet;
 
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate.BottomSheetDelegate;
-import com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate.BoundValuesDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 
 import org.junit.Before;
 import org.junit.Test;

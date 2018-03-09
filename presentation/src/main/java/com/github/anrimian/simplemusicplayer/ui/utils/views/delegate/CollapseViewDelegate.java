@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.views.bottom_sheet.delegate;
+package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
 
 import android.util.Log;
 import android.view.View;

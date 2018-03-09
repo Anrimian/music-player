@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.views.coordinator;
+package com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

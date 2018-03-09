@@ -23,7 +23,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_behavior="com.github.anrimian.simplemusicplayer.utils.views.coordinator.HidingViewWithBottomSheetBehavior"/>
+                app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.HidingViewWithBottomSheetBehavior"/>
 
             <FrameLayout
                 android:id="@+id/drawer_fragment_container"
@@ -31,7 +31,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="@dimen/bottom_sheet_height"
                 app:layout_anchor="@id/toolbar"
-                app:layout_behavior="com.github.anrimian.simplemusicplayer.utils.views.coordinator.LinkedCoordinateViewBehavior"/>
+                app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.LinkedCoordinateViewBehavior"/>
 
             <View
                 android:id="@+id/bottom_sheet_top_shadow"
@@ -44,7 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                app:layout_behavior="com.github.anrimian.simplemusicplayer.utils.views.coordinator.BoundViewBottomSheetBehavior">
+                app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.BoundViewBottomSheetBehavior">
 
                 <include
                     android:id="@+id/play_queue_toolbar"

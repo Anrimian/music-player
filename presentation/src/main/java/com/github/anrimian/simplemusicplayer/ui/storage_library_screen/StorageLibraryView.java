@@ -6,7 +6,7 @@ import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.simplemusicplayer.utils.moxy.SingleStateByTagStrategy;
+import com.github.anrimian.simplemusicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
 

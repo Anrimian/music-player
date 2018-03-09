@@ -1,12 +1,8 @@
-package com.github.anrimian.simplemusicplayer.utils.fragments;
+package com.github.anrimian.simplemusicplayer.ui.utils.fragments;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
 import android.widget.FrameLayout;
-
-import com.github.anrimian.simplemusicplayer.R;
 
 /**
  * Created on 20.10.2017.
