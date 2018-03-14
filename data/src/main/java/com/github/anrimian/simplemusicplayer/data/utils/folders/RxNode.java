@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
 public class RxNode<K, T> {
 
-    /*private final PublishSubject<Change<RxNode<K, T>>> changeSubject = PublishSubject.create();
+    /*    private final PublishSubject<Change<RxNode<K, T>>> changeSubject = PublishSubject.create();
     private final List<RxNode<K, T>> nodes = new LinkedList<>();
 
     @Nonnull
@@ -44,7 +44,7 @@ public class RxNode<K, T> {
     public void addNode(RxNode<K, T> node) {
         nodes.add(node);
         changeSubject.onNext(new Change<>(NEW, node));
-        updateBranch();
+        notifyNodeUpdated(this);
     }
 
     public void setData(T data) {
@@ -62,7 +62,7 @@ public class RxNode<K, T> {
     public void removeNode(RxNode<K, T> node) {
         nodes.remove(node);
         changeSubject.onNext(new Change<>(DELETED, node));
-        updateBranch();
+        notifyNodeUpdated(this);
     }
 
     @Nullable
@@ -83,12 +83,13 @@ public class RxNode<K, T> {
         }
     }
 
-    private void updateBranch() {
-        changeSubject.onNext(new Change<>(MODIFY, this));
-        RxNode<K, T> parent = getParent();
-        if (parent != null) {
-            parent.updateBranch();
-        }
+    @Override
+    public String toString() {
+        return "RxNode{" +
+                "nodes=" + nodes +
+                ", key=" + key +
+                ", data=" + data +
+                '}';
     }*/
 
 
