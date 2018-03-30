@@ -2,15 +2,22 @@ package com.github.anrimian.simplemusicplayer.ui.main;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.FileObserver;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.data.storage.TestFileObserver;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (hasFilePermissions()) {
             goToMainScreen();
+            testFolderObserver();
         } else {
             goToStartScreen();
         }
@@ -61,5 +69,36 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.main_activity_container, fragment)
                     .commit();
         }
+    }
+
+    private TestFileObserver testFileObserver1;
+    private TestFileObserver testFileObserver2;
+
+    private FileObserver fileObserver;
+
+    private void testFolderObserver() {
+        File root = Environment.getExternalStorageDirectory();
+        File testDirectory = new File(root, "/test_directory/");
+        testDirectory.mkdirs();
+        testFileObserver1 = new TestFileObserver(testDirectory.getPath());
+        testFileObserver1.getEventObservable().subscribe();
+        testFileObserver2 = new TestFileObserver(root + "/test_directory/");
+        testFileObserver2.getEventObservable().subscribe();
+
+        fileObserver = new FileObserver(testDirectory.getPath()) {
+            @Override
+            public void onEvent(int event, @Nullable String path) {
+                System.out.println("event: " + event);
+            }
+        };
+
+        File file = new File(testDirectory, "test_file");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        testDirectory.delete();
+//        file.delete();
     }
 }
