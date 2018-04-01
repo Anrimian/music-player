@@ -55,26 +55,36 @@ dependencies {
     implementation project(':data')
     def presentationDependencies = rootProject.ext.presentationDependencies
     def presentationTestDependencies = rootProject.ext.presentationTestDependencies
+
     implementation presentationDependencies.supportLibrary
     implementation presentationDependencies.supportLibraryDesign
     implementation presentationDependencies.cardView
     implementation presentationDependencies.recyclerView
     implementation presentationDependencies.constraintLayout
     implementation presentationDependencies.supportMedia
+
     implementation presentationDependencies.rxAndroid
     implementation presentationDependencies.rxPermissions
+
     implementation presentationDependencies.acra
+
     implementation presentationDependencies.moxy
     annotationProcessor presentationDependencies.moxyCompiler
+
     implementation presentationDependencies.butterKnife
     annotationProcessor presentationDependencies.butterKnifeCompiler
+
     implementation presentationDependencies.dagger
     annotationProcessor presentationDependencies.daggerCompiler
+
     implementation presentationDependencies.room
     annotationProcessor presentationDependencies.roomCompiler
+
     compileOnly presentationDependencies.javaxAnnotation
+
     testImplementation presentationTestDependencies.junit
     testImplementation presentationTestDependencies.mockito
+
     androidTestImplementation presentationTestDependencies.dexmaker
     androidTestImplementation presentationTestDependencies.dexmakerMockito
     androidTestImplementation presentationTestDependencies.mockito

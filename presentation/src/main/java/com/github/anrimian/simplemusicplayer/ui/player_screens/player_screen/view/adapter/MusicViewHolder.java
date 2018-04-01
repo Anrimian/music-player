@@ -56,6 +56,7 @@ class MusicViewHolder extends RecyclerView.ViewHolder {
         int alpha = show? 20: 0;
         int color = setAlphaComponent(getColorFromAttr(getContext(), R.attr.colorPrimary), alpha);
         clickableItem.setBackgroundColor(color);
+        clickableItem.setClickable(!show);
     }
 
     private void showAdditionalInfo() {

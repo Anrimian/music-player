@@ -2,8 +2,9 @@ package com.github.anrimian.simplemusicplayer.data.storage;
 
 import android.Manifest;
 import android.os.Environment;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
+
+import com.github.anrimian.simplemusicplayer.data.utils.folders.RecursiveFileObserver;
 
 import org.junit.After;
 import org.junit.Before;
@@ -14,8 +15,6 @@ import java.io.File;
 
 import io.reactivex.observers.TestObserver;
 
-import static org.junit.Assert.*;
-
 public class TestFileObserverTest {
 
     @Rule
@@ -25,6 +24,8 @@ public class TestFileObserverTest {
     private TestFileObserver testFileObserver;
 
     private TestObserver<FileObserverEvent> fileTestObserver;
+
+    private RecursiveFileObserver observer;
 
     @Before
     public void setUp() throws Exception {
@@ -41,6 +42,11 @@ public class TestFileObserverTest {
         fileTestObserver.assertValue(event -> event.getAction() == EventType.CREATE);
         file.delete();
         fileTestObserver.assertValue(event -> event.getAction() == EventType.DELETE);
+    }
+
+    @Test
+    public void recursiveObserverTest() throws Exception {
+
     }
 
     @After

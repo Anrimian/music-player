@@ -8,16 +8,17 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.data.storage.TestFileObserver;
+import com.github.anrimian.simplemusicplayer.data.utils.folders.RecursiveFileObserver;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (hasFilePermissions()) {
             goToMainScreen();
-            testFolderObserver();
+//            testFolderObserver();
         } else {
             goToStartScreen();
         }
@@ -75,11 +76,21 @@ public class MainActivity extends AppCompatActivity {
     private TestFileObserver testFileObserver2;
 
     private FileObserver fileObserver;
+    private FileObserver fileObserver2;
+
+    private RecursiveFileObserver observer;
 
     private void testFolderObserver() {
         File root = Environment.getExternalStorageDirectory();
+/*        observer = new RecursiveFileObserver(root.getPath(), (event, file) -> {
+            Log.d("KEK", "event: " + event + ", file: " + file);
+        });
+        observer.startWatching();*/
+
         File testDirectory = new File(root, "/test_directory/");
         testDirectory.mkdirs();
+
+
         testFileObserver1 = new TestFileObserver(testDirectory.getPath());
         testFileObserver1.getEventObservable().subscribe();
         testFileObserver2 = new TestFileObserver(root + "/test_directory/");
@@ -88,16 +99,25 @@ public class MainActivity extends AppCompatActivity {
         fileObserver = new FileObserver(testDirectory.getPath()) {
             @Override
             public void onEvent(int event, @Nullable String path) {
-                System.out.println("event: " + event);
+                Log.d("KEK", "event: " + event + ", path: " + path);
             }
         };
+        fileObserver.startWatching();
 
         File file = new File(testDirectory, "test_file");
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        fileObserver2 = new FileObserver(file.getPath()) {
+            @Override
+            public void onEvent(int event, @Nullable String path) {
+                Log.d("KEK", "event: " + event + ", path: " + path);
+            }
+        };
+        fileObserver2.startWatching();
+//        try {
+//            file.createNewFile();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        file.delete();
         testDirectory.delete();
 //        file.delete();
     }

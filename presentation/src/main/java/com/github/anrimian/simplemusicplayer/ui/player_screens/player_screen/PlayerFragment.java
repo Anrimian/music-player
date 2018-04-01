@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -354,7 +355,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onStart();
         presenter.onStart();
         Intent intent = new Intent(getActivity(), MusicService.class);
-        getActivity().startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getActivity().startForegroundService(intent);
+        } else {
+            getActivity().startService(intent);
+        }
         getActivity().bindService(intent, musicServiceConnection, Context.BIND_AUTO_CREATE);
     }
 

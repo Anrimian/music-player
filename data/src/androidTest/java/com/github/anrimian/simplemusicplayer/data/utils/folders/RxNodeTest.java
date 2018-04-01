@@ -1,19 +1,5 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Objects;
-
-import io.reactivex.observers.TestObserver;
-import io.reactivex.subjects.PublishSubject;
-
-import static java.util.Arrays.asList;
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class RxNodeTest {
 /*    private FolderTree folderTree;
 
