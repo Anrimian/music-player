@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.infrastructure.service.models.mappers;
+package com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.mappers;
 
 import android.support.v4.media.session.PlaybackStateCompat;
 

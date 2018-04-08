@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.di.library;
+package com.github.anrimian.simplemusicplayer.di.app.library;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

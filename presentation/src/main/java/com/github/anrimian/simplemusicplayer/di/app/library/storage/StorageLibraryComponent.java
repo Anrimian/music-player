@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.di.library.storage;
+package com.github.anrimian.simplemusicplayer.di.app.library.storage;
 
 import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.StorageLibraryPresenter;
 

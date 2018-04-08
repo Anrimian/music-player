@@ -6,10 +6,10 @@ import android.content.Context;
 import com.github.anrimian.simplemusicplayer.di.app.AppComponent;
 import com.github.anrimian.simplemusicplayer.di.app.AppModule;
 import com.github.anrimian.simplemusicplayer.di.app.DaggerAppComponent;
-import com.github.anrimian.simplemusicplayer.di.library.LibraryComponent;
-import com.github.anrimian.simplemusicplayer.di.library.LibraryModule;
-import com.github.anrimian.simplemusicplayer.di.library.storage.StorageLibraryComponent;
-import com.github.anrimian.simplemusicplayer.di.library.storage.StorageLibraryModule;
+import com.github.anrimian.simplemusicplayer.di.app.library.LibraryComponent;
+import com.github.anrimian.simplemusicplayer.di.app.library.LibraryModule;
+import com.github.anrimian.simplemusicplayer.di.app.library.storage.StorageLibraryComponent;
+import com.github.anrimian.simplemusicplayer.di.app.library.storage.StorageLibraryModule;
 
 import javax.annotation.Nullable;
 

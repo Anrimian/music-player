@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".infrastructure.service.MusicService"
+        <service android:name=".infrastructure.service.music.MusicService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />

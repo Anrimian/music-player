@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer;
 import android.app.Application;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.ServiceManager;
 import com.github.anrimian.simplemusicplayer.utils.acra.AcraReportDialog;
 
 import org.acra.ACRA;
@@ -15,10 +16,14 @@ import org.acra.config.ConfigurationBuilder;
 
 public class App extends Application {
 
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
+    private ServiceManager serviceManager;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Components.init(getApplicationContext());
+        serviceManager = Components.getAppComponent().serviceManager();
         initAcra();
     }
 

@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.di.library;
+package com.github.anrimian.simplemusicplayer.di.app.library;
 
 import android.content.Context;
 

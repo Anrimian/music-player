@@ -1,13 +1,9 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen;
 
 import android.Manifest;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -40,7 +36,6 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
@@ -172,7 +167,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private PlayQueueAdapter playQueueAdapter;
 
-    private MusicServiceConnection musicServiceConnection = new MusicServiceConnection();
     private BottomSheetDelegate bottomSheetDelegate;
 
     private ActionBarDrawerToggle drawerToggle;
@@ -354,19 +348,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void onStart() {
         super.onStart();
         presenter.onStart();
-        Intent intent = new Intent(getActivity(), MusicService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            getActivity().startForegroundService(intent);
-        } else {
-            getActivity().startService(intent);
-        }
-        getActivity().bindService(intent, musicServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        getActivity().unbindService(musicServiceConnection);
         presenter.onStop();
     }
 
@@ -513,18 +499,5 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return false;
         });
         popup.show();
-    }
-
-    private class MusicServiceConnection implements android.content.ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
     }
 }

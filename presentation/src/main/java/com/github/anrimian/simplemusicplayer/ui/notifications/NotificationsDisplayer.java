@@ -15,15 +15,15 @@ import android.widget.RemoteViews;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.models.PlayerInfo;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 
-import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PAUSE;
-import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.PLAY;
-import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.REQUEST_CODE;
-import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.SKIP_TO_NEXT;
-import static com.github.anrimian.simplemusicplayer.infrastructure.service.MusicService.SKIP_TO_PREVIOUS;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService.PAUSE;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService.PLAY;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService.SKIP_TO_NEXT;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService.SKIP_TO_PREVIOUS;
 
 
 /**

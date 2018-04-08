@@ -5,8 +5,10 @@ import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.settings.SettingsRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.repositories.ui_state.UiStateRepositoryImpl;
+import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.ServiceManager;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
 
 import javax.annotation.Nonnull;
@@ -53,5 +55,12 @@ public class AppModule {
     @Singleton
     UiStateRepository provideUiStateRepository(Context context) {
         return new UiStateRepositoryImpl(context);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    ServiceManager serviceManager(Context context, MusicPlayerInteractor musicPlayerInteractor) {
+        return new ServiceManager(context, musicPlayerInteractor);
     }
 }

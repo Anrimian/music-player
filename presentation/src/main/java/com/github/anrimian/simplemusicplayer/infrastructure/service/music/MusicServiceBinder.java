@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.infrastructure.service;
+package com.github.anrimian.simplemusicplayer.infrastructure.service.music;
 
 import android.os.Binder;
 import android.support.v4.media.session.MediaSessionCompat;

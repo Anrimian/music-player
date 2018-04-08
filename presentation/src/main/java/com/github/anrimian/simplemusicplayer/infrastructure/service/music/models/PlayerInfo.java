@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.infrastructure.service.models;
+package com.github.anrimian.simplemusicplayer.infrastructure.service.music.models;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 

@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.infrastructure.service;
+package com.github.anrimian.simplemusicplayer.infrastructure.service.music;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -17,9 +17,9 @@ import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.models.PlayerInfo;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.models.TrackInfo;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.models.mappers.PlayerStateMapper;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerInfo;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.TrackInfo;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
 

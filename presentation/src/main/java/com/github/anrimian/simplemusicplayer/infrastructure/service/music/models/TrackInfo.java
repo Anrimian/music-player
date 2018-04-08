@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.infrastructure.service.models;
+package com.github.anrimian.simplemusicplayer.infrastructure.service.music.models;
 
 /**
  * Created on 10.12.2017.
