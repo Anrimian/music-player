@@ -27,7 +27,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
 
     @Override
     public void setPlayListPosition(int position) {
-        uiStatePreferences.setPlayQueuePosition(position);
+        uiStatePreferences.setCurrentCompositionPosition(position);
     }
 
     @Override

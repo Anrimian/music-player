@@ -35,17 +35,15 @@ public class UiStatePreferences {
         return preferences.getLong(TRACK_POSITION);
     }
 
-    public void setCurrentComposition(long id, int position) {
+    public void setCurrentCompositionId(long id) {
         preferences.putLong(CURRENT_COMPOSITION_ID, id);
-        preferences.putInt(CURRENT_COMPOSITION_POSITION, position);
     }
 
     public Long getCurrentCompositionId() {
         return preferences.getLong(CURRENT_COMPOSITION_ID, NO_COMPOSITION);
     }
 
-    @Deprecated
-    public void setPlayQueuePosition(int position) {
+    public void setCurrentCompositionPosition(int position) {
         preferences.putInt(CURRENT_COMPOSITION_POSITION, position);
     }
 

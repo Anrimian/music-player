@@ -73,8 +73,12 @@ public class PlayQueueDataSource {
         });
     }
 
-    public void setRandomPlayingEnabled(boolean enabled, Composition currentComposition) {
-
+    /**
+     *
+     * @return new position of current composition
+     */
+    public int setRandomPlayingEnabled(boolean enabled, Composition currentComposition) {
+        return 0;
     }
 
     private void shufflePlayList(boolean keepPosition) {

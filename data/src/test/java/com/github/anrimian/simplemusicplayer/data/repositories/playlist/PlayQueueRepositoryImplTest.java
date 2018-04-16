@@ -15,7 +15,10 @@ import io.reactivex.schedulers.Schedulers;
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.simplemusicplayer.data.repositories.TestDataProvider.getFakeCompositions;
 import static java.util.Collections.emptyList;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -89,12 +92,15 @@ public class PlayQueueRepositoryImplTest {
         verify(playQueueDataSource).setPlayQueue(getFakeCompositions());
         //noinspection unchecked
         playListObserver.assertValues(emptyList(), getFakeCompositions());
-        verify(uiStatePreferences).setCurrentComposition(0L, 0);
+        verify(uiStatePreferences).setCurrentCompositionId(0L);
+        verify(uiStatePreferences).setCurrentCompositionPosition(0);
         compositionObserver.assertValue(getFakeCompositions().get(0));
     }
 
     @Test
     public void setRandomPlayingEnabledTest() {
+        when(playQueueDataSource.setRandomPlayingEnabled(anyBoolean(), any())).thenReturn(0);
+
         setPlayQueueTest();
 
         TestObserver<List<Composition>> playListObserver = playQueueRepository.getPlayQueueObservable()
@@ -105,6 +111,7 @@ public class PlayQueueRepositoryImplTest {
         verify(playQueueDataSource).setRandomPlayingEnabled(true, getFakeCompositions().get(0));
         //noinspection unchecked
         playListObserver.assertValues(getFakeCompositions(), getFakeCompositions());
+        verify(uiStatePreferences, times(2)).setCurrentCompositionPosition(0);
     }
 
     @Test

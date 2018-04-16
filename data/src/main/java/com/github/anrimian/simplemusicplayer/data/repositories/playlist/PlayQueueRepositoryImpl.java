@@ -75,9 +75,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             throw new IllegalStateException("change play mode without current composition");
         }
 
-        playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition);
+        position = playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition);
         List<Composition> playQueue = playQueueDataSource.getPlayQueue();
         currentPlayListSubject.onNext(playQueue);
+
+        uiStatePreferences.setCurrentCompositionPosition(position);
     }
 
     @Override
@@ -120,7 +122,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private void updateCurrentComposition(List<Composition> currentPlayList, int position) {
         Composition currentComposition = currentPlayList.get(position);
-        uiStatePreferences.setCurrentComposition(currentComposition.getId(), position);
+        uiStatePreferences.setCurrentCompositionId(currentComposition.getId());
+        uiStatePreferences.setCurrentCompositionPosition(position);
         currentCompositionSubject.onNext(currentComposition);
     }
 
