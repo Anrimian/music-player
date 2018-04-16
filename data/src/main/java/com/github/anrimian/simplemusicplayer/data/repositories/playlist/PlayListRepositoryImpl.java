@@ -4,7 +4,7 @@ import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
 import com.github.anrimian.simplemusicplayer.data.database.dao.CompositionsDao;
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionEntity;
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionItemEntity;
-import com.github.anrimian.simplemusicplayer.data.mappers.compositions.CompositionsMapper;
+import com.github.anrimian.simplemusicplayer.data.models.compositions.CompositionsMapper;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
@@ -54,7 +54,7 @@ public class PlayListRepositoryImpl implements PlayListRepository {
                 compositionItemEntity.setComposition(compositionEntity);
                 compositionItemEntity.setInitialPosition(i);
                 compositionItemEntity.setShuffledPosition(currentPlayList.getPositionForIndex(i));
-                compositionsDao.setCurrentPlayList(compositionItemEntity);
+                compositionsDao.setPlayQueue(compositionItemEntity);
             }*/
 
             List<CompositionItemEntity> itemEntities = new ArrayList<>();

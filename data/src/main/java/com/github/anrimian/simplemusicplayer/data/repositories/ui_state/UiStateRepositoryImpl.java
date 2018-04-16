@@ -1,9 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.ui_state;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import com.github.anrimian.simplemusicplayer.data.utils.preferences.SharedPreferencesHelper;
+import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
 
 /**
@@ -12,35 +9,29 @@ import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateReposito
 
 public class UiStateRepositoryImpl implements UiStateRepository {
 
-    private static final String PREFERENCES_NAME = "ui_preferences";
+    private UiStatePreferences uiStatePreferences;
 
-    private static final String TRACK_POSITION = "track_position";
-    private static final String PLAY_LIST_POSITION = "play_list_position";
-
-    private SharedPreferencesHelper preferences;
-
-    public UiStateRepositoryImpl(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
-        this.preferences = new SharedPreferencesHelper(sharedPreferences);
+    public UiStateRepositoryImpl(UiStatePreferences uiStatePreferences) {
+        this.uiStatePreferences = uiStatePreferences;
     }
 
     @Override
     public void setTrackPosition(long position) {
-        preferences.putLong(TRACK_POSITION, position);
+        uiStatePreferences.setTrackPosition(position);
     }
 
     @Override
     public long getTrackPosition() {
-        return preferences.getLong(TRACK_POSITION);
+        return uiStatePreferences.getTrackPosition();
     }
 
     @Override
     public void setPlayListPosition(int position) {
-        preferences.putInt(PLAY_LIST_POSITION, position);
+        uiStatePreferences.setPlayQueuePosition(position);
     }
 
     @Override
     public int getPlayListPosition() {
-        return preferences.getInt(PLAY_LIST_POSITION);
+        return uiStatePreferences.getCurrentCompositionPosition();
     }
 }

@@ -49,6 +49,7 @@ dependencies {
     annotationProcessor dataDependencies.mapStructCompiler
 
     testImplementation testDependencies.junit
+    testImplementation testDependencies.mockito
     androidTestImplementation testDependencies.junit
     androidTestImplementation testDependencies.supportTest
     androidTestImplementation testDependencies.espresso

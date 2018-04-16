@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.RemoteViews;
 
@@ -18,6 +17,8 @@ import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
+
+import javax.annotation.Nonnull;
 
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService.PAUSE;
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService.PLAY;
@@ -51,17 +52,26 @@ public class NotificationsDisplayer {
         }
     }
 
-    public Notification getForegroundNotification(PlayerInfo info, MediaSessionCompat mediaSession) {
-        return getDefaultMusicNotification(info, mediaSession).build();
+    public Notification getForegroundNotification(@Nonnull PlayerInfo info) {
+        return getDefaultMusicNotification(info).build();
     }
 
-    public void updateForegroundNotification(PlayerInfo info, MediaSessionCompat mediaSession) {
-        Notification notification = getDefaultMusicNotification(info, mediaSession).build();
+    public Notification getStubNotification() {
+        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
+                .setContentTitle(getString(R.string.preparing_for_launch))
+                .setSmallIcon(R.drawable.ic_menu)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .build();
+    }
+
+
+    public void updateForegroundNotification(@Nonnull PlayerInfo info) {
+        Notification notification = getDefaultMusicNotification(info).build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
-    private NotificationCompat.Builder getDefaultMusicNotification(PlayerInfo info,
-                                                                   MediaSessionCompat mediaSession) {
+    private NotificationCompat.Builder getDefaultMusicNotification(@Nonnull PlayerInfo info) {
         boolean play = info.getState() == PlaybackStateCompat.STATE_PLAYING;
         Composition composition = info.getComposition();
 

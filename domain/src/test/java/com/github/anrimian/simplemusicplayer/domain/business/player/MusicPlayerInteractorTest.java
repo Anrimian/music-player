@@ -48,7 +48,7 @@ public class MusicPlayerInteractorTest {
 
     private SettingsRepository settingsRepository;
     private UiStateRepository uiStateRepository;
-    private PlayListRepository playListRepository;
+    private PlayListRepository playQueueRepository;
 
     private TestObserver<PlayerState> playerStateTestObserver = new TestObserver<>();
     private TestObserver<Composition> currentCompositionTestObserver = new TestObserver<>();
@@ -97,9 +97,9 @@ public class MusicPlayerInteractorTest {
         when(uiStateRepository.getPlayListPosition()).thenReturn(0);
         when(uiStateRepository.getTrackPosition()).thenReturn(0L);
 
-        playListRepository = mock(PlayListRepository.class);
-        when(playListRepository.getCurrentPlayList()).thenReturn(just(new CurrentPlayListInfo(new ArrayList<>(), new ArrayList<>())));
-        when(playListRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
+        playQueueRepository = mock(PlayListRepository.class);
+        when(playQueueRepository.getCurrentPlayList()).thenReturn(just(new CurrentPlayListInfo(new ArrayList<>(), new ArrayList<>())));
+        when(playQueueRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
 
         systemMusicController = mock(SystemMusicController.class);
         when(systemMusicController.getAudioFocusObservable()).thenReturn(audioFocusSubject);
@@ -109,7 +109,7 @@ public class MusicPlayerInteractorTest {
                 systemMusicController,
                 settingsRepository,
                 uiStateRepository,
-                playListRepository);
+                playQueueRepository);
         musicPlayerInteractor.getPlayerStateObservable().subscribe(playerStateTestObserver);
         musicPlayerInteractor.getCurrentCompositionObservable().subscribe(currentCompositionTestObserver);
         musicPlayerInteractor.getCurrentPlayListObservable().subscribe(currentPlayListTestObserver);
@@ -255,8 +255,8 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void testShuffleInitialPlayList() throws Exception {
-        when(playListRepository.getCurrentPlayList()).thenReturn(just(new CurrentPlayListInfo(fakeCompositions, fakeCompositions)));
-        when(playListRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
+        when(playQueueRepository.getCurrentPlayList()).thenReturn(just(new CurrentPlayListInfo(fakeCompositions, fakeCompositions)));
+        when(playQueueRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
 
         when(settingsRepository.isRandomPlayingEnabled()).thenReturn(true);
 
@@ -264,7 +264,7 @@ public class MusicPlayerInteractorTest {
                 systemMusicController,
                 settingsRepository,
                 uiStateRepository,
-                playListRepository);
+                playQueueRepository);
         TestObserver<PlayerState> playerStateTestObserver = musicPlayerInteractor.getPlayerStateObservable().test();
 
         musicPlayerInteractor.setRandomPlayingEnabled(true);

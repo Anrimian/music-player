@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class PlayListRepositoryImplTest {
 
-    private PlayListRepository playListRepository;
+    private PlayListRepository playQueueRepository;
 
     private TestScheduler testScheduler = new TestScheduler();
 
@@ -57,15 +57,15 @@ public class PlayListRepositoryImplTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
         AppDatabase appDatabase = Room.databaseBuilder(appContext, AppDatabase.class, "test_db").build();
 
-        playListRepository = new PlayListRepositoryImpl(appDatabase, Schedulers.computation());
+        playQueueRepository = new PlayListRepositoryImpl(appDatabase, Schedulers.computation());
     }
 
     @Test
     public void currentPlayListTest() throws Exception {
-        /*TestObserver<CurrentPlayListInfo> testObserver =*/ playListRepository.setCurrentPlayList(currentPlayListInfo)
-                .andThen(playListRepository.getCurrentPlayList())
-                .flatMapCompletable(compositions -> playListRepository.setCurrentPlayList(currentPlayListInfo))
-                .andThen(playListRepository.getCurrentPlayList())
+        /*TestObserver<CurrentPlayListInfo> testObserver =*/ playQueueRepository.setCurrentPlayList(currentPlayListInfo)
+                .andThen(playQueueRepository.getCurrentPlayList())
+                .flatMapCompletable(compositions -> playQueueRepository.setCurrentPlayList(currentPlayListInfo))
+                .andThen(playQueueRepository.getCurrentPlayList())
                 .subscribe(currentPlayListInfo -> {
                     List<Composition> initialPlayList = currentPlayListInfo.getInitialPlayList();
                     List<Composition> currentPlayList = currentPlayListInfo.getCurrentPlayList();
@@ -78,10 +78,14 @@ public class PlayListRepositoryImplTest {
         testObserver.assertNoErrors();
         testObserver.assertValue(currentPlayListInfo -> {
             List<Composition> initialPlayList = currentPlayListInfo.getInitialPlayList();
-            List<Composition> currentPlayList = currentPlayListInfo.getCurrentPlayList();
+            List<Composition> currentPlayList = currentPlayListInfo.getPlayQueue();
             assertEquals(fakeCompositions, initialPlayList);
             assertEquals(shuffledCompositions, currentPlayList);
             return true;
         });*/
+    }
+
+    @Test
+    public void setPlayQueue() {
     }
 }

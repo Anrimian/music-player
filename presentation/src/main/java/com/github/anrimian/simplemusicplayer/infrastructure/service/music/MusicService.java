@@ -12,24 +12,26 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
+import android.view.KeyEvent;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerInfo;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.TrackInfo;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
 
-import java.util.List;
-
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS;
+import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE;
@@ -72,7 +74,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private MediaSessionCompat mediaSession;
     private MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
-    private MusicServiceBinder musicServiceBinder = new MusicServiceBinder(this, mediaSession);
     private CompositeDisposable serviceDisposable = new CompositeDisposable();
 
     private boolean firstLaunch = true;
@@ -83,8 +84,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Components.getAppComponent().inject(this);
 
         mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
-        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-                | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS | FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         mediaSession.setCallback(mediaSessionCallback);
 
@@ -104,6 +104,44 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
+        if (requestCode != -1) {
+            handleNotificationAction(requestCode);
+        } else {
+            KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession, intent);
+            if (keyEvent != null) {
+                handleMediaButtonAction(keyEvent);
+            }
+        }
+        return START_NOT_STICKY;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(becomingNoisyReceiver);
+        mediaSession.release();
+        serviceDisposable.dispose();
+    }
+
+    @Deprecated //possible, if warning don't gone after fix
+    private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
+        switch (keyEvent.getKeyCode()) {
+            case KeyEvent.KEYCODE_MEDIA_PLAY: {
+                Log.d("KEK", "start playing");
+//                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
+//                musicPlayerInteractor.play();
+                break;
+            }
+        }
+    }
+
+    private void handleNotificationAction(int requestCode) {
         switch (requestCode) {
             case PLAY: {
                 musicPlayerInteractor.play();
@@ -122,95 +160,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 break;
             }
         }
-        MediaButtonReceiver.handleIntent(mediaSession, intent);
-        return START_NOT_STICKY;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return musicServiceBinder;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(becomingNoisyReceiver);
-        mediaSession.release();
-        serviceDisposable.dispose();
-    }
-/*    @Nullable
-    @Override
-    public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
-        return null;
-    }
-
-    @Override
-    public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-
-    }*/
-
-/* .doOnNext(composition -> {
-        MediaMetadataCompat metadata = metadataBuilder
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, composition.getTitle())
-                .build();
-        mediaSession.setMetadata(metadata);
-    })*/
-
-    public void startPlaying(List<Composition> compositions) {
-        musicPlayerInteractor.startPlaying(compositions);
-    }
-
-    public void play() {
-        musicPlayerInteractor.play();
-    }
-
-    public void pause() {
-        musicPlayerInteractor.pause();
-    }
-
-    public void stop() {
-        musicPlayerInteractor.stop();
-    }
-
-    public void skipToPrevious() {
-        musicPlayerInteractor.skipToPrevious();
-    }
-
-    public void skipToNext() {
-        musicPlayerInteractor.skipToNext();
-    }
-
-    public Observable<PlayerState> getPlayerStateObservable() {
-        return musicPlayerInteractor.getPlayerStateObservable();
-    }
-
-    public Observable<Composition> getCurrentCompositionObservable() {
-        return musicPlayerInteractor.getCurrentCompositionObservable();
-    }
-
-    public Observable<List<Composition>> getCurrentPlayListObservable() {
-        return musicPlayerInteractor.getCurrentPlayListObservable();
-    }
-
-    public Observable<Long> getTrackPositionObservable() {
-        return musicPlayerInteractor.getTrackPositionObservable();
-    }
-
-    public boolean isInfinitePlayingEnabled() {
-        return musicPlayerInteractor.isInfinitePlayingEnabled();
-    }
-
-    public boolean isRandomPlayingEnabled() {
-        return musicPlayerInteractor.isRandomPlayingEnabled();
-    }
-
-    public void setRandomPlayingEnabled(boolean enabled) {
-        musicPlayerInteractor.setRandomPlayingEnabled(enabled);
-    }
-
-    public void setInfinitePlayingEnabled(boolean enabled) {
-        musicPlayerInteractor.setInfinitePlayingEnabled(enabled);
     }
 
     private void subscribeOnPlayerChanges() {
@@ -247,14 +196,14 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private void onPlayerStateChanged(PlayerInfo info) {
         if (!firstLaunch) {
-            notificationsDisplayer.updateForegroundNotification(info, mediaSession);
+            notificationsDisplayer.updateForegroundNotification(info);
         }
         firstLaunch = false;
 
         switch (info.getState()) {
             case STATE_PLAYING: {
                 mediaSession.setActive(true);
-                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(info, mediaSession));
+                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(info));
                 break;
             }
             case STATE_STOPPED:

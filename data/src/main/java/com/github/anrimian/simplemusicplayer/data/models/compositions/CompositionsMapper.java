@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.mappers.compositions;
+package com.github.anrimian.simplemusicplayer.data.models.compositions;
 
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionEntity;
 import com.github.anrimian.simplemusicplayer.data.utils.mappers.DateMapper;

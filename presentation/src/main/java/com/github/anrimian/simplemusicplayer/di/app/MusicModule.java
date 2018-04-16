@@ -38,12 +38,12 @@ class MusicModule {
                                                        SystemMusicController systemMusicController,
                                                        SettingsRepository settingsRepository,
                                                        UiStateRepository uiStateRepository,
-                                                       PlayListRepository playListRepository) {
+                                                       PlayListRepository playQueueRepository) {
         return new MusicPlayerInteractor(musicPlayerController,
                 systemMusicController,
                 settingsRepository,
                 uiStateRepository,
-                playListRepository);
+                playQueueRepository);
     }
 
     @Provides
@@ -64,7 +64,7 @@ class MusicModule {
     @NonNull
     @Singleton
     PlayListRepository providePlayListRepository(AppDatabase appDatabase,
-                                                 @Named(DB_SCHEDULER) Scheduler scheduler) {
+                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new PlayListRepositoryImpl(appDatabase, scheduler);
     }
 }

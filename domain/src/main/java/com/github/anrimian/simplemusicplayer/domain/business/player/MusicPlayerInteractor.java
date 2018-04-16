@@ -64,6 +64,7 @@ public class MusicPlayerInteractor {
         restorePlaylistState();
     }
 
+    @Deprecated
     public void startPlaying(List<Composition> compositions) {
         if (compositions == null || compositions.isEmpty()) {
             return;
