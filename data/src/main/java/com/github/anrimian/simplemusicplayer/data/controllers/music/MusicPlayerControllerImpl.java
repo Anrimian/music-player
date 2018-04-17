@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerStateRxWrapper;
+import com.github.anrimian.simplemusicplayer.data.utils.exo_player.callback.CallbackPlayerListener;
+import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerCallback;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
@@ -22,6 +24,8 @@ import com.google.android.exoplayer2.upstream.FileDataSource;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -34,12 +38,17 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
-    private PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
-    private BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
+    private final PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
+    private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
 
-    private SimpleExoPlayer player;
+    private final SimpleExoPlayer player;
+    private final CallbackPlayerListener callbackPlayerListener = new CallbackPlayerListener();
 
+    @Nullable
     private Disposable trackPositionDisposable;
+
+    @Nullable
+    private Composition preparedComposition;
 
     public MusicPlayerControllerImpl(Context context) {
         player = ExoPlayerFactory.newSimpleInstance(
@@ -47,13 +56,30 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
         player.addListener(playerStateRxWrapper);
+        player.addListener(callbackPlayerListener);
+    }
+
+    @Override
+    public void setMusicPlayerCallback(MusicPlayerCallback musicPlayerCallback) {
+        callbackPlayerListener.setMusicPlayerCallback(musicPlayerCallback);
     }
 
     @Override
     public Completable prepareToPlay(Composition composition) {
+        if (composition.equals(preparedComposition)) {
+            return Completable.complete();
+        }
         return prepareMediaSource(composition)
                 .toCompletable()//on error can be: com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException: java.io.FileNotFoundException
+                .doOnComplete(() -> preparedComposition = composition)
                 .doOnEvent(t -> trackPositionSubject.onNext(0L));
+    }
+
+    @Override
+    public void prepareToPlayIgnoreError(Composition composition) {
+        prepareToPlay(composition)
+                .onErrorComplete()
+                .subscribe();
     }
 
     @Override

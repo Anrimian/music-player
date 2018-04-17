@@ -12,7 +12,11 @@ import io.reactivex.Observable;
 
 public interface MusicPlayerController {
 
+    void setMusicPlayerCallback(MusicPlayerCallback musicPlayerCallback);
+
     Completable prepareToPlay(Composition composition);
+
+    void prepareToPlayIgnoreError(Composition composition);
 
     void stop();
 

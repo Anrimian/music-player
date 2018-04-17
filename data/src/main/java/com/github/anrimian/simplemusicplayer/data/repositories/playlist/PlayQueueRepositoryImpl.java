@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.playlist;
 
+import com.github.anrimian.simplemusicplayer.data.models.exceptions.CompositionNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
@@ -11,6 +12,7 @@ import javax.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
@@ -59,6 +61,13 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return getSavedComposition()
                 .mergeWith(currentCompositionSubject)
                 .subscribeOn(dbScheduler);
+    }
+
+    @Override
+    public Single<Composition> getCurrentComposition() {
+        return getCurrentCompositionObservable()
+                .lastOrError()
+                .onErrorResumeNext(Single.error(new CompositionNotFoundException()));
     }
 
     @Override
