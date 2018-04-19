@@ -3,8 +3,11 @@ package com.github.anrimian.simplemusicplayer.domain.business.player;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
+import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 
 import java.util.List;
 
@@ -28,7 +31,7 @@ public class MusicPlayerInteractorNew {
 
     private final MusicPlayerController musicPlayerController;
     //    private SystemMusicController systemMusicController;
-//    private SettingsRepository settingsRepository;
+    private final SettingsRepository settingsRepository;
 //    private UiStateRepository uiStateRepository;
     private final PlayQueueRepository playQueueRepository;
 
@@ -36,43 +39,38 @@ public class MusicPlayerInteractorNew {
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
     public MusicPlayerInteractorNew(MusicPlayerController musicPlayerController,
+                                    SettingsRepository settingsRepository,
 //                                    SystemMusicController systemMusicController,
 //                                    SettingsRepository settingsRepository,
 //                                    UiStateRepository uiStateRepository,
                                     PlayQueueRepository playQueueRepository) {
         this.musicPlayerController = musicPlayerController;
 //        this.systemMusicController = systemMusicController;
-//        this.settingsRepository = settingsRepository;
+        this.settingsRepository = settingsRepository;
 //        this.uiStateRepository = uiStateRepository;
         this.playQueueRepository = playQueueRepository;
 
     }
 
-    public Completable startPlaying(Composition composition) {
-        return playQueueRepository.setPlayQueue(singletonList(composition))
-                .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
-                .andThen(playQueueRepository.getCurrentComposition())
-                .flatMapCompletable(musicPlayerController::prepareToPlay)
-                .doOnComplete(this::onCompositionReadyToPlay)
-                .doOnError(t -> stop());
-    }
-
     public Completable startPlaying(List<Composition> compositions) {
         return playQueueRepository.setPlayQueue(compositions)
                 .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
-                .andThen(playQueueRepository.getCurrentComposition())
-                .doOnSuccess(musicPlayerController::prepareToPlayIgnoreError)
-                .toCompletable()
-                .doOnComplete(this::onCompositionReadyToPlay);
+                .doOnError(t -> playerStateSubject.onNext(STOP))
+                .doOnComplete(this::play);
     }
 
-    public Completable play() {
-        return playQueueRepository.getCurrentComposition()
-                .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
-                .doOnSuccess(musicPlayerController::prepareToPlayIgnoreError)
-                .toCompletable()
-                .doOnComplete(this::onCompositionReadyToPlay);
-        //subscribe on next compositions?
+    public void play() {
+        if (playerStateSubject.getValue() != PLAY) {
+            musicPlayerController.resume();
+            playerStateSubject.onNext(PLAY);
+
+            playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
+                    .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
+                    .subscribe());
+
+            playerDisposable.add(musicPlayerController.getEventsObservable()
+                    .subscribe(this::onMusicPlayerEventReceived));
+        }
     }
 
     public void stop() {
@@ -86,18 +84,25 @@ public class MusicPlayerInteractorNew {
         return playerStateSubject.distinctUntilChanged();
     }
 
-    private void onCompositionReadyToPlay() {
-        musicPlayerController.resume();
-        playerStateSubject.onNext(PLAY);
-
-//        subscribeOnAudioFocusChanges();
-        playerDisposable.add(musicPlayerController.getEventsObservable()
-                .subscribe(this::onMusicPlayerEventReceived));
-    }
-
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
-
+        if (playerEvent instanceof FinishedEvent) {
+            onCompositionPlayFinished();
+        } else if (playerEvent instanceof ErrorEvent) {
+            onCompositionPlayFinished();
+            //write error about composition...
+        }
     }
+
+    private void onCompositionPlayFinished() {
+        int currentPosition = playQueueRepository.skipToNext();
+        if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled()) {
+            //possible bug with stopping from end to start. Check on live app
+            musicPlayerController.resume();
+        } else {
+            stop();
+        }
+    }
+
 
 //    private class PlayerCallback implements MusicPlayerCallback {
 //

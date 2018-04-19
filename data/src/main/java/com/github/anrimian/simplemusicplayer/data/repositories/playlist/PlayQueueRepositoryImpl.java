@@ -92,7 +92,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public void skipToNext() {
+    public int skipToNext() {
         List<Composition> currentPlayList = currentPlayListSubject.getValue();
         checkCompositionsList(currentPlayList);
 
@@ -102,10 +102,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             position++;
         }
         updateCurrentComposition(currentPlayList, position);
+        return position;
     }
 
     @Override
-    public void skipToPrevious() {
+    public int skipToPrevious() {
         List<Composition> currentPlayList = currentPlayListSubject.getValue();
         checkCompositionsList(currentPlayList);
 
@@ -114,6 +115,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             position = currentPlayList.size() - 1;
         }
         updateCurrentComposition(currentPlayList, position);
+        return position;
     }
 
     @Override

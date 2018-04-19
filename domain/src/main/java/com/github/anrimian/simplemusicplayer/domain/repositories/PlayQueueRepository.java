@@ -23,9 +23,9 @@ public interface PlayQueueRepository {
 
     void setRandomPlayingEnabled(boolean enabled);
 
-    void skipToNext();
+    int skipToNext();
 
-    void skipToPrevious();
+    int skipToPrevious();
 
     void skipToPosition(int position);
 }
