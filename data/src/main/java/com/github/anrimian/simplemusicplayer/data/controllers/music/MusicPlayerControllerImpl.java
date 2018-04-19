@@ -3,12 +3,12 @@ package com.github.anrimian.simplemusicplayer.data.controllers.music;
 import android.content.Context;
 import android.net.Uri;
 
+import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerStateRxWrapper;
-import com.github.anrimian.simplemusicplayer.data.utils.exo_player.callback.CallbackPlayerListener;
-import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerCallback;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -42,7 +42,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
 
     private final SimpleExoPlayer player;
-    private final CallbackPlayerListener callbackPlayerListener = new CallbackPlayerListener();
+    private final PlayerEventListener playerEventListener = new PlayerEventListener();
 
     @Nullable
     private Disposable trackPositionDisposable;
@@ -56,12 +56,12 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
         player.addListener(playerStateRxWrapper);
-        player.addListener(callbackPlayerListener);
+        player.addListener(playerEventListener);
     }
 
     @Override
-    public void setMusicPlayerCallback(MusicPlayerCallback musicPlayerCallback) {
-        callbackPlayerListener.setMusicPlayerCallback(musicPlayerCallback);
+    public Observable<PlayerEvent> getEventsObservable() {
+        return playerEventListener.getEventsObservable();
     }
 
     @Override

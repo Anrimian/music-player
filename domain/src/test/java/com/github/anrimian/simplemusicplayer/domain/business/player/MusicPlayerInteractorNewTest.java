@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 
 import org.junit.Before;
@@ -10,6 +11,7 @@ import org.junit.Test;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
@@ -32,6 +34,8 @@ public class MusicPlayerInteractorNewTest {
 
     private MusicPlayerInteractorNew musicPlayerInteractor;
 
+    private PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
+
     @Before
     public void setUp() {
         when(playQueueRepository.setPlayQueue(any())).thenReturn(Completable.complete());
@@ -39,6 +43,7 @@ public class MusicPlayerInteractorNewTest {
                 .thenReturn(Single.just(getFakeCompositions().get(0)));
 
         when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
+        when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
 
         musicPlayerInteractor = new MusicPlayerInteractorNew(musicPlayerController,
                 playQueueRepository);

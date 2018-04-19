@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.domain.controllers;
 
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -12,7 +13,7 @@ import io.reactivex.Observable;
 
 public interface MusicPlayerController {
 
-    void setMusicPlayerCallback(MusicPlayerCallback musicPlayerCallback);
+    Observable<PlayerEvent> getEventsObservable();
 
     Completable prepareToPlay(Composition composition);
 
