@@ -16,6 +16,7 @@ import io.reactivex.Single;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
+import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static io.reactivex.subjects.BehaviorSubject.create;
 
 /**
@@ -30,7 +31,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler dbScheduler;
 
-    private final BehaviorSubject<List<Composition>> currentPlayListSubject = create();
+    private final BehaviorSubject<List<Composition>> currentPlayQueueSubject = create();
     private final BehaviorSubject<Composition> currentCompositionSubject = create();
 
     private int position = NO_POSITION;
@@ -49,7 +50,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             checkCompositionsList(compositions);
             playQueueDataSource.setPlayQueue(compositions);
             List<Composition> playQueue = playQueueDataSource.getPlayQueue();
-            currentPlayListSubject.onNext(playQueue);
+            currentPlayQueueSubject.onNext(playQueue);
 
             position = 0;
             updateCurrentComposition(playQueue, position);
@@ -58,8 +59,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Observable<Composition> getCurrentCompositionObservable() {
-        return getSavedComposition()
-                .mergeWith(currentCompositionSubject)
+        return withDefaultValue(currentCompositionSubject, this::getSavedComposition)
                 .subscribeOn(dbScheduler);
     }
 
@@ -72,8 +72,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Observable<List<Composition>> getPlayQueueObservable() {
-        return getSavedPlayQueue()
-                .mergeWith(currentPlayListSubject)
+        return withDefaultValue(currentPlayQueueSubject, playQueueDataSource::getPlayQueue)
                 .subscribeOn(dbScheduler);
     }
 
@@ -86,14 +85,14 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
         position = playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition);
         List<Composition> playQueue = playQueueDataSource.getPlayQueue();
-        currentPlayListSubject.onNext(playQueue);
+        currentPlayQueueSubject.onNext(playQueue);
 
         uiStatePreferences.setCurrentCompositionPosition(position);
     }
 
     @Override
     public int skipToNext() {
-        List<Composition> currentPlayList = currentPlayListSubject.getValue();
+        List<Composition> currentPlayList = currentPlayQueueSubject.getValue();
         checkCompositionsList(currentPlayList);
 
         if (position >= currentPlayList.size() - 1) {
@@ -107,7 +106,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public int skipToPrevious() {
-        List<Composition> currentPlayList = currentPlayListSubject.getValue();
+        List<Composition> currentPlayList = currentPlayQueueSubject.getValue();
         checkCompositionsList(currentPlayList);
 
         position--;
@@ -120,7 +119,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public void skipToPosition(int position) {
-        List<Composition> currentPlayList = currentPlayListSubject.getValue();
+        List<Composition> currentPlayList = currentPlayQueueSubject.getValue();
         checkCompositionsList(currentPlayList);
 
         if (position < 0 || position >= currentPlayList.size()) {
@@ -138,25 +137,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         currentCompositionSubject.onNext(currentComposition);
     }
 
-    private Observable<Composition> getSavedComposition() {
-        return Observable.create(emitter -> {
-            if (currentCompositionSubject.getValue() == null) {
-                List<Composition> playQueue = playQueueDataSource.getPlayQueue();
-                Composition currentComposition = findCurrentComposition(playQueue);
-                if (currentComposition != null) {
-                    emitter.onNext(currentComposition);
-                }
-            }
-        });
-    }
-
-    private Observable<List<Composition>> getSavedPlayQueue() {
-        return Observable.create(emitter -> {
-            if (currentPlayListSubject.getValue() == null) {
-                List<Composition> playQueue = playQueueDataSource.getPlayQueue();
-                emitter.onNext(playQueue);
-            }
-        });
+    private Composition getSavedComposition() {
+        List<Composition> playQueue = playQueueDataSource.getPlayQueue();
+        return findCurrentComposition(playQueue);
     }
 
     @Nullable

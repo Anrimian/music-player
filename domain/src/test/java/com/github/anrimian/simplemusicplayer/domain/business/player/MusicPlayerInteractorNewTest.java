@@ -23,6 +23,7 @@ import io.reactivex.subjects.PublishSubject;
 import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 import static java.util.Collections.singletonList;
@@ -152,5 +153,40 @@ public class MusicPlayerInteractorNewTest {
         inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
 
         testSubscriber.assertValues(IDLE, PLAY);
+    }
+
+    @Test
+    public void pauseTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+        musicPlayerInteractor.pause();
+
+        verify(musicPlayerController).resume();
+        verify(musicPlayerController).prepareToPlayIgnoreError(any());
+        verify(musicPlayerController).pause();
+        testSubscriber.assertValues(IDLE, PLAY, PAUSE);
+    }
+
+    @Test
+    public void onCompositionPlayFinishedInStopState() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+        musicPlayerInteractor.stop();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(any());
+        inOrder.verify(musicPlayerController).stop();
+
+        playerEventSubject.onNext(new FinishedEvent());
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+//
+        inOrder.verify(playQueueRepository, never()).skipToNext();
+        inOrder.verify(musicPlayerController, never()).resume();
+        inOrder.verify(musicPlayerController, never()).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+        testSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 }

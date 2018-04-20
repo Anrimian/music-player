@@ -18,6 +18,7 @@ import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 import static io.reactivex.subjects.BehaviorSubject.createDefault;
@@ -32,7 +33,7 @@ public class MusicPlayerInteractorNew {
     private final MusicPlayerController musicPlayerController;
     //    private SystemMusicController systemMusicController;
     private final SettingsRepository settingsRepository;
-//    private UiStateRepository uiStateRepository;
+    //    private UiStateRepository uiStateRepository;
     private final PlayQueueRepository playQueueRepository;
 
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
@@ -70,6 +71,8 @@ public class MusicPlayerInteractorNew {
 
             playerDisposable.add(musicPlayerController.getEventsObservable()
                     .subscribe(this::onMusicPlayerEventReceived));
+
+            //subscribe on audio focus
         }
     }
 
@@ -77,11 +80,66 @@ public class MusicPlayerInteractorNew {
         musicPlayerController.stop();
         playerStateSubject.onNext(STOP);
         playerDisposable.clear();
+
 //        systemMusicController.abandonAudioFocus();
+    }
+
+    public void pause() {
+        musicPlayerController.pause();
+        playerStateSubject.onNext(PAUSE);
+        playerDisposable.clear();
+
+//            systemMusicController.abandonAudioFocus();
+    }
+
+    public void skipToPrevious() {
+        playQueueRepository.skipToPrevious();
+    }
+
+    public void skipToNext() {
+        playQueueRepository.skipToNext();
+    }
+
+    public void skipToPosition(int position) {
+        playQueueRepository.skipToPosition(position);
+    }
+
+    public boolean isInfinitePlayingEnabled() {
+        return settingsRepository.isInfinitePlayingEnabled();
+    }
+
+    public boolean isRandomPlayingEnabled() {
+        return settingsRepository.isRandomPlayingEnabled();
+    }
+
+    public void setRandomPlayingEnabled(boolean enabled) {
+        playQueueRepository.setRandomPlayingEnabled(enabled);
+    }
+
+    public void setInfinitePlayingEnabled(boolean enabled) {
+        settingsRepository.setInfinitePlayingEnabled(enabled);
+    }
+
+    public void onAudioBecomingNoisy() {
+//        pause();
+    }
+
+    public Observable<Long> getTrackPositionObservable() {
+//        return musicPlayerController.getTrackPositionObservable()
+//                .doOnNext(uiStateRepository::setTrackPosition);
+        return null;
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
         return playerStateSubject.distinctUntilChanged();
+    }
+
+    public Observable<Composition> getCurrentCompositionObservable() {
+        return playQueueRepository.getCurrentCompositionObservable();
+    }
+
+    public Observable<List<Composition>> getPlayQueuetObservable() {
+        return playQueueRepository.getPlayQueueObservable();
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
@@ -95,8 +153,8 @@ public class MusicPlayerInteractorNew {
 
     private void onCompositionPlayFinished() {
         int currentPosition = playQueueRepository.skipToNext();
-        if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled()) {
-            //possible bug with stopping from end to start. Check on live app
+        if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled() ) {
+            //TODO possible bug with stopping from end to start queue. Check on live app
             musicPlayerController.resume();
         } else {
             stop();
