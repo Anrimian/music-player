@@ -6,6 +6,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 
@@ -35,6 +36,7 @@ public class MusicPlayerInteractorNew {
     private final SettingsRepository settingsRepository;
     //    private UiStateRepository uiStateRepository;
     private final PlayQueueRepository playQueueRepository;
+    private final MusicProviderRepository musicProviderRepository;
 
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
@@ -44,12 +46,14 @@ public class MusicPlayerInteractorNew {
 //                                    SystemMusicController systemMusicController,
 //                                    SettingsRepository settingsRepository,
 //                                    UiStateRepository uiStateRepository,
-                                    PlayQueueRepository playQueueRepository) {
+                                    PlayQueueRepository playQueueRepository,
+                                    MusicProviderRepository musicProviderRepository) {
         this.musicPlayerController = musicPlayerController;
 //        this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
 //        this.uiStateRepository = uiStateRepository;
         this.playQueueRepository = playQueueRepository;
+        this.musicProviderRepository = musicProviderRepository;
 
     }
 
@@ -147,6 +151,7 @@ public class MusicPlayerInteractorNew {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
             onCompositionPlayFinished();
+//            musicProviderRepository.setCompositionCorrupted()
             //write error about composition...
         }
     }

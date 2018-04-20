@@ -4,6 +4,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 
 /**
@@ -13,4 +14,6 @@ import io.reactivex.Single;
 public interface MusicProviderRepository {
 
     Single<List<Composition>> getAllCompositions();
+
+    Completable setCompositionCorrupted(Composition composition);
 }

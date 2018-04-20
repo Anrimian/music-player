@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
@@ -39,6 +40,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Single<List<Composition>> getAllCompositions() {
         return storageMusicDataSource.getAllCompositions()
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable setCompositionCorrupted(Composition composition) {
+        return Completable.complete()
                 .subscribeOn(scheduler);
     }
 }
