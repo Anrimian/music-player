@@ -21,7 +21,8 @@ import dagger.Component;
         ErrorModule.class,
         MusicModule.class,
         DbModule.class,
-        StorageModule.class
+        StorageModule.class,
+        SettingsModule.class
 })
 public interface AppComponent {
 

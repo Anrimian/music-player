@@ -1,7 +1,9 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
+import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
@@ -20,6 +22,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 import static io.reactivex.subjects.BehaviorSubject.createDefault;
@@ -31,7 +34,7 @@ import static io.reactivex.subjects.BehaviorSubject.createDefault;
 public class MusicPlayerInteractorNew {
 
     private final MusicPlayerController musicPlayerController;
-    //    private SystemMusicController systemMusicController;
+    private final SystemMusicController systemMusicController;
     private final SettingsRepository settingsRepository;
     //    private UiStateRepository uiStateRepository;
     private final PlayQueueRepository playQueueRepository;
@@ -42,13 +45,12 @@ public class MusicPlayerInteractorNew {
 
     public MusicPlayerInteractorNew(MusicPlayerController musicPlayerController,
                                     SettingsRepository settingsRepository,
-//                                    SystemMusicController systemMusicController,
-//                                    SettingsRepository settingsRepository,
+                                    SystemMusicController systemMusicController,
 //                                    UiStateRepository uiStateRepository,
                                     PlayQueueRepository playQueueRepository,
                                     MusicProviderRepository musicProviderRepository) {
         this.musicPlayerController = musicPlayerController;
-//        this.systemMusicController = systemMusicController;
+        this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
 //        this.uiStateRepository = uiStateRepository;
         this.playQueueRepository = playQueueRepository;
@@ -64,7 +66,7 @@ public class MusicPlayerInteractorNew {
     }
 
     public void play() {
-        if (playerStateSubject.getValue() != PLAY) {
+        if (playerStateSubject.getValue() != PLAY && systemMusicController.requestAudioFocus()) {
             musicPlayerController.resume();
             playerStateSubject.onNext(PLAY);
 
@@ -75,7 +77,8 @@ public class MusicPlayerInteractorNew {
             playerDisposable.add(musicPlayerController.getEventsObservable()
                     .subscribe(this::onMusicPlayerEventReceived));
 
-            //subscribe on audio focus
+            playerDisposable.add(systemMusicController.getAudioFocusObservable()
+                    .subscribe(this::onAudioFocusChanged));
         }
     }
 
@@ -123,7 +126,7 @@ public class MusicPlayerInteractorNew {
         settingsRepository.setInfinitePlayingEnabled(enabled);
     }
 
-    public void onAudioBecomingNoisy() {
+    public void onAudioBecomingNoisy() {//TODO remake
 //        pause();
     }
 
@@ -171,18 +174,21 @@ public class MusicPlayerInteractorNew {
         }
     }
 
-
-//    private class PlayerCallback implements MusicPlayerCallback {
-//
-//        @Override
-//        public void onFinished() {
-//            //skip to next...
-//        }
-//
-//        @Override
-//        public void onError(Throwable throwable) {
-//            //skip to next and write error about composition...
-//        }
-//    }
-
+    private void onAudioFocusChanged(AudioFocusEvent event) {
+        switch (event) {
+            case GAIN: {
+                if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
+                    musicPlayerController.resume();
+                    playerStateSubject.onNext(PLAY);
+                }
+                break;
+            }
+            case LOSS_SHORTLY:
+            case LOSS: {
+                musicPlayerController.pause();
+                playerStateSubject.onNext(PAUSED_EXTERNALLY);
+                break;
+            }
+        }
+    }
 }

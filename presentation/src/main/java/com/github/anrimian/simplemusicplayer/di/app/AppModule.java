@@ -3,11 +3,7 @@ package com.github.anrimian.simplemusicplayer.di.app;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.github.anrimian.simplemusicplayer.data.repositories.settings.SettingsRepositoryImpl;
-import com.github.anrimian.simplemusicplayer.data.repositories.ui_state.UiStateRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.ServiceManager;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
 
@@ -41,20 +37,6 @@ public class AppModule {
     @Singleton
     NotificationsDisplayer provideNotificationsController(Context context) {
         return new NotificationsDisplayer(context);
-    }
-
-    @Provides
-    @Nonnull
-    @Singleton
-    SettingsRepository provideSettingsRepository(Context context) {
-        return new SettingsRepositoryImpl(context);
-    }
-
-    @Provides
-    @Nonnull
-    @Singleton
-    UiStateRepository provideUiStateRepository(Context context) {
-        return new UiStateRepositoryImpl(context);
     }
 
     @Provides

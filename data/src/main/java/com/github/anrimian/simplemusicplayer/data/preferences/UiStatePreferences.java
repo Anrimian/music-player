@@ -11,7 +11,7 @@ import com.github.anrimian.simplemusicplayer.data.utils.preferences.SharedPrefer
 public class UiStatePreferences {
 
     public static final long NO_COMPOSITION = Long.MIN_VALUE;
-    public static final int NO_POSITION = -1;
+    public static final int NO_POSITION = 0;
 
     private static final String PREFERENCES_NAME = "ui_preferences";
 

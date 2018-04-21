@@ -1,7 +1,9 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
+import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
@@ -22,9 +24,12 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.getFakeCompositions;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.GAIN;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.LOSS;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 import static org.mockito.Matchers.any;
@@ -42,11 +47,13 @@ public class MusicPlayerInteractorNewTest {
     private SettingsRepository settingsRepository = mock(SettingsRepository.class);
     private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
     private MusicProviderRepository musicProviderRepository = mock(MusicProviderRepository.class);
+    private SystemMusicController systemMusicController = mock(SystemMusicController.class);
 
     private MusicPlayerInteractorNew musicPlayerInteractor;
 
     private PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
     private BehaviorSubject<Composition> currentCompositionSubject = BehaviorSubject.createDefault(getFakeCompositions().get(0));
+    private PublishSubject<AudioFocusEvent> audioFocusSubject = PublishSubject.create();
 
     private InOrder inOrder = Mockito.inOrder(playQueueRepository,
             musicPlayerController,
@@ -67,8 +74,13 @@ public class MusicPlayerInteractorNewTest {
         when(musicProviderRepository.onErrorWithComposition(any(), any()))
                 .thenReturn(Completable.complete());
 
+        when(systemMusicController.getAudioFocusObservable()).thenReturn(audioFocusSubject);
+        when(systemMusicController.requestAudioFocus()).thenReturn(true);
+
+
         musicPlayerInteractor = new MusicPlayerInteractorNew(musicPlayerController,
                 settingsRepository,
+                systemMusicController,
                 playQueueRepository,
                 musicProviderRepository);
     }
@@ -220,5 +232,38 @@ public class MusicPlayerInteractorNewTest {
         inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
 
         testSubscriber.assertValues(IDLE, PLAY);
+    }
+
+    @Test
+    public void onAudioFocusNotGainedTest() {
+        when(systemMusicController.requestAudioFocus()).thenReturn(false);
+
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        verify(musicPlayerController, never()).prepareToPlayIgnoreError(any());
+        verify(musicPlayerController, never()).resume();
+        testSubscriber.assertValues(IDLE);
+    }
+
+    @Test
+    public void onAudioFocusLossAndGainTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        audioFocusSubject.onNext(LOSS);
+
+        inOrder.verify(musicPlayerController).pause();
+
+        audioFocusSubject.onNext(GAIN);
+
+        testSubscriber.assertValues(IDLE, PLAY, PAUSED_EXTERNALLY, PLAY);
     }
 }

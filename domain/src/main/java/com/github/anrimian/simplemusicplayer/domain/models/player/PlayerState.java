@@ -9,5 +9,6 @@ public enum PlayerState {
     PLAY,
     PAUSE,
     STOP,
-    LOADING
+    LOADING,
+    PAUSED_EXTERNALLY
 }
