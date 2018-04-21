@@ -15,5 +15,5 @@ public interface MusicProviderRepository {
 
     Single<List<Composition>> getAllCompositions();
 
-    Completable setCompositionCorrupted(Composition composition);
+    Completable onErrorWithComposition(Throwable throwable, Composition composition);
 }

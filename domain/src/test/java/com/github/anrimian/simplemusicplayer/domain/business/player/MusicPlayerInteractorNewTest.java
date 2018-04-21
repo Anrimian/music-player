@@ -3,8 +3,10 @@ package com.github.anrimian.simplemusicplayer.domain.business.player;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 
@@ -14,7 +16,6 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import io.reactivex.Completable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.BehaviorSubject;
@@ -26,7 +27,6 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
-import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -41,28 +41,36 @@ public class MusicPlayerInteractorNewTest {
     private MusicPlayerController musicPlayerController = mock(MusicPlayerController.class);
     private SettingsRepository settingsRepository = mock(SettingsRepository.class);
     private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
+    private MusicProviderRepository musicProviderRepository = mock(MusicProviderRepository.class);
 
     private MusicPlayerInteractorNew musicPlayerInteractor;
 
     private PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
     private BehaviorSubject<Composition> currentCompositionSubject = BehaviorSubject.createDefault(getFakeCompositions().get(0));
 
-    private InOrder inOrder = Mockito.inOrder(playQueueRepository, musicPlayerController);
+    private InOrder inOrder = Mockito.inOrder(playQueueRepository,
+            musicPlayerController,
+            musicProviderRepository);
 
     @Before
     public void setUp() {
         when(playQueueRepository.setPlayQueue(any())).thenReturn(Completable.complete());
         when(playQueueRepository.getCurrentComposition())
                 .thenReturn(Single.just(getFakeCompositions().get(0)));
-        when(playQueueRepository.getCurrentCompositionObservable()).thenReturn(currentCompositionSubject);
+        when(playQueueRepository.getCurrentCompositionObservable())
+                .thenReturn(currentCompositionSubject);
         when(playQueueRepository.skipToNext()).thenReturn(1);
 
         when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
         when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
 
+        when(musicProviderRepository.onErrorWithComposition(any(), any()))
+                .thenReturn(Completable.complete());
+
         musicPlayerInteractor = new MusicPlayerInteractorNew(musicPlayerController,
                 settingsRepository,
-                playQueueRepository);
+                playQueueRepository,
+                musicProviderRepository);
     }
 
     @Test
@@ -188,5 +196,29 @@ public class MusicPlayerInteractorNewTest {
         inOrder.verify(musicPlayerController, never()).resume();
         inOrder.verify(musicPlayerController, never()).prepareToPlayIgnoreError(getFakeCompositions().get(1));
         testSubscriber.assertValues(IDLE, PLAY, STOP);
+    }
+
+    @Test
+    public void onCompositionErrorTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        Throwable throwable = new IllegalStateException();
+        playerEventSubject.onNext(new ErrorEvent(throwable));
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+
+        inOrder.verify(playQueueRepository).getCurrentComposition();
+        inOrder.verify(musicProviderRepository)
+                .onErrorWithComposition(throwable, getFakeCompositions().get(0));
+        inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+
+        testSubscriber.assertValues(IDLE, PLAY);
     }
 }

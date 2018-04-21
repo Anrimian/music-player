@@ -23,7 +23,6 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 import static io.reactivex.subjects.BehaviorSubject.createDefault;
-import static java.util.Collections.singletonList;
 
 /**
  * Created on 02.11.2017.
@@ -149,11 +148,17 @@ public class MusicPlayerInteractorNew {
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
         if (playerEvent instanceof FinishedEvent) {
             onCompositionPlayFinished();
-        } else if (playerEvent instanceof ErrorEvent) {
+        } else if (playerEvent instanceof ErrorEvent) {//TODO infinite error case? Just ignore?
+            writeErrorAboutCurrentComposition(((ErrorEvent) playerEvent).getThrowable());
             onCompositionPlayFinished();
-//            musicProviderRepository.setCompositionCorrupted()
-            //write error about composition...
         }
+    }
+
+    private void writeErrorAboutCurrentComposition(Throwable throwable) {
+        playQueueRepository.getCurrentComposition()
+                .flatMapCompletable(composition ->
+                        musicProviderRepository.onErrorWithComposition(throwable, composition))
+                .subscribe();
     }
 
     private void onCompositionPlayFinished() {
