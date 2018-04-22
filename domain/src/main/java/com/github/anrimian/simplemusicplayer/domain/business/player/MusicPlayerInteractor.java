@@ -88,7 +88,7 @@ public class MusicPlayerInteractor {
             case IDLE:
             case PLAY:
             case PAUSE: {
-                if (systemMusicController.requestAudioFocus()) {
+                if (systemMusicController.requestAudioFocusOld()) {
                     musicPlayerController.resume();
                     setState(PLAY);
                 }

@@ -78,6 +78,7 @@ public class PlayQueueDataSource {
      * @return new position of current composition
      */
     public int setRandomPlayingEnabled(boolean enabled, Composition currentComposition) {
+        //set to preferences
         return 0;
     }
 

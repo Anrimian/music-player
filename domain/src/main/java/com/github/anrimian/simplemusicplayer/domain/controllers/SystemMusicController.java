@@ -2,6 +2,8 @@ package com.github.anrimian.simplemusicplayer.domain.controllers;
 
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 
 /**
@@ -10,9 +12,15 @@ import io.reactivex.Observable;
 
 public interface SystemMusicController {
 
-    boolean requestAudioFocus();
+    @Nullable
+    Observable<AudioFocusEvent> requestAudioFocus();
 
+    @Deprecated
+    boolean requestAudioFocusOld();
+
+    @Deprecated
     Observable<AudioFocusEvent> getAudioFocusObservable();
 
+    @Deprecated
     void abandonAudioFocus();
 }

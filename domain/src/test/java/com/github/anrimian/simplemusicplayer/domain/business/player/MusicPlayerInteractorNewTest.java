@@ -74,9 +74,7 @@ public class MusicPlayerInteractorNewTest {
         when(musicProviderRepository.onErrorWithComposition(any(), any()))
                 .thenReturn(Completable.complete());
 
-        when(systemMusicController.getAudioFocusObservable()).thenReturn(audioFocusSubject);
-        when(systemMusicController.requestAudioFocus()).thenReturn(true);
-
+        when(systemMusicController.requestAudioFocus()).thenReturn(audioFocusSubject);
 
         musicPlayerInteractor = new MusicPlayerInteractorNew(musicPlayerController,
                 settingsRepository,
@@ -236,7 +234,7 @@ public class MusicPlayerInteractorNewTest {
 
     @Test
     public void onAudioFocusNotGainedTest() {
-        when(systemMusicController.requestAudioFocus()).thenReturn(false);
+        when(systemMusicController.requestAudioFocus()).thenReturn(null);
 
         TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
                 .test();

@@ -118,6 +118,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     private void startTracingTrackPosition() {
+        stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .map(o -> player.getCurrentPosition())
                 .subscribe(trackPositionSubject::onNext);
@@ -126,6 +127,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private void stopTracingTrackPosition() {
         if (trackPositionDisposable != null) {
             trackPositionDisposable.dispose();
+            trackPositionDisposable = null;
         }
     }
 

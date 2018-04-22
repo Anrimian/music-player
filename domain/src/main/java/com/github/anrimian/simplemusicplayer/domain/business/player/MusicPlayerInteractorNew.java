@@ -66,19 +66,21 @@ public class MusicPlayerInteractorNew {
     }
 
     public void play() {
-        if (playerStateSubject.getValue() != PLAY && systemMusicController.requestAudioFocus()) {
+        Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
+        if (audioFocusObservable != null) {
             musicPlayerController.resume();
             playerStateSubject.onNext(PLAY);
 
-            playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
-                    .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
-                    .subscribe());
+            if (playerDisposable.size() == 0) {
+                playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
+                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
+                        .subscribe());
 
-            playerDisposable.add(musicPlayerController.getEventsObservable()
-                    .subscribe(this::onMusicPlayerEventReceived));
+                playerDisposable.add(musicPlayerController.getEventsObservable()
+                        .subscribe(this::onMusicPlayerEventReceived));
 
-            playerDisposable.add(systemMusicController.getAudioFocusObservable()
-                    .subscribe(this::onAudioFocusChanged));
+                playerDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
+            }
         }
     }
 
@@ -86,16 +88,12 @@ public class MusicPlayerInteractorNew {
         musicPlayerController.stop();
         playerStateSubject.onNext(STOP);
         playerDisposable.clear();
-
-//        systemMusicController.abandonAudioFocus();
     }
 
     public void pause() {
         musicPlayerController.pause();
         playerStateSubject.onNext(PAUSE);
         playerDisposable.clear();
-
-//            systemMusicController.abandonAudioFocus();
     }
 
     public void skipToPrevious() {

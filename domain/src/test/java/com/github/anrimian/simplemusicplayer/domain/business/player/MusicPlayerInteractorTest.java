@@ -103,7 +103,7 @@ public class MusicPlayerInteractorTest {
 
         systemMusicController = mock(SystemMusicController.class);
         when(systemMusicController.getAudioFocusObservable()).thenReturn(audioFocusSubject);
-        when(systemMusicController.requestAudioFocus()).thenReturn(true);
+        when(systemMusicController.requestAudioFocusOld()).thenReturn(true);
 
         musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
                 systemMusicController,
@@ -130,7 +130,7 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void startPlayingWithoutAudioFocusTest() throws Exception {
-        when(systemMusicController.requestAudioFocus()).thenReturn(false);
+        when(systemMusicController.requestAudioFocusOld()).thenReturn(false);
 
         musicPlayerInteractor.startPlaying(fakeCompositions);
 
