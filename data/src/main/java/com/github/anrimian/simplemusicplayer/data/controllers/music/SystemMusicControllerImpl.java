@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 
 import com.github.anrimian.simplemusicplayer.data.utils.rx.audio_focus.AudioFocusRxWrapper;
+import com.github.anrimian.simplemusicplayer.data.utils.rx.receivers.RxReceivers;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 
@@ -27,8 +28,10 @@ public class SystemMusicControllerImpl implements SystemMusicController {
     private PublishSubject<AudioFocusEvent> audioFocusSubject = PublishSubject.create();
 
     private final AudioFocusRxWrapper audioFocusRxWrapper;
+    private final Context context;
 
     public SystemMusicControllerImpl(Context context) {
+        this.context = context;
         audioFocusRxWrapper = new AudioFocusRxWrapper(context);
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
@@ -45,9 +48,14 @@ public class SystemMusicControllerImpl implements SystemMusicController {
 
     @Nullable
     @Override
-    @Deprecated
     public Observable<AudioFocusEvent> requestAudioFocus() {
         return audioFocusRxWrapper.requestAudioFocus(STREAM_MUSIC, AUDIOFOCUS_GAIN);
+    }
+
+    @Override
+    public Observable<Object> getAudioBecomingNoisyObservable() {
+        return RxReceivers.from(AudioManager.ACTION_AUDIO_BECOMING_NOISY, context)
+                .map(i -> new Object());
     }
 
     @Override

@@ -29,7 +29,6 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFo
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
-import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
 import static org.mockito.Matchers.any;
@@ -54,6 +53,7 @@ public class MusicPlayerInteractorNewTest {
     private PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
     private BehaviorSubject<Composition> currentCompositionSubject = BehaviorSubject.createDefault(getFakeCompositions().get(0));
     private PublishSubject<AudioFocusEvent> audioFocusSubject = PublishSubject.create();
+    private PublishSubject<Object> noisyAudioSubject = PublishSubject.create();
 
     private InOrder inOrder = Mockito.inOrder(playQueueRepository,
             musicPlayerController,
@@ -75,6 +75,7 @@ public class MusicPlayerInteractorNewTest {
                 .thenReturn(Completable.complete());
 
         when(systemMusicController.requestAudioFocus()).thenReturn(audioFocusSubject);
+        when(systemMusicController.getAudioBecomingNoisyObservable()).thenReturn(noisyAudioSubject);
 
         musicPlayerInteractor = new MusicPlayerInteractorNew(musicPlayerController,
                 settingsRepository,
@@ -262,6 +263,47 @@ public class MusicPlayerInteractorNewTest {
 
         audioFocusSubject.onNext(GAIN);
 
-        testSubscriber.assertValues(IDLE, PLAY, PAUSED_EXTERNALLY, PLAY);
+        inOrder.verify(musicPlayerController).resume();
+
+        testSubscriber.assertValues(IDLE, PLAY, PAUSE, PLAY);
+    }
+
+    @Test
+    public void onAudioBecomingNoisyTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        noisyAudioSubject.onNext(new Object());
+
+        inOrder.verify(musicPlayerController).pause();
+
+        testSubscriber.assertValues(IDLE, PLAY, PAUSE);
+    }
+
+    @Test
+    public void onAudioFocusLossThenBecomingNoisyAndGainFocusTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        audioFocusSubject.onNext(LOSS);
+
+        inOrder.verify(musicPlayerController).pause();
+
+        noisyAudioSubject.onNext(new Object());
+        audioFocusSubject.onNext(GAIN);
+
+        inOrder.verify(musicPlayerController, never()).resume();
+
+        testSubscriber.assertValues(IDLE, PLAY, PAUSE);
     }
 }

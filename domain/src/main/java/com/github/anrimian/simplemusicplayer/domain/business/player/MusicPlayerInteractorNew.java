@@ -66,6 +66,10 @@ public class MusicPlayerInteractorNew {
     }
 
     public void play() {
+        if (playerStateSubject.getValue() == PLAY) {
+            return;
+        }
+
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
             musicPlayerController.resume();
@@ -80,6 +84,9 @@ public class MusicPlayerInteractorNew {
                         .subscribe(this::onMusicPlayerEventReceived));
 
                 playerDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
+
+                playerDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
+                        .subscribe(this::onAudioBecomingNoisy));
             }
         }
     }
@@ -124,10 +131,6 @@ public class MusicPlayerInteractorNew {
         settingsRepository.setInfinitePlayingEnabled(enabled);
     }
 
-    public void onAudioBecomingNoisy() {//TODO remake
-//        pause();
-    }
-
     public Observable<Long> getTrackPositionObservable() {
 //        return musicPlayerController.getTrackPositionObservable()
 //                .doOnNext(uiStateRepository::setTrackPosition);
@@ -135,7 +138,8 @@ public class MusicPlayerInteractorNew {
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
-        return playerStateSubject.distinctUntilChanged();
+        return playerStateSubject.map(PlayerState::toBaseState)
+                .distinctUntilChanged();
     }
 
     public Observable<Composition> getCurrentCompositionObservable() {
@@ -188,5 +192,11 @@ public class MusicPlayerInteractorNew {
                 break;
             }
         }
+    }
+
+    @SuppressWarnings("unused")
+    private void onAudioBecomingNoisy(Object o) {
+        musicPlayerController.pause();
+        playerStateSubject.onNext(PAUSE);
     }
 }

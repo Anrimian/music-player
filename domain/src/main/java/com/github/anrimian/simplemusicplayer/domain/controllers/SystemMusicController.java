@@ -15,6 +15,8 @@ public interface SystemMusicController {
     @Nullable
     Observable<AudioFocusEvent> requestAudioFocus();
 
+    Observable<Object> getAudioBecomingNoisyObservable();
+
     @Deprecated
     boolean requestAudioFocusOld();
 

@@ -246,8 +246,11 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private final BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d("KEK", "onReceive, intent: " + intent);
             String action = intent.getAction();
+            Log.d("KEK", "onReceive, action: " + action);
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                Log.d("KEK", "onReceive, ACTION_AUDIO_BECOMING_NOISY");
                 musicPlayerInteractor.onAudioBecomingNoisy();
             }
         }
