@@ -306,4 +306,30 @@ public class MusicPlayerInteractorNewTest {
 
         testSubscriber.assertValues(IDLE, PLAY, PAUSE);
     }
+
+    @Test
+    public void onCompositionErrorInEndTest() {
+        when(playQueueRepository.skipToNext()).thenReturn(0);
+
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        Throwable throwable = new IllegalStateException();
+        playerEventSubject.onNext(new ErrorEvent(throwable));
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+
+        inOrder.verify(playQueueRepository).getCurrentComposition();
+        inOrder.verify(musicProviderRepository)
+                .onErrorWithComposition(throwable, getFakeCompositions().get(0));
+        inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController, never()).resume();
+        inOrder.verify(musicPlayerController, never()).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+
+        testSubscriber.assertValues(IDLE, PLAY, STOP);
+    }
 }

@@ -153,9 +153,14 @@ public class MusicPlayerInteractorNew {
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
         if (playerEvent instanceof FinishedEvent) {
             onCompositionPlayFinished();
-        } else if (playerEvent instanceof ErrorEvent) {//TODO infinite error case? Just ignore?
+        } else if (playerEvent instanceof ErrorEvent) {
             writeErrorAboutCurrentComposition(((ErrorEvent) playerEvent).getThrowable());
-            onCompositionPlayFinished();
+            int currentPosition = playQueueRepository.skipToNext();
+            if (currentPosition == 0) {
+                stop();
+            } else {
+                musicPlayerController.resume();
+            }
         }
     }
 
