@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.data.controllers.music;
 import android.content.Context;
 import android.net.Uri;
 
+import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerStateRxWrapper;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
@@ -40,9 +41,10 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private final PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
+    private final PlayerEventListener playerEventListener = new PlayerEventListener();
 
     private final SimpleExoPlayer player;
-    private final PlayerEventListener playerEventListener = new PlayerEventListener();
+    private final UiStatePreferences uiStatePreferences;
 
     @Nullable
     private Disposable trackPositionDisposable;
@@ -50,7 +52,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Nullable
     private Composition preparedComposition;
 
-    public MusicPlayerControllerImpl(Context context) {
+    public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences, Context context) {
+        this.uiStatePreferences = uiStatePreferences;
         player = ExoPlayerFactory.newSimpleInstance(
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
@@ -71,8 +74,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         }
         return prepareMediaSource(composition)
                 .toCompletable()//on error can be: com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException: java.io.FileNotFoundException
-                .doOnComplete(() -> preparedComposition = composition)
-                .doOnEvent(t -> trackPositionSubject.onNext(0L));
+                .doOnEvent(t -> onCompositionPrepared(t, composition));
     }
 
     @Override
@@ -84,19 +86,19 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void stop() {
-        player.setPlayWhenReady(false);
         seekTo(0);
-        stopTracingTrackPosition();
+        pause();
     }
 
     @Override
     public void pause() {
         player.setPlayWhenReady(false);
         stopTracingTrackPosition();
+        uiStatePreferences.setTrackPosition(player.getCurrentPosition());
     }
 
     @Override
-    public void seekTo(long position) {
+    public void seekTo(long position) {//TODO when we save position?
         player.seekTo(position);
         trackPositionSubject.onNext(position);
     }
@@ -115,6 +117,17 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public Observable<Long> getTrackPositionObservable() {
         return trackPositionSubject;
+    }
+
+    private void onCompositionPrepared(Throwable throwable, Composition composition) {
+        if (preparedComposition == null) {
+            if (throwable == null) {
+                seekTo(uiStatePreferences.getTrackPosition());
+            } else {
+                seekTo(0);
+            }
+        }
+        preparedComposition = composition;
     }
 
     private void startTracingTrackPosition() {

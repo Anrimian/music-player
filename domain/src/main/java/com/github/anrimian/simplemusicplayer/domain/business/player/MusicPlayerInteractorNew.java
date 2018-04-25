@@ -36,7 +36,6 @@ public class MusicPlayerInteractorNew {
     private final MusicPlayerController musicPlayerController;
     private final SystemMusicController systemMusicController;
     private final SettingsRepository settingsRepository;
-    //    private UiStateRepository uiStateRepository;
     private final PlayQueueRepository playQueueRepository;
     private final MusicProviderRepository musicProviderRepository;
 
@@ -46,16 +45,13 @@ public class MusicPlayerInteractorNew {
     public MusicPlayerInteractorNew(MusicPlayerController musicPlayerController,
                                     SettingsRepository settingsRepository,
                                     SystemMusicController systemMusicController,
-//                                    UiStateRepository uiStateRepository,
                                     PlayQueueRepository playQueueRepository,
                                     MusicProviderRepository musicProviderRepository) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
-//        this.uiStateRepository = uiStateRepository;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
-
     }
 
     public Completable startPlaying(List<Composition> compositions) {
@@ -132,9 +128,7 @@ public class MusicPlayerInteractorNew {
     }
 
     public Observable<Long> getTrackPositionObservable() {
-//        return musicPlayerController.getTrackPositionObservable()
-//                .doOnNext(uiStateRepository::setTrackPosition);
-        return null;
+        return musicPlayerController.getTrackPositionObservable();
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
