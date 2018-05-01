@@ -3,7 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.storage_library_screen;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
@@ -59,11 +59,13 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
     }
 
     void onCompositionClicked(Composition composition) {
-        interactor.playMusic(composition);
+        interactor.playMusic(composition)
+                .subscribe();//TODO handle error later
     }
 
     void onPlayAllButtonClicked() {
-        interactor.playAllMusicInPath(path);
+        interactor.playAllMusicInPath(path)
+                .subscribe();//TODO handle error later
     }
 
     void onBackPathButtonClicked() {

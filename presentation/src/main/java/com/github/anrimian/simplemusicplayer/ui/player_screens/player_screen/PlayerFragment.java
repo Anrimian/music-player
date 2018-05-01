@@ -35,7 +35,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
@@ -358,21 +358,20 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showStopState() {
-        setContentBottomHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height));
         ivPlayPause.setImageResource(R.drawable.ic_play);
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
     }
 
     @Override
     public void showPlayState() {
-        setContentBottomHeight(getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height));
         ivPlayPause.setImageResource(R.drawable.ic_pause);
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
     }
 
     @Override
-    public void hideMusicControls() {
-        setContentBottomHeight(0);
+    public void showMusicControls(boolean show) {
+        setContentBottomHeight(show ?
+                getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height) : 0);
     }
 
     @Override
@@ -393,7 +392,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void updatePlayList(List<Composition> currentPlayList, List<Composition> newPlayList) {
+    public void updatePlayQueue(List<Composition> currentPlayList, List<Composition> newPlayList) {
         playQueueAdapter.updatePlayList(currentPlayList, newPlayList);
     }
 

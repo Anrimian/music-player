@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 import java.util.List;

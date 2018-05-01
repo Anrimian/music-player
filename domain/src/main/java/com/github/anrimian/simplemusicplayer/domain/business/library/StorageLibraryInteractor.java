@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.business.library;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 
 /**
@@ -36,10 +37,10 @@ public class StorageLibraryInteractor {
         this.musicPlayerInteractor = musicPlayerInteractor;
     }
 
-    public void playAllMusicInPath(@Nullable String path) {
-        getMusicFileTree().map(tree -> findNodeByPath(tree, path))
+    public Completable playAllMusicInPath(@Nullable String path) {
+        return getMusicFileTree().map(tree -> findNodeByPath(tree, path))
                 .map(this::getAllCompositions)
-                .subscribe(musicPlayerInteractor::startPlaying);
+                .flatMapCompletable(musicPlayerInteractor::startPlaying);
     }
 
     public Single<List<FileSource>> getMusicInPath(@Nullable String path) {
@@ -48,10 +49,10 @@ public class StorageLibraryInteractor {
                 .map(this::applyOrder);
     }
 
-    public void playMusic(Composition composition) {
+    public Completable playMusic(Composition composition) {
         List<Composition> list = new ArrayList<>();
         list.add(composition);
-        musicPlayerInteractor.startPlaying(list);
+        return musicPlayerInteractor.startPlaying(list);
     }
 
     private List<FileSource> applyOrder(List<FileSource> FileSources) {

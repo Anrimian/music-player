@@ -6,7 +6,7 @@ import android.provider.MediaStore;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.music.exceptions.MusicNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 import java.util.ArrayList;
 import java.util.Date;

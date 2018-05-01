@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.controllers;
 
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 
@@ -15,9 +15,9 @@ public interface MusicPlayerController {
 
     Observable<PlayerEvent> getEventsObservable();
 
-    Completable prepareToPlay(Composition composition);
+    Completable prepareToPlay(CurrentComposition composition);
 
-    void prepareToPlayIgnoreError(Composition composition);
+    void prepareToPlayIgnoreError(CurrentComposition composition);
 
     void stop();
 

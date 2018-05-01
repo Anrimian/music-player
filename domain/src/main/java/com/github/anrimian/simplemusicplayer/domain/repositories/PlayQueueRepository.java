@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.repositories;
 
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 
 import java.util.List;
 
@@ -15,9 +16,9 @@ public interface PlayQueueRepository {
 
     Completable setPlayQueue(List<Composition> compositions);
 
-    Observable<Composition> getCurrentCompositionObservable();
+    Observable<CurrentComposition> getCurrentCompositionObservable();
 
-    Single<Composition> getCurrentComposition();
+    Single<CurrentComposition> getCurrentComposition();
 
     Observable<List<Composition>> getPlayQueueObservable();
 

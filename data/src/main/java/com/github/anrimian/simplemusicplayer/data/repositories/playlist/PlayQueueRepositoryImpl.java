@@ -2,7 +2,8 @@ package com.github.anrimian.simplemusicplayer.data.repositories.playlist;
 
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.CompositionNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final Scheduler dbScheduler;
 
     private final BehaviorSubject<List<Composition>> currentPlayQueueSubject = create();
-    private final BehaviorSubject<Composition> currentCompositionSubject = create();
+    private final BehaviorSubject<CurrentComposition> currentCompositionSubject = create();
 
     private int position = NO_POSITION;
 
@@ -58,13 +59,13 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Observable<Composition> getCurrentCompositionObservable() {
+    public Observable<CurrentComposition> getCurrentCompositionObservable() {
         return withDefaultValue(currentCompositionSubject, this::getSavedComposition)
                 .subscribeOn(dbScheduler);
     }
 
     @Override
-    public Single<Composition> getCurrentComposition() {
+    public Single<CurrentComposition> getCurrentComposition() {
         return getCurrentCompositionObservable()
                 .lastOrError()
                 .onErrorResumeNext(Single.error(new CompositionNotFoundException()));
@@ -78,12 +79,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public void setRandomPlayingEnabled(boolean enabled) {
-        Composition currentComposition = currentCompositionSubject.getValue();
+        CurrentComposition currentComposition = currentCompositionSubject.getValue();
         if (currentComposition == null) {
             throw new IllegalStateException("change play mode without current composition");
         }
 
-        position = playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition);
+        position = playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition.getComposition());
         List<Composition> playQueue = playQueueDataSource.getPlayQueue();
         currentPlayQueueSubject.onNext(playQueue);
 
@@ -131,19 +132,21 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private void updateCurrentComposition(List<Composition> currentPlayList, int position) {
-        Composition currentComposition = currentPlayList.get(position);
-        uiStatePreferences.setCurrentCompositionId(currentComposition.getId());
+        Composition composition = currentPlayList.get(position);
+        uiStatePreferences.setCurrentCompositionId(composition.getId());
         uiStatePreferences.setCurrentCompositionPosition(position);
+
+        CurrentComposition currentComposition = new CurrentComposition(composition, position, 0);
         currentCompositionSubject.onNext(currentComposition);
     }
 
-    private Composition getSavedComposition() {
+    private CurrentComposition getSavedComposition() {
         List<Composition> playQueue = playQueueDataSource.getPlayQueue();
-        return findCurrentComposition(playQueue);
+        return findSavedComposition(playQueue);
     }
 
     @Nullable
-    private Composition findCurrentComposition(List<Composition> compositions) {
+    private CurrentComposition findSavedComposition(List<Composition> compositions) {
         long id = uiStatePreferences.getCurrentCompositionId();
         int position = uiStatePreferences.getCurrentCompositionPosition();
 
@@ -151,7 +154,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         if (position > 0 && position < compositions.size()) {
             Composition expectedComposition = compositions.get(position);
             if (expectedComposition.getId() == id) {
-                return expectedComposition;
+                return new CurrentComposition(expectedComposition, position, uiStatePreferences.getTrackPosition());
             }
         }
 
@@ -159,9 +162,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             return null;
         }
 
-        for (Composition composition: compositions) {
+        for (int i = 0; i< compositions.size(); i++) {
+            Composition composition = compositions.get(i);
             if (composition.getId() == id) {
-                return composition;
+                return new CurrentComposition(composition, position, uiStatePreferences.getTrackPosition());
             }
         }
         return null;

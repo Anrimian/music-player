@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 
 import org.junit.After;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
  */
 public class PlayerPresenterTest {
 
-    private MusicPlayerInteractor musicPlayerInteractor;
+    private MusicPlayerInteractor musicPlayerInteractor = mock(MusicPlayerInteractor.class);
     private Scheduler uiScheduler = Schedulers.single();
     private PlayerView playerView;
 
@@ -35,28 +35,29 @@ public class PlayerPresenterTest {
     private PlayerPresenter playerPresenter;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         playerStateSubject = BehaviorSubject.createDefault(PlayerState.IDLE);
         currentCompositionSubject = BehaviorSubject.create();
         currentPlayListSubject = BehaviorSubject.create();
 
-        musicPlayerInteractor = mock(MusicPlayerInteractor.class);
         when(musicPlayerInteractor.getCurrentCompositionObservable()).thenReturn(currentCompositionSubject);
-        when(musicPlayerInteractor.getCurrentPlayListObservable()).thenReturn(currentPlayListSubject);
+        when(musicPlayerInteractor.getPlayQueueObservable()).thenReturn(currentPlayListSubject);
         when(musicPlayerInteractor.getPlayerStateObservable()).thenReturn(playerStateSubject);
 
         playerView = mock(PlayerView.class);
 
         playerPresenter = new PlayerPresenter(musicPlayerInteractor, uiScheduler);
         playerPresenter.attachView(playerView);
+        playerPresenter.onStart();
 
-        verify(playerView).hideMusicControls();
+        verify(playerView).showMusicControls(false);
         verify(playerView).bindPlayList(any());
     }
 
     @After
-    public void tearDown() throws Exception {
-        playerPresenter.detachView(playerView);
+    public void tearDown() {
+        playerPresenter.onStop();
+        playerPresenter.destroyView(playerView);
     }
 
     @Test

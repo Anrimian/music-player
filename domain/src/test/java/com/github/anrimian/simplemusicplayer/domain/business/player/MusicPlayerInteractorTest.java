@@ -2,352 +2,334 @@ package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
-import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
-import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.mockito.Mockito;
 
 import io.reactivex.Completable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
+import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.getFakeCompositions;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.GAIN;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.LOSS;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
-import static io.reactivex.Single.just;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created on 12.11.2017.
+ * Created on 17.04.2018.
  */
 public class MusicPlayerInteractorTest {
 
+    private MusicPlayerController musicPlayerController = mock(MusicPlayerController.class);
+    private SettingsRepository settingsRepository = mock(SettingsRepository.class);
+    private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
+    private MusicProviderRepository musicProviderRepository = mock(MusicProviderRepository.class);
+    private SystemMusicController systemMusicController = mock(SystemMusicController.class);
+
     private MusicPlayerInteractor musicPlayerInteractor;
-    private MusicPlayerController musicPlayerController;
-    private SystemMusicController systemMusicController;
 
-    private SettingsRepository settingsRepository;
-    private UiStateRepository uiStateRepository;
-    private PlayListRepository playQueueRepository;
-
-    private TestObserver<PlayerState> playerStateTestObserver = new TestObserver<>();
-    private TestObserver<Composition> currentCompositionTestObserver = new TestObserver<>();
-    private TestObserver<List<Composition>> currentPlayListTestObserver = new TestObserver<>();
-    private TestObserver<Long> trackStateTestObserver = new TestObserver<>();
-
-    private Composition one = new Composition();
-    private Composition two = new Composition();
-    private Composition three = new Composition();
-    private Composition four = new Composition();
-
-    private List<Composition> fakeCompositions = new ArrayList<>();
-
-    private PublishSubject<InternalPlayerState> internalPlayerStateObservable = PublishSubject.create();
-    private PublishSubject<Long> trackStateObservable = PublishSubject.create();
+    private PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
+    private BehaviorSubject<Composition> currentCompositionSubject = BehaviorSubject.createDefault(getFakeCompositions().get(0));
     private PublishSubject<AudioFocusEvent> audioFocusSubject = PublishSubject.create();
+    private PublishSubject<Object> noisyAudioSubject = PublishSubject.create();
+
+    private InOrder inOrder = Mockito.inOrder(playQueueRepository,
+            musicPlayerController,
+            musicProviderRepository);
 
     @Before
-    public void setUp() throws Exception {
-        one.setFilePath("root/music/one");
-        one.setId(1);
-        fakeCompositions.add(one);
+    public void setUp() {
+        when(playQueueRepository.setPlayQueue(any())).thenReturn(Completable.complete());
+        when(playQueueRepository.getCurrentComposition())
+                .thenReturn(Single.just(getFakeCompositions().get(0)));
+        when(playQueueRepository.getCurrentCompositionObservable())
+                .thenReturn(currentCompositionSubject);
+        when(playQueueRepository.skipToNext()).thenReturn(1);
 
-        two.setFilePath("root/music/two");
-        two.setId(2);
-        fakeCompositions.add(two);
-
-        three.setFilePath("root/music/old/three");
-        three.setId(3);
-        fakeCompositions.add(three);
-
-        four.setFilePath("root/music/old/to delete/four");
-        four.setId(4);
-        fakeCompositions.add(four);
-
-        musicPlayerController = mock(MusicPlayerController.class);
-        when(musicPlayerController.getPlayerStateObservable()).thenReturn(internalPlayerStateObservable);
-        when(musicPlayerController.getTrackPositionObservable()).thenReturn(trackStateObservable);
         when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
+        when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
 
-        settingsRepository = mock(SettingsRepository.class);
-        when(settingsRepository.isInfinitePlayingEnabled()).thenReturn(false);
-        when(settingsRepository.isRandomPlayingEnabled()).thenReturn(false);
+        when(musicProviderRepository.onErrorWithComposition(any(), any()))
+                .thenReturn(Completable.complete());
 
-        uiStateRepository = mock(UiStateRepository.class);
-        when(uiStateRepository.getPlayListPosition()).thenReturn(0);
-        when(uiStateRepository.getTrackPosition()).thenReturn(0L);
-
-        playQueueRepository = mock(PlayListRepository.class);
-        when(playQueueRepository.getCurrentPlayList()).thenReturn(just(new CurrentPlayListInfo(new ArrayList<>(), new ArrayList<>())));
-        when(playQueueRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
-
-        systemMusicController = mock(SystemMusicController.class);
-        when(systemMusicController.getAudioFocusObservable()).thenReturn(audioFocusSubject);
-        when(systemMusicController.requestAudioFocusOld()).thenReturn(true);
+        when(systemMusicController.requestAudioFocus()).thenReturn(audioFocusSubject);
+        when(systemMusicController.getAudioBecomingNoisyObservable()).thenReturn(noisyAudioSubject);
 
         musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
-                systemMusicController,
                 settingsRepository,
-                uiStateRepository,
-                playQueueRepository);
-        musicPlayerInteractor.getPlayerStateObservable().subscribe(playerStateTestObserver);
-        musicPlayerInteractor.getCurrentCompositionObservable().subscribe(currentCompositionTestObserver);
-        musicPlayerInteractor.getCurrentPlayListObservable().subscribe(currentPlayListTestObserver);
-        musicPlayerInteractor.getTrackPositionObservable().subscribe(trackStateTestObserver);
+                systemMusicController,
+                playQueueRepository,
+                musicProviderRepository);
     }
 
     @Test
-    public void startPlayingTest() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
+    public void startPlayingTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
 
-        playerStateTestObserver.assertValues(IDLE, PLAY);
-        currentCompositionTestObserver.assertValues(one);
-        currentPlayListTestObserver.assertValue(fakeCompositions);
-        verify(musicPlayerController).prepareToPlay(eq(one));
+        musicPlayerInteractor.startPlaying(getFakeCompositions())
+                .test()
+                .assertComplete();
+
+        verify(playQueueRepository).setPlayQueue(getFakeCompositions());
+        verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
         verify(musicPlayerController).resume();
-    }
-
-
-    @Test
-    public void startPlayingWithoutAudioFocusTest() throws Exception {
-        when(systemMusicController.requestAudioFocusOld()).thenReturn(false);
-
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-
-        playerStateTestObserver.assertValues(IDLE, PLAY);
-        currentCompositionTestObserver.assertValues(one);
-        currentPlayListTestObserver.assertValue(fakeCompositions);
-        verify(musicPlayerController).prepareToPlay(eq(one));
-        verify(musicPlayerController, never()).resume();
+        testSubscriber.assertValues(IDLE, LOADING, PLAY);
     }
 
     @Test
-    public void emptyPlayTest() throws Exception {
-        musicPlayerInteractor.play();
-
-        verify(musicPlayerController, never()).resume();
-        playerStateTestObserver.assertValues(IDLE);
-    }
-
-    @Test
-    public void playAfterPauseTest() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-        musicPlayerInteractor.pause();
-        musicPlayerInteractor.play();
-
-        verify(musicPlayerController, times(2)).resume();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY);
-    }
-
-    @Test
-    public void playAfterStopTest() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-        musicPlayerInteractor.stop();
-        musicPlayerInteractor.play();
-
-        verify(musicPlayerController, times(2)).prepareToPlay(eq(one));
-        playerStateTestObserver.assertValues(IDLE, PLAY, STOP, PLAY);
-    }
-
-    @Test
-    public void stopTest() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-        musicPlayerInteractor.stop();
-
-        verify(musicPlayerController).stop();
-        playerStateTestObserver.assertValues(IDLE, PLAY, STOP);
-    }
-
-    @Test
-    public void pauseTest() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-        musicPlayerInteractor.pause();
-
-        verify(musicPlayerController).pause();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE);
-    }
-
-    @Test
-    public void testSkipToNext() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-
-        musicPlayerInteractor.skipToNext();
-        verify(musicPlayerController).prepareToPlay(eq(two));
-    }
-
-    @Test
-    public void testSkipToPrevious() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-
-        musicPlayerInteractor.skipToPrevious();
-        verify(musicPlayerController).prepareToPlay(eq(four));
-    }
-
-    @Test
-    public void testSkipToNextInPauseState() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-        musicPlayerInteractor.pause();
-        musicPlayerInteractor.skipToNext();
-        musicPlayerInteractor.play();
-
-        verify(musicPlayerController).prepareToPlay(eq(two));
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY);
-    }
-
-    @Test
-    public void testAutoPlayWithoutRepeat() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-
-        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
-        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
-        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
-        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
-        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
-        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
-        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
-
-        verify(musicPlayerController, times(4)).prepareToPlay(any());
-    }
-
-    @Test
-    public void testRandomPlaying() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-
-        when(settingsRepository.isRandomPlayingEnabled()).thenReturn(true);
-        musicPlayerInteractor.setRandomPlayingEnabled(true);
-
-        musicPlayerInteractor.skipToNext();
-        musicPlayerInteractor.skipToPrevious();
-        verify(musicPlayerController, times(2)).prepareToPlay(eq(one));
-    }
-
-    @Test
-    public void playOnlyOneTwoTimesTest() throws Exception {
-        musicPlayerInteractor.startPlaying(Collections.singletonList(one));
-
-        internalPlayerStateObservable.onNext(InternalPlayerState.ENDED);
+    public void playWithoutPreparingTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
 
         musicPlayerInteractor.play();
 
-        verify(musicPlayerController, times(2)).prepareToPlay(eq(one));
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY);
+        verify(musicPlayerController).prepareToPlayIgnoreError(any());
+        verify(musicPlayerController).resume();
+        testSubscriber.assertValues(IDLE, PLAY);
     }
 
     @Test
-    public void testShuffleInitialPlayList() throws Exception {
-        when(playQueueRepository.getCurrentPlayList()).thenReturn(just(new CurrentPlayListInfo(fakeCompositions, fakeCompositions)));
-        when(playQueueRepository.setCurrentPlayList(any())).thenReturn(Completable.complete());
-
-        when(settingsRepository.isRandomPlayingEnabled()).thenReturn(true);
-
-        musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
-                systemMusicController,
-                settingsRepository,
-                uiStateRepository,
-                playQueueRepository);
-        TestObserver<PlayerState> playerStateTestObserver = musicPlayerInteractor.getPlayerStateObservable().test();
-
-        musicPlayerInteractor.setRandomPlayingEnabled(true);
+    public void onPlayFinishedTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
 
         musicPlayerInteractor.play();
-        verify(musicPlayerController).prepareToPlay(eq(one));
 
-        playerStateTestObserver.assertValues(PAUSE, PLAY);
-    }
-
-    @Test
-    public void testPlayCompositionWhenPlayingList() throws Exception {
-        when(settingsRepository.isRandomPlayingEnabled()).thenReturn(true);
-
-        musicPlayerInteractor.startPlaying(fakeCompositions);
-
-        musicPlayerInteractor.skipToNext();
-        musicPlayerInteractor.skipToNext();
-
-        musicPlayerInteractor.startPlaying(Collections.singletonList(one));
-
-        playerStateTestObserver.assertValues(IDLE, PLAY);
-        verify(musicPlayerController, times(4)).prepareToPlay(any());
-    }
-
-    @Test
-    public void audioFocusNormalEventsTest() throws Exception {
-        startPlayingTest();
-
-        InOrder inOrder = inOrder(musicPlayerController);
-
-        audioFocusSubject.onNext(AudioFocusEvent.LOSS);
-        inOrder.verify(musicPlayerController).pause();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE);
-
-        audioFocusSubject.onNext(AudioFocusEvent.GAIN);
         inOrder.verify(musicPlayerController).resume();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY);
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
-        audioFocusSubject.onNext(AudioFocusEvent.LOSS_SHORTLY);
-        inOrder.verify(musicPlayerController).pause();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY, PAUSE);
+        playerEventSubject.onNext(new FinishedEvent());
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
 
-        audioFocusSubject.onNext(AudioFocusEvent.GAIN);
+        inOrder.verify(playQueueRepository).skipToNext();
         inOrder.verify(musicPlayerController).resume();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY, PAUSE, PLAY);
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+
+        testSubscriber.assertValues(IDLE, PLAY);
     }
 
     @Test
-    public void audioFocusWithNoisyTestTest() throws Exception {//TODO think about this case
-        startPlayingTest();
+    public void onPlayToEndTest() {
+        when(playQueueRepository.skipToNext()).thenReturn(0);
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
 
-        InOrder inOrder = inOrder(musicPlayerController);
+        musicPlayerInteractor.play();
 
-        audioFocusSubject.onNext(AudioFocusEvent.LOSS);
-        inOrder.verify(musicPlayerController).pause();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE);
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
-        musicPlayerInteractor.onAudioBecomingNoisy();
+        playerEventSubject.onNext(new FinishedEvent());
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
 
-        audioFocusSubject.onNext(AudioFocusEvent.GAIN);
+        inOrder.verify(playQueueRepository).skipToNext();
         inOrder.verify(musicPlayerController, never()).resume();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE);
+        inOrder.verify(musicPlayerController).stop();
 
-        musicPlayerInteractor.play();
-        inOrder.verify(musicPlayerController).resume();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY);
-
-        audioFocusSubject.onNext(AudioFocusEvent.LOSS_SHORTLY);
-        inOrder.verify(musicPlayerController).pause();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY, PAUSE);
-
-        audioFocusSubject.onNext(AudioFocusEvent.GAIN);
-        inOrder.verify(musicPlayerController).resume();
-        playerStateTestObserver.assertValues(IDLE, PLAY, PAUSE, PLAY, PAUSE, PLAY);
+        testSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 
     @Test
-    public void moveToComposition() throws Exception {
-        musicPlayerInteractor.startPlaying(fakeCompositions);
+    public void onPlayToEndWithInfiniteModeTest() {
+        when(playQueueRepository.skipToNext()).thenReturn(0);
+        when(settingsRepository.isInfinitePlayingEnabled()).thenReturn(true);
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
 
-        musicPlayerInteractor.moveToComposition(three);
-        verify(musicPlayerController).prepareToPlay(eq(three));
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        playerEventSubject.onNext(new FinishedEvent());
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+
+        inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+
+        testSubscriber.assertValues(IDLE, PLAY);
     }
 
+    @Test
+    public void pauseTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+        musicPlayerInteractor.pause();
+
+        verify(musicPlayerController).resume();
+        verify(musicPlayerController).prepareToPlayIgnoreError(any());
+        verify(musicPlayerController).pause();
+        testSubscriber.assertValues(IDLE, PLAY, PAUSE);
+    }
+
+    @Test
+    public void onCompositionPlayFinishedInStopState() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+        musicPlayerInteractor.stop();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(any());
+        inOrder.verify(musicPlayerController).stop();
+
+        playerEventSubject.onNext(new FinishedEvent());
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+//
+        inOrder.verify(playQueueRepository, never()).skipToNext();
+        inOrder.verify(musicPlayerController, never()).resume();
+        inOrder.verify(musicPlayerController, never()).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+        testSubscriber.assertValues(IDLE, PLAY, STOP);
+    }
+
+    @Test
+    public void onCompositionErrorTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        Throwable throwable = new IllegalStateException();
+        playerEventSubject.onNext(new ErrorEvent(throwable));
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+
+        inOrder.verify(playQueueRepository).getCurrentComposition();
+        inOrder.verify(musicProviderRepository)
+                .onErrorWithComposition(throwable, getFakeCompositions().get(0));
+        inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+
+        testSubscriber.assertValues(IDLE, PLAY);
+    }
+
+    @Test
+    public void onAudioFocusNotGainedTest() {
+        when(systemMusicController.requestAudioFocus()).thenReturn(null);
+
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        verify(musicPlayerController, never()).prepareToPlayIgnoreError(any());
+        verify(musicPlayerController, never()).resume();
+        testSubscriber.assertValues(IDLE);
+    }
+
+    @Test
+    public void onAudioFocusLossAndGainTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        audioFocusSubject.onNext(LOSS);
+
+        inOrder.verify(musicPlayerController).pause();
+
+        audioFocusSubject.onNext(GAIN);
+
+        inOrder.verify(musicPlayerController).resume();
+
+        testSubscriber.assertValues(IDLE, PLAY, PAUSE, PLAY);
+    }
+
+    @Test
+    public void onAudioBecomingNoisyTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        noisyAudioSubject.onNext(new Object());
+
+        inOrder.verify(musicPlayerController).pause();
+
+        testSubscriber.assertValues(IDLE, PLAY, PAUSE);
+    }
+
+    @Test
+    public void onAudioFocusLossThenBecomingNoisyAndGainFocusTest() {
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        audioFocusSubject.onNext(LOSS);
+
+        inOrder.verify(musicPlayerController).pause();
+
+        noisyAudioSubject.onNext(new Object());
+        audioFocusSubject.onNext(GAIN);
+
+        inOrder.verify(musicPlayerController, never()).resume();
+
+        testSubscriber.assertValues(IDLE, PLAY, PAUSE);
+    }
+
+    @Test
+    public void onCompositionErrorInEndTest() {
+        when(playQueueRepository.skipToNext()).thenReturn(0);
+
+        TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
+                .test();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+
+        Throwable throwable = new IllegalStateException();
+        playerEventSubject.onNext(new ErrorEvent(throwable));
+        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+
+        inOrder.verify(playQueueRepository).getCurrentComposition();
+        inOrder.verify(musicProviderRepository)
+                .onErrorWithComposition(throwable, getFakeCompositions().get(0));
+        inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController, never()).resume();
+        inOrder.verify(musicPlayerController, never()).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+
+        testSubscriber.assertValues(IDLE, PLAY, STOP);
+    }
 }

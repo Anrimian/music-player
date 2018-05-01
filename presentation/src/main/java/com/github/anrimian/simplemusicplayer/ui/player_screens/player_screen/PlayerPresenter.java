@@ -3,7 +3,8 @@ package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 
 import java.util.ArrayList;
@@ -27,8 +28,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private Disposable trackStateDisposable;
     private Disposable currentCompositionDisposable;
 
-    private final List<Composition> currentPlayList = new ArrayList<>();
-    private Composition currentComposition;
+    private final List<Composition> playQueue = new ArrayList<>();
+    private Composition composition;
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            Scheduler uiScheduler) {
@@ -39,7 +40,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().bindPlayList(currentPlayList);
+        getViewState().bindPlayList(playQueue);
         getViewState().showInfinitePlayingButton(musicPlayerInteractor.isInfinitePlayingEnabled());
         getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
     }
@@ -93,11 +94,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onShareCompositionButtonClicked() {
-        getViewState().showShareMusicDialog(currentComposition.getFilePath());
+        getViewState().showShareMusicDialog(composition.getFilePath());
     }
 
     void onCompositionItemClicked(Composition composition) {
-        musicPlayerInteractor.moveToComposition(composition);
+        musicPlayerInteractor.skipToPosition(playQueue.indexOf(composition));//TODO optimise later
     }
 
     private void subscribeOnCurrentCompositionChanging() {
@@ -107,20 +108,16 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         presenterDisposable.add(currentCompositionDisposable);
     }
 
-    private void onCurrentCompositionChanged(Composition composition) {
-        currentComposition = composition;
+    private void onCurrentCompositionChanged(CurrentComposition currentComposition) {
+        composition = currentComposition.getComposition();
         if (trackStateDisposable != null) {
             trackStateDisposable.dispose();
             trackStateDisposable = null;
         }
-        int position = currentPlayList.indexOf(composition);
-        if (position != -1) {
-            getViewState().showCurrentComposition(composition, position);
-            getViewState().showTrackState(0, composition.getDuration());
-            subscribeOnTrackPositionChanging();
-        } else {
-            throw new IllegalStateException("can not find position in queue: " + composition);
-        }
+
+        getViewState().showCurrentComposition(composition, currentComposition.getQueuePosition());
+        getViewState().showTrackState(currentComposition.getPlayPosition(), composition.getDuration());
+        subscribeOnTrackPositionChanging();
     }
 
     private void subscribeOnPlayerStateChanges() {
@@ -135,10 +132,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 getViewState().showPlayState();
                 return;
             }
-            case IDLE: {
-                getViewState().hideMusicControls();
-                return;
-            }
             default: {
                 getViewState().showStopState();
             }
@@ -146,26 +139,28 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnCurrentPlaylistChanging() {
-        presenterDisposable.add(musicPlayerInteractor.getCurrentPlayListObservable()
+        presenterDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayListChanged));
     }
 
-    private void onPlayListChanged(List<Composition> newPlayList) {
+    private void onPlayListChanged(List<Composition> newPlayQueue) {
         if (currentCompositionDisposable != null) {
             currentCompositionDisposable.dispose();
             currentCompositionDisposable = null;
-            currentComposition = null;
+            composition = null;
         }
         if (trackStateDisposable != null) {
             trackStateDisposable.dispose();
             trackStateDisposable = null;
         }
 
-        List<Composition> oldPlayList = new ArrayList<>(currentPlayList);
-        currentPlayList.clear();
-        currentPlayList.addAll(newPlayList);
-        getViewState().updatePlayList(oldPlayList, currentPlayList);
+        List<Composition> oldPlayList = new ArrayList<>(playQueue);
+        playQueue.clear();
+        playQueue.addAll(newPlayQueue);
+
+        getViewState().updatePlayQueue(oldPlayList, playQueue);
+        getViewState().showMusicControls(!playQueue.isEmpty());
 
         subscribeOnCurrentCompositionChanging();
     }
@@ -177,7 +172,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onTrackPositionChanged(Long currentPosition) {
-        long duration = currentComposition.getDuration();
+        long duration = composition.getDuration();
         getViewState().showTrackState(currentPosition, duration);
     }
 }

@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors;
 
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.Visitor;
 

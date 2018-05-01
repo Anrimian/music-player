@@ -7,7 +7,8 @@ import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerStateRxWrapper;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -31,7 +32,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created on 10.11.2017.
@@ -40,7 +41,7 @@ import io.reactivex.subjects.BehaviorSubject;
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private final PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
-    private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
+    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final PlayerEventListener playerEventListener = new PlayerEventListener();
 
     private final SimpleExoPlayer player;
@@ -50,7 +51,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private Disposable trackPositionDisposable;
 
     @Nullable
-    private Composition preparedComposition;
+    private CurrentComposition preparedComposition;
 
     public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences, Context context) {
         this.uiStatePreferences = uiStatePreferences;
@@ -68,17 +69,18 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public Completable prepareToPlay(Composition composition) {
+    public Completable prepareToPlay(CurrentComposition composition) {
         if (composition.equals(preparedComposition)) {
+//            seekTo(0);
             return Completable.complete();
         }
-        return prepareMediaSource(composition)
+        return prepareMediaSource(composition.getComposition())
                 .toCompletable()//on error can be: com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException: java.io.FileNotFoundException
                 .doOnEvent(t -> onCompositionPrepared(t, composition));
     }
 
     @Override
-    public void prepareToPlayIgnoreError(Composition composition) {
+    public void prepareToPlayIgnoreError(CurrentComposition composition) {
         prepareToPlay(composition)
                 .onErrorComplete()
                 .subscribe();
@@ -119,15 +121,13 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         return trackPositionSubject;
     }
 
-    private void onCompositionPrepared(Throwable throwable, Composition composition) {
-        if (preparedComposition == null) {
-            if (throwable == null) {
-                seekTo(uiStatePreferences.getTrackPosition());
-            } else {
-                seekTo(0);
-            }
+    private void onCompositionPrepared(Throwable throwable, CurrentComposition currentComposition) {
+        if (throwable == null) {
+            seekTo(currentComposition.getPlayPosition());
+        } else {
+            seekTo(0);
         }
-        preparedComposition = composition;
+        preparedComposition = currentComposition;
     }
 
     private void startTracingTrackPosition() {

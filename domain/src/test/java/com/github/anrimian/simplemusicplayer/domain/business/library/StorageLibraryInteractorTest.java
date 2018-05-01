@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.business.library;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
@@ -39,7 +39,7 @@ public class StorageLibraryInteractorTest {
     private List<Composition> fakeCompositions = new ArrayList<>();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Composition one = new Composition();
         one.setFilePath("root/music/one");
         one.setDuration(100);

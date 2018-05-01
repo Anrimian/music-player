@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.ui.player_screens.play_queue;
 
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 import java.util.ArrayList;
 import java.util.List;

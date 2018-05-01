@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.playlist;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 
 import org.junit.Before;

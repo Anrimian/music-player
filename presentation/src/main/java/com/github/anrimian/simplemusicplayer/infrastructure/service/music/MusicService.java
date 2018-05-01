@@ -2,22 +2,18 @@ package com.github.anrimian.simplemusicplayer.infrastructure.service.music;
 
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.media.AudioManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerInfo;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.TrackInfo;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper;
@@ -96,8 +92,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
 
-        registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-
         subscribeOnPlayerChanges();
     }
 
@@ -124,18 +118,15 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(becomingNoisyReceiver);
         mediaSession.release();
         serviceDisposable.dispose();
     }
 
-    @Deprecated //possible, if warning don't gone after fix
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.KEYCODE_MEDIA_PLAY: {
-                Log.d("KEK", "start playing");
-//                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
-//                musicPlayerInteractor.play();
+                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
+                musicPlayerInteractor.play();
                 break;
             }
         }
@@ -166,6 +157,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Observable<Integer> playerStateObservable = musicPlayerInteractor.getPlayerStateObservable()
                 .map(PlayerStateMapper::toMediaState);
         Observable<Composition> compositionObservable = musicPlayerInteractor.getCurrentCompositionObservable()
+                .map(CurrentComposition::getComposition)
                 .doOnNext(this::onCurrentCompositionChanged);
         Observable<Long> trackPositionObservable = musicPlayerInteractor.getTrackPositionObservable();
 
@@ -242,17 +234,4 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             musicPlayerInteractor.skipToPrevious();
         }
     }
-
-    private final BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("KEK", "onReceive, intent: " + intent);
-            String action = intent.getAction();
-            Log.d("KEK", "onReceive, action: " + action);
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
-                Log.d("KEK", "onReceive, ACTION_AUDIO_BECOMING_NOISY");
-                musicPlayerInteractor.onAudioBecomingNoisy();
-            }
-        }
-    };
 }

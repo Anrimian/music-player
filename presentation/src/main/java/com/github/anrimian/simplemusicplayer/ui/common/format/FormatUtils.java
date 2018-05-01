@@ -3,7 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.common.format;
 import android.content.Context;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 import java.util.Locale;
 

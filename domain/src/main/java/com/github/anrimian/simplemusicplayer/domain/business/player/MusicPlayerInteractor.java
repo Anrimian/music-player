@@ -2,27 +2,31 @@ package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
-import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
-import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
+import static io.reactivex.subjects.BehaviorSubject.createDefault;
 
 /**
  * Created on 02.11.2017.
@@ -30,120 +34,86 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 
 public class MusicPlayerInteractor {
 
-    private static final int NO_POSITION = -1;
+    private final MusicPlayerController musicPlayerController;
+    private final SystemMusicController systemMusicController;
+    private final SettingsRepository settingsRepository;
+    private final PlayQueueRepository playQueueRepository;
+    private final MusicProviderRepository musicProviderRepository;
 
-    private MusicPlayerController musicPlayerController;
-    private SystemMusicController systemMusicController;
-    private SettingsRepository settingsRepository;
-    private UiStateRepository uiStateRepository;
-    private PlayListRepository playListRepository;
-
-    private PlayerState playerState = IDLE;
-    private BehaviorSubject<PlayerState> playerStateSubject = BehaviorSubject.createDefault(playerState);
-    private BehaviorSubject<Composition> currentCompositionSubject = BehaviorSubject.create();
-    private BehaviorSubject<List<Composition>> currentPlayListSubject = BehaviorSubject.create();
-
-    private List<Composition> initialPlayList;
-    private List<Composition> currentPlayList = new ArrayList<>();
-
-    private int currentPlayPosition = NO_POSITION;
+    private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
+    private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                 SystemMusicController systemMusicController,
                                  SettingsRepository settingsRepository,
-                                 UiStateRepository uiStateRepository,
-                                 PlayListRepository playListRepository) {
+                                 SystemMusicController systemMusicController,
+                                 PlayQueueRepository playQueueRepository,
+                                 MusicProviderRepository musicProviderRepository) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
-        this.uiStateRepository = uiStateRepository;
-        this.playListRepository = playListRepository;
-
-        subscribeOnAudioFocusChanges();
-        subscribeOnInternalPlayerState();
-        restorePlaylistState();
+        this.playQueueRepository = playQueueRepository;
+        this.musicProviderRepository = musicProviderRepository;
     }
 
-    @Deprecated
-    public void startPlaying(List<Composition> compositions) {
-        if (compositions == null || compositions.isEmpty()) {
-            return;
-        }
-        initialPlayList = compositions;
-        currentPlayList.clear();
-        currentPlayList.addAll(compositions);
-        shufflePlayList(false);
-        saveCurrentPlayList();
-
-        currentPlayPosition = 0;
-        prepareToPlayPosition(true);
+    public Completable startPlaying(List<Composition> compositions) {//TODO bug with stopping
+        return playQueueRepository.setPlayQueue(compositions)
+                .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
+                .doOnError(t -> playerStateSubject.onNext(STOP))
+                .doOnComplete(this::play);
     }
 
     public void play() {
-        if (currentPlayList == null || currentPlayList.isEmpty()) {
+        if (playerStateSubject.getValue() == PLAY) {
             return;
         }
 
-        switch (playerState) {
-            case IDLE:
-            case PLAY:
-            case PAUSE: {
-                if (systemMusicController.requestAudioFocusOld()) {
-                    musicPlayerController.resume();
-                    setState(PLAY);
-                }
-                return;
-            }
-            case STOP: {
-                prepareToPlayPosition(true);
-            }
-        }
-    }
+        Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
+        if (audioFocusObservable != null) {
+            musicPlayerController.resume();
+            playerStateSubject.onNext(PLAY);
 
-    public void pause() {
-        if (playerState != PAUSE) {
-            musicPlayerController.pause();
-            systemMusicController.abandonAudioFocus();
-            setState(PAUSE);
+            if (playerDisposable.size() == 0) {
+                playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
+                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)//TODO and play after.
+                        .subscribe());
+
+                playerDisposable.add(musicPlayerController.getEventsObservable()
+                        .subscribe(this::onMusicPlayerEventReceived));
+
+                playerDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
+
+                playerDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
+                        .subscribe(this::onAudioBecomingNoisy));
+            }
         }
     }
 
     public void stop() {
-        if (playerState != STOP) {
-            musicPlayerController.stop();
-            systemMusicController.abandonAudioFocus();
-            setState(STOP);
-        }
+        musicPlayerController.stop();
+        playerStateSubject.onNext(STOP);
+        playerDisposable.clear();
+    }
+
+    public void pause() {
+        musicPlayerController.pause();
+        playerStateSubject.onNext(PAUSE);
+        playerDisposable.clear();
     }
 
     public void skipToPrevious() {
-        moveToPrevious();
-        prepareToPlayPosition(playerState == PLAY);
+        playQueueRepository.skipToPrevious();
     }
 
     public void skipToNext() {
-        moveToNext();
-        prepareToPlayPosition(playerState == PLAY);
+        playQueueRepository.skipToNext();
     }
 
-    public Observable<PlayerState> getPlayerStateObservable() {
-        return playerStateSubject;
-    }
-
-    public Observable<Composition> getCurrentCompositionObservable() {
-        return currentCompositionSubject;
-    }
-
-    public Observable<List<Composition>> getCurrentPlayListObservable() {
-        return currentPlayListSubject;
+    public void skipToPosition(int position) {
+        playQueueRepository.skipToPosition(position);
     }
 
     public boolean isInfinitePlayingEnabled() {
         return settingsRepository.isInfinitePlayingEnabled();
-    }
-
-    public void onAudioBecomingNoisy() {
-        pause();
     }
 
     public boolean isRandomPlayingEnabled() {
@@ -151,10 +121,7 @@ public class MusicPlayerInteractor {
     }
 
     public void setRandomPlayingEnabled(boolean enabled) {
-        settingsRepository.setRandomPlayingEnabled(enabled);
-        shufflePlayList(true);
-        saveCurrentPlayList();
-        uiStateRepository.setPlayListPosition(currentPlayPosition);
+        playQueueRepository.setRandomPlayingEnabled(enabled);
     }
 
     public void setInfinitePlayingEnabled(boolean enabled) {
@@ -162,161 +129,74 @@ public class MusicPlayerInteractor {
     }
 
     public Observable<Long> getTrackPositionObservable() {
-        return musicPlayerController.getTrackPositionObservable()
-                .doOnNext(uiStateRepository::setTrackPosition);
+        return musicPlayerController.getTrackPositionObservable();
     }
 
-    public void moveToComposition(Composition composition) {
-        currentPlayPosition = currentPlayList.indexOf(composition);
-        if (currentPlayPosition == -1) {
-            throw new IllegalStateException("can not find composition in play queue: " + composition);
+    public Observable<PlayerState> getPlayerStateObservable() {
+        return playerStateSubject.map(PlayerState::toBaseState)
+                .distinctUntilChanged();
+    }
+
+    public Observable<CurrentComposition> getCurrentCompositionObservable() {
+        return playQueueRepository.getCurrentCompositionObservable();
+    }
+
+    public Observable<List<Composition>> getPlayQueueObservable() {
+        return playQueueRepository.getPlayQueueObservable();
+    }
+
+    private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
+        if (playerEvent instanceof FinishedEvent) {
+            onCompositionPlayFinished();
+        } else if (playerEvent instanceof ErrorEvent) {
+            writeErrorAboutCurrentComposition(((ErrorEvent) playerEvent).getThrowable());
+            int currentPosition = playQueueRepository.skipToNext();
+            if (currentPosition == 0) {
+                stop();
+            } else {
+                musicPlayerController.resume();
+            }
         }
-        currentCompositionSubject.onNext(composition);
-        prepareToPlayPosition(true);
     }
 
-    private void subscribeOnAudioFocusChanges() {
-        systemMusicController.getAudioFocusObservable()
-                .subscribe(this::onAudioFocusChanged);
+    private void writeErrorAboutCurrentComposition(Throwable throwable) {
+        playQueueRepository.getCurrentComposition()
+                .map(CurrentComposition::getComposition)
+                .flatMapCompletable(composition ->
+                        musicProviderRepository.onErrorWithComposition(throwable, composition))
+                .subscribe();
+    }
+
+    private void onCompositionPlayFinished() {
+        int currentPosition = playQueueRepository.skipToNext();
+        if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled() ) {
+            musicPlayerController.resume();
+        } else {
+            stop();
+        }
     }
 
     private void onAudioFocusChanged(AudioFocusEvent event) {
         switch (event) {
             case GAIN: {
-                play();
+                if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
+                    musicPlayerController.resume();
+                    playerStateSubject.onNext(PLAY);
+                }
                 break;
             }
             case LOSS_SHORTLY:
             case LOSS: {
-                pause();
+                musicPlayerController.pause();
+                playerStateSubject.onNext(PAUSED_EXTERNALLY);
                 break;
             }
         }
     }
 
-    private void restorePlaylistState() {
-        setState(LOADING);
-        playListRepository.getCurrentPlayList()
-                .subscribe(this::onPlayListRestored);
-    }
-
-    private void onPlayListRestored(CurrentPlayListInfo currentPlayListInfo) {
-        List<Composition> initialPlayList = currentPlayListInfo.getInitialPlayList();
-        List<Composition> currentPlayList = currentPlayListInfo.getCurrentPlayList();
-        if (initialPlayList.isEmpty()) {
-            setState(IDLE);
-            return;
-        }
-        this.initialPlayList = initialPlayList;
-        this.currentPlayList.clear();
-        this.currentPlayList.addAll(currentPlayList);
-        currentPlayListSubject.onNext(this.currentPlayList);
-        currentPlayPosition = uiStateRepository.getPlayListPosition();
-        long trackPosition = uiStateRepository.getTrackPosition();
-        prepareToPlayPosition(false, trackPosition);
-    }
-
-    private void subscribeOnInternalPlayerState() {
-        musicPlayerController.getPlayerStateObservable()
-                .subscribe(this::onInternalPlayerStateChanged);
-    }
-
-    private void shufflePlayList(boolean keepPosition) {
-        Composition currentComposition = null;
-        if (keepPosition) {
-            currentComposition = currentPlayList.get(currentPlayPosition);
-        }
-
-        currentPlayList.clear();
-        if (settingsRepository.isRandomPlayingEnabled()) {
-            List<Composition> playListToShuffle = new ArrayList<>(initialPlayList);
-
-            if (currentComposition != null) {
-                playListToShuffle.remove(currentPlayPosition);
-                currentPlayList.add(currentComposition);
-            }
-
-            Collections.shuffle(playListToShuffle);
-            currentPlayList.addAll(playListToShuffle);
-        } else {
-            currentPlayList.addAll(initialPlayList);
-        }
-
-        if (currentComposition != null) {
-            currentPlayPosition = currentPlayList.indexOf(currentComposition);
-        }
-        currentPlayListSubject.onNext(currentPlayList);
-    }
-
-    private void saveCurrentPlayList() {
-        CurrentPlayListInfo currentPlayListInfo = new CurrentPlayListInfo(initialPlayList, currentPlayList);
-        playListRepository.setCurrentPlayList(currentPlayListInfo)
-                .subscribe();
-    }
-
-    private void onInternalPlayerStateChanged(InternalPlayerState state) {
-        switch (state) {
-            case ENDED: {
-                if (playerState == PLAY) {
-                    boolean playAfter = (currentPlayPosition < currentPlayList.size() - 2)
-                            || settingsRepository.isInfinitePlayingEnabled();
-                    moveToNext();
-                    prepareToPlayPosition(playAfter);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void setState(PlayerState playerState) {
-        if (this.playerState != playerState) {
-            this.playerState = playerState;
-            playerStateSubject.onNext(playerState);
-        }
-    }
-
-    private void moveToNext() {
-        if (currentPlayPosition >= currentPlayList.size() - 1) {
-            currentPlayPosition = 0;
-        } else {
-            currentPlayPosition++;
-        }
-    }
-
-    private void moveToPrevious() {
-        currentPlayPosition--;
-        if (currentPlayPosition < 0) {
-            currentPlayPosition = currentPlayList.size() - 1;
-        }
-    }
-
-    private void prepareToPlayPosition(boolean playAfter) {
-        prepareToPlayPosition(playAfter, 0L);
-    }
-
-    private void prepareToPlayPosition(boolean playAfter, long fromPosition) {
-        Composition currentComposition = currentPlayList.get(currentPlayPosition);
-        currentCompositionSubject.onNext(currentComposition);
-        uiStateRepository.setPlayListPosition(currentPlayPosition);
-        musicPlayerController.prepareToPlay(currentComposition)
-                .subscribe(() -> {
-                    musicPlayerController.seekTo(fromPosition);
-                    if (playAfter) {
-                        setState(PLAY);
-                        play();
-                    } else {
-                        pause();
-                    }
-                }, throwable -> onPlayCompositionError(throwable, playAfter));
-    }
-
-    private void onPlayCompositionError(Throwable throwable, boolean playAfter) {
-        if (currentPlayList.size() == 1) {
-            stop();
-        } else {
-            throwable.printStackTrace();//TODO save errors about compositions
-            moveToNext();
-            prepareToPlayPosition(playAfter);
-        }
+    @SuppressWarnings("unused")
+    private void onAudioBecomingNoisy(Object o) {
+        musicPlayerController.pause();
+        playerStateSubject.onNext(PAUSE);
     }
 }

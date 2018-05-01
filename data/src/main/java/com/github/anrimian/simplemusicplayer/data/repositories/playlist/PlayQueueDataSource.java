@@ -5,8 +5,7 @@ import com.github.anrimian.simplemusicplayer.data.database.models.CompositionEnt
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionItemEntity;
 import com.github.anrimian.simplemusicplayer.data.models.compositions.CompositionsMapper;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 import org.mapstruct.factory.Mappers;
 
@@ -14,7 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Single;
+import io.reactivex.Completable;
+import io.reactivex.Scheduler;
 
 import static java.util.Arrays.asList;
 
@@ -27,14 +27,17 @@ public class PlayQueueDataSource {
 
     private final CompositionsDao compositionsDao;
     private final SettingsPreferences settingsPreferences;
+    private final Scheduler scheduler;
 
     private List<Composition> initialPlayList;
     private List<Composition> shuffledPlayList;
 
     public PlayQueueDataSource(CompositionsDao compositionsDao,
-                               SettingsPreferences settingsPreferences) {
+                               SettingsPreferences settingsPreferences,
+                               Scheduler scheduler) {
         this.compositionsDao = compositionsDao;
         this.settingsPreferences = settingsPreferences;
+        this.scheduler = scheduler;
     }
 
     public void setPlayQueue(List<Composition> compositions) {
@@ -76,21 +79,26 @@ public class PlayQueueDataSource {
     }
 
     private void savePlayQueue() {
-        compositionsDao.deleteCurrentPlayList();
+        Completable.fromRunnable(() -> {
+            compositionsDao.deleteCurrentPlayList();
 
-        List<CompositionItemEntity> itemEntities = new ArrayList<>();
-        for (int i = 0; i < initialPlayList.size(); i++) {
-            Composition composition = initialPlayList.get(i);
-            CompositionEntity compositionEntity = compositionsMapper.toCompositionEntity(composition);
-            CompositionItemEntity compositionItemEntity = new CompositionItemEntity();
-            compositionItemEntity.setComposition(compositionEntity);
-            compositionItemEntity.setInitialPosition(initialPlayList.indexOf(composition));
-            compositionItemEntity.setShuffledPosition(shuffledPlayList.indexOf(composition));
-            itemEntities.add(compositionItemEntity);
-        }
-        compositionsDao.setCurrentPlayList(itemEntities);
+            List<CompositionItemEntity> itemEntities = new ArrayList<>();
+            for (int i = 0; i < initialPlayList.size(); i++) {
+                Composition composition = initialPlayList.get(i);
+                CompositionEntity compositionEntity = compositionsMapper.toCompositionEntity(composition);
+                CompositionItemEntity compositionItemEntity = new CompositionItemEntity();
+                compositionItemEntity.setComposition(compositionEntity);
+                compositionItemEntity.setInitialPosition(initialPlayList.indexOf(composition));
+                compositionItemEntity.setShuffledPosition(shuffledPlayList.indexOf(composition));
+                itemEntities.add(compositionItemEntity);
+            }
+            compositionsDao.setCurrentPlayList(itemEntities);
+        }).subscribeOn(scheduler)
+                .subscribe();
+
     }
 
+    @SuppressWarnings("unchecked")
     private void loadPlayQueue() {
         List<CompositionItemEntity> compositionItemEntities = compositionsDao.getCurrentPlayList();
         Composition[] initialPlayListArray = new Composition[compositionItemEntities.size()];
@@ -100,7 +108,7 @@ public class PlayQueueDataSource {
             initialPlayListArray[compositionItem.getInitialPosition()] = composition;
             currentPlayListArray[compositionItem.getShuffledPosition()] = composition;
         }
-        initialPlayList = asList(initialPlayListArray);
-        shuffledPlayList = asList(currentPlayListArray);
+        initialPlayList = new ArrayList(asList(initialPlayListArray));
+        shuffledPlayList = new ArrayList(asList(currentPlayListArray));
     }
 }

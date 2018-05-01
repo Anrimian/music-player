@@ -6,7 +6,7 @@ import android.support.test.InstrumentationRegistry;
 
 import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
 import com.github.anrimian.simplemusicplayer.data.repositories.playlist.PlayListRepositoryImpl;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
 

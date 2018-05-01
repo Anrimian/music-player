@@ -13,7 +13,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.RemoteViews;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerInfo;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;

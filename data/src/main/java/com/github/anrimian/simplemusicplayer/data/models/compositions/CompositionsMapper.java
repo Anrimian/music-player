@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.models.compositions;
 
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionEntity;
 import com.github.anrimian.simplemusicplayer.data.utils.mappers.DateMapper;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;

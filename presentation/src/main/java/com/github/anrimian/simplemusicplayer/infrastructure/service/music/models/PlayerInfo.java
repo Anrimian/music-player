@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.infrastructure.service.music.models;
 
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 /**
  * Created on 11.11.2017.

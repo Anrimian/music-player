@@ -7,13 +7,21 @@ import android.support.annotation.NonNull;
 import com.github.anrimian.simplemusicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.simplemusicplayer.data.controllers.music.SystemMusicControllerImpl;
 import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
+import com.github.anrimian.simplemusicplayer.data.database.dao.CompositionsDao;
+import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
+import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.repositories.playlist.PlayListRepositoryImpl;
+import com.github.anrimian.simplemusicplayer.data.repositories.playlist.PlayQueueDataSource;
+import com.github.anrimian.simplemusicplayer.data.repositories.playlist.PlayQueueRepositoryImpl;
+import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
+import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
+import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.simplemusicplayer.domain.repositories.UiStateRepository;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,6 +31,7 @@ import dagger.Provides;
 import io.reactivex.Scheduler;
 
 import static com.github.anrimian.simplemusicplayer.di.app.SchedulerModule.DB_SCHEDULER;
+import static com.github.anrimian.simplemusicplayer.di.app.SchedulerModule.IO_SCHEDULER;
 
 /**
  * Created on 02.11.2017.
@@ -34,16 +43,34 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerInteractor provideMusicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                                       SystemMusicController systemMusicController,
-                                                       SettingsRepository settingsRepository,
-                                                       UiStateRepository uiStateRepository,
-                                                       PlayListRepository playQueueRepository) {
+    MusicPlayerInteractor provideMusicPlayerInteractorNew(MusicPlayerController musicPlayerController,
+                                                          SettingsRepository settingsRepository,
+                                                          SystemMusicController systemMusicController,
+                                                          PlayQueueRepository playQueueRepository,
+                                                          MusicProviderRepository musicProviderRepository) {
         return new MusicPlayerInteractor(musicPlayerController,
-                systemMusicController,
                 settingsRepository,
-                uiStateRepository,
-                playQueueRepository);
+                systemMusicController,
+                playQueueRepository,
+                musicProviderRepository);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    PlayQueueRepository playQueueRepository(PlayQueueDataSource playQueueDataSource,
+                                            UiStatePreferences uiStatePreferences,
+                                            @Named(DB_SCHEDULER) Scheduler dbScheduler) {
+        return new PlayQueueRepositoryImpl(playQueueDataSource, uiStatePreferences, dbScheduler);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    PlayQueueDataSource playQueueDataSource(CompositionsDao compositionsDao,
+                                            SettingsPreferences settingsPreferences,
+                                            @Named(DB_SCHEDULER) Scheduler dbScheduler) {
+        return new PlayQueueDataSource(compositionsDao, settingsPreferences, dbScheduler);
     }
 
     @Provides
@@ -56,15 +83,24 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerController provideMusicPlayerController(Context context) {
-        return new MusicPlayerControllerImpl(context);
+    MusicPlayerController provideMusicPlayerController(UiStatePreferences uiStatePreferences,
+                                                       Context context) {
+        return new MusicPlayerControllerImpl(uiStatePreferences, context);
     }
 
     @Provides
     @NonNull
     @Singleton
     PlayListRepository providePlayListRepository(AppDatabase appDatabase,
-                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
+                                                 @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new PlayListRepositoryImpl(appDatabase, scheduler);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    MusicProviderRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
+                                                    @Named(IO_SCHEDULER) Scheduler scheduler) {
+        return new MusicProviderRepositoryImpl(storageMusicDataSource, scheduler);
     }
 }

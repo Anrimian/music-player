@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.models.files;
 
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 import javax.annotation.Nonnull;
 

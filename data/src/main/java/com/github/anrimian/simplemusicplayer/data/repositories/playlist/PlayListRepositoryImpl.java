@@ -5,7 +5,7 @@ import com.github.anrimian.simplemusicplayer.data.database.dao.CompositionsDao;
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionEntity;
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionItemEntity;
 import com.github.anrimian.simplemusicplayer.data.models.compositions.CompositionsMapper;
-import com.github.anrimian.simplemusicplayer.domain.models.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
 
