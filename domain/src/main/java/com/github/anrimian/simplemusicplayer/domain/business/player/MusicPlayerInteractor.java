@@ -74,7 +74,7 @@ public class MusicPlayerInteractor {
 
             if (playerDisposable.size() == 0) {
                 playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
-                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)//TODO check
+                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
                         .subscribe(this::onCompositionPrepared));
                 playerDisposable.add(musicPlayerController.getEventsObservable()
                         .subscribe(this::onMusicPlayerEventReceived));
