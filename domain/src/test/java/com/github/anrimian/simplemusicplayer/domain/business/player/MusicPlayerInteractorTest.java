@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.domain.business.player;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
@@ -23,6 +24,7 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
+import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.currentComposition;
 import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.GAIN;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.LOSS;
@@ -51,7 +53,7 @@ public class MusicPlayerInteractorTest {
     private MusicPlayerInteractor musicPlayerInteractor;
 
     private PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
-    private BehaviorSubject<Composition> currentCompositionSubject = BehaviorSubject.createDefault(getFakeCompositions().get(0));
+    private BehaviorSubject<CurrentComposition> currentCompositionSubject = BehaviorSubject.createDefault(currentComposition(getFakeCompositions().get(0)));
     private PublishSubject<AudioFocusEvent> audioFocusSubject = PublishSubject.create();
     private PublishSubject<Object> noisyAudioSubject = PublishSubject.create();
 
@@ -63,7 +65,7 @@ public class MusicPlayerInteractorTest {
     public void setUp() {
         when(playQueueRepository.setPlayQueue(any())).thenReturn(Completable.complete());
         when(playQueueRepository.getCurrentComposition())
-                .thenReturn(Single.just(getFakeCompositions().get(0)));
+                .thenReturn(Single.just(currentComposition(getFakeCompositions().get(0))));
         when(playQueueRepository.getCurrentCompositionObservable())
                 .thenReturn(currentCompositionSubject);
         when(playQueueRepository.skipToNext()).thenReturn(1);
@@ -94,7 +96,7 @@ public class MusicPlayerInteractorTest {
                 .assertComplete();
 
         verify(playQueueRepository).setPlayQueue(getFakeCompositions());
-        verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
+        verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         verify(musicPlayerController).resume();
         testSubscriber.assertValues(IDLE, LOADING, PLAY);
     }
@@ -118,15 +120,15 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
         playerEventSubject.onNext(new FinishedEvent());
-        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
 
         inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
 
         testSubscriber.assertValues(IDLE, PLAY);
     }
@@ -139,11 +141,11 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
         playerEventSubject.onNext(new FinishedEvent());
-        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
 
         inOrder.verify(playQueueRepository).skipToNext();
         inOrder.verify(musicPlayerController, never()).resume();
@@ -161,15 +163,15 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
         playerEventSubject.onNext(new FinishedEvent());
-        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
 
         inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
 
         testSubscriber.assertValues(IDLE, PLAY);
     }
@@ -196,16 +198,17 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.play();
         musicPlayerInteractor.stop();
 
-        inOrder.verify(musicPlayerController).resume();
         inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(any());
+        inOrder.verify(musicPlayerController).resume();
         inOrder.verify(musicPlayerController).stop();
 
         playerEventSubject.onNext(new FinishedEvent());
-        currentCompositionSubject.onNext(getFakeCompositions().get(1));
-//
-        inOrder.verify(playQueueRepository, never()).skipToNext();
+        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
+
+        inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
         inOrder.verify(musicPlayerController, never()).resume();
-        inOrder.verify(musicPlayerController, never()).prepareToPlayIgnoreError(getFakeCompositions().get(1));
+
         testSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 
@@ -216,19 +219,19 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
         Throwable throwable = new IllegalStateException();
         playerEventSubject.onNext(new ErrorEvent(throwable));
-        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
 
         inOrder.verify(playQueueRepository).getCurrentComposition();
         inOrder.verify(musicProviderRepository)
                 .onErrorWithComposition(throwable, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(1));
 
         testSubscriber.assertValues(IDLE, PLAY);
     }
@@ -254,8 +257,8 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
         audioFocusSubject.onNext(LOSS);
 
@@ -275,8 +278,8 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
         noisyAudioSubject.onNext(new Object());
 
@@ -292,8 +295,8 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
         audioFocusSubject.onNext(LOSS);
 
@@ -316,19 +319,19 @@ public class MusicPlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(getFakeCompositions().get(0));
 
         Throwable throwable = new IllegalStateException();
         playerEventSubject.onNext(new ErrorEvent(throwable));
-        currentCompositionSubject.onNext(getFakeCompositions().get(1));
+        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
 
         inOrder.verify(playQueueRepository).getCurrentComposition();
         inOrder.verify(musicProviderRepository)
                 .onErrorWithComposition(throwable, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
         inOrder.verify(musicPlayerController, never()).resume();
-        inOrder.verify(musicPlayerController, never()).prepareToPlayIgnoreError(getFakeCompositions().get(1));
 
         testSubscriber.assertValues(IDLE, PLAY, STOP);
     }

@@ -41,6 +41,7 @@ public class MusicPlayerInteractor {
     private final MusicProviderRepository musicProviderRepository;
 
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
+    private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
@@ -69,20 +70,23 @@ public class MusicPlayerInteractor {
 
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
-            musicPlayerController.resume();
             playerStateSubject.onNext(PLAY);
 
             if (playerDisposable.size() == 0) {
                 playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
-                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)//TODO and play after.
-                        .subscribe());
-
+                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)//TODO check
+                        .subscribe(this::onCompositionPrepared));
                 playerDisposable.add(musicPlayerController.getEventsObservable()
                         .subscribe(this::onMusicPlayerEventReceived));
+            } else {
+                musicPlayerController.resume();
+            }
 
-                playerDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
+            if (systemEventsDisposable.size() == 0) {
+                systemEventsDisposable.add(audioFocusObservable
+                        .subscribe(this::onAudioFocusChanged));
 
-                playerDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
+                systemEventsDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
                         .subscribe(this::onAudioBecomingNoisy));
             }
         }
@@ -91,13 +95,13 @@ public class MusicPlayerInteractor {
     public void stop() {
         musicPlayerController.stop();
         playerStateSubject.onNext(STOP);
-        playerDisposable.clear();
+        systemEventsDisposable.clear();
     }
 
     public void pause() {
         musicPlayerController.pause();
         playerStateSubject.onNext(PAUSE);
-        playerDisposable.clear();
+        systemEventsDisposable.clear();
     }
 
     public void skipToPrevious() {
@@ -143,6 +147,12 @@ public class MusicPlayerInteractor {
 
     public Observable<List<Composition>> getPlayQueueObservable() {
         return playQueueRepository.getPlayQueueObservable();
+    }
+
+    private void onCompositionPrepared(CurrentComposition currentComposition) {
+        if (playerStateSubject.getValue() == PLAY) {
+            musicPlayerController.resume();
+        }
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {

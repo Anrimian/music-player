@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.repositories.playlist;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 
 import org.junit.Before;
@@ -13,6 +14,7 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
+import static com.github.anrimian.simplemusicplayer.data.repositories.TestDataProvider.currentComposition;
 import static com.github.anrimian.simplemusicplayer.data.repositories.TestDataProvider.getFakeCompositions;
 import static java.util.Collections.emptyList;
 import static org.mockito.Matchers.any;
@@ -66,7 +68,7 @@ public class PlayQueueRepositoryImplTest {
 
         playQueueRepository.getCurrentCompositionObservable()
                 .test()
-                .assertValue(getFakeCompositions().get(1));
+                .assertValue(currentComposition(getFakeCompositions().get(1)));
     }
 
     @Test
@@ -80,7 +82,7 @@ public class PlayQueueRepositoryImplTest {
     public void setPlayQueueTest() {
         TestObserver<List<Composition>> playListObserver = playQueueRepository.getPlayQueueObservable()
                 .test();
-        TestObserver<Composition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         when(playQueueDataSource.getPlayQueue()).thenReturn(getFakeCompositions());
@@ -94,7 +96,7 @@ public class PlayQueueRepositoryImplTest {
         playListObserver.assertValues(emptyList(), getFakeCompositions());
         verify(uiStatePreferences).setCurrentCompositionId(0L);
         verify(uiStatePreferences).setCurrentCompositionPosition(0);
-        compositionObserver.assertValue(getFakeCompositions().get(0));
+        compositionObserver.assertValue(currentComposition(getFakeCompositions().get(0)));
     }
 
     @Test
@@ -118,40 +120,40 @@ public class PlayQueueRepositoryImplTest {
     public void skipToNext() {
         setPlayQueueTest();
 
-        TestObserver<Composition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         playQueueRepository.skipToNext();
 
-        compositionObserver.assertValues(getFakeCompositions().get(0),
-                getFakeCompositions().get(1));
+        compositionObserver.assertValues(currentComposition(getFakeCompositions().get(0)),
+                currentComposition(getFakeCompositions().get(1)));
     }
 
     @Test
     public void skipToPrevious() {
         setPlayQueueTest();
 
-        TestObserver<Composition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         playQueueRepository.skipToNext();
         playQueueRepository.skipToPrevious();
 
-        compositionObserver.assertValues(getFakeCompositions().get(0),
-                getFakeCompositions().get(1),
-                getFakeCompositions().get(0));
+        compositionObserver.assertValues(currentComposition(getFakeCompositions().get(0)),
+                currentComposition(getFakeCompositions().get(1)),
+                currentComposition(getFakeCompositions().get(0)));
     }
 
     @Test
     public void skipToPositionTest() {
         setPlayQueueTest();
 
-        TestObserver<Composition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         playQueueRepository.skipToPosition(1000);
 
-        compositionObserver.assertValues(getFakeCompositions().get(0),
-                getFakeCompositions().get(1000));
+        compositionObserver.assertValues(currentComposition(getFakeCompositions().get(0)),
+                currentComposition(getFakeCompositions().get(1000)));
     }
 }

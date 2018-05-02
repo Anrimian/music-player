@@ -22,7 +22,11 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.Interna
 
 public class PlayerEventListener implements Player.EventListener {
 
-    private PublishSubject<PlayerEvent> subject = PublishSubject.create();
+    private final PublishSubject<PlayerEvent> subject;
+
+    public PlayerEventListener(PublishSubject<PlayerEvent> subject) {
+        this.subject = subject;
+    }
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {

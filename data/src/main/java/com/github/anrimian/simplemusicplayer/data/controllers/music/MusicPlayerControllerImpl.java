@@ -10,6 +10,7 @@ import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerContr
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -42,7 +43,9 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private final PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
-    private final PlayerEventListener playerEventListener = new PlayerEventListener();
+
+    private final PublishSubject<PlayerEvent> subject = PublishSubject.create();
+    private final PlayerEventListener playerEventListener = new PlayerEventListener(subject);
 
     private final SimpleExoPlayer player;
     private final UiStatePreferences uiStatePreferences;
@@ -126,6 +129,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
             seekTo(currentComposition.getPlayPosition());
         } else {
             seekTo(0);
+            subject.onNext(new ErrorEvent(throwable));
         }
         preparedComposition = currentComposition;
     }
