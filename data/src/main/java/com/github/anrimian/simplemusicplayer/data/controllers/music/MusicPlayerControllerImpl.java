@@ -33,6 +33,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
 /**
@@ -42,7 +43,7 @@ import io.reactivex.subjects.PublishSubject;
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private final PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
-    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
+    private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
 
     private final PublishSubject<PlayerEvent> subject = PublishSubject.create();
     private final PlayerEventListener playerEventListener = new PlayerEventListener(subject);
@@ -74,7 +75,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public Completable prepareToPlay(CurrentComposition composition) {
         if (composition.equals(preparedComposition)) {
-//            seekTo(0);
             return Completable.complete();
         }
         return prepareMediaSource(composition.getComposition())

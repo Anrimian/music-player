@@ -1,12 +1,20 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.music.exceptions.MusicNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
+import com.github.anrimian.simplemusicplayer.data.utils.db.CursorWrapper;
+import com.github.anrimian.simplemusicplayer.data.utils.rx.content_observer.ContentObserverDisposable;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableList;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +22,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.Emitter;
+import io.reactivex.Observable;
 import io.reactivex.Single;
+
 
 public class StorageMusicDataSource {
 
@@ -25,140 +36,129 @@ public class StorageMusicDataSource {
     }
 
     public Single<List<Composition>> getAllCompositions() {
-        return Single.create(emitter -> {
-            Cursor cursor = null;
-            try {
-                cursor = context.getContentResolver().query(
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
-                if (cursor == null) {
-                    emitter.onError(new MusicNotFoundException());
-                    return;
-                }
-                List<Composition> compositions = new ArrayList<>(cursor.getCount());
-                for (int i = 0; i < cursor.getCount(); i++) {
-                    cursor.moveToPosition(i);
+        return Single.just(getCompositionsFromProvider());
+    }
 
-                    int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-                    int titleColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-                    int albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-                    int durationColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-                    int idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
-                    int filePathColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-                    int sizeColumn = cursor.getColumnIndex(MediaStore.Images.Media.SIZE);
-                    int countColumn = cursor.getColumnIndex(MediaStore.Audio.Media._COUNT);
-                    int albumIdColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-                    int albumKeyColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_KEY);
-                    int artistIdColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
-                    int artistKeyColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_KEY);
-                    int bookmarkColumn = cursor.getColumnIndex(MediaStore.Audio.Media.BOOKMARK);
-                    int composerColumn = cursor.getColumnIndex(MediaStore.Audio.Media.COMPOSER);
-                    int dateAddedColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED);
-                    int dateModifiedColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED);
-                    int displayNameColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
-                    int isAlarmColumn = cursor.getColumnIndex(MediaStore.Audio.Media.IS_ALARM);
-                    int isMusicColumn = cursor.getColumnIndex(MediaStore.Audio.Media.IS_MUSIC);
-                    int isNotificationColumn = cursor.getColumnIndex(MediaStore.Audio.Media.IS_NOTIFICATION);
-                    int isPodcastColumn = cursor.getColumnIndex(MediaStore.Audio.Media.IS_PODCAST);
-                    int isRingtoneColumn = cursor.getColumnIndex(MediaStore.Audio.Media.IS_RINGTONE);
-                    int mimeTypeColumn = cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE);
-                    int titleKeyColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE_KEY);
-                    int trackColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TRACK);
-                    int yearColumn = cursor.getColumnIndex(MediaStore.Audio.Media.YEAR);
-                    //MediaStore.Audio.Albums.ALBUM_ART
-
-//                    Uri mediaPath = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.song_name);
-//                    MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-//                    mmr.setDataSource(this, mediaPath);
-//                    mmr.extractMetadata(MediaMetadataRetriever.)
-
-                    String artist = cursor.getString(artistColumn);
-                    String title = cursor.getString(titleColumn);
-                    String album = cursor.getString(albumColumn);
-                    String filePath = cursor.getString(filePathColumn);
-                    String albumKey = cursor.getString(albumKeyColumn);
-                    String composer = cursor.getString(composerColumn);
-                    String displayName = cursor.getString(displayNameColumn);
-                    String mimeType = cursor.getString(mimeTypeColumn);
-
-                    long duration = cursor.getLong(durationColumn);
-                    long size = cursor.getLong(sizeColumn);
-                    long id = cursor.getLong(idColumn);
-                    long artistId = cursor.getLong(artistIdColumn);
-                    long bookmark = cursor.getLong(bookmarkColumn);
-                    long albumId = cursor.getLong(albumIdColumn);
-                    long dateAdded = cursor.getLong(dateAddedColumn);
-                    long dateModified = cursor.getLong(dateModifiedColumn);
-
-                    boolean isAlarm = cursor.getInt(isAlarmColumn) == 1;
-                    boolean isMusic = cursor.getInt(isMusicColumn) == 1;
-                    boolean isNotification = cursor.getInt(isNotificationColumn) == 1;
-                    boolean isPodcast = cursor.getInt(isPodcastColumn) == 1;
-                    boolean isRingtone = cursor.getInt(isRingtoneColumn) == 1;
-
-                    @Nullable Integer year = cursor.getInt(yearColumn);
-
-//                    Log.d("MusicProviderRepository", "new composition----------");
-//                    Log.d("MusicProviderRepository", "artist: " + artist);
-//                    Log.d("MusicProviderRepository", "title: " + title);
-//                    Log.d("MusicProviderRepository", "album: " + album);
-//                    Log.d("MusicProviderRepository", "duration: " + duration);
-//                    Log.d("MusicProviderRepository", "id: " + id);
-//                    Log.d("MusicProviderRepository", "size: " + size);
-//                    Log.d("MusicProviderRepository", "filePath: " + filePath);
-//
-////                    Log.d("MusicProviderRepository", "count: " + count);
-//                    Log.d("MusicProviderRepository", "albumId: " + albumId);
-//                    Log.d("MusicProviderRepository", "albumKey: " + albumKey);
-//                    Log.d("MusicProviderRepository", "artistId: " + artistId);
-////                    Log.d("MusicProviderRepository", "artistKey: " + artistKey);
-//                    Log.d("MusicProviderRepository", "bookmark: " + bookmark);
-//                    Log.d("MusicProviderRepository", "composer: " + composer);
-//                    Log.d("MusicProviderRepository", "dateAdded: " + dateAdded);
-//                    Log.d("MusicProviderRepository", "dateModified: " + dateModified);
-//                    Log.d("MusicProviderRepository", "displayName: " + displayName);
-//                    Log.d("MusicProviderRepository", "isAlarm: " + isAlarm);
-//                    Log.d("MusicProviderRepository", "isMusic: " + isMusic);
-//                    Log.d("MusicProviderRepository", "isNotification: " + isNotification);
-//                    Log.d("MusicProviderRepository", "isPodcast: " + isPodcast);
-//                    Log.d("MusicProviderRepository", "isRingtone: " + isRingtone);
-//                    Log.d("MusicProviderRepository", "mimeType: " + mimeType);
-////                    Log.d("MusicProviderRepository", "titleKey: " + titleKey);
-////                    Log.d("MusicProviderRepository", "track: " + track);
-//                    Log.d("MusicProviderRepository", "year: " + year);
-
-                    if (artist.equals("<unknown>")) {
-                        artist = null;
-                    }
-
-                    Composition composition = new Composition();
-                    //composition
-                    composition.setArtist(artist);
-                    composition.setTitle(title);
-                    composition.setAlbum(album);
-                    composition.setFilePath(filePath);
-                    composition.setComposer(composer);
-                    composition.setDisplayName(displayName);
-
-                    composition.setDuration(duration);
-                    composition.setSize(size);
-                    composition.setId(id);
-                    composition.setDateAdded(new Date(dateAdded * 1000L));
-                    composition.setDateModified(new Date(dateModified * 1000L));
-
-                    composition.setAlarm(isAlarm);
-                    composition.setMusic(isMusic);
-                    composition.setNotification(isNotification);
-                    composition.setPodcast(isPodcast);
-                    composition.setRingtone(isRingtone);
-
-                    composition.setYear(year);
-                    compositions.add(composition);
-                }
-//                Log.d("MusicProviderRepository", "compositions:" + compositions.size());
-                emitter.onSuccess(compositions);
-            } finally {
-                IOUtils.closeSilently(cursor);
-            }
+    public Single<ChangeableList<Composition>> getCompositions() {//TODO cache list
+        return Single.fromCallable(() -> {
+            List<Composition> compositions = getCompositionsFromProvider();
+            return new ChangeableList<>(compositions, getCompositionChangeObservable().share());
         });
+    }
+
+    private Observable<Change<Composition>> getCompositionChangeObservable() {
+        return Observable.create(emitter -> {
+            ContentObserver contentObserver = new CompositionsContentObserver(emitter);
+            ContentResolver contentResolver = context.getContentResolver();
+            contentResolver.registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            false,
+                            contentObserver);
+            emitter.setDisposable(new ContentObserverDisposable(contentObserver, contentResolver));
+        });
+    }
+
+    private List<Composition> getCompositionsFromProvider() {
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+            if (cursor == null) {
+                throw new MusicNotFoundException();
+            }
+            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+            List<Composition> compositions = new ArrayList<>(cursor.getCount());
+            for (int i = 0; i < cursor.getCount(); i++) {
+                cursor.moveToPosition(i);
+
+                String artist = cursorWrapper.getString(MediaStore.Audio.Media.ARTIST);
+                String title = cursorWrapper.getString(MediaStore.Audio.Media.TITLE);
+                String album = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM);
+                String filePath = cursorWrapper.getString(MediaStore.Images.Media.DATA);
+                String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
+                String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
+                String displayName = cursorWrapper.getString(MediaStore.Audio.Media.DISPLAY_NAME);
+                String mimeType = cursorWrapper.getString(MediaStore.Audio.Media.MIME_TYPE);
+
+                long duration = cursorWrapper.getLong(MediaStore.Audio.Media.DURATION);
+                long size = cursorWrapper.getLong(MediaStore.Images.Media.SIZE);
+                long id = cursorWrapper.getLong(MediaStore.Audio.Media._ID);
+                long artistId = cursorWrapper.getLong(MediaStore.Audio.Media.ARTIST_ID);
+                long bookmark = cursorWrapper.getLong(MediaStore.Audio.Media.BOOKMARK);
+                long albumId = cursorWrapper.getLong(MediaStore.Audio.Media.ALBUM_ID);
+                long dateAdded = cursorWrapper.getLong(MediaStore.Audio.Media.DATE_ADDED);
+                long dateModified = cursorWrapper.getLong(MediaStore.Audio.Media.DATE_MODIFIED);
+
+                boolean isAlarm = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_ALARM);
+                boolean isMusic = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_MUSIC);
+                boolean isNotification = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_NOTIFICATION);
+                boolean isPodcast = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_PODCAST);
+                boolean isRingtone = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_RINGTONE);
+
+                @Nullable Integer year = cursorWrapper.getInt(MediaStore.Audio.Media.YEAR);
+
+                if (artist.equals("<unknown>")) {
+                    artist = null;
+                }
+
+                Composition composition = new Composition();
+                //composition
+                composition.setArtist(artist);
+                composition.setTitle(title);
+                composition.setAlbum(album);
+                composition.setFilePath(filePath);
+                composition.setComposer(composer);
+                composition.setDisplayName(displayName);
+
+                composition.setDuration(duration);
+                composition.setSize(size);
+                composition.setId(id);
+                composition.setDateAdded(new Date(dateAdded * 1000L));
+                composition.setDateModified(new Date(dateModified * 1000L));
+
+                composition.setAlarm(isAlarm);
+                composition.setMusic(isMusic);
+                composition.setNotification(isNotification);
+                composition.setPodcast(isPodcast);
+                composition.setRingtone(isRingtone);
+
+                composition.setYear(year);
+                compositions.add(composition);
+            }
+            return compositions;
+        } finally {
+            IOUtils.closeSilently(cursor);
+        }
+    }
+
+    private class CompositionsContentObserver extends ContentObserver {
+
+        private Emitter<Change<Composition>> changeEmitter;
+
+        CompositionsContentObserver(Emitter<Change<Composition>> changeEmitter) {
+            super(null);
+            this.changeEmitter = changeEmitter;
+        }
+
+        @Override
+        public boolean deliverSelfNotifications() {
+            return true;
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            Log.d("KEK", "onChange: " + selfChange);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
+            Log.d("KEK", "onChange: " + selfChange + ", uri: " + uri);
+        }
+
     }
 }
