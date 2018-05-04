@@ -26,7 +26,7 @@ import static io.reactivex.subjects.BehaviorSubject.create;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
-    private static final int NO_POSITION = -1;
+    private static final int NO_POSITION = 0;
 
     private final PlayQueueDataSource playQueueDataSource;
     private final UiStatePreferences uiStatePreferences;
@@ -93,7 +93,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public int skipToNext() {
-        List<Composition> currentPlayList = currentPlayQueueSubject.getValue();
+        List<Composition> currentPlayList = playQueueDataSource.getPlayQueue();
         checkCompositionsList(currentPlayList);
 
         if (position >= currentPlayList.size() - 1) {
@@ -107,7 +107,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public int skipToPrevious() {
-        List<Composition> currentPlayList = currentPlayQueueSubject.getValue();
+        List<Composition> currentPlayList = playQueueDataSource.getPlayQueue();
         checkCompositionsList(currentPlayList);
 
         position--;
@@ -120,7 +120,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public void skipToPosition(int position) {
-        List<Composition> currentPlayList = currentPlayQueueSubject.getValue();
+        List<Composition> currentPlayList = playQueueDataSource.getPlayQueue();
         checkCompositionsList(currentPlayList);
 
         if (position < 0 || position >= currentPlayList.size()) {
@@ -154,6 +154,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         if (position > 0 && position < compositions.size()) {
             Composition expectedComposition = compositions.get(position);
             if (expectedComposition.getId() == id) {
+                this.position = position;//TODO maybe remove position? replace with hash map?
                 return new CurrentComposition(expectedComposition, position, uiStatePreferences.getTrackPosition());
             }
         }
@@ -165,6 +166,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         for (int i = 0; i< compositions.size(); i++) {
             Composition composition = compositions.get(i);
             if (composition.getId() == id) {
+                this.position = i;
                 return new CurrentComposition(composition, position, uiStatePreferences.getTrackPosition());
             }
         }
