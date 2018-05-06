@@ -45,17 +45,14 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private final PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
 
-    private final PublishSubject<PlayerEvent> subject = PublishSubject.create();
-    private final PlayerEventListener playerEventListener = new PlayerEventListener(subject);
+    private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
+    private final PlayerEventListener playerEventListener = new PlayerEventListener(playerEventSubject);
 
     private final SimpleExoPlayer player;
     private final UiStatePreferences uiStatePreferences;
 
     @Nullable
     private Disposable trackPositionDisposable;
-
-    @Nullable
-    private CurrentComposition preparedComposition;
 
     public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences, Context context) {
         this.uiStatePreferences = uiStatePreferences;
@@ -74,9 +71,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public Completable prepareToPlay(CurrentComposition composition) {
-        if (composition.equals(preparedComposition)) {
-            return Completable.complete();
-        }
         return prepareMediaSource(composition.getComposition())
                 .toCompletable()//on error can be: com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException: java.io.FileNotFoundException
                 .doOnEvent(t -> onCompositionPrepared(t, composition));
@@ -129,9 +123,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
             seekTo(currentComposition.getPlayPosition());
         } else {
             seekTo(0);
-            subject.onNext(new ErrorEvent(throwable));
+            playerEventSubject.onNext(new ErrorEvent(throwable));
         }
-        preparedComposition = currentComposition;
     }
 
     private void startTracingTrackPosition() {
