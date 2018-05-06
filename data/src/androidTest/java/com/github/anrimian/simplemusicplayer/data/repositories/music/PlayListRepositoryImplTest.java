@@ -5,7 +5,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
 import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
-import com.github.anrimian.simplemusicplayer.data.repositories.playlist.PlayListRepositoryImpl;
+import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayListRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.CurrentPlayListInfo;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListRepository;
@@ -41,7 +41,7 @@ public class PlayListRepositoryImplTest {
     private CurrentPlayListInfo currentPlayListInfo;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         for (int i = 0; i < 100000; i++) {
             Composition composition = new Composition();
 
@@ -61,7 +61,7 @@ public class PlayListRepositoryImplTest {
     }
 
     @Test
-    public void currentPlayListTest() throws Exception {
+    public void currentPlayListTest() {
         /*TestObserver<CurrentPlayListInfo> testObserver =*/ playQueueRepository.setCurrentPlayList(currentPlayListInfo)
                 .andThen(playQueueRepository.getCurrentPlayList())
                 .flatMapCompletable(compositions -> playQueueRepository.setCurrentPlayList(currentPlayListInfo))

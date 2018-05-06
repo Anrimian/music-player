@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.repositories.playlist;
+package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.simplemusicplayer.data.database.dao.CompositionsDao;
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionEntity;

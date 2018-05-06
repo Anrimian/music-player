@@ -116,6 +116,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         }
 
         getViewState().showCurrentComposition(composition, currentComposition.getQueuePosition());
+        getViewState().showTrackState(currentComposition.getPlayPosition(), composition.getDuration());
         subscribeOnTrackPositionChanging();
     }
 

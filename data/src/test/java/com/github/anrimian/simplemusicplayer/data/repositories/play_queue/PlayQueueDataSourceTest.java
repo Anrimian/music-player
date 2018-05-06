@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.repositories.playlist;
+package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.simplemusicplayer.data.database.dao.CompositionsDao;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
@@ -8,7 +8,6 @@ import org.junit.Before;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 public class PlayQueueDataSourceTest {
