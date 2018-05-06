@@ -17,12 +17,4 @@ public interface SystemMusicController {
 
     Observable<Object> getAudioBecomingNoisyObservable();
 
-    @Deprecated
-    boolean requestAudioFocusOld();
-
-    @Deprecated
-    Observable<AudioFocusEvent> getAudioFocusObservable();
-
-    @Deprecated
-    void abandonAudioFocus();
 }

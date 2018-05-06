@@ -20,16 +20,17 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFo
  */
 public class AudioFocusRxWrapper {
 
-    private AudioManager audioManager;
+    private final AudioManager audioManager;
+    private final AudioFocusObservable audioFocusChangeListener;
 
     public AudioFocusRxWrapper(Context context) {
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioFocusChangeListener = new AudioFocusObservable(audioManager);
     }
 
     @SuppressLint("CheckResult")
     @Nullable
     public Observable<AudioFocusEvent> requestAudioFocus(int streamType, int durationHint) {
-        AudioFocusObservable audioFocusChangeListener = new AudioFocusObservable(audioManager);
         int audioFocusResult = audioManager.requestAudioFocus(audioFocusChangeListener, streamType,
                 durationHint);
         if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -38,12 +39,12 @@ public class AudioFocusRxWrapper {
         return null;
     }
 
-    private class AudioFocusObservable implements AudioManager.OnAudioFocusChangeListener{
+    private class AudioFocusObservable implements AudioManager.OnAudioFocusChangeListener {
 
         private final PublishSubject<AudioFocusEvent> subject = PublishSubject.create();
 
         @SuppressLint("CheckResult")
-        AudioFocusObservable(AudioManager audioManager) {
+        private AudioFocusObservable(AudioManager audioManager) {
             subject.doOnDispose(() -> audioManager.abandonAudioFocus(this));
         }
 
@@ -65,7 +66,7 @@ public class AudioFocusRxWrapper {
             }
         }
 
-        public Observable<AudioFocusEvent> getObservable() {
+        private Observable<AudioFocusEvent> getObservable() {
             return subject;
         }
     }
