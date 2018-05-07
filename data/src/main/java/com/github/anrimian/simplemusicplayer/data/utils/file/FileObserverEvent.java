@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.storage;
+package com.github.anrimian.simplemusicplayer.data.utils.file;
 
 import javax.annotation.Nonnull;
 

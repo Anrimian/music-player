@@ -15,22 +15,22 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class StorageMusicDataSourceTest {
+public class StorageMusicProviderTest {
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 
-    private StorageMusicDataSource storageMusicDataSource;
+    private StorageMusicProvider storageMusicProvider;
 
     @Before
     public void before() {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        storageMusicDataSource = new StorageMusicDataSource(appContext);
+        storageMusicProvider = new StorageMusicProvider(appContext);
     }
 
     @Test
     public void testRepositoryReturnValues() {
-        List<Composition> compositions = storageMusicDataSource.getAllCompositions().blockingGet();
+        List<Composition> compositions = storageMusicProvider.getCompositions();
         for (Composition composition: compositions) {
             System.out.println(composition);
             Assert.assertNotNull(composition.getFilePath());

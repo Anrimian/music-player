@@ -4,6 +4,9 @@ import android.Manifest;
 import android.os.Environment;
 import android.support.test.rule.GrantPermissionRule;
 
+import com.github.anrimian.simplemusicplayer.data.utils.file.EventType;
+import com.github.anrimian.simplemusicplayer.data.utils.file.FileObserverEvent;
+import com.github.anrimian.simplemusicplayer.data.utils.file.TestFileObserver;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RecursiveFileObserver;
 
 import org.junit.After;

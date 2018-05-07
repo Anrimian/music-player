@@ -11,7 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.data.storage.TestFileObserver;
+import com.github.anrimian.simplemusicplayer.data.utils.file.TestFileObserver;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RecursiveFileObserver;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;

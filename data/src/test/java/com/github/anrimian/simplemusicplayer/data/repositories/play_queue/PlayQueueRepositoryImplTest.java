@@ -14,8 +14,8 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
-import static com.github.anrimian.simplemusicplayer.data.repositories.TestDataProvider.currentComposition;
-import static com.github.anrimian.simplemusicplayer.data.repositories.TestDataProvider.getFakeCompositions;
+import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.currentComposition;
+import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
 import static java.util.Collections.emptyList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
