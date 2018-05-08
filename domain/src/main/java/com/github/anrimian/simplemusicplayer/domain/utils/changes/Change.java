@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.utils.changes;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("NullableProblems")
@@ -9,14 +11,11 @@ public class Change<T> {
     private ChangeType changeType;
 
     @Nonnull
-    private T data;
+    private List<T> data;
 
-    public Change(@Nonnull ChangeType changeType, @Nonnull T data) {
+    public Change(@Nonnull ChangeType changeType, @Nonnull List<T> data) {
         this.changeType = changeType;
         this.data = data;
-    }
-
-    public Change() {
     }
 
     @Nonnull
@@ -29,11 +28,11 @@ public class Change<T> {
     }
 
     @Nonnull
-    public T getData() {
+    public List<T> getData() {
         return data;
     }
 
-    public void setData(@Nonnull T data) {
+    public void setData(@Nonnull List<T> data) {
         this.data = data;
     }
 
@@ -44,8 +43,7 @@ public class Change<T> {
 
         Change<?> change = (Change<?>) o;
 
-        if (changeType != change.changeType) return false;
-        return data.equals(change.data);
+        return changeType == change.changeType && data.equals(change.data);
     }
 
     @Override

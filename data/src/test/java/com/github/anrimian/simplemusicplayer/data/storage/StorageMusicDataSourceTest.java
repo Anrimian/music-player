@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.List;
 
 import io.reactivex.observers.TestObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
@@ -31,7 +32,7 @@ public class StorageMusicDataSourceTest {
         when(musicProvider.getCompositions()).thenReturn(getFakeCompositions());
         when(musicProvider.getChangeObservable()).thenReturn(publishSubject);
 
-        storageMusicDataSource = new StorageMusicDataSource(musicProvider);
+        storageMusicDataSource = new StorageMusicDataSource(musicProvider, Schedulers.trampoline());
     }
 
     @Test
@@ -41,14 +42,21 @@ public class StorageMusicDataSourceTest {
         TestObserver<Change<Composition>> changeTestObserver = list.getChangeObservable().test();
 
         List<Composition> changedCompositions = getFakeCompositions();
+        changedCompositions.remove(changedCompositions.size() - 1);
+        changedCompositions.remove(3);
+        changedCompositions.remove(1);
         changedCompositions.remove(0);
+
         when(musicProvider.getCompositions()).thenReturn(changedCompositions);
 
         publishSubject.onNext(new Object());
 
         changeTestObserver.assertValue(change -> {
             assertEquals(ChangeType.DELETED, change.getChangeType());
-            assertEquals(getFakeCompositions().get(0), change.getData());
+            assertEquals(getFakeCompositions().get(0), change.getData().get(0));
+            assertEquals(getFakeCompositions().get(1), change.getData().get(1));
+            assertEquals(getFakeCompositions().get(3), change.getData().get(2));
+            assertEquals(getFakeCompositions().get(getFakeCompositions().size() - 1), change.getData().get(3));
             return true;
         });
     }
