@@ -3,8 +3,8 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -31,7 +31,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         return storageMusicDataSource.getCompositions()
                 .doOnSuccess(compositionChangeableList -> compositionChangeableList.getChangeObservable()
                         .subscribe())
-                .map(ChangeableList::getList)
+                .map(list -> (List<Composition>) new ArrayList(list.getHashMap().values()))
                 .subscribeOn(scheduler);
     }
 

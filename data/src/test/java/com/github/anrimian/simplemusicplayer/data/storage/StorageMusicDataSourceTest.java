@@ -3,19 +3,19 @@ package com.github.anrimian.simplemusicplayer.data.storage;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableList;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Map;
 
 import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
-import static org.junit.Assert.*;
+import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositionsMap;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,41 +23,76 @@ public class StorageMusicDataSourceTest {
 
     private StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
 
-    private PublishSubject<Object> publishSubject = PublishSubject.create();
+    private PublishSubject<Map<Long, Composition>> changeSubject = PublishSubject.create();
 
     private StorageMusicDataSource storageMusicDataSource;
 
     @Before
     public void setUp() {
-        when(musicProvider.getCompositions()).thenReturn(getFakeCompositions());
-        when(musicProvider.getChangeObservable()).thenReturn(publishSubject);
+        when(musicProvider.getCompositions()).thenReturn(getFakeCompositionsMap());
+        when(musicProvider.getChangeObservable()).thenReturn(changeSubject);
 
         storageMusicDataSource = new StorageMusicDataSource(musicProvider, Schedulers.trampoline());
     }
 
     @Test
     public void removeChangeTest() {
-        ChangeableList<Composition> list = storageMusicDataSource.getCompositions().blockingGet();
+        ChangeableMap<Long, Composition> list = storageMusicDataSource.getCompositions().blockingGet();
 
         TestObserver<Change<Composition>> changeTestObserver = list.getChangeObservable().test();
 
-        List<Composition> changedCompositions = getFakeCompositions();
-        changedCompositions.remove(changedCompositions.size() - 1);
-        changedCompositions.remove(3);
-        changedCompositions.remove(1);
-        changedCompositions.remove(0);
+        Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
+        changedCompositions.remove(changedCompositions.size() - 1L);
+        changedCompositions.remove(3L);
+        changedCompositions.remove(1L);
+        changedCompositions.remove(0L);
 
-        when(musicProvider.getCompositions()).thenReturn(changedCompositions);
-
-        publishSubject.onNext(new Object());
+        changeSubject.onNext(changedCompositions);
 
         changeTestObserver.assertValue(change -> {
             assertEquals(ChangeType.DELETED, change.getChangeType());
-            assertEquals(getFakeCompositions().get(0), change.getData().get(0));
-            assertEquals(getFakeCompositions().get(1), change.getData().get(1));
-            assertEquals(getFakeCompositions().get(3), change.getData().get(2));
-            assertEquals(getFakeCompositions().get(getFakeCompositions().size() - 1), change.getData().get(3));
+            assertEquals(getFakeCompositionsMap().get(0L), change.getData().get(0));
+            assertEquals(getFakeCompositionsMap().get(1L), change.getData().get(1));
+            assertEquals(getFakeCompositionsMap().get(3L), change.getData().get(2));
+            assertEquals(getFakeCompositionsMap().get(getFakeCompositionsMap().size() - 1L), change.getData().get(3));
             return true;
         });
+
+        storageMusicDataSource.getCompositions()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(null, compositions.getHashMap().get(0L));
+                    assertEquals(null, compositions.getHashMap().get(1L));
+                    assertEquals(null, compositions.getHashMap().get(3L));
+                    assertEquals(null, compositions.getHashMap().get(getFakeCompositionsMap().size() - 1L));
+                    return true;
+                });
+    }
+
+    @Test
+    public void addChangeTest() {
+        ChangeableMap<Long, Composition> list = storageMusicDataSource.getCompositions().blockingGet();
+
+        TestObserver<Change<Composition>> changeTestObserver = list.getChangeObservable().test();
+
+        Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
+        Composition addedComposition = new Composition();
+        addedComposition.setId(-1L);
+        changedCompositions.put(-1L, addedComposition);
+
+        changeSubject.onNext(changedCompositions);
+
+        changeTestObserver.assertValue(change -> {
+            assertEquals(ChangeType.ADDED, change.getChangeType());
+            assertEquals(addedComposition, change.getData().get(0));
+            return true;
+        });
+
+        storageMusicDataSource.getCompositions()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(addedComposition, compositions.getHashMap().get(-1L));
+                    return true;
+                });
     }
 }

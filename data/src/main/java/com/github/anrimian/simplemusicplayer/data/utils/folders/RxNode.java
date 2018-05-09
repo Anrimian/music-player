@@ -43,7 +43,7 @@ public class RxNode<K, T> {
 
     public void addNode(RxNode<K, T> node) {
         nodes.add(node);
-        changeSubject.onNext(new Change<>(NEW, node));
+        changeSubject.onNext(new Change<>(ADDED, node));
         notifyNodeUpdated(this);
     }
 

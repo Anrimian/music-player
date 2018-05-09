@@ -1,22 +1,22 @@
 package com.github.anrimian.simplemusicplayer.domain.utils.changes;
 
-import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 
-public class ChangeableList<T> {
+public class ChangeableMap<K, T> {
 
-    private List<T> list;
+    private final Map<K, T> hashMap;
 
-    private Observable<Change<T>> changeObservable;
+    private final Observable<Change<T>> changeObservable;
 
-    public ChangeableList(List<T> list, Observable<Change<T>> changeObservable) {
-        this.list = list;
+    public ChangeableMap(Map<K, T> hashMap, Observable<Change<T>> changeObservable) {
+        this.hashMap = hashMap;
         this.changeObservable = changeObservable;
     }
 
-    public List<T> getList() {
-        return list;
+    public Map<K, T> getHashMap() {
+        return hashMap;
     }
 
     public Observable<Change<T>> getChangeObservable() {
@@ -26,7 +26,7 @@ public class ChangeableList<T> {
     @Override
     public String toString() {
         return "ChangeableList{" +
-                "list=" + list +
+                "hashMap=" + hashMap +
                 '}';
     }
 
@@ -35,13 +35,15 @@ public class ChangeableList<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ChangeableList<?> that = (ChangeableList<?>) o;
+        ChangeableMap<?, ?> that = (ChangeableMap<?, ?>) o;
 
-        return list != null ? list.equals(that.list) : that.list == null;
+        return hashMap != null ? hashMap.equals(that.hashMap) : that.hashMap == null;
     }
 
     @Override
     public int hashCode() {
-        return list != null ? list.hashCode() : 0;
+        return hashMap != null ? hashMap.hashCode() : 0;
     }
+
+
 }

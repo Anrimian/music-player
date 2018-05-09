@@ -3,10 +3,12 @@ package com.github.anrimian.simplemusicplayer.data.storage;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableList;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -21,59 +23,68 @@ public class StorageMusicDataSource {
     private final Scheduler scheduler;
 
     @Nullable
-    private ChangeableList<Composition> compositions;
+    private ChangeableMap<Long, Composition> compositions;
 
     public StorageMusicDataSource(StorageMusicProvider musicProvider, Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.scheduler = scheduler;
     }
 
-    public Single<ChangeableList<Composition>> getCompositions() {
+    public Single<ChangeableMap<Long, Composition>> getCompositions() {
         return Single.fromCallable(this::getList)
                 .observeOn(scheduler);
     }
 
-    private ChangeableList<Composition> getList() {
+    private ChangeableMap<Long, Composition> getList() {
         if (compositions == null) {
             synchronized (StorageMusicDataSource.this) {
                 if (compositions == null) {
-                    compositions = createList();
+                    compositions = createMap();
                 }
             }
         }
         return compositions;
     }
 
-    private ChangeableList<Composition> createList() {
-        List<Composition> compositions = musicProvider.getCompositions();
+    private ChangeableMap<Long, Composition> createMap() {
+        Map<Long, Composition> hashMap = musicProvider.getCompositions();
+
         Observable<Change<Composition>> changeObservable = musicProvider.getChangeObservable()
                 .flatMap(this::calculateChange)
                 .share()
                 .observeOn(scheduler);
-        return new ChangeableList<>(compositions, changeObservable);
+        return new ChangeableMap<>(hashMap, changeObservable);
     }
 
-    private Observable<Change<Composition>> calculateChange(Object o) {
+    private Observable<Change<Composition>> calculateChange(Map<Long, Composition> newCompositions) {
         return Observable.create(emitter -> {
-            List<Composition> existsCompositions = compositions.getList();
-            List<Composition> newCompositions = musicProvider.getCompositions();
-
             List<Composition> deletedCompositions = new ArrayList<>();
-            for (int existsIndex = 0; existsIndex < existsCompositions.size(); existsIndex++) {
-                Composition existsComposition = existsCompositions.get(existsIndex);
+            List<Composition> addedCompositions = new ArrayList<>();
 
-                boolean deleted = true;
-                for (Composition newComposition: newCompositions) {
-                    if (existsComposition.equals(newComposition)) {
-                        deleted = false;
-                    }
-                }
-                if (deleted) {
-                    deletedCompositions.add(existsComposition);
+            Map<Long, Composition> existsCompositions = compositions.getHashMap();
+
+            for (Composition newComposition: newCompositions.values()) {
+                Composition existComposition = existsCompositions.get(newComposition.getId());
+                if (existComposition == null) {
+                    addedCompositions.add(newComposition);
+                    existsCompositions.put(newComposition.getId(), newComposition);
+                } else {
+                    //handle change
                 }
             }
+            for (Composition existComposition: new HashMap<>(existsCompositions).values()) {
+                Composition newComposition = newCompositions.get(existComposition.getId());
+                if (newComposition == null) {
+                    deletedCompositions.add(existComposition);
+                    existsCompositions.remove(existComposition.getId());
+                }
+            }
+
             if (!deletedCompositions.isEmpty()) {
                 emitter.onNext(new Change<>(ChangeType.DELETED, deletedCompositions));
+            }
+            if (!addedCompositions.isEmpty()) {
+                emitter.onNext(new Change<>(ChangeType.ADDED, addedCompositions));
             }
         });
     }

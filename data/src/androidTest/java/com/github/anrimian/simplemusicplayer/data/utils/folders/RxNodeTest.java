@@ -48,11 +48,11 @@ public class RxNodeTest {
         Folder folder12 = new Folder();
         folder12.setLocalId(22);
         folder12.setParentLocalId(1L);
-        changeFolderSubject.onNext(new Change<>(ChangeType.NEW, folder12));
+        changeFolderSubject.onNext(new Change<>(ChangeType.ADDED, folder12));
 
         testObserver.assertValueAt(0, change -> change.getData()
                 .getFolder()
-                .getLocalId() == 22 && change.getChangeType() == ChangeType.NEW);
+                .getLocalId() == 22 && change.getChangeType() == ChangeType.ADDED);
 
         testObserver.assertValueAt(1, change -> change.getData()
                 .getFolder()

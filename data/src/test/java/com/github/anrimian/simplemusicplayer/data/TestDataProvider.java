@@ -4,7 +4,9 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 16.04.2018.
@@ -13,12 +15,24 @@ public class TestDataProvider {
 
     public static List<Composition> getFakeCompositions() {
         List<Composition> compositions = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             Composition composition = new Composition();
 
             composition.setFilePath("music-" + i);
             composition.setId(i);
             compositions.add(composition);
+        }
+        return compositions;
+    }
+
+    public static Map<Long, Composition> getFakeCompositionsMap() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        for (long i = 0; i < 100000; i++) {
+            Composition composition = new Composition();
+
+            composition.setFilePath("music-" + i);
+            composition.setId(i);
+            compositions.put(i, composition);
         }
         return compositions;
     }

@@ -46,7 +46,7 @@ public class FolderTree {
 
     private void onFolderChanged(Change<Folder> change) {
         switch (change.getChangeType()) {
-            case NEW: {
+            case ADDED: {
                 addNewNode(change.getData());
                 break;
             }

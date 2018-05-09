@@ -10,9 +10,9 @@ import com.github.anrimian.simplemusicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.simplemusicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -29,12 +29,13 @@ public class StorageMusicProvider {
         this.context = context;
     }
 
-    public Observable<Object> getChangeObservable() {
+    public Observable<Map<Long, Composition>> getChangeObservable() {
         return RxContentObserver.getObservable(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
-                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS);
+                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)
+                .map(o -> getCompositions());
     }
 
-    public List<Composition> getCompositions() {
+    public Map<Long, Composition> getCompositions() {
         Cursor cursor = null;
         try {
             cursor = context.getContentResolver().query(
@@ -47,7 +48,7 @@ public class StorageMusicProvider {
                 throw new MusicNotFoundException();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            List<Composition> compositions = new ArrayList<>(cursor.getCount());
+            Map<Long, Composition> compositions = new HashMap<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
@@ -103,7 +104,7 @@ public class StorageMusicProvider {
                 composition.setRingtone(isRingtone);
 
                 composition.setYear(year);
-                compositions.add(composition);
+                compositions.put(id, composition);
             }
             return compositions;
         } finally {
