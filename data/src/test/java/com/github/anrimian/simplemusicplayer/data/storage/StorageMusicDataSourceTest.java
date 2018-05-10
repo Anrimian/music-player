@@ -95,4 +95,32 @@ public class StorageMusicDataSourceTest {
                     return true;
                 });
     }
+
+
+    @Test
+    public void modifyChangeTest() {
+        ChangeableMap<Long, Composition> list = storageMusicDataSource.getCompositions().blockingGet();
+
+        TestObserver<Change<Composition>> changeTestObserver = list.getChangeObservable().test();
+
+        Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
+        Composition changedComposition = changedCompositions.get(0L);
+        changedComposition.setFilePath("test path");
+
+        changeSubject.onNext(changedCompositions);
+
+        changeTestObserver.assertValue(change -> {
+            assertEquals(ChangeType.MODIFY, change.getChangeType());
+            assertEquals(changedComposition, change.getData().get(0));
+            return true;
+        });
+
+        storageMusicDataSource.getCompositions()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(changedComposition, compositions.getHashMap().get(0L));
+                    assertEquals("test path", compositions.getHashMap().get(0L).getFilePath());
+                    return true;
+                });
+    }
 }

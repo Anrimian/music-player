@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
+import com.github.anrimian.simplemusicplayer.data.utils.Objects;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
@@ -60,23 +62,26 @@ public class StorageMusicDataSource {
         return Observable.create(emitter -> {
             List<Composition> deletedCompositions = new ArrayList<>();
             List<Composition> addedCompositions = new ArrayList<>();
+            List<Composition> changedCompositions = new ArrayList<>();
 
             Map<Long, Composition> existsCompositions = compositions.getHashMap();
+
+            for (Composition existComposition: new HashMap<>(existsCompositions).values()) {
+                Composition newComposition = newCompositions.get(existComposition.getId());
+                if (newComposition == null) {
+                    deletedCompositions.add(existComposition);
+                    existsCompositions.remove(existComposition.getId());
+                }
+            }
 
             for (Composition newComposition: newCompositions.values()) {
                 Composition existComposition = existsCompositions.get(newComposition.getId());
                 if (existComposition == null) {
                     addedCompositions.add(newComposition);
                     existsCompositions.put(newComposition.getId(), newComposition);
-                } else {
-                    //handle change
-                }
-            }
-            for (Composition existComposition: new HashMap<>(existsCompositions).values()) {
-                Composition newComposition = newCompositions.get(existComposition.getId());
-                if (newComposition == null) {
-                    deletedCompositions.add(existComposition);
-                    existsCompositions.remove(existComposition.getId());
+                } else if (hasChanges(newComposition, existComposition)) {
+                    changedCompositions.add(newComposition);
+                    existsCompositions.put(newComposition.getId(), newComposition);
                 }
             }
 
@@ -86,6 +91,23 @@ public class StorageMusicDataSource {
             if (!addedCompositions.isEmpty()) {
                 emitter.onNext(new Change<>(ChangeType.ADDED, addedCompositions));
             }
+            if (!changedCompositions.isEmpty()) {
+                emitter.onNext(new Change<>(ChangeType.MODIFY, changedCompositions));
+            }
         });
+    }
+
+    private boolean hasChanges(@Nonnull Composition first, @Nonnull Composition second) {
+        return !Objects.equals(first.getAlbum(), second.getAlbum())
+                || !Objects.equals(first.getArtist(), second.getArtist())
+                || !Objects.equals(first.getComposer(), second.getComposer())
+                || !Objects.equals(first.getDateAdded(), second.getDateAdded())
+                || !Objects.equals(first.getDateModified(), second.getDateModified())
+                || !Objects.equals(first.getDisplayName(), second.getDisplayName())
+                || first.getDuration() != second.getDuration()
+                || !Objects.equals(first.getFilePath(), second.getFilePath())
+                || first.getSize() != second.getSize()
+                || !Objects.equals(first.getTitle(), second.getTitle())
+                || !Objects.equals(first.getYear(), second.getYear());
     }
 }
