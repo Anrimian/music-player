@@ -16,4 +16,12 @@ public class PlayQueue {
         shuffledPlayList = new ArrayList<>(initialPlayList);
         Collections.shuffle(shuffledPlayList);
     }
+
+    public List<Composition> getShuffledPlayList() {
+        return shuffledPlayList;
+    }
+
+    public List<Composition> getInitialPlayList() {
+        return initialPlayList;
+    }
 }

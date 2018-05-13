@@ -1,16 +1,16 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
-import com.github.anrimian.simplemusicplayer.data.models.compositions.CompositionsMapper;
+import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntity;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-
-import org.mapstruct.factory.Mappers;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -21,8 +21,6 @@ import io.reactivex.Single;
  */
 public class PlayQueueDataSourceNew {
 
-    private final CompositionsMapper compositionsMapper = Mappers.getMapper(CompositionsMapper.class);
-
     private final PlayQueueDao playQueueDao;
     private final StorageMusicDataSource storageMusicDataSource;
     private final SettingsPreferences settingsPreferences;
@@ -30,6 +28,9 @@ public class PlayQueueDataSourceNew {
 
     private List<Composition> initialPlayList;
     private List<Composition> shuffledPlayList;
+
+    @Nullable
+    private PlayQueue playQueue;
 
     public PlayQueueDataSourceNew(PlayQueueDao playQueueDao,
                                   StorageMusicDataSource storageMusicDataSource,
@@ -48,16 +49,13 @@ public class PlayQueueDataSourceNew {
     }
 
     public Single<List<Composition>> getPlayQueue() {
-        return Single.fromCallable(() -> {
-            if (initialPlayList == null) {
-                loadPlayQueue();
-            }
-
-            if (settingsPreferences.isRandomPlayingEnabled()) {
-                return shuffledPlayList;
-            }
-            return initialPlayList;
-        }).subscribeOn(scheduler);
+        return getSavedPlayQueue()
+                .map(playQueue -> {
+                    if (settingsPreferences.isRandomPlayingEnabled()) {
+                        return playQueue.getShuffledPlayList();
+                    }
+                    return playQueue.getInitialPlayList();
+                }).subscribeOn(scheduler);
     }
 
     /**
@@ -79,9 +77,23 @@ public class PlayQueueDataSourceNew {
         return initialPlayList.indexOf(currentComposition);
     }
 
+    private Single<PlayQueue> getSavedPlayQueue() {
+        if (playQueue == null) {
+            return loadPlayQueue()
+                    .doOnSuccess(playQueue -> this.playQueue = playQueue);
+        }
+        return Single.just(playQueue);
+    }
+
     private Completable savePlayQueue(PlayQueue playQueue) {
         return Completable.fromRunnable(() -> {
+            playQueueDao.deletePlayQueue();
 
+            List<PlayQueueEntity> playQueueEntityList = new ArrayList<>();
+
+            playQueueDao.setPlayQueue(playQueueEntityList);
+
+            this.playQueue = playQueue;
         });
 
 
@@ -105,7 +117,23 @@ public class PlayQueueDataSourceNew {
     }
 
     @SuppressWarnings("unchecked")
-    private void loadPlayQueue() {
+    private Single<PlayQueue> loadPlayQueue() {
+        return storageMusicDataSource.getCompositions()
+                .map(ChangeableMap::getHashMap)
+                .map(compositionMap -> {
+                    List<PlayQueueEntity> playQueueEntities = playQueueDao.getPlayQueue();
+                    for (PlayQueueEntity playQueueEntity: playQueueEntities) {
+
+                    }
+
+//                    return new PlayQueue();
+                    return null;
+                });
+
+//        Map<Long, Composition> compositionMap = storageMusicDataSource.getCompositions()
+
+//        return null;
+
 //        List<CompositionItemEntity> compositionItemEntities = playQueueDao.getCurrentPlayList();
 //        Composition[] initialPlayListArray = new Composition[compositionItemEntities.size()];
 //        Composition[] currentPlayListArray = new Composition[compositionItemEntities.size()];

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 
+//TODO delete
 public class ChangeableMap<K, T> {
 
     private final Map<K, T> hashMap;
