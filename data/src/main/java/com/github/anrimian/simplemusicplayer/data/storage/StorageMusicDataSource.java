@@ -37,6 +37,10 @@ public class StorageMusicDataSource {
                 .observeOn(scheduler);
     }
 
+    public ChangeableMap<Long, Composition> getCompositionsList() {
+        return getList();
+    }
+
     private ChangeableMap<Long, Composition> getList() {
         if (compositions == null) {
             synchronized (StorageMusicDataSource.this) {
