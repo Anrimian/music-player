@@ -116,11 +116,11 @@ public class PlayQueueDataSourceNew {
         Map<Long, Integer> shuffledPlayList = new HashMap<>(playQueueEntities.size());
         Map<Long, Composition> compositionMap = new HashMap<>(playQueueEntities.size());
         for (PlayQueueEntity playQueueEntity: playQueueEntities) {
-            Composition composition = allCompositionMap.get(playQueueEntity.getId());
+            long id = playQueueEntity.getId();
+            Composition composition = allCompositionMap.get(id);
             if (composition == null) {
-                //TODO delete
+                playQueueDao.deletePlayQueueEntity(id);
             } else {
-                long id = composition.getId();
                 compositionMap.put(id, composition);
                 initialPlayList.put(id, playQueueEntity.getPosition());
                 shuffledPlayList.put(id, playQueueEntity.getShuffledPosition());

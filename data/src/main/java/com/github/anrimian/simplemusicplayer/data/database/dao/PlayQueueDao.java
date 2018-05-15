@@ -20,4 +20,7 @@ public interface PlayQueueDao {
 
     @Query("DELETE FROM play_queue")
     void deletePlayQueue();
+
+    @Query("DELETE FROM play_queue WHERE id = :id")
+    void deletePlayQueueEntity(long id);
 }

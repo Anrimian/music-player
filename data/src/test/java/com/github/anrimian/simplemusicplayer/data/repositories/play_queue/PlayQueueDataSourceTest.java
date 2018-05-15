@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
+import android.content.Intent;
+
 import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
 import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntity;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
@@ -20,9 +22,11 @@ import io.reactivex.schedulers.Schedulers;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositionsMap;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -99,6 +103,24 @@ public class PlayQueueDataSourceTest {
                     assertEquals(getFakeCompositions(), compositions);
                     return true;
                 });
+    }
+
+    @Test
+    public void getPlayQueueWithUnexcitingCompositions() {
+        PlayQueueEntity playQueueEntity = new PlayQueueEntity();
+        playQueueEntity.setId(Long.MAX_VALUE);
+        playQueueEntity.setPosition(0);
+        playQueueEntity.setShuffledPosition(0);
+        when(playQueueDao.getPlayQueue()).thenReturn(singletonList(playQueueEntity));
+
+        playQueueDataSource.getPlayQueue()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(0, compositions.size());
+                    return true;
+                });
+
+        verify(playQueueDao).deletePlayQueueEntity(eq(Long.MAX_VALUE));
     }
 
     private List<PlayQueueEntity> getPlayQueueEntities() {
