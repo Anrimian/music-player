@@ -70,7 +70,7 @@ public class PlayQueueDataSourceNew {
                         playQueue.shuffle();
 
                         moveCompositionToTop(currentComposition);
-                        //TODO save
+                        playQueueDao.updatePlayQueue(toEntityList(playQueue));
                     }
                 }))
                 .andThen(Single.fromCallable(() -> getCurrentPosition(currentComposition)))
@@ -106,22 +106,24 @@ public class PlayQueueDataSourceNew {
         });
     }
 
+    private List<PlayQueueEntity> toEntityList(PlayQueue playQueue) {
+        List<PlayQueueEntity> playQueueEntityList = new ArrayList<>();
+
+        for (Composition composition: playQueue.getCompositionMap().values()) {
+            PlayQueueEntity playQueueEntity = new PlayQueueEntity();
+            playQueueEntity.setId(composition.getId());
+            playQueueEntity.setPosition(playQueue.getPosition(composition));
+            playQueueEntity.setShuffledPosition(playQueue.getShuffledPosition(composition));
+
+            playQueueEntityList.add(playQueueEntity);
+        }
+        return playQueueEntityList;
+    }
+
     private Completable savePlayQueue(PlayQueue playQueue) {
         return Completable.fromRunnable(() -> {
             playQueueDao.deletePlayQueue();
-
-            List<PlayQueueEntity> playQueueEntityList = new ArrayList<>();
-
-            for (Composition composition: playQueue.getCompositionMap().values()) {
-                PlayQueueEntity playQueueEntity = new PlayQueueEntity();
-                playQueueEntity.setId(composition.getId());
-                playQueueEntity.setPosition(playQueue.getPosition(composition));
-                playQueueEntity.setShuffledPosition(playQueue.getShuffledPosition(composition));
-
-                playQueueEntityList.add(playQueueEntity);
-            }
-
-            playQueueDao.setPlayQueue(playQueueEntityList);
+            playQueueDao.setPlayQueue(toEntityList(playQueue));
 
             this.playQueue = playQueue;
         });

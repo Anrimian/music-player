@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.data.database.dao;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import com.github.anrimian.simplemusicplayer.data.database.models.CompositionItemEntity;
 import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntity;
@@ -17,6 +18,9 @@ public interface PlayQueueDao {
 
     @Insert
     void setPlayQueue(List<PlayQueueEntity> playQueueEntityList);
+
+    @Update
+    void updatePlayQueue(List<PlayQueueEntity> playQueueEntityList);
 
     @Query("DELETE FROM play_queue")
     void deletePlayQueue();

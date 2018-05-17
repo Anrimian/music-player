@@ -25,6 +25,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -145,6 +146,7 @@ public class PlayQueueDataSourceTest {
         int position = playQueueDataSource.setRandomPlayingEnabled(true, composition)
                 .blockingGet();
 
+        verify(playQueueDao).updatePlayQueue(anyListOf(PlayQueueEntity.class));
         assertEquals(0, position);
     }
 
