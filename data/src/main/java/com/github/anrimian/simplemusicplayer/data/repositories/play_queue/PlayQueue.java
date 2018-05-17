@@ -68,7 +68,7 @@ public class PlayQueue {
         return initialPlayList;
     }
 
-    private void shuffle() {
+    public void shuffle() {
         List<Integer> valueList = new ArrayList<>(initialPlayList.values());
         Collections.shuffle(valueList);
 

@@ -123,6 +123,31 @@ public class PlayQueueDataSourceTest {
         verify(playQueueDao).deletePlayQueueEntity(eq(Long.MAX_VALUE));
     }
 
+    @Test
+    public void setRandomPlayingDisabledTest() {
+        playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
+
+        when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(false);
+
+        int position = playQueueDataSource.setRandomPlayingEnabled(false, getFakeCompositions().get(1))
+                .blockingGet();
+
+        assertEquals(1, position);
+    }
+
+    @Test
+    public void setRandomPlayingEnabledTest() {
+        playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
+
+        when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(true);
+
+        Composition composition = getFakeCompositions().get(1);
+        int position = playQueueDataSource.setRandomPlayingEnabled(true, composition)
+                .blockingGet();
+
+        assertEquals(0, position);
+    }
+
     private List<PlayQueueEntity> getPlayQueueEntities() {
         List<PlayQueueEntity> playQueueEntities = new ArrayList<>();
         List<Composition> compositions = getFakeCompositions();

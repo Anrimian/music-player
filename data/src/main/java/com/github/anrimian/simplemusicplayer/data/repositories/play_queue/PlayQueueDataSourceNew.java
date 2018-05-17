@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
@@ -61,20 +62,39 @@ public class PlayQueueDataSourceNew {
      *
      * @return new position of current composition
      */
-    public int setRandomPlayingEnabled(boolean enabled, Composition currentComposition) {
-        if (playQueue == null) {
-            throw new IllegalStateException("change play mode before initialization");
-        }
+    public Single<Integer> setRandomPlayingEnabled(boolean enabled, Composition currentComposition) {
+        return getSavedPlayQueue()
+                .flatMapCompletable(playQueue -> Completable.fromRunnable(() -> {
+                    settingsPreferences.setRandomPlayingEnabled(enabled);
+                    if (enabled) {
+                        playQueue.shuffle();
 
-        settingsPreferences.setRandomPlayingEnabled(enabled);
-        return 0;
-//        if (enabled) {
-//            shuffledPlayList.remove(currentComposition);
-//            shuffledPlayList.add(0, currentComposition);
-////            savePlayQueue();//TODO optimize in next refactoring wave
-//            return 0;
-//        }
-//        return initialPlayList.indexOf(currentComposition);
+                        moveCompositionToTop(currentComposition);
+                        //TODO save
+                    }
+                }))
+                .andThen(Single.fromCallable(() -> getCurrentPosition(currentComposition)))
+                .subscribeOn(scheduler);
+    }
+
+    private void moveCompositionToTop(Composition composition) {
+        Map<Long, Integer> shuffledPlayList = playQueue.getShuffledPlayMap();
+
+        long id = composition.getId();
+        int previousPosition = shuffledPlayList.put(id, 0);
+        for (Map.Entry<Long, Integer> entry: shuffledPlayList.entrySet()) {
+            if (entry.getValue() == previousPosition) {
+                shuffledPlayList.put(entry.getKey(), previousPosition);
+                break;
+            }
+        }
+    }
+
+    private int getCurrentPosition(Composition composition) {
+        if (settingsPreferences.isRandomPlayingEnabled()) {
+            return playQueue.getShuffledPosition(composition);
+        }
+        return playQueue.getPosition(composition);
     }
 
     private Single<PlayQueue> getSavedPlayQueue() {
