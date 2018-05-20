@@ -7,12 +7,12 @@ import android.support.annotation.NonNull;
 import com.github.anrimian.simplemusicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.simplemusicplayer.data.controllers.music.SystemMusicControllerImpl;
 import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
-import com.github.anrimian.simplemusicplayer.data.database.dao.CompositionsDao;
+import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayListRepositoryImpl;
-import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueDataSource;
+import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueDataSourceNew;
 import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
@@ -58,7 +58,7 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    PlayQueueRepository playQueueRepository(PlayQueueDataSource playQueueDataSource,
+    PlayQueueRepository playQueueRepository(PlayQueueDataSourceNew playQueueDataSource,
                                             UiStatePreferences uiStatePreferences,
                                             @Named(DB_SCHEDULER) Scheduler dbScheduler) {
         return new PlayQueueRepositoryImpl(playQueueDataSource, uiStatePreferences, dbScheduler);
@@ -67,10 +67,11 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    PlayQueueDataSource playQueueDataSource(CompositionsDao compositionsDao,
-                                            SettingsPreferences settingsPreferences,
-                                            @Named(DB_SCHEDULER) Scheduler dbScheduler) {
-        return new PlayQueueDataSource(compositionsDao, settingsPreferences, dbScheduler);
+    PlayQueueDataSourceNew playQueueDataSource(PlayQueueDao playQueueDao,
+                                               StorageMusicDataSource storageMusicDataSource,
+                                               SettingsPreferences settingsPreferences,
+                                               @Named(DB_SCHEDULER) Scheduler dbScheduler) {
+        return new PlayQueueDataSourceNew(playQueueDao, storageMusicDataSource, settingsPreferences, dbScheduler);
     }
 
     @Provides

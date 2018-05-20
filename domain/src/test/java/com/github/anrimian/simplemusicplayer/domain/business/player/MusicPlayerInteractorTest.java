@@ -2,7 +2,6 @@ package com.github.anrimian.simplemusicplayer.domain.business.player;
 
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
@@ -68,7 +67,7 @@ public class MusicPlayerInteractorTest {
                 .thenReturn(Single.just(currentComposition(getFakeCompositions().get(0))));
         when(playQueueRepository.getCurrentCompositionObservable())
                 .thenReturn(currentCompositionSubject);
-        when(playQueueRepository.skipToNext()).thenReturn(1);
+        when(playQueueRepository.skipToNext()).thenReturn(Single.just(1));
 
         when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
         when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
@@ -135,7 +134,7 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onPlayToEndTest() {
-        when(playQueueRepository.skipToNext()).thenReturn(0);
+        when(playQueueRepository.skipToNext()).thenReturn(Single.just(0));
         TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
                 .test();
 
@@ -156,7 +155,7 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onPlayToEndWithInfiniteModeTest() {
-        when(playQueueRepository.skipToNext()).thenReturn(0);
+        when(playQueueRepository.skipToNext()).thenReturn(Single.just(0));
         when(settingsRepository.isInfinitePlayingEnabled()).thenReturn(true);
         TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
                 .test();
@@ -312,7 +311,7 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onCompositionErrorInEndTest() {
-        when(playQueueRepository.skipToNext()).thenReturn(0);
+        when(playQueueRepository.skipToNext()).thenReturn(Single.just(0));
 
         TestObserver<PlayerState> testSubscriber = musicPlayerInteractor.getPlayerStateObservable()
                 .test();

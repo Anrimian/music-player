@@ -18,6 +18,7 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
@@ -105,15 +106,15 @@ public class MusicPlayerInteractor {
     }
 
     public void skipToPrevious() {
-        playQueueRepository.skipToPrevious();
+        playQueueRepository.skipToPrevious().subscribe();
     }
 
     public void skipToNext() {
-        playQueueRepository.skipToNext();
+        playQueueRepository.skipToNext().subscribe();
     }
 
     public void skipToPosition(int position) {
-        playQueueRepository.skipToPosition(position);
+        playQueueRepository.skipToPosition(position).subscribe();
     }
 
     public boolean isInfinitePlayingEnabled() {
@@ -160,12 +161,14 @@ public class MusicPlayerInteractor {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
             writeErrorAboutCurrentComposition(((ErrorEvent) playerEvent).getThrowable());
-            int currentPosition = playQueueRepository.skipToNext();
-            if (currentPosition == 0) {
-                stop();
-            } else {
-                musicPlayerController.resume();
-            }
+            Disposable subscribe = playQueueRepository.skipToNext()//TODO lock skipping actions
+                    .subscribe(currentPosition -> {
+                        if (currentPosition == 0) {
+                            stop();
+                        } else {
+                            musicPlayerController.resume();
+                        }
+                    });
         }
     }
 
@@ -178,12 +181,14 @@ public class MusicPlayerInteractor {
     }
 
     private void onCompositionPlayFinished() {
-        int currentPosition = playQueueRepository.skipToNext();
-        if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled() ) {
-            musicPlayerController.resume();
-        } else {
-            stop();
-        }
+        Disposable subscribe = playQueueRepository.skipToNext()
+                .subscribe(currentPosition -> {
+                    if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled()) {
+                        musicPlayerController.resume();
+                    } else {
+                        stop();
+                    }
+                });
     }
 
     private void onAudioFocusChanged(AudioFocusEvent event) {

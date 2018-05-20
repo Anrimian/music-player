@@ -1,7 +1,9 @@
 package com.github.anrimian.simplemusicplayer.data.utils.rx;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.subjects.BehaviorSubject;
 
 public class RxUtils {
@@ -14,6 +16,28 @@ public class RxUtils {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
                 T value = creator.create();
+                if (value != null) {
+                    subject.onNext(value);
+                }
+            }
+        }).mergeWith(subject);
+    }
+
+    public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Single<T> creator) {
+        return Observable.<T>create(emitter -> {
+            if (subject.getValue() == null) {
+                T value = creator.blockingGet();
+                if (value != null) {
+                    subject.onNext(value);
+                }
+            }
+        }).mergeWith(subject);
+    }
+
+    public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Maybe<T> creator) {
+        return Observable.<T>create(emitter -> {
+            if (subject.getValue() == null) {
+                T value = creator.blockingGet();
                 if (value != null) {
                     subject.onNext(value);
                 }

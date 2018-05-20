@@ -11,6 +11,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -28,7 +29,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private static final int NO_POSITION = 0;
 
-    private final PlayQueueDataSource playQueueDataSource;
+    private final PlayQueueDataSourceNew playQueueDataSource;
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler dbScheduler;
 
@@ -37,7 +38,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private int position = NO_POSITION;
 
-    public PlayQueueRepositoryImpl(PlayQueueDataSource playQueueDataSource,
+    public PlayQueueRepositoryImpl(PlayQueueDataSourceNew playQueueDataSource,
                                    UiStatePreferences uiStatePreferences,
                                    Scheduler dbScheduler) {
         this.playQueueDataSource = playQueueDataSource;
@@ -47,20 +48,20 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Completable setPlayQueue(List<Composition> compositions) {
-        return Completable.fromRunnable(() -> {
-            checkCompositionsList(compositions);
-            playQueueDataSource.setPlayQueue(compositions);
-            List<Composition> playQueue = playQueueDataSource.getPlayQueue();
-            currentPlayQueueSubject.onNext(playQueue);
-
-            position = 0;
-            updateCurrentComposition(playQueue, position);
-        }).subscribeOn(dbScheduler);
+        checkCompositionsList(compositions);
+        return playQueueDataSource.setPlayQueue(compositions)
+                .doOnSuccess(playQueue -> {
+                    currentPlayQueueSubject.onNext(playQueue);
+                    position = 0;
+                    updateCurrentComposition(playQueue, position);
+                })
+                .toCompletable()
+                .subscribeOn(dbScheduler);
     }
 
     @Override
     public Observable<CurrentComposition> getCurrentCompositionObservable() {
-        return withDefaultValue(currentCompositionSubject, this::getSavedComposition)
+        return withDefaultValue(currentCompositionSubject, getSavedComposition())
                 .subscribeOn(dbScheduler);
     }
 
@@ -73,7 +74,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Observable<List<Composition>> getPlayQueueObservable() {
-        return withDefaultValue(currentPlayQueueSubject, playQueueDataSource::getPlayQueue)
+        return withDefaultValue(currentPlayQueueSubject, playQueueDataSource.getPlayQueue())
                 .subscribeOn(dbScheduler);
     }
 
@@ -84,51 +85,62 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             throw new IllegalStateException("change play mode without current composition");
         }
 
-        position = playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition.getComposition());
-        List<Composition> playQueue = playQueueDataSource.getPlayQueue();
-        currentPlayQueueSubject.onNext(playQueue);
+        playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition.getComposition())
+                .flatMap(position -> playQueueDataSource.getPlayQueue()
+                        .doOnSuccess(playQueue -> {
+                            this.position = position;
 
-        uiStatePreferences.setCurrentCompositionPosition(position);
+                            currentPlayQueueSubject.onNext(playQueue);
+                            uiStatePreferences.setCurrentCompositionPosition(position);
+                        }))
+                .subscribe();
     }
 
     @Override
-    public int skipToNext() {
-        List<Composition> currentPlayList = playQueueDataSource.getPlayQueue();
-        checkCompositionsList(currentPlayList);
+    public Single<Integer> skipToNext() {
+        return playQueueDataSource.getPlayQueue()
+                .map(currentPlayList -> {
+                    checkCompositionsList(currentPlayList);
 
-        if (position >= currentPlayList.size() - 1) {
-            position = 0;
-        } else {
-            position++;
-        }
-        updateCurrentComposition(currentPlayList, position);
-        return position;
+                    if (position >= currentPlayList.size() - 1) {
+                        position = 0;
+                    } else {
+                        position++;
+                    }
+                    updateCurrentComposition(currentPlayList, position);
+                    return position;
+                });
     }
 
     @Override
-    public int skipToPrevious() {
-        List<Composition> currentPlayList = playQueueDataSource.getPlayQueue();
-        checkCompositionsList(currentPlayList);
+    public Single<Integer> skipToPrevious() {
+        return playQueueDataSource.getPlayQueue()
+                .map(currentPlayList -> {
+                    checkCompositionsList(currentPlayList);
 
-        position--;
-        if (position < 0) {
-            position = currentPlayList.size() - 1;
-        }
-        updateCurrentComposition(currentPlayList, position);
-        return position;
+                    position--;
+                    if (position < 0) {
+                        position = currentPlayList.size() - 1;
+                    }
+                    updateCurrentComposition(currentPlayList, position);
+                    return position;
+                });
     }
 
     @Override
-    public void skipToPosition(int position) {
-        List<Composition> currentPlayList = playQueueDataSource.getPlayQueue();
-        checkCompositionsList(currentPlayList);
+    public Completable skipToPosition(int position) {
+        return playQueueDataSource.getPlayQueue()
+                .doOnSuccess(currentPlayList -> {
+                    checkCompositionsList(currentPlayList);
 
-        if (position < 0 || position >= currentPlayList.size()) {
-            throw new IndexOutOfBoundsException("unexpected position: " + position);
-        }
+                    if (position < 0 || position >= currentPlayList.size()) {
+                        throw new IndexOutOfBoundsException("unexpected position: " + position);
+                    }
 
-        this.position = position;
-        updateCurrentComposition(currentPlayList, position);
+                    this.position = position;
+                    updateCurrentComposition(currentPlayList, position);
+                })
+                .toCompletable();
     }
 
     private void updateCurrentComposition(List<Composition> currentPlayList, int position) {
@@ -140,37 +152,46 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         currentCompositionSubject.onNext(currentComposition);
     }
 
-    private CurrentComposition getSavedComposition() {
-        List<Composition> playQueue = playQueueDataSource.getPlayQueue();
-        return findSavedComposition(playQueue);
+    private Maybe<CurrentComposition> getSavedComposition() {
+        return playQueueDataSource.getPlayQueue()
+                .flatMapMaybe(this::findSavedComposition);
     }
 
     @Nullable
-    private CurrentComposition findSavedComposition(List<Composition> compositions) {
-        long id = uiStatePreferences.getCurrentCompositionId();
-        int position = uiStatePreferences.getCurrentCompositionPosition();
+    private Maybe<CurrentComposition> findSavedComposition(List<Composition> compositions) {
+        return Maybe.create(emitter -> {
+            long id = uiStatePreferences.getCurrentCompositionId();
+            int position = uiStatePreferences.getCurrentCompositionPosition();
 
-        //optimized way
-        if (position > 0 && position < compositions.size()) {
-            Composition expectedComposition = compositions.get(position);
-            if (expectedComposition.getId() == id) {
-                this.position = position;//TODO maybe remove position? replace with hash map?
-                return new CurrentComposition(expectedComposition, position, uiStatePreferences.getTrackPosition());
+            //optimized way
+            if (position > 0 && position < compositions.size()) {
+                Composition expectedComposition = compositions.get(position);
+                if (expectedComposition.getId() == id) {
+                    this.position = position;//TODO maybe remove position? replace with hash map?
+                    emitter.onSuccess(new CurrentComposition(expectedComposition,
+                            position,
+                            uiStatePreferences.getTrackPosition()));
+                    return;
+                }
             }
-        }
 
-        if (id == NO_COMPOSITION) {
-            return null;
-        }
-
-        for (int i = 0; i< compositions.size(); i++) {
-            Composition composition = compositions.get(i);
-            if (composition.getId() == id) {
-                this.position = i;
-                return new CurrentComposition(composition, position, uiStatePreferences.getTrackPosition());
+            if (id == NO_COMPOSITION) {
+                emitter.onComplete();
+                return;
             }
-        }
-        return null;
+
+            for (int i = 0; i< compositions.size(); i++) {
+                Composition composition = compositions.get(i);
+                if (composition.getId() == id) {
+                    this.position = i;
+                    emitter.onSuccess(new CurrentComposition(composition,
+                            position,
+                            uiStatePreferences.getTrackPosition()));
+                    return;
+                }
+            }
+            emitter.onComplete();
+        });
     }
 
     private void checkCompositionsList(@Nullable List<Composition> compositions) {

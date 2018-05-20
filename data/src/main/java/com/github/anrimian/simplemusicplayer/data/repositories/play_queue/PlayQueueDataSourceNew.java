@@ -5,7 +5,6 @@ import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntit
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
-import io.reactivex.Maybe;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
@@ -42,20 +40,24 @@ public class PlayQueueDataSourceNew {
         this.scheduler = scheduler;
     }
 
-    public Completable setPlayQueue(List<Composition> compositions) {
+    public Single<List<Composition>> setPlayQueue(List<Composition> compositions) {
         return Single.fromCallable(() -> new PlayQueue(compositions))
-                .flatMapCompletable(this::savePlayQueue)
+                .doOnSuccess(this::savePlayQueue)
+                .map(this::getSelectedPlayQueue)
                 .subscribeOn(scheduler);
     }
 
     public Single<List<Composition>> getPlayQueue() {
         return getSavedPlayQueue()
-                .map(playQueue -> {
-                    if (settingsPreferences.isRandomPlayingEnabled()) {
-                        return playQueue.getShuffledPlayList();
-                    }
-                    return playQueue.getInitialPlayList();
-                }).subscribeOn(scheduler);
+                .map(this::getSelectedPlayQueue)
+                .subscribeOn(scheduler);
+    }
+
+    private List<Composition> getSelectedPlayQueue(PlayQueue playQueue) {
+        if (settingsPreferences.isRandomPlayingEnabled()) {
+            return playQueue.getShuffledPlayList();
+        }
+        return playQueue.getInitialPlayList();
     }
 
     /**
@@ -81,9 +83,9 @@ public class PlayQueueDataSourceNew {
         Map<Long, Integer> shuffledPlayList = playQueue.getShuffledPlayMap();
 
         long id = composition.getId();
-        int previousPosition = shuffledPlayList.put(id, 0);
         for (Map.Entry<Long, Integer> entry: shuffledPlayList.entrySet()) {
-            if (entry.getValue() == previousPosition) {
+            if (entry.getValue() == 0) {
+                int previousPosition = shuffledPlayList.put(id, 0);
                 shuffledPlayList.put(entry.getKey(), previousPosition);
                 break;
             }
@@ -100,7 +102,11 @@ public class PlayQueueDataSourceNew {
     private Single<PlayQueue> getSavedPlayQueue() {
         return Single.fromCallable(() -> {
             if (playQueue == null) {
-                playQueue = loadPlayQueue();
+                synchronized (this) {
+                    if (playQueue == null) {
+                        playQueue = loadPlayQueue();
+                    }
+                }
             }
             return playQueue;
         });
@@ -120,13 +126,11 @@ public class PlayQueueDataSourceNew {
         return playQueueEntityList;
     }
 
-    private Completable savePlayQueue(PlayQueue playQueue) {
-        return Completable.fromRunnable(() -> {
-            playQueueDao.deletePlayQueue();
-            playQueueDao.setPlayQueue(toEntityList(playQueue));
+    private void savePlayQueue(PlayQueue playQueue) {
+        playQueueDao.deletePlayQueue();
+        playQueueDao.setPlayQueue(toEntityList(playQueue));
 
-            this.playQueue = playQueue;
-        });
+        this.playQueue = playQueue;
     }
 
     @SuppressWarnings("unchecked")

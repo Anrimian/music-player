@@ -10,15 +10,17 @@ import org.junit.Test;
 
 import java.util.List;
 
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.currentComposition;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
+import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static java.util.Collections.emptyList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,11 +34,11 @@ public class PlayQueueRepositoryImplTest {
     private PlayQueueRepository playQueueRepository;
 
     private UiStatePreferences uiStatePreferences = mock(UiStatePreferences.class);
-    private PlayQueueDataSource playQueueDataSource = mock(PlayQueueDataSource.class);
+    private PlayQueueDataSourceNew playQueueDataSource = mock(PlayQueueDataSourceNew.class);
 
     @Before
     public void setUp() {
-        when(playQueueDataSource.getPlayQueue()).thenReturn(emptyList());
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(emptyList()));
         when(uiStatePreferences.getCurrentCompositionId()).thenReturn(NO_COMPOSITION);
 
         playQueueRepository = new PlayQueueRepositoryImpl(playQueueDataSource,
@@ -53,7 +55,7 @@ public class PlayQueueRepositoryImplTest {
 
     @Test
     public void testPlayQueueObserverWithInitialState() {
-        when(playQueueDataSource.getPlayQueue()).thenReturn(getFakeCompositions());
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(getFakeCompositions()));
 
         playQueueRepository.getPlayQueueObservable()
                 .test()
@@ -62,7 +64,7 @@ public class PlayQueueRepositoryImplTest {
 
     @Test
     public void testCurrentCompositionObserver() {
-        when(playQueueDataSource.getPlayQueue()).thenReturn(getFakeCompositions());
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(getFakeCompositions()));
         when(uiStatePreferences.getCurrentCompositionId()).thenReturn(1L);
         when(uiStatePreferences.getCurrentCompositionPosition()).thenReturn(1);
 
@@ -80,7 +82,7 @@ public class PlayQueueRepositoryImplTest {
 
     @Test
     public void testCurrentCompositionObserverWithInitialState() {
-        when(playQueueDataSource.getPlayQueue()).thenReturn(getFakeCompositions());
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(getFakeCompositions()));
         when(uiStatePreferences.getCurrentCompositionId()).thenReturn(1L);
 
         playQueueRepository.getCurrentCompositionObservable()
@@ -95,7 +97,9 @@ public class PlayQueueRepositoryImplTest {
         TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
-        when(playQueueDataSource.getPlayQueue()).thenReturn(getFakeCompositions());
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(getFakeCompositions()));
+        when(playQueueDataSource.setPlayQueue(any())).thenReturn(Single.just(getFakeCompositions()));
+
 
         playQueueRepository.setPlayQueue(getFakeCompositions())
                 .test()
@@ -111,7 +115,7 @@ public class PlayQueueRepositoryImplTest {
 
     @Test
     public void setRandomPlayingEnabledTest() {
-        when(playQueueDataSource.setRandomPlayingEnabled(anyBoolean(), any())).thenReturn(0);
+        when(playQueueDataSource.setRandomPlayingEnabled(anyBoolean(), any())).thenReturn(Single.just(0));
 
         setPlayQueueTest();
 
@@ -127,13 +131,38 @@ public class PlayQueueRepositoryImplTest {
     }
 
     @Test
+    public void setRandomPlayingEnabledAndSkipToNextTest() {
+        when(playQueueDataSource.setRandomPlayingEnabled(anyBoolean(), any())).thenReturn(Single.just(3));
+
+        setPlayQueueTest();
+
+        TestObserver<List<Composition>> playListObserver = playQueueRepository.getPlayQueueObservable()
+                .test();
+        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+                .test();
+
+        playQueueRepository.setRandomPlayingEnabled(true);
+
+        verify(playQueueDataSource).setRandomPlayingEnabled(true, getFakeCompositions().get(0));
+        //noinspection unchecked
+        playListObserver.assertValues(getFakeCompositions(), getFakeCompositions());
+        verify(uiStatePreferences, times(2)).setCurrentCompositionPosition(anyInt());
+
+
+        playQueueRepository.skipToNext().subscribe();
+
+        compositionObserver.assertValues(currentComposition(getFakeCompositions().get(0)),
+                currentComposition(getFakeCompositions().get(4)));
+    }
+
+    @Test
     public void skipToNext() {
         setPlayQueueTest();
 
         TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
-        playQueueRepository.skipToNext();
+        playQueueRepository.skipToNext().subscribe();
 
         compositionObserver.assertValues(currentComposition(getFakeCompositions().get(0)),
                 currentComposition(getFakeCompositions().get(1)));
@@ -141,14 +170,14 @@ public class PlayQueueRepositoryImplTest {
 
     @Test
     public void skipToNextFromInitialState() {
-        when(playQueueDataSource.getPlayQueue()).thenReturn(getFakeCompositions());
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(getFakeCompositions()));
         when(uiStatePreferences.getCurrentCompositionId()).thenReturn(1L);
         when(uiStatePreferences.getCurrentCompositionPosition()).thenReturn(1);
 
         TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
-        playQueueRepository.skipToNext();
+        playQueueRepository.skipToNext().subscribe();
 
         compositionObserver.assertValues(currentComposition(getFakeCompositions().get(1)),
                 currentComposition(getFakeCompositions().get(2)));
@@ -161,8 +190,9 @@ public class PlayQueueRepositoryImplTest {
         TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
-        playQueueRepository.skipToNext();
-        playQueueRepository.skipToPrevious();
+        playQueueRepository.skipToNext()
+                .flatMap(pos -> playQueueRepository.skipToPrevious())
+                .subscribe();
 
         compositionObserver.assertValues(currentComposition(getFakeCompositions().get(0)),
                 currentComposition(getFakeCompositions().get(1)),
@@ -176,7 +206,7 @@ public class PlayQueueRepositoryImplTest {
         TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
-        playQueueRepository.skipToPosition(1000);
+        playQueueRepository.skipToPosition(1000).subscribe();
 
         compositionObserver.assertValues(currentComposition(getFakeCompositions().get(0)),
                 currentComposition(getFakeCompositions().get(1000)));

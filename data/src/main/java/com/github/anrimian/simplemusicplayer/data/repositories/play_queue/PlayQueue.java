@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +25,6 @@ public class PlayQueue {
             long id = composition.getId();
             compositionMap.put(id, composition);
             initialPlayList.put(id, i);
-            shuffledPlayList.put(id, i);
         }
 
         shuffle();
@@ -69,6 +67,8 @@ public class PlayQueue {
     }
 
     public void shuffle() {
+        shuffledPlayList.clear();
+
         List<Integer> valueList = new ArrayList<>(initialPlayList.values());
         Collections.shuffle(valueList);
 
@@ -80,7 +80,7 @@ public class PlayQueue {
 
     private List<Composition> createList(Map<Long, Integer> positionMap) {
         Composition[] compositions = new Composition[positionMap.size()];
-        for (long id: positionMap.values()) {
+        for (long id: positionMap.keySet()) {
             compositions[positionMap.get(id)] = compositionMap.get(id);
         }
         return Arrays.asList(compositions);

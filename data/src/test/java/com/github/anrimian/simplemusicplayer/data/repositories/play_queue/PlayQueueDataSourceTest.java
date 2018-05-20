@@ -1,7 +1,5 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
-import android.content.Intent;
-
 import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
 import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntity;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
@@ -25,7 +23,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -56,7 +53,6 @@ public class PlayQueueDataSourceTest {
     @Test
     public void setPlayQueueInNormalMode() {
         playQueueDataSource.setPlayQueue(getFakeCompositions())
-                .andThen(playQueueDataSource.getPlayQueue())
                 .test()
                 .assertValue(compositions -> {
                     assertEquals(getFakeCompositions(), compositions);
@@ -72,7 +68,6 @@ public class PlayQueueDataSourceTest {
         when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(true);
 
         playQueueDataSource.setPlayQueue(getFakeCompositions())
-                .andThen(playQueueDataSource.getPlayQueue())
                 .test()
                 .assertValue(compositions -> {
                     assertNotEquals(getFakeCompositions(), compositions);
@@ -130,10 +125,9 @@ public class PlayQueueDataSourceTest {
 
         when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(false);
 
-        int position = playQueueDataSource.setRandomPlayingEnabled(false, getFakeCompositions().get(1))
-                .blockingGet();
-
-        assertEquals(1, position);
+        playQueueDataSource.setRandomPlayingEnabled(false, getFakeCompositions().get(1))
+                .test()
+                .assertValue(1);
     }
 
     @Test
@@ -143,11 +137,16 @@ public class PlayQueueDataSourceTest {
         when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(true);
 
         Composition composition = getFakeCompositions().get(1);
-        int position = playQueueDataSource.setRandomPlayingEnabled(true, composition)
-                .blockingGet();
+        playQueueDataSource.setRandomPlayingEnabled(true, composition)
+                .test()
+                .assertValue(0);
+
+        playQueueDataSource.getPlayQueue()
+                .flatMapObservable(Observable::fromIterable)
+                .test()
+                .assertComplete();
 
         verify(playQueueDao).updatePlayQueue(anyListOf(PlayQueueEntity.class));
-        assertEquals(0, position);
     }
 
     private List<PlayQueueEntity> getPlayQueueEntities() {
