@@ -29,7 +29,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private static final int NO_POSITION = 0;
 
-    private final PlayQueueDataSourceNew playQueueDataSource;
+    private final PlayQueueDataSource playQueueDataSource;
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler dbScheduler;
 
@@ -38,7 +38,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private int position = NO_POSITION;
 
-    public PlayQueueRepositoryImpl(PlayQueueDataSourceNew playQueueDataSource,
+    public PlayQueueRepositoryImpl(PlayQueueDataSource playQueueDataSource,
                                    UiStatePreferences uiStatePreferences,
                                    Scheduler dbScheduler) {
         this.playQueueDataSource = playQueueDataSource;

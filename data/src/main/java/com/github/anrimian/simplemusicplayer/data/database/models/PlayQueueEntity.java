@@ -3,7 +3,6 @@ package com.github.anrimian.simplemusicplayer.data.database.models;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-import static com.github.anrimian.simplemusicplayer.data.database.AppDatabase.CURRENT_PLAY_LIST;
 import static com.github.anrimian.simplemusicplayer.data.database.AppDatabase.PLAY_QUEUE;
 
 @Entity(tableName = PLAY_QUEUE)

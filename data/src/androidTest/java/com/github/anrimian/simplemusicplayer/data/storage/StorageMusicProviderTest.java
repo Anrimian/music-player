@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 public class StorageMusicProviderTest {
 
@@ -30,8 +31,8 @@ public class StorageMusicProviderTest {
 
     @Test
     public void testRepositoryReturnValues() {
-        List<Composition> compositions = storageMusicProvider.getCompositions();
-        for (Composition composition: compositions) {
+        Map<Long, Composition> compositions = storageMusicProvider.getCompositions();
+        for (Composition composition: compositions.values()) {
             System.out.println(composition);
             Assert.assertNotNull(composition.getFilePath());
         }

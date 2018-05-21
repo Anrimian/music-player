@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
 import com.github.anrimian.simplemusicplayer.data.database.DatabaseManager;
-import com.github.anrimian.simplemusicplayer.data.database.dao.CompositionsDao;
 import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
 
 import javax.annotation.Nonnull;
@@ -32,13 +31,6 @@ public class DbModule {
     @Singleton
     AppDatabase provideAppDatabase(DatabaseManager databaseManager) {
         return databaseManager.getAppDatabase();
-    }
-
-    @Provides
-    @Nonnull
-    @Singleton
-    CompositionsDao compositionsDao(AppDatabase appDatabase) {
-        return appDatabase.compositionsDao();
     }
 
     @Provides

@@ -43,10 +43,6 @@ dependencies {
 
     implementation dataDependencies.room
     annotationProcessor dataDependencies.roomCompiler
-    implementation dataDependencies.roomRx
-
-    implementation dataDependencies.mapStruct
-    annotationProcessor dataDependencies.mapStructCompiler
 
     testImplementation testDependencies.junit
     testImplementation testDependencies.mockito

@@ -5,7 +5,6 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.github.anrimian.simplemusicplayer.data.database.models.CompositionItemEntity;
 import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntity;
 
 import java.util.List;

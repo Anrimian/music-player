@@ -16,17 +16,16 @@ ext {
 
     //Libraries
     supportLibraryVersion = "27.0.2"
-    constraintLayoutVersion = "1.0.2"
-    rxJavaVersion = "2.1.5"
+    constraintLayoutVersion = "1.1.0"
+    rxJavaVersion = "2.1.12"
     rxAndroidVersion = "2.0.1"
     rxPermissionsVersion = "0.9.4@aar"
     acraVersion = "4.9.0"
     moxyVersion = "1.5.3"
     butterKnifeVersion = "8.8.1"
-    daggerVersion = "2.12"
+    daggerVersion = "2.13"
     exoPlayerVersion = "r2.5.4"
-    roomVersion = "1.0.0"
-    mapStructVersion = "1.2.0.Final"
+    roomVersion = "1.1.0"
 
     //Testing
     jUnitVersion = '4.12'
@@ -81,10 +80,7 @@ ext {
             javaxAnnotation:    'com.google.code.findbugs:jsr305:2.0.1',
             exoPlayerCore:      "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion",
             room:               "android.arch.persistence.room:runtime:$roomVersion",
-            roomCompiler:       "android.arch.persistence.room:compiler:$roomVersion",
-            roomRx:             "android.arch.persistence.room:rxjava2:$roomVersion",
-            mapStruct:          "org.mapstruct:mapstruct:$mapStructVersion",
-            mapStructCompiler:  "org.mapstruct:mapstruct-processor:$mapStructVersion"
+            roomCompiler:       "android.arch.persistence.room:compiler:$roomVersion"
     ]
 
     dataTestDependencies = [

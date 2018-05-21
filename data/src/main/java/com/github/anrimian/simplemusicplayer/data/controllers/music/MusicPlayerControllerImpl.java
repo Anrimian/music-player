@@ -5,7 +5,6 @@ import android.net.Uri;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerEventListener;
-import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerStateRxWrapper;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
@@ -42,7 +41,6 @@ import io.reactivex.subjects.PublishSubject;
 
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
-    private final PlayerStateRxWrapper playerStateRxWrapper = new PlayerStateRxWrapper();
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
 
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
@@ -60,7 +58,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
-        player.addListener(playerStateRxWrapper);
         player.addListener(playerEventListener);
     }
 
@@ -106,11 +103,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public void resume() {
         player.setPlayWhenReady(true);
         startTracingTrackPosition();
-    }
-
-    @Override
-    public Observable<InternalPlayerState> getPlayerStateObservable() {
-        return playerStateRxWrapper.getStateObservable();
     }
 
     @Override

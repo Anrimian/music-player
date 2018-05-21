@@ -34,7 +34,7 @@ public class PlayQueueRepositoryImplTest {
     private PlayQueueRepository playQueueRepository;
 
     private UiStatePreferences uiStatePreferences = mock(UiStatePreferences.class);
-    private PlayQueueDataSourceNew playQueueDataSource = mock(PlayQueueDataSourceNew.class);
+    private PlayQueueDataSource playQueueDataSource = mock(PlayQueueDataSource.class);
 
     @Before
     public void setUp() {

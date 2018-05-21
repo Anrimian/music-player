@@ -44,6 +44,7 @@ public class MusicPlayerInteractor {
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
     private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
+    private Disposable skipDisposable;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  SettingsRepository settingsRepository,
@@ -57,7 +58,7 @@ public class MusicPlayerInteractor {
         this.musicProviderRepository = musicProviderRepository;
     }
 
-    public Completable startPlaying(List<Composition> compositions) {//TODO bug with stopping
+    public Completable startPlaying(List<Composition> compositions) {
         return playQueueRepository.setPlayQueue(compositions)
                 .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
                 .doOnError(t -> playerStateSubject.onNext(STOP))
@@ -106,15 +107,27 @@ public class MusicPlayerInteractor {
     }
 
     public void skipToPrevious() {
-        playQueueRepository.skipToPrevious().subscribe();
+        if (skipDisposable == null) {
+            playQueueRepository.skipToPrevious()
+                    .doFinally(() -> skipDisposable = null)
+                    .subscribe();
+        }
     }
 
     public void skipToNext() {
-        playQueueRepository.skipToNext().subscribe();
+        if (skipDisposable == null) {
+            playQueueRepository.skipToNext()
+                    .doFinally(() -> skipDisposable = null)
+                    .subscribe();
+        }
     }
 
     public void skipToPosition(int position) {
-        playQueueRepository.skipToPosition(position).subscribe();
+        if (skipDisposable == null) {
+            playQueueRepository.skipToPosition(position)
+                    .doFinally(() -> skipDisposable = null)
+                    .subscribe();
+        }
     }
 
     public boolean isInfinitePlayingEnabled() {
@@ -161,14 +174,17 @@ public class MusicPlayerInteractor {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
             writeErrorAboutCurrentComposition(((ErrorEvent) playerEvent).getThrowable());
-            Disposable subscribe = playQueueRepository.skipToNext()//TODO lock skipping actions
-                    .subscribe(currentPosition -> {
-                        if (currentPosition == 0) {
-                            stop();
-                        } else {
-                            musicPlayerController.resume();
-                        }
-                    });
+            if (skipDisposable == null) {
+                skipDisposable = playQueueRepository.skipToNext()
+                        .subscribe(currentPosition -> {
+                            if (currentPosition == 0) {
+                                stop();
+                            } else {
+                                musicPlayerController.resume();
+                            }
+                            skipDisposable = null;
+                        });
+            }
         }
     }
 
@@ -181,14 +197,17 @@ public class MusicPlayerInteractor {
     }
 
     private void onCompositionPlayFinished() {
-        Disposable subscribe = playQueueRepository.skipToNext()
-                .subscribe(currentPosition -> {
-                    if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled()) {
-                        musicPlayerController.resume();
-                    } else {
-                        stop();
-                    }
-                });
+        if (skipDisposable == null) {
+            skipDisposable = playQueueRepository.skipToNext()
+                    .subscribe(currentPosition -> {
+                        if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled()) {
+                            musicPlayerController.resume();
+                        } else {
+                            stop();
+                        }
+                        skipDisposable = null;
+                    });
+        }
     }
 
     private void onAudioFocusChanged(AudioFocusEvent event) {

@@ -36,7 +36,7 @@ public class PlayQueueDataSourceTest {
     private final SettingsPreferences settingsPreferences = mock(SettingsPreferences.class);
     private final Scheduler scheduler = Schedulers.trampoline();
 
-    private PlayQueueDataSourceNew playQueueDataSource;
+    private PlayQueueDataSource playQueueDataSource;
 
     @Before
     public void setUp() {
@@ -44,7 +44,7 @@ public class PlayQueueDataSourceTest {
         when(storageMusicDataSource.getCompositionsList()).thenReturn(new ChangeableMap<>(
                 getFakeCompositionsMap(), Observable.never()));
 
-        playQueueDataSource = new PlayQueueDataSourceNew(playQueueDao,
+        playQueueDataSource = new PlayQueueDataSource(playQueueDao,
                 storageMusicDataSource,
                 settingsPreferences,
                 scheduler);
