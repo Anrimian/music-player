@@ -17,6 +17,8 @@ import javax.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.PublishSubject;
 
 
 public class StorageMusicDataSource {
@@ -24,42 +26,45 @@ public class StorageMusicDataSource {
     private final StorageMusicProvider musicProvider;
     private final Scheduler scheduler;
 
-    @Nullable
-    private ChangeableMap<Long, Composition> compositions;
+    private final PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
+
+    private Map<Long, Composition> compositions;
+    private Disposable changeDisposable;
 
     public StorageMusicDataSource(StorageMusicProvider musicProvider, Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.scheduler = scheduler;
     }
 
-    public Single<ChangeableMap<Long, Composition>> getCompositions() {
-        return Single.fromCallable(this::getList)
-                .observeOn(scheduler);
+    public Single<Map<Long, Composition>> getCompositions() {
+        return Single.fromCallable(this::getCompositionsMap)
+                .subscribeOn(scheduler);
     }
 
-    public ChangeableMap<Long, Composition> getCompositionsList() {
-        return getList();
-    }
-
-    private ChangeableMap<Long, Composition> getList() {
+    public Map<Long, Composition> getCompositionsMap() {
         if (compositions == null) {
             synchronized (StorageMusicDataSource.this) {
                 if (compositions == null) {
-                    compositions = createMap();
+                    compositions = musicProvider.getCompositions();
+                    subscribeOnCompositionChanges();
                 }
             }
         }
         return compositions;
     }
 
-    private ChangeableMap<Long, Composition> createMap() {
-        Map<Long, Composition> hashMap = musicProvider.getCompositions();
+    public Observable<Change<Composition>> getChangeObservable() {
+        return changeSubject;
+    }
 
-        Observable<Change<Composition>> changeObservable = musicProvider.getChangeObservable()
+    private void subscribeOnCompositionChanges() {
+        if (changeDisposable != null) {
+            throw new IllegalStateException("subscribe on composition changes twice");
+        }
+        changeDisposable = musicProvider.getChangeObservable()
                 .flatMap(this::calculateChange)
-                .share()
-                .observeOn(scheduler);
-        return new ChangeableMap<>(hashMap, changeObservable);
+                .subscribeOn(scheduler)
+                .subscribe(changeSubject::onNext);
     }
 
     private Observable<Change<Composition>> calculateChange(Map<Long, Composition> newCompositions) {
@@ -68,7 +73,7 @@ public class StorageMusicDataSource {
             List<Composition> addedCompositions = new ArrayList<>();
             List<Composition> changedCompositions = new ArrayList<>();
 
-            Map<Long, Composition> existsCompositions = compositions.getHashMap();
+            Map<Long, Composition> existsCompositions = compositions;
 
             for (Composition existComposition: new HashMap<>(existsCompositions).values()) {
                 Composition newComposition = newCompositions.get(existComposition.getId());

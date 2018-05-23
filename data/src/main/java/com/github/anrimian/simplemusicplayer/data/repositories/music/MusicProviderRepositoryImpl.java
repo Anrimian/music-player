@@ -29,9 +29,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Single<List<Composition>> getAllCompositions() {
         return storageMusicDataSource.getCompositions()
-                .doOnSuccess(compositionChangeableList -> compositionChangeableList.getChangeObservable()
-                        .subscribe())
-                .map(list -> (List<Composition>) new ArrayList(list.getHashMap().values()))
+                .map(compositions -> (List<Composition>) new ArrayList(compositions.values()))
                 .subscribeOn(scheduler);
     }
 

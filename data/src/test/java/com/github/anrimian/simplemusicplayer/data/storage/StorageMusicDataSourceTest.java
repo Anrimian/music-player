@@ -37,9 +37,8 @@ public class StorageMusicDataSourceTest {
 
     @Test
     public void removeChangeTest() {
-        ChangeableMap<Long, Composition> list = storageMusicDataSource.getCompositions().blockingGet();
-
-        TestObserver<Change<Composition>> changeTestObserver = list.getChangeObservable().test();
+        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
         changedCompositions.remove(changedCompositions.size() - 1L);
@@ -61,19 +60,18 @@ public class StorageMusicDataSourceTest {
         storageMusicDataSource.getCompositions()
                 .test()
                 .assertValue(compositions -> {
-                    assertEquals(null, compositions.getHashMap().get(0L));
-                    assertEquals(null, compositions.getHashMap().get(1L));
-                    assertEquals(null, compositions.getHashMap().get(3L));
-                    assertEquals(null, compositions.getHashMap().get(getFakeCompositionsMap().size() - 1L));
+                    assertEquals(null, compositions.get(0L));
+                    assertEquals(null, compositions.get(1L));
+                    assertEquals(null, compositions.get(3L));
+                    assertEquals(null, compositions.get(getFakeCompositionsMap().size() - 1L));
                     return true;
                 });
     }
 
     @Test
     public void addChangeTest() {
-        ChangeableMap<Long, Composition> list = storageMusicDataSource.getCompositions().blockingGet();
-
-        TestObserver<Change<Composition>> changeTestObserver = list.getChangeObservable().test();
+        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
         Composition addedComposition = new Composition();
@@ -91,7 +89,7 @@ public class StorageMusicDataSourceTest {
         storageMusicDataSource.getCompositions()
                 .test()
                 .assertValue(compositions -> {
-                    assertEquals(addedComposition, compositions.getHashMap().get(-1L));
+                    assertEquals(addedComposition, compositions.get(-1L));
                     return true;
                 });
     }
@@ -99,9 +97,8 @@ public class StorageMusicDataSourceTest {
 
     @Test
     public void modifyChangeTest() {
-        ChangeableMap<Long, Composition> list = storageMusicDataSource.getCompositions().blockingGet();
-
-        TestObserver<Change<Composition>> changeTestObserver = list.getChangeObservable().test();
+        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
         Composition changedComposition = changedCompositions.get(0L);
@@ -118,8 +115,8 @@ public class StorageMusicDataSourceTest {
         storageMusicDataSource.getCompositions()
                 .test()
                 .assertValue(compositions -> {
-                    assertEquals(changedComposition, compositions.getHashMap().get(0L));
-                    assertEquals("test path", compositions.getHashMap().get(0L).getFilePath());
+                    assertEquals(changedComposition, compositions.get(0L));
+                    assertEquals("test path", compositions.get(0L).getFilePath());
                     return true;
                 });
     }

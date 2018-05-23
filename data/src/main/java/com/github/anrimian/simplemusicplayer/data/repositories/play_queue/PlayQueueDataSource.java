@@ -5,6 +5,7 @@ import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntit
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,8 +15,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created on 16.04.2018.
@@ -27,8 +31,12 @@ public class PlayQueueDataSource {
     private final SettingsPreferences settingsPreferences;
     private final Scheduler scheduler;
 
+    private final PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
+
     @Nullable
     private PlayQueue playQueue;
+
+    private Disposable changeDisposable;
 
     public PlayQueueDataSource(PlayQueueDao playQueueDao,
                                StorageMusicDataSource storageMusicDataSource,
@@ -51,6 +59,10 @@ public class PlayQueueDataSource {
         return getSavedPlayQueue()
                 .map(this::getSelectedPlayQueue)
                 .subscribeOn(scheduler);
+    }
+
+    public Observable<Change<Composition>> getChangeObservable() {
+        return changeSubject;
     }
 
     private List<Composition> getSelectedPlayQueue(PlayQueue playQueue) {
@@ -105,11 +117,30 @@ public class PlayQueueDataSource {
                 synchronized (this) {
                     if (playQueue == null) {
                         playQueue = loadPlayQueue();
+                        subscribeOnCompositionChanges();
                     }
                 }
             }
             return playQueue;
         });
+    }
+
+    private void subscribeOnCompositionChanges() {
+        if (changeDisposable == null && !playQueue.isEmpty()) {
+            changeDisposable = storageMusicDataSource.getChangeObservable()
+                    .subscribe(this::processCompositionChange);
+        }
+    }
+
+    private void processCompositionChange(Change<Composition> change) {
+        switch (change.getChangeType()) {//TODO handle changes
+            case MODIFY: {
+                break;
+            }
+            case DELETED: {
+                break;
+            }
+        }
     }
 
     private List<PlayQueueEntity> toEntityList(PlayQueue playQueue) {
@@ -131,11 +162,14 @@ public class PlayQueueDataSource {
         playQueueDao.setPlayQueue(toEntityList(playQueue));
 
         this.playQueue = playQueue;
+
+        subscribeOnCompositionChanges();
+
     }
 
     @SuppressWarnings("unchecked")
     private PlayQueue loadPlayQueue() {
-        Map<Long, Composition> allCompositionMap = storageMusicDataSource.getCompositionsList().getHashMap();
+        Map<Long, Composition> allCompositionMap = storageMusicDataSource.getCompositionsMap();
         List<PlayQueueEntity> playQueueEntities = playQueueDao.getPlayQueue();
 
         Map<Long, Integer> initialPlayList = new HashMap<>(playQueueEntities.size());

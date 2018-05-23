@@ -16,7 +16,7 @@ public class PlayQueue {
     private final Map<Long, Integer> shuffledPlayList;
     private final Map<Long, Composition> compositionMap;
 
-    public PlayQueue(List<Composition> compositions) {
+    PlayQueue(List<Composition> compositions) {
         compositionMap = new HashMap<>(compositions.size());
         initialPlayList = new HashMap<>(compositions.size());
         shuffledPlayList = new HashMap<>(compositions.size());
@@ -30,9 +30,9 @@ public class PlayQueue {
         shuffle();
     }
 
-    public PlayQueue(Map<Long, Integer> initialPlayList,
-                     Map<Long, Integer> shuffledPlayList,
-                     Map<Long, Composition> compositionMap) {
+    PlayQueue(Map<Long, Integer> initialPlayList,
+              Map<Long, Integer> shuffledPlayList,
+              Map<Long, Composition> compositionMap) {
         this.initialPlayList = initialPlayList;
         this.shuffledPlayList = shuffledPlayList;
         this.compositionMap = compositionMap;
@@ -84,5 +84,9 @@ public class PlayQueue {
             compositions[positionMap.get(id)] = compositionMap.get(id);
         }
         return Arrays.asList(compositions);
+    }
+
+    public boolean isEmpty() {
+        return compositionMap.isEmpty();
     }
 }

@@ -5,6 +5,7 @@ import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntit
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
 import org.junit.Before;
@@ -16,6 +17,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositionsMap;
@@ -26,6 +28,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,13 +40,16 @@ public class PlayQueueDataSourceTest {
     private final SettingsPreferences settingsPreferences = mock(SettingsPreferences.class);
     private final Scheduler scheduler = Schedulers.trampoline();
 
+    private final PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
+
     private PlayQueueDataSource playQueueDataSource;
 
     @Before
     public void setUp() {
         when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(false);
-        when(storageMusicDataSource.getCompositionsList()).thenReturn(new ChangeableMap<>(
-                getFakeCompositionsMap(), Observable.never()));
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(getFakeCompositionsMap());
+        when(storageMusicDataSource.getChangeObservable()).thenReturn(changeSubject);
 
         playQueueDataSource = new PlayQueueDataSource(playQueueDao,
                 storageMusicDataSource,
@@ -61,6 +68,7 @@ public class PlayQueueDataSourceTest {
 
         verify(playQueueDao).deletePlayQueue();
         verify(playQueueDao).setPlayQueue(anyListOf(PlayQueueEntity.class));
+        verify(storageMusicDataSource).getChangeObservable();
     }
 
     @Test
@@ -74,6 +82,8 @@ public class PlayQueueDataSourceTest {
                     assertEquals(getFakeCompositions().size(), compositions.size());
                     return true;
                 });
+
+        verify(storageMusicDataSource).getChangeObservable();
     }
 
     @Test
@@ -86,6 +96,8 @@ public class PlayQueueDataSourceTest {
                     assertEquals(0, compositions.size());
                     return true;
                 });
+
+        verify(storageMusicDataSource, never()).getChangeObservable();
     }
 
     @Test
@@ -99,7 +111,35 @@ public class PlayQueueDataSourceTest {
                     assertEquals(getFakeCompositions(), compositions);
                     return true;
                 });
+
+        verify(storageMusicDataSource).getChangeObservable();
     }
+
+    @Test
+    public void getPlayQueueInInitialStateAndSetNewQueue() {
+        when(playQueueDao.getPlayQueue()).thenReturn(getPlayQueueEntities());
+
+        playQueueDataSource.getPlayQueue()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(getPlayQueueEntities().size(), compositions.size());
+                    assertEquals(getFakeCompositions(), compositions);
+                    return true;
+                });
+
+        playQueueDataSource.setPlayQueue(getFakeCompositions())
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(getFakeCompositions(), compositions);
+                    return true;
+                });
+
+        verify(playQueueDao).deletePlayQueue();
+        verify(playQueueDao).setPlayQueue(anyListOf(PlayQueueEntity.class));
+
+        verify(storageMusicDataSource, times(1)).getChangeObservable();
+    }
+
 
     @Test
     public void getPlayQueueWithUnexcitingCompositions() {
@@ -117,6 +157,7 @@ public class PlayQueueDataSourceTest {
                 });
 
         verify(playQueueDao).deletePlayQueueEntity(eq(Long.MAX_VALUE));
+        verify(storageMusicDataSource, never()).getChangeObservable();
     }
 
     @Test
