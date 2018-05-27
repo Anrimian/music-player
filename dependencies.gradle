@@ -16,7 +16,7 @@ ext {
 
     //Libraries
     supportLibraryVersion = "27.0.2"
-    constraintLayoutVersion = "1.1.0"
+    constraintLayoutVersion = "1.0.2"//TODO update lib and fix player layout later
     rxJavaVersion = "2.1.12"
     rxAndroidVersion = "2.0.1"
     rxPermissionsVersion = "0.9.4@aar"
