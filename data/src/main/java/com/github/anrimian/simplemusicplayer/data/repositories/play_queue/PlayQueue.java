@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 public class PlayQueue {
 
     private final Map<Long, Integer> initialPlayList;
@@ -58,14 +60,6 @@ public class PlayQueue {
         return createList(initialPlayList);
     }
 
-    public Map<Long, Integer> getShuffledPlayMap() {
-        return shuffledPlayList;
-    }
-
-    public Map<Long, Integer> getInitialPlayMap() {
-        return initialPlayList;
-    }
-
     public void shuffle() {
         shuffledPlayList.clear();
 
@@ -78,15 +72,49 @@ public class PlayQueue {
         }
     }
 
+    @Nullable
+    public Composition getCompositionById(Long id) {
+        return compositionMap.get(id);
+    }
+
+    public boolean isEmpty() {
+        return compositionMap.isEmpty();
+    }
+
+    public void deleteComposition(long id) {
+        compositionMap.remove(id);
+
+        int freeShuffledPosition = shuffledPlayList.remove(id);
+        for (Map.Entry<Long, Integer> entry:  shuffledPlayList.entrySet()) {
+            if (entry.getValue() > freeShuffledPosition) {
+                shuffledPlayList.put(entry.getKey(), entry.getValue() - 1);
+            }
+        }
+
+        int freeInitialPosition = initialPlayList.remove(id);
+        for (Map.Entry<Long, Integer> entry:  initialPlayList.entrySet()) {
+            if (entry.getValue() > freeInitialPosition) {
+                initialPlayList.put(entry.getKey(), entry.getValue() - 1);
+            }
+        }
+    }
+
+    public void moveCompositionToTopInShuffledList(Composition composition) {
+        long id = composition.getId();
+        for (Map.Entry<Long, Integer> entry: shuffledPlayList.entrySet()) {
+            if (entry.getValue() == 0) {
+                int previousPosition = shuffledPlayList.put(id, 0);
+                shuffledPlayList.put(entry.getKey(), previousPosition);
+                break;
+            }
+        }
+    }
+
     private List<Composition> createList(Map<Long, Integer> positionMap) {
         Composition[] compositions = new Composition[positionMap.size()];
         for (long id: positionMap.keySet()) {
             compositions[positionMap.get(id)] = compositionMap.get(id);
         }
         return Arrays.asList(compositions);
-    }
-
-    public boolean isEmpty() {
-        return compositionMap.isEmpty();
     }
 }

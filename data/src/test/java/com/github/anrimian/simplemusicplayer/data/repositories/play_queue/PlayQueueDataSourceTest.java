@@ -6,21 +6,26 @@ import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreference
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositionsMap;
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
@@ -188,6 +193,37 @@ public class PlayQueueDataSourceTest {
                 .assertComplete();
 
         verify(playQueueDao).updatePlayQueue(anyListOf(PlayQueueEntity.class));
+    }
+
+    @Test
+    public void testDeletedChanges() {
+        playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
+
+        TestObserver<Change<Composition>> changeObserver = playQueueDataSource.getChangeObservable()
+                .test();
+
+        Composition unexcitedComposition = new Composition();
+        unexcitedComposition.setId(2000000);
+        changeSubject.onNext(new Change<>(DELETED, Arrays.asList(getFakeCompositions().get(0),
+                getFakeCompositions().get(1),
+                unexcitedComposition)
+        ));
+
+        changeObserver.assertValue(change -> {
+            assertEquals(DELETED, change.getChangeType());
+            assertEquals(getFakeCompositions().get(0), change.getData().get(0));
+            assertEquals(getFakeCompositions().get(1), change.getData().get(1));
+            assertEquals(2, change.getData().size());
+            return true;
+        });
+
+        playQueueDataSource.getPlayQueue()
+                .test()
+                .assertValue(list -> {
+                    assertEquals(getFakeCompositions().get(2), list.get(0));
+                    assertEquals(getFakeCompositions().size() - 2, list.size());
+                    return true;
+                });
     }
 
     private List<PlayQueueEntity> getPlayQueueEntities() {

@@ -6,6 +6,7 @@ import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreference
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,25 +84,12 @@ public class PlayQueueDataSource {
                     if (enabled) {
                         playQueue.shuffle();
 
-                        moveCompositionToTop(currentComposition);
+                        playQueue.moveCompositionToTopInShuffledList(currentComposition);
                         playQueueDao.updatePlayQueue(toEntityList(playQueue));
                     }
                 }))
                 .andThen(Single.fromCallable(() -> getCurrentPosition(currentComposition)))
                 .subscribeOn(scheduler);
-    }
-
-    private void moveCompositionToTop(Composition composition) {
-        Map<Long, Integer> shuffledPlayList = playQueue.getShuffledPlayMap();
-
-        long id = composition.getId();
-        for (Map.Entry<Long, Integer> entry: shuffledPlayList.entrySet()) {
-            if (entry.getValue() == 0) {
-                int previousPosition = shuffledPlayList.put(id, 0);
-                shuffledPlayList.put(entry.getKey(), previousPosition);
-                break;
-            }
-        }
     }
 
     private int getCurrentPosition(Composition composition) {
@@ -133,13 +121,26 @@ public class PlayQueueDataSource {
     }
 
     private void processCompositionChange(Change<Composition> change) {
-        switch (change.getChangeType()) {//TODO handle changes
-            case MODIFY: {
-                break;
-            }
+        List<Composition> changedCompositions = change.getData();
+        switch (change.getChangeType()) {
             case DELETED: {
+                List<Composition> compositionsToNotify = new ArrayList<>();
+                for (Composition deletedComposition: changedCompositions) {
+                    long id = deletedComposition.getId();
+                    if (playQueue.getCompositionById(id) != null) {
+                        playQueue.deleteComposition(id);
+                        compositionsToNotify.add(deletedComposition);
+                    }
+                }
+                if (!compositionsToNotify.isEmpty()) {
+                    changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
+                }
                 break;
             }
+            case MODIFY: {//TODO handle changes
+                break;
+            }
+
         }
     }
 
