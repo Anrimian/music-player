@@ -26,6 +26,7 @@ import io.reactivex.subjects.PublishSubject;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositionsMap;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
@@ -222,6 +223,40 @@ public class PlayQueueDataSourceTest {
                 .assertValue(list -> {
                     assertEquals(getFakeCompositions().get(2), list.get(0));
                     assertEquals(getFakeCompositions().size() - 2, list.size());
+                    return true;
+                });
+    }
+
+    @Test
+    public void testModifyChanges() {
+        playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
+
+        TestObserver<Change<Composition>> changeObserver = playQueueDataSource.getChangeObservable()
+                .test();
+
+        Composition changedComposition = getFakeCompositions().get(0);
+        changedComposition.setTitle("changed title");
+
+        Composition unexcitedComposition = new Composition();
+        unexcitedComposition.setId(2000000);
+        changeSubject.onNext(new Change<>(MODIFY, Arrays.asList(changedComposition,
+                getFakeCompositions().get(1),
+                unexcitedComposition)
+        ));
+
+        changeObserver.assertValue(change -> {
+            assertEquals(MODIFY, change.getChangeType());
+            assertEquals("changed title", change.getData().get(0).getTitle());
+            assertEquals(getFakeCompositions().get(0), change.getData().get(0));
+            assertEquals(getFakeCompositions().get(1), change.getData().get(1));
+            assertEquals(2, change.getData().size());
+            return true;
+        });
+
+        playQueueDataSource.getPlayQueue()
+                .test()
+                .assertValue(list -> {
+                    assertEquals("changed title", list.get(0).getTitle());
                     return true;
                 });
     }

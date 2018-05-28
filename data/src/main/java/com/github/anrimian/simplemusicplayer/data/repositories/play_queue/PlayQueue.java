@@ -110,6 +110,10 @@ public class PlayQueue {
         }
     }
 
+    public void updateComposition(Composition modifiedComposition) {
+        compositionMap.put(modifiedComposition.getId(), modifiedComposition);
+    }
+
     private List<Composition> createList(Map<Long, Integer> positionMap) {
         Composition[] compositions = new Composition[positionMap.size()];
         for (long id: positionMap.keySet()) {
@@ -117,4 +121,6 @@ public class PlayQueue {
         }
         return Arrays.asList(compositions);
     }
+
+
 }

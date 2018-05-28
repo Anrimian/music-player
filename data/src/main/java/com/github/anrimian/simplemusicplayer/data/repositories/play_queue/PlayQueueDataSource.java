@@ -137,10 +137,20 @@ public class PlayQueueDataSource {
                 }
                 break;
             }
-            case MODIFY: {//TODO handle changes
+            case MODIFY: {
+                List<Composition> compositionsToNotify = new ArrayList<>();
+                for (Composition modifiedComposition: changedCompositions) {
+                    long id = modifiedComposition.getId();
+                    if (playQueue.getCompositionById(id) != null) {
+                        playQueue.updateComposition(modifiedComposition);
+                        compositionsToNotify.add(modifiedComposition);
+                    }
+                }
+                if (!compositionsToNotify.isEmpty()) {
+                    changeSubject.onNext(new Change<>(ChangeType.MODIFY, compositionsToNotify));
+                }
                 break;
             }
-
         }
     }
 
