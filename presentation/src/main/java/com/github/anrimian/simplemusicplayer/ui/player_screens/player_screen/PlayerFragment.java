@@ -174,6 +174,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private int selectedDrawerItemId = NO_ITEM;
     private int itemIdToStart = NO_ITEM;
 
+    private LinearLayoutManager playQueueLayoutManager;
+
     @ProvidePresenter
     PlayerPresenter providePresenter() {
         return Components.getLibraryComponent().libraryPresenter();
@@ -307,7 +309,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
 
-        rvPlayList.setLayoutManager(new LinearLayoutManager(getContext()));
+        playQueueLayoutManager = new LinearLayoutManager(getContext());
+        rvPlayList.setLayoutManager(playQueueLayoutManager);
 
         Fragment currentFragment = getFragmentManager().findFragmentById(R.id.drawer_fragment_container);
         if (currentFragment == null || savedInstanceState == null) {
@@ -380,8 +383,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
         tvCurrentCompositionInfo.setText(composition.getAlbum());
         tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, getContext()));
-        rvPlayList.scrollToPosition(position);
+
         playQueueAdapter.onCurrentCompositionChanged(composition);
+
+        if (position >= playQueueLayoutManager.findLastVisibleItemPosition()) {
+            playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
+        } else {
+            playQueueLayoutManager.scrollToPosition(position);
+        }
     }
 
     @Override
