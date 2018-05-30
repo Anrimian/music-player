@@ -46,7 +46,7 @@ public class PlayQueueDataSourceTest {
     private final SettingsPreferences settingsPreferences = mock(SettingsPreferences.class);
     private final Scheduler scheduler = Schedulers.trampoline();
 
-    private final PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
+    private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
 
     private PlayQueueDataSource playQueueDataSource;
 
@@ -200,7 +200,7 @@ public class PlayQueueDataSourceTest {
     public void testDeletedChanges() {
         playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
 
-        TestObserver<Change<Composition>> changeObserver = playQueueDataSource.getChangeObservable()
+        TestObserver<Change<List<Composition>>> changeObserver = playQueueDataSource.getChangeObservable()
                 .test();
 
         Composition unexcitedComposition = new Composition();
@@ -209,6 +209,9 @@ public class PlayQueueDataSourceTest {
                 getFakeCompositions().get(1),
                 unexcitedComposition)
         ));
+
+        verify(playQueueDao).deletePlayQueueEntity(eq(0L));
+        verify(playQueueDao).deletePlayQueueEntity(eq(1L));
 
         changeObserver.assertValue(change -> {
             assertEquals(DELETED, change.getChangeType());
@@ -231,7 +234,7 @@ public class PlayQueueDataSourceTest {
     public void testModifyChanges() {
         playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
 
-        TestObserver<Change<Composition>> changeObserver = playQueueDataSource.getChangeObservable()
+        TestObserver<Change<List<Composition>>> changeObserver = playQueueDataSource.getChangeObservable()
                 .test();
 
         Composition changedComposition = getFakeCompositions().get(0);

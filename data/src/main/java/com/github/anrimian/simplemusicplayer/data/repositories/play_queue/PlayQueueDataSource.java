@@ -32,7 +32,7 @@ public class PlayQueueDataSource {
     private final SettingsPreferences settingsPreferences;
     private final Scheduler scheduler;
 
-    private final PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
+    private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
 
     @Nullable
     private PlayQueue playQueue;
@@ -62,7 +62,7 @@ public class PlayQueueDataSource {
                 .subscribeOn(scheduler);
     }
 
-    public Observable<Change<Composition>> getChangeObservable() {
+    public Observable<Change<List<Composition>>> getChangeObservable() {
         return changeSubject;
     }
 
@@ -116,11 +116,12 @@ public class PlayQueueDataSource {
     private void subscribeOnCompositionChanges() {
         if (changeDisposable == null && !playQueue.isEmpty()) {
             changeDisposable = storageMusicDataSource.getChangeObservable()
+                    .subscribeOn(scheduler)
                     .subscribe(this::processCompositionChange);
         }
     }
 
-    private void processCompositionChange(Change<Composition> change) {
+    private void processCompositionChange(Change<List<Composition>> change) {
         List<Composition> changedCompositions = change.getData();
         switch (change.getChangeType()) {
             case DELETED: {
@@ -129,6 +130,7 @@ public class PlayQueueDataSource {
                     long id = deletedComposition.getId();
                     if (playQueue.getCompositionById(id) != null) {
                         playQueue.deleteComposition(id);
+                        playQueueDao.deletePlayQueueEntity(id);
                         compositionsToNotify.add(deletedComposition);
                     }
                 }

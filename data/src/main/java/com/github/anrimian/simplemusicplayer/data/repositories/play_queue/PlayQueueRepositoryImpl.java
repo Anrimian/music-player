@@ -5,6 +5,8 @@ import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
@@ -35,6 +38,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private final BehaviorSubject<List<Composition>> currentPlayQueueSubject = create();
     private final BehaviorSubject<CurrentComposition> currentCompositionSubject = create();
+
+    private final PublishSubject<Change<CurrentComposition>> currentCompositionChangeSubject
+            = PublishSubject.create();
 
     private int position = NO_POSITION;
 
@@ -141,6 +147,42 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     updateCurrentComposition(currentPlayList, position);
                 })
                 .toCompletable();
+    }
+
+    @Override
+    public Observable<Change<List<Composition>>> getPlayQueueChangeObservable() {
+        return playQueueDataSource.getChangeObservable()
+                .doOnNext(this::processPlayQueueChange);
+    }
+
+    public Observable<Change<CurrentComposition>> getCurrenctCompositionChangeObservable() {
+        return currentCompositionChangeSubject;
+    }
+
+    private void processPlayQueueChange(Change<List<Composition>> change) {
+        Composition currentComposition = currentCompositionSubject.getValue().getComposition();
+        for (Composition changedComposition: change.getData()) {
+            if (changedComposition.equals(currentComposition)) {
+                processCurrentCompositionChange(changedComposition, change.getChangeType());
+                return;
+            }
+        }
+    }
+
+    private void processCurrentCompositionChange(Composition changedComposition,
+                                                 ChangeType changeType) {
+        switch (changeType) {//TODO finish
+            case DELETED: {
+                //if not empty - select next, but if empty with change?
+                //if empty - emit change
+                break;
+            }
+            case MODIFY: {
+                //emit change
+                break;
+            }
+        }
+
     }
 
     private void updateCurrentComposition(List<Composition> currentPlayList, int position) {

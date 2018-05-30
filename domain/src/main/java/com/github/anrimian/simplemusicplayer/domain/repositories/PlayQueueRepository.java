@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.domain.repositories;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.List;
 
@@ -29,4 +30,6 @@ public interface PlayQueueRepository {
     Single<Integer> skipToPrevious();
 
     Completable skipToPosition(int position);
+
+    Observable<Change<List<Composition>>> getPlayQueueChangeObservable();
 }

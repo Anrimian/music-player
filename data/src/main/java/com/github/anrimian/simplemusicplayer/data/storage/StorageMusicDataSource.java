@@ -26,7 +26,7 @@ public class StorageMusicDataSource {
     private final StorageMusicProvider musicProvider;
     private final Scheduler scheduler;
 
-    private final PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
+    private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
 
     private Map<Long, Composition> compositions;
     private Disposable changeDisposable;
@@ -53,7 +53,7 @@ public class StorageMusicDataSource {
         return compositions;
     }
 
-    public Observable<Change<Composition>> getChangeObservable() {
+    public Observable<Change<List<Composition>>> getChangeObservable() {
         return changeSubject;
     }
 
@@ -67,7 +67,7 @@ public class StorageMusicDataSource {
                 .subscribe(changeSubject::onNext);
     }
 
-    private Observable<Change<Composition>> calculateChange(Map<Long, Composition> newCompositions) {
+    private Observable<Change<List<Composition>>> calculateChange(Map<Long, Composition> newCompositions) {
         return Observable.create(emitter -> {
             List<Composition> deletedCompositions = new ArrayList<>();
             List<Composition> addedCompositions = new ArrayList<>();

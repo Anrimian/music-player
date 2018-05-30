@@ -8,6 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.observers.TestObserver;
@@ -37,7 +38,7 @@ public class StorageMusicDataSourceTest {
 
     @Test
     public void removeChangeTest() {
-        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
         storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
@@ -70,7 +71,7 @@ public class StorageMusicDataSourceTest {
 
     @Test
     public void addChangeTest() {
-        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
         storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
@@ -97,7 +98,7 @@ public class StorageMusicDataSourceTest {
 
     @Test
     public void modifyChangeTest() {
-        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
         storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();

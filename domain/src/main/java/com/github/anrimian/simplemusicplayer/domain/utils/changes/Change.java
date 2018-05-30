@@ -11,9 +11,9 @@ public class Change<T> {
     private ChangeType changeType;
 
     @Nonnull
-    private List<T> data;
+    private T data;
 
-    public Change(@Nonnull ChangeType changeType, @Nonnull List<T> data) {
+    public Change(@Nonnull ChangeType changeType, @Nonnull T data) {
         this.changeType = changeType;
         this.data = data;
     }
@@ -28,11 +28,11 @@ public class Change<T> {
     }
 
     @Nonnull
-    public List<T> getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(@Nonnull List<T> data) {
+    public void setData(@Nonnull T data) {
         this.data = data;
     }
 
