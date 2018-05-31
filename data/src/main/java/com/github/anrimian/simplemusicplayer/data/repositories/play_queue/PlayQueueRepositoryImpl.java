@@ -17,6 +17,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
@@ -36,13 +37,14 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler dbScheduler;
 
-    private final BehaviorSubject<List<Composition>> currentPlayQueueSubject = create();
     private final BehaviorSubject<CurrentComposition> currentCompositionSubject = create();
 
-    private final PublishSubject<Change<CurrentComposition>> currentCompositionChangeSubject
+    private final PublishSubject<Change<Composition>> currentCompositionChangeSubject
             = PublishSubject.create();
 
     private int position = NO_POSITION;
+
+    private Disposable currentCompositionChangeDisposable;
 
     public PlayQueueRepositoryImpl(PlayQueueDataSource playQueueDataSource,
                                    UiStatePreferences uiStatePreferences,
@@ -57,9 +59,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         checkCompositionsList(compositions);
         return playQueueDataSource.setPlayQueue(compositions)
                 .doOnSuccess(playQueue -> {
-                    currentPlayQueueSubject.onNext(playQueue);
                     position = 0;
                     updateCurrentComposition(playQueue, position);
+                    subscribeOnCurrentCompositionChange();
                 })
                 .toCompletable()
                 .subscribeOn(dbScheduler);
@@ -80,8 +82,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Observable<List<Composition>> getPlayQueueObservable() {
-        return withDefaultValue(currentPlayQueueSubject, playQueueDataSource.getPlayQueue())
-                .subscribeOn(dbScheduler);
+        return Observable.never();//TODO remove and replace with single later
+    }
+
+    @Override
+    public Single<List<Composition>> getPlayQueue() {
+        return playQueueDataSource.getPlayQueue();
     }
 
     @Override
@@ -92,13 +98,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         }
 
         playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition.getComposition())
-                .flatMap(position -> playQueueDataSource.getPlayQueue()
-                        .doOnSuccess(playQueue -> {
-                            this.position = position;
-
-                            currentPlayQueueSubject.onNext(playQueue);
-                            uiStatePreferences.setCurrentCompositionPosition(position);
-                        }))
+                .doOnSuccess(position -> {
+                    this.position = position;
+                    uiStatePreferences.setCurrentCompositionPosition(position);
+                })
                 .subscribe();
     }
 
@@ -151,15 +154,22 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Observable<Change<List<Composition>>> getPlayQueueChangeObservable() {
-        return playQueueDataSource.getChangeObservable()
-                .doOnNext(this::processPlayQueueChange);
+        return playQueueDataSource.getChangeObservable();
     }
 
-    public Observable<Change<CurrentComposition>> getCurrenctCompositionChangeObservable() {
+    @Override
+    public Observable<Change<Composition>> getCurrentCompositionChangeObservable() {
         return currentCompositionChangeSubject;
     }
 
-    private void processPlayQueueChange(Change<List<Composition>> change) {
+    private void subscribeOnCurrentCompositionChange() {
+        if (currentCompositionChangeDisposable == null) {
+            currentCompositionChangeDisposable = playQueueDataSource.getChangeObservable()
+                    .subscribe(this::processChangeForCurrentComposition);
+        }
+    }
+
+    private void processChangeForCurrentComposition(Change<List<Composition>> change) {
         Composition currentComposition = currentCompositionSubject.getValue().getComposition();
         for (Composition changedComposition: change.getData()) {
             if (changedComposition.equals(currentComposition)) {
@@ -172,17 +182,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private void processCurrentCompositionChange(Composition changedComposition,
                                                  ChangeType changeType) {
         switch (changeType) {//TODO finish
-            case DELETED: {
-                //if not empty - select next, but if empty with change?
+            case DELETED: {//we emit it on change composition mode or composition setting(
+//                List<Composition> playQueue = playQueueDataSource.getPlayQueue().blockingGet();
+                //if not empty - select next, but if empty with change? - select none
                 //if empty - emit change
                 break;
             }
             case MODIFY: {
-                //emit change
+                currentCompositionChangeSubject.onNext(new Change<>(changeType, changedComposition));
                 break;
             }
         }
-
     }
 
     private void updateCurrentComposition(List<Composition> currentPlayList, int position) {
@@ -196,7 +206,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private Maybe<CurrentComposition> getSavedComposition() {
         return playQueueDataSource.getPlayQueue()
-                .flatMapMaybe(this::findSavedComposition);
+                .flatMapMaybe(this::findSavedComposition)
+                .doOnSuccess(currentComposition -> subscribeOnCurrentCompositionChange());
     }
 
     @Nullable

@@ -48,7 +48,14 @@ public class PlayQueueDataSourceTest {
 
     private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
 
-    private PlayQueueDataSource playQueueDataSource;
+    private PlayQueueDataSource playQueueDataSource = new PlayQueueDataSource(playQueueDao,
+            storageMusicDataSource,
+            settingsPreferences,
+            scheduler);
+
+    private TestObserver<Change<List<Composition>>> changeObserver = playQueueDataSource
+            .getChangeObservable()
+            .test();
 
     @Before
     public void setUp() {
@@ -56,11 +63,6 @@ public class PlayQueueDataSourceTest {
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(getFakeCompositionsMap());
         when(storageMusicDataSource.getChangeObservable()).thenReturn(changeSubject);
-
-        playQueueDataSource = new PlayQueueDataSource(playQueueDao,
-                storageMusicDataSource,
-                settingsPreferences,
-                scheduler);
     }
 
     @Test
@@ -74,6 +76,12 @@ public class PlayQueueDataSourceTest {
 
         verify(playQueueDao).deletePlayQueue();
         verify(playQueueDao).setPlayQueue(anyListOf(PlayQueueEntity.class));
+        changeObserver.assertValue(change -> {
+            assertEquals(ChangeType.ADDED, change.getChangeType());
+            assertEquals(getFakeCompositions(), change.getData());
+            return true;
+        });
+
         verify(storageMusicDataSource).getChangeObservable();
     }
 
@@ -88,6 +96,11 @@ public class PlayQueueDataSourceTest {
                     assertEquals(getFakeCompositions().size(), compositions.size());
                     return true;
                 });
+        changeObserver.assertValue(change -> {
+            assertEquals(ChangeType.ADDED, change.getChangeType());
+            assertEquals(getFakeCompositions().size(), change.getData().size());
+            return true;
+        });
 
         verify(storageMusicDataSource).getChangeObservable();
     }
@@ -144,6 +157,17 @@ public class PlayQueueDataSourceTest {
         verify(playQueueDao).setPlayQueue(anyListOf(PlayQueueEntity.class));
 
         verify(storageMusicDataSource, times(1)).getChangeObservable();
+
+        changeObserver.assertValueAt(0, change -> {
+            assertEquals(ChangeType.DELETED, change.getChangeType());
+            assertEquals(getFakeCompositions(), change.getData());
+            return true;
+        });
+        changeObserver.assertValueAt(1, change -> {
+            assertEquals(ChangeType.ADDED, change.getChangeType());
+            assertEquals(getFakeCompositions(), change.getData());
+            return true;
+        });
     }
 
 
@@ -175,6 +199,17 @@ public class PlayQueueDataSourceTest {
         playQueueDataSource.setRandomPlayingEnabled(false, getFakeCompositions().get(1))
                 .test()
                 .assertValue(1);
+
+        changeObserver.assertValueAt(1, change -> {
+            assertEquals(ChangeType.DELETED, change.getChangeType());
+            assertEquals(getFakeCompositions().size(), change.getData().size());
+            return true;
+        });
+        changeObserver.assertValueAt(2, change -> {
+            assertEquals(ChangeType.ADDED, change.getChangeType());
+            assertEquals(getFakeCompositions().size(), change.getData().size());
+            return true;
+        });
     }
 
     @Test
@@ -194,6 +229,17 @@ public class PlayQueueDataSourceTest {
                 .assertComplete();
 
         verify(playQueueDao).updatePlayQueue(anyListOf(PlayQueueEntity.class));
+
+        changeObserver.assertValueAt(1, change -> {
+            assertEquals(ChangeType.DELETED, change.getChangeType());
+            assertEquals(getFakeCompositions().size(), change.getData().size());
+            return true;
+        });
+        changeObserver.assertValueAt(2, change -> {
+            assertEquals(ChangeType.ADDED, change.getChangeType());
+            assertEquals(getFakeCompositions().size(), change.getData().size());
+            return true;
+        });
     }
 
     @Test

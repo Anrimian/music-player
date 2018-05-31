@@ -20,7 +20,11 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
+
+import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static io.reactivex.subjects.BehaviorSubject.create;
 
 /**
  * Created on 16.04.2018.
@@ -63,7 +67,7 @@ public class PlayQueueDataSource {
     }
 
     public Observable<Change<List<Composition>>> getChangeObservable() {
-        return changeSubject;
+        return changeSubject.subscribeOn(scheduler);
     }
 
     private List<Composition> getSelectedPlayQueue(PlayQueue playQueue) {
@@ -80,6 +84,8 @@ public class PlayQueueDataSource {
     public Single<Integer> setRandomPlayingEnabled(boolean enabled, Composition currentComposition) {
         return getSavedPlayQueue()
                 .flatMapCompletable(playQueue -> Completable.fromRunnable(() -> {
+                    notifyPlayQueueRemoved();
+
                     settingsPreferences.setRandomPlayingEnabled(enabled);
                     if (enabled) {
                         playQueue.shuffle();
@@ -87,9 +93,21 @@ public class PlayQueueDataSource {
                         playQueue.moveCompositionToTopInShuffledList(currentComposition);
                         playQueueDao.updatePlayQueue(toEntityList(playQueue));
                     }
+
+                    notifyPlayQueueAdded();
                 }))
                 .andThen(Single.fromCallable(() -> getCurrentPosition(currentComposition)))
                 .subscribeOn(scheduler);
+    }
+
+    private void notifyPlayQueueRemoved() {
+        if (playQueue != null) {
+            changeSubject.onNext(new Change<>(ChangeType.DELETED, getSelectedPlayQueue(playQueue)));
+        }
+    }
+
+    private void notifyPlayQueueAdded() {
+        changeSubject.onNext(new Change<>(ChangeType.ADDED, getSelectedPlayQueue(playQueue)));
     }
 
     private int getCurrentPosition(Composition composition) {
@@ -125,34 +143,42 @@ public class PlayQueueDataSource {
         List<Composition> changedCompositions = change.getData();
         switch (change.getChangeType()) {
             case DELETED: {
-                List<Composition> compositionsToNotify = new ArrayList<>();
-                for (Composition deletedComposition: changedCompositions) {
-                    long id = deletedComposition.getId();
-                    if (playQueue.getCompositionById(id) != null) {
-                        playQueue.deleteComposition(id);
-                        playQueueDao.deletePlayQueueEntity(id);
-                        compositionsToNotify.add(deletedComposition);
-                    }
-                }
-                if (!compositionsToNotify.isEmpty()) {
-                    changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
-                }
+                processDeleteChange(changedCompositions);
                 break;
             }
             case MODIFY: {
-                List<Composition> compositionsToNotify = new ArrayList<>();
-                for (Composition modifiedComposition: changedCompositions) {
-                    long id = modifiedComposition.getId();
-                    if (playQueue.getCompositionById(id) != null) {
-                        playQueue.updateComposition(modifiedComposition);
-                        compositionsToNotify.add(modifiedComposition);
-                    }
-                }
-                if (!compositionsToNotify.isEmpty()) {
-                    changeSubject.onNext(new Change<>(ChangeType.MODIFY, compositionsToNotify));
-                }
+                processModifyChange(changedCompositions);
                 break;
             }
+        }
+    }
+
+    private void processDeleteChange(List<Composition> changedCompositions) {
+        List<Composition> compositionsToNotify = new ArrayList<>();
+        for (Composition deletedComposition: changedCompositions) {
+            long id = deletedComposition.getId();
+            if (playQueue.getCompositionById(id) != null) {
+                playQueue.deleteComposition(id);
+                playQueueDao.deletePlayQueueEntity(id);
+                compositionsToNotify.add(deletedComposition);
+            }
+        }
+        if (!compositionsToNotify.isEmpty()) {
+            changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
+        }
+    }
+
+    private void processModifyChange(List<Composition> changedCompositions) {
+        List<Composition> compositionsToNotify = new ArrayList<>();
+        for (Composition modifiedComposition: changedCompositions) {
+            long id = modifiedComposition.getId();
+            if (playQueue.getCompositionById(id) != null) {
+                playQueue.updateComposition(modifiedComposition);
+                compositionsToNotify.add(modifiedComposition);
+            }
+        }
+        if (!compositionsToNotify.isEmpty()) {
+            changeSubject.onNext(new Change<>(ChangeType.MODIFY, compositionsToNotify));
         }
     }
 
@@ -174,7 +200,9 @@ public class PlayQueueDataSource {
         playQueueDao.deletePlayQueue();
         playQueueDao.setPlayQueue(toEntityList(playQueue));
 
+        notifyPlayQueueRemoved();
         this.playQueue = playQueue;
+        notifyPlayQueueAdded();
 
         subscribeOnCompositionChanges();
 
