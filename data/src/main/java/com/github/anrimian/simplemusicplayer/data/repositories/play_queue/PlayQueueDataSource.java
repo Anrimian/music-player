@@ -36,6 +36,7 @@ public class PlayQueueDataSource {
     private final SettingsPreferences settingsPreferences;
     private final Scheduler scheduler;
 
+    private final BehaviorSubject<List<Composition>> playQueueSubject = create();
     private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
 
     @Nullable
@@ -57,12 +58,18 @@ public class PlayQueueDataSource {
         return Single.fromCallable(() -> new PlayQueue(compositions))
                 .doOnSuccess(this::savePlayQueue)
                 .map(this::getSelectedPlayQueue)
+                .doOnSuccess(playQueueSubject::onNext)
                 .subscribeOn(scheduler);
     }
 
     public Single<List<Composition>> getPlayQueue() {
         return getSavedPlayQueue()
                 .map(this::getSelectedPlayQueue)
+                .subscribeOn(scheduler);
+    }
+
+    public Observable<List<Composition>> getPlayQueueObservable() {
+        return withDefaultValue(playQueueSubject, getPlayQueue())
                 .subscribeOn(scheduler);
     }
 
@@ -84,8 +91,6 @@ public class PlayQueueDataSource {
     public Single<Integer> setRandomPlayingEnabled(boolean enabled, Composition currentComposition) {
         return getSavedPlayQueue()
                 .flatMapCompletable(playQueue -> Completable.fromRunnable(() -> {
-                    notifyPlayQueueRemoved();
-
                     settingsPreferences.setRandomPlayingEnabled(enabled);
                     if (enabled) {
                         playQueue.shuffle();
@@ -93,21 +98,10 @@ public class PlayQueueDataSource {
                         playQueue.moveCompositionToTopInShuffledList(currentComposition);
                         playQueueDao.updatePlayQueue(toEntityList(playQueue));
                     }
-
-                    notifyPlayQueueAdded();
+                    playQueueSubject.onNext(getSelectedPlayQueue(playQueue));
                 }))
                 .andThen(Single.fromCallable(() -> getCurrentPosition(currentComposition)))
                 .subscribeOn(scheduler);
-    }
-
-    private void notifyPlayQueueRemoved() {
-        if (playQueue != null) {
-            changeSubject.onNext(new Change<>(ChangeType.DELETED, getSelectedPlayQueue(playQueue)));
-        }
-    }
-
-    private void notifyPlayQueueAdded() {
-        changeSubject.onNext(new Change<>(ChangeType.ADDED, getSelectedPlayQueue(playQueue)));
     }
 
     private int getCurrentPosition(Composition composition) {
@@ -165,6 +159,7 @@ public class PlayQueueDataSource {
         }
         if (!compositionsToNotify.isEmpty()) {
             changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
+            updateSubject();
         }
     }
 
@@ -179,7 +174,14 @@ public class PlayQueueDataSource {
         }
         if (!compositionsToNotify.isEmpty()) {
             changeSubject.onNext(new Change<>(ChangeType.MODIFY, compositionsToNotify));
+            updateSubject();
         }
+    }
+
+    private void updateSubject() {
+        List<Composition> cachedCompositions = playQueueSubject.getValue();
+        cachedCompositions.clear();
+        cachedCompositions.addAll(getSelectedPlayQueue(playQueue));
     }
 
     private List<PlayQueueEntity> toEntityList(PlayQueue playQueue) {
@@ -200,9 +202,7 @@ public class PlayQueueDataSource {
         playQueueDao.deletePlayQueue();
         playQueueDao.setPlayQueue(toEntityList(playQueue));
 
-        notifyPlayQueueRemoved();
         this.playQueue = playQueue;
-        notifyPlayQueueAdded();
 
         subscribeOnCompositionChanges();
 

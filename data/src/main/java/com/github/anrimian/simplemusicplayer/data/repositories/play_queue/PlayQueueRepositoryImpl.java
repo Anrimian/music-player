@@ -23,6 +23,8 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static io.reactivex.subjects.BehaviorSubject.create;
 
 /**
@@ -82,12 +84,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Observable<List<Composition>> getPlayQueueObservable() {
-        return Observable.never();//TODO remove and replace with single later
-    }
-
-    @Override
-    public Single<List<Composition>> getPlayQueue() {
-        return playQueueDataSource.getPlayQueue();
+        return playQueueDataSource.getPlayQueueObservable();
     }
 
     @Override
@@ -181,15 +178,21 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private void processCurrentCompositionChange(Composition changedComposition,
                                                  ChangeType changeType) {
-        switch (changeType) {//TODO finish
-            case DELETED: {//we emit it on change composition mode or composition setting(
-//                List<Composition> playQueue = playQueueDataSource.getPlayQueue().blockingGet();
-                //if not empty - select next, but if empty with change? - select none
-                //if empty - emit change
+        switch (changeType) {
+            case DELETED: {
+                List<Composition> playQueue = playQueueDataSource.getPlayQueue().blockingGet();
+                if (playQueue.isEmpty()) {
+                    currentCompositionChangeSubject.onNext(new Change<>(DELETED, changedComposition));
+                } else {
+                    if (position >= playQueue.size()) {
+                        position = 0;
+                    }
+                    updateCurrentComposition(playQueue, position);
+                }
                 break;
             }
             case MODIFY: {
-                currentCompositionChangeSubject.onNext(new Change<>(changeType, changedComposition));
+                currentCompositionChangeSubject.onNext(new Change<>(MODIFY, changedComposition));
                 break;
             }
         }
@@ -220,7 +223,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             if (position > 0 && position < compositions.size()) {
                 Composition expectedComposition = compositions.get(position);
                 if (expectedComposition.getId() == id) {
-                    this.position = position;//TODO maybe remove position? replace with hash map?
+                    this.position = position;
                     emitter.onSuccess(new CurrentComposition(expectedComposition,
                             position,
                             uiStatePreferences.getTrackPosition()));

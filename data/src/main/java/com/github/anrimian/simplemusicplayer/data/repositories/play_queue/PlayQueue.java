@@ -119,7 +119,7 @@ public class PlayQueue {
         for (long id: positionMap.keySet()) {
             compositions[positionMap.get(id)] = compositionMap.get(id);
         }
-        return Arrays.asList(compositions);
+        return new ArrayList<>(Arrays.asList(compositions));
     }
 
 

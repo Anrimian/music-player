@@ -20,7 +20,9 @@ import io.reactivex.subjects.PublishSubject;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.currentComposition;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -41,7 +43,6 @@ public class PlayQueueRepositoryImplTest {
     private PlayQueueDataSource playQueueDataSource = mock(PlayQueueDataSource.class);
 
     private PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
-
 
     @Before
     public void setUp() {
@@ -206,5 +207,74 @@ public class PlayQueueRepositoryImplTest {
             assertEquals(getFakeCompositions().get(0), change.getData());
             return true;
         });
+    }
+
+    @Test
+    public void testCurrentCompositionDeleteChange() {
+        setPlayQueueTest();
+
+        TestObserver<Change<Composition>> changeObserver = playQueueRepository
+                .getCurrentCompositionChangeObservable()
+                .test();
+
+        TestObserver<CurrentComposition> currentCompositionObserver = playQueueRepository
+                .getCurrentCompositionObservable()
+                .test();
+
+        List<Composition> changedCompositions = getFakeCompositions();
+        changedCompositions.remove(0);
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(changedCompositions));
+
+        changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(getFakeCompositions().get(0))));
+
+        changeObserver.assertNoValues();
+        currentCompositionObserver
+                .assertValueAt(0, currentComposition(getFakeCompositions().get(0)))
+                .assertValueAt(1, currentComposition(getFakeCompositions().get(1)));
+    }
+
+    @Test
+    public void testCurrentCompositionDeleteChangeWithEmptyPlayQueue() {
+        setPlayQueueTest();
+
+        TestObserver<Change<Composition>> observer = playQueueRepository.getCurrentCompositionChangeObservable()
+                .test();
+
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(emptyList()));
+
+        changeSubject.onNext(new Change<>(ChangeType.DELETED, getFakeCompositions()));
+
+        observer.assertValue(change -> {
+            assertEquals(ChangeType.DELETED, change.getChangeType());
+            assertEquals(getFakeCompositions().get(0), change.getData());
+            return true;
+        });
+    }
+
+    @Test
+    public void testCurrentCompositionDeleteChangeWithLastPosition() {
+        setPlayQueueTest();
+
+        playQueueRepository.skipToPosition(getFakeCompositions().size() - 1);
+
+        TestObserver<Change<Composition>> changeObserver = playQueueRepository
+                .getCurrentCompositionChangeObservable()
+                .test();
+
+        TestObserver<CurrentComposition> currentCompositionObserver = playQueueRepository
+                .getCurrentCompositionObservable()
+                .test();
+
+        List<Composition> changedCompositions = getFakeCompositions();
+        changedCompositions.remove(getFakeCompositions().size() - 1);
+        when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(changedCompositions));
+
+        changeSubject.onNext(new Change<>(ChangeType.DELETED,
+                singletonList(getFakeCompositions().get(getFakeCompositions().size() - 1))));
+
+        changeObserver.assertNoValues();
+        currentCompositionObserver
+                .assertValueAt(0, currentComposition(getFakeCompositions().get(0)))
+                .assertValueAt(0, currentComposition(getFakeCompositions().get(0)));
     }
 }

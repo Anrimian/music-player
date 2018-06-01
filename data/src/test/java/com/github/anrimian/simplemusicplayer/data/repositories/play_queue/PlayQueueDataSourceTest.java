@@ -76,12 +76,6 @@ public class PlayQueueDataSourceTest {
 
         verify(playQueueDao).deletePlayQueue();
         verify(playQueueDao).setPlayQueue(anyListOf(PlayQueueEntity.class));
-        changeObserver.assertValue(change -> {
-            assertEquals(ChangeType.ADDED, change.getChangeType());
-            assertEquals(getFakeCompositions(), change.getData());
-            return true;
-        });
-
         verify(storageMusicDataSource).getChangeObservable();
     }
 
@@ -96,11 +90,6 @@ public class PlayQueueDataSourceTest {
                     assertEquals(getFakeCompositions().size(), compositions.size());
                     return true;
                 });
-        changeObserver.assertValue(change -> {
-            assertEquals(ChangeType.ADDED, change.getChangeType());
-            assertEquals(getFakeCompositions().size(), change.getData().size());
-            return true;
-        });
 
         verify(storageMusicDataSource).getChangeObservable();
     }
@@ -117,6 +106,21 @@ public class PlayQueueDataSourceTest {
                 });
 
         verify(storageMusicDataSource, never()).getChangeObservable();
+    }
+
+    @Test
+    public void getPlayQueueObservableInInitialState() {
+        when(playQueueDao.getPlayQueue()).thenReturn(getPlayQueueEntities());
+
+        playQueueDataSource.getPlayQueueObservable()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(getPlayQueueEntities().size(), compositions.size());
+                    assertEquals(getFakeCompositions(), compositions);
+                    return true;
+                });
+
+        verify(storageMusicDataSource).getChangeObservable();
     }
 
     @Test
@@ -146,6 +150,10 @@ public class PlayQueueDataSourceTest {
                     return true;
                 });
 
+        TestObserver<List<Composition>> playQueueObserver = playQueueDataSource
+                .getPlayQueueObservable()
+                .test();
+
         playQueueDataSource.setPlayQueue(getFakeCompositions())
                 .test()
                 .assertValue(compositions -> {
@@ -158,18 +166,8 @@ public class PlayQueueDataSourceTest {
 
         verify(storageMusicDataSource, times(1)).getChangeObservable();
 
-        changeObserver.assertValueAt(0, change -> {
-            assertEquals(ChangeType.DELETED, change.getChangeType());
-            assertEquals(getFakeCompositions(), change.getData());
-            return true;
-        });
-        changeObserver.assertValueAt(1, change -> {
-            assertEquals(ChangeType.ADDED, change.getChangeType());
-            assertEquals(getFakeCompositions(), change.getData());
-            return true;
-        });
+        playQueueObserver.assertValueAt(1, getFakeCompositions());
     }
-
 
     @Test
     public void getPlayQueueWithUnexcitingCompositions() {
@@ -194,27 +192,26 @@ public class PlayQueueDataSourceTest {
     public void setRandomPlayingDisabledTest() {
         playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
 
+        TestObserver<List<Composition>> playQueueObserver = playQueueDataSource
+                .getPlayQueueObservable()
+                .test();
+
         when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(false);
 
         playQueueDataSource.setRandomPlayingEnabled(false, getFakeCompositions().get(1))
                 .test()
                 .assertValue(1);
 
-        changeObserver.assertValueAt(1, change -> {
-            assertEquals(ChangeType.DELETED, change.getChangeType());
-            assertEquals(getFakeCompositions().size(), change.getData().size());
-            return true;
-        });
-        changeObserver.assertValueAt(2, change -> {
-            assertEquals(ChangeType.ADDED, change.getChangeType());
-            assertEquals(getFakeCompositions().size(), change.getData().size());
-            return true;
-        });
+        playQueueObserver.assertValueCount(2);
     }
 
     @Test
     public void setRandomPlayingEnabledTest() {
         playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
+
+        TestObserver<List<Composition>> playQueueObserver = playQueueDataSource
+                .getPlayQueueObservable()
+                .test();
 
         when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(true);
 
@@ -229,25 +226,12 @@ public class PlayQueueDataSourceTest {
                 .assertComplete();
 
         verify(playQueueDao).updatePlayQueue(anyListOf(PlayQueueEntity.class));
-
-        changeObserver.assertValueAt(1, change -> {
-            assertEquals(ChangeType.DELETED, change.getChangeType());
-            assertEquals(getFakeCompositions().size(), change.getData().size());
-            return true;
-        });
-        changeObserver.assertValueAt(2, change -> {
-            assertEquals(ChangeType.ADDED, change.getChangeType());
-            assertEquals(getFakeCompositions().size(), change.getData().size());
-            return true;
-        });
+        playQueueObserver.assertValueCount(2);
     }
 
     @Test
     public void testDeletedChanges() {
         playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
-
-        TestObserver<Change<List<Composition>>> changeObserver = playQueueDataSource.getChangeObservable()
-                .test();
 
         Composition unexcitedComposition = new Composition();
         unexcitedComposition.setId(2000000);
@@ -274,14 +258,20 @@ public class PlayQueueDataSourceTest {
                     assertEquals(getFakeCompositions().size() - 2, list.size());
                     return true;
                 });
+
+        playQueueDataSource
+                .getPlayQueueObservable()
+                .test()
+                .assertValue(list -> {
+                    assertEquals(getFakeCompositions().get(2), list.get(0));
+                    assertEquals(getFakeCompositions().size() - 2, list.size());
+                    return true;
+                });
     }
 
     @Test
     public void testModifyChanges() {
         playQueueDataSource.setPlayQueue(getFakeCompositions()).subscribe();
-
-        TestObserver<Change<List<Composition>>> changeObserver = playQueueDataSource.getChangeObservable()
-                .test();
 
         Composition changedComposition = getFakeCompositions().get(0);
         changedComposition.setTitle("changed title");
@@ -303,6 +293,14 @@ public class PlayQueueDataSourceTest {
         });
 
         playQueueDataSource.getPlayQueue()
+                .test()
+                .assertValue(list -> {
+                    assertEquals("changed title", list.get(0).getTitle());
+                    return true;
+                });
+
+        playQueueDataSource
+                .getPlayQueueObservable()
                 .test()
                 .assertValue(list -> {
                     assertEquals("changed title", list.get(0).getTitle());

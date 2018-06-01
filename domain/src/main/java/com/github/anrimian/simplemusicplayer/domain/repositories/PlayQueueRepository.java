@@ -23,8 +23,6 @@ public interface PlayQueueRepository {
 
     Observable<List<Composition>> getPlayQueueObservable();
 
-    Single<List<Composition>> getPlayQueue();
-
     Observable<Change<List<Composition>>> getPlayQueueChangeObservable();
 
     void setRandomPlayingEnabled(boolean enabled);
