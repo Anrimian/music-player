@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.utils.rx;
 
+import android.annotation.SuppressLint;
+
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -23,24 +25,20 @@ public class RxUtils {
         }).mergeWith(subject);
     }
 
+    @SuppressLint("CheckResult")
     public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Single<T> creator) {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
-                T value = creator.blockingGet();
-                if (value != null) {
-                    subject.onNext(value);
-                }
+                creator.subscribe(subject::onNext);
             }
         }).mergeWith(subject);
     }
 
+    @SuppressLint("CheckResult")
     public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Maybe<T> creator) {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
-                T value = creator.blockingGet();
-                if (value != null) {
-                    subject.onNext(value);
-                }
+                creator.subscribe(subject::onNext);
             }
         }).mergeWith(subject);
     }
