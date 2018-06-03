@@ -101,6 +101,20 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.skipToPosition(playQueue.indexOf(composition));//TODO optimise later
     }
 
+    void onTrackRewoundTo(int progress) {
+        long position = composition.getDuration() * progress / 100;
+        musicPlayerInteractor.seekTo(position);
+    }
+
+    public void onSeekStart() {
+        musicPlayerInteractor.onSeekStarted();
+    }
+
+    public void onSeekStop(int progress) {
+        long position = composition.getDuration() * progress / 100;
+        musicPlayerInteractor.onSeekFinished(position);
+    }
+
     private void subscribeOnCurrentCompositionChanging() {
         currentCompositionDisposable = musicPlayerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)

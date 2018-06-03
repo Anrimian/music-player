@@ -8,7 +8,6 @@ import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerEventLi
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
-import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -97,6 +96,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public void seekTo(long position) {//TODO when we save position?
         player.seekTo(position);
         trackPositionSubject.onNext(position);
+        uiStatePreferences.setTrackPosition(player.getCurrentPosition());
     }
 
     @Override

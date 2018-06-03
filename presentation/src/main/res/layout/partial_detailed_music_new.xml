@@ -101,13 +101,13 @@
         android:layout_marginBottom="8dp"
         android:paddingTop="16dp"
         android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@id/pb_track_state"
-        app:layout_constraintEnd_toEndOf="@id/pb_track_state"
+        app:layout_constraintBottom_toTopOf="@id/sb_track_state"
+        app:layout_constraintEnd_toEndOf="@id/sb_track_state"
         app:layout_constraintStart_toStartOf="@id/music_icon_wrapper"
         tools:text="ddddddddddddddddddddd" />
 
     <ProgressBar
-        android:id="@+id/pb_track_state"
+        android:id="@+id/sb_track_state"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

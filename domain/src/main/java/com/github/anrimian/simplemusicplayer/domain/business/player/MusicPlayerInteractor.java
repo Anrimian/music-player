@@ -20,6 +20,7 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.LOADING;
@@ -41,6 +42,7 @@ public class MusicPlayerInteractor {
     private final PlayQueueRepository playQueueRepository;
     private final MusicProviderRepository musicProviderRepository;
 
+    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
     private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
@@ -56,6 +58,12 @@ public class MusicPlayerInteractor {
         this.settingsRepository = settingsRepository;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
+
+        playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
+                .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
+                .subscribe(this::onCompositionPrepared));
+        playerDisposable.add(musicPlayerController.getEventsObservable()
+                .subscribe(this::onMusicPlayerEventReceived));
     }
 
     public Completable startPlaying(List<Composition> compositions) {
@@ -74,13 +82,20 @@ public class MusicPlayerInteractor {
         if (audioFocusObservable != null) {
             playerStateSubject.onNext(PLAY);
 
-            if (playerDisposable.size() == 0) {
-                playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
-                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
-                        .subscribe(this::onCompositionPrepared));
-                playerDisposable.add(musicPlayerController.getEventsObservable()
-                        .subscribe(this::onMusicPlayerEventReceived));
-            } else {
+//            if (playerDisposable.size() == 0) {
+                //TODO check how it works in constructor
+                // possible problem - resume before preparing player(too fast start)
+
+//                playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
+//                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
+//                        .subscribe(this::onCompositionPrepared));
+//                playerDisposable.add(musicPlayerController.getEventsObservable()
+//                        .subscribe(this::onMusicPlayerEventReceived));
+//            } else {
+//                musicPlayerController.resume();
+//            }
+
+            if (playerDisposable.size() != 0) {
                 musicPlayerController.resume();
             }
 
@@ -142,12 +157,30 @@ public class MusicPlayerInteractor {
         playQueueRepository.setRandomPlayingEnabled(enabled);
     }
 
+    public void onSeekStarted() {
+        if (playerStateSubject.getValue() == PLAY) {
+            musicPlayerController.pause();
+        }
+    }
+
+    public void seekTo(long position) {
+        trackPositionSubject.onNext(position);
+    }
+
+    public void onSeekFinished(long position) {
+        if (playerStateSubject.getValue() == PLAY) {
+            musicPlayerController.resume();
+        }
+        musicPlayerController.seekTo(position);
+    }
+
     public void setInfinitePlayingEnabled(boolean enabled) {
         settingsRepository.setInfinitePlayingEnabled(enabled);
     }
 
     public Observable<Long> getTrackPositionObservable() {
-        return musicPlayerController.getTrackPositionObservable();
+        return musicPlayerController.getTrackPositionObservable()
+                .mergeWith(trackPositionSubject);
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {

@@ -102,18 +102,20 @@
         android:layout_marginBottom="8dp"
         android:paddingTop="16dp"
         app:layout_constraintStart_toStartOf="@id/music_icon_wrapper"
-        app:layout_constraintEnd_toEndOf="@id/pb_track_state"
-        app:layout_constraintBottom_toTopOf="@id/pb_track_state"/>
+        app:layout_constraintEnd_toEndOf="@id/sb_track_state"
+        app:layout_constraintBottom_toTopOf="@id/sb_track_state"/>
 
-    <ProgressBar
-        android:id="@+id/pb_track_state"
+    <android.support.v7.widget.AppCompatSeekBar
+        android:id="@+id/sb_track_state"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
+        android:layout_marginLeft="1.5dp"
+        android:layout_marginRight="1.5dp"
         app:layout_constraintBottom_toTopOf="@+id/tv_total_time"
-        app:layout_constraintEnd_toEndOf="@+id/tv_total_time"
-        app:layout_constraintStart_toStartOf="@+id/tv_played_time" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tv_played_time"

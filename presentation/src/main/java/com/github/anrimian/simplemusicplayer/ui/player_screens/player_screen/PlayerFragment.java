@@ -16,6 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -27,7 +28,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
@@ -49,6 +49,7 @@ import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ExpandViewD
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ReverseDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.TargetViewDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.VisibilityDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -133,8 +134,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.tv_total_time)
     TextView tvTotalTime;
 
-    @BindView(R.id.pb_track_state)
-    ProgressBar pbTrackState;
+    @BindView(R.id.sb_track_state)
+    AppCompatSeekBar sbTrackState;
 
     @BindView(R.id.bottom_sheet_top_shadow)
     View bottomSheetTopShadow;
@@ -175,6 +176,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private int itemIdToStart = NO_ITEM;
 
     private LinearLayoutManager playQueueLayoutManager;
+    private SeekBarViewWrapper seekBarViewWrapper;
 
     @ProvidePresenter
     PlayerPresenter providePresenter() {
@@ -261,7 +263,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
 //                .addDelegate(new BoundValuesDelegate(0.4f, 0.6f, new VisibilityDelegate(bottomSheetBottomShadow)))
 //                .addDelegate(new BoundValuesDelegate(0.9f, 1.0f, new VisibilityDelegate(rvPlayList)))
-                .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(pbTrackState)))
+                .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(sbTrackState)))
 //                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(playActionsTopShadow)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
@@ -322,6 +324,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked);
 //        bottomPanel.setOnClickListener(v -> onBottomPanelClicked());
         topBottomSheetPanel.setOnClickListener(v -> onTopPanelClicked());
+
+        seekBarViewWrapper = new SeekBarViewWrapper(sbTrackState);
+        seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);
+        seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart);
+        seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
     }
 
     @Override
@@ -432,7 +439,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showTrackState(long currentPosition, long duration) {
         int progress = (int) (currentPosition * 100 / duration);
-        pbTrackState.setProgress(progress);
+        seekBarViewWrapper.setProgress(progress);
         tvPlayedTime.setText(formatMilliseconds(currentPosition));
     }
 
