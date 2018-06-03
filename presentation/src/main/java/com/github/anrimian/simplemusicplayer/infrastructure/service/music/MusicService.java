@@ -72,8 +72,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private CompositeDisposable serviceDisposable = new CompositeDisposable();
 
-    private boolean firstLaunch = true;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -187,11 +185,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void onPlayerStateChanged(PlayerInfo info) {
-        if (!firstLaunch) {
-            notificationsDisplayer.updateForegroundNotification(info);
-        }
-        firstLaunch = false;
-
         switch (info.getState()) {
             case STATE_PLAYING: {
                 mediaSession.setActive(true);
