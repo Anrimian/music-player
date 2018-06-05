@@ -1,11 +1,13 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
+import com.github.anrimian.simplemusicplayer.data.models.exceptions.DeleteFileException;
 import com.github.anrimian.simplemusicplayer.data.utils.Objects;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,11 +16,15 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 
 public class StorageMusicDataSource {
@@ -55,6 +61,17 @@ public class StorageMusicDataSource {
 
     public Observable<Change<List<Composition>>> getChangeObservable() {
         return changeSubject;
+    }
+
+    public Completable deleteComposition(Composition composition) {
+        return getCompositions()
+                .doOnSuccess(compositions -> {
+                    musicProvider.deleteComposition(composition.getFilePath());
+                    compositions.remove(composition.getId());
+                    changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
+                })
+                .toCompletable()
+                .subscribeOn(scheduler);
     }
 
     private void subscribeOnCompositionChanges() {

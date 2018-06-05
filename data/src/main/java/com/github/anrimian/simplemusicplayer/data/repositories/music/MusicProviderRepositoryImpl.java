@@ -38,4 +38,9 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         return Completable.complete()
                 .subscribeOn(scheduler);
     }
+
+    @Override
+    public Completable deleteComposition(Composition composition) {
+        return storageMusicDataSource.deleteComposition(composition);
+    }
 }

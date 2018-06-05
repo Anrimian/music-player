@@ -4,12 +4,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 
+import com.github.anrimian.simplemusicplayer.data.models.exceptions.DeleteFileException;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.exceptions.MusicNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.simplemusicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +111,14 @@ public class StorageMusicProvider {
             return compositions;
         } finally {
             IOUtils.closeSilently(cursor);
+        }
+    }
+
+    public void deleteComposition(String path) {
+        File file = new File(path);
+        boolean deleted = file.delete();
+        if (!deleted) {
+            throw new DeleteFileException("can not delete file: " + path);
         }
     }
 }

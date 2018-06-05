@@ -121,4 +121,26 @@ public class StorageMusicDataSourceTest {
                     return true;
                 });
     }
+
+    @Test
+    public void deleteCompositionTest() {
+        TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+
+        storageMusicDataSource.deleteComposition(getFakeCompositionsMap().get(0L))
+            .test()
+            .assertComplete();
+
+        changeTestObserver.assertValue(change -> {
+            assertEquals(ChangeType.DELETED, change.getChangeType());
+            assertEquals(getFakeCompositionsMap().get(0L), change.getData().get(0));
+            return true;
+        });
+
+        storageMusicDataSource.getCompositions()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(null, compositions.get(0L));
+                    return true;
+                });
+    }
 }

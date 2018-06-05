@@ -208,6 +208,10 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getCompositionChangeObservable();
     }
 
+    public Completable deleteComposition(Composition composition) {
+        return musicProviderRepository.deleteComposition(composition);
+    }
+
     private void onCompositionPrepared(CurrentComposition currentComposition) {
         if (playerStateSubject.getValue() == PLAY) {
             musicPlayerController.resume();
