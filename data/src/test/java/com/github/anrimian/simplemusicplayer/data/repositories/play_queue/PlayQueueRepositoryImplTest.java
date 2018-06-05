@@ -20,7 +20,6 @@ import io.reactivex.subjects.PublishSubject;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.currentComposition;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
@@ -197,7 +196,7 @@ public class PlayQueueRepositoryImplTest {
     public void testCurrentCompositionModifyChange() {
         setPlayQueueTest();
 
-        TestObserver<Change<Composition>> observer = playQueueRepository.getCurrentCompositionChangeObservable()
+        TestObserver<Change<Composition>> observer = playQueueRepository.getCompositionChangeObservable()
                 .test();
 
         changeSubject.onNext(new Change<>(ChangeType.MODIFY, getFakeCompositions()));
@@ -214,7 +213,7 @@ public class PlayQueueRepositoryImplTest {
         setPlayQueueTest();
 
         TestObserver<Change<Composition>> changeObserver = playQueueRepository
-                .getCurrentCompositionChangeObservable()
+                .getCompositionChangeObservable()
                 .test();
 
         TestObserver<CurrentComposition> currentCompositionObserver = playQueueRepository
@@ -237,7 +236,7 @@ public class PlayQueueRepositoryImplTest {
     public void testCurrentCompositionDeleteChangeWithEmptyPlayQueue() {
         setPlayQueueTest();
 
-        TestObserver<Change<Composition>> observer = playQueueRepository.getCurrentCompositionChangeObservable()
+        TestObserver<Change<Composition>> observer = playQueueRepository.getCompositionChangeObservable()
                 .test();
 
         when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(emptyList()));
@@ -258,7 +257,7 @@ public class PlayQueueRepositoryImplTest {
         playQueueRepository.skipToPosition(getFakeCompositions().size() - 1);
 
         TestObserver<Change<Composition>> changeObserver = playQueueRepository
-                .getCurrentCompositionChangeObservable()
+                .getCompositionChangeObservable()
                 .test();
 
         TestObserver<CurrentComposition> currentCompositionObserver = playQueueRepository

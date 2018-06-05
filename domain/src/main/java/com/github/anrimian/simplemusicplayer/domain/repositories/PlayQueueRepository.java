@@ -25,6 +25,8 @@ public interface PlayQueueRepository {
 
     Observable<Change<List<Composition>>> getPlayQueueChangeObservable();
 
+    Observable<Change<Composition>> getCompositionChangeObservable();
+
     void setRandomPlayingEnabled(boolean enabled);
 
     Single<Integer> skipToNext();
@@ -32,6 +34,4 @@ public interface PlayQueueRepository {
     Single<Integer> skipToPrevious();
 
     Completable skipToPosition(int position);
-
-    Observable<Change<Composition>> getCurrentCompositionChangeObservable();
 }

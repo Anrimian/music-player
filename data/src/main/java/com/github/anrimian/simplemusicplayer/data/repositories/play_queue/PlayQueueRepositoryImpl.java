@@ -155,7 +155,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Observable<Change<Composition>> getCurrentCompositionChangeObservable() {
+    public Observable<Change<Composition>> getCompositionChangeObservable() {
         return currentCompositionChangeSubject;
     }
 

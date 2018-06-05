@@ -12,6 +12,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerE
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.List;
 
@@ -44,9 +45,12 @@ public class MusicPlayerInteractor {
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
+
     private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
+
     private Disposable skipDisposable;
+    private Disposable compositionChangeDisposable;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  SettingsRepository settingsRepository,
@@ -83,8 +87,8 @@ public class MusicPlayerInteractor {
             playerStateSubject.onNext(PLAY);
 
 //            if (playerDisposable.size() == 0) {
-                //TODO check how it works in constructor
-                // possible problem - resume before preparing player(too fast start)
+            //TODO check how it works in constructor
+            // possible problem - resume before preparing player(too fast start)
 
 //                playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
 //                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
@@ -196,9 +200,34 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getPlayQueueObservable();
     }
 
+    public Observable<Change<List<Composition>>> getPlayQueueChangeObservable() {
+        return playQueueRepository.getPlayQueueChangeObservable();
+    }
+
+    public Observable<Change<Composition>> getCompositionChangeObservable() {
+        return playQueueRepository.getCompositionChangeObservable();
+    }
+
     private void onCompositionPrepared(CurrentComposition currentComposition) {
         if (playerStateSubject.getValue() == PLAY) {
             musicPlayerController.resume();
+        }
+        subscribeOnCompositionChanges();
+    }
+
+    private void subscribeOnCompositionChanges() {
+        if (compositionChangeDisposable == null) {
+            compositionChangeDisposable = playQueueRepository.getCompositionChangeObservable()
+                    .subscribe(this::onCurrentCompositionChanged);
+        }
+    }
+
+    private void onCurrentCompositionChanged(Change<Composition> change) {
+        switch (change.getChangeType()) {//TODO check replace composition
+            case DELETED: {
+                musicPlayerController.stop();
+                break;
+            }
         }
     }
 
