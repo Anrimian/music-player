@@ -89,8 +89,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
-
-        subscribeOnPlayerChanges();
     }
 
     @Override
@@ -104,6 +102,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 handleMediaButtonAction(keyEvent);
             }
         }
+        subscribeOnPlayerChanges();
         return START_NOT_STICKY;
     }
 
