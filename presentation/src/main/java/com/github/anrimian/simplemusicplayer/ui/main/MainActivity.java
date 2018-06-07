@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicServiceManager;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (hasFilePermissions()) {
+            MusicServiceManager.initialize();
             goToMainScreen();
         } else {
             goToStartScreen();

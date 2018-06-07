@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.ServiceManager;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicServiceManager;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
 
 import javax.annotation.Nonnull;
@@ -42,7 +42,7 @@ public class AppModule {
     @Provides
     @Nonnull
     @Singleton
-    ServiceManager serviceManager(Context context, MusicPlayerInteractor musicPlayerInteractor) {
-        return new ServiceManager(context, musicPlayerInteractor);
+    MusicServiceManager serviceManager(Context context, MusicPlayerInteractor musicPlayerInteractor) {
+        return new MusicServiceManager(context, musicPlayerInteractor);
     }
 }
