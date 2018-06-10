@@ -35,7 +35,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Completable onErrorWithComposition(Throwable throwable, Composition composition) {
-        return Completable.complete()//TODO write error about composition
+        return Completable.complete()//TODO write error about composition. Handle deleted compositions
                 .subscribeOn(scheduler);
     }
 

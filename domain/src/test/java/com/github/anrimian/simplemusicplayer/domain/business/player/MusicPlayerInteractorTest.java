@@ -38,6 +38,7 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -218,7 +219,7 @@ public class MusicPlayerInteractorTest {
                 .onErrorWithComposition(throwable, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
         inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
-        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController, times(1)).resume();
 
         playerStateSubscriber.assertValues(IDLE, PLAY);
     }

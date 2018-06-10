@@ -33,7 +33,7 @@ public class StorageMusicProvider {
 
     public Observable<Map<Long, Composition>> getChangeObservable() {
         return RxContentObserver.getObservable(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
-                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)
+                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)//TODO not this
                 .map(o -> getCompositions());
     }
 
@@ -114,7 +114,7 @@ public class StorageMusicProvider {
         }
     }
 
-    public void deleteComposition(String path) {
+    public void deleteComposition(String path) {//TODO update media store and not become update
         File file = new File(path);
         boolean deleted = file.delete();
         if (!deleted) {

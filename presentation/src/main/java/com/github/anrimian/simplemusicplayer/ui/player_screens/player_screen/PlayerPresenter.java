@@ -6,6 +6,7 @@ import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerI
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable trackStateDisposable;
     private Disposable currentCompositionDisposable;
+    private Disposable playQueueChangeDisposable;
 
     private final List<Composition> playQueue = new ArrayList<>();
     private Composition composition;
@@ -106,6 +108,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.seekTo(position);
     }
 
+    void onDeleteCompositionButtonClicked() {
+        musicPlayerInteractor.deleteComposition(composition)
+                .observeOn(uiScheduler)
+                .subscribe();//TODO displayError
+    }
+
     public void onSeekStart() {
         musicPlayerInteractor.onSeekStarted();
     }
@@ -177,6 +185,29 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showMusicControls(!playQueue.isEmpty());
 
         subscribeOnCurrentCompositionChanging();
+        subscribeOnPlayQueueChanged();
+    }
+
+    private void subscribeOnPlayQueueChanged() {
+        if (playQueueChangeDisposable != null) {
+            playQueueChangeDisposable.dispose();//TODO add to presenter disposable later
+        }
+        playQueueChangeDisposable = musicPlayerInteractor.getPlayQueueChangeObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onPlayQueueChanged);
+    }
+
+    private void onPlayQueueChanged(Change<List<Composition>> change) {
+        List<Composition> compositions = change.getData();
+        switch (change.getChangeType()) {
+            case DELETED: {
+                for (Composition composition: compositions) {
+                    int index = playQueue.indexOf(composition);
+                    playQueue.remove(index);
+                    getViewState().notifyPlayQueueItemRemoved(index);
+                }
+            }
+        }
     }
 
     private void subscribeOnTrackPositionChanging() {

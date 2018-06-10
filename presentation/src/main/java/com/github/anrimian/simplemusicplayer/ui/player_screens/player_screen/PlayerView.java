@@ -47,4 +47,7 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showShareMusicDialog(String filePath);
+
+    @StateStrategyType(SkipStrategy.class)
+    void notifyPlayQueueItemRemoved(int index);
 }

@@ -25,6 +25,7 @@
     <string name="content_description_shuffle">Перемешать композиции</string>
     <string name="unknown_author">Неизвестный исполнитель</string>
     <string name="preparing_for_launch">Подготовка к запуску…</string>
+    <string name="delete">Удалить</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

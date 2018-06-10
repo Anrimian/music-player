@@ -28,7 +28,6 @@ public class PlayQueue {
             compositionMap.put(id, composition);
             initialPlayList.put(id, i);
         }
-
         shuffle();
     }
 

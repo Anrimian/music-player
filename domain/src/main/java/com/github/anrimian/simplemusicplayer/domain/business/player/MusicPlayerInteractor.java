@@ -245,8 +245,6 @@ public class MusicPlayerInteractor {
                         .subscribe(currentPosition -> {
                             if (currentPosition == 0) {
                                 stop();
-                            } else {
-                                musicPlayerController.resume();
                             }
                             skipDisposable = null;
                         });
@@ -266,9 +264,7 @@ public class MusicPlayerInteractor {
         if (skipDisposable == null) {
             skipDisposable = playQueueRepository.skipToNext()
                     .subscribe(currentPosition -> {
-                        if (currentPosition != 0 || settingsRepository.isInfinitePlayingEnabled()) {
-                            musicPlayerController.resume();
-                        } else {
+                        if (currentPosition == 0 && !settingsRepository.isInfinitePlayingEnabled()) {
                             stop();
                         }
                         skipDisposable = null;

@@ -153,7 +153,7 @@ public class PlayQueueDataSource {
             long id = deletedComposition.getId();
             if (playQueue.getCompositionById(id) != null) {
                 playQueue.deleteComposition(id);
-                playQueueDao.deletePlayQueueEntity(id);
+                playQueueDao.deletePlayQueueEntity(id);//TODO also update other columns
                 compositionsToNotify.add(deletedComposition);
             }
         }

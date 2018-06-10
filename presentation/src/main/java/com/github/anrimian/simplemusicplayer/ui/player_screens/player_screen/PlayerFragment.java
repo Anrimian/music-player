@@ -454,6 +454,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         startActivity(Intent.createChooser(intent, getString(R.string.share)));
     }
 
+    @Override
+    public void notifyPlayQueueItemRemoved(int index) {
+        playQueueAdapter.notifyItemRemoved(index);
+    }
+
     private void onBottomPanelClicked() {
         if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
@@ -509,6 +514,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 case R.id.menu_share: {
                     presenter.onShareCompositionButtonClicked();
                     return true;
+                }
+                case R.id.menu_delete: {
+//                    presenter.onDeleteCompositionButtonClicked();//TODO also show dialog
+//                    return true;
                 }
             }
             return false;
