@@ -11,6 +11,8 @@ import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,13 +33,18 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
+import static org.mockito.internal.verification.VerificationModeFactory.atMost;
 
 public class PlayQueueDataSourceTest {
 
@@ -47,6 +54,8 @@ public class PlayQueueDataSourceTest {
     private final Scheduler scheduler = Schedulers.trampoline();
 
     private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
+
+    private InOrder inOrder = Mockito.inOrder(playQueueDao);
 
     private PlayQueueDataSource playQueueDataSource = new PlayQueueDataSource(playQueueDao,
             storageMusicDataSource,
@@ -239,9 +248,12 @@ public class PlayQueueDataSourceTest {
                 getFakeCompositions().get(1),
                 unexcitedComposition)
         ));
-
         verify(playQueueDao).deletePlayQueueEntity(eq(0L));
+        verify(playQueueDao, atLeastOnce()).updateShuffledPosition(anyLong(), anyInt());
+        verify(playQueueDao, atLeastOnce()).updatePosition(anyLong(), anyInt());
         verify(playQueueDao).deletePlayQueueEntity(eq(1L));
+        verify(playQueueDao, atLeastOnce()).updateShuffledPosition(anyLong(), anyInt());
+        verify(playQueueDao, atLeastOnce()).updatePosition(anyLong(), anyInt());
 
         changeObserver.assertValue(change -> {
             assertEquals(DELETED, change.getChangeType());

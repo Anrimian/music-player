@@ -26,4 +26,10 @@ public interface PlayQueueDao {
 
     @Query("DELETE FROM play_queue WHERE id = :id")
     void deletePlayQueueEntity(long id);
+
+    @Query("UPDATE play_queue SET shuffledPosition = :newPosition WHERE id = :id")
+    void updateShuffledPosition(long id, int newPosition);
+
+    @Query("UPDATE play_queue SET position = :newPosition WHERE id = :id")
+    void updatePosition(long id, int newPosition);
 }

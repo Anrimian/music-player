@@ -81,7 +81,7 @@ public class PlayQueueDataSource {
         if (settingsPreferences.isRandomPlayingEnabled()) {
             return playQueue.getShuffledPlayList();
         }
-        return playQueue.getInitialPlayList();
+        return playQueue.getPlayList();
     }
 
     /**
@@ -153,7 +153,32 @@ public class PlayQueueDataSource {
             long id = deletedComposition.getId();
             if (playQueue.getCompositionById(id) != null) {
                 playQueue.deleteComposition(id);
-                playQueueDao.deletePlayQueueEntity(id);//TODO also update other columns
+                playQueueDao.deletePlayQueueEntity(id);
+
+                Map<Long, Integer> positionMap = playQueue.getPositionMap();
+                Map<Long, Integer> shuffledPositionMap = playQueue.getShuffledPositionMap();
+                int freeShuffledPosition = shuffledPositionMap.remove(id);
+                for (Map.Entry<Long, Integer> entry:  shuffledPositionMap.entrySet()) {
+                    Long key = entry.getKey();
+                    Integer position = entry.getValue();
+                    if (position > freeShuffledPosition) {
+                        int newPosition = position - 1;
+                        shuffledPositionMap.put(key, newPosition);
+                        playQueueDao.updateShuffledPosition(key, newPosition);
+                    }
+                }
+
+                int freeInitialPosition = positionMap.remove(id);
+                for (Map.Entry<Long, Integer> entry:  positionMap.entrySet()) {
+                    Long key = entry.getKey();
+                    Integer position = entry.getValue();
+                    if (position > freeInitialPosition) {
+                        int newPosition = position - 1;
+                        positionMap.put(key, newPosition);
+                        playQueueDao.updatePosition(key, newPosition);
+                    }
+                }
+
                 compositionsToNotify.add(deletedComposition);
             }
         }

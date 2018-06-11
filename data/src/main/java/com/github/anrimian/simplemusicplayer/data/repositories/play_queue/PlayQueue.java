@@ -14,28 +14,28 @@ import javax.annotation.Nullable;
 
 public class PlayQueue {
 
-    private final Map<Long, Integer> initialPlayList;
-    private final Map<Long, Integer> shuffledPlayList;
+    private final Map<Long, Integer> positionMap;
+    private final Map<Long, Integer> shuffledPositionMap;
     private final Map<Long, Composition> compositionMap;
 
     PlayQueue(List<Composition> compositions) {
         compositionMap = new HashMap<>(compositions.size());
-        initialPlayList = new HashMap<>(compositions.size());
-        shuffledPlayList = new HashMap<>(compositions.size());
+        positionMap = new HashMap<>(compositions.size());
+        shuffledPositionMap = new HashMap<>(compositions.size());
         for (int i = 0; i < compositions.size(); i++) {
             Composition composition = compositions.get(i);
             long id = composition.getId();
             compositionMap.put(id, composition);
-            initialPlayList.put(id, i);
+            positionMap.put(id, i);
         }
         shuffle();
     }
 
-    PlayQueue(Map<Long, Integer> initialPlayList,
-              Map<Long, Integer> shuffledPlayList,
+    PlayQueue(Map<Long, Integer> positionMap,
+              Map<Long, Integer> shuffledPositionMap,
               Map<Long, Composition> compositionMap) {
-        this.initialPlayList = initialPlayList;
-        this.shuffledPlayList = shuffledPlayList;
+        this.positionMap = positionMap;
+        this.shuffledPositionMap = shuffledPositionMap;
         this.compositionMap = compositionMap;
     }
 
@@ -44,30 +44,38 @@ public class PlayQueue {
     }
 
     public int getPosition(Composition composition) {
-        return initialPlayList.get(composition.getId());
+        return positionMap.get(composition.getId());
     }
 
     public int getShuffledPosition(Composition composition) {
-        return shuffledPlayList.get(composition.getId());
+        return shuffledPositionMap.get(composition.getId());
     }
 
     public List<Composition> getShuffledPlayList() {
-        return createList(shuffledPlayList);
+        return createList(shuffledPositionMap);
     }
 
-    public List<Composition> getInitialPlayList() {
-        return createList(initialPlayList);
+    public List<Composition> getPlayList() {
+        return createList(positionMap);
+    }
+
+    public Map<Long, Integer> getPositionMap() {
+        return positionMap;
+    }
+
+    public Map<Long, Integer> getShuffledPositionMap() {
+        return shuffledPositionMap;
     }
 
     public void shuffle() {
-        shuffledPlayList.clear();
+        shuffledPositionMap.clear();
 
-        List<Integer> valueList = new ArrayList<>(initialPlayList.values());
+        List<Integer> valueList = new ArrayList<>(positionMap.values());
         Collections.shuffle(valueList);
 
         Iterator<Integer> valueIterator = valueList.iterator();
-        for (Long id: initialPlayList.keySet()) {
-            shuffledPlayList.put(id, valueIterator.next());
+        for (Long id: positionMap.keySet()) {
+            shuffledPositionMap.put(id, valueIterator.next());
         }
     }
 
@@ -82,28 +90,14 @@ public class PlayQueue {
 
     public void deleteComposition(long id) {
         compositionMap.remove(id);
-
-        int freeShuffledPosition = shuffledPlayList.remove(id);
-        for (Map.Entry<Long, Integer> entry:  shuffledPlayList.entrySet()) {
-            if (entry.getValue() > freeShuffledPosition) {
-                shuffledPlayList.put(entry.getKey(), entry.getValue() - 1);
-            }
-        }
-
-        int freeInitialPosition = initialPlayList.remove(id);
-        for (Map.Entry<Long, Integer> entry:  initialPlayList.entrySet()) {
-            if (entry.getValue() > freeInitialPosition) {
-                initialPlayList.put(entry.getKey(), entry.getValue() - 1);
-            }
-        }
     }
 
     public void moveCompositionToTopInShuffledList(Composition composition) {
         long id = composition.getId();
-        for (Map.Entry<Long, Integer> entry: shuffledPlayList.entrySet()) {
+        for (Map.Entry<Long, Integer> entry: shuffledPositionMap.entrySet()) {
             if (entry.getValue() == 0) {
-                int previousPosition = shuffledPlayList.put(id, 0);
-                shuffledPlayList.put(entry.getKey(), previousPosition);
+                int previousPosition = shuffledPositionMap.put(id, 0);
+                shuffledPositionMap.put(entry.getKey(), previousPosition);
                 break;
             }
         }
