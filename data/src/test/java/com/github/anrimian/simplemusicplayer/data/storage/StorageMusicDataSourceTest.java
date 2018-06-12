@@ -3,7 +3,6 @@ package com.github.anrimian.simplemusicplayer.data.storage;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeableMap;
 
 import org.junit.Before;
 import org.junit.Test;

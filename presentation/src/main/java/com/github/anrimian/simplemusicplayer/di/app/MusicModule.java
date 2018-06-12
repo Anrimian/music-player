@@ -14,6 +14,7 @@ import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProvid
 import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueDataSource;
 import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
@@ -41,16 +42,18 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerInteractor provideMusicPlayerInteractorNew(MusicPlayerController musicPlayerController,
-                                                          SettingsRepository settingsRepository,
-                                                          SystemMusicController systemMusicController,
-                                                          PlayQueueRepository playQueueRepository,
-                                                          MusicProviderRepository musicProviderRepository) {
+    MusicPlayerInteractor musicPlayerInteractor(MusicPlayerController musicPlayerController,
+                                                SettingsRepository settingsRepository,
+                                                SystemMusicController systemMusicController,
+                                                PlayQueueRepository playQueueRepository,
+                                                MusicProviderRepository musicProviderRepository,
+                                                Analytics analytics) {
         return new MusicPlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
                 playQueueRepository,
-                musicProviderRepository);
+                musicProviderRepository,
+                analytics);
     }
 
     @Provides
@@ -69,7 +72,10 @@ class MusicModule {
                                             StorageMusicDataSource storageMusicDataSource,
                                             SettingsPreferences settingsPreferences,
                                             @Named(DB_SCHEDULER) Scheduler dbScheduler) {
-        return new PlayQueueDataSource(playQueueDao, storageMusicDataSource, settingsPreferences, dbScheduler);
+        return new PlayQueueDataSource(playQueueDao,
+                storageMusicDataSource,
+                settingsPreferences,
+                dbScheduler);
     }
 
     @Provides

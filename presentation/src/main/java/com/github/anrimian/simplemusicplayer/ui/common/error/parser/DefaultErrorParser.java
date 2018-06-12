@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.StringRes;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 
 /**
@@ -12,10 +13,12 @@ import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 
 public class DefaultErrorParser implements ErrorParser {
 
-    private Context context;
+    private final Context context;
+    private final Analytics analytics;
 
-    public DefaultErrorParser(Context context) {
+    public DefaultErrorParser(Context context, Analytics analytics) {
         this.context = context;
+        this.analytics = analytics;
     }
 
     @Override
@@ -28,13 +31,8 @@ public class DefaultErrorParser implements ErrorParser {
         return new ErrorCommand(getString(R.string.unexpected_error));
     }
 
-    protected void logException(Throwable throwable) {
-        throwable.printStackTrace();
-//        if (Fabric.isInitialized()) {//TODO debug/release versions
-//            if (Crashlytics.getInstance() != null) {
-//                Crashlytics.logException(throwable);
-//            }
-//        }
+    public void logException(Throwable throwable) {
+        analytics.processNonFatalError(throwable);
     }
 
     private String getString(@StringRes int resId) {

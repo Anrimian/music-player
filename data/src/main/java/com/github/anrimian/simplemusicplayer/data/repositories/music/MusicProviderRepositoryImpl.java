@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 import java.util.ArrayList;
@@ -34,13 +35,20 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Completable onErrorWithComposition(Throwable throwable, Composition composition) {
-        return Completable.complete()//TODO write error about composition. Handle deleted compositions
+    public Completable processErrorWithComposition(Throwable throwable, Composition composition) {
+        return processCompositionError(throwable, composition)//TODO write error about composition. Handle deleted compositions
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable deleteComposition(Composition composition) {
         return storageMusicDataSource.deleteComposition(composition);
+    }
+
+    private Completable processCompositionError(Throwable throwable, Composition composition) {
+        if (throwable instanceof FileNodeNotFoundException) {
+            return storageMusicDataSource.deleteComposition(composition);
+        }
+        return Completable.error(new IllegalStateException("unexpected error with composition: " + throwable));
     }
 }

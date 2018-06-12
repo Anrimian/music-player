@@ -93,7 +93,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public void seekTo(long position) {//TODO when we save position?
+    public void seekTo(long position) {
         player.seekTo(position);
         trackPositionSubject.onNext(position);
         uiStatePreferences.setTrackPosition(player.getCurrentPosition());

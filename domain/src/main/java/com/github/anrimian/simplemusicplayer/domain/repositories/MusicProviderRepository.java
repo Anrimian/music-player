@@ -15,7 +15,7 @@ public interface MusicProviderRepository {
 
     Single<List<Composition>> getAllCompositions();
 
-    Completable onErrorWithComposition(Throwable throwable, Composition composition);
+    Completable processErrorWithComposition(Throwable throwable, Composition composition);
 
     Completable deleteComposition(Composition composition);
 }

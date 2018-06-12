@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
+import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
@@ -42,6 +43,7 @@ public class MusicPlayerInteractor {
     private final SettingsRepository settingsRepository;
     private final PlayQueueRepository playQueueRepository;
     private final MusicProviderRepository musicProviderRepository;
+    private final Analytics analytics;
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
@@ -56,12 +58,14 @@ public class MusicPlayerInteractor {
                                  SettingsRepository settingsRepository,
                                  SystemMusicController systemMusicController,
                                  PlayQueueRepository playQueueRepository,
-                                 MusicProviderRepository musicProviderRepository) {
+                                 MusicProviderRepository musicProviderRepository,
+                                 Analytics analytics) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
+        this.analytics = analytics;
 
         playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
                 .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
@@ -239,35 +243,37 @@ public class MusicPlayerInteractor {
         if (playerEvent instanceof FinishedEvent) {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
-            writeErrorAboutCurrentComposition(((ErrorEvent) playerEvent).getThrowable());
+            processErrorAboutCurrentComposition(((ErrorEvent) playerEvent).getThrowable());
             if (skipDisposable == null) {
                 skipDisposable = playQueueRepository.skipToNext()
+                        .doFinally(() -> skipDisposable = null)
                         .subscribe(currentPosition -> {
                             if (currentPosition == 0) {
                                 stop();
                             }
-                            skipDisposable = null;
                         });
             }
         }
     }
 
-    private void writeErrorAboutCurrentComposition(Throwable throwable) {
+    private void processErrorAboutCurrentComposition(Throwable throwable) {
         playQueueRepository.getCurrentComposition()
                 .map(CurrentComposition::getComposition)
                 .flatMapCompletable(composition ->
-                        musicProviderRepository.onErrorWithComposition(throwable, composition))
+                        musicProviderRepository.processErrorWithComposition(throwable, composition))
+                .doOnError(analytics::processNonFatalError)
+                .onErrorComplete()
                 .subscribe();
     }
 
     private void onCompositionPlayFinished() {
         if (skipDisposable == null) {
             skipDisposable = playQueueRepository.skipToNext()
+                    .doFinally(() -> skipDisposable = null)
                     .subscribe(currentPosition -> {
                         if (currentPosition == 0 && !settingsRepository.isInfinitePlayingEnabled()) {
                             stop();
                         }
-                        skipDisposable = null;
                     });
         }
     }

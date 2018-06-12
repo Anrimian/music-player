@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
+import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
@@ -52,6 +53,7 @@ public class MusicPlayerInteractorTest {
     private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
     private MusicProviderRepository musicProviderRepository = mock(MusicProviderRepository.class);
     private SystemMusicController systemMusicController = mock(SystemMusicController.class);
+    private Analytics analytics = mock(Analytics.class);
 
     private MusicPlayerInteractor musicPlayerInteractor;
 
@@ -80,7 +82,7 @@ public class MusicPlayerInteractorTest {
         when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
         when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
 
-        when(musicProviderRepository.onErrorWithComposition(any(), any()))
+        when(musicProviderRepository.processErrorWithComposition(any(), any()))
                 .thenReturn(Completable.complete());
 
         when(systemMusicController.requestAudioFocus()).thenReturn(audioFocusSubject);
@@ -90,7 +92,8 @@ public class MusicPlayerInteractorTest {
                 settingsRepository,
                 systemMusicController,
                 playQueueRepository,
-                musicProviderRepository);
+                musicProviderRepository,
+                analytics);
 
         playerStateSubscriber = musicPlayerInteractor.getPlayerStateObservable()
                 .test();
@@ -216,7 +219,7 @@ public class MusicPlayerInteractorTest {
 
         inOrder.verify(playQueueRepository).getCurrentComposition();
         inOrder.verify(musicProviderRepository)
-                .onErrorWithComposition(throwable, getFakeCompositions().get(0));
+                .processErrorWithComposition(throwable, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
         inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
         inOrder.verify(musicPlayerController, times(1)).resume();
@@ -300,7 +303,7 @@ public class MusicPlayerInteractorTest {
 
         inOrder.verify(playQueueRepository).getCurrentComposition();
         inOrder.verify(musicProviderRepository)
-                .onErrorWithComposition(throwable, getFakeCompositions().get(0));
+                .processErrorWithComposition(throwable, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
         inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
         inOrder.verify(musicPlayerController, never()).resume();
