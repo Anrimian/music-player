@@ -101,7 +101,8 @@ public class StorageLibraryInteractor {
 
     private Single<FileTree<Composition>> getMusicFileTree() {
         if (musicFileTree == null) {
-            return createMusicFileTree().doOnSuccess(musicFileTree -> this.musicFileTree = musicFileTree);
+            return createMusicFileTree()
+                    .doOnSuccess(musicFileTree -> this.musicFileTree = musicFileTree);
         } else {
             return Single.just(musicFileTree);
         }

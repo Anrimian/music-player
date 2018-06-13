@@ -74,7 +74,7 @@ public class RxNode<K, T> {
     }
 
     public void removeNode(K key) {
-        RxNode<K, T> node = findChild(key);
+        RxNode<K, T> node = getChild(key);
         if (node != null) {
             removeNode(node);
         }
@@ -87,7 +87,7 @@ public class RxNode<K, T> {
     }
 
     @Nullable
-    public RxNode<K, T> findChild(K key) {
+    public RxNode<K, T> getChild(K key) {
         return nodes.get(key);
     }
 
