@@ -13,7 +13,7 @@ public class FolderTreeMapper {
 //        }
 //        FolderTreeInfo folderTreeInfo = new FolderTreeInfo();
 //        folderTreeInfo.setNodes(folderNodes);
-//        folderTreeInfo.setChangeObservable(node.getChangeObservable().map(this::toFolderNode));
+//        folderTreeInfo.setChangeObservable(node.getChildChangeObservable().map(this::toFolderNode));
 //        return folderTreeInfo;
 //    }
 //

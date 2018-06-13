@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer;
+package com.github.anrimian.simplemusicplayer.infrastructure.analytics;
 
 import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 

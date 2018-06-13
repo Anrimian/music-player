@@ -10,7 +10,7 @@ public class FolderTreeInfo {
     private List<FolderNode> nodes;
 
     @Nonnull
-    public Observable<Change<FolderNode>> getChangeObservable() {
+    public Observable<Change<FolderNode>> getChildChangeObservable() {
         return changeObservable;
     }
 

@@ -1,9 +1,29 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
+
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.ADDED;
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
+import static io.reactivex.subjects.PublishSubject.create;
+import static java.util.Collections.singletonList;
+
 public class RxNode<K, T> {
 
-    /*    private final PublishSubject<Change<RxNode<K, T>>> changeSubject = PublishSubject.create();
-    private final List<RxNode<K, T>> nodes = new LinkedList<>();
+    private final PublishSubject<Change<List<RxNode<K, T>>>> childChangeSubject = create();
+//    private final PublishSubject<Change<RxNode<K, T>>> selfChangeSubject = create();
+
+    private final LinkedHashMap<K, RxNode<K, T>> nodes = new LinkedHashMap<>();
 
     @Nonnull
     private K key;
@@ -12,10 +32,9 @@ public class RxNode<K, T> {
     @Nullable
     private RxNode<K, T> parent;
 
-    public RxNode(@Nonnull K key, T data, @Nullable RxNode<K, T> parent) {
+    public RxNode(@Nonnull K key, T data) {
         this.key = key;
         this.data = data;
-        this.parent = parent;
     }
 
     @Nullable
@@ -24,8 +43,8 @@ public class RxNode<K, T> {
     }
 
     @Nonnull
-    public List<RxNode<K, T>> getNodes() {
-        return nodes;
+    public Collection<RxNode<K, T>> getNodes() {
+        return nodes.values();
     }
 
     @Nonnull
@@ -37,14 +56,16 @@ public class RxNode<K, T> {
         return data;
     }
 
-    public Observable<Change<RxNode<K, T>>> getChangeObservable() {
-        return changeSubject;
+    public Observable<Change<List<RxNode<K, T>>>> getChildChangeObservable() {
+        return childChangeSubject;
     }
 
     public void addNode(RxNode<K, T> node) {
-        nodes.add(node);
-        changeSubject.onNext(new Change<>(ADDED, node));
-        notifyNodeUpdated(this);
+        node.parent = this;
+        nodes.put(node.getKey(), node);
+//        selfChangeSubject.onNext(new Change<>(MODIFY, this));
+        childChangeSubject.onNext(new Change<>(ADDED, singletonList(node)));
+//        notifyNodeUpdated(this);
     }
 
     public void setData(T data) {
@@ -60,23 +81,18 @@ public class RxNode<K, T> {
     }
 
     public void removeNode(RxNode<K, T> node) {
-        nodes.remove(node);
-        changeSubject.onNext(new Change<>(DELETED, node));
+        nodes.remove(node.getKey());
+        childChangeSubject.onNext(new Change<>(DELETED, singletonList(node)));
         notifyNodeUpdated(this);
     }
 
     @Nullable
     public RxNode<K, T> findChild(K key) {
-        for (RxNode<K, T> node: nodes) {
-            if (node.getKey().equals(key)) {
-                return node;
-            }
-        }
-        return null;
+        return nodes.get(key);
     }
 
     private void notifyNodeUpdated(RxNode<K, T> node) {
-        changeSubject.onNext(new Change<>(MODIFY, node));
+        childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
         RxNode<K, T> parent = getParent();
         if (parent != null) {
             parent.notifyNodeUpdated(this);
@@ -90,7 +106,20 @@ public class RxNode<K, T> {
                 ", key=" + key +
                 ", data=" + data +
                 '}';
-    }*/
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        RxNode<?, ?> rxNode = (RxNode<?, ?>) o;
+
+        return key.equals(rxNode.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return key.hashCode();
+    }
 }

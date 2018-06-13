@@ -3,7 +3,7 @@ package com.github.anrimian.simplemusicplayer.di.app;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.github.anrimian.simplemusicplayer.AnalyticsImpl;
+import com.github.anrimian.simplemusicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicServiceManager;
@@ -44,7 +44,8 @@ public class AppModule {
     @Provides
     @Nonnull
     @Singleton
-    MusicServiceManager serviceManager(Context context, MusicPlayerInteractor musicPlayerInteractor) {
+    MusicServiceManager serviceManager(Context context,
+                                       MusicPlayerInteractor musicPlayerInteractor) {
         return new MusicServiceManager(context, musicPlayerInteractor);
     }
 

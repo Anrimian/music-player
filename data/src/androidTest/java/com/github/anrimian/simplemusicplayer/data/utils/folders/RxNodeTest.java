@@ -42,7 +42,7 @@ public class RxNodeTest {
     public void addFolderTest() throws Exception {
         TestObserver<Change<FolderNode>> testObserver = folderTree.getFolders(folder1)
                 .blockingGet()
-                .getChangeObservable()
+                .getChildChangeObservable()
                 .test();
 
         Folder folder12 = new Folder();
@@ -64,11 +64,11 @@ public class RxNodeTest {
     public void modifyFolderTest() throws Exception {
         TestObserver<Change<FolderNode>> testObserver = folderTree.getFolders(folder1)
                 .blockingGet()
-                .getChangeObservable()
+                .getChildChangeObservable()
                 .test();
         TestObserver<Change<FolderNode>> testRootObserver = folderTree.getFolders(null)
                 .blockingGet()
-                .getChangeObservable()
+                .getChildChangeObservable()
                 .test();
 
         folder11.setName("test");
@@ -93,7 +93,7 @@ public class RxNodeTest {
     public void removeFolderTest() throws Exception {
         TestObserver<Change<FolderNode>> testObserver = folderTree.getFolders(folder1)
                 .blockingGet()
-                .getChangeObservable()
+                .getChildChangeObservable()
                 .test();
 
         changeFolderSubject.onNext(new Change<>(ChangeType.DELETED, folder11));
@@ -111,7 +111,7 @@ public class RxNodeTest {
     public void removeChildFolderTest() throws Exception {
         TestObserver<Change<FolderNode>> testObserver = folderTree.getFolders(folder1)
                 .blockingGet()
-                .getChangeObservable()
+                .getChildChangeObservable()
                 .test();
 
         changeFolderSubject.onNext(new Change<>(ChangeType.DELETED, folder111));
