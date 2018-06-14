@@ -43,7 +43,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
 
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
-    private final PlayerEventListener playerEventListener = new PlayerEventListener(playerEventSubject);
 
     private final SimpleExoPlayer player;
     private final UiStatePreferences uiStatePreferences;
@@ -57,12 +56,14 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
+
+        PlayerEventListener playerEventListener = new PlayerEventListener(playerEventSubject);
         player.addListener(playerEventListener);
     }
 
     @Override
     public Observable<PlayerEvent> getEventsObservable() {
-        return playerEventListener.getEventsObservable();
+        return playerEventSubject;
     }
 
     @Override

@@ -84,8 +84,4 @@ public class PlayerEventListener implements Player.EventListener {
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
 
     }
-
-    public Observable<PlayerEvent> getEventsObservable() {
-        return subject;
-    }
 }

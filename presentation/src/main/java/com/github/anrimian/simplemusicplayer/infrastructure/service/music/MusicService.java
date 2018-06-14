@@ -168,7 +168,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     //TODO can be invalid position in new track(new track emits first), fix later. Maybe don't emit position so often, save on pause/stop?
     private void onTrackInfoChanged(TrackInfo info) {
         stateBuilder.setState(info.getState(), info.getTrackPosition(), 1);
-        mediaSession.setPlaybackState(stateBuilder.build());
+        mediaSession.setPlaybackState(stateBuilder.build());//TODO maybe state can set only in active session?
     }
 
     private void onCurrentCompositionChanged(Composition composition) {
@@ -186,15 +186,15 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private void onPlayerStateChanged(PlayerInfo info) {
         switch (info.getState()) {
             case STATE_PLAYING: {
-                mediaSession.setActive(true);
                 startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(info));
+                mediaSession.setActive(true);
                 break;
             }
             case STATE_STOPPED:
             case STATE_PAUSED: {
                 notificationsDisplayer.updateForegroundNotification(info);
-                mediaSession.setActive(false);
                 stopForeground(false);
+                mediaSession.setActive(false);
                 break;
             }
         }
