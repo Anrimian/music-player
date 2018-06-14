@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
 
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
@@ -20,39 +21,32 @@ public class MusicFolderDataSource {
     private final StorageMusicDataSource storageMusicDataSource;
 
     @Nullable
-    private RxNode<String, Composition> root;
+    private RxNode<String> root;
 
     public MusicFolderDataSource(StorageMusicDataSource storageMusicDataSource) {
         this.storageMusicDataSource = storageMusicDataSource;
     }
 
-    public Single<List<FileSource>> getMusicInPath(@Nullable String path) {
+    public Single<List<NodeData>> getMusicInPath(@Nullable String path) {
         return getMusicFileTree()
                 .map(tree -> getFilesListByPath(path));
     }
 
-    private List<FileSource> getFilesListByPath(@Nullable String path) {
-        RxNode<String, Composition> targetNode = findNodeByPath(path);
-        List<FileSource> musicList = new ArrayList<>();
-        for (RxNode<String, Composition> node : targetNode.getNodes()) {
-            FileSource fileSource;
-            Composition data = node.getData();
-            if (data == null) {
-                fileSource = new FolderFileSource(node.getKey(), 0);
-            } else {
-                fileSource = new MusicFileSource(data);
-            }
-            musicList.add(fileSource);
+    private List<NodeData> getFilesListByPath(@Nullable String path) {
+        RxNode<String> targetNode = findNodeByPath(path);
+        List<NodeData> fileList = new ArrayList<>();
+        for (RxNode<String> node : targetNode.getNodes()) {
+            fileList.add(node.getData());
         }
-        return musicList;
+        return fileList;
     }
 
-    private RxNode<String, Composition> findNodeByPath(@Nullable String fullPath) {
+    private RxNode<String> findNodeByPath(@Nullable String fullPath) {
         if (fullPath == null) {
             return root;
         }
-        RxNode<String, Composition> target = root;
-        RxNode<String, Composition> found = null;
+        RxNode<String> target = root;
+        RxNode<String> found = null;
         for (String partialPath: fullPath.split("/")) {
             found = target.getChild(partialPath);
             if (found != null) {
@@ -62,7 +56,7 @@ public class MusicFolderDataSource {
         return found;
     }
 
-    private Single<RxNode<String, Composition>> getMusicFileTree() {
+    private Single<RxNode<String>> getMusicFileTree() {
         return Single.fromCallable(() -> {
             if (root == null) {
                 root = createMusicFileTree();
@@ -71,29 +65,30 @@ public class MusicFolderDataSource {
         });
     }
 
-    private RxNode<String, Composition> createMusicFileTree() {
-        RxNode<String, Composition> root = new RxNode<>(null, null);
+    private RxNode<String> createMusicFileTree() {
+        RxNode<String> root = new RxNode<>(null, null);
         for (Composition composition: storageMusicDataSource.getCompositionsMap().values()) {
             String path = composition.getFilePath();
 
             getParentForPath(root, path, (node, partialPath) ->
-                    node.addNode(new RxNode<>(partialPath, composition))
+                    node.addNode(new RxNode<>(partialPath, new CompositionNode(composition)))
             );
         }
         return root;
     }
 
-    private void getParentForPath(RxNode<String, Composition> root,
+    private void getParentForPath(RxNode<String> root,
                                   String path,
                                   NodeCallback nodeCallback) {
-        RxNode<String, Composition> target = root;
+        RxNode<String> target = root;
 
         String[] partialPaths = path.split("/");
         for (int i = 0; i < partialPaths.length - 1; i++) {
             String partialPath = partialPaths[i];
-            RxNode<String, Composition> child = target.getChild(partialPath);
+            RxNode<String> child = target.getChild(partialPath);
             if (child == null) {
-                child = new RxNode<>(partialPath, null);
+                String folderPath = getPath(partialPaths, i);
+                child = new RxNode<>(partialPath, new FolderNode(folderPath));
                 target.addNode(child);
             }
             target = child;
@@ -101,9 +96,20 @@ public class MusicFolderDataSource {
         nodeCallback.onNodeFound(target, partialPaths[partialPaths.length - 1]);
     }
 
+    private String getPath(String[] paths, int index) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i <= index; i++) {
+            if (i != 0) {
+                sb.append("/");
+            }
+            sb.append(paths[i]);
+        }
+        return sb.toString();
+    }
+
     private interface NodeCallback {
 
-        void onNodeFound(RxNode<String, Composition> node, String partialPath);
+        void onNodeFound(RxNode<String> node, String partialPath);
     }
 
 }

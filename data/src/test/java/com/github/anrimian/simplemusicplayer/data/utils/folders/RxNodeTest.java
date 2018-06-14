@@ -14,15 +14,15 @@ import static org.junit.Assert.*;
 
 public class RxNodeTest {
 
-    private RxNode<Integer, String> root = new RxNode<>(0, "root");
+    private RxNode<Integer> root = new RxNode<>(0, new StringNode("root"));
 
     @Test
     public void addChildTest() {
-        TestObserver<Change<List<RxNode<Integer, String>>>> childObserver = root
+        TestObserver<Change<List<RxNode<Integer>>>> childObserver = root
                 .getChildChangeObservable()
                 .test();
 
-        RxNode<Integer, String> rootChild1 = new RxNode<>(1, "child 1");
+        RxNode<Integer> rootChild1 = new RxNode<>(1, new StringNode("child 1"));
         root.addNode(rootChild1);
 
         childObserver.assertValue(change -> {

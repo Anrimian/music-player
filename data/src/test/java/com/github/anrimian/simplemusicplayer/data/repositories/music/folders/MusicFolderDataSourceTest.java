@@ -6,9 +6,11 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,12 +30,70 @@ public class MusicFolderDataSourceTest {
 
     @Test
     public void getSingleCompositionTest() {
-        when(storageMusicDataSource.getCompositionsMap()).thenReturn(getFakeCompositionsMap());
+        Composition composition = new Composition();
+        composition.setFilePath("simple path");
+        composition.setId(1L);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(singletonMap(1L, composition));
 
         musicFolderDataSource.getMusicInPath(null)
-                .subscribe(list -> {
+                .test()
+                .assertValue(list -> {
                     assertEquals(1, list.size());
-//                    assertEquals(getFakeCompositionsMap().get(1L), list.get(0));
+                    assertEquals(composition, ((CompositionNode) list.get(0)).getComposition());
+                    return true;
+                });
+    }
+
+    @Test
+    public void getCompositionsInTreeTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = new Composition();
+        compositionOne.setFilePath("root/music/one.dd");
+        compositionOne.setId(1L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = new Composition();
+        compositionTwo.setFilePath("root/music/two.dd");
+        compositionTwo.setId(2L);
+        compositions.put(2L, compositionTwo);
+
+        Composition compositionThree = new Composition();
+        compositionThree.setFilePath("root/music/favorite/three.dd");
+        compositionThree.setId(3L);
+        compositions.put(3L, compositionThree);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        musicFolderDataSource.getMusicInPath("root/music")
+                .test()
+                .assertValue(list -> {
+                    assertEquals(3, list.size());
+                    assertEquals(compositionOne, ((CompositionNode) list.get(0)).getComposition());
+                    assertEquals(compositionTwo, ((CompositionNode) list.get(1)).getComposition());
+
+                    FolderNode folderNode = (FolderNode) list.get(2);
+                    assertEquals("root/music/favorite", folderNode.getFullPath());
+                    assertEquals(1, folderNode.getCompositionsCount());
+                    return true;
+                });
+
+        musicFolderDataSource.getMusicInPath("root")
+                .test()
+                .assertValue(list -> {
+                    FolderNode folderNode = (FolderNode) list.get(0);
+                    assertEquals("root/music", folderNode.getFullPath());
+                    assertEquals(3, folderNode.getCompositionsCount());
+                    return true;
+                });
+
+        musicFolderDataSource.getMusicInPath(null)
+                .test()
+                .assertValue(list -> {
+                    FolderNode folderNode = (FolderNode) list.get(0);
+                    assertEquals("root", folderNode.getFullPath());
+                    assertEquals(3, folderNode.getCompositionsCount());
+                    return true;
                 });
     }
 

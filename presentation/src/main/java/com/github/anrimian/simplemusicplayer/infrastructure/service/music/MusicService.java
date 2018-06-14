@@ -185,7 +185,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private void onPlayerStateChanged(PlayerInfo info) {
         switch (info.getState()) {
-            case STATE_PLAYING: {
+            case STATE_PLAYING: {//TODO error with update notification
                 startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(info));
                 mediaSession.setActive(true);
                 break;

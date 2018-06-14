@@ -18,32 +18,31 @@ import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeT
 import static io.reactivex.subjects.PublishSubject.create;
 import static java.util.Collections.singletonList;
 
-public class RxNode<K, T> {
+public class RxNode<K> {
 
-    private final PublishSubject<Change<List<RxNode<K, T>>>> childChangeSubject = create();
-//    private final PublishSubject<Change<RxNode<K, T>>> selfChangeSubject = create();
+    private final PublishSubject<Change<List<RxNode<K>>>> childChangeSubject = create();
+//    private final PublishSubject<Change<RxNode<K>>> selfChangeSubject = create();
 
-    private final LinkedHashMap<K, RxNode<K, T>> nodes = new LinkedHashMap<>();
+    private final LinkedHashMap<K, RxNode<K>> nodes = new LinkedHashMap<>();
 
-    @Nonnull
     private K key;
-    private T data;
+    private NodeData data;
 
     @Nullable
-    private RxNode<K, T> parent;
+    private RxNode<K> parent;
 
-    public RxNode(@Nonnull K key, T data) {
+    public RxNode(K key, NodeData data) {
         this.key = key;
         this.data = data;
     }
 
     @Nullable
-    public RxNode<K, T> getParent() {
+    public RxNode<K> getParent() {
         return parent;
     }
 
     @Nonnull
-    public Collection<RxNode<K, T>> getNodes() {
+    public Collection<RxNode<K>> getNodes() {
         return nodes.values();
     }
 
@@ -52,48 +51,56 @@ public class RxNode<K, T> {
         return key;
     }
 
-    public T getData() {
+    public NodeData getData() {
         return data;
     }
 
-    public Observable<Change<List<RxNode<K, T>>>> getChildChangeObservable() {
+    public Observable<Change<List<RxNode<K>>>> getChildChangeObservable() {
         return childChangeSubject;
     }
 
-    public void addNode(RxNode<K, T> node) {
+    public void addNode(RxNode<K> node) {
         node.parent = this;
         nodes.put(node.getKey(), node);
-//        selfChangeSubject.onNext(new Change<>(MODIFY, this));
+//        selfChangeSubject.onNext(new Change<>(MODIFYhis));
         childChangeSubject.onNext(new Change<>(ADDED, singletonList(node)));
+
+        notifyNodeAdded(node.getData());
 //        notifyNodeUpdated(this);
     }
 
-    public void setData(T data) {
-        this.data = data;
-        notifyNodeUpdated(this);
-    }
-
     public void removeNode(K key) {
-        RxNode<K, T> node = getChild(key);
+        RxNode<K> node = getChild(key);
         if (node != null) {
             removeNode(node);
         }
     }
 
-    public void removeNode(RxNode<K, T> node) {
+    public void removeNode(RxNode<K> node) {
         nodes.remove(node.getKey());
         childChangeSubject.onNext(new Change<>(DELETED, singletonList(node)));
         notifyNodeUpdated(this);
     }
 
     @Nullable
-    public RxNode<K, T> getChild(K key) {
+    public RxNode<K> getChild(K key) {
         return nodes.get(key);
     }
 
-    private void notifyNodeUpdated(RxNode<K, T> node) {
+    private void notifyNodeAdded(NodeData data) {
+        if (this.data != null) {
+            this.data.onNodeAdded(data);
+        }
+
+        RxNode<K> parent = getParent();
+        if (parent != null) {
+            parent.notifyNodeAdded(data);
+        }
+    }
+
+    private void notifyNodeUpdated(RxNode<K> node) {
         childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
-        RxNode<K, T> parent = getParent();
+        RxNode<K> parent = getParent();
         if (parent != null) {
             parent.notifyNodeUpdated(this);
         }
@@ -113,7 +120,7 @@ public class RxNode<K, T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        RxNode<?, ?> rxNode = (RxNode<?, ?>) o;
+        RxNode<?> rxNode = (RxNode<?>) o;
 
         return key.equals(rxNode.key);
     }
