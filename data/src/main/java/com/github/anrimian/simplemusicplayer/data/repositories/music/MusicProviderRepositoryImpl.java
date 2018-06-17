@@ -2,9 +2,10 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
+import com.google.android.exoplayer2.upstream.FileDataSource;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +47,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     private Completable processCompositionError(Throwable throwable, Composition composition) {
-        if (throwable instanceof FileNodeNotFoundException) {
-            return storageMusicDataSource.deleteComposition(composition);
+        if (throwable instanceof FileDataSource.FileDataSourceException) {
+            throwable = throwable.getCause();
+            if (throwable instanceof FileNotFoundException) {
+                return storageMusicDataSource.deleteComposition(composition);
+            }
         }
         return Completable.error(new IllegalStateException("unexpected error with composition: " + throwable));
     }

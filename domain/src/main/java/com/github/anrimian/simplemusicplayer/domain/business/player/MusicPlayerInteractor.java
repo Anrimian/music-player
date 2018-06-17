@@ -54,6 +54,8 @@ public class MusicPlayerInteractor {
     private Disposable skipDisposable;
     private Disposable compositionChangeDisposable;
 
+    private Composition currentComposition;
+
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  SettingsRepository settingsRepository,
                                  SystemMusicController systemMusicController,
@@ -68,8 +70,7 @@ public class MusicPlayerInteractor {
         this.analytics = analytics;
 
         playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
-                .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
-                .subscribe(this::onCompositionPrepared));
+                .subscribe(this::onCompositionChanged));
         playerDisposable.add(musicPlayerController.getEventsObservable()
                 .subscribe(this::onMusicPlayerEventReceived));
     }
@@ -96,7 +97,7 @@ public class MusicPlayerInteractor {
 
 //                playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
 //                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
-//                        .subscribe(this::onCompositionPrepared));
+//                        .subscribe(this::onCompositionChanged));
 //                playerDisposable.add(musicPlayerController.getEventsObservable()
 //                        .subscribe(this::onMusicPlayerEventReceived));
 //            } else {
@@ -216,7 +217,10 @@ public class MusicPlayerInteractor {
         return musicProviderRepository.deleteComposition(composition);
     }
 
-    private void onCompositionPrepared(CurrentComposition currentComposition) {
+    private void onCompositionChanged(CurrentComposition currentComposition) {
+        this.currentComposition = currentComposition.getComposition();
+        musicPlayerController.prepareToPlayIgnoreError(currentComposition);
+
         if (playerStateSubject.getValue() == PLAY) {
             musicPlayerController.resume();
         }
@@ -257,10 +261,7 @@ public class MusicPlayerInteractor {
     }
 
     private void processErrorAboutCurrentComposition(Throwable throwable) {
-        playQueueRepository.getCurrentComposition()
-                .map(CurrentComposition::getComposition)
-                .flatMapCompletable(composition ->
-                        musicProviderRepository.processErrorWithComposition(throwable, composition))
+        musicProviderRepository.processErrorWithComposition(throwable, currentComposition)
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
                 .subscribe();

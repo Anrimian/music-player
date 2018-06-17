@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 
 public class StorageMusicProvider {
@@ -117,6 +116,9 @@ public class StorageMusicProvider {
 
     public void deleteComposition(String path) {//TODO update media store and not become update
         File file = new File(path);
+        if (!file.exists()) {
+            return;
+        }
         boolean deleted = file.delete();
         if (!deleted) {
             throw new DeleteFileException("can not delete file: " + path);

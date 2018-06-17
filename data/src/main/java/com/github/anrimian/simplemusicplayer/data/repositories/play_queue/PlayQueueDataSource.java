@@ -155,10 +155,9 @@ public class PlayQueueDataSource {
                 playQueue.deleteComposition(id);
                 playQueueDao.deletePlayQueueEntity(id);
 
-                Map<Long, Integer> positionMap = playQueue.getPositionMap();
                 Map<Long, Integer> shuffledPositionMap = playQueue.getShuffledPositionMap();
                 int freeShuffledPosition = shuffledPositionMap.remove(id);
-                for (Map.Entry<Long, Integer> entry:  shuffledPositionMap.entrySet()) {
+                for (Map.Entry<Long, Integer> entry: shuffledPositionMap.entrySet()) {// FIXME: 17.06.2018 concurrent modification
                     Long key = entry.getKey();
                     Integer position = entry.getValue();
                     if (position > freeShuffledPosition) {
@@ -168,8 +167,9 @@ public class PlayQueueDataSource {
                     }
                 }
 
+                Map<Long, Integer> positionMap = playQueue.getPositionMap();
                 int freeInitialPosition = positionMap.remove(id);
-                for (Map.Entry<Long, Integer> entry:  positionMap.entrySet()) {
+                for (Map.Entry<Long, Integer> entry: positionMap.entrySet()) {
                     Long key = entry.getKey();
                     Integer position = entry.getValue();
                     if (position > freeInitialPosition) {

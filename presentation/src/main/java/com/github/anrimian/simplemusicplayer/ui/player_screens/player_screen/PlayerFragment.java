@@ -516,8 +516,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     return true;
                 }
                 case R.id.menu_delete: {
-//                    presenter.onDeleteCompositionButtonClicked();//TODO also show dialog
-//                    return true;
+                    presenter.onDeleteCompositionButtonClicked();//TODO also show dialog
+                    return true;
                 }
             }
             return false;
