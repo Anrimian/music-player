@@ -55,7 +55,7 @@ public class StorageMusicDataSource {
     }
 
     public Observable<Change<List<Composition>>> getChangeObservable() {
-        return changeSubject;
+        return changeSubject.subscribeOn(scheduler);
     }
 
     public Completable deleteComposition(Composition composition) {

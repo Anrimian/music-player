@@ -30,6 +30,6 @@ public class StorageModule {
     @Singleton
     StorageMusicDataSource storageMusicDataSource(StorageMusicProvider musicProvider,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new StorageMusicDataSource(musicProvider, scheduler);
+        return new  StorageMusicDataSource(musicProvider, scheduler);
     }
 }

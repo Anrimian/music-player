@@ -77,13 +77,6 @@ public class PlayQueueDataSource {
         return changeSubject.subscribeOn(scheduler);
     }
 
-    private List<Composition> getSelectedPlayQueue(PlayQueue playQueue) {
-        if (settingsPreferences.isRandomPlayingEnabled()) {
-            return playQueue.getShuffledPlayList();
-        }
-        return playQueue.getPlayList();
-    }
-
     /**
      *
      * @return new position of current composition
@@ -102,6 +95,13 @@ public class PlayQueueDataSource {
                 }))
                 .andThen(Single.fromCallable(() -> getCurrentPosition(currentComposition)))
                 .subscribeOn(scheduler);
+    }
+
+    private List<Composition> getSelectedPlayQueue(PlayQueue playQueue) {
+        if (settingsPreferences.isRandomPlayingEnabled()) {
+            return playQueue.getShuffledPlayList();
+        }
+        return playQueue.getPlayList();
     }
 
     private int getCurrentPosition(Composition composition) {

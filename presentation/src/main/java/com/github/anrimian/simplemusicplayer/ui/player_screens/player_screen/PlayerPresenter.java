@@ -205,6 +205,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                     int index = playQueue.indexOf(composition);
                     playQueue.remove(index);
                     getViewState().notifyPlayQueueItemRemoved(index);
+
+                    if (playQueue.isEmpty()) {
+                        getViewState().showMusicControls(false);
+                    }
                 }
             }
         }

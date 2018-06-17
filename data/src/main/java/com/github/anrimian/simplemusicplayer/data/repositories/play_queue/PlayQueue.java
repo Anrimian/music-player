@@ -5,10 +5,10 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
@@ -19,9 +19,9 @@ public class PlayQueue {
     private final Map<Long, Composition> compositionMap;
 
     PlayQueue(List<Composition> compositions) {
-        compositionMap = new ConcurrentHashMap<>(compositions.size());
-        positionMap = new ConcurrentHashMap<>(compositions.size());
-        shuffledPositionMap = new ConcurrentHashMap<>(compositions.size());
+        compositionMap = new HashMap<>(compositions.size());
+        positionMap = new HashMap<>(compositions.size());
+        shuffledPositionMap = new HashMap<>(compositions.size());
         for (int i = 0; i < compositions.size(); i++) {
             Composition composition = compositions.get(i);
             long id = composition.getId();

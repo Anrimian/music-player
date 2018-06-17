@@ -105,15 +105,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Single<Integer> skipToNext() {
         return playQueueDataSource.getPlayQueue()
-                .map(currentPlayList -> {
-                    checkCompositionsList(currentPlayList);
+                .map(playQueue -> {
+                    if (playQueue.isEmpty()) {
+                        return 0;
+                    }
 
-                    if (position >= currentPlayList.size() - 1) {
+                    if (position >= playQueue.size() - 1) {
                         position = 0;
                     } else {
                         position++;
                     }
-                    updateCurrentComposition(currentPlayList, position);
+                    updateCurrentComposition(playQueue, position);
                     return position;
                 });
     }
@@ -121,14 +123,16 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Single<Integer> skipToPrevious() {
         return playQueueDataSource.getPlayQueue()
-                .map(currentPlayList -> {
-                    checkCompositionsList(currentPlayList);
+                .map(playQueue -> {
+                    if (playQueue.isEmpty()) {
+                        return 0;
+                    }
 
                     position--;
                     if (position < 0) {
-                        position = currentPlayList.size() - 1;
+                        position = playQueue.size() - 1;
                     }
-                    updateCurrentComposition(currentPlayList, position);
+                    updateCurrentComposition(playQueue, position);
                     return position;
                 });
     }
@@ -136,15 +140,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable skipToPosition(int position) {
         return playQueueDataSource.getPlayQueue()
-                .doOnSuccess(currentPlayList -> {
-                    checkCompositionsList(currentPlayList);
+                .doOnSuccess(playQueue -> {
+                    checkCompositionsList(playQueue);
 
-                    if (position < 0 || position >= currentPlayList.size()) {
+                    if (position < 0 || position >= playQueue.size()) {
                         throw new IndexOutOfBoundsException("unexpected position: " + position);
                     }
 
                     this.position = position;
-                    updateCurrentComposition(currentPlayList, position);
+                    updateCurrentComposition(playQueue, position);
                 })
                 .toCompletable();
     }
@@ -200,6 +204,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private void updateCurrentComposition(List<Composition> currentPlayList, int position) {
         Composition composition = currentPlayList.get(position);
+        if (composition == null) {
+            System.out.println("wtf");//TODO fix and remove
+        }
         uiStatePreferences.setCurrentCompositionId(composition.getId());
         uiStatePreferences.setCurrentCompositionPosition(position);
 

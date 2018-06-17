@@ -247,23 +247,20 @@ public class MusicPlayerInteractor {
         if (playerEvent instanceof FinishedEvent) {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
-            processErrorAboutCurrentComposition(((ErrorEvent) playerEvent).getThrowable());
-            if (skipDisposable == null) {
-                skipDisposable = playQueueRepository.skipToNext()
-                        .doFinally(() -> skipDisposable = null)
-                        .subscribe(currentPosition -> {
-                            if (currentPosition == 0) {
-                                stop();
-                            }
-                        });
-            }
+            handleErrorWithComposition(((ErrorEvent) playerEvent).getThrowable());
         }
     }
 
-    private void processErrorAboutCurrentComposition(Throwable throwable) {
+    private void handleErrorWithComposition(Throwable throwable) {
         musicProviderRepository.processErrorWithComposition(throwable, currentComposition)
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
+                .andThen(playQueueRepository.skipToNext())
+                .doOnSuccess(currentPosition -> {
+                    if (currentPosition == 0) {
+                        stop();
+                    }
+                })
                 .subscribe();
     }
 

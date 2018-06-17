@@ -190,10 +190,11 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 mediaSession.setActive(true);
                 break;
             }
-            case STATE_STOPPED:
             case STATE_PAUSED: {
                 notificationsDisplayer.updateForegroundNotification(info);
                 stopForeground(false);
+            }
+            case STATE_STOPPED: {
                 mediaSession.setActive(false);
                 break;
             }
