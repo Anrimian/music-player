@@ -217,7 +217,6 @@ public class MusicPlayerInteractorTest {
         playerEventSubject.onNext(new ErrorEvent(throwable));
         currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
 
-        inOrder.verify(playQueueRepository).getCurrentComposition();
         inOrder.verify(musicProviderRepository)
                 .processErrorWithComposition(throwable, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
@@ -301,7 +300,6 @@ public class MusicPlayerInteractorTest {
         playerEventSubject.onNext(new ErrorEvent(throwable));
         currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
 
-        inOrder.verify(playQueueRepository).getCurrentComposition();
         inOrder.verify(musicProviderRepository)
                 .processErrorWithComposition(throwable, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
