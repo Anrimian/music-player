@@ -8,6 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentCo
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
@@ -36,7 +37,9 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -54,6 +57,7 @@ public class MusicPlayerInteractorTest {
     private MusicProviderRepository musicProviderRepository = mock(MusicProviderRepository.class);
     private SystemMusicController systemMusicController = mock(SystemMusicController.class);
     private Analytics analytics = mock(Analytics.class);
+    private PlayerErrorParser playerErrorParser = mock(PlayerErrorParser.class);
 
     private MusicPlayerInteractor musicPlayerInteractor;
 
@@ -82,8 +86,9 @@ public class MusicPlayerInteractorTest {
         when(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete());
         when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
 
-        when(musicProviderRepository.processErrorWithComposition(any(), any()))
+        when(musicProviderRepository.writeErrorAboutComposition(any(), any()))
                 .thenReturn(Completable.complete());
+        when(musicProviderRepository.deleteComposition(any())).thenReturn(Completable.complete());
 
         when(systemMusicController.requestAudioFocus()).thenReturn(audioFocusSubject);
         when(systemMusicController.getAudioBecomingNoisyObservable()).thenReturn(noisyAudioSubject);
@@ -93,7 +98,8 @@ public class MusicPlayerInteractorTest {
                 systemMusicController,
                 playQueueRepository,
                 musicProviderRepository,
-                analytics);
+                analytics,
+                playerErrorParser);
 
         playerStateSubscriber = musicPlayerInteractor.getPlayerStateObservable()
                 .test();
@@ -207,7 +213,9 @@ public class MusicPlayerInteractorTest {
     }
 
     @Test
-    public void onCompositionErrorTest() {
+    public void onCompositionUnknownErrorTest() {
+        when(playerErrorParser.getErrorType(any())).thenReturn(UNKNOWN);
+
         musicPlayerInteractor.play();
 
         inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
@@ -218,10 +226,51 @@ public class MusicPlayerInteractorTest {
         currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
 
         inOrder.verify(musicProviderRepository)
-                .processErrorWithComposition(throwable, getFakeCompositions().get(0));
+                .writeErrorAboutComposition(UNKNOWN, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
         inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
         inOrder.verify(musicPlayerController, times(1)).resume();
+
+        playerStateSubscriber.assertValues(IDLE, PLAY);
+    }
+
+    @Test
+    public void onCompositionUnknownErrorInEndTest() {
+        when(playerErrorParser.getErrorType(any())).thenReturn(UNKNOWN);
+        when(playQueueRepository.skipToNext()).thenReturn(Single.just(0));
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
+        inOrder.verify(musicPlayerController).resume();
+
+        Throwable throwable = new IllegalStateException();
+        playerEventSubject.onNext(new ErrorEvent(throwable));
+        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
+
+        inOrder.verify(musicProviderRepository)
+                .writeErrorAboutComposition(UNKNOWN, getFakeCompositions().get(0));
+        inOrder.verify(playQueueRepository).skipToNext();
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
+        inOrder.verify(musicPlayerController, never()).resume();
+
+        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
+    }
+
+    @Test
+    public void onCompositionDeletedErrorTest() {
+        when(playerErrorParser.getErrorType(any())).thenReturn(DELETED);
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
+        inOrder.verify(musicPlayerController).resume();
+
+        Throwable throwable = new IllegalStateException();
+        playerEventSubject.onNext(new ErrorEvent(throwable));
+        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
+
+        inOrder.verify(musicProviderRepository).deleteComposition(getFakeCompositions().get(0));
 
         playerStateSubscriber.assertValues(IDLE, PLAY);
     }
@@ -285,28 +334,6 @@ public class MusicPlayerInteractorTest {
         inOrder.verify(musicPlayerController, never()).resume();
 
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
-    }
-
-    @Test
-    public void onCompositionErrorInEndTest() {
-        when(playQueueRepository.skipToNext()).thenReturn(Single.just(0));
-
-        musicPlayerInteractor.play();
-
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(0)));
-        inOrder.verify(musicPlayerController).resume();
-
-        Throwable throwable = new IllegalStateException();
-        playerEventSubject.onNext(new ErrorEvent(throwable));
-        currentCompositionSubject.onNext(currentComposition(getFakeCompositions().get(1)));
-
-        inOrder.verify(musicProviderRepository)
-                .processErrorWithComposition(throwable, getFakeCompositions().get(0));
-        inOrder.verify(playQueueRepository).skipToNext();
-        inOrder.verify(musicPlayerController).prepareToPlayIgnoreError(currentComposition(getFakeCompositions().get(1)));
-        inOrder.verify(musicPlayerController, never()).resume();
-
-        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 
     @Test

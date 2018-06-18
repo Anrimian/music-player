@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.google.android.exoplayer2.upstream.FileDataSource;
 
@@ -36,23 +37,13 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Completable processErrorWithComposition(Throwable throwable, Composition composition) {
-        return processCompositionError(throwable, composition)//TODO write error about composition. Handle deleted compositions
+    public Completable writeErrorAboutComposition(ErrorType errorType, Composition composition) {
+        return Completable.complete()//TODO write error about composition
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable deleteComposition(Composition composition) {
         return storageMusicDataSource.deleteComposition(composition);
-    }
-
-    private Completable processCompositionError(Throwable throwable, Composition composition) {
-        if (throwable instanceof FileDataSource.FileDataSourceException) {
-            throwable = throwable.getCause();
-            if (throwable instanceof FileNotFoundException) {
-                return storageMusicDataSource.deleteComposition(composition);
-            }
-        }
-        return Completable.error(new IllegalStateException("unexpected error with composition: " + throwable));
     }
 }

@@ -2,7 +2,9 @@ package com.github.anrimian.simplemusicplayer.di.app;
 
 import android.content.Context;
 
+import com.github.anrimian.simplemusicplayer.data.controllers.music.error.PlayerErrorParserImpl;
 import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
+import com.github.anrimian.simplemusicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.DefaultErrorParser;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.StorageErrorParser;
@@ -36,5 +38,12 @@ public class ErrorModule {
     @Named(STORAGE_ERROR_PARSER)
     ErrorParser provideStorageErrorParser(Context context, ErrorParser defaultErrorParser) {
         return new StorageErrorParser(context, defaultErrorParser);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    PlayerErrorParser playerErrorParser(Analytics analytics) {
+        return new PlayerErrorParserImpl(analytics);
     }
 }

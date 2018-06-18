@@ -8,6 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentCo
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
@@ -44,6 +45,7 @@ public class MusicPlayerInteractor {
     private final PlayQueueRepository playQueueRepository;
     private final MusicProviderRepository musicProviderRepository;
     private final Analytics analytics;
+    private final PlayerErrorParser playerErrorParser;
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
@@ -61,13 +63,15 @@ public class MusicPlayerInteractor {
                                  SystemMusicController systemMusicController,
                                  PlayQueueRepository playQueueRepository,
                                  MusicProviderRepository musicProviderRepository,
-                                 Analytics analytics) {
+                                 Analytics analytics,
+                                 PlayerErrorParser playerErrorParser) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
         this.analytics = analytics;
+        this.playerErrorParser = playerErrorParser;
 
         playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
                 .subscribe(this::onCompositionChanged));
@@ -247,21 +251,33 @@ public class MusicPlayerInteractor {
         if (playerEvent instanceof FinishedEvent) {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
-            handleErrorWithComposition(((ErrorEvent) playerEvent).getThrowable());
+            ErrorEvent errorEvent = (ErrorEvent) playerEvent;
+            handleErrorWithComposition(playerErrorParser.getErrorType(errorEvent.getThrowable()));
         }
     }
 
-    private void handleErrorWithComposition(Throwable throwable) {
-        musicProviderRepository.processErrorWithComposition(throwable, currentComposition)
-                .doOnError(analytics::processNonFatalError)
-                .onErrorComplete()
-                .andThen(playQueueRepository.skipToNext())
-                .doOnSuccess(currentPosition -> {
-                    if (currentPosition == 0) {
-                        stop();
-                    }
-                })
-                .subscribe();
+    private void handleErrorWithComposition(ErrorType errorType) {
+        switch (errorType) {
+            case DELETED: {
+                musicProviderRepository.deleteComposition(currentComposition)
+                        .doOnError(analytics::processNonFatalError)
+                        .onErrorComplete()
+                        .subscribe();
+                break;
+            }
+            default: {
+                musicProviderRepository.writeErrorAboutComposition(errorType, currentComposition)
+                        .doOnError(analytics::processNonFatalError)
+                        .onErrorComplete()
+                        .andThen(playQueueRepository.skipToNext())
+                        .doOnSuccess(currentPosition -> {
+                            if (currentPosition == 0) {
+                                stop();
+                            }
+                        })
+                        .subscribe();
+            }
+        }
     }
 
     private void onCompositionPlayFinished() {

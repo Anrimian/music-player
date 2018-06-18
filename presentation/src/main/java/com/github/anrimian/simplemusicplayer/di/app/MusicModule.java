@@ -16,6 +16,7 @@ import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQu
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
@@ -47,13 +48,15 @@ class MusicModule {
                                                 SystemMusicController systemMusicController,
                                                 PlayQueueRepository playQueueRepository,
                                                 MusicProviderRepository musicProviderRepository,
-                                                Analytics analytics) {
+                                                Analytics analytics,
+                                                PlayerErrorParser playerErrorParser) {
         return new MusicPlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
                 playQueueRepository,
                 musicProviderRepository,
-                analytics);
+                analytics,
+                playerErrorParser);
     }
 
     @Provides

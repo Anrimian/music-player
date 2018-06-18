@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.repositories;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface MusicProviderRepository {
 
     Single<List<Composition>> getAllCompositions();
 
-    Completable processErrorWithComposition(Throwable throwable, Composition composition);
+    Completable writeErrorAboutComposition(ErrorType errorType, Composition composition);
 
     Completable deleteComposition(Composition composition);
 }
