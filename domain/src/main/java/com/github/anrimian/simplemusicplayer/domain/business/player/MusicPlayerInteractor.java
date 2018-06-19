@@ -8,7 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentCo
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
-import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType;
+import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
@@ -94,23 +94,7 @@ public class MusicPlayerInteractor {
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
             playerStateSubject.onNext(PLAY);
-
-//            if (playerDisposable.size() == 0) {
-            //TODO check how it works in constructor
-            // possible problem - resume before preparing player(too fast start)
-
-//                playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
-//                        .doOnNext(musicPlayerController::prepareToPlayIgnoreError)
-//                        .subscribe(this::onCompositionChanged));
-//                playerDisposable.add(musicPlayerController.getEventsObservable()
-//                        .subscribe(this::onMusicPlayerEventReceived));
-//            } else {
-//                musicPlayerController.resume();
-//            }
-
-            if (playerDisposable.size() != 0) {
-                musicPlayerController.resume();
-            }
+            musicPlayerController.resume();
 
             if (systemEventsDisposable.size() == 0) {
                 systemEventsDisposable.add(audioFocusObservable
@@ -223,7 +207,7 @@ public class MusicPlayerInteractor {
 
     private void onCompositionChanged(CurrentComposition currentComposition) {
         this.currentComposition = currentComposition.getComposition();
-        musicPlayerController.prepareToPlayIgnoreError(currentComposition);
+        musicPlayerController.prepareToPlay(currentComposition);
 
         if (playerStateSubject.getValue() == PLAY) {
             musicPlayerController.resume();

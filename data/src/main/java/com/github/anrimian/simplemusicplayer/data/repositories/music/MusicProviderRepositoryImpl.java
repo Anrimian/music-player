@@ -2,11 +2,9 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType;
+import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
-import com.google.android.exoplayer2.upstream.FileDataSource;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +18,8 @@ import io.reactivex.Single;
 
 public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
-    private StorageMusicDataSource storageMusicDataSource;
-    private Scheduler scheduler;
+    private final StorageMusicDataSource storageMusicDataSource;
+    private final Scheduler scheduler;
 
     public MusicProviderRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
                                        Scheduler scheduler) {

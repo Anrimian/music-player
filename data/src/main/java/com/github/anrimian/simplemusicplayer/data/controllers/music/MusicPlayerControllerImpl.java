@@ -67,15 +67,10 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public Completable prepareToPlay(CurrentComposition composition) {
-        return prepareMediaSource(composition.getComposition())
+    public void prepareToPlay(CurrentComposition composition) {
+        prepareMediaSource(composition.getComposition())
                 .toCompletable()//on error can be: com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException: java.io.FileNotFoundException
-                .doOnEvent(t -> onCompositionPrepared(t, composition));
-    }
-
-    @Override
-    public void prepareToPlayIgnoreError(CurrentComposition composition) {
-        prepareToPlay(composition)
+                .doOnEvent(t -> onCompositionPrepared(t, composition))
                 .onErrorComplete()
                 .subscribe();
     }
@@ -139,11 +134,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
             Uri uri = Uri.fromFile(new File(composition.getFilePath()));
             DataSpec dataSpec = new DataSpec(uri);
             final FileDataSource fileDataSource = new FileDataSource();
-            try {
-                fileDataSource.open(dataSpec);
-            } catch (FileDataSource.FileDataSourceException e) {
-                emitter.onError(e);
-            }
+            fileDataSource.open(dataSpec);
 
             DataSource.Factory factory = () -> fileDataSource;
             MediaSource mediaSource = new ExtractorMediaSource(fileDataSource.getUri(),

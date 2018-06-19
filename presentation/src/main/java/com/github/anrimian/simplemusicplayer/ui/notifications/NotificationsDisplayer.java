@@ -14,8 +14,9 @@ import android.widget.RemoteViews;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.MusicService;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerInfo;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerMetaState;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 
 import javax.annotation.Nonnull;
@@ -52,8 +53,8 @@ public class NotificationsDisplayer {
         }
     }
 
-    public Notification getForegroundNotification(@Nonnull PlayerInfo info) {
-        return getDefaultMusicNotification(info).build();
+    public Notification getForegroundNotification(@Nonnull PlayerMetaState state) {
+        return getDefaultMusicNotification(state).build();
     }
 
     public Notification getStubNotification() {
@@ -66,14 +67,14 @@ public class NotificationsDisplayer {
     }
 
 
-    public void updateForegroundNotification(@Nonnull PlayerInfo info) {
-        Notification notification = getDefaultMusicNotification(info).build();
+    public void updateForegroundNotification(@Nonnull PlayerMetaState state) {
+        Notification notification = getDefaultMusicNotification(state).build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
-    private NotificationCompat.Builder getDefaultMusicNotification(@Nonnull PlayerInfo info) {
-        boolean play = info.getState() == PlaybackStateCompat.STATE_PLAYING;
-        Composition composition = info.getComposition();
+    private NotificationCompat.Builder getDefaultMusicNotification(@Nonnull PlayerMetaState state) {
+        boolean play = state.getState() == PlayerState.PLAY;
+        Composition composition = state.getComposition();
 
         RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_music);
         contentView.setImageViewResource(R.id.iv_play_stop, play? R.drawable.ic_pause : R.drawable.ic_play);

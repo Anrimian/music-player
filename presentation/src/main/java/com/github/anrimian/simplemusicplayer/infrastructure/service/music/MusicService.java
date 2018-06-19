@@ -14,8 +14,8 @@ import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerInfo;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.TrackInfo;
+import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerMetaState;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS;
 import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS;
@@ -38,6 +39,8 @@ import static android.support.v4.media.session.PlaybackStateCompat.Builder;
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED;
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING;
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED;
+import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.dispose;
+import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
@@ -68,9 +71,13 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                     | ACTION_SKIP_TO_NEXT
                     | ACTION_SKIP_TO_PREVIOUS);
 
+    private final MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
+    private final CompositeDisposable serviceDisposable = new CompositeDisposable();
+
     private MediaSessionCompat mediaSession;
-    private MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
-    private CompositeDisposable serviceDisposable = new CompositeDisposable();
+
+    private Disposable currentCompositionDisposable;
+    private Composition currentComposition;
 
     @Override
     public void onCreate() {
@@ -151,27 +158,64 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayerChanges() {
-        Observable<Integer> playerStateObservable = musicPlayerInteractor.getPlayerStateObservable()
-                .map(PlayerStateMapper::toMediaState);
-        Observable<Composition> compositionObservable = musicPlayerInteractor.getCurrentCompositionObservable()
-                .map(CurrentComposition::getComposition)
-                .doOnNext(this::onCurrentCompositionChanged);
-        Observable<Long> trackPositionObservable = musicPlayerInteractor.getTrackPositionObservable();
-
-        serviceDisposable.add(Observable.combineLatest(playerStateObservable, trackPositionObservable, TrackInfo::new)
-                .subscribe(this::onTrackInfoChanged));
-
-        serviceDisposable.add(Observable.combineLatest(playerStateObservable, compositionObservable, PlayerInfo::new)
+        serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+                .withLatestFrom(getCurrentCompositionObservable(),
+                        musicPlayerInteractor.getTrackPositionObservable(),
+                        PlayerMetaState::new)
                 .subscribe(this::onPlayerStateChanged));
     }
 
-    //TODO can be invalid position in new track(new track emits first), fix later. Maybe don't emit position so often, save on pause/stop?
-    private void onTrackInfoChanged(TrackInfo info) {
-        stateBuilder.setState(info.getState(), info.getTrackPosition(), 1);
-        mediaSession.setPlaybackState(stateBuilder.build());//TODO maybe state can set only in active session?
+    private void onPlayerStateChanged(PlayerMetaState playerMetaState) {
+        currentComposition = playerMetaState.getComposition();
+        PlayerState playerState = playerMetaState.getState();
+
+        switch (playerState) {
+            case PLAY: {//TODO possible error with update notification
+                mediaSession.setActive(true);
+                updateMediaSession(playerMetaState);
+                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(playerMetaState));
+                subscribeOnCurrentCompositionChanging();
+                break;
+            }
+            case PAUSE: {
+                updateMediaSession(playerMetaState);
+
+                notificationsDisplayer.updateForegroundNotification(playerMetaState);
+                stopForeground(false);
+            }
+            case STOP: {
+                mediaSession.setActive(false);
+                break;
+            }
+        }
     }
 
-    private void onCurrentCompositionChanged(Composition composition) {
+    private void subscribeOnCurrentCompositionChanging() {
+        if (currentCompositionDisposable != null) {
+            currentCompositionDisposable = getCurrentCompositionObservable()
+                    .withLatestFrom(musicPlayerInteractor.getPlayerStateObservable(),
+                            PlayerMetaState::new)
+                    .subscribe(this::onCurrentCompositionChanged);
+            serviceDisposable.add(currentCompositionDisposable);
+        }
+    }
+
+    private void onCurrentCompositionChanged(PlayerMetaState playerMetaState) {
+        Composition composition = playerMetaState.getComposition();
+        if (!currentComposition.equals(composition)) {
+            currentComposition = composition;
+            notificationsDisplayer.updateForegroundNotification(playerMetaState);
+        }
+    }
+
+    private Observable<Composition> getCurrentCompositionObservable() {
+        return musicPlayerInteractor.getCurrentCompositionObservable()
+                .map(CurrentComposition::getComposition);
+    }
+
+    private void updateMediaSession(PlayerMetaState playerMetaState) {
+        Composition composition = playerMetaState.getComposition();
+
         MediaMetadataCompat metadata = metadataBuilder
 //                .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
 //                        BitmapFactory.decodeResource(getResources(), track.getBitmapResId()))
@@ -181,24 +225,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.getDuration())
                 .build();
         mediaSession.setMetadata(metadata);
-    }
 
-    private void onPlayerStateChanged(PlayerInfo info) {
-        switch (info.getState()) {
-            case STATE_PLAYING: {//TODO error with update notification
-                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(info));
-                mediaSession.setActive(true);
-                break;
-            }
-            case STATE_PAUSED: {
-                notificationsDisplayer.updateForegroundNotification(info);
-                stopForeground(false);
-            }
-            case STATE_STOPPED: {
-                mediaSession.setActive(false);
-                break;
-            }
-        }
+        stateBuilder.setState(toMediaState(playerMetaState.getState()),
+                playerMetaState.getTrackPosition(),
+                1,
+                System.currentTimeMillis());
+        mediaSession.setPlaybackState(stateBuilder.build());
     }
 
     private class MediaSessionCallback extends MediaSessionCompat.Callback {

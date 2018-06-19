@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.business.player;
 
-import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType;
+import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
 
 public interface PlayerErrorParser {
 

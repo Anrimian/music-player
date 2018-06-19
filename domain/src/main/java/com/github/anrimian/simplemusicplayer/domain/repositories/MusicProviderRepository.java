@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.repositories;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorType;
+import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
 
 import java.util.List;
 

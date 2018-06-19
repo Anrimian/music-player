@@ -15,9 +15,7 @@ public interface MusicPlayerController {
 
     Observable<PlayerEvent> getEventsObservable();
 
-    Completable prepareToPlay(CurrentComposition composition);
-
-    void prepareToPlayIgnoreError(CurrentComposition composition);
+    void prepareToPlay(CurrentComposition composition);
 
     void stop();
 
