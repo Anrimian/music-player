@@ -65,7 +65,7 @@ public class MusicFolderDataSourceTest {
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
-        musicFolderDataSource.getMusicInPath("root/music")
+        musicFolderDataSource.getMusicInPath(null)
                 .test()
                 .assertValue(list -> {
                     assertEquals(3, list.size());
@@ -78,23 +78,22 @@ public class MusicFolderDataSourceTest {
                     return true;
                 });
 
-        musicFolderDataSource.getMusicInPath("root")
+        musicFolderDataSource.getMusicInPath("root/music/favorite")
                 .test()
                 .assertValue(list -> {
-                    FolderNode folderNode = (FolderNode) list.get(0);
-                    assertEquals("root/music", folderNode.getFullPath());
-                    assertEquals(3, folderNode.getCompositionsCount());
+                    assertEquals(1, list.size());
+                    assertEquals(compositionThree, ((CompositionNode) list.get(0)).getComposition());
                     return true;
                 });
 
-        musicFolderDataSource.getMusicInPath(null)
-                .test()
-                .assertValue(list -> {
-                    FolderNode folderNode = (FolderNode) list.get(0);
-                    assertEquals("root", folderNode.getFullPath());
-                    assertEquals(3, folderNode.getCompositionsCount());
-                    return true;
-                });
+//        musicFolderDataSource.getMusicInPath(null)
+//                .test()
+//                .assertValue(list -> {
+//                    FolderNode folderNode = (FolderNode) list.get(0);
+//                    assertEquals("root", folderNode.getFullPath());
+//                    assertEquals(3, folderNode.getCompositionsCount());
+//                    return true;
+//                });
     }
 
     private static Map<Long, Composition> getFakeCompositionsMap() {

@@ -4,10 +4,6 @@ import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
-import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +39,11 @@ public class MusicFolderDataSource {
 
     private RxNode<String> findNodeByPath(@Nullable String fullPath) {
         if (fullPath == null) {
-            return root;
+            RxNode<String> found = root;
+            while (isEmptyFolderNode(found)) {
+                found = found.getNodes().get(0);
+            }
+            return found;
         }
         RxNode<String> target = root;
         RxNode<String> found = null;
@@ -54,6 +54,11 @@ public class MusicFolderDataSource {
             }
         }
         return found;
+    }
+
+    private boolean isEmptyFolderNode(RxNode<String> node) {
+        List<RxNode<String>> nodes = node.getNodes();
+        return nodes.size() == 1 && nodes.get(0).getData() instanceof FolderNode;
     }
 
     private Single<RxNode<String>> getMusicFileTree() {

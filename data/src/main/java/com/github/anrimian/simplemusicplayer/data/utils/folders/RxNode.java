@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,8 +43,8 @@ public class RxNode<K> {
     }
 
     @Nonnull
-    public Collection<RxNode<K>> getNodes() {
-        return nodes.values();
+    public List<RxNode<K>> getNodes() {
+        return new ArrayList<>(nodes.values());
     }
 
     @Nonnull

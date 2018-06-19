@@ -27,6 +27,7 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
+import static android.support.v4.media.MediaMetadataCompat.*;
 import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS;
 import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
@@ -219,10 +220,10 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         MediaMetadataCompat metadata = metadataBuilder
 //                .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
 //                        BitmapFactory.decodeResource(getResources(), track.getBitmapResId()))
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, composition.getTitle())
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, composition.getAlbum())
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.getDuration())
+                .putString(METADATA_KEY_TITLE, composition.getTitle())
+                .putString(METADATA_KEY_ALBUM, composition.getAlbum())
+                .putString(METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
+                .putLong(METADATA_KEY_DURATION, composition.getDuration())
                 .build();
         mediaSession.setMetadata(metadata);
 
