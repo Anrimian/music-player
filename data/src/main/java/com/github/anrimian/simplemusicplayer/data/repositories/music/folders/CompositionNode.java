@@ -5,7 +5,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 
 import javax.annotation.Nullable;
 
-public class CompositionNode implements NodeData {
+public class CompositionNode extends NodeData {
 
     private Composition composition;
 
@@ -15,11 +15,6 @@ public class CompositionNode implements NodeData {
 
     public Composition getComposition() {
         return composition;
-    }
-
-    @Override
-    public void onNodeAdded(NodeData nodeData) {
-
     }
 
     @Override

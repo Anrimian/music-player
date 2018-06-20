@@ -1,16 +1,11 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
-public class StringNode implements NodeData{
+public class StringNode extends NodeData{
 
     private String data;
 
     StringNode(String data) {
         this.data = data;
-    }
-
-    @Override
-    public void onNodeAdded(NodeData nodeData) {
-
     }
 
     @Override

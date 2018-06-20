@@ -4,6 +4,7 @@ import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Single;
+
+import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
+import static io.reactivex.Observable.fromIterable;
 
 public class MusicFolderDataSource {
 
@@ -23,16 +27,30 @@ public class MusicFolderDataSource {
         this.storageMusicDataSource = storageMusicDataSource;
     }
 
-    public Single<List<NodeData>> getMusicInPath(@Nullable String path) {
+    public Single<Folder> getMusicInPath(@Nullable String path) {
         return getMusicFileTree()
-                .map(tree -> getFilesListByPath(path));
+                .map(tree -> getFolderInPath(path));
     }
 
-    private List<NodeData> getFilesListByPath(@Nullable String path) {
-        RxNode<String> targetNode = findNodeByPath(path);
+    private Folder getFolderInPath(@Nullable String path) {
+        RxNode<String> node = findNodeByPath(path);
+        return new Folder(getFilesListFromNode(node),
+                node.getChildChangeObservable().map(this::toNodeDataChange),
+                node.getSelfChangeObservable());
+    }
+
+    private Change<List<NodeData>> toNodeDataChange(Change<List<RxNode<String>>> change) {
+        List<NodeData> changedNodes = new ArrayList<>();
+        for (RxNode<String> changedNode : change.getData()) {
+            changedNodes.add(changedNode.getData());
+        }
+        return new Change<>(change.getChangeType(), changedNodes);
+    }
+
+    private List<NodeData> getFilesListFromNode(RxNode<String> node) {
         List<NodeData> fileList = new ArrayList<>();
-        for (RxNode<String> node : targetNode.getNodes()) {
-            fileList.add(node.getData());
+        for (RxNode<String> child : node.getNodes()) {
+            fileList.add(child.getData());
         }
         return fileList;
     }
@@ -65,9 +83,50 @@ public class MusicFolderDataSource {
         return Single.fromCallable(() -> {
             if (root == null) {
                 root = createMusicFileTree();
+                subscribeOnCompositionsChanging();
             }
             return root;
         });
+    }
+
+    private void subscribeOnCompositionsChanging() {
+        storageMusicDataSource.getChangeObservable()
+                .doOnNext(this::onCompositionsChanged)
+                .subscribe();
+    }
+
+    private void onCompositionsChanged(Change<List<Composition>> change) {
+        switch (change.getChangeType()) {
+            case ADDED: {
+                processAddChange(change.getData());
+                break;
+            }
+            case DELETED: {
+                break;
+            }
+            case MODIFY: {
+                break;
+            }
+        }
+    }
+
+    private void processAddChange(List<Composition> compositions) {
+        fromIterable(compositions)
+                .groupBy(Composition::getFilePath)
+                .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
+                        .doOnSuccess(pathCompositions ->
+                                putCompositions(group.getKey(), pathCompositions))
+                        .subscribe())
+                .subscribe();
+    }
+
+    private void putCompositions(String path, List<Composition> compositions) {
+        getParentForPath(root, path, (node, partialPath) ->
+                node.addNodes(mapList(compositions,
+                        newComposition ->
+                        new RxNode<>(partialPath, new CompositionNode(newComposition))
+                ))
+        );
     }
 
     private RxNode<String> createMusicFileTree() {

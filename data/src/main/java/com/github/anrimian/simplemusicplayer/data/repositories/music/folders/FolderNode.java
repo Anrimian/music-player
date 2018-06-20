@@ -2,7 +2,9 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
 
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 
-public class FolderNode implements NodeData {
+import java.util.List;
+
+public class FolderNode extends NodeData {
 
     private String fullPath;
     private int compositionsCount;
@@ -12,10 +14,15 @@ public class FolderNode implements NodeData {
     }
 
     @Override
-    public void onNodeAdded(NodeData nodeData) {
-        if (nodeData instanceof CompositionNode) {
-            compositionsCount++;
+    public boolean onNodesAdded(List<NodeData> nodes) {
+        boolean updated = false;
+        for (NodeData nodeData: nodes) {
+            if (nodeData instanceof CompositionNode) {
+                compositionsCount++;
+                updated = true;
+            }
         }
+        return updated;
     }
 
     public String getFullPath() {

@@ -3,7 +3,6 @@ package com.github.anrimian.simplemusicplayer.data.utils.folders;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -13,6 +12,7 @@ import javax.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
+import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.ADDED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
@@ -22,7 +22,7 @@ import static java.util.Collections.singletonList;
 public class RxNode<K> {
 
     private final PublishSubject<Change<List<RxNode<K>>>> childChangeSubject = create();
-//    private final PublishSubject<Change<RxNode<K>>> selfChangeSubject = create();
+    private final PublishSubject<Change<NodeData>> selfChangeSubject = create();
 
     private final LinkedHashMap<K, RxNode<K>> nodes = new LinkedHashMap<>();
 
@@ -60,14 +60,40 @@ public class RxNode<K> {
         return childChangeSubject;
     }
 
+    public PublishSubject<Change<NodeData>> getSelfChangeObservable() {
+        return selfChangeSubject;
+    }
+
+    public void addNodes(List<RxNode<K>> newNodes) {
+        List<RxNode<K>> addedNodes = new ArrayList<>();
+        List<RxNode<K>> modifiedNodes = new ArrayList<>();
+        for (RxNode<K> newNode : newNodes) {
+            newNode.parent = this;
+            RxNode<K> previous = nodes.put(newNode.getKey(), newNode);
+            if (previous == null) {
+                addedNodes.add(newNode);
+            } else {
+                modifiedNodes.add(newNode);
+            }
+        }
+        if (!addedNodes.isEmpty()) {
+            childChangeSubject.onNext(new Change<>(ADDED, addedNodes));
+            notifyNodesAdded(mapList(addedNodes, new ArrayList<>(), RxNode::getData));
+        }
+        if (!modifiedNodes.isEmpty()) {
+            childChangeSubject.onNext(new Change<>(MODIFY, modifiedNodes));
+        }
+    }
+
     public void addNode(RxNode<K> node) {
         node.parent = this;
-        nodes.put(node.getKey(), node);
-//        selfChangeSubject.onNext(new Change<>(MODIFYhis));
-        childChangeSubject.onNext(new Change<>(ADDED, singletonList(node)));
-
-        notifyNodeAdded(node.getData());
-//        notifyNodeUpdated(this);
+        RxNode<K> previous = nodes.put(node.getKey(), node);
+        if (previous == null) {
+            childChangeSubject.onNext(new Change<>(ADDED, singletonList(node)));
+        } else {
+            childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
+        }
+        notifyNodesAdded(singletonList(node.getData()));
     }
 
     public void removeNode(K key) {
@@ -88,14 +114,17 @@ public class RxNode<K> {
         return nodes.get(key);
     }
 
-    private void notifyNodeAdded(NodeData data) {
+    private void notifyNodesAdded(List<NodeData> data) {
         if (this.data != null) {
-            this.data.onNodeAdded(data);
+            boolean updated = this.data.onNodesAdded(data);
+            if (updated) {
+                selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
+            }
         }
 
         RxNode<K> parent = getParent();
         if (parent != null) {
-            parent.notifyNodeAdded(data);
+            parent.notifyNodesAdded(data);
         }
     }
 
