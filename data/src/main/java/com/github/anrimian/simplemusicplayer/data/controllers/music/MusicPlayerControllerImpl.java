@@ -23,11 +23,11 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.FileDataSource;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -68,7 +68,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void prepareToPlay(CurrentComposition composition) {
-        prepareMediaSource(composition.getComposition())
+        checkComposition(composition.getComposition())
+                .flatMap(this::prepareMediaSource)
                 .toCompletable()//on error can be: com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException: java.io.FileNotFoundException
                 .doOnEvent(t -> onCompositionPrepared(t, composition))
                 .onErrorComplete()
@@ -127,6 +128,16 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
             trackPositionDisposable.dispose();
             trackPositionDisposable = null;
         }
+    }
+
+    private Single<Composition> checkComposition(Composition composition) {
+        return Single.fromCallable(() -> {
+            File file = new File(composition.getFilePath());
+            if (!file.exists()) {
+                throw new FileNotFoundException(composition.getFilePath() + " not found");
+            }
+           return composition;
+        });
     }
 
     private Single<MediaSource> prepareMediaSource(Composition composition) {

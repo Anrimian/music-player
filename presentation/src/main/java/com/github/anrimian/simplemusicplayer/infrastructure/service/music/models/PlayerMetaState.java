@@ -35,4 +35,12 @@ public class PlayerMetaState {
         return composition;
     }
 
+    @Override
+    public String toString() {
+        return "PlayerMetaState{" +
+                "state=" + state +
+                ", composition=" + composition +
+                ", trackPosition=" + trackPosition +
+                '}';
+    }
 }

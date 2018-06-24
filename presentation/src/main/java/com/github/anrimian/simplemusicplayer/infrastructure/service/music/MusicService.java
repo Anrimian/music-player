@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
@@ -16,7 +17,6 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerMetaState;
-import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
 import com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer;
 
@@ -27,7 +27,10 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-import static android.support.v4.media.MediaMetadataCompat.*;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ARTIST;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DURATION;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE;
 import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS;
 import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
@@ -37,10 +40,6 @@ import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_T
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP;
 import static android.support.v4.media.session.PlaybackStateCompat.Builder;
-import static android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED;
-import static android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING;
-import static android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED;
-import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.dispose;
 import static com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
@@ -97,6 +96,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
+
+        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
     }
 
     @Override
@@ -130,7 +131,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.KEYCODE_MEDIA_PLAY: {
-                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
                 musicPlayerInteractor.play();
                 break;
             }
@@ -159,10 +159,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayerChanges() {
-        serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
-                .withLatestFrom(getCurrentCompositionObservable(),
-                        musicPlayerInteractor.getTrackPositionObservable(),
-                        PlayerMetaState::new)
+        serviceDisposable.add(Observable.combineLatest(
+                musicPlayerInteractor.getPlayerStateObservable(),
+                getCurrentCompositionObservable(),
+                musicPlayerInteractor.getTrackPositionObservable(),
+                PlayerMetaState::new)
+                .distinctUntilChanged((oldState, newState) -> oldState.getState() == newState.getState())
                 .subscribe(this::onPlayerStateChanged));
     }
 
@@ -171,7 +173,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         PlayerState playerState = playerMetaState.getState();
 
         switch (playerState) {
-            case PLAY: {//TODO possible error with update notification
+            case PLAY: {//TODO error with often update notification
                 mediaSession.setActive(true);
                 updateMediaSession(playerMetaState);
                 startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(playerMetaState));
@@ -192,7 +194,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnCurrentCompositionChanging() {
-        if (currentCompositionDisposable != null) {
+        if (currentCompositionDisposable == null) {
             currentCompositionDisposable = getCurrentCompositionObservable()
                     .withLatestFrom(musicPlayerInteractor.getPlayerStateObservable(),
                             PlayerMetaState::new)

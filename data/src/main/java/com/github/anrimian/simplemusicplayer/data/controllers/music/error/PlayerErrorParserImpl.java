@@ -23,6 +23,9 @@ public class PlayerErrorParserImpl implements PlayerErrorParser {
                 return ErrorType.DELETED;
             }
         }
+        if (throwable instanceof FileNotFoundException) {
+            return ErrorType.DELETED;
+        }
         analytics.processNonFatalError(throwable);
         return ErrorType.UNKNOWN;
     }
