@@ -1,6 +1,5 @@
 package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -43,7 +42,5 @@ public class CollapseViewDelegate implements BottomSheetDelegate {
         params.height = height;
         params.width = width;
         view.setLayoutParams(params);
-        Log.d("ABDS", "width: " + width);
-//        view.setAlpha(1 - slideOffset);
     }
 }

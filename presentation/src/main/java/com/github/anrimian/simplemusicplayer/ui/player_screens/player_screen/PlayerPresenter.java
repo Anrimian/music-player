@@ -203,11 +203,13 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             case DELETED: {
                 for (Composition composition: compositions) {
                     int index = playQueue.indexOf(composition);
-                    playQueue.remove(index);
-                    getViewState().notifyPlayQueueItemRemoved(index);
+                    if (index != -1) {
+                        playQueue.remove(index);
+                        getViewState().notifyPlayQueueItemRemoved(index);
 
-                    if (playQueue.isEmpty()) {
-                        getViewState().showMusicControls(false);
+                        if (playQueue.isEmpty()) {
+                            getViewState().showMusicControls(false);
+                        }
                     }
                 }
             }

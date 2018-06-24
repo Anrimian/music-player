@@ -29,6 +29,8 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.currentComposition;
 import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.getFakeCompositions;
+import static com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType.DELETED;
+import static com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType.UNKNOWN;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.GAIN;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.LOSS;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;
@@ -36,9 +38,7 @@ import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerS
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.STOP;
-import static com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -75,8 +75,6 @@ public class MusicPlayerInteractorTest {
     @Before
     public void setUp() {
         when(playQueueRepository.setPlayQueue(any())).thenReturn(Completable.complete());
-        when(playQueueRepository.getCurrentComposition())
-                .thenReturn(Single.just(currentComposition(getFakeCompositions().get(0))));
         when(playQueueRepository.getCurrentCompositionObservable())
                 .thenReturn(currentCompositionSubject);
         when(playQueueRepository.skipToNext()).thenReturn(Single.just(1));

@@ -175,23 +175,12 @@ public class Composition {
     @Override
     public String toString() {
         return "Composition{" +
-                "\n artist='" + artist + '\'' +
-                "\n title='" + title + '\'' +
-                "\n album='" + album + '\'' +
+                "\n id=" + id +
                 "\n filePath='" + filePath + '\'' +
-                "\n composer='" + composer + '\'' +
-                "\n displayName='" + displayName + '\'' +
                 "\n duration=" + duration +
                 "\n size=" + size +
-                "\n id=" + id +
                 "\n dateAdded=" + dateAdded +
                 "\n dateModified=" + dateModified +
-                "\n isAlarm=" + isAlarm +
-                "\n isMusic=" + isMusic +
-                "\n isNotification=" + isNotification +
-                "\n isPodcast=" + isPodcast +
-                "\n isRingtone=" + isRingtone +
-                "\n year=" + year +
                 '}';
     }
 

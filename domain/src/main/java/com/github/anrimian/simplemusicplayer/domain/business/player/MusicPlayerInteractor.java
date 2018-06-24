@@ -81,7 +81,10 @@ public class MusicPlayerInteractor {
 
     public Completable startPlaying(List<Composition> compositions) {
         return playQueueRepository.setPlayQueue(compositions)
-                .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
+                .doOnSubscribe(d -> {
+                    playerStateSubject.onNext(LOADING);
+                    musicPlayerController.releasePreparedComposition();
+                })
                 .doOnError(t -> playerStateSubject.onNext(STOP))
                 .doOnComplete(this::play);
     }
@@ -94,7 +97,7 @@ public class MusicPlayerInteractor {
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
             playerStateSubject.onNext(PLAY);
-            musicPlayerController.resume();
+            musicPlayerController.resume();//FIXME start playing then prepare 10+ deleted compositions case
 
             if (systemEventsDisposable.size() == 0) {
                 systemEventsDisposable.add(audioFocusObservable

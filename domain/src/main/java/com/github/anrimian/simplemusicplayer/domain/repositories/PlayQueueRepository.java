@@ -19,8 +19,6 @@ public interface PlayQueueRepository {
 
     Observable<CurrentComposition> getCurrentCompositionObservable();
 
-    Single<CurrentComposition> getCurrentComposition();
-
     Observable<List<Composition>> getPlayQueueObservable();
 
     Observable<Change<List<Composition>>> getPlayQueueChangeObservable();

@@ -1,6 +1,5 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
-import com.github.anrimian.simplemusicplayer.data.models.exceptions.CompositionNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
@@ -73,13 +72,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     public Observable<CurrentComposition> getCurrentCompositionObservable() {
         return withDefaultValue(currentCompositionSubject, getSavedComposition())
                 .subscribeOn(dbScheduler);
-    }
-
-    @Override
-    public Single<CurrentComposition> getCurrentComposition() {
-        return getCurrentCompositionObservable()
-                .lastOrError()
-                .onErrorResumeNext(Single.error(new CompositionNotFoundException()));
     }
 
     @Override

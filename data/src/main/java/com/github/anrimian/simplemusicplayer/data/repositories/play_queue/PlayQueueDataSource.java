@@ -105,10 +105,12 @@ public class PlayQueueDataSource {
     }
 
     private int getCurrentPosition(Composition composition) {
-        if (settingsPreferences.isRandomPlayingEnabled()) {
-            return playQueue.getShuffledPosition(composition);
+        synchronized (this) {
+            if (settingsPreferences.isRandomPlayingEnabled()) {
+                return playQueue.getShuffledPosition(composition);
+            }
+            return playQueue.getPosition(composition);
         }
-        return playQueue.getPosition(composition);
     }
 
     private Single<PlayQueue> getSavedPlayQueue() {
@@ -148,58 +150,62 @@ public class PlayQueueDataSource {
     }
 
     private void processDeleteChange(List<Composition> changedCompositions) {
-        List<Composition> compositionsToNotify = new ArrayList<>();
-        for (Composition deletedComposition: changedCompositions) {
-            long id = deletedComposition.getId();
-            if (playQueue.getCompositionById(id) != null) {
-                playQueue.deleteComposition(id);
-                playQueueDao.deletePlayQueueEntity(id);
+        synchronized (this) {
+            List<Composition> compositionsToNotify = new ArrayList<>();
+            for (Composition deletedComposition : changedCompositions) {
+                long id = deletedComposition.getId();
+                if (playQueue.getCompositionById(id) != null) {
+                    playQueue.deleteComposition(id);
+                    playQueueDao.deletePlayQueueEntity(id);
 
-                Map<Long, Integer> shuffledPositionMap = playQueue.getShuffledPositionMap();
-                int freeShuffledPosition = shuffledPositionMap.remove(id);
-                for (Map.Entry<Long, Integer> entry: shuffledPositionMap.entrySet()) {// FIXME: 17.06.2018 concurrent modification
-                    Long key = entry.getKey();
-                    Integer position = entry.getValue();
-                    if (position > freeShuffledPosition) {
-                        int newPosition = position - 1;
-                        shuffledPositionMap.put(key, newPosition);
-                        playQueueDao.updateShuffledPosition(key, newPosition);
+                    Map<Long, Integer> shuffledPositionMap = playQueue.getShuffledPositionMap();
+                    int freeShuffledPosition = shuffledPositionMap.remove(id);
+                    for (Map.Entry<Long, Integer> entry : shuffledPositionMap.entrySet()) {// FIXME: 17.06.2018 concurrent modification
+                        Long key = entry.getKey();
+                        Integer position = entry.getValue();
+                        if (position > freeShuffledPosition) {
+                            int newPosition = position - 1;
+                            shuffledPositionMap.put(key, newPosition);
+                            playQueueDao.updateShuffledPosition(key, newPosition);
+                        }
                     }
-                }
 
-                Map<Long, Integer> positionMap = playQueue.getPositionMap();
-                int freeInitialPosition = positionMap.remove(id);
-                for (Map.Entry<Long, Integer> entry: positionMap.entrySet()) {
-                    Long key = entry.getKey();
-                    Integer position = entry.getValue();
-                    if (position > freeInitialPosition) {
-                        int newPosition = position - 1;
-                        positionMap.put(key, newPosition);
-                        playQueueDao.updatePosition(key, newPosition);
+                    Map<Long, Integer> positionMap = playQueue.getPositionMap();
+                    int freeInitialPosition = positionMap.remove(id);
+                    for (Map.Entry<Long, Integer> entry : positionMap.entrySet()) {
+                        Long key = entry.getKey();
+                        Integer position = entry.getValue();
+                        if (position > freeInitialPosition) {
+                            int newPosition = position - 1;
+                            positionMap.put(key, newPosition);
+                            playQueueDao.updatePosition(key, newPosition);
+                        }
                     }
-                }
 
-                compositionsToNotify.add(deletedComposition);
+                    compositionsToNotify.add(deletedComposition);
+                }
             }
-        }
-        if (!compositionsToNotify.isEmpty()) {
-            changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
-            updateSubject();
+            if (!compositionsToNotify.isEmpty()) {
+                changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
+                updateSubject();
+            }
         }
     }
 
     private void processModifyChange(List<Composition> changedCompositions) {
-        List<Composition> compositionsToNotify = new ArrayList<>();
-        for (Composition modifiedComposition: changedCompositions) {
-            long id = modifiedComposition.getId();
-            if (playQueue.getCompositionById(id) != null) {
-                playQueue.updateComposition(modifiedComposition);
-                compositionsToNotify.add(modifiedComposition);
+        synchronized (this) {
+            List<Composition> compositionsToNotify = new ArrayList<>();
+            for (Composition modifiedComposition : changedCompositions) {
+                long id = modifiedComposition.getId();
+                if (playQueue.getCompositionById(id) != null) {
+                    playQueue.updateComposition(modifiedComposition);
+                    compositionsToNotify.add(modifiedComposition);
+                }
             }
-        }
-        if (!compositionsToNotify.isEmpty()) {
-            changeSubject.onNext(new Change<>(ChangeType.MODIFY, compositionsToNotify));
-            updateSubject();
+            if (!compositionsToNotify.isEmpty()) {
+                changeSubject.onNext(new Change<>(ChangeType.MODIFY, compositionsToNotify));
+                updateSubject();
+            }
         }
     }
 
@@ -224,13 +230,14 @@ public class PlayQueueDataSource {
     }
 
     private void savePlayQueue(PlayQueue playQueue) {
-        playQueueDao.deletePlayQueue();
-        playQueueDao.setPlayQueue(toEntityList(playQueue));
+        synchronized (this) {
+            playQueueDao.deletePlayQueue();
+            playQueueDao.setPlayQueue(toEntityList(playQueue));
 
-        this.playQueue = playQueue;
+            this.playQueue = playQueue;
 
-        subscribeOnCompositionChanges();
-
+            subscribeOnCompositionChanges();
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -1,10 +1,8 @@
 package com.github.anrimian.simplemusicplayer.domain.controllers;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
-import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 /**
@@ -26,4 +24,6 @@ public interface MusicPlayerController {
     void seekTo(long position);
 
     Observable<Long> getTrackPositionObservable();
+
+    void releasePreparedComposition();
 }

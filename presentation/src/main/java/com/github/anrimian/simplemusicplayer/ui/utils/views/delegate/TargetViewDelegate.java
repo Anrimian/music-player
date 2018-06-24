@@ -54,7 +54,6 @@ public class TargetViewDelegate implements BottomSheetDelegate {
 
         float deltaPadding = endPadding - startPadding;
         int resultPadding = (int) (startPadding + (deltaPadding * slideOffset));
-        Log.d("resultPadding", "resultPadding: " + resultPadding);
         view.setPadding(resultPadding, resultPadding, resultPadding, resultPadding);
     }
 }
