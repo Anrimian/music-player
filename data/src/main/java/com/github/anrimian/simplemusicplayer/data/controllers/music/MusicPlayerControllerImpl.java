@@ -10,6 +10,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.PreparedEvent;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -70,7 +71,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public void prepareToPlay(CurrentComposition composition) {
         checkComposition(composition.getComposition())
                 .flatMap(this::prepareMediaSource)
-                .toCompletable()//on error can be: com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException: java.io.FileNotFoundException
+                .toCompletable()
                 .doOnEvent(t -> onCompositionPrepared(t, composition))
                 .onErrorComplete()
                 .subscribe();
@@ -115,8 +116,10 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private void onCompositionPrepared(Throwable throwable, CurrentComposition currentComposition) {
         if (throwable == null) {
             seekTo(currentComposition.getPlayPosition());
+            playerEventSubject.onNext(new PreparedEvent(currentComposition.getComposition()));
         } else {
             seekTo(0);
+            player.setPlayWhenReady(false);
             playerEventSubject.onNext(new ErrorEvent(throwable));
         }
     }

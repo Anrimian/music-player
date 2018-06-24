@@ -1,6 +1,5 @@
 package com.github.anrimian.simplemusicplayer.data.utils.exo_player;
 
-import com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
@@ -11,14 +10,7 @@ import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
-import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
-
-import static com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState.BUFFERING;
-import static com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState.ENDED;
-import static com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState.IDLE;
-import static com.github.anrimian.simplemusicplayer.domain.models.player.InternalPlayerState.READY;
 
 public class PlayerEventListener implements Player.EventListener {
 

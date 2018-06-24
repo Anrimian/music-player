@@ -11,6 +11,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEv
 import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.simplemusicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
@@ -81,10 +82,7 @@ public class MusicPlayerInteractor {
 
     public Completable startPlaying(List<Composition> compositions) {
         return playQueueRepository.setPlayQueue(compositions)
-                .doOnSubscribe(d -> {
-                    playerStateSubject.onNext(LOADING);
-                    musicPlayerController.releasePreparedComposition();
-                })
+                .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
                 .doOnError(t -> playerStateSubject.onNext(STOP))
                 .doOnComplete(this::play);
     }
@@ -97,7 +95,7 @@ public class MusicPlayerInteractor {
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
             playerStateSubject.onNext(PLAY);
-            musicPlayerController.resume();//FIXME start playing then prepare 10+ deleted compositions case
+            musicPlayerController.resume();
 
             if (systemEventsDisposable.size() == 0) {
                 systemEventsDisposable.add(audioFocusObservable
@@ -212,9 +210,6 @@ public class MusicPlayerInteractor {
         this.currentComposition = currentComposition.getComposition();
         musicPlayerController.prepareToPlay(currentComposition);
 
-        if (playerStateSubject.getValue() == PLAY) {
-            musicPlayerController.resume();
-        }
         subscribeOnCompositionChanges();
     }
 
@@ -235,11 +230,20 @@ public class MusicPlayerInteractor {
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
+        if (playerEvent instanceof PreparedEvent) {
+            onCompositionPrepared(((PreparedEvent) playerEvent).getComposition());
+        }
         if (playerEvent instanceof FinishedEvent) {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;
             handleErrorWithComposition(playerErrorParser.getErrorType(errorEvent.getThrowable()));
+        }
+    }
+
+    private void onCompositionPrepared(Composition composition) {
+        if (playerStateSubject.getValue() == PLAY) {
+            musicPlayerController.resume();
         }
     }
 
