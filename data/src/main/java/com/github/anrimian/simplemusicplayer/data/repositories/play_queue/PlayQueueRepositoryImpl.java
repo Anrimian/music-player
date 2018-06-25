@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
@@ -38,10 +38,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler dbScheduler;
 
-    private final BehaviorSubject<CurrentComposition> currentCompositionSubject = create();
-
-    private final PublishSubject<Change<Composition>> currentCompositionChangeSubject
-            = PublishSubject.create();
+    private final BehaviorSubject<CompositionEvent> currentCompositionSubject = create();
 
     private int position = NO_POSITION;
 
@@ -69,7 +66,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Observable<CurrentComposition> getCurrentCompositionObservable() {
+    public Observable<CompositionEvent> getCurrentCompositionObservable() {
         return withDefaultValue(currentCompositionSubject, getSavedComposition())
                 .subscribeOn(dbScheduler);
     }
@@ -81,12 +78,16 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public void setRandomPlayingEnabled(boolean enabled) {
-        CurrentComposition currentComposition = currentCompositionSubject.getValue();
-        if (currentComposition == null) {
+        CompositionEvent compositionEvent = currentCompositionSubject.getValue();
+        if (compositionEvent == null) {
             throw new IllegalStateException("change play mode without current composition");
         }
+        Composition composition = compositionEvent.getComposition();
+        if (composition == null) {
+            throw new IllegalStateException("change play mode with composition event: null");
+        }
 
-        playQueueDataSource.setRandomPlayingEnabled(enabled, currentComposition.getComposition())
+        playQueueDataSource.setRandomPlayingEnabled(enabled, compositionEvent.getComposition())
                 .doOnSuccess(position -> {
                     this.position = position;
                     uiStatePreferences.setCurrentCompositionPosition(position);
@@ -150,11 +151,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return playQueueDataSource.getChangeObservable();
     }
 
-    @Override
-    public Observable<Change<Composition>> getCompositionChangeObservable() {
-        return currentCompositionChangeSubject;
-    }
-
     private void subscribeOnCurrentCompositionChange() {
         if (currentCompositionChangeDisposable == null) {
             currentCompositionChangeDisposable = playQueueDataSource.getChangeObservable()
@@ -178,7 +174,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             case DELETED: {
                 List<Composition> playQueue = playQueueDataSource.getPlayQueue().blockingGet();
                 if (playQueue.isEmpty()) {
-                    currentCompositionChangeSubject.onNext(new Change<>(DELETED, changedComposition));
+                    currentCompositionSubject.onNext(new CompositionEvent());
                 } else {
                     if (position >= playQueue.size()) {
                         position = 0;
@@ -188,7 +184,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 break;
             }
             case MODIFY: {
-                currentCompositionChangeSubject.onNext(new Change<>(MODIFY, changedComposition));
+                currentCompositionSubject.onNext(new CompositionEvent(changedComposition, position));
                 break;
             }
         }
@@ -202,18 +198,18 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         uiStatePreferences.setCurrentCompositionId(composition.getId());
         uiStatePreferences.setCurrentCompositionPosition(position);
 
-        CurrentComposition currentComposition = new CurrentComposition(composition, position, 0);
-        currentCompositionSubject.onNext(currentComposition);
+        CompositionEvent compositionEvent = new CompositionEvent(composition, position, 0);
+        currentCompositionSubject.onNext(compositionEvent);
     }
 
-    private Maybe<CurrentComposition> getSavedComposition() {
+    private Maybe<CompositionEvent> getSavedComposition() {
         return playQueueDataSource.getPlayQueue()
                 .flatMapMaybe(this::findSavedComposition)
                 .doOnSuccess(currentComposition -> subscribeOnCurrentCompositionChange());
     }
 
     @Nullable
-    private Maybe<CurrentComposition> findSavedComposition(List<Composition> compositions) {
+    private Maybe<CompositionEvent> findSavedComposition(List<Composition> compositions) {
         return Maybe.create(emitter -> {
             long id = uiStatePreferences.getCurrentCompositionId();
             int position = uiStatePreferences.getCurrentCompositionPosition();
@@ -223,7 +219,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 Composition expectedComposition = compositions.get(position);
                 if (expectedComposition.getId() == id) {
                     this.position = position;
-                    emitter.onSuccess(new CurrentComposition(expectedComposition,
+                    emitter.onSuccess(new CompositionEvent(expectedComposition,
                             position,
                             uiStatePreferences.getTrackPosition()));
                     return;
@@ -239,7 +235,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 Composition composition = compositions.get(i);
                 if (composition.getId() == id) {
                     this.position = i;
-                    emitter.onSuccess(new CurrentComposition(composition,
+                    emitter.onSuccess(new CompositionEvent(composition,
                             position,
                             uiStatePreferences.getTrackPosition()));
                     return;

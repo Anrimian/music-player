@@ -7,20 +7,5 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
  */
 public class PreparedEvent implements PlayerEvent {
 
-    private Composition composition;
 
-    public PreparedEvent(Composition composition) {
-        this.composition = composition;
-    }
-
-    public Composition getComposition() {
-        return composition;
-    }
-
-    @Override
-    public String toString() {
-        return "PreparedEvent{" +
-                "composition=" + composition +
-                '}';
-    }
 }

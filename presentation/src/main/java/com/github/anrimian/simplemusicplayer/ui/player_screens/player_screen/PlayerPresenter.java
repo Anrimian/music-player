@@ -4,7 +4,7 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
@@ -130,16 +130,17 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         presenterDisposable.add(currentCompositionDisposable);
     }
 
-    private void onCurrentCompositionChanged(CurrentComposition currentComposition) {
-        composition = currentComposition.getComposition();
+    private void onCurrentCompositionChanged(CompositionEvent compositionEvent) {
+        composition = compositionEvent.getComposition();
         if (trackStateDisposable != null) {
             trackStateDisposable.dispose();
             trackStateDisposable = null;
         }
-
-        getViewState().showCurrentComposition(composition, currentComposition.getQueuePosition());
-        getViewState().showTrackState(currentComposition.getPlayPosition(), composition.getDuration());
-        subscribeOnTrackPositionChanging();
+        if (composition != null) {
+            getViewState().showCurrentComposition(composition, compositionEvent.getQueuePosition());
+            getViewState().showTrackState(compositionEvent.getPlayPosition(), composition.getDuration());
+            subscribeOnTrackPositionChanging();
+        }
     }
 
     private void subscribeOnPlayerStateChanges() {

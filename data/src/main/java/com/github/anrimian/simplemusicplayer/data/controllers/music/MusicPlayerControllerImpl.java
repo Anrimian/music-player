@@ -7,7 +7,6 @@ import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PreparedEvent;
@@ -68,11 +67,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public void prepareToPlay(CurrentComposition composition) {
-        checkComposition(composition.getComposition())
+    public void prepareToPlay(Composition composition, long startPosition) {
+        checkComposition(composition)
                 .flatMap(this::prepareMediaSource)
                 .toCompletable()
-                .doOnEvent(t -> onCompositionPrepared(t, composition))
+                .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
                 .subscribe();
     }
@@ -108,15 +107,10 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         return trackPositionSubject;
     }
 
-    @Override
-    public void releasePreparedComposition() {
-
-    }
-
-    private void onCompositionPrepared(Throwable throwable, CurrentComposition currentComposition) {
+    private void onCompositionPrepared(Throwable throwable, long startPosition) {
         if (throwable == null) {
-            seekTo(currentComposition.getPlayPosition());
-            playerEventSubject.onNext(new PreparedEvent(currentComposition.getComposition()));
+            seekTo(startPosition);
+            playerEventSubject.onNext(new PreparedEvent());
         } else {
             seekTo(0);
             player.setPlayWhenReady(false);

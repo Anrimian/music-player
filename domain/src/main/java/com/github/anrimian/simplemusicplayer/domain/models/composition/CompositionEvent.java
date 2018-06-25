@@ -1,28 +1,51 @@
 package com.github.anrimian.simplemusicplayer.domain.models.composition;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Created on 24.06.2018.
+ * Created on 01.05.2018.
  */
 public class CompositionEvent {
 
     @Nullable
-    private CurrentComposition currentComposition;
+    private Composition composition;
 
-    public CompositionEvent(@Nullable CurrentComposition currentComposition) {
-        this.currentComposition = currentComposition;
+    private int queuePosition;
+    private long playPosition;
+
+    public CompositionEvent(@Nullable Composition composition, int queuePosition, long playPosition) {
+        this.composition = composition;
+        this.queuePosition = queuePosition;
+        this.playPosition = playPosition;
+    }
+
+    public CompositionEvent() {
+    }
+
+    public CompositionEvent(Composition changedComposition, int position) {
+        this(changedComposition, position, 0);
     }
 
     @Nullable
-    public CurrentComposition getCurrentComposition() {
-        return currentComposition;
+    public Composition getComposition() {
+        return composition;
+    }
+
+    public int getQueuePosition() {
+        return queuePosition;
+    }
+
+    public long getPlayPosition() {
+        return playPosition;
     }
 
     @Override
     public String toString() {
         return "CompositionEvent{" +
-                "currentComposition=" + currentComposition +
+                "composition=" + composition +
+                ", queuePosition=" + queuePosition +
+                ", playPosition=" + playPosition +
                 '}';
     }
 
@@ -33,11 +56,11 @@ public class CompositionEvent {
 
         CompositionEvent that = (CompositionEvent) o;
 
-        return currentComposition != null ? currentComposition.equals(that.currentComposition) : that.currentComposition == null;
+        return composition.equals(that.composition);
     }
 
     @Override
     public int hashCode() {
-        return currentComposition != null ? currentComposition.hashCode() : 0;
+        return composition.hashCode();
     }
 }

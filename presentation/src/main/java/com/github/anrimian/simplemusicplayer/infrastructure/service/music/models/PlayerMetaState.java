@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.infrastructure.service.music.models;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 
 /**
@@ -13,14 +14,14 @@ public class PlayerMetaState {
     private final Composition composition;
     private final long trackPosition;
 
-    public PlayerMetaState(PlayerState state, Composition composition, long trackPosition) {
+    public PlayerMetaState(PlayerState state, CompositionEvent compositionEvent, long trackPosition) {
         this.state = state;
-        this.composition = composition;
+        this.composition = compositionEvent.getComposition();
         this.trackPosition = trackPosition;
     }
 
-    public PlayerMetaState(Composition composition, PlayerState state) {
-        this(state, composition, 0);
+    public PlayerMetaState(CompositionEvent compositionEvent, PlayerState state) {
+        this(state, compositionEvent, 0);
     }
 
     public long getTrackPosition() {

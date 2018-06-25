@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class TestDataProvider {
         return compositions;
     }
 
-    public static CurrentComposition currentComposition(Composition composition) {
-        return new CurrentComposition(composition, 0, 0L);
+    public static CompositionEvent currentComposition(Composition composition) {
+        return new CompositionEvent(composition, 0, 0L);
     }
 }

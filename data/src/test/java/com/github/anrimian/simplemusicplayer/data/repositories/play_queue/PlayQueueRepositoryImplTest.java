@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
@@ -84,7 +84,7 @@ public class PlayQueueRepositoryImplTest {
 
     @Test
     public void setPlayQueueTest() {
-        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(getFakeCompositions()));
@@ -121,7 +121,7 @@ public class PlayQueueRepositoryImplTest {
 
         setPlayQueueTest();
 
-        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         playQueueRepository.setRandomPlayingEnabled(true);
@@ -139,7 +139,7 @@ public class PlayQueueRepositoryImplTest {
     public void skipToNext() {
         setPlayQueueTest();
 
-        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         playQueueRepository.skipToNext().subscribe();
@@ -154,7 +154,7 @@ public class PlayQueueRepositoryImplTest {
         when(uiStatePreferences.getCurrentCompositionId()).thenReturn(1L);
         when(uiStatePreferences.getCurrentCompositionPosition()).thenReturn(1);
 
-        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         playQueueRepository.skipToNext().subscribe();
@@ -167,7 +167,7 @@ public class PlayQueueRepositoryImplTest {
     public void skipToPrevious() {
         setPlayQueueTest();
 
-        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         playQueueRepository.skipToNext()
@@ -183,7 +183,7 @@ public class PlayQueueRepositoryImplTest {
     public void skipToPositionTest() {
         setPlayQueueTest();
 
-        TestObserver<CurrentComposition> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         playQueueRepository.skipToPosition(1000).subscribe();
@@ -196,14 +196,13 @@ public class PlayQueueRepositoryImplTest {
     public void testCurrentCompositionModifyChange() {
         setPlayQueueTest();
 
-        TestObserver<Change<Composition>> observer = playQueueRepository.getCompositionChangeObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         changeSubject.onNext(new Change<>(ChangeType.MODIFY, getFakeCompositions()));
 
-        observer.assertValue(change -> {
-            assertEquals(ChangeType.MODIFY, change.getChangeType());
-            assertEquals(getFakeCompositions().get(0), change.getData());
+        compositionObserver.assertValueAt(1, event -> {
+            assertEquals(getFakeCompositions().get(0), event.getComposition());
             return true;
         });
     }
@@ -212,12 +211,7 @@ public class PlayQueueRepositoryImplTest {
     public void testCurrentCompositionDeleteChange() {
         setPlayQueueTest();
 
-        TestObserver<Change<Composition>> changeObserver = playQueueRepository
-                .getCompositionChangeObservable()
-                .test();
-
-        TestObserver<CurrentComposition> currentCompositionObserver = playQueueRepository
-                .getCurrentCompositionObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         List<Composition> changedCompositions = getFakeCompositions();
@@ -226,8 +220,7 @@ public class PlayQueueRepositoryImplTest {
 
         changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(getFakeCompositions().get(0))));
 
-        changeObserver.assertNoValues();
-        currentCompositionObserver
+        compositionObserver
                 .assertValueAt(0, currentComposition(getFakeCompositions().get(0)))
                 .assertValueAt(1, currentComposition(getFakeCompositions().get(1)));
     }
@@ -236,16 +229,15 @@ public class PlayQueueRepositoryImplTest {
     public void testCurrentCompositionDeleteChangeWithEmptyPlayQueue() {
         setPlayQueueTest();
 
-        TestObserver<Change<Composition>> observer = playQueueRepository.getCompositionChangeObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(emptyList()));
 
         changeSubject.onNext(new Change<>(ChangeType.DELETED, getFakeCompositions()));
 
-        observer.assertValue(change -> {
-            assertEquals(ChangeType.DELETED, change.getChangeType());
-            assertEquals(getFakeCompositions().get(0), change.getData());
+        compositionObserver.assertValueAt(1, event -> {
+            assertEquals(null, event.getComposition());
             return true;
         });
     }
@@ -254,14 +246,9 @@ public class PlayQueueRepositoryImplTest {
     public void testCurrentCompositionDeleteChangeWithLastPosition() {
         setPlayQueueTest();
 
-        playQueueRepository.skipToPosition(getFakeCompositions().size() - 1);
+        playQueueRepository.skipToPosition(getFakeCompositions().size() - 1).subscribe();
 
-        TestObserver<Change<Composition>> changeObserver = playQueueRepository
-                .getCompositionChangeObservable()
-                .test();
-
-        TestObserver<CurrentComposition> currentCompositionObserver = playQueueRepository
-                .getCurrentCompositionObservable()
+        TestObserver<CompositionEvent> compositionObserver = playQueueRepository.getCurrentCompositionObservable()
                 .test();
 
         List<Composition> changedCompositions = getFakeCompositions();
@@ -271,9 +258,7 @@ public class PlayQueueRepositoryImplTest {
         changeSubject.onNext(new Change<>(ChangeType.DELETED,
                 singletonList(getFakeCompositions().get(getFakeCompositions().size() - 1))));
 
-        changeObserver.assertNoValues();
-        currentCompositionObserver
-                .assertValueAt(0, currentComposition(getFakeCompositions().get(0)))
-                .assertValueAt(0, currentComposition(getFakeCompositions().get(0)));
+        compositionObserver
+                .assertValueAt(1, currentComposition(getFakeCompositions().get(0)));
     }
 }

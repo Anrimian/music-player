@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.domain.controllers;
 
-import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 
 import io.reactivex.Observable;
@@ -13,7 +13,7 @@ public interface MusicPlayerController {
 
     Observable<PlayerEvent> getEventsObservable();
 
-    void prepareToPlay(CurrentComposition composition);
+    void prepareToPlay(Composition composition, long startPosition);
 
     void stop();
 
@@ -24,6 +24,4 @@ public interface MusicPlayerController {
     void seekTo(long position);
 
     Observable<Long> getTrackPositionObservable();
-
-    void releasePreparedComposition();
 }

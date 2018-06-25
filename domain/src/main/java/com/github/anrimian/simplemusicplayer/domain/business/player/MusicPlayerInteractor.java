@@ -4,7 +4,7 @@ import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
@@ -186,7 +186,7 @@ public class MusicPlayerInteractor {
                 .distinctUntilChanged();
     }
 
-    public Observable<CurrentComposition> getCurrentCompositionObservable() {
+    public Observable<CompositionEvent> getCurrentCompositionObservable() {
         return playQueueRepository.getCurrentCompositionObservable();
     }
 
@@ -198,40 +198,22 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getPlayQueueChangeObservable();
     }
 
-    public Observable<Change<Composition>> getCompositionChangeObservable() {
-        return playQueueRepository.getCompositionChangeObservable();
-    }
-
     public Completable deleteComposition(Composition composition) {
         return musicProviderRepository.deleteComposition(composition);
     }
 
-    private void onCompositionChanged(CurrentComposition currentComposition) {
-        this.currentComposition = currentComposition.getComposition();
-        musicPlayerController.prepareToPlay(currentComposition);
-
-        subscribeOnCompositionChanges();
-    }
-
-    private void subscribeOnCompositionChanges() {
-        if (compositionChangeDisposable == null) {
-            compositionChangeDisposable = playQueueRepository.getCompositionChangeObservable()
-                    .subscribe(this::onCurrentCompositionChanged);
-        }
-    }
-
-    private void onCurrentCompositionChanged(Change<Composition> change) {
-        switch (change.getChangeType()) {//TODO check replace composition
-            case DELETED: {
-                musicPlayerController.stop();
-                break;
-            }
+    private void onCompositionChanged(CompositionEvent compositionEvent) {
+        this.currentComposition = compositionEvent.getComposition();
+        if (currentComposition == null) {
+            musicPlayerController.stop();
+        } else {
+            musicPlayerController.prepareToPlay(currentComposition, compositionEvent.getPlayPosition());
         }
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
         if (playerEvent instanceof PreparedEvent) {
-            onCompositionPrepared(((PreparedEvent) playerEvent).getComposition());
+            onCompositionPrepared();
         }
         if (playerEvent instanceof FinishedEvent) {
             onCompositionPlayFinished();
@@ -241,7 +223,7 @@ public class MusicPlayerInteractor {
         }
     }
 
-    private void onCompositionPrepared(Composition composition) {
+    private void onCompositionPrepared() {
         if (playerStateSubject.getValue() == PLAY) {
             musicPlayerController.resume();
         }

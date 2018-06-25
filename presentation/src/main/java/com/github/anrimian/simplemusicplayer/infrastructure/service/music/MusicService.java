@@ -13,7 +13,7 @@ import android.view.KeyEvent;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.music.models.PlayerMetaState;
 import com.github.anrimian.simplemusicplayer.ui.main.MainActivity;
@@ -169,6 +169,11 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private void onPlayerStateChanged(PlayerMetaState playerMetaState) {
         currentComposition = playerMetaState.getComposition();
+        if (currentComposition == null) {
+            stopSelf();
+            return;
+        }
+
         PlayerState playerState = playerMetaState.getState();
 
         switch (playerState) {
@@ -204,15 +209,14 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private void onCurrentCompositionChanged(PlayerMetaState playerMetaState) {
         Composition composition = playerMetaState.getComposition();
-        if (!currentComposition.equals(composition)) {
+        if (composition != null && !currentComposition.equals(composition)) {
             currentComposition = composition;
             notificationsDisplayer.updateForegroundNotification(playerMetaState);
         }
     }
 
-    private Observable<Composition> getCurrentCompositionObservable() {
-        return musicPlayerInteractor.getCurrentCompositionObservable()
-                .map(CurrentComposition::getComposition);
+    private Observable<CompositionEvent> getCurrentCompositionObservable() {
+        return musicPlayerInteractor.getCurrentCompositionObservable();
     }
 
     private void updateMediaSession(PlayerMetaState playerMetaState) {
