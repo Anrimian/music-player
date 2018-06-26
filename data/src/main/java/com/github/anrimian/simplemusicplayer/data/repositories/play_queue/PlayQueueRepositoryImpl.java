@@ -18,12 +18,9 @@ import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
-import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
-import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static io.reactivex.subjects.BehaviorSubject.create;
 
 /**
@@ -36,7 +33,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private final PlayQueueDataSource playQueueDataSource;
     private final UiStatePreferences uiStatePreferences;
-    private final Scheduler dbScheduler;
+    private final Scheduler scheduler;
 
     private final BehaviorSubject<CompositionEvent> currentCompositionSubject = create();
 
@@ -46,10 +43,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     public PlayQueueRepositoryImpl(PlayQueueDataSource playQueueDataSource,
                                    UiStatePreferences uiStatePreferences,
-                                   Scheduler dbScheduler) {
+                                   Scheduler scheduler) {
         this.playQueueDataSource = playQueueDataSource;
         this.uiStatePreferences = uiStatePreferences;
-        this.dbScheduler = dbScheduler;
+        this.scheduler = scheduler;
     }
 
     @Override
@@ -62,18 +59,19 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     subscribeOnCurrentCompositionChange();
                 })
                 .toCompletable()
-                .subscribeOn(dbScheduler);
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Observable<CompositionEvent> getCurrentCompositionObservable() {
         return withDefaultValue(currentCompositionSubject, getSavedComposition())
-                .subscribeOn(dbScheduler);
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Observable<List<Composition>> getPlayQueueObservable() {
-        return playQueueDataSource.getPlayQueueObservable();
+        return playQueueDataSource.getPlayQueueObservable()
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -92,6 +90,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     this.position = position;
                     uiStatePreferences.setCurrentCompositionPosition(position);
                 })
+                .subscribeOn(scheduler)
                 .subscribe();
     }
 
@@ -110,7 +109,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     }
                     updateCurrentComposition(playQueue, position);
                     return position;
-                });
+                })
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -127,7 +127,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     }
                     updateCurrentComposition(playQueue, position);
                     return position;
-                });
+                })
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -143,17 +144,20 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     this.position = position;
                     updateCurrentComposition(playQueue, position);
                 })
-                .toCompletable();
+                .toCompletable()
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Observable<Change<List<Composition>>> getPlayQueueChangeObservable() {
-        return playQueueDataSource.getChangeObservable();
+        return playQueueDataSource.getChangeObservable()
+                .subscribeOn(scheduler);
     }
 
     private void subscribeOnCurrentCompositionChange() {
         if (currentCompositionChangeDisposable == null) {
             currentCompositionChangeDisposable = playQueueDataSource.getChangeObservable()
+                    .subscribeOn(scheduler)
                     .subscribe(this::processChangeForCurrentComposition);
         }
     }
@@ -205,7 +209,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private Maybe<CompositionEvent> getSavedComposition() {
         return playQueueDataSource.getPlayQueue()
                 .flatMapMaybe(this::findSavedComposition)
-                .doOnSuccess(currentComposition -> subscribeOnCurrentCompositionChange());
+                .doOnSuccess(currentComposition -> subscribeOnCurrentCompositionChange())
+                .subscribeOn(scheduler);
     }
 
     @Nullable

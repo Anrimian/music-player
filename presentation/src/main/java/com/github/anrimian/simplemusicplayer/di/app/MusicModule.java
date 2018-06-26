@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.simplemusicplayer.data.controllers.music.SystemMusicControllerImpl;
-import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
 import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
@@ -73,12 +72,10 @@ class MusicModule {
     @Singleton
     PlayQueueDataSource playQueueDataSource(PlayQueueDao playQueueDao,
                                             StorageMusicDataSource storageMusicDataSource,
-                                            SettingsPreferences settingsPreferences,
-                                            @Named(DB_SCHEDULER) Scheduler dbScheduler) {
+                                            SettingsPreferences settingsPreferences) {
         return new PlayQueueDataSource(playQueueDao,
                 storageMusicDataSource,
-                settingsPreferences,
-                dbScheduler);
+                settingsPreferences);
     }
 
     @Provides

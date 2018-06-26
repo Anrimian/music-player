@@ -46,7 +46,6 @@ public class PlayQueueDataSourceTest {
     private final PlayQueueDao playQueueDao = mock(PlayQueueDao.class);
     private final StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
     private final SettingsPreferences settingsPreferences = mock(SettingsPreferences.class);
-    private final Scheduler scheduler = Schedulers.trampoline();
 
     private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
 
@@ -54,8 +53,7 @@ public class PlayQueueDataSourceTest {
 
     private PlayQueueDataSource playQueueDataSource = new PlayQueueDataSource(playQueueDao,
             storageMusicDataSource,
-            settingsPreferences,
-            scheduler);
+            settingsPreferences);
 
     private TestObserver<Change<List<Composition>>> changeObserver = playQueueDataSource
             .getChangeObservable()

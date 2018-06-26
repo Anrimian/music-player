@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.concurrent.Executors;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -26,6 +27,7 @@ public class SchedulerModule {
     @Provides
     @NonNull
     @Named(IO_SCHEDULER)
+    @Singleton
     Scheduler provideIOScheduler() {
         return Schedulers.io();
     }
@@ -33,6 +35,7 @@ public class SchedulerModule {
     @Provides
     @NonNull
     @Named(UI_SCHEDULER)
+    @Singleton
     Scheduler provideUiScheduler() {
         return AndroidSchedulers.mainThread();
     }
@@ -40,6 +43,7 @@ public class SchedulerModule {
     @Provides
     @NonNull
     @Named(DB_SCHEDULER)
+    @Singleton
     Scheduler provideDBScheduler() {
         return Schedulers.from(Executors.newSingleThreadExecutor());
     }
