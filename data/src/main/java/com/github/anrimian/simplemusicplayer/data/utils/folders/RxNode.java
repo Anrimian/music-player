@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
+import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.*;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.ADDED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
@@ -96,6 +98,20 @@ public class RxNode<K> {
         notifyNodesAdded(singletonList(node.getData()));
     }
 
+    public void removeNodes(List<K> keys) {
+        List<RxNode<K>> removedNodes = new ArrayList<>();
+        for (K key: keys) {
+            RxNode<K> removedNode = nodes.remove(key);
+            if (removedNode != null) {
+                removedNodes.add(removedNode);
+            }
+        }
+        if (!removedNodes.isEmpty()) {
+            childChangeSubject.onNext(new Change<>(DELETED, removedNodes));
+            notifyNodesRemoved(mapList(removedNodes, new ArrayList<>(), RxNode::getData));
+        }
+    }
+
     public void removeNode(K key) {
         RxNode<K> node = getChild(key);
         if (node != null) {
@@ -112,6 +128,20 @@ public class RxNode<K> {
     @Nullable
     public RxNode<K> getChild(K key) {
         return nodes.get(key);
+    }
+
+    private void notifyNodesRemoved(List<NodeData> data) {
+        if (this.data != null) {
+            boolean updated = this.data.onNodesRemoved(data);
+            if (updated) {
+                selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
+            }
+        }
+
+        RxNode<K> parent = getParent();
+        if (parent != null) {
+            parent.notifyNodesRemoved(data);
+        }
     }
 
     private void notifyNodesAdded(List<NodeData> data) {

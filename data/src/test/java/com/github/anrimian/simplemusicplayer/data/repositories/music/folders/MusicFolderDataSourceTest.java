@@ -17,6 +17,7 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.ADDED;
+import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -140,6 +141,143 @@ public class MusicFolderDataSourceTest {
                     assertEquals(2, list.size());
                     assertEquals(compositionOne, ((CompositionNode) list.get(0)).getComposition());
                     assertEquals(compositionTwo, ((CompositionNode) list.get(1)).getComposition());
+                    return true;
+                });
+    }
+
+    @Test
+    public void newCompositionChangeInChildNodeTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = new Composition();
+        compositionOne.setFilePath("root/music/one.dd");
+        compositionOne.setId(1L);
+        compositions.put(1L, compositionOne);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        Folder observerFolder = musicFolderDataSource.getMusicInPath(null).blockingGet();
+        TestObserver<Change<NodeData>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<Change<List<NodeData>>> childChangeObserver = observerFolder.getChildChangeObservable().test();
+
+        Composition compositionTwo = new Composition();
+        compositionTwo.setFilePath("root/music/basic/two.dd");
+        compositionTwo.setId(2L);
+        changeSubject.onNext(new Change<>(ADDED, singletonList(compositionTwo)));
+
+        childChangeObserver.assertValue(change -> {
+            assertEquals(ADDED, change.getChangeType());
+            FolderNode folderNode = ((FolderNode) change.getData().get(0));
+            assertEquals("root/music/basic", folderNode.getFullPath());
+            assertEquals(1, folderNode.getCompositionsCount());
+            return true;
+        });
+
+        selfChangeObserver.assertValue(change -> {
+            assertEquals(MODIFY, change.getChangeType());
+            FolderNode folderNode = (FolderNode) change.getData();
+            assertEquals(2, folderNode.getCompositionsCount());
+            return true;
+        });
+
+        musicFolderDataSource.getMusicInPath(null)
+                .test()
+                .assertValue(folder -> {
+                    List<NodeData> list = folder.getFiles();
+                    assertEquals(2, list.size());
+                    assertEquals(compositionOne, ((CompositionNode) list.get(0)).getComposition());
+
+                    FolderNode folderNode = ((FolderNode) list.get(1));
+                    assertEquals("root/music/basic", folderNode.getFullPath());
+                    assertEquals(1, folderNode.getCompositionsCount());
+                    return true;
+                });
+    }
+
+    @Test
+    public void deleteCompositionTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = new Composition();
+        compositionOne.setFilePath("root/music/one.dd");
+        compositionOne.setId(1L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = new Composition();
+        compositionTwo.setFilePath("root/music/two.dd");
+        compositionTwo.setId(2L);
+        compositions.put(2L, compositionTwo);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        Folder observerFolder = musicFolderDataSource.getMusicInPath(null).blockingGet();
+        TestObserver<Change<NodeData>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<Change<List<NodeData>>> childChangeObserver = observerFolder.getChildChangeObservable().test();
+
+        changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
+
+        childChangeObserver.assertValue(change -> {
+            assertEquals(DELETED, change.getChangeType());
+            assertEquals(compositionTwo, ((CompositionNode) change.getData().get(0)).getComposition());
+            return true;
+        });
+
+        selfChangeObserver.assertValue(change -> {
+            assertEquals(MODIFY, change.getChangeType());
+            FolderNode folderNode = (FolderNode) change.getData();
+            assertEquals(1, folderNode.getCompositionsCount());
+            return true;
+        });
+
+        musicFolderDataSource.getMusicInPath(null)
+                .test()
+                .assertValue(folder -> {
+                    List<NodeData> list = folder.getFiles();
+                    assertEquals(1, list.size());
+                    assertEquals(compositionOne, ((CompositionNode) list.get(0)).getComposition());
+                    return true;
+                });
+    }
+
+    @Test
+    public void deleteCompositionInChildNodeTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = new Composition();
+        compositionOne.setFilePath("root/music/one.dd");
+        compositionOne.setId(1L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = new Composition();
+        compositionTwo.setFilePath("root/music/basic/two.dd");
+        compositionTwo.setId(2L);
+        compositions.put(2L, compositionTwo);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        Folder observerFolder = musicFolderDataSource.getMusicInPath(null).blockingGet();
+        TestObserver<Change<NodeData>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<Change<List<NodeData>>> childChangeObserver = observerFolder.getChildChangeObservable().test();
+
+        changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
+
+        childChangeObserver.assertValue(change -> {
+            assertEquals(DELETED, change.getChangeType());
+            FolderNode folderNode = ((FolderNode) change.getData().get(0));
+            assertEquals("root/music/basic", folderNode.getFullPath());
+            return true;
+        });
+
+        selfChangeObserver.assertValue(change -> {
+            assertEquals(MODIFY, change.getChangeType());
+            FolderNode folderNode = (FolderNode) change.getData();
+            assertEquals(1, folderNode.getCompositionsCount());
+            return true;
+        });
+
+        musicFolderDataSource.getMusicInPath(null)
+                .test()
+                .assertValue(folder -> {
+                    List<NodeData> list = folder.getFiles();
+                    assertEquals(1, list.size());
+                    assertEquals(compositionOne, ((CompositionNode) list.get(0)).getComposition());
                     return true;
                 });
     }

@@ -14,4 +14,8 @@ public abstract class NodeData {
     public boolean onNodesAdded(List<NodeData> nodes) {
         return false;
     }
+
+    public boolean onNodesRemoved(List<NodeData> nodes) {
+        return false;
+    }
 }

@@ -25,6 +25,18 @@ public class FolderNode extends NodeData {
         return updated;
     }
 
+    @Override
+    public boolean onNodesRemoved(List<NodeData> nodes) {
+        boolean updated = false;
+        for (NodeData nodeData: nodes) {
+            if (nodeData instanceof CompositionNode) {
+                compositionsCount--;
+                updated = true;
+            }
+        }
+        return updated;
+    }
+
     public String getFullPath() {
         return fullPath;
     }

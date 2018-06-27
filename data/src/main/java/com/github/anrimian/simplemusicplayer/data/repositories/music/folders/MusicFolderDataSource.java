@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
 
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.data.utils.FileUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
@@ -13,6 +14,7 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Single;
 
+import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getParentDirPath;
 import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
 import static io.reactivex.Observable.fromIterable;
 
@@ -55,6 +57,7 @@ public class MusicFolderDataSource {
         return fileList;
     }
 
+    @Nullable
     private RxNode<String> findNodeByPath(@Nullable String fullPath) {
         if (fullPath == null) {
             RxNode<String> found = root;
@@ -102,6 +105,7 @@ public class MusicFolderDataSource {
                 break;
             }
             case DELETED: {
+                processDeleteChange(change.getData());
                 break;
             }
             case MODIFY: {
@@ -110,9 +114,28 @@ public class MusicFolderDataSource {
         }
     }
 
+    private void processDeleteChange(List<Composition> compositions) {
+        fromIterable(compositions)
+                .groupBy(composition -> getParentDirPath(composition.getFilePath()))
+                .doOnNext(group -> group.map(Composition::getFilePath)
+                        .map(FileUtils::getFileName)
+                        .collect(ArrayList<String>::new, List::add)
+                        .doOnSuccess(pathCompositions ->
+                                removeCompositions(group.getKey(), pathCompositions))
+                        .subscribe())
+                .subscribe();
+    }
+
+    private void removeCompositions(String path, List<String> paths) {
+        RxNode<String> parent = findNodeByPath(path);
+        if (parent != null) {
+            parent.removeNodes(paths);//TODO also delete empty node
+        }
+    }
+
     private void processAddChange(List<Composition> compositions) {
         fromIterable(compositions)
-                .groupBy(Composition::getFilePath)
+                .groupBy(Composition::getFilePath)//TODO group by parent path
                 .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
                         .doOnSuccess(pathCompositions ->
                                 putCompositions(group.getKey(), pathCompositions))
