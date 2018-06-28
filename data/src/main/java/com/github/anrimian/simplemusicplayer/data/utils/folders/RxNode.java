@@ -113,17 +113,13 @@ public class RxNode<K> {
     }
 
     public void removeNode(K key) {
-        RxNode<K> node = getChild(key);
-        if (node != null) {
-            removeNode(node);
+        RxNode<K> removedNode = nodes.remove(key);
+        if (removedNode != null) {
+            childChangeSubject.onNext(new Change<>(DELETED, singletonList(removedNode)));
+            notifyNodesRemoved(singletonList(removedNode.getData()));
         }
     }
 
-    public void removeNode(RxNode<K> node) {
-        nodes.remove(node.getKey());
-        childChangeSubject.onNext(new Change<>(DELETED, singletonList(node)));
-        notifyNodeUpdated(this);
-    }
 
     @Nullable
     public RxNode<K> getChild(K key) {

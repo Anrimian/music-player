@@ -127,33 +127,52 @@ public class MusicFolderDataSource {
     }
 
     private void removeCompositions(String path, List<String> paths) {
-        RxNode<String> parent = findNodeByPath(path);
-        if (parent != null) {
-            parent.removeNodes(paths);//TODO also delete empty node
+        RxNode<String> node = findNodeByPath(path);
+        if (node != null) {
+            node.removeNodes(paths);
+
+            clearEmptyNode(node);
+        }
+    }
+
+    private void clearEmptyNode(RxNode<String> node) {
+        if (node.getNodes().isEmpty()) {
+            RxNode<String> parent = node.getParent();
+            if (parent != null) {
+                parent.removeNode(node.getKey());
+                clearEmptyNode(parent);
+            }
         }
     }
 
     private void processAddChange(List<Composition> compositions) {
         fromIterable(compositions)
-                .groupBy(Composition::getFilePath)//TODO group by parent path
+                .groupBy(composition -> getParentDirPath(composition.getFilePath()))
                 .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
                         .doOnSuccess(pathCompositions ->
-                                putCompositions(group.getKey(), pathCompositions))
+                                putCompositions(root, group.getKey(), pathCompositions))
                         .subscribe())
                 .subscribe();
     }
 
-    private void putCompositions(String path, List<Composition> compositions) {
-        getParentForPath(root, path, (node, partialPath) ->
+    private void putCompositions(RxNode<String> root, String path, List<Composition> compositions) {
+        getNode(root, path, (node, partialPath) ->
                 node.addNodes(mapList(compositions,
                         newComposition ->
-                        new RxNode<>(partialPath, new CompositionNode(newComposition))
+                                new RxNode<>(partialPath, new CompositionNode(newComposition))
                 ))
         );
     }
 
     private RxNode<String> createMusicFileTree() {
         RxNode<String> root = new RxNode<>(null, null);
+//        fromIterable(storageMusicDataSource.getCompositionsMap().values())//TODO optimize tree creating
+//                .groupBy(composition -> getParentDirPath(composition.getFilePath()))
+//                .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
+//                        .doOnSuccess(pathCompositions ->
+//                                putCompositions(root, group.getKey(), pathCompositions))
+//                        .subscribe())
+//                .subscribe();
         for (Composition composition: storageMusicDataSource.getCompositionsMap().values()) {
             String path = composition.getFilePath();
 
@@ -162,6 +181,25 @@ public class MusicFolderDataSource {
             );
         }
         return root;
+    }
+
+    private void getNode(RxNode<String> root,
+                         String path,
+                         NodeCallback nodeCallback) {
+        RxNode<String> target = root;
+
+        String[] partialPaths = path.split("/");
+        for (int i = 0; i < partialPaths.length; i++) {
+            String partialPath = partialPaths[i];
+            RxNode<String> child = target.getChild(partialPath);
+            if (child == null) {
+                String folderPath = getPath(partialPaths, i);
+                child = new RxNode<>(partialPath, new FolderNode(folderPath));
+                target.addNode(child);
+            }
+            target = child;
+        }
+        nodeCallback.onNodeFound(target, partialPaths[partialPaths.length - 1]);
     }
 
     private void getParentForPath(RxNode<String> root,
