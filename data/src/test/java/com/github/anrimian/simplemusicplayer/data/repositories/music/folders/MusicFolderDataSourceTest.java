@@ -9,9 +9,11 @@ import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
@@ -21,6 +23,7 @@ import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeT
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -238,7 +241,7 @@ public class MusicFolderDataSourceTest {
     }
 
     @Test
-    public void deleteCompositionInChildNodeTest() {
+    public void deleteCompositionInChildNodeTest() {//TODO self change delete test
         Map<Long, Composition> compositions = new HashMap<>();
         Composition compositionOne = new Composition();
         compositionOne.setFilePath("root/music/one.dd");
@@ -280,6 +283,80 @@ public class MusicFolderDataSourceTest {
                     assertEquals(compositionOne, ((CompositionNode) list.get(0)).getComposition());
                     return true;
                 });
+    }
+
+    @Test
+    public void modifyFileTest() {//TODO modify unexcited file test, modify path test
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = new Composition();
+        compositionOne.setFilePath("root/music/one.dd");
+        compositionOne.setId(1L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = new Composition();
+        compositionTwo.setFilePath("root/music/two.dd");
+        compositionTwo.setSize(2);
+        compositionTwo.setId(2L);
+        compositions.put(2L, compositionTwo);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        musicFolderDataSource.getMusicInPath(null)
+                .test()
+                .assertValue(folder -> {
+                    CompositionNode compositionNode = ((CompositionNode) folder.getFiles().get(1));
+                    assertEquals(2, compositionNode.getComposition().getSize());
+                    return true;
+                });
+
+        Folder observerFolder = musicFolderDataSource.getMusicInPath(null).blockingGet();
+        TestObserver<Change<List<NodeData>>> childChangeObserver = observerFolder.getChildChangeObservable().test();
+
+        Composition compositionTwoChanged = new Composition();
+        compositionTwoChanged.setFilePath("root/music/two.dd");
+        compositionTwoChanged.setSize(4);
+        compositionTwoChanged.setId(2L);
+
+        changeSubject.onNext(new Change<>(MODIFY, singletonList(compositionTwoChanged)));
+
+        childChangeObserver.assertValue(change -> {
+            assertEquals(MODIFY, change.getChangeType());
+            CompositionNode compositionNode = ((CompositionNode) change.getData().get(0));
+            assertEquals(4, compositionNode.getComposition().getSize());
+            return true;
+        });
+
+        musicFolderDataSource.getMusicInPath(null)
+                .test()
+                .assertValue(folder -> {
+                    CompositionNode compositionNode = ((CompositionNode) folder.getFiles().get(1));
+                    assertEquals(4, compositionNode.getComposition().getSize());
+                    return true;
+                });
+    }
+
+    @Test
+    public void getManyCompositionTest() {
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(getManyCompositionsMap());
+
+        musicFolderDataSource.getMusicInPath(null)
+                .test()
+                .assertValue(folder -> {
+                    List<NodeData> list = folder.getFiles();
+                    assertEquals(getManyCompositionsMap().size(), list.size());
+                    return true;
+                });
+    }
+
+    private static Map<Long, Composition> getManyCompositionsMap() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        for (long i = 0; i < 100000; i++) {
+            Composition composition = new Composition();
+            composition.setFilePath("0/1/2/3/4/5/6/7/8/9/10/music-" + i);
+            composition.setId(i);
+            compositions.put(i, composition);
+        }
+        return compositions;
     }
 
     private static Map<Long, Composition> getFakeCompositionsMap() {

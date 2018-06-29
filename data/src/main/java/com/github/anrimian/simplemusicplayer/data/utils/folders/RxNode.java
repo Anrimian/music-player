@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
+import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.CompositionNode;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
@@ -126,6 +127,16 @@ public class RxNode<K> {
         return nodes.get(key);
     }
 
+    public void updateNode(K key, NodeData nodeData) {
+        RxNode<K> node = nodes.get(key);
+        if (node != null) {
+            node.data = nodeData;
+            childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
+        } else {
+            addNode(new RxNode<>(key, data));
+        }
+    }
+
     private void notifyNodesRemoved(List<NodeData> data) {
         if (this.data != null) {
             boolean updated = this.data.onNodesRemoved(data);
@@ -151,14 +162,6 @@ public class RxNode<K> {
         RxNode<K> parent = getParent();
         if (parent != null) {
             parent.notifyNodesAdded(data);
-        }
-    }
-
-    private void notifyNodeUpdated(RxNode<K> node) {
-        childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
-        RxNode<K> parent = getParent();
-        if (parent != null) {
-            parent.notifyNodeUpdated(this);
         }
     }
 

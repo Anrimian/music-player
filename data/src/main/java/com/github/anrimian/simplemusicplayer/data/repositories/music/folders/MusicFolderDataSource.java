@@ -109,8 +109,17 @@ public class MusicFolderDataSource {
                 break;
             }
             case MODIFY: {
+                processModifyChange(change.getData());
                 break;
             }
+        }
+    }
+
+    private void processModifyChange(List<Composition> compositions) {
+        for (Composition composition : compositions) {
+            getParentForPath(root, composition.getFilePath(), (node, partialPath) ->
+                    node.updateNode(partialPath, new CompositionNode(composition))
+            );
         }
     }
 
