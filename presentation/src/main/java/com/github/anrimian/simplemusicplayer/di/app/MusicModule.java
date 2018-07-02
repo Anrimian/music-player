@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.github.anrimian.simplemusicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.simplemusicplayer.data.controllers.music.SystemMusicControllerImpl;
-import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
+import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDaoWrapper;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
@@ -70,7 +70,7 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    PlayQueueDataSource playQueueDataSource(PlayQueueDao playQueueDao,
+    PlayQueueDataSource playQueueDataSource(PlayQueueDaoWrapper playQueueDao,
                                             StorageMusicDataSource storageMusicDataSource,
                                             SettingsPreferences settingsPreferences) {
         return new PlayQueueDataSource(playQueueDao,

@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.database.models;
+package com.github.anrimian.simplemusicplayer.data.database.entities;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
@@ -12,7 +12,6 @@ public class PlayQueueEntity {
     private long id;
 
     private int position;
-    private int shuffledPosition;
 
     public long getId() {
         return id;
@@ -28,13 +27,5 @@ public class PlayQueueEntity {
 
     public void setPosition(int position) {
         this.position = position;
-    }
-
-    public int getShuffledPosition() {
-        return shuffledPosition;
-    }
-
-    public void setShuffledPosition(int shuffledPosition) {
-        this.shuffledPosition = shuffledPosition;
     }
 }

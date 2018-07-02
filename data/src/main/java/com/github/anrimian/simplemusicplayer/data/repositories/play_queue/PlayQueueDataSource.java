@@ -1,7 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
-import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
-import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntity;
+import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDaoWrapper;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
@@ -9,7 +8,6 @@ import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +15,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -31,7 +28,7 @@ import static io.reactivex.subjects.BehaviorSubject.create;
  */
 public class PlayQueueDataSource {
 
-    private final PlayQueueDao playQueueDao;
+    private final PlayQueueDaoWrapper playQueueDao;
     private final StorageMusicDataSource storageMusicDataSource;
     private final SettingsPreferences settingsPreferences;
 
@@ -43,7 +40,7 @@ public class PlayQueueDataSource {
 
     private Disposable changeDisposable;
 
-    public PlayQueueDataSource(PlayQueueDao playQueueDao,
+    public PlayQueueDataSource(PlayQueueDaoWrapper playQueueDao,
                                StorageMusicDataSource storageMusicDataSource,
                                SettingsPreferences settingsPreferences) {
         this.playQueueDao = playQueueDao;
@@ -52,7 +49,7 @@ public class PlayQueueDataSource {
     }
 
     public Single<List<Composition>> setPlayQueue(List<Composition> compositions) {
-        return Single.fromCallable(() -> new PlayQueue(compositions))
+        return Single.fromCallable(() -> new PlayQueue(compositions, settingsPreferences.isRandomPlayingEnabled()))
                 .doOnSuccess(this::savePlayQueue)
                 .map(this::getSelectedPlayQueue)
                 .doOnSuccess(playQueueSubject::onNext);
@@ -79,11 +76,10 @@ public class PlayQueueDataSource {
         return getSavedPlayQueue()
                 .flatMapCompletable(playQueue -> Completable.fromRunnable(() -> {
                     settingsPreferences.setRandomPlayingEnabled(enabled);
+                    playQueue.changeShuffleMode(enabled);
                     if (enabled) {
-                        playQueue.shuffle();
-
                         playQueue.moveCompositionToTopInShuffledList(currentComposition);
-                        playQueueDao.updatePlayQueue(toEntityList(playQueue));
+                        playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
                     }
                     playQueueSubject.onNext(getSelectedPlayQueue(playQueue));
                 }))
@@ -91,16 +87,10 @@ public class PlayQueueDataSource {
     }
 
     private List<Composition> getSelectedPlayQueue(PlayQueue playQueue) {
-        if (settingsPreferences.isRandomPlayingEnabled()) {
-            return playQueue.getShuffledPlayList();
-        }
-        return playQueue.getPlayList();
+        return playQueue.getCurrentPlayQueue();
     }
 
     private int getCurrentPosition(Composition composition) {
-        if (settingsPreferences.isRandomPlayingEnabled()) {
-            return playQueue.getShuffledPosition(composition);
-        }
         return playQueue.getPosition(composition);
     }
 
@@ -145,36 +135,15 @@ public class PlayQueueDataSource {
             long id = deletedComposition.getId();
             if (playQueue.getCompositionById(id) != null) {
                 playQueue.deleteComposition(id);
-                playQueueDao.deletePlayQueueEntity(id);
-
-                Map<Long, Integer> shuffledPositionMap = playQueue.getShuffledPositionMap();
-                int freeShuffledPosition = shuffledPositionMap.remove(id);
-                for (Map.Entry<Long, Integer> entry : shuffledPositionMap.entrySet()) {// FIXME: 17.06.2018 concurrent modification
-                    Long key = entry.getKey();
-                    Integer position = entry.getValue();
-                    if (position > freeShuffledPosition) {
-                        int newPosition = position - 1;
-                        shuffledPositionMap.put(key, newPosition);
-                        playQueueDao.updateShuffledPosition(key, newPosition);
-                    }
-                }
-
-                Map<Long, Integer> positionMap = playQueue.getPositionMap();
-                int freeInitialPosition = positionMap.remove(id);
-                for (Map.Entry<Long, Integer> entry : positionMap.entrySet()) {
-                    Long key = entry.getKey();
-                    Integer position = entry.getValue();
-                    if (position > freeInitialPosition) {
-                        int newPosition = position - 1;
-                        positionMap.put(key, newPosition);
-                        playQueueDao.updatePosition(key, newPosition);
-                    }
-                }
-
                 compositionsToNotify.add(deletedComposition);
             }
         }
         if (!compositionsToNotify.isEmpty()) {
+
+            //optimize later if need
+            playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
+            playQueueDao.setPlayQueue(playQueue.getCompositionQueue());
+
             changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
             updateSubject();
         }
@@ -198,26 +167,12 @@ public class PlayQueueDataSource {
     private void updateSubject() {
         List<Composition> cachedCompositions = playQueueSubject.getValue();
         cachedCompositions.clear();
-        cachedCompositions.addAll(getSelectedPlayQueue(playQueue));
-    }
-
-    private List<PlayQueueEntity> toEntityList(PlayQueue playQueue) {
-        List<PlayQueueEntity> playQueueEntityList = new ArrayList<>();
-
-        for (Composition composition: playQueue.getCompositionMap().values()) {
-            PlayQueueEntity playQueueEntity = new PlayQueueEntity();
-            playQueueEntity.setId(composition.getId());
-            playQueueEntity.setPosition(playQueue.getPosition(composition));
-            playQueueEntity.setShuffledPosition(playQueue.getShuffledPosition(composition));
-
-            playQueueEntityList.add(playQueueEntity);
-        }
-        return playQueueEntityList;
+        cachedCompositions.addAll(playQueue.getCurrentPlayQueue());
     }
 
     private void savePlayQueue(PlayQueue playQueue) {
-        playQueueDao.deletePlayQueue();
-        playQueueDao.setPlayQueue(toEntityList(playQueue));
+        playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
+        playQueueDao.setPlayQueue(playQueue.getCompositionQueue());
 
         this.playQueue = playQueue;
 
@@ -227,22 +182,8 @@ public class PlayQueueDataSource {
     @SuppressWarnings("unchecked")
     private PlayQueue loadPlayQueue() {
         Map<Long, Composition> allCompositionMap = storageMusicDataSource.getCompositionsMap();
-        List<PlayQueueEntity> playQueueEntities = playQueueDao.getPlayQueue();
-
-        Map<Long, Integer> initialPlayList = new HashMap<>(playQueueEntities.size());
-        Map<Long, Integer> shuffledPlayList = new HashMap<>(playQueueEntities.size());
-        Map<Long, Composition> compositionMap = new HashMap<>(playQueueEntities.size());
-        for (PlayQueueEntity playQueueEntity: playQueueEntities) {
-            long id = playQueueEntity.getId();
-            Composition composition = allCompositionMap.get(id);
-            if (composition == null) {
-                playQueueDao.deletePlayQueueEntity(id);
-            } else {
-                compositionMap.put(id, composition);
-                initialPlayList.put(id, playQueueEntity.getPosition());
-                shuffledPlayList.put(id, playQueueEntity.getShuffledPosition());
-            }
-        }
-        return new PlayQueue(initialPlayList, shuffledPlayList, compositionMap);
+        List<Composition> playQueue = playQueueDao.getPlayQueue(allCompositionMap);
+        List<Composition> shuffledQueue = playQueueDao.getPlayQueue(allCompositionMap);
+        return new PlayQueue(playQueue, shuffledQueue, settingsPreferences.isRandomPlayingEnabled());
     }
 }

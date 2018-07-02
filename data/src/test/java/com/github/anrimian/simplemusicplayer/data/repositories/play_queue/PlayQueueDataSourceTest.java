@@ -1,7 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
-import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDao;
-import com.github.anrimian.simplemusicplayer.data.database.models.PlayQueueEntity;
+import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDaoWrapper;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
@@ -12,14 +11,11 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.observers.TestObserver;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
@@ -27,23 +23,19 @@ import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFak
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
 
 public class PlayQueueDataSourceTest {
 
-    private final PlayQueueDao playQueueDao = mock(PlayQueueDao.class);
+    private final PlayQueueDaoWrapper playQueueDao = mock(PlayQueueDaoWrapper.class);
     private final StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
     private final SettingsPreferences settingsPreferences = mock(SettingsPreferences.class);
 
@@ -76,8 +68,7 @@ public class PlayQueueDataSourceTest {
                     return true;
                 });
 
-        verify(playQueueDao).deletePlayQueue();
-        verify(playQueueDao).setPlayQueue(anyListOf(PlayQueueEntity.class));
+        verify(playQueueDao).setPlayQueue(getFakeCompositions());
         verify(storageMusicDataSource).getChangeObservable();
     }
 
@@ -98,7 +89,7 @@ public class PlayQueueDataSourceTest {
 
     @Test
     public void getEmptyPlayQueueInInitialState() {
-        when(playQueueDao.getPlayQueue()).thenReturn(emptyList());
+        when(playQueueDao.getPlayQueue(any())).thenReturn(emptyList());
 
         playQueueDataSource.getPlayQueue()
                 .test()
@@ -112,12 +103,12 @@ public class PlayQueueDataSourceTest {
 
     @Test
     public void getPlayQueueObservableInInitialState() {
-        when(playQueueDao.getPlayQueue()).thenReturn(getPlayQueueEntities());
+        when(playQueueDao.getPlayQueue(any())).thenReturn(getFakeCompositions());
+        when(playQueueDao.getShuffledPlayQueue(any())).thenReturn(getFakeCompositions());
 
         playQueueDataSource.getPlayQueueObservable()
                 .test()
                 .assertValue(compositions -> {
-                    assertEquals(getPlayQueueEntities().size(), compositions.size());
                     assertEquals(getFakeCompositions(), compositions);
                     return true;
                 });
@@ -127,12 +118,12 @@ public class PlayQueueDataSourceTest {
 
     @Test
     public void getPlayQueueInInitialState() {
-        when(playQueueDao.getPlayQueue()).thenReturn(getPlayQueueEntities());
+        when(playQueueDao.getPlayQueue(any())).thenReturn(getFakeCompositions());
+        when(playQueueDao.getShuffledPlayQueue(any())).thenReturn(getFakeCompositions());
 
         playQueueDataSource.getPlayQueue()
                 .test()
                 .assertValue(compositions -> {
-                    assertEquals(getPlayQueueEntities().size(), compositions.size());
                     assertEquals(getFakeCompositions(), compositions);
                     return true;
                 });
@@ -142,12 +133,12 @@ public class PlayQueueDataSourceTest {
 
     @Test
     public void getPlayQueueInInitialStateAndSetNewQueue() {
-        when(playQueueDao.getPlayQueue()).thenReturn(getPlayQueueEntities());
+        when(playQueueDao.getPlayQueue(any())).thenReturn(getFakeCompositions());
+        when(playQueueDao.getShuffledPlayQueue(any())).thenReturn(getFakeCompositions());
 
         playQueueDataSource.getPlayQueue()
                 .test()
                 .assertValue(compositions -> {
-                    assertEquals(getPlayQueueEntities().size(), compositions.size());
                     assertEquals(getFakeCompositions(), compositions);
                     return true;
                 });
@@ -163,31 +154,11 @@ public class PlayQueueDataSourceTest {
                     return true;
                 });
 
-        verify(playQueueDao).deletePlayQueue();
-        verify(playQueueDao).setPlayQueue(anyListOf(PlayQueueEntity.class));
+        verify(playQueueDao).setPlayQueue(getFakeCompositions());
 
         verify(storageMusicDataSource, times(1)).getChangeObservable();
 
         playQueueObserver.assertValueAt(1, getFakeCompositions());
-    }
-
-    @Test
-    public void getPlayQueueWithUnexcitingCompositions() {
-        PlayQueueEntity playQueueEntity = new PlayQueueEntity();
-        playQueueEntity.setId(Long.MAX_VALUE);
-        playQueueEntity.setPosition(0);
-        playQueueEntity.setShuffledPosition(0);
-        when(playQueueDao.getPlayQueue()).thenReturn(singletonList(playQueueEntity));
-
-        playQueueDataSource.getPlayQueue()
-                .test()
-                .assertValue(compositions -> {
-                    assertEquals(0, compositions.size());
-                    return true;
-                });
-
-        verify(playQueueDao).deletePlayQueueEntity(eq(Long.MAX_VALUE));
-        verify(storageMusicDataSource, never()).getChangeObservable();
     }
 
     @Test
@@ -227,7 +198,7 @@ public class PlayQueueDataSourceTest {
                 .test()
                 .assertComplete();
 
-        verify(playQueueDao).updatePlayQueue(anyListOf(PlayQueueEntity.class));
+        verify(playQueueDao).setPlayQueue(anyListOf(Composition.class));
         playQueueObserver.assertValueCount(2);
     }
 
@@ -241,12 +212,13 @@ public class PlayQueueDataSourceTest {
                 getFakeCompositions().get(1),
                 unexcitedComposition)
         ));
-        verify(playQueueDao).deletePlayQueueEntity(eq(0L));
-        verify(playQueueDao, atLeastOnce()).updateShuffledPosition(anyLong(), anyInt());
-        verify(playQueueDao, atLeastOnce()).updatePosition(anyLong(), anyInt());
-        verify(playQueueDao).deletePlayQueueEntity(eq(1L));
-        verify(playQueueDao, atLeastOnce()).updateShuffledPosition(anyLong(), anyInt());
-        verify(playQueueDao, atLeastOnce()).updatePosition(anyLong(), anyInt());
+
+        List<Composition> expectedList = getFakeCompositions();
+        expectedList.remove(0);
+        expectedList.remove(0);
+
+        inOrder.verify(playQueueDao).setShuffledPlayQueue(anyListOf(Composition.class));
+        inOrder.verify(playQueueDao).setPlayQueue(expectedList);
 
         changeObserver.assertValue(change -> {
             assertEquals(DELETED, change.getChangeType());
@@ -311,20 +283,5 @@ public class PlayQueueDataSourceTest {
                     assertEquals("changed title", list.get(0).getTitle());
                     return true;
                 });
-    }
-
-    private List<PlayQueueEntity> getPlayQueueEntities() {
-        List<PlayQueueEntity> playQueueEntities = new ArrayList<>();
-        List<Composition> compositions = getFakeCompositions();
-        for (int i = 0; i < 100000; i++) {
-            Composition composition = compositions.get(i);
-            PlayQueueEntity playQueueEntity = new PlayQueueEntity();
-            playQueueEntity.setId(composition.getId());
-            playQueueEntity.setPosition(i);
-            playQueueEntity.setShuffledPosition(compositions.size() - 1 - i);
-
-            playQueueEntities.add(playQueueEntity);
-        }
-        return playQueueEntities;
     }
 }
