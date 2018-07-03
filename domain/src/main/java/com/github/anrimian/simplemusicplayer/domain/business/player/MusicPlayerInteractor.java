@@ -20,6 +20,7 @@ import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -194,7 +195,7 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getPlayQueueObservable();
     }
 
-    public Observable<Change<List<Composition>>> getPlayQueueChangeObservable() {
+    public Flowable<Change<List<Composition>>> getPlayQueueChangeObservable() {
         return playQueueRepository.getPlayQueueChangeObservable();
     }
 

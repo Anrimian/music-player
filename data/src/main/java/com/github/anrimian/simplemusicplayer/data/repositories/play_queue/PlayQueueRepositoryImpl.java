@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
@@ -149,7 +150,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Observable<Change<List<Composition>>> getPlayQueueChangeObservable() {
+    public Flowable<Change<List<Composition>>> getPlayQueueChangeObservable() {
         return playQueueDataSource.getChangeObservable()
                 .subscribeOn(scheduler);
     }
@@ -196,9 +197,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private void updateCurrentComposition(List<Composition> currentPlayList, int position) {
         Composition composition = currentPlayList.get(position);
-        if (composition == null) {
-            System.out.println("wtf");//TODO fix and remove
-        }
         uiStatePreferences.setCurrentCompositionId(composition.getId());
         uiStatePreferences.setCurrentCompositionPosition(position);
 

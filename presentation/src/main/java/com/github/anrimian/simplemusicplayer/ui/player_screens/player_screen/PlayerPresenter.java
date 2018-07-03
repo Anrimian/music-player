@@ -28,7 +28,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable trackStateDisposable;
     private Disposable currentCompositionDisposable;
-    private Disposable playQueueChangeDisposable;
 
     private final List<Composition> playQueue = new ArrayList<>();
     private Composition composition;
@@ -49,7 +48,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onStart() {
         subscribeOnPlayerStateChanges();
-        subscribeOnCurrentPlaylistChanging();
+        subscribeOnPlayQueueChanges();
+        subscribeOnPlayQueue();
     }
 
     void onStop() {
@@ -161,7 +161,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         }
     }
 
-    private void subscribeOnCurrentPlaylistChanging() {
+    private void subscribeOnPlayQueue() {
         presenterDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayListChanged));
@@ -186,16 +186,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showMusicControls(!playQueue.isEmpty());
 
         subscribeOnCurrentCompositionChanging();
-        subscribeOnPlayQueueChanged();
     }
 
-    private void subscribeOnPlayQueueChanged() {
-        if (playQueueChangeDisposable != null) {
-            playQueueChangeDisposable.dispose();//TODO add to presenter disposable later
-        }
-        playQueueChangeDisposable = musicPlayerInteractor.getPlayQueueChangeObservable()
+    private void subscribeOnPlayQueueChanges() {
+        presenterDisposable.add(musicPlayerInteractor.getPlayQueueChangeObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayQueueChanged);
+                .subscribe(this::onPlayQueueChanged));
     }
 
     private void onPlayQueueChanged(Change<List<Composition>> change) {
@@ -213,6 +209,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                         }
                     }
                 }
+                break;
             }
         }
     }

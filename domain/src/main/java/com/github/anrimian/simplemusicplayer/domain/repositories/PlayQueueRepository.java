@@ -7,6 +7,7 @@ import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -21,7 +22,7 @@ public interface PlayQueueRepository {
 
     Observable<List<Composition>> getPlayQueueObservable();
 
-    Observable<Change<List<Composition>>> getPlayQueueChangeObservable();
+    Flowable<Change<List<Composition>>> getPlayQueueChangeObservable();
 
     void setRandomPlayingEnabled(boolean enabled);
 

@@ -1,7 +1,5 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
-import android.util.Log;
-
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
@@ -44,7 +42,6 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Completable deleteComposition(Composition composition) {
-        Log.d("KEK", "deleteComposition: " + composition);
         return storageMusicDataSource.deleteComposition(composition);
     }
 }

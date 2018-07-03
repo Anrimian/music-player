@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
+import android.util.Log;
+
 import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDaoWrapper;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
@@ -13,7 +15,9 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -64,8 +68,8 @@ public class PlayQueueDataSource {
         return withDefaultValue(playQueueSubject, getPlayQueue());
     }
 
-    public Observable<Change<List<Composition>>> getChangeObservable() {
-        return changeSubject;
+    public Flowable<Change<List<Composition>>> getChangeObservable() {
+        return changeSubject.toFlowable(BackpressureStrategy.BUFFER);
     }
 
     /**
@@ -144,6 +148,7 @@ public class PlayQueueDataSource {
             playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
             playQueueDao.setPlayQueue(playQueue.getCompositionQueue());
 
+            Log.d("KEK", "changeSubject.onNext: " + compositionsToNotify.get(0).getFilePath());
             changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
             updateSubject();
         }
