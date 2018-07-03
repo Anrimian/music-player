@@ -3,7 +3,6 @@ package com.github.anrimian.simplemusicplayer.domain.business.player;
 import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.simplemusicplayer.domain.controllers.SystemMusicController;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
@@ -14,8 +13,6 @@ import com.github.anrimian.simplemusicplayer.domain.models.player.events.Prepare
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +41,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -348,6 +344,7 @@ public class MusicPlayerInteractorTest {
 
         currentCompositionSubject.onNext(new CompositionEvent());
 
-        inOrder.verify(musicPlayerController).stop();
+        verify(musicPlayerController).stop();
+        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 }

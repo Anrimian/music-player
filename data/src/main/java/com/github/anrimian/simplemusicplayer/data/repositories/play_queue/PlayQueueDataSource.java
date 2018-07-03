@@ -1,7 +1,5 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
-import android.util.Log;
-
 import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDaoWrapper;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
@@ -148,7 +146,6 @@ public class PlayQueueDataSource {
             playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
             playQueueDao.setPlayQueue(playQueue.getCompositionQueue());
 
-            Log.d("KEK", "changeSubject.onNext: " + compositionsToNotify.get(0).getFilePath());
             changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToNotify));
             updateSubject();
         }

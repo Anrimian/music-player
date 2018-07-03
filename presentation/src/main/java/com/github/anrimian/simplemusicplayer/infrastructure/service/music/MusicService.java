@@ -97,6 +97,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
 
         startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
+
+        subscribeOnPlayerChanges();
     }
 
     @Override
@@ -110,7 +112,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 handleMediaButtonAction(keyEvent);
             }
         }
-        subscribeOnPlayerChanges();
         return START_NOT_STICKY;
     }
 
@@ -169,15 +170,14 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private void onPlayerStateChanged(PlayerMetaState playerMetaState) {
         currentComposition = playerMetaState.getComposition();
-        if (currentComposition == null) {
-            stopSelf();
-            return;
-        }
 
         PlayerState playerState = playerMetaState.getState();
-
         switch (playerState) {
             case PLAY: {//TODO error with often update notification
+                if (currentComposition == null) {
+                    return;
+                }
+
                 mediaSession.setActive(true);
                 updateMediaSession(playerMetaState);
                 startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(playerMetaState));
@@ -186,12 +186,15 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             }
             case PAUSE: {
                 updateMediaSession(playerMetaState);
-
+                mediaSession.setActive(false);
                 notificationsDisplayer.updateForegroundNotification(playerMetaState);
                 stopForeground(false);
+                break;
             }
             case STOP: {
+                stopForeground(true);
                 mediaSession.setActive(false);
+                stopSelf();
                 break;
             }
         }

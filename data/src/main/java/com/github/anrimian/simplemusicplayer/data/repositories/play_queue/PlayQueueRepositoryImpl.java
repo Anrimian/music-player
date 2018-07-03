@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -179,6 +178,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             case DELETED: {
                 List<Composition> playQueue = playQueueDataSource.getPlayQueue().blockingGet();
                 if (playQueue.isEmpty()) {
+                    uiStatePreferences.setCurrentCompositionId(NO_COMPOSITION);
+                    uiStatePreferences.setCurrentCompositionPosition(0);
                     currentCompositionSubject.onNext(new CompositionEvent());
                 } else {
                     if (position >= playQueue.size()) {
@@ -204,48 +205,43 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         currentCompositionSubject.onNext(compositionEvent);
     }
 
-    private Maybe<CompositionEvent> getSavedComposition() {
+    private Single<CompositionEvent> getSavedComposition() {
         return playQueueDataSource.getPlayQueue()
-                .flatMapMaybe(this::findSavedComposition)
+                .map(this::findSavedComposition)
                 .doOnSuccess(currentComposition -> subscribeOnCurrentCompositionChange())
                 .subscribeOn(scheduler);
     }
 
     @Nullable
-    private Maybe<CompositionEvent> findSavedComposition(List<Composition> compositions) {
-        return Maybe.create(emitter -> {
-            long id = uiStatePreferences.getCurrentCompositionId();
-            int position = uiStatePreferences.getCurrentCompositionPosition();
+    private CompositionEvent findSavedComposition(List<Composition> compositions) {
+        long id = uiStatePreferences.getCurrentCompositionId();
+        int position = uiStatePreferences.getCurrentCompositionPosition();//TODO remove position
 
-            //optimized way
-            if (position > 0 && position < compositions.size()) {
-                Composition expectedComposition = compositions.get(position);
-                if (expectedComposition.getId() == id) {
-                    this.position = position;
-                    emitter.onSuccess(new CompositionEvent(expectedComposition,
-                            position,
-                            uiStatePreferences.getTrackPosition()));
-                    return;
-                }
+        //optimized way
+        if (position > 0 && position < compositions.size()) {
+            Composition expectedComposition = compositions.get(position);
+            if (expectedComposition.getId() == id) {
+                this.position = position;
+                return new CompositionEvent(expectedComposition,
+                        position,
+                        uiStatePreferences.getTrackPosition());
             }
+        }
 
-            if (id == NO_COMPOSITION) {
-                emitter.onComplete();
-                return;
-            }
+        if (id == NO_COMPOSITION) {
+            return new CompositionEvent();
+        }
 
-            for (int i = 0; i< compositions.size(); i++) {
-                Composition composition = compositions.get(i);
-                if (composition.getId() == id) {
-                    this.position = i;
-                    emitter.onSuccess(new CompositionEvent(composition,
-                            position,
-                            uiStatePreferences.getTrackPosition()));
-                    return;
-                }
+        for (int i = 0; i < compositions.size(); i++) {
+            Composition composition = compositions.get(i);
+            if (composition.getId() == id) {
+                this.position = i;
+                return new CompositionEvent(composition,
+                        position,
+                        uiStatePreferences.getTrackPosition());
             }
-            emitter.onComplete();
-        });
+        }
+        return new CompositionEvent();
     }
 
     private void checkCompositionsList(@Nullable List<Composition> compositions) {

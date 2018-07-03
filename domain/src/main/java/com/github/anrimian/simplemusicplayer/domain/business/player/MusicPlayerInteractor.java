@@ -56,7 +56,6 @@ public class MusicPlayerInteractor {
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
     private Disposable skipDisposable;
-    private Disposable compositionChangeDisposable;
 
     private Composition currentComposition;
 
@@ -89,7 +88,7 @@ public class MusicPlayerInteractor {
     }
 
     public void play() {
-        if (playerStateSubject.getValue() == PLAY) {
+        if (playerStateSubject.getValue() == PLAY || playerStateSubject.getValue() == STOP) {
             return;
         }
 
@@ -206,7 +205,7 @@ public class MusicPlayerInteractor {
     private void onCompositionChanged(CompositionEvent compositionEvent) {
         this.currentComposition = compositionEvent.getComposition();
         if (currentComposition == null) {
-            musicPlayerController.stop();
+            stop();
         } else {
             musicPlayerController.prepareToPlay(currentComposition, compositionEvent.getPlayPosition());
         }
@@ -215,8 +214,7 @@ public class MusicPlayerInteractor {
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
         if (playerEvent instanceof PreparedEvent) {
             onCompositionPrepared();
-        }
-        if (playerEvent instanceof FinishedEvent) {
+        } else if (playerEvent instanceof FinishedEvent) {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;

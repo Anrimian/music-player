@@ -79,7 +79,9 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public void stop() {
         seekTo(0);
-        pause();
+        player.stop();
+        stopTracingTrackPosition();
+        uiStatePreferences.setTrackPosition(0);
     }
 
     @Override
