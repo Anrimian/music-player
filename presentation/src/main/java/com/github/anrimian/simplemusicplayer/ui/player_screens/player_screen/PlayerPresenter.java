@@ -203,10 +203,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                     if (index != -1) {
                         playQueue.remove(index);
                         getViewState().notifyPlayQueueItemRemoved(index);
-
-                        if (playQueue.isEmpty()) {
-                            getViewState().showMusicControls(false);
-                        }
+                    }
+                    if (playQueue.isEmpty()) {
+                        getViewState().showMusicControls(false);
                     }
                 }
                 break;

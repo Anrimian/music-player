@@ -382,6 +382,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showMusicControls(boolean show) {
         setContentBottomHeight(show ?
                 getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height) : 0);
+
+        if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
+            bottomSheetBehavior.setState(STATE_COLLAPSED);
+        }
     }
 
     @Override
@@ -516,8 +520,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     return true;
                 }
                 case R.id.menu_delete: {
-//                    presenter.onDeleteCompositionButtonClicked();//TODO also show dialog
-//                    return true;
+                    presenter.onDeleteCompositionButtonClicked();//TODO also show dialog
+                    return true;
                 }
             }
             return false;

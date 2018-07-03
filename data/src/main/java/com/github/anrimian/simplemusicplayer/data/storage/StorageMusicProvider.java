@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
@@ -15,7 +16,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -25,22 +25,23 @@ public class StorageMusicProvider {
 
     private static final int CHANGE_EVENTS_WINDOW_SECONDS = 5;
 
-    private final Context context;
+    private final ContentResolver contentResolver;
 
     public StorageMusicProvider(Context context) {
-        this.context = context;
+        contentResolver = context.getContentResolver();
     }
 
     public Observable<Map<Long, Composition>> getChangeObservable() {
-        return RxContentObserver.getObservable(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
-                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)//TODO not this
+        return RxContentObserver.getObservable(contentResolver, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
+//                .doOnNext(o -> Log.d("KEK", "received update"))
+//                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)//TODO not this, ask on so
                 .map(o -> getCompositions());
     }
 
     public Map<Long, Composition> getCompositions() {
         Cursor cursor = null;
         try {
-            cursor = context.getContentResolver().query(
+            cursor = contentResolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
                     null,
@@ -114,7 +115,11 @@ public class StorageMusicProvider {
         }
     }
 
-    public void deleteComposition(String path) {//TODO update media store and not become update
+    public void deleteComposition(String path) {//TODO not become update
+        contentResolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.Images.Media.DATA + " = ?",
+                new String[] { path });
+
         File file = new File(path);
         if (!file.exists()) {
             return;

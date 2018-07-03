@@ -75,6 +75,7 @@ public class StorageMusicDataSource {
         }
         changeDisposable = musicProvider.getChangeObservable()
                 .flatMap(this::calculateChange)
+//                .doOnNext(change -> Log.d("KEK", "change: " + change.getChangeType() + ", compositions: " + change.getData()))
                 .subscribeOn(scheduler)
                 .subscribe(changeSubject::onNext);
     }
