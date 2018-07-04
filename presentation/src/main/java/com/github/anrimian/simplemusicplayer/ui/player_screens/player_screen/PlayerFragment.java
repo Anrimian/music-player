@@ -383,7 +383,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         setContentBottomHeight(show ?
                 getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height) : 0);
 
-        if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
+        if (!show && bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
         }
     }
