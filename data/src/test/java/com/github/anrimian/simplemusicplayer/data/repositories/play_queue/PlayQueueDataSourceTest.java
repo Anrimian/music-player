@@ -17,6 +17,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subscribers.TestSubscriber;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositionsMap;
@@ -47,7 +48,7 @@ public class PlayQueueDataSourceTest {
             storageMusicDataSource,
             settingsPreferences);
 
-    private TestObserver<Change<List<Composition>>> changeObserver = playQueueDataSource
+    private TestSubscriber<Change<List<Composition>>> changeObserver = playQueueDataSource
             .getChangeObservable()
             .test();
 

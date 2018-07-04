@@ -241,7 +241,7 @@ public class MusicFolderDataSourceTest {
     }
 
     @Test
-    public void deleteCompositionInChildNodeTest() {//TODO self change delete test
+    public void deleteCompositionInChildNodeTest() {
         Map<Long, Composition> compositions = new HashMap<>();
         Composition compositionOne = new Composition();
         compositionOne.setFilePath("root/music/one.dd");
@@ -259,7 +259,33 @@ public class MusicFolderDataSourceTest {
         TestObserver<Change<NodeData>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<Change<List<NodeData>>> childChangeObserver = observerFolder.getChildChangeObservable().test();
 
+        Folder basicFolder = musicFolderDataSource.getMusicInPath("root/music/basic").blockingGet();
+        TestObserver<Change<NodeData>> basicFolderSelfObserver = basicFolder.getSelfChangeObservable().test();
+        TestObserver<Change<List<NodeData>>> basicFolderChildObserver = basicFolder.getChildChangeObservable().test();
+
         changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
+
+        basicFolderChildObserver.assertValue(change -> {
+            assertEquals(DELETED, change.getChangeType());
+            CompositionNode compositionNode = ((CompositionNode) change.getData().get(0));
+            assertEquals(compositionTwo, compositionNode.getComposition());
+            return true;
+        });
+
+        basicFolderSelfObserver.assertValueAt(0, change -> {
+            assertEquals(MODIFY, change.getChangeType());
+            FolderNode folderNode = ((FolderNode) change.getData());
+            assertEquals("root/music/basic", folderNode.getFullPath());
+            assertEquals(0, folderNode.getCompositionsCount());
+            return true;
+        });
+
+        basicFolderSelfObserver.assertValueAt(1, change -> {
+            assertEquals(DELETED, change.getChangeType());
+            FolderNode folderNode = ((FolderNode) change.getData());
+            assertEquals("root/music/basic", folderNode.getFullPath());
+            return true;
+        });
 
         childChangeObserver.assertValue(change -> {
             assertEquals(DELETED, change.getChangeType());

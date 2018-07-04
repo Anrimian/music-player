@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -46,7 +47,7 @@ public class PlayQueueRepositoryImplTest {
     @Before
     public void setUp() {
         when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(emptyList()));
-        when(playQueueDataSource.getChangeObservable()).thenReturn(changeSubject);
+        when(playQueueDataSource.getChangeObservable()).thenReturn(changeSubject.toFlowable(BackpressureStrategy.BUFFER));
         when(uiStatePreferences.getCurrentCompositionId()).thenReturn(NO_COMPOSITION);
 
         playQueueRepository = new PlayQueueRepositoryImpl(playQueueDataSource,

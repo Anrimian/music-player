@@ -19,6 +19,7 @@ import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeT
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.ADDED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
+import static io.reactivex.Observable.fromArray;
 import static io.reactivex.subjects.PublishSubject.create;
 import static java.util.Collections.singletonList;
 
@@ -108,19 +109,22 @@ public class RxNode<K> {
             }
         }
         if (!removedNodes.isEmpty()) {
+            for (RxNode<K> removedNode: removedNodes){
+                removedNode.notifySelfRemoved();
+            }
             childChangeSubject.onNext(new Change<>(DELETED, removedNodes));
-            notifyNodesRemoved(mapList(removedNodes, new ArrayList<>(), RxNode::getData));
+            notifyNodesRemoved(mapList(removedNodes, RxNode::getData));
         }
     }
 
     public void removeNode(K key) {
         RxNode<K> removedNode = nodes.remove(key);
         if (removedNode != null) {
+            removedNode.notifySelfRemoved();
             childChangeSubject.onNext(new Change<>(DELETED, singletonList(removedNode)));
             notifyNodesRemoved(singletonList(removedNode.getData()));
         }
     }
-
 
     @Nullable
     public RxNode<K> getChild(K key) {
@@ -135,6 +139,10 @@ public class RxNode<K> {
         } else {
             addNode(new RxNode<>(key, data));
         }
+    }
+
+    private void notifySelfRemoved() {
+        selfChangeSubject.onNext(new Change<>(DELETED, data));
     }
 
     private void notifyNodesRemoved(List<NodeData> data) {
