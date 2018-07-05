@@ -15,6 +15,11 @@ public abstract class NodeData {
         return false;
     }
 
+    /**
+     *
+     * @param nodes added data
+     * @return was updated or not
+     */
     public boolean onNodesRemoved(List<NodeData> nodes) {
         return false;
     }

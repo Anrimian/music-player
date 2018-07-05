@@ -167,7 +167,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 .subscribe(this::onPlayListChanged));
     }
 
-    private void onPlayListChanged(List<Composition> newPlayQueue) {
+    private void onPlayListChanged(List<Composition> newPlayQueue) {//TODO scroll to current composition
         if (currentCompositionDisposable != null) {
             currentCompositionDisposable.dispose();
             currentCompositionDisposable = null;

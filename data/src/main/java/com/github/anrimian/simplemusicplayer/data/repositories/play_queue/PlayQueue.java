@@ -53,7 +53,9 @@ public class PlayQueue {
 
     public void changeShuffleMode(boolean shuffled) {
         this.shuffled = shuffled;
-
+        if (shuffled) {
+            Collections.shuffle(shuffledQueue);
+        }
         positionMap.clear();
         fillPositionMap();
     }
