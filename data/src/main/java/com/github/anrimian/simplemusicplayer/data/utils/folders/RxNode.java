@@ -137,7 +137,7 @@ public class RxNode<K> {
             node.data = nodeData;
             childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
         } else {
-            addNode(new RxNode<>(key, data));
+            addNode(new RxNode<>(key, nodeData));
         }
     }
 
