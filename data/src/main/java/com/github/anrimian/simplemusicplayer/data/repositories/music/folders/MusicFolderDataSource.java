@@ -8,12 +8,15 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.Single;
 
+import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getParentDirPath;
 import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
 import static io.reactivex.Observable.fromIterable;
@@ -21,6 +24,8 @@ import static io.reactivex.Observable.fromIterable;
 public class MusicFolderDataSource {
 
     private final StorageMusicDataSource storageMusicDataSource;
+
+    private Map<Long, String> pathIdMap = new HashMap<>();
 
     @Nullable
     private RxNode<String> root;
@@ -117,6 +122,12 @@ public class MusicFolderDataSource {
 
     private void processModifyChange(List<Composition> compositions) {
         for (Composition composition : compositions) {
+            String path = pathIdMap.get(composition.getId());
+            if (path != null && !path.equals(composition.getFilePath())) {
+                findNodeByPath(getParentDirPath(path))
+                        .removeNode(getFileName(composition.getFilePath()));
+            }
+            pathIdMap.put(composition.getId(), composition.getFilePath());
             getParentForPath(root, composition.getFilePath(), (node, partialPath) ->
                     node.updateNode(partialPath, new CompositionNode(composition))
             );
@@ -125,6 +136,7 @@ public class MusicFolderDataSource {
 
     private void processDeleteChange(List<Composition> compositions) {
         fromIterable(compositions)
+                .doOnNext(composition -> pathIdMap.remove(composition.getId()))
                 .groupBy(composition -> getParentDirPath(composition.getFilePath()))
                 .doOnNext(group -> group.map(Composition::getFilePath)
                         .map(FileUtils::getFileName)
@@ -156,6 +168,7 @@ public class MusicFolderDataSource {
 
     private void processAddChange(List<Composition> compositions) {
         fromIterable(compositions)
+                .doOnNext(composition -> pathIdMap.put(composition.getId(), composition.getFilePath()))
                 .groupBy(composition -> getParentDirPath(composition.getFilePath()))
                 .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
                         .doOnSuccess(pathCompositions ->
@@ -184,6 +197,7 @@ public class MusicFolderDataSource {
 //                .subscribe();
         for (Composition composition: storageMusicDataSource.getCompositionsMap().values()) {
             String path = composition.getFilePath();
+            pathIdMap.put(composition.getId(), path);
 
             getParentForPath(root, path, (node, partialPath) ->
                     node.addNode(new RxNode<>(partialPath, new CompositionNode(composition)))

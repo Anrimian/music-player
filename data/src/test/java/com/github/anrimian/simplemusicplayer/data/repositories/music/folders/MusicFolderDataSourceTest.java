@@ -4,16 +4,13 @@ import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
@@ -23,8 +20,7 @@ import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeT
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
-import static java.util.stream.Collectors.joining;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -400,6 +396,63 @@ public class MusicFolderDataSourceTest {
                     assertEquals(2, list.size());
                     assertEquals(compositionOne, ((CompositionNode) list.get(0)).getComposition());
                     assertEquals(compositionTwo, ((CompositionNode) list.get(1)).getComposition());
+                    return true;
+                });
+    }
+
+    @Test
+    public void changeFilePathTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = new Composition();
+        compositionOne.setFilePath("root/music/one.dd");
+        compositionOne.setId(1L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = new Composition();
+        compositionTwo.setFilePath("root/music/two.dd");
+        compositionTwo.setId(2L);
+        compositions.put(2L, compositionTwo);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        Folder observerFolder = musicFolderDataSource.getMusicInPath(null).blockingGet();
+        TestObserver<Change<NodeData>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<Change<List<NodeData>>> childChangeObserver = observerFolder.getChildChangeObservable().test();
+
+        Composition compositionTwoChanged = new Composition();
+        compositionTwoChanged.setFilePath("root/music/basic/two.dd");
+        compositionTwoChanged.setId(2L);
+
+        changeSubject.onNext(new Change<>(MODIFY, singletonList(compositionTwoChanged)));
+
+        childChangeObserver.assertValueAt(0, change -> {
+            assertEquals(DELETED, change.getChangeType());
+            assertEquals(compositionTwo, ((CompositionNode) change.getData().get(0)).getComposition());
+            return true;
+        });
+
+        childChangeObserver.assertValueAt(1, change -> {
+            assertEquals(ADDED, change.getChangeType());
+            FolderNode folderNode = (FolderNode) change.getData().get(0);
+            assertEquals("root/music/basic", folderNode.getFullPath());
+            return true;
+        });
+
+        selfChangeObserver.assertValueAt(0, change -> {
+            assertEquals(MODIFY, change.getChangeType());
+            FolderNode folderNode = (FolderNode) change.getData();
+            assertEquals(2, folderNode.getCompositionsCount());
+            return true;
+        });
+
+        musicFolderDataSource.getMusicInPath(null)
+                .test()
+                .assertValue(folder -> {
+                    List<NodeData> list = folder.getFiles();
+                    assertEquals(2, list.size());
+
+                    FolderNode folderNode = (FolderNode) list.get(1);
+                    assertEquals("root/music/basic", folderNode.getFullPath());
                     return true;
                 });
     }
