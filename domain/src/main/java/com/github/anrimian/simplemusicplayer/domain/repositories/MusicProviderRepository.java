@@ -16,6 +16,8 @@ public interface MusicProviderRepository {
 
     Single<List<Composition>> getAllCompositions();
 
+//    Single<Folder> getCompositionsInPath(@Nullable String path);
+
     Completable writeErrorAboutComposition(ErrorType errorType, Composition composition);
 
     Completable deleteComposition(Composition composition);

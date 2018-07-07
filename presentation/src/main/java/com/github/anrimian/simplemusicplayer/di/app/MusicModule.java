@@ -10,6 +10,7 @@ import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDaoWrapp
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueDataSource;
 import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
@@ -97,7 +98,10 @@ class MusicModule {
     @NonNull
     @Singleton
     MusicProviderRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
+                                                    MusicFolderDataSource musicFolderDataSource,
                                                     @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new MusicProviderRepositoryImpl(storageMusicDataSource, scheduler);
+        return new MusicProviderRepositoryImpl(storageMusicDataSource,
+                musicFolderDataSource,
+                scheduler);
     }
 }

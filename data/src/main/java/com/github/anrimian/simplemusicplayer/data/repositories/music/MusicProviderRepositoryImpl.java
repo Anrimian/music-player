@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
+import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
@@ -19,11 +20,14 @@ import io.reactivex.Single;
 public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     private final StorageMusicDataSource storageMusicDataSource;
+    private final MusicFolderDataSource musicFolderDataSource;
     private final Scheduler scheduler;
 
     public MusicProviderRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
+                                       MusicFolderDataSource musicFolderDataSource,
                                        Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
+        this.musicFolderDataSource = musicFolderDataSource;
         this.scheduler = scheduler;
     }
 
@@ -33,6 +37,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                 .map(compositions -> (List<Composition>) new ArrayList(compositions.values()))
                 .subscribeOn(scheduler);
     }
+
+//    @Override
+//    public Single<Folder> getCompositionsInPath(@Nullable String path) {
+//        return musicFolderDataSource.getMusicInPath(path)
+//                .subscribeOn(scheduler);
+//    }
 
     @Override
     public Completable writeErrorAboutComposition(ErrorType errorType, Composition composition) {

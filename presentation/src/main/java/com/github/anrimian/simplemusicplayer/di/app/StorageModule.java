@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.di.app;
 
 import android.content.Context;
 
+import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicProvider;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 
@@ -30,6 +31,13 @@ public class StorageModule {
     @Singleton
     StorageMusicDataSource storageMusicDataSource(StorageMusicProvider musicProvider,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new  StorageMusicDataSource(musicProvider, scheduler);
+        return new StorageMusicDataSource(musicProvider, scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    MusicFolderDataSource musicFolderDataSource(StorageMusicDataSource storageMusicDataSource) {
+        return new MusicFolderDataSource(storageMusicDataSource);
     }
 }

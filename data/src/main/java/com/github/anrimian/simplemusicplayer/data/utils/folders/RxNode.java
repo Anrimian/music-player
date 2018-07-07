@@ -176,9 +176,7 @@ public class RxNode<K> {
     @Override
     public String toString() {
         return "RxNode{" +
-                "nodes=" + nodes +
-                ", key=" + key +
-                ", data=" + data +
+                "key=" + key +
                 '}';
     }
 

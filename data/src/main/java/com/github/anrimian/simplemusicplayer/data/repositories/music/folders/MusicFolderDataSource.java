@@ -5,6 +5,9 @@ import com.github.anrimian.simplemusicplayer.data.utils.FileUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
@@ -15,6 +18,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getParentDirPath;
@@ -43,21 +47,35 @@ public class MusicFolderDataSource {
         RxNode<String> node = findNodeByPath(path);
         return new Folder(getFilesListFromNode(node),
                 node.getChildChangeObservable().map(this::toNodeDataChange),
-                node.getSelfChangeObservable());
+                node.getSelfChangeObservable().map(this::toChangeFileSource));
     }
 
-    private Change<List<NodeData>> toNodeDataChange(Change<List<RxNode<String>>> change) {
-        List<NodeData> changedNodes = new ArrayList<>();
+    private Change<List<FileSource>> toNodeDataChange(Change<List<RxNode<String>>> change) {
+        List<FileSource> changedNodes = new ArrayList<>();
         for (RxNode<String> changedNode : change.getData()) {
-            changedNodes.add(changedNode.getData());
+            changedNodes.add(toFileSource(changedNode.getData()));
         }
         return new Change<>(change.getChangeType(), changedNodes);
     }
 
-    private List<NodeData> getFilesListFromNode(RxNode<String> node) {
-        List<NodeData> fileList = new ArrayList<>();
+    private Change<FileSource> toChangeFileSource(Change<NodeData> change) {
+        return new Change<>(change.getChangeType(), toFileSource(change.getData()));
+    }
+
+    private FileSource toFileSource(NodeData nodeData) {
+        if (nodeData instanceof CompositionNode) {
+            return new MusicFileSource(((CompositionNode) nodeData).getComposition());
+        } else if (nodeData instanceof FolderNode){
+            FolderNode node = (FolderNode) nodeData;
+            return new FolderFileSource(node.getFullPath(), node.getCompositionsCount());
+        }
+        throw new IllegalStateException("unexpected type of node: " + nodeData);
+    }
+
+    private List<FileSource> getFilesListFromNode(RxNode<String> node) {
+        List<FileSource> fileList = new ArrayList<>();
         for (RxNode<String> child : node.getNodes()) {
-            fileList.add(child.getData());
+            fileList.add(toFileSource(child.getData()));
         }
         return fileList;
     }
