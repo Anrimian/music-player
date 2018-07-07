@@ -24,6 +24,7 @@ import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFak
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.shuffle;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.any;
@@ -126,6 +127,24 @@ public class PlayQueueDataSourceTest {
                 .test()
                 .assertValue(compositions -> {
                     assertEquals(getFakeCompositions(), compositions);
+                    return true;
+                });
+
+        verify(storageMusicDataSource).getChangeObservable();
+    }
+
+    @Test
+    public void getPlayQueueInInitialStateWithShuffledMode() {
+        List<Composition> shuffledCompositions = getFakeCompositions();
+        shuffle(shuffledCompositions);
+        when(playQueueDao.getPlayQueue(any())).thenReturn(getFakeCompositions());
+        when(playQueueDao.getShuffledPlayQueue(any())).thenReturn(shuffledCompositions);
+        when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(true);
+
+        playQueueDataSource.getPlayQueue()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(shuffledCompositions, compositions);
                     return true;
                 });
 

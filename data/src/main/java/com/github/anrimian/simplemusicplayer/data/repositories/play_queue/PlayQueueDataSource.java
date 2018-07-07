@@ -185,7 +185,7 @@ public class PlayQueueDataSource {
     private PlayQueue loadPlayQueue() {
         Map<Long, Composition> allCompositionMap = storageMusicDataSource.getCompositionsMap();
         List<Composition> playQueue = playQueueDao.getPlayQueue(allCompositionMap);
-        List<Composition> shuffledQueue = playQueueDao.getPlayQueue(allCompositionMap);
+        List<Composition> shuffledQueue = playQueueDao.getShuffledPlayQueue(allCompositionMap);
         return new PlayQueue(playQueue, shuffledQueue, settingsPreferences.isRandomPlayingEnabled());
     }
 }
