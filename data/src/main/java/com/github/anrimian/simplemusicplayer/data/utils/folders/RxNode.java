@@ -94,10 +94,10 @@ public class RxNode<K> {
         RxNode<K> previous = nodes.put(node.getKey(), node);
         if (previous == null) {
             childChangeSubject.onNext(new Change<>(ADDED, singletonList(node)));
+            notifyNodesAdded(singletonList(node.getData()));
         } else {
             childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
         }
-        notifyNodesAdded(singletonList(node.getData()));
     }
 
     public void removeNodes(List<K> keys) {
@@ -150,12 +150,12 @@ public class RxNode<K> {
             boolean updated = this.data.onNodesRemoved(data);
             if (updated) {
                 selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
-            }
-        }
 
-        RxNode<K> parent = getParent();
-        if (parent != null) {
-            parent.notifyNodesRemoved(data);
+                RxNode<K> parent = getParent();
+                if (parent != null) {
+                    parent.notifyNodesRemoved(data);
+                }
+            }
         }
     }
 
@@ -164,13 +164,18 @@ public class RxNode<K> {
             boolean updated = this.data.onNodesAdded(data);
             if (updated) {
                 selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
+
+                RxNode<K> parent = getParent();
+                if (parent != null) {
+                    parent.notifyNodeChanged(this);
+                    parent.notifyNodesAdded(data);
+                }
             }
         }
+    }
 
-        RxNode<K> parent = getParent();
-        if (parent != null) {
-            parent.notifyNodesAdded(data);
-        }
+    private void notifyNodeChanged(RxNode<K> node) {
+        childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
     }
 
     @Override
