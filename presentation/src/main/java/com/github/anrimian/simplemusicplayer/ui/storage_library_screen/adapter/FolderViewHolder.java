@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.OnTransitionItemClickListener;
 
 import javax.annotation.Nonnull;

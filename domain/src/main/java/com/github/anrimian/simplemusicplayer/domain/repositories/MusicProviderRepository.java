@@ -1,9 +1,12 @@
 package com.github.anrimian.simplemusicplayer.domain.repositories;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorType;
 
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -16,7 +19,7 @@ public interface MusicProviderRepository {
 
     Single<List<Composition>> getAllCompositions();
 
-//    Single<Folder> getCompositionsInPath(@Nullable String path);
+    Single<Folder> getCompositionsInPath(@Nullable String path);
 
     Completable writeErrorAboutComposition(ErrorType errorType, Composition composition);
 

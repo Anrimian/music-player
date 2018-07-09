@@ -1,14 +1,10 @@
-package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
+package com.github.anrimian.simplemusicplayer.domain.models.composition.folders;
 
-import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.List;
 
 import io.reactivex.Observable;
-
-import static io.reactivex.subjects.PublishSubject.create;
 
 public class Folder {
 

@@ -8,7 +8,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.ErrorEvent;
-import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
+import com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.events.PreparedEvent;

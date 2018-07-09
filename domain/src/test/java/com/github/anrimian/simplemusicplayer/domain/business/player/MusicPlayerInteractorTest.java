@@ -27,8 +27,8 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.currentComposition;
 import static com.github.anrimian.simplemusicplayer.domain.business.TestDataProvider.getFakeCompositions;
-import static com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType.DELETED;
-import static com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType.UNKNOWN;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorType.DELETED;
+import static com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorType.UNKNOWN;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.GAIN;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.AudioFocusEvent.LOSS;
 import static com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState.IDLE;

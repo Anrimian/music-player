@@ -5,9 +5,10 @@ import com.github.anrimian.simplemusicplayer.data.utils.FileUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getParentDirPath;

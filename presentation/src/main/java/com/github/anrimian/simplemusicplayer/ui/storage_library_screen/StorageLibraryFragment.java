@@ -19,7 +19,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.wrappers.HeaderViewWrapper;

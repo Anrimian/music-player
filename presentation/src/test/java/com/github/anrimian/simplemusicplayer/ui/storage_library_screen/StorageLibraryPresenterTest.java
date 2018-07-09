@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.ui.storage_library_screen;
 
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 

@@ -2,9 +2,10 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
 
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import org.junit.Before;

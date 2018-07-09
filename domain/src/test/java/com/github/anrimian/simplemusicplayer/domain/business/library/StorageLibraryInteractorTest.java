@@ -3,9 +3,9 @@ package com.github.anrimian.simplemusicplayer.domain.business.library;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 import org.junit.After;

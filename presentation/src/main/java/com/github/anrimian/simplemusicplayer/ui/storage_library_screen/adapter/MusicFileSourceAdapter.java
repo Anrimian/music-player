@@ -7,9 +7,9 @@ import android.view.ViewGroup;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.OnTransitionItemClickListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.endless_scrolling.HeaderFooterRecyclerViewAdapter;

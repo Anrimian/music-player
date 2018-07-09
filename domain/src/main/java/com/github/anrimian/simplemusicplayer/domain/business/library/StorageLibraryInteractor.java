@@ -2,10 +2,11 @@ package com.github.anrimian.simplemusicplayer.domain.business.library;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FolderFileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.files.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors.CollectVisitor;
@@ -37,12 +38,17 @@ public class StorageLibraryInteractor {
         this.musicPlayerInteractor = musicPlayerInteractor;
     }
 
+    public Single<Folder> getCompositionsInPath(@Nullable String path) {
+        return musicProviderRepository.getCompositionsInPath(path);
+    }
+
     public Completable playAllMusicInPath(@Nullable String path) {
         return getMusicFileTree().map(tree -> findNodeByPath(tree, path))
                 .map(this::getAllCompositions)
                 .flatMapCompletable(musicPlayerInteractor::startPlaying);
     }
 
+    @Deprecated
     public Single<List<FileSource>> getMusicInPath(@Nullable String path) {
         return getMusicFileTree()
                 .map(tree -> getFilesListByPath(tree, path))

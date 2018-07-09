@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.controllers.music.error;
 
 import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.domain.business.player.PlayerErrorParser;
-import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
+import com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorType;
 import com.google.android.exoplayer2.upstream.FileDataSource;
 
 import java.io.FileNotFoundException;

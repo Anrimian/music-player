@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.domain.models.files;
+package com.github.anrimian.simplemusicplayer.domain.models.composition.folders;
 
 import javax.annotation.Nonnull;
 

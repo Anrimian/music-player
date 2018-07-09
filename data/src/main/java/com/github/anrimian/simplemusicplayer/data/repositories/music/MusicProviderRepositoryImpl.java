@@ -3,11 +3,14 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.error.ErrorType;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -38,11 +41,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                 .subscribeOn(scheduler);
     }
 
-//    @Override
-//    public Single<Folder> getCompositionsInPath(@Nullable String path) {
-//        return musicFolderDataSource.getMusicInPath(path)
-//                .subscribeOn(scheduler);
-//    }
+    @Override
+    public Single<Folder> getCompositionsInPath(@Nullable String path) {
+        return musicFolderDataSource.getMusicInPath(path)
+                .subscribeOn(scheduler);
+    }
 
     @Override
     public Completable writeErrorAboutComposition(ErrorType errorType, Composition composition) {

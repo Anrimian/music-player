@@ -4,7 +4,7 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.files.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
