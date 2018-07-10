@@ -38,7 +38,7 @@ public class MusicFolderDataSource {
         this.storageMusicDataSource = storageMusicDataSource;
     }
 
-    public Single<Folder> getMusicInPath(@Nullable String path) {
+    public Single<Folder> getCompositionsInPath(@Nullable String path) {
         return getMusicFileTree()
                 .map(tree -> getFolderInPath(path));
     }
