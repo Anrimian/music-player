@@ -1,6 +1,8 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
+import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.AlphabeticalDescFolderSorter;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.AlphabeticalFolderSorter;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.Sorter;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
@@ -29,13 +31,16 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     private final StorageMusicDataSource storageMusicDataSource;
     private final MusicFolderDataSource musicFolderDataSource;
+    private final SettingsPreferences settingsPreferences;
     private final Scheduler scheduler;
 
     public MusicProviderRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
                                        MusicFolderDataSource musicFolderDataSource,
+                                       SettingsPreferences settingsPreferences,
                                        Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
         this.musicFolderDataSource = musicFolderDataSource;
+        this.settingsPreferences = settingsPreferences;
         this.scheduler = scheduler;
     }
 
@@ -72,7 +77,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     private Sorter<Folder> getFolderSorter() {
-        return new AlphabeticalFolderSorter();
+        switch (settingsPreferences.getFolderOrder()) {
+            case ALPHABETICAL: return new AlphabeticalFolderSorter();
+            case ALPHABETICAL_DESC: return new AlphabeticalDescFolderSorter();
+            default: return new AlphabeticalFolderSorter();
+        }
     }
 
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {

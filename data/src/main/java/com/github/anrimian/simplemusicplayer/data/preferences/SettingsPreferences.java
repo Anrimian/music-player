@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.github.anrimian.simplemusicplayer.data.utils.preferences.SharedPreferencesHelper;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
+
+import static com.github.anrimian.simplemusicplayer.domain.models.composition.Order.CREATE_TIME;
+import static com.github.anrimian.simplemusicplayer.domain.models.composition.Order.valueOf;
 
 /**
  * Created on 16.04.2018.
@@ -14,6 +18,8 @@ public class SettingsPreferences {
 
     private static final String RANDOM_PLAYING_ENABLED = "random_playing_enabled";
     private static final String INFINITE_PLAYING_ENABLED = "infinite_playing_enabled";
+    private static final String FOLDER_ORDER = "folder_order";
+    private static final String COMPOSITIONS_ORDER = "compositions_order";
 
     private SharedPreferencesHelper preferences;
 
@@ -36,5 +42,21 @@ public class SettingsPreferences {
 
     public boolean isInfinitePlayingEnabled() {
         return preferences.getBoolean(INFINITE_PLAYING_ENABLED);
+    }
+
+    public Order getFolderOrder() {
+        return Order.fromId(preferences.getInt(FOLDER_ORDER, CREATE_TIME.getId()));
+    }
+
+    public void setFolderOrder(Order order) {
+        preferences.putInt(FOLDER_ORDER, order.getId());
+    }
+
+    public Order getCompositionsOrder() {
+        return Order.fromId(preferences.getInt(COMPOSITIONS_ORDER, CREATE_TIME.getId()));
+    }
+
+    public void setCompositionsOrder(Order order) {
+        preferences.putInt(COMPOSITIONS_ORDER, order.getId());
     }
 }

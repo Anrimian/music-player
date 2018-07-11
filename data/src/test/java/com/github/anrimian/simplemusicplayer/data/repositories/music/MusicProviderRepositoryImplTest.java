@@ -1,10 +1,10 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
+import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
@@ -12,15 +12,12 @@ import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRe
 import org.junit.Before;
 import org.junit.Test;
 
-import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.fakeComposition;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getTestFolderSingle;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,13 +25,20 @@ public class MusicProviderRepositoryImplTest {
 
     private StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
     private MusicFolderDataSource musicFolderDataSource = mock(MusicFolderDataSource.class);
+    private SettingsPreferences settingsPreferences = mock(SettingsPreferences.class);
     private Scheduler scheduler = Schedulers.trampoline();
 
     private MusicProviderRepository musicProviderRepository = new MusicProviderRepositoryImpl(
             storageMusicDataSource,
             musicFolderDataSource,
+            settingsPreferences,
             scheduler
     );
+
+    @Before
+    public void setUp() {
+        when(settingsPreferences.getFolderOrder()).thenReturn(Order.ALPHABETICAL);
+    }
 
     @Test
     public void getAllCompositionsInPath() {

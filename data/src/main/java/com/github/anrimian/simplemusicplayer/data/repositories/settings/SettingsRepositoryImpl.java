@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.settings;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 
 /**
@@ -33,5 +34,15 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public boolean isInfinitePlayingEnabled() {
         return settingsPreferences.isInfinitePlayingEnabled();
+    }
+
+    @Override
+    public void setFolderOrder(Order order) {
+        settingsPreferences.setFolderOrder(order);
+    }
+
+    @Override
+    public void setCompositionsOrder(Order order) {
+        settingsPreferences.setCompositionsOrder(order);
     }
 }
