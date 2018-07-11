@@ -1,9 +1,10 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.AlphabeticalFolderSorter;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.Sorter;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
@@ -17,10 +18,8 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 
 /**
  * Created on 24.10.2017.
@@ -50,6 +49,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Single<Folder> getCompositionsInPath(@Nullable String path) {
         return musicFolderDataSource.getCompositionsInPath(path)
+                .doOnSuccess(getFolderSorter()::applyOrder)
                 .subscribeOn(scheduler);
     }
 
@@ -71,8 +71,13 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         return storageMusicDataSource.deleteComposition(composition);
     }
 
+    private Sorter<Folder> getFolderSorter() {
+        return new AlphabeticalFolderSorter();
+    }
+
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {
         return musicFolderDataSource.getCompositionsInPath(path)
+                .doOnSuccess(getFolderSorter()::applyOrder)
                 .map(Folder::getFiles)
                 .flatMapObservable(Observable::fromIterable)
                 .flatMap(fileSource -> {

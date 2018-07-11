@@ -18,6 +18,7 @@ import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.fakeComposition;
+import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getTestFolderSingle;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -41,13 +42,13 @@ public class MusicProviderRepositoryImplTest {
         Composition compositionTwo = fakeComposition(2, "2");
 
         when(musicFolderDataSource.getCompositionsInPath(null))
-                .thenReturn(getTestFolder(
+                .thenReturn(getTestFolderSingle(
                         new FolderFileSource("basic", 1),
                         new MusicFileSource(compositionOne)
                 ));
 
         when(musicFolderDataSource.getCompositionsInPath("basic"))
-                .thenReturn(getTestFolder(
+                .thenReturn(getTestFolderSingle(
                         new MusicFileSource(compositionTwo)
                 ));
 
@@ -62,7 +63,4 @@ public class MusicProviderRepositoryImplTest {
 
     }
 
-    private Single<Folder> getTestFolder(FileSource... fileSources) {
-        return Single.just(new Folder(asList(fileSources), Observable.never(), Observable.never()));
-    }
 }
