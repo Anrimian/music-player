@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.repositories.music.sort;
+package com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
@@ -8,15 +8,16 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.M
 
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.fakeComposition;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getTestFolder;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-public class AlphabeticalDescFolderSorterTest {
+public class AlphabeticalFolderSorterTest {
 
-    private AlphabeticalDescFolderSorter folderSorter = new AlphabeticalDescFolderSorter();
+    private AlphabeticalFolderSorter folderSorter = new AlphabeticalFolderSorter();
 
     @Test
     public void applyOrder() {
@@ -25,18 +26,18 @@ public class AlphabeticalDescFolderSorterTest {
 
         Folder folder = getTestFolder(
                 new MusicFileSource(compositionOne),
-                new FolderFileSource("basic", 1),
+                new FolderFileSource("basic", 1, new Date(0), new Date(0)),
                 new MusicFileSource(compositionTwo),
-                new FolderFileSource("aby", 1)
+                new FolderFileSource("aby", 1, new Date(0), new Date(0))
         );
 
         folderSorter.applyOrder(folder);
 
         List<FileSource> files = folder.getFiles();
 
-        assertEquals("basic", ((FolderFileSource) files.get(0)).getPath());
-        assertEquals("aby", ((FolderFileSource) files.get(1)).getPath());
-        assertEquals(compositionTwo, ((MusicFileSource) files.get(2)).getComposition());
-        assertEquals(compositionOne, ((MusicFileSource) files.get(3)).getComposition());
+        assertEquals("aby", ((FolderFileSource) files.get(0)).getFullPath());
+        assertEquals("basic", ((FolderFileSource) files.get(1)).getFullPath());
+        assertEquals(compositionOne, ((MusicFileSource) files.get(2)).getComposition());
+        assertEquals(compositionTwo, ((MusicFileSource) files.get(3)).getComposition());
     }
 }

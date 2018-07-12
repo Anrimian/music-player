@@ -6,6 +6,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.F
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +49,27 @@ public class TestDataProvider {
         return new CompositionEvent(composition, 0, 0L);
     }
 
+    public static Composition fakeComposition(long id, String filePath, long createDate) {
+        Composition composition = new Composition();
+        composition.setId(id);
+        composition.setFilePath(filePath);
+        composition.setDateAdded(new Date(createDate));
+        return composition;
+    }
+
     public static Composition fakeComposition(long id, String name) {
         Composition composition = new Composition();
         composition.setId(id);
         composition.setDisplayName(name);
         composition.setFilePath(name);
+        return composition;
+    }
+
+    public static Composition fakeComposition(long id, long createDate) {
+        Composition composition = new Composition();
+        composition.setId(id);
+        composition.setFilePath(String.valueOf(id));
+        composition.setDateAdded(new Date(createDate * 1000L));
         return composition;
     }
 

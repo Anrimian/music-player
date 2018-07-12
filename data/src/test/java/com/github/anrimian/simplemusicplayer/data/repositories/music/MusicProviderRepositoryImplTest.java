@@ -12,6 +12,8 @@ import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRe
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
+
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 
@@ -47,7 +49,7 @@ public class MusicProviderRepositoryImplTest {
 
         when(musicFolderDataSource.getCompositionsInPath(null))
                 .thenReturn(getTestFolderSingle(
-                        new FolderFileSource("basic", 1),
+                        new FolderFileSource("basic", 1, new Date(0), new Date(0)),
                         new MusicFileSource(compositionOne)
                 ));
 

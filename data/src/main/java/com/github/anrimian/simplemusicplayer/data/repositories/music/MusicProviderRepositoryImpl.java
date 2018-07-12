@@ -2,9 +2,11 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.AlphabeticalDescFolderSorter;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.AlphabeticalFolderSorter;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder.AlphabeticalDescFolderSorter;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder.AlphabeticalFolderSorter;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.Sorter;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder.CreateDateDescFolderSorter;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder.CreateDateFolderSorter;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
@@ -80,6 +82,8 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         switch (settingsPreferences.getFolderOrder()) {
             case ALPHABETICAL: return new AlphabeticalFolderSorter();
             case ALPHABETICAL_DESC: return new AlphabeticalDescFolderSorter();
+            case CREATE_TIME: return new CreateDateFolderSorter();
+            case CREATE_TIME_DESC: return new CreateDateDescFolderSorter();
             default: return new AlphabeticalFolderSorter();
         }
     }
@@ -91,7 +95,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                 .flatMapObservable(Observable::fromIterable)
                 .flatMap(fileSource -> {
                     if (fileSource instanceof FolderFileSource) {
-                        return getCompositionsObservable(((FolderFileSource) fileSource).getPath());
+                        return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());
                     } else if (fileSource instanceof MusicFileSource) {
                         return Observable.just(((MusicFileSource) fileSource).getComposition());
                     }

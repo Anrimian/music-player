@@ -44,7 +44,7 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
     }
 
     void bind(@Nonnull FolderFileSource folderFileSource) {
-        this.path = folderFileSource.getPath();
+        this.path = folderFileSource.getFullPath();
         String displayPath = path;
         int lastSlashIndex = path.lastIndexOf('/');
         if (lastSlashIndex != -1) {

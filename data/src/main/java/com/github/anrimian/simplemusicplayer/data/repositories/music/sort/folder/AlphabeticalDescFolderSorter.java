@@ -1,16 +1,14 @@
-package com.github.anrimian.simplemusicplayer.data.repositories.music.sort;
+package com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder;
 
-import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.Sorter;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 
 import java.text.Collator;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
-public class AlphabeticalFolderSorter implements Sorter<Folder> {
+public class AlphabeticalDescFolderSorter implements Sorter<Folder> {
 
     @Override
     public void applyOrder(Folder data) {
@@ -19,13 +17,13 @@ public class AlphabeticalFolderSorter implements Sorter<Folder> {
                 Collator collator = Collator.getInstance();
                 if (first instanceof FolderFileSource) {
                     return collator.compare(
-                            ((FolderFileSource) first).getPath(),
-                            ((FolderFileSource) second).getPath()
+                            ((FolderFileSource) second).getFullPath(),
+                            ((FolderFileSource) first).getFullPath()
                     );
                 } else if (first instanceof MusicFileSource) {
                     return collator.compare(
-                            ((MusicFileSource) first).getComposition().getFilePath(),
-                            ((MusicFileSource) second).getComposition().getFilePath()
+                            ((MusicFileSource) second).getComposition().getFilePath(),
+                            ((MusicFileSource) first).getComposition().getFilePath()
                     );
                 }
             } else {

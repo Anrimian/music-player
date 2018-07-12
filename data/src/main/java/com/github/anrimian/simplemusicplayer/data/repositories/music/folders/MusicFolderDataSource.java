@@ -67,7 +67,10 @@ public class MusicFolderDataSource {
             return new MusicFileSource(((CompositionNode) nodeData).getComposition());
         } else if (nodeData instanceof FolderNode){
             FolderNode node = (FolderNode) nodeData;
-            return new FolderFileSource(node.getFullPath(), node.getCompositionsCount());
+            return new FolderFileSource(node.getFullPath(),
+                    node.getCompositionsCount(),
+                    node.getNewestCreateDate(),
+                    node.getLatestCreateDate());
         }
         throw new IllegalStateException("unexpected type of node: " + nodeData);
     }

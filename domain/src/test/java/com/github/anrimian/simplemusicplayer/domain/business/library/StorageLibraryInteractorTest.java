@@ -73,14 +73,14 @@ public class StorageLibraryInteractorTest {
         List<FileSource> collection = getMusicListInPath(null);
         assertEquals(3, collection.size());
         FolderFileSource old = (FolderFileSource) collection.get(0);
-        assertEquals("music/old", old.getPath());
+        assertEquals("music/old", old.getFullPath());
         assertEquals(2, old.getFilesCount());
 
-        List<FileSource> oldCollection = getMusicListInPath(old.getPath());
+        List<FileSource> oldCollection = getMusicListInPath(old.getFullPath());
         FolderFileSource toDelete = (FolderFileSource) oldCollection.get(0);
-        assertEquals("music/old/to delete", toDelete.getPath());
+        assertEquals("music/old/to delete", toDelete.getFullPath());
 
-        List<FileSource> toDeleteCollection = getMusicListInPath(toDelete.getPath());
+        List<FileSource> toDeleteCollection = getMusicListInPath(toDelete.getFullPath());
         assertEquals("root/music/old/to delete/four", ((MusicFileSource) toDeleteCollection.get(0)).getComposition().getFilePath());
     }
 
@@ -127,7 +127,7 @@ public class StorageLibraryInteractorTest {
                 break;
             }
             if (fileSource instanceof FolderFileSource) {
-                assertNotNull(((FolderFileSource) fileSource).getPath());
+                assertNotNull(((FolderFileSource) fileSource).getFullPath());
                 break;
             }
         }
@@ -138,7 +138,7 @@ public class StorageLibraryInteractorTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
 
     }
 

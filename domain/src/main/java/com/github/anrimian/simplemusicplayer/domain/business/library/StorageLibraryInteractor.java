@@ -12,6 +12,7 @@ import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors.CollectVisitor;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -88,7 +89,9 @@ public class StorageLibraryInteractor {
             FileSource fileSource;
             Composition data = node.getData();
             if (data == null) {
-                fileSource = new FolderFileSource(tree.getFullPathOfNode(node), node.getDataChildCount());
+                fileSource = new FolderFileSource(tree.getFullPathOfNode(node),
+                        node.getDataChildCount(),
+                        new Date(), new Date());
             } else {
                 fileSource = new MusicFileSource(data);
             }

@@ -1,13 +1,20 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
 
-import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
+import android.text.format.DateUtils;
 
+import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+
+import java.util.Date;
 import java.util.List;
 
 public class FolderNode extends NodeData {
 
     private String fullPath;
     private int compositionsCount;
+
+    private Date newestCreateDate;//TODO process deletion, modify changes
+    private Date latestCreateDate;
 
     FolderNode(String fullPath) {
         this.fullPath = fullPath;
@@ -19,6 +26,16 @@ public class FolderNode extends NodeData {
         for (NodeData nodeData: nodes) {
             if (nodeData instanceof CompositionNode) {
                 compositionsCount++;
+
+                Composition composition = ((CompositionNode) nodeData).getComposition();
+                Date dateAdded = composition.getDateAdded();
+                if (newestCreateDate == null || dateAdded.compareTo(newestCreateDate) > 0) {
+                    newestCreateDate = dateAdded;
+                }
+                if (latestCreateDate == null || dateAdded.compareTo(latestCreateDate) < 0) {
+                    latestCreateDate = dateAdded;
+                }
+
                 updated = true;
             }
         }
@@ -43,6 +60,14 @@ public class FolderNode extends NodeData {
 
     public int getCompositionsCount() {
         return compositionsCount;
+    }
+
+    public Date getNewestCreateDate() {
+        return newestCreateDate;
+    }
+
+    public Date getLatestCreateDate() {
+        return latestCreateDate;
     }
 
     @Override

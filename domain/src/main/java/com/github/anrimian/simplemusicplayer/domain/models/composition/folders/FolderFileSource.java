@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.domain.models.composition.folders;
 
+import java.util.Date;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -9,28 +11,44 @@ import javax.annotation.Nonnull;
 public class FolderFileSource implements FileSource {
 
     @Nonnull
-    private String path;
+    private String fullPath;
 
     private int filesCount;
 
-    public FolderFileSource(@Nonnull String path, int filesCount) {
-        this.path = path;
+    private Date newestCreateDate;
+    private Date latestCreateDate;
+
+    public FolderFileSource(@Nonnull String fullPath,
+                            int filesCount,
+                            @Nonnull Date newestCreateDate,
+                            @Nonnull Date latestCreateDate) {
+        this.fullPath = fullPath;
         this.filesCount = filesCount;
+        this.newestCreateDate = newestCreateDate;
+        this.latestCreateDate = latestCreateDate;
     }
 
     @Nonnull
-    public String getPath() {
-        return path;
+    public String getFullPath() {
+        return fullPath;
     }
 
     public int getFilesCount() {
         return filesCount;
     }
 
+    public Date getNewestCreateDate() {
+        return newestCreateDate;
+    }
+
+    public Date getLatestCreateDate() {
+        return latestCreateDate;
+    }
+
     @Override
     public String toString() {
         return "FolderFileSource{" +
-                "path='" + path + '\'' +
+                "fullPath='" + fullPath + '\'' +
                 ", filesCount=" + filesCount +
                 '}';
     }
