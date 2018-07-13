@@ -1,14 +1,14 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.AlphabeticalDescFileComparator;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.AlphabeticalFileComparator;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.CreateDateDescFileComparator;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.CreateDateFileComparator;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder.AlphabeticalDescFolderSorter;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder.AlphabeticalFolderSorter;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.Sorter;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder.CreateDateDescFolderSorter;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.sort.folder.CreateDateFolderSorter;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
@@ -16,6 +16,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorTyp
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -56,7 +57,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Single<Folder> getCompositionsInPath(@Nullable String path) {
         return musicFolderDataSource.getCompositionsInPath(path)
-                .doOnSuccess(getFolderSorter()::applyOrder)
+                .doOnSuccess(folder -> folder.applyFileOrder(getFileComparator()))
                 .subscribeOn(scheduler);
     }
 
@@ -78,29 +79,28 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         return storageMusicDataSource.deleteComposition(composition);
     }
 
-    private Sorter<Folder> getFolderSorter() {
+    private Comparator<FileSource> getFileComparator() {
         switch (settingsPreferences.getFolderOrder()) {
-            case ALPHABETICAL: return new AlphabeticalFolderSorter();
-            case ALPHABETICAL_DESC: return new AlphabeticalDescFolderSorter();
-            case CREATE_TIME: return new CreateDateFolderSorter();
-            case CREATE_TIME_DESC: return new CreateDateDescFolderSorter();
-            default: return new AlphabeticalFolderSorter();
+            case ALPHABETICAL: return new AlphabeticalFileComparator();
+            case ALPHABETICAL_DESC: return new AlphabeticalDescFileComparator();
+            case CREATE_TIME: return new CreateDateFileComparator();
+            case CREATE_TIME_DESC: return new CreateDateDescFileComparator();
+            default: return new AlphabeticalFileComparator();
         }
     }
 
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {
-//        return musicFolderDataSource.getCompositionsInPath(path)
-//                .doOnSuccess(getFolderSorter()::applyOrder)
-//                .map(Folder::getFiles)
-//                .flatMapObservable(Observable::fromIterable)
-//                .flatMap(fileSource -> {
-//                    if (fileSource instanceof FolderFileSource) {
-//                        return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());
-//                    } else if (fileSource instanceof MusicFileSource) {
-//                        return Observable.just(((MusicFileSource) fileSource).getComposition());
-//                    }
-//                    throw new IllegalStateException("unexpected file source type: " + fileSource);
-//                });
-        return null;
+        return musicFolderDataSource.getCompositionsInPath(path)
+                .doOnSuccess(folder -> folder.applyFileOrder(getFileComparator()))
+                .flatMapObservable(Folder::getFilesObservable)
+                .flatMap(Observable::fromIterable)
+                .flatMap(fileSource -> {
+                    if (fileSource instanceof FolderFileSource) {
+                        return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());
+                    } else if (fileSource instanceof MusicFileSource) {
+                        return Observable.just(((MusicFileSource) fileSource).getComposition());
+                    }
+                    throw new IllegalStateException("unexpected file source type: " + fileSource);
+                });
     }
 }

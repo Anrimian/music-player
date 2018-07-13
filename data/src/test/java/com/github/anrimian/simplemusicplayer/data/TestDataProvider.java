@@ -78,6 +78,6 @@ public class TestDataProvider {
     }
 
     public static Folder getTestFolder(FileSource... fileSources) {
-        return new Folder(/*asList(fileSources),*/ Observable.never(), Observable.never());
+        return new Folder(Observable.just(asList(fileSources)), Observable.never());
     }
 }
