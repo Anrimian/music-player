@@ -1,15 +1,11 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
-
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
 import io.reactivex.observers.TestObserver;
 
-import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.ADDED;
 import static org.junit.Assert.*;
 
 public class RxNodeTest {
@@ -18,16 +14,16 @@ public class RxNodeTest {
 
     @Test
     public void addChildTest() {
-        TestObserver<Change<List<RxNode<Integer>>>> childObserver = root
-                .getChildChangeObservable()
+        TestObserver<List<RxNode<Integer>>> childObserver = root
+                .getChildObservable()
                 .test();
 
         RxNode<Integer> rootChild1 = new RxNode<>(1, new StringNode("child 1"));
         root.addNode(rootChild1);
 
-        childObserver.assertValue(change -> {
-            assertEquals(ADDED, change.getChangeType());
-            assertEquals(rootChild1, change.getData().get(0));
+        childObserver.assertValueAt(1, list -> {
+            assertEquals(1, list.size());
+            assertEquals(rootChild1, list.get(0));
 
             return true;
         });

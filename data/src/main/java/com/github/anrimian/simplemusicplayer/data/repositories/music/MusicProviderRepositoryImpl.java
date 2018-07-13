@@ -89,18 +89,18 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {
-        return musicFolderDataSource.getCompositionsInPath(path)
-                .doOnSuccess(getFolderSorter()::applyOrder)
-                .map(Folder::getFiles)
-                .flatMapObservable(Observable::fromIterable)
-                .flatMap(fileSource -> {
-                    if (fileSource instanceof FolderFileSource) {
-                        return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());
-                    } else if (fileSource instanceof MusicFileSource) {
-                        return Observable.just(((MusicFileSource) fileSource).getComposition());
-                    }
-                    throw new IllegalStateException("unexpected file source type: " + fileSource);
-                });
-
+//        return musicFolderDataSource.getCompositionsInPath(path)
+//                .doOnSuccess(getFolderSorter()::applyOrder)
+//                .map(Folder::getFiles)
+//                .flatMapObservable(Observable::fromIterable)
+//                .flatMap(fileSource -> {
+//                    if (fileSource instanceof FolderFileSource) {
+//                        return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());
+//                    } else if (fileSource instanceof MusicFileSource) {
+//                        return Observable.just(((MusicFileSource) fileSource).getComposition());
+//                    }
+//                    throw new IllegalStateException("unexpected file source type: " + fileSource);
+//                });
+        return null;
     }
 }

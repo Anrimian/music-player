@@ -23,6 +23,7 @@ import io.reactivex.Single;
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getParentDirPath;
 import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
+import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static io.reactivex.Observable.fromIterable;
 
 public class MusicFolderDataSource {
@@ -45,17 +46,16 @@ public class MusicFolderDataSource {
 
     private Folder getFolderInPath(@Nullable String path) {
         RxNode<String> node = findNodeByPath(path);
-        return new Folder(getFilesListFromNode(node),
-                node.getChildChangeObservable().map(this::toNodeDataChange),
+        return new Folder(node.getChildObservable().map(this::toFileSources),
                 node.getSelfChangeObservable().map(this::toChangeFileSource));
     }
 
-    private Change<List<FileSource>> toNodeDataChange(Change<List<RxNode<String>>> change) {
+    private List<FileSource> toFileSources(List<RxNode<String>> nodes) {
         List<FileSource> changedNodes = new ArrayList<>();
-        for (RxNode<String> changedNode : change.getData()) {
+        for (RxNode<String> changedNode : nodes) {
             changedNodes.add(toFileSource(changedNode.getData()));
         }
-        return new Change<>(change.getChangeType(), changedNodes);
+        return changedNodes;
     }
 
     private Change<FileSource> toChangeFileSource(Change<NodeData> change) {
@@ -73,14 +73,6 @@ public class MusicFolderDataSource {
                     node.getLatestCreateDate());
         }
         throw new IllegalStateException("unexpected type of node: " + nodeData);
-    }
-
-    private List<FileSource> getFilesListFromNode(RxNode<String> node) {
-        List<FileSource> fileList = new ArrayList<>();
-        for (RxNode<String> child : node.getNodes()) {
-            fileList.add(toFileSource(child.getData()));
-        }
-        return fileList;
     }
 
     @Nullable
@@ -209,22 +201,27 @@ public class MusicFolderDataSource {
 
     private RxNode<String> createMusicFileTree() {
         RxNode<String> root = new RxNode<>(null, null);
-//        fromIterable(storageMusicDataSource.getCompositionsMap().values())//TODO optimize tree creating
-//                .groupBy(composition -> getParentDirPath(composition.getFilePath()))
-//                .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
-//                        .doOnSuccess(pathCompositions ->
-//                                putCompositions(root, group.getKey(), pathCompositions))
-//                        .subscribe())
-//                .subscribe();
-        for (Composition composition: storageMusicDataSource.getCompositionsMap().values()) {
-            String path = composition.getFilePath();
-            pathIdMap.put(composition.getId(), path);
-
-            getParentForPath(root, path, (node, partialPath) ->
-                    node.addNode(new RxNode<>(partialPath, new CompositionNode(composition)))
-            );
-        }
+        fromIterable(storageMusicDataSource.getCompositionsMap().values())
+                .doOnNext(composition -> pathIdMap.put(composition.getId(), composition.getFilePath()))
+                .groupBy(composition -> getParentDirPath(composition.getFilePath()))
+                .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
+                        .doOnSuccess(pathCompositions ->
+                                putCompositions2(root, group.getKey(), pathCompositions))
+                        .subscribe())
+                .subscribe();
         return root;
+    }
+
+    private void putCompositions2(RxNode<String> root, String path, List<Composition> compositions) {
+        getNode(root, path, (node, partialPath) -> node.addNodes(toNodeList(compositions)));
+    }
+
+    private List<RxNode<String>> toNodeList(List<Composition> compositions) {
+        return mapList(compositions, newComposition -> new RxNode<>(
+                        getFileName(newComposition.getFilePath()),
+                        new CompositionNode(newComposition)
+                )
+        );
     }
 
     private void getNode(RxNode<String> root,

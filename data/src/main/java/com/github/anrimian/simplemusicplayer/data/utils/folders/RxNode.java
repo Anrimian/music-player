@@ -1,8 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
-import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.CompositionNode;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -12,21 +10,20 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
-import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.*;
-import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.ADDED;
+import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
-import static io.reactivex.Observable.fromArray;
 import static io.reactivex.subjects.PublishSubject.create;
 import static java.util.Collections.singletonList;
 
 public class RxNode<K> {
 
-    private final PublishSubject<Change<List<RxNode<K>>>> childChangeSubject = create();
-    private final PublishSubject<Change<NodeData>> selfChangeSubject = create();
+    private final BehaviorSubject<List<RxNode<K>>> childSubject = BehaviorSubject.create();
+    private final PublishSubject<Change<NodeData>> selfChangeSubject = PublishSubject.create();
 
     private final LinkedHashMap<K, RxNode<K>> nodes = new LinkedHashMap<>();
 
@@ -60,8 +57,8 @@ public class RxNode<K> {
         return data;
     }
 
-    public Observable<Change<List<RxNode<K>>>> getChildChangeObservable() {
-        return childChangeSubject;
+    public Observable<List<RxNode<K>>> getChildObservable() {
+        return withDefaultValue(childSubject, this::getNodes);
     }
 
     public PublishSubject<Change<NodeData>> getSelfChangeObservable() {
@@ -80,24 +77,24 @@ public class RxNode<K> {
                 modifiedNodes.add(newNode);
             }
         }
+
         if (!addedNodes.isEmpty()) {
-            childChangeSubject.onNext(new Change<>(ADDED, addedNodes));
             notifyNodesAdded(mapList(addedNodes, new ArrayList<>(), RxNode::getData));
         }
-        if (!modifiedNodes.isEmpty()) {
-            childChangeSubject.onNext(new Change<>(MODIFY, modifiedNodes));
+        if (!modifiedNodes.isEmpty() || !addedNodes.isEmpty()) {
+            notifyChildrenChanged();
         }
     }
 
     public void addNode(RxNode<K> node) {
         node.parent = this;
         RxNode<K> previous = nodes.put(node.getKey(), node);
+
         if (previous == null) {
-            childChangeSubject.onNext(new Change<>(ADDED, singletonList(node)));
             notifyNodesAdded(singletonList(node.getData()));
-        } else {
-            childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
         }
+
+        notifyChildrenChanged();
     }
 
     public void removeNodes(List<K> keys) {
@@ -112,8 +109,9 @@ public class RxNode<K> {
             for (RxNode<K> removedNode: removedNodes){
                 removedNode.notifySelfRemoved();
             }
-            childChangeSubject.onNext(new Change<>(DELETED, removedNodes));
+
             notifyNodesRemoved(mapList(removedNodes, RxNode::getData));
+            notifyChildrenChanged();
         }
     }
 
@@ -121,7 +119,7 @@ public class RxNode<K> {
         RxNode<K> removedNode = nodes.remove(key);
         if (removedNode != null) {
             removedNode.notifySelfRemoved();
-            childChangeSubject.onNext(new Change<>(DELETED, singletonList(removedNode)));
+            notifyChildrenChanged();
             notifyNodesRemoved(singletonList(removedNode.getData()));
         }
     }
@@ -135,10 +133,11 @@ public class RxNode<K> {
         RxNode<K> node = nodes.get(key);
         if (node != null) {
             node.data = nodeData;
-            childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
         } else {
             addNode(new RxNode<>(key, nodeData));
         }
+
+        notifyChildrenChanged();
     }
 
     private void notifySelfRemoved() {
@@ -167,15 +166,15 @@ public class RxNode<K> {
 
                 RxNode<K> parent = getParent();
                 if (parent != null) {
-                    parent.notifyNodeChanged(this);
                     parent.notifyNodesAdded(data);
+                    parent.notifyChildrenChanged();
                 }
             }
         }
     }
 
-    private void notifyNodeChanged(RxNode<K> node) {
-        childChangeSubject.onNext(new Change<>(MODIFY, singletonList(node)));
+    private void notifyChildrenChanged() {
+        childSubject.onNext(getNodes());
     }
 
     @Override

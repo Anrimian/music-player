@@ -12,7 +12,7 @@ public class CreateDateFolderSorter implements Sorter<Folder> {
 
     @Override
     public void applyOrder(Folder data) {
-        Collections.sort(data.getFiles(), (first, second) -> {
+/*        Collections.sort(data.getFiles(), (first, second) -> {
             if (first.getClass().equals(second.getClass())) {
                 if (first instanceof FolderFileSource) {
                     return ((FolderFileSource) first).getNewestCreateDate()
@@ -25,6 +25,6 @@ public class CreateDateFolderSorter implements Sorter<Folder> {
                 return first instanceof FolderFileSource? -1 : 1;
             }
             return 0;
-        });
+        });*/
     }
 }

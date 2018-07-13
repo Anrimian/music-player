@@ -12,7 +12,7 @@ public class AlphabeticalFolderSorter implements Sorter<Folder> {
 
     @Override
     public void applyOrder(Folder data) {
-        Collections.sort(data.getFiles(), (first, second) -> {
+/*        Collections.sort(data.getFiles(), (first, second) -> {
             if (first.getClass().equals(second.getClass())) {
                 Collator collator = Collator.getInstance();
                 if (first instanceof FolderFileSource) {
@@ -30,6 +30,6 @@ public class AlphabeticalFolderSorter implements Sorter<Folder> {
                 return first instanceof FolderFileSource? -1 : 1;
             }
             return 0;
-        });
+        });*/
     }
 }
