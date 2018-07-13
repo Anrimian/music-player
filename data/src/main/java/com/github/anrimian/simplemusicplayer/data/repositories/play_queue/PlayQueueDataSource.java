@@ -188,4 +188,8 @@ public class PlayQueueDataSource {
         List<Composition> shuffledQueue = playQueueDao.getShuffledPlayQueue(allCompositionMap);
         return new PlayQueue(playQueue, shuffledQueue, settingsPreferences.isRandomPlayingEnabled());
     }
+
+    public int getCompositionPosition(Composition composition) {
+        return playQueue.getPosition(composition);
+    }
 }

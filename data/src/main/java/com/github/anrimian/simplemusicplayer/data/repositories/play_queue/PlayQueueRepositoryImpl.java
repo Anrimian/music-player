@@ -9,6 +9,7 @@ import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
@@ -60,6 +61,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 })
                 .toCompletable()
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public int getCompositionPosition(@Nonnull Composition composition) {
+        return playQueueDataSource.getCompositionPosition(composition);
     }
 
     @Override
@@ -201,7 +207,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         uiStatePreferences.setCurrentCompositionId(composition.getId());
         uiStatePreferences.setCurrentCompositionPosition(position);
 
-        CompositionEvent compositionEvent = new CompositionEvent(composition, position, 0);
+        CompositionEvent compositionEvent = new CompositionEvent(composition, 0);
         currentCompositionSubject.onNext(compositionEvent);
     }
 
@@ -222,9 +228,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             Composition expectedComposition = compositions.get(position);
             if (expectedComposition.getId() == id) {
                 this.position = position;
-                return new CompositionEvent(expectedComposition,
-                        position,
-                        uiStatePreferences.getTrackPosition());
+                return new CompositionEvent(expectedComposition, uiStatePreferences.getTrackPosition());
             }
         }
 
@@ -236,9 +240,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             Composition composition = compositions.get(i);
             if (composition.getId() == id) {
                 this.position = i;
-                return new CompositionEvent(composition,
-                        position,
-                        uiStatePreferences.getTrackPosition());
+                return new CompositionEvent(composition, uiStatePreferences.getTrackPosition());
             }
         }
         return new CompositionEvent();

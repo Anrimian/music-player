@@ -70,7 +70,7 @@ public class PlayQueueRepositoryImplTest {
     public void testCurrentCompositionObserverWithEmptyInitialState() {
         playQueueRepository.getCurrentCompositionObservable()
                 .test()
-                .assertNoValues();
+                .assertValue(event -> event.getComposition() == null);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class PlayQueueRepositoryImplTest {
 
         when(playQueueDataSource.getPlayQueue()).thenReturn(Single.just(getFakeCompositions()));
         when(playQueueDataSource.setPlayQueue(any())).thenReturn(Single.just(getFakeCompositions()));
-
+        when(playQueueRepository.getCompositionPosition(any())).thenReturn(0);
 
         playQueueRepository.setPlayQueue(getFakeCompositions())
                 .test()
@@ -100,7 +100,7 @@ public class PlayQueueRepositoryImplTest {
         //noinspection unchecked
         verify(uiStatePreferences).setCurrentCompositionId(0L);
         verify(uiStatePreferences).setCurrentCompositionPosition(0);
-        compositionObserver.assertValue(currentComposition(getFakeCompositions().get(0)));
+        compositionObserver.assertValueAt(1, currentComposition(getFakeCompositions().get(0)));
     }
 
     @Test

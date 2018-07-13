@@ -46,7 +46,7 @@ public class TestDataProvider {
     }
 
     public static CompositionEvent currentComposition(Composition composition) {
-        return new CompositionEvent(composition, 0, 0L);
+        return new CompositionEvent(composition, 0L);
     }
 
     public static Composition fakeComposition(long id, String filePath, long createDate) {

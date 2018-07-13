@@ -6,6 +6,8 @@ import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -17,6 +19,8 @@ import io.reactivex.Single;
 public interface PlayQueueRepository {
 
     Completable setPlayQueue(List<Composition> compositions);
+
+    int getCompositionPosition(@Nonnull Composition composition);
 
     Observable<CompositionEvent> getCurrentCompositionObservable();
 

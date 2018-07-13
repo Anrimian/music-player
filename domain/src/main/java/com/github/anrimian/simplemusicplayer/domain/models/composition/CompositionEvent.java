@@ -11,29 +11,23 @@ public class CompositionEvent {
     @Nullable
     private Composition composition;
 
-    private int queuePosition;
     private long playPosition;
 
-    public CompositionEvent(@Nullable Composition composition, int queuePosition, long playPosition) {
+    public CompositionEvent(@Nullable Composition composition, long playPosition) {
         this.composition = composition;
-        this.queuePosition = queuePosition;
         this.playPosition = playPosition;
     }
 
     public CompositionEvent() {
     }
 
-    public CompositionEvent(Composition changedComposition, int position) {
-        this(changedComposition, position, 0);
+    public CompositionEvent(Composition composition) {
+        this(composition, 0);
     }
 
     @Nullable
     public Composition getComposition() {
         return composition;
-    }
-
-    public int getQueuePosition() {
-        return queuePosition;
     }
 
     public long getPlayPosition() {
@@ -44,7 +38,6 @@ public class CompositionEvent {
     public String toString() {
         return "CompositionEvent{" +
                 "composition=" + composition +
-                ", queuePosition=" + queuePosition +
                 ", playPosition=" + playPosition +
                 '}';
     }

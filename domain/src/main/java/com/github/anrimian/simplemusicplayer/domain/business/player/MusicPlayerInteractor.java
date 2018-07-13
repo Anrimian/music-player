@@ -202,6 +202,10 @@ public class MusicPlayerInteractor {
         return musicProviderRepository.deleteComposition(composition);
     }
 
+    public int getQueuePosition(Composition composition) {
+        return playQueueRepository.getCompositionPosition(composition);
+    }
+
     private void onCompositionChanged(CompositionEvent compositionEvent) {
         this.currentComposition = compositionEvent.getComposition();
         if (currentComposition == null) {

@@ -137,7 +137,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             trackStateDisposable = null;
         }
         if (composition != null) {
-            getViewState().showCurrentComposition(composition, compositionEvent.getQueuePosition());
+            int position = musicPlayerInteractor.getQueuePosition(composition);
+            getViewState().showCurrentComposition(composition, position);
             getViewState().showTrackState(compositionEvent.getPlayPosition(), composition.getDuration());
             subscribeOnTrackPositionChanging();
         }
