@@ -5,7 +5,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import java.text.Collator;
 import java.util.Comparator;
 
-public class AphabeticalDescCompositionComparator implements Comparator<Composition> {
+public class AlphabeticalDescCompositionComparator implements Comparator<Composition> {
 
     @Override
     public int compare(Composition first, Composition second) {

@@ -9,6 +9,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
@@ -18,6 +19,8 @@ import io.reactivex.Single;
 public interface MusicProviderRepository {
 
     Single<List<Composition>> getAllCompositions();
+
+    Observable<List<Composition>> getAllCompositionsObservable();
 
     Single<Folder> getCompositionsInPath(@Nullable String path);
 

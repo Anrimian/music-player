@@ -17,8 +17,10 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
+import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static java.util.Collections.singletonList;
 
 
@@ -28,6 +30,7 @@ public class StorageMusicDataSource {
     private final Scheduler scheduler;
 
     private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
+    private final BehaviorSubject<Map<Long, Composition>> compositionSubject = BehaviorSubject.create();
 
     private Map<Long, Composition> compositions;
     private Disposable changeDisposable;
@@ -56,6 +59,10 @@ public class StorageMusicDataSource {
 
     public Observable<Change<List<Composition>>> getChangeObservable() {
         return changeSubject.subscribeOn(scheduler);
+    }
+
+    public Observable<Map<Long, Composition>> getCompositionObservable() {
+        return withDefaultValue(compositionSubject, getCompositions());
     }
 
     public Completable deleteComposition(Composition composition) {
@@ -115,6 +122,12 @@ public class StorageMusicDataSource {
             }
             if (!changedCompositions.isEmpty()) {
                 emitter.onNext(new Change<>(ChangeType.MODIFY, changedCompositions));
+            }
+
+            if (!deletedCompositions.isEmpty()
+                    || !addedCompositions.isEmpty()
+                    || !changedCompositions.isEmpty()) {
+                compositionSubject.onNext(existsCompositions);
             }
         });
     }

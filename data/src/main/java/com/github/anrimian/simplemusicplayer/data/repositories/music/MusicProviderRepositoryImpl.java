@@ -1,6 +1,10 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.composition.AlphabeticalCompositionComparator;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.composition.AlphabeticalDescCompositionComparator;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.composition.CreateDateCompositionComparator;
+import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.composition.CreateDateDescCompositionComparator;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.AlphabeticalDescFileComparator;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.AlphabeticalFileComparator;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.CreateDateDescFileComparator;
@@ -16,8 +20,10 @@ import com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorTyp
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -48,10 +54,17 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
+    @Deprecated
     public Single<List<Composition>> getAllCompositions() {
         return storageMusicDataSource.getCompositions()
                 .map(compositions -> (List<Composition>) new ArrayList(compositions.values()))
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Observable<List<Composition>> getAllCompositionsObservable() {
+        return storageMusicDataSource.getCompositionObservable()
+                .map(this::toSortedList);
     }
 
     @Override
@@ -89,6 +102,16 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         }
     }
 
+    private Comparator<Composition> getCompositionComparator() {
+        switch (settingsPreferences.getCompositionsOrder()) {
+            case ALPHABETICAL: return new AlphabeticalCompositionComparator();
+            case ALPHABETICAL_DESC: return new AlphabeticalDescCompositionComparator();
+            case CREATE_TIME: return new CreateDateCompositionComparator();
+            case CREATE_TIME_DESC: return new CreateDateDescCompositionComparator();
+            default: return new AlphabeticalCompositionComparator();
+        }
+    }
+
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {
         return musicFolderDataSource.getCompositionsInPath(path)
                 .doOnSuccess(folder -> folder.applyFileOrder(getFileComparator()))
@@ -102,5 +125,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                     }
                     throw new IllegalStateException("unexpected file source type: " + fileSource);
                 });
+    }
+
+    private List<Composition> toSortedList(Map<Long, Composition> compositionMap) {
+        List<Composition> list = new ArrayList<>(compositionMap.values());
+        Collections.sort(list, getCompositionComparator());
+        return list;
     }
 }
