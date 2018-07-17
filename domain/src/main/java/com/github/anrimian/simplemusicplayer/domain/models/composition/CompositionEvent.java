@@ -45,15 +45,15 @@ public class CompositionEvent {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CompositionEvent)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         CompositionEvent that = (CompositionEvent) o;
 
-        return composition.equals(that.composition);
+        return composition != null ? composition.equals(that.composition) : that.composition == null;
     }
 
     @Override
     public int hashCode() {
-        return composition.hashCode();
+        return composition != null ? composition.hashCode() : 0;
     }
 }

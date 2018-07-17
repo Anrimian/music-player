@@ -194,10 +194,6 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getPlayQueueObservable();
     }
 
-    public Flowable<Change<List<Composition>>> getPlayQueueChangeObservable() {
-        return playQueueRepository.getPlayQueueChangeObservable();
-    }
-
     public Completable deleteComposition(Composition composition) {
         return musicProviderRepository.deleteComposition(composition);
     }

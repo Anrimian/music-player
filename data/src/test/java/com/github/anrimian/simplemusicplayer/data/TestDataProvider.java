@@ -33,6 +33,14 @@ public class TestDataProvider {
         return compositions;
     }
 
+    public static Composition fakeComposition(int index) {
+        return getFakeCompositions().get(index);
+    }
+
+    public static CompositionEvent compositionEvent(Composition composition) {
+        return new CompositionEvent(composition);
+    }
+
     public static Map<Long, Composition> getFakeCompositionsMap() {
         Map<Long, Composition> compositions = new HashMap<>();
         for (long i = 0; i < 100000; i++) {

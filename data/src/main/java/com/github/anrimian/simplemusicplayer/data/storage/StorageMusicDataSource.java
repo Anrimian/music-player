@@ -57,6 +57,13 @@ public class StorageMusicDataSource {
         return compositions;
     }
 
+    public Composition getCompositionById(long id) {
+        if (compositions == null) {
+            musicProvider.getComposition(id);
+        }
+        return compositions.get(id);
+    }
+
     public Observable<Change<List<Composition>>> getChangeObservable() {
         return changeSubject.subscribeOn(scheduler);
     }

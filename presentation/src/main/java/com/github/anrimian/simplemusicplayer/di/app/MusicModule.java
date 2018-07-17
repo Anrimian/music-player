@@ -11,7 +11,6 @@ import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreference
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueDataSource;
 import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
@@ -62,21 +61,16 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    PlayQueueRepository playQueueRepository(PlayQueueDataSource playQueueDataSource,
+    PlayQueueRepository playQueueRepository(PlayQueueDaoWrapper playQueueDao,
+                                            StorageMusicDataSource storageMusicDataSource,
+                                            SettingsPreferences settingsPreferences,
                                             UiStatePreferences uiStatePreferences,
                                             @Named(DB_SCHEDULER) Scheduler dbScheduler) {
-        return new PlayQueueRepositoryImpl(playQueueDataSource, uiStatePreferences, dbScheduler);
-    }
-
-    @Provides
-    @NonNull
-    @Singleton
-    PlayQueueDataSource playQueueDataSource(PlayQueueDaoWrapper playQueueDao,
-                                            StorageMusicDataSource storageMusicDataSource,
-                                            SettingsPreferences settingsPreferences) {
-        return new PlayQueueDataSource(playQueueDao,
+        return new PlayQueueRepositoryImpl(playQueueDao,
                 storageMusicDataSource,
-                settingsPreferences);
+                settingsPreferences,
+                uiStatePreferences,
+                dbScheduler);
     }
 
     @Provides
@@ -99,9 +93,11 @@ class MusicModule {
     @Singleton
     MusicProviderRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
                                                     MusicFolderDataSource musicFolderDataSource,
+                                                    SettingsPreferences settingsPreferences,
                                                     @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MusicProviderRepositoryImpl(storageMusicDataSource,
                 musicFolderDataSource,
+                settingsPreferences,
                 scheduler);
     }
 }

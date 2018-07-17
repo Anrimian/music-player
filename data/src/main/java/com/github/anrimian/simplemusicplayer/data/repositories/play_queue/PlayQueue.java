@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -10,11 +11,14 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import static java.util.Arrays.asList;
+
 public class PlayQueue {
 
     private final List<Composition> compositionQueue;
     private final List<Composition> shuffledQueue;
     private final Map<Long, Integer> positionMap = new HashMap<>();
+    private final Map<Long, Integer> secondaryPositionMap = new HashMap<>();
 
     private boolean shuffled;
 
@@ -40,7 +44,7 @@ public class PlayQueue {
     }
 
     public List<Composition> getCurrentPlayQueue() {
-        return new ArrayList<>(shuffled? shuffledQueue: compositionQueue);
+        return shuffled? shuffledQueue: compositionQueue;
     }
 
     public List<Composition> getCompositionQueue() {
@@ -56,7 +60,6 @@ public class PlayQueue {
         if (shuffled) {
             Collections.shuffle(shuffledQueue);
         }
-        positionMap.clear();
         fillPositionMap();
     }
 
@@ -86,16 +89,35 @@ public class PlayQueue {
         return compositionQueue.isEmpty();
     }
 
-    public void deleteComposition(long id) {
-        List<Composition> currentList = shuffled? shuffledQueue: compositionQueue;
-        List<Composition> secondaryList = shuffled? compositionQueue: shuffledQueue;
+    public void deleteCompositions(List<Composition> compositions) {
+        Composition[] currentList = new Composition[compositionQueue.size()];
+        (shuffled? shuffledQueue: compositionQueue).toArray(currentList);
 
-        int position = positionMap.get(id);
-        Composition composition = currentList.remove(position);
+        Composition[] secondaryList = new Composition[compositionQueue.size()];
+        (shuffled? compositionQueue: shuffledQueue).toArray(secondaryList);
 
-        secondaryList.remove(composition);
+        for (Composition composition: compositions) {
+            int position = positionMap.get(composition.getId());
+            currentList[position] = null;
 
-        positionMap.clear();
+            int secondaryPosition = secondaryPositionMap.get(composition.getId());
+            secondaryList[secondaryPosition] = null;
+        }
+
+        compositionQueue.clear();
+        for (Composition composition: currentList) {
+            if (composition != null) {
+                compositionQueue.add(composition);
+            }
+        }
+
+        shuffledQueue.clear();
+        for (Composition composition: secondaryList) {
+            if (composition != null) {
+                shuffledQueue.add(composition);
+            }
+        }
+
         fillPositionMap();
     }
 
@@ -103,18 +125,26 @@ public class PlayQueue {
         List<Composition> currentList = shuffled? shuffledQueue: compositionQueue;
         List<Composition> secondaryList = shuffled? compositionQueue: shuffledQueue;
 
-        int position = positionMap.get(composition.getId());
-        currentList.set(position, composition);
-
-        secondaryList.set(secondaryList.indexOf(composition), composition);
+        currentList.set(positionMap.get(composition.getId()), composition);
+        secondaryList.set(secondaryPositionMap.get(composition.getId()), composition);
     }
 
     private void fillPositionMap() {
-        List<Composition> compositions = shuffled? shuffledQueue: compositionQueue;
-        for (int i = 0; i < compositions.size(); i++) {
-            Composition composition = compositions.get(i);
+        positionMap.clear();
+        secondaryPositionMap.clear();
+
+        List<Composition> currentList = shuffled? shuffledQueue: compositionQueue;
+        for (int i = 0; i < currentList.size(); i++) {
+            Composition composition = currentList.get(i);
             long id = composition.getId();
             positionMap.put(id, i);
+        }
+
+        List<Composition> secondaryList = shuffled? compositionQueue: shuffledQueue;
+        for (int i = 0; i < secondaryList.size(); i++) {
+            Composition composition = secondaryList.get(i);
+            long id = composition.getId();
+            secondaryPositionMap.put(id, i);
         }
     }
 }

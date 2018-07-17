@@ -26,8 +26,6 @@ public interface PlayQueueRepository {
 
     Observable<List<Composition>> getPlayQueueObservable();
 
-    Flowable<Change<List<Composition>>> getPlayQueueChangeObservable();
-
     void setRandomPlayingEnabled(boolean enabled);
 
     Single<Integer> skipToNext();

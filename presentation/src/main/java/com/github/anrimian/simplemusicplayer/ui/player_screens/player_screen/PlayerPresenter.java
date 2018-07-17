@@ -48,7 +48,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onStart() {
         subscribeOnPlayerStateChanges();
-        subscribeOnPlayQueueChanges();
         subscribeOnPlayQueue();
     }
 
@@ -187,31 +186,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showMusicControls(!playQueue.isEmpty());
 
         subscribeOnCurrentCompositionChanging();
-    }
-
-    private void subscribeOnPlayQueueChanges() {
-        presenterDisposable.add(musicPlayerInteractor.getPlayQueueChangeObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayQueueChanged));
-    }
-
-    private void onPlayQueueChanged(Change<List<Composition>> change) {
-        List<Composition> compositions = change.getData();
-        switch (change.getChangeType()) {
-            case DELETED: {
-                for (Composition composition: compositions) {
-                    int index = playQueue.indexOf(composition);
-                    if (index != -1) {
-                        playQueue.remove(index);
-                        getViewState().notifyPlayQueueItemRemoved(index);
-                    }
-                    if (playQueue.isEmpty()) {
-                        getViewState().showMusicControls(false);
-                    }
-                }
-                break;
-            }
-        }
     }
 
     private void subscribeOnTrackPositionChanging() {
