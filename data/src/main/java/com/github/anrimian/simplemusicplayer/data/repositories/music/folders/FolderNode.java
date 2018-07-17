@@ -10,7 +10,7 @@ import java.util.List;
 
 public class FolderNode extends NodeData {
 
-    private String fullPath;
+    private final String fullPath;
     private int compositionsCount;
 
     private Date newestCreateDate;//TODO process deletion, modify changes
@@ -26,16 +26,7 @@ public class FolderNode extends NodeData {
         for (NodeData nodeData: nodes) {
             if (nodeData instanceof CompositionNode) {
                 compositionsCount++;
-
-                Composition composition = ((CompositionNode) nodeData).getComposition();
-                Date dateAdded = composition.getDateAdded();
-                if (newestCreateDate == null || dateAdded.compareTo(newestCreateDate) > 0) {
-                    newestCreateDate = dateAdded;
-                }
-                if (latestCreateDate == null || dateAdded.compareTo(latestCreateDate) < 0) {
-                    latestCreateDate = dateAdded;
-                }
-
+                recalculateDate(nodeData);
                 updated = true;
             }
         }
@@ -43,14 +34,36 @@ public class FolderNode extends NodeData {
     }
 
     @Override
-    public boolean onNodesRemoved(List<NodeData> nodes) {
+    public boolean onNodesRemoved(List<NodeData> nodes, List<NodeData> allNodes) {
         boolean updated = false;
+        boolean dateChanged = false;
+
         for (NodeData nodeData: nodes) {
             if (nodeData instanceof CompositionNode) {
                 compositionsCount--;
+
+                Composition composition = ((CompositionNode) nodeData).getComposition();
+                Date dateAdded = composition.getDateAdded();
+                if (newestCreateDate.equals(dateAdded)) {
+                    dateChanged = true;
+                    newestCreateDate = null;
+                }
+                if (latestCreateDate.equals(dateAdded)) {
+                    dateChanged = true;
+                    latestCreateDate = null;
+                }
+
                 updated = true;
             }
         }
+        if (dateChanged) {
+            for (NodeData nodeData: allNodes) {
+                if (nodeData instanceof CompositionNode) {
+                    recalculateDate(nodeData);
+                }
+            }
+        }
+
         return updated;
     }
 
@@ -91,5 +104,18 @@ public class FolderNode extends NodeData {
     @Override
     public int hashCode() {
         return fullPath != null ? fullPath.hashCode() : 0;
+    }
+
+    private void recalculateDate(NodeData nodeData) {
+        if (nodeData instanceof CompositionNode) {
+            Composition composition = ((CompositionNode) nodeData).getComposition();
+            Date dateAdded = composition.getDateAdded();
+            if (newestCreateDate == null || dateAdded.compareTo(newestCreateDate) > 0) {
+                newestCreateDate = dateAdded;
+            }
+            if (latestCreateDate == null || dateAdded.compareTo(latestCreateDate) < 0) {
+                latestCreateDate = dateAdded;
+            }
+        }
     }
 }

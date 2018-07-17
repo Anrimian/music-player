@@ -146,7 +146,7 @@ public class RxNode<K> {
 
     private void notifyNodesRemoved(List<NodeData> data) {
         if (this.data != null) {
-            boolean updated = this.data.onNodesRemoved(data);
+            boolean updated = this.data.onNodesRemoved(data, mapList(getNodes(), RxNode::getData));
             if (updated) {
                 selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
 

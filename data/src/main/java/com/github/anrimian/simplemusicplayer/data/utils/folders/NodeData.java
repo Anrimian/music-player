@@ -8,19 +8,20 @@ public abstract class NodeData {
 
     /**
      *
-     * @param nodes added data
+     * @param addedNodes added data
      * @return was updated or not
      */
-    public boolean onNodesAdded(List<NodeData> nodes) {
+    public boolean onNodesAdded(List<NodeData> addedNodes) {
         return false;
     }
 
     /**
      *
-     * @param nodes added data
+     * @param removedNodes added data
+     * @param allNodes all data
      * @return was updated or not
      */
-    public boolean onNodesRemoved(List<NodeData> nodes) {
+    public boolean onNodesRemoved(List<NodeData> removedNodes, List<NodeData> allNodes) {
         return false;
     }
 }
