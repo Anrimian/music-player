@@ -24,4 +24,14 @@ public abstract class NodeData {
     public boolean onNodesRemoved(List<NodeData> removedNodes, List<NodeData> allNodes) {
         return false;
     }
+
+    /**
+     *
+     * @param removedNodes added data
+     * @param allNodes all data
+     * @return was updated or not
+     */
+    public boolean onNodesChanged(List<NodeData> removedNodes, List<NodeData> allNodes) {
+        return false;
+    }
 }

@@ -12,8 +12,8 @@ public class CreateDateDescFileComparator implements Comparator<FileSource> {
     public int compare(FileSource first, FileSource second) {
         if (first.getClass().equals(second.getClass())) {
             if (first instanceof FolderFileSource) {
-                return ((FolderFileSource) second).getNewestCreateDate()
-                        .compareTo(((FolderFileSource) first).getNewestCreateDate());
+                return ((FolderFileSource) second).getLatestCreateDate()
+                        .compareTo(((FolderFileSource) first).getLatestCreateDate());
             } else if (first instanceof MusicFileSource) {
                 return ((MusicFileSource) second).getComposition().getDateAdded()
                         .compareTo(((MusicFileSource) first).getComposition().getDateAdded());

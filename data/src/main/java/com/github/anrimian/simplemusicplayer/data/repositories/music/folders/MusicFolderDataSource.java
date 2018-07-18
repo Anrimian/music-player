@@ -69,8 +69,8 @@ public class MusicFolderDataSource {
             FolderNode node = (FolderNode) nodeData;
             return new FolderFileSource(node.getFullPath(),
                     node.getCompositionsCount(),
-                    node.getNewestCreateDate(),
-                    node.getLatestCreateDate());
+                    node.getLatestCreateDate(),
+                    node.getEarliestCreateDate());
         }
         throw new IllegalStateException("unexpected type of node: " + nodeData);
     }

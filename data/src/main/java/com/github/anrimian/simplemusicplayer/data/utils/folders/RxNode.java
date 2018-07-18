@@ -133,15 +133,31 @@ public class RxNode<K> {
         RxNode<K> node = nodes.get(key);
         if (node != null) {
             node.data = nodeData;
+
+            notifyNodesChanged(singletonList(nodeData));
+            notifyChildrenChanged();
         } else {
             addNode(new RxNode<>(key, nodeData));
         }
-
-        notifyChildrenChanged();
     }
 
     private void notifySelfRemoved() {
         selfChangeSubject.onNext(new Change<>(DELETED, data));
+    }
+
+    private void notifyNodesChanged(List<NodeData> data) {
+        if (this.data != null) {
+            boolean updated = this.data.onNodesChanged(data, mapList(getNodes(), RxNode::getData));
+            if (updated) {
+                selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
+
+                RxNode<K> parent = getParent();
+                if (parent != null) {
+                    parent.notifyNodesChanged(data);
+                    parent.notifyChildrenChanged();
+                }
+            }
+        }
     }
 
     private void notifyNodesRemoved(List<NodeData> data) {

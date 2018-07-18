@@ -15,17 +15,17 @@ public class FolderFileSource implements FileSource {
 
     private int filesCount;
 
-    private Date newestCreateDate;
     private Date latestCreateDate;
+    private Date earliestCreateDate;
 
     public FolderFileSource(@Nonnull String fullPath,
                             int filesCount,
                             @Nonnull Date newestCreateDate,
-                            @Nonnull Date latestCreateDate) {
+                            @Nonnull Date earliestCreateDate) {
         this.fullPath = fullPath;
         this.filesCount = filesCount;
-        this.newestCreateDate = newestCreateDate;
-        this.latestCreateDate = latestCreateDate;
+        this.latestCreateDate = newestCreateDate;
+        this.earliestCreateDate = earliestCreateDate;
     }
 
     @Nonnull
@@ -37,12 +37,12 @@ public class FolderFileSource implements FileSource {
         return filesCount;
     }
 
-    public Date getNewestCreateDate() {
-        return newestCreateDate;
-    }
-
     public Date getLatestCreateDate() {
         return latestCreateDate;
+    }
+
+    public Date getEarliestCreateDate() {
+        return earliestCreateDate;
     }
 
     @Override

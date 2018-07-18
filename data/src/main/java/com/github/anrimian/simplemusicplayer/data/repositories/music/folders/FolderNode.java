@@ -1,7 +1,5 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
 
-import android.text.format.DateUtils;
-
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
@@ -13,8 +11,8 @@ public class FolderNode extends NodeData {
     private final String fullPath;
     private int compositionsCount;
 
-    private Date newestCreateDate;//TODO process deletion, modify changes
     private Date latestCreateDate;
+    private Date earliestCreateDate;
 
     FolderNode(String fullPath) {
         this.fullPath = fullPath;
@@ -22,15 +20,13 @@ public class FolderNode extends NodeData {
 
     @Override
     public boolean onNodesAdded(List<NodeData> nodes) {
-        boolean updated = false;
         for (NodeData nodeData: nodes) {
             if (nodeData instanceof CompositionNode) {
                 compositionsCount++;
-                recalculateDate(nodeData);
-                updated = true;
             }
+            recalculateDate(nodeData);
         }
-        return updated;
+        return true;
     }
 
     @Override
@@ -41,30 +37,36 @@ public class FolderNode extends NodeData {
         for (NodeData nodeData: nodes) {
             if (nodeData instanceof CompositionNode) {
                 compositionsCount--;
-
-                Composition composition = ((CompositionNode) nodeData).getComposition();
-                Date dateAdded = composition.getDateAdded();
-                if (newestCreateDate.equals(dateAdded)) {
-                    dateChanged = true;
-                    newestCreateDate = null;
-                }
-                if (latestCreateDate.equals(dateAdded)) {
-                    dateChanged = true;
-                    latestCreateDate = null;
-                }
-
                 updated = true;
+            }
+            Date date = getDateFromNode(nodeData, true);
+            if (latestCreateDate.equals(date)) {
+                dateChanged = true;
+                latestCreateDate = null;
+            }
+            date = getDateFromNode(nodeData, true);
+            if (earliestCreateDate.equals(date)) {
+                dateChanged = true;
+                earliestCreateDate = null;
             }
         }
         if (dateChanged) {
             for (NodeData nodeData: allNodes) {
-                if (nodeData instanceof CompositionNode) {
-                    recalculateDate(nodeData);
-                }
+                recalculateDate(nodeData);
             }
         }
 
-        return updated;
+        return updated || dateChanged;
+    }
+
+    @Override
+    public boolean onNodesChanged(List<NodeData> nodes, List<NodeData> allNodes) {
+        latestCreateDate = null;
+        earliestCreateDate = null;
+        for (NodeData nodeData: allNodes) {
+            recalculateDate(nodeData);
+        }
+        return true;
     }
 
     public String getFullPath() {
@@ -75,12 +77,12 @@ public class FolderNode extends NodeData {
         return compositionsCount;
     }
 
-    public Date getNewestCreateDate() {
-        return newestCreateDate;
-    }
-
     public Date getLatestCreateDate() {
         return latestCreateDate;
+    }
+
+    public Date getEarliestCreateDate() {
+        return earliestCreateDate;
     }
 
     @Override
@@ -107,15 +109,28 @@ public class FolderNode extends NodeData {
     }
 
     private void recalculateDate(NodeData nodeData) {
-        if (nodeData instanceof CompositionNode) {
-            Composition composition = ((CompositionNode) nodeData).getComposition();
-            Date dateAdded = composition.getDateAdded();
-            if (newestCreateDate == null || dateAdded.compareTo(newestCreateDate) > 0) {
-                newestCreateDate = dateAdded;
-            }
-            if (latestCreateDate == null || dateAdded.compareTo(latestCreateDate) < 0) {
-                latestCreateDate = dateAdded;
+        Date date = getDateFromNode(nodeData, true);
+        if (date != null) {
+            if (latestCreateDate == null || date.compareTo(latestCreateDate) > 0) {
+                latestCreateDate = date;
             }
         }
+        date = getDateFromNode(nodeData, false);
+        if (date != null) {
+            if (earliestCreateDate == null || date.compareTo(earliestCreateDate) < 0) {
+                earliestCreateDate = date;
+            }
+        }
+    }
+
+    private Date getDateFromNode(NodeData nodeData, boolean latestDate) {
+        if (nodeData instanceof CompositionNode) {
+            Composition composition = ((CompositionNode) nodeData).getComposition();
+            return composition.getDateAdded();
+        } else if (nodeData instanceof FolderNode) {
+            FolderNode folderNode = (FolderNode) nodeData;
+            return latestDate? folderNode.getLatestCreateDate(): folderNode.getEarliestCreateDate();
+        }
+        return null;
     }
 }
