@@ -3,10 +3,10 @@ package com.github.anrimian.simplemusicplayer.data.storage;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.DeleteFileException;
-import com.github.anrimian.simplemusicplayer.data.repositories.music.exceptions.MusicNotFoundException;
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.simplemusicplayer.data.utils.rx.content_observer.RxContentObserver;
@@ -20,6 +20,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
+
+import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
 
 public class StorageMusicProvider {
 
@@ -39,16 +41,24 @@ public class StorageMusicProvider {
     }
 
     public Map<Long, Composition> getCompositions() {
+        return getCompositions(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+    }
+
+    public Map<Long, Composition> getCompositionsInPlayList(long playListId) {
+        return getCompositions(getContentUri("external", playListId));
+    }
+
+    private Map<Long, Composition> getCompositions(Uri uri) {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    uri,
                     null,
                     null,
                     null,
                     null);
             if (cursor == null) {
-                throw new MusicNotFoundException();
+                return new HashMap<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             Map<Long, Composition> compositions = new HashMap<>(cursor.getCount());
