@@ -50,6 +50,11 @@ class MusicViewHolder extends RecyclerView.ViewHolder {
         this.composition = composition;
         tvMusicName.setText(formatCompositionName(composition));
         showAdditionalInfo();
+
+        int textColorAttr = composition.isCorrupted()? android.R.attr.textColorSecondary:
+                android.R.attr.textColorPrimary;
+
+        tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
     }
 
     void showAsPlayingComposition(boolean show) {

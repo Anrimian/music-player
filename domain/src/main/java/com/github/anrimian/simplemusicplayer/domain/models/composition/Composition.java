@@ -30,6 +30,15 @@ public class Composition {
     private boolean isNotification;
     private boolean isPodcast;
     private boolean isRingtone;
+    private boolean isCorrupted;
+
+    public boolean isCorrupted() {
+        return isCorrupted;
+    }
+
+    public void setCorrupted(boolean corrupted) {
+        isCorrupted = corrupted;
+    }
 
     @Nullable
     private Integer year;

@@ -66,6 +66,7 @@ public class StorageMusicProvider {
                 cursor.moveToPosition(i);
 
                 Composition composition = getCompositionFromCursor(cursorWrapper);
+                checkCorruptedComposition(composition);
                 compositions.put(composition.getId(), composition);
             }
             return compositions;
@@ -165,5 +166,11 @@ public class StorageMusicProvider {
 
         composition.setYear(year);
         return composition;
+    }
+
+    private void checkCorruptedComposition(Composition composition) {
+        if (composition.getDuration() == 0) {
+            composition.setCorrupted(true);
+        }
     }
 }

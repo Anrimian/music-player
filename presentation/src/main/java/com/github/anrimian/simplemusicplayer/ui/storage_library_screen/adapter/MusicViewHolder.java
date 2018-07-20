@@ -18,6 +18,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.simplemusicplayer.utils.AndroidUtils.getColorFromAttr;
 
 /**
  * Created on 31.10.2017.
@@ -48,6 +49,11 @@ class MusicViewHolder extends RecyclerView.ViewHolder {
         this.composition = composition;
         tvMusicName.setText(formatCompositionName(composition));
         showAdditionalInfo();
+
+        int textColorAttr = composition.isCorrupted()? android.R.attr.textColorSecondary:
+                android.R.attr.textColorPrimary;
+
+        tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
     }
 
     private void showAdditionalInfo() {

@@ -150,6 +150,7 @@ public class StorageMusicDataSource {
                 || !Objects.equals(first.getFilePath(), second.getFilePath())
                 || first.getSize() != second.getSize()
                 || !Objects.equals(first.getTitle(), second.getTitle())
-                || !Objects.equals(first.getYear(), second.getYear());
+                || !Objects.equals(first.getYear(), second.getYear())
+                || first.isCorrupted() != second.isCorrupted();
     }
 }
