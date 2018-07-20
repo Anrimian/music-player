@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
+import com.github.anrimian.simplemusicplayer.data.storage.files.FileManager;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.when;
 public class StorageMusicDataSourceTest {
 
     private StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
+    private FileManager fileManager = mock(FileManager.class);
 
     private PublishSubject<Map<Long, Composition>> changeSubject = PublishSubject.create();
 
@@ -34,7 +36,9 @@ public class StorageMusicDataSourceTest {
         when(musicProvider.getCompositions()).thenReturn(getFakeCompositionsMap());
         when(musicProvider.getChangeObservable()).thenReturn(changeSubject);
 
-        storageMusicDataSource = new StorageMusicDataSource(musicProvider, Schedulers.trampoline());
+        storageMusicDataSource = new StorageMusicDataSource(musicProvider,
+                fileManager,
+                Schedulers.trampoline());
     }
 
     @Test

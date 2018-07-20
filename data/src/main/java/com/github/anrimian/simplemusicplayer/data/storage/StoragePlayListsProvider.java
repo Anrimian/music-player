@@ -1,22 +1,22 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.MediaStore;
+import android.net.Uri;
 import android.provider.MediaStore.Audio.Playlists;
-import android.util.Log;
 
+import com.github.anrimian.simplemusicplayer.data.models.exceptions.PlayListNotCreatedException;
+import com.github.anrimian.simplemusicplayer.data.models.exceptions.PlayListNotDeletedException;
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.simplemusicplayer.data.utils.rx.content_observer.RxContentObserver;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Observable;
 
@@ -71,6 +71,25 @@ public class StoragePlayListsProvider {
 
         } finally {
             IOUtils.closeSilently(cursor);
+        }
+    }
+
+    public void createPlayList(String name) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Playlists.NAME, name);
+        Uri uri = contentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, contentValues);
+        if (uri == null) {
+            throw new PlayListNotCreatedException();
+        }
+    }
+
+    public void deletePlayList(long id) {
+        int deletedRows = contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(id) });
+
+        if (deletedRows == 0) {
+            throw new PlayListNotDeletedException();
         }
     }
 

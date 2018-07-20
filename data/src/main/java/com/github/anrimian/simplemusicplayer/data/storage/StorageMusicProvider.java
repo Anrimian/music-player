@@ -79,15 +79,6 @@ public class StorageMusicProvider {
         contentResolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 MediaStore.Images.Media.DATA + " = ?",
                 new String[] { path });
-
-        File file = new File(path);
-        if (!file.exists()) {
-            return;
-        }
-        boolean deleted = file.delete();
-        if (!deleted) {
-            throw new DeleteFileException("can not delete file: " + path);
-        }
     }
 
     @Nullable

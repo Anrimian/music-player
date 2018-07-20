@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
+import com.github.anrimian.simplemusicplayer.data.storage.files.FileManager;
 import com.github.anrimian.simplemusicplayer.data.utils.Objects;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
@@ -27,6 +28,7 @@ import static java.util.Collections.singletonList;
 public class StorageMusicDataSource {
 
     private final StorageMusicProvider musicProvider;
+    private final FileManager fileManager;
     private final Scheduler scheduler;
 
     private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
@@ -35,8 +37,11 @@ public class StorageMusicDataSource {
     private Map<Long, Composition> compositions;
     private Disposable changeDisposable;
 
-    public StorageMusicDataSource(StorageMusicProvider musicProvider, Scheduler scheduler) {
+    public StorageMusicDataSource(StorageMusicProvider musicProvider,
+                                  FileManager fileManager,
+                                  Scheduler scheduler) {
         this.musicProvider = musicProvider;
+        this.fileManager = fileManager;
         this.scheduler = scheduler;
     }
 
@@ -76,6 +81,7 @@ public class StorageMusicDataSource {
         return getCompositions()
                 .doOnSuccess(compositions -> {
                     musicProvider.deleteComposition(composition.getFilePath());
+                    fileManager.deleteFile(composition.getFilePath());
                     compositions.remove(composition.getId());
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
                 })
