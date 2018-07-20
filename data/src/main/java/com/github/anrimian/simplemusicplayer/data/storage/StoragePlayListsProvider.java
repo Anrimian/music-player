@@ -4,15 +4,24 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.Playlists;
 import android.util.Log;
 
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.db.CursorWrapper;
+import com.github.anrimian.simplemusicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import io.reactivex.Observable;
+
+import static com.github.anrimian.simplemusicplayer.data.utils.Objects.requireNonNull;
+import static java.util.Collections.emptyList;
 
 public class StoragePlayListsProvider {
 
@@ -24,54 +33,56 @@ public class StoragePlayListsProvider {
         this.storageMusicProvider = storageMusicProvider;
     }
 
-    public void getPlayLists() {
+    public Observable<List<PlayList>> getChangeObservable() {
+        return RxContentObserver.getObservable(contentResolver, Playlists.EXTERNAL_CONTENT_URI)
+                .map(o -> getPlayLists());
+    }
+
+    public List<PlayList> getPlayLists() {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
-                    MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                    Playlists.EXTERNAL_CONTENT_URI,
                     null,
                     null,
                     null,
                     null);
             if (cursor == null) {
-                return;
+                return emptyList();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
 //            Map<Long, Composition> compositions = new HashMap<>(cursor.getCount());
 
-            List<Long> ids = new ArrayList<>();
+            List<PlayList> playLists = new ArrayList<>();
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
-                long id = getPlayListFromCursor(cursorWrapper);
-                ids.add(id);
+                playLists.add(getPlayListFromCursor(cursorWrapper));
             }
-            for (long id : ids) {
-
-                //        MediaStore.Audio.Playlists.Members.AUDIO_ID //look at this
-                Map<Long, Composition> compositions = storageMusicProvider.getCompositionsInPlayList(id);
-                Log.d("KEK", "playlist: " + id);
-                for (Composition composition: compositions.values()) {
-                    Log.d("KEK", "composition: " + composition);
-                }
-            }
+            return playLists;
+//            for (long id : ids) {
+//
+//                //        MediaStore.Audio.Playlists.Members.AUDIO_ID //look at this
+//                Map<Long, Composition> compositions = storageMusicProvider.getCompositionsInPlayList(id);
+//                Log.d("KEK", "playlist: " + id);
+//                for (Composition composition: compositions.values()) {
+//                    Log.d("KEK", "composition: " + composition);
+//                }
+//            }
 
         } finally {
             IOUtils.closeSilently(cursor);
         }
     }
 
-    private long getPlayListFromCursor(CursorWrapper cursorWrapper) {
-        long id = cursorWrapper.getLong(MediaStore.Audio.Playlists._ID);
-        String name = cursorWrapper.getString(MediaStore.Audio.Playlists.NAME);
-        String data = cursorWrapper.getString(MediaStore.Audio.Playlists.DATA);
-        String dateAdded = cursorWrapper.getString(MediaStore.Audio.Playlists.DATE_ADDED);
-        String dateModified = cursorWrapper.getString(MediaStore.Audio.Playlists.DATE_MODIFIED);
+    private PlayList getPlayListFromCursor(CursorWrapper cursorWrapper) {
+        long id = cursorWrapper.getLong(Playlists._ID);
+        String name = cursorWrapper.getString(Playlists.NAME);
+        long dateAdded = cursorWrapper.getLong(Playlists.DATE_ADDED);
+        long dateModified = cursorWrapper.getLong(Playlists.DATE_MODIFIED);
 
-        Log.d("KEK", "id: " + id);
-        Log.d("KEK", "name: " + name);
-        Log.d("KEK", "data: " + data);
-        Log.d("KEK", "dateAdded: " + dateAdded);
-        Log.d("KEK", "dateModified: " + dateModified);
-        return id;
+        return new PlayList(id,
+                requireNonNull(name),
+                new Date(dateAdded * 1000L),
+                new Date(dateModified * 1000L));
     }
 }

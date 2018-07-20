@@ -5,9 +5,15 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.List;
+
+import static junit.framework.Assert.assertNotNull;
 
 public class StoragePlayListsProviderTest {
 
@@ -25,6 +31,7 @@ public class StoragePlayListsProviderTest {
 
     @Test
     public void getPlayLists() {
-        storagePlayListsProvider.getPlayLists();
+        List<PlayList> playListList = storagePlayListsProvider.getPlayLists();
+        assertNotNull(playListList);
     }
 }
