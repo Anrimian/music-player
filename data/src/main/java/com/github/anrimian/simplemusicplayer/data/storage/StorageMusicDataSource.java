@@ -59,7 +59,7 @@ public class StorageMusicDataSource {
 
     public Composition getCompositionById(long id) {
         if (compositions == null) {
-            musicProvider.getComposition(id);
+            return musicProvider.getComposition(id);
         }
         return compositions.get(id);
     }

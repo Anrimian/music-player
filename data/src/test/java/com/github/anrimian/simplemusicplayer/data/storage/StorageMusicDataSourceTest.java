@@ -16,7 +16,9 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositionsMap;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class StorageMusicDataSourceTest {
@@ -141,5 +143,12 @@ public class StorageMusicDataSourceTest {
                     assertEquals(null, compositions.get(0L));
                     return true;
                 });
+    }
+
+    @Test
+    public void getCompositionById() {
+        storageMusicDataSource.getCompositionById(1L);
+
+        verify(musicProvider).getComposition(eq(1L));
     }
 }
