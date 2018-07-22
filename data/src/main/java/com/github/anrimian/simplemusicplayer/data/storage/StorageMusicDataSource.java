@@ -1,5 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
+import android.util.Log;
+
 import com.github.anrimian.simplemusicplayer.data.storage.files.FileManager;
 import com.github.anrimian.simplemusicplayer.data.utils.Objects;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
@@ -70,7 +72,9 @@ public class StorageMusicDataSource {
     }
 
     public Observable<Change<List<Composition>>> getChangeObservable() {
-        return changeSubject.subscribeOn(scheduler);
+        return changeSubject.subscribeOn(scheduler).doOnNext(change -> {
+            Log.d("KEK", "send change: " + change);
+        });
     }
 
     public Observable<Map<Long, Composition>> getCompositionObservable() {
@@ -80,10 +84,12 @@ public class StorageMusicDataSource {
     public Completable deleteComposition(Composition composition) {
         return getCompositions()
                 .doOnSuccess(compositions -> {
-                    musicProvider.deleteComposition(composition.getFilePath());
+                    Log.d("KEK", "deleteComposition: " + composition);
+//                    musicProvider.deleteComposition(composition.getFilePath());
                     fileManager.deleteFile(composition.getFilePath());
                     compositions.remove(composition.getId());
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
+                    Log.d("KEK", "composition deleted");
                 })
                 .toCompletable()
                 .subscribeOn(scheduler);
@@ -95,7 +101,6 @@ public class StorageMusicDataSource {
         }
         changeDisposable = musicProvider.getChangeObservable()
                 .flatMap(this::calculateChange)
-//                .doOnNext(change -> Log.d("KEK", "change: " + change.getChangeType() + ", compositions: " + change.getData()))
                 .subscribeOn(scheduler)
                 .subscribe(changeSubject::onNext);
     }

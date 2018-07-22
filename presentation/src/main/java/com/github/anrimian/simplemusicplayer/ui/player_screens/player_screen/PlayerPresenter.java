@@ -1,12 +1,13 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen;
 
+import android.util.Log;
+
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,8 +137,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             trackStateDisposable = null;
         }
         if (composition != null) {
-            int position = musicPlayerInteractor.getQueuePosition(composition);
-            getViewState().showCurrentComposition(composition, position);
+            Integer position = musicPlayerInteractor.getQueuePosition(composition);
+            if (position != null) {
+                getViewState().showCurrentComposition(composition, position);
+            }
             getViewState().showTrackState(compositionEvent.getPlayPosition(), composition.getDuration());
             subscribeOnTrackPositionChanging();
         }
@@ -167,7 +170,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 .subscribe(this::onPlayListChanged));
     }
 
-    private void onPlayListChanged(List<Composition> newPlayQueue) {//TODO scroll to current composition
+    private void onPlayListChanged(List<Composition> newPlayQueue) {
+        Log.d("KEK", "onPlayListChanged, size: " + newPlayQueue.size());
         if (currentCompositionDisposable != null) {
             currentCompositionDisposable.dispose();
             currentCompositionDisposable = null;
@@ -185,7 +189,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().updatePlayQueue(oldPlayList, playQueue);
         getViewState().showMusicControls(!playQueue.isEmpty());
 
-        subscribeOnCurrentCompositionChanging();
+        if (!playQueue.isEmpty()) {
+            subscribeOnCurrentCompositionChanging();
+        }
     }
 
     private void subscribeOnTrackPositionChanging() {

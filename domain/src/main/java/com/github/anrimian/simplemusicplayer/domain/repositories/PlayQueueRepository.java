@@ -2,14 +2,13 @@ package com.github.anrimian.simplemusicplayer.domain.repositories;
 
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -20,7 +19,8 @@ public interface PlayQueueRepository {
 
     Completable setPlayQueue(List<Composition> compositions);
 
-    int getCompositionPosition(@Nonnull Composition composition);
+    @Nullable
+    Integer getCompositionPosition(@Nonnull Composition composition);
 
     Observable<CompositionEvent> getCurrentCompositionObservable();
 

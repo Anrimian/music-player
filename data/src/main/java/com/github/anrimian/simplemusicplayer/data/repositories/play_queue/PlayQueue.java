@@ -1,17 +1,16 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
+import android.util.Log;
+
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-
-import static java.util.Arrays.asList;
 
 public class PlayQueue {
 
@@ -39,7 +38,9 @@ public class PlayQueue {
         fillPositionMap();
     }
 
-    public int getPosition(Composition composition) {
+    @Nullable
+    public Integer getPosition(Composition composition) {
+        Log.d("KEK", "getPosition: " + composition + ", size:" + compositionQueue.size());
         return positionMap.get(composition.getId());
     }
 

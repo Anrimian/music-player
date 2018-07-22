@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.controllers.music;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.simplemusicplayer.data.utils.exo_player.PlayerEventListener;
@@ -68,6 +69,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
+        Log.d("KEK", "prepareToPlay: " + composition);
         checkComposition(composition)
                 .flatMap(this::prepareMediaSource)
                 .toCompletable()
