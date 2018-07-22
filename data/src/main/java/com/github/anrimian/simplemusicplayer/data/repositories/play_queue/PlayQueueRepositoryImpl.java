@@ -75,7 +75,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
 
     @Override
     public Observable<CompositionEvent> getCurrentCompositionObservable() {
-        return withDefaultValue(currentCompositionSubject, this::getCompositionEvent)
+        return withDefaultValue(currentCompositionSubject, this::getSavedCompositionEvent)
                 .subscribeOn(scheduler);
     }
 
@@ -130,7 +130,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
     @Override
     public void setRandomPlayingEnabled(boolean enabled) {
         getSavedPlayQueue().doOnSuccess(playQueue -> {
-            Composition currentComposition = getCompositionEvent().getComposition();
+            Composition currentComposition = getCurrentComposition();
             settingsPreferences.setRandomPlayingEnabled(enabled);
             playQueue.changeShuffleMode(enabled);
             if (enabled) {
@@ -281,12 +281,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
     }
 
     @Nonnull
-    private CompositionEvent getCompositionEvent() {
+    private CompositionEvent getSavedCompositionEvent() {
         if (currentCompositionSubject.getValue() != null) {
             return currentCompositionSubject.getValue();
         }
 
-        return new CompositionEvent(getSavedComposition());
+        return new CompositionEvent(getSavedComposition(), uiStatePreferences.getTrackPosition());
     }
 
     private Composition getCurrentComposition() {

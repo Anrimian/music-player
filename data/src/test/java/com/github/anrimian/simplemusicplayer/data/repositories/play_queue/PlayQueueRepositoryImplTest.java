@@ -137,6 +137,20 @@ public class PlayQueueRepositoryImplTest {
     }
 
     @Test
+    public void getCurrentCompositionInInitialState() {
+        when(uiStatePreferences.getTrackPosition()).thenReturn(4L);
+        when(storageMusicDataSource.getCompositionById(anyLong())).thenReturn(fakeComposition(1));
+
+        playQueueRepositoryImpl.getCurrentCompositionObservable()
+                .test()
+                .assertValue(event -> {
+                    assertEquals(fakeComposition(1), event.getComposition());
+                    assertEquals(4L, event.getPlayPosition());
+                    return true;
+                });
+    }
+
+    @Test
     public void getPlayQueueInInitialState() {
         when(playQueueDao.getPlayQueue(any())).thenReturn(getFakeCompositions());
         when(playQueueDao.getShuffledPlayQueue(any())).thenReturn(getFakeCompositions());
