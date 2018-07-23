@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
@@ -61,7 +62,7 @@ public class StorageMusicProvider {
                 return new HashMap<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            Map<Long, Composition> compositions = new HashMap<>(cursor.getCount());
+            Map<Long, Composition> compositions = new ConcurrentHashMap<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 

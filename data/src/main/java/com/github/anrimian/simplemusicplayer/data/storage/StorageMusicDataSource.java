@@ -42,7 +42,6 @@ public class StorageMusicDataSource {
     public StorageMusicDataSource(StorageMusicProvider musicProvider,
                                   FileManager fileManager,
                                   Scheduler scheduler) {
-        Log.d("KEK", "StorageMusicDataSource: call constructor");
         this.musicProvider = musicProvider;
         this.fileManager = fileManager;
         this.scheduler = scheduler;
@@ -73,9 +72,7 @@ public class StorageMusicDataSource {
     }
 
     public Observable<Change<List<Composition>>> getChangeObservable() {
-        return changeSubject/*.subscribeOn(scheduler)*/.doOnNext(change -> {
-            Log.d("KEK", "send change: " + change);
-        });
+        return changeSubject;
     }
 
     public Observable<Map<Long, Composition>> getCompositionObservable() {
@@ -85,12 +82,10 @@ public class StorageMusicDataSource {
     public Completable deleteComposition(Composition composition) {
         return getCompositions()
                 .doOnSuccess(compositions -> {
-                    Log.d("KEK", "deleteComposition: " + composition);
-//                    musicProvider.deleteComposition(composition.getFilePath());
+                    musicProvider.deleteComposition(composition.getFilePath());
                     fileManager.deleteFile(composition.getFilePath());
                     compositions.remove(composition.getId());
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
-                    Log.d("KEK", "composition deleted");
                 })
                 .toCompletable()
                 .subscribeOn(scheduler);

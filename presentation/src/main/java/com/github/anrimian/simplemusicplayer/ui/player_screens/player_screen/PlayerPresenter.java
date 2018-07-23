@@ -171,7 +171,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onPlayListChanged(List<Composition> newPlayQueue) {
-        Log.d("KEK", "onPlayListChanged, size: " + newPlayQueue.size());
         if (currentCompositionDisposable != null) {
             currentCompositionDisposable.dispose();
             currentCompositionDisposable = null;

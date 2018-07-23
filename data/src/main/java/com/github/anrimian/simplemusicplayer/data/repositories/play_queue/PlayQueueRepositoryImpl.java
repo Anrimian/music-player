@@ -67,7 +67,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
                 .doOnSuccess(this::savePlayQueue)
                 .map(this::getSelectedPlayQueue)
                 .doOnSuccess(playQueue -> {
-                    Log.d("KEK", "setPlayQueue: onNext");
                     playQueueSubject.onNext(playQueue);
                     setCurrentComposition(playQueue.get(0));
                 })
@@ -92,7 +91,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
         return getSavedPlayQueue()
                 .map(playQueue -> {
                     List<Composition> compositions = getSelectedPlayQueue(playQueue);
-                    int position = playQueue.getPosition(getCurrentComposition());
+                    Integer position = playQueue.getPosition(getCurrentComposition());
+                    if (position == null) {
+                        return 0;
+                    }
                     if (position >= compositions.size() - 1) {
                         position = 0;
                     } else {
@@ -109,7 +111,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
         return getSavedPlayQueue()
                 .map(playQueue -> {
                     List<Composition> compositions = getSelectedPlayQueue(playQueue);
-                    int position = playQueue.getPosition(getCurrentComposition());
+                    Integer position = playQueue.getPosition(getCurrentComposition());
+                    if (position == null) {
+                        return 0;
+                    }
                     position--;
                     if (position < 0) {
                         position = compositions.size() - 1;
@@ -139,7 +144,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
                 playQueue.moveCompositionToTopInShuffledList(currentComposition);
                 playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
             }
-            Log.d("KEK", "setRandomPlayingEnabled: onNext: ");
             playQueueSubject.onNext(getSelectedPlayQueue(playQueue));
         }).subscribeOn(scheduler)
                 .subscribe();
@@ -153,10 +157,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
 
     private Single<List<Composition>> getPlayQueue() {
         return getSavedPlayQueue()
-                .map(this::getSelectedPlayQueue)
-                .doOnSuccess(playQueue -> {
-                    Log.d("KEK", "getPlayQueue: onNext: ");
-                });
+                .map(this::getSelectedPlayQueue);
     }
 
     private void setCurrentComposition(@Nullable Composition composition) {
@@ -184,20 +185,13 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
     }
 
     private void subscribeOnCompositionChanges() {
-        Log.d("KEK", "try to subscribeOnCompositionChanges");
         if (changeDisposable == null && !playQueue.isEmpty()) {
-            Log.d("KEK", "subscribeOnCompositionChanges");
             changeDisposable = storageMusicDataSource.getChangeObservable()
-                    .doOnNext(change -> {
-                        Log.d("KEK", "receive change: " + change);
-                    })
-//                    .subscribeOn(scheduler)
                     .subscribe(this::processCompositionChange);
         }
     }
 
     private void processCompositionChange(Change<List<Composition>> change) {
-        Log.d("KEK", "processCompositionChange");
         List<Composition> changedCompositions = change.getData();
         switch (change.getChangeType()) {
             case DELETED: {
@@ -212,7 +206,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
     }
 
     private void processDeleteChange(List<Composition> changedCompositions) {
-        Log.d("KEK", "processDeleteChange");
         List<Composition> compositionsToDelete = new ArrayList<>();
         Integer currentCompositionPosition = playQueue.getPosition(getCurrentComposition());
         boolean currentCompositionDeleted = false;
@@ -233,7 +226,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
             playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
             playQueueDao.setPlayQueue(playQueue.getCompositionQueue());
 
-            Log.d("KEK", "processDeleteChange: onNext: ");
             playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
 
             if (currentCompositionDeleted) {
@@ -245,7 +237,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
                     }
                     newComposition = compositions.get(currentCompositionPosition);
                 }
-                Log.d("KEK", "new composition after delete: " + newComposition);
                 setCurrentComposition(newComposition);
             }
         }
@@ -267,7 +258,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
             }
         }
         if (!compositionsToNotify.isEmpty()) {
-            Log.d("KEK", "processModifyChange: onNext: ");
             playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
 
             if (changedCurrentComposition != null) {
@@ -302,6 +292,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
         return new CompositionEvent(getSavedComposition(), uiStatePreferences.getTrackPosition());
     }
 
+    @Nullable
     private Composition getCurrentComposition() {
         if (currentCompositionSubject.getValue() != null) {
             return currentCompositionSubject.getValue().getComposition();
@@ -311,7 +302,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
 
     @Nullable
     private Composition getSavedComposition() {
-        Log.d("KEK", "getSavedComposition");
         long id = uiStatePreferences.getCurrentCompositionId();
         return storageMusicDataSource.getCompositionById(id);
     }

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class PlayQueue {
@@ -39,8 +40,10 @@ public class PlayQueue {
     }
 
     @Nullable
-    public Integer getPosition(Composition composition) {
-        Log.d("KEK", "getPosition: " + composition + ", size:" + compositionQueue.size());
+    public Integer getPosition(@Nullable Composition composition) {
+        if (composition == null) {
+            return null;
+        }
         return positionMap.get(composition.getId());
     }
 

@@ -69,7 +69,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
-        Log.d("KEK", "prepareToPlay: " + composition);
         checkComposition(composition)
                 .flatMap(this::prepareMediaSource)
                 .toCompletable()

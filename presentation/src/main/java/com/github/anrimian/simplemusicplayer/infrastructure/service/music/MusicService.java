@@ -170,7 +170,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void onPlayerStateChanged(PlayerMetaState playerMetaState) {
-        Log.d("KEK", "onPlayerStateChanged: " + playerMetaState);
         currentComposition = playerMetaState.getComposition();
 
         PlayerState playerState = playerMetaState.getState();
@@ -212,9 +211,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private void onCurrentCompositionChanged(PlayerMetaState playerMetaState) {
         Composition composition = playerMetaState.getComposition();
-        Log.d("KEK", "onCurrentCompositionChanged: " + composition);
         if (composition == null) {
-            Log.d("KEK", "onCurrentCompositionChanged stop service");
             stop();
             return;
         }
