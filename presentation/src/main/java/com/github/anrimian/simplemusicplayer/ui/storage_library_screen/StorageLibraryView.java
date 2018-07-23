@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.storage_library_screen;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
@@ -47,4 +48,7 @@ interface StorageLibraryView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void notifyItemsLoaded(int start, int size);
+
+    @StateStrategyType(SkipStrategy.class)
+    void updateList(List<FileSource> oldList, List<FileSource> sourceList);
 }

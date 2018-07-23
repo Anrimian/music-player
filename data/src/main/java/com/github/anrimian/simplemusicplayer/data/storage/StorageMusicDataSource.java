@@ -1,9 +1,7 @@
 package com.github.anrimian.simplemusicplayer.data.storage;
 
-import android.util.Log;
-
 import com.github.anrimian.simplemusicplayer.data.storage.files.FileManager;
-import com.github.anrimian.simplemusicplayer.data.utils.Objects;
+import com.github.anrimian.simplemusicplayer.domain.utils.Objects;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;

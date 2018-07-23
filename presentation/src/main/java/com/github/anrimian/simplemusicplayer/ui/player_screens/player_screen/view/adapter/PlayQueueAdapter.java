@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
 import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
-import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.SimpleDiffCallback;
 
 import java.util.List;
 
@@ -82,7 +82,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     }
 
     public void updatePlayList(List<Composition> oldPlayList, List<Composition> newPlayList) {
-        DiffUtil.DiffResult result = calculateDiff(new SimpleDiffCallback(oldPlayList, newPlayList), false);
+        DiffUtil.DiffResult result = calculateDiff(new SimpleDiffCallback<>(oldPlayList, newPlayList), false);
         result.dispatchUpdatesTo(this);
     }
 }

@@ -20,7 +20,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 
-import static com.github.anrimian.simplemusicplayer.data.utils.Objects.requireNonNull;
+import static com.github.anrimian.simplemusicplayer.domain.utils.Objects.requireNonNull;
 import static java.util.Collections.emptyList;
 
 public class StoragePlayListsProvider {

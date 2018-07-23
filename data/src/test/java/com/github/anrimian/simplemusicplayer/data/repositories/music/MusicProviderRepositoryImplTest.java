@@ -69,4 +69,26 @@ public class MusicProviderRepositoryImplTest {
 
     }
 
+    @Test
+    public void getAllCompositionsInPathSimple() {
+        Composition compositionOne = fakeComposition(1, "1");
+        Composition compositionTwo = fakeComposition(2, "2");
+
+        when(musicFolderDataSource.getCompositionsInPath(null))
+                .thenReturn(getTestFolderSingle(
+                        new MusicFileSource(compositionOne),
+                        new MusicFileSource(compositionTwo)
+                ));
+
+        musicProviderRepository.getAllCompositionsInPath(null)
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(2, compositions.size());
+                    assertEquals(compositionOne, compositions.get(0));
+                    assertEquals(compositionTwo, compositions.get(1));
+                    return true;
+                });
+
+    }
+
 }

@@ -13,7 +13,7 @@
     <string name="internal_app_error">Внутренняя ошибка приложения</string>
     <string name="unexpected_error">Необработанная ошибка</string>
     <string name="file_not_found">Файл не найден</string>
-    <string name="there_is_nothing_here">Здесь ничего нет</string>
+    <string name="compositions_on_device_not_found">Композиций на устройстве не найдено</string>
     <string name="foreground_channel_id">Уведомления о проигрывании музыки</string>
     <string name="play_stop">Играть или остановить</string>
     <string name="previous_track">Предыдущий трек</string>

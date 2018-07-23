@@ -63,7 +63,6 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         return fragment;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Nullable
     private String getPath() {
         return getArguments().getString(PATH);
@@ -124,8 +123,9 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @Override
     public void showEmptyList() {
+        fab.setVisibility(View.GONE);
         progressViewWrapper.hideAll();
-        progressViewWrapper.showMessage(R.string.there_is_nothing_here, false);
+        progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
     }
 
     @Override
@@ -135,6 +135,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 
     @Override
     public void showList() {
+        fab.setVisibility(View.VISIBLE);
         progressViewWrapper.hideAll();
     }
 
@@ -171,6 +172,11 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void updateList(List<FileSource> oldList, List<FileSource> sourceList) {
+        adapter.updateList(oldList, sourceList);
     }
 
     private void goToMusicStorageScreen(String path, View... sharedViews) {

@@ -23,6 +23,21 @@ public class MusicFileSource implements FileSource {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MusicFileSource that = (MusicFileSource) o;
+
+        return composition.equals(that.composition);
+    }
+
+    @Override
+    public int hashCode() {
+        return composition.hashCode();
+    }
+
+    @Override
     public String toString() {
         return "MusicFileSource{" +
                 "composition=" + composition +

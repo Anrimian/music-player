@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.utils;
+package com.github.anrimian.simplemusicplayer.domain.utils;
 
 public class Objects {
 

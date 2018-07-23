@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
 
@@ -54,17 +55,10 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    @Deprecated
-    public Single<List<Composition>> getAllCompositions() {
-        return storageMusicDataSource.getCompositions()
-                .map(compositions -> (List<Composition>) new ArrayList(compositions.values()))
-                .subscribeOn(scheduler);
-    }
-
-    @Override
     public Observable<List<Composition>> getAllCompositionsObservable() {
         return storageMusicDataSource.getCompositionObservable()
-                .map(this::toSortedList);
+                .map(this::toSortedList)
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -115,8 +109,8 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {
         return musicFolderDataSource.getCompositionsInPath(path)
                 .doOnSuccess(folder -> folder.applyFileOrder(getFileComparator()))
-                .flatMapObservable(Folder::getFilesObservable)
-                .flatMap(Observable::fromIterable)
+                .flatMap(folder -> folder.getFilesObservable().firstOrError())
+                .flatMapObservable(Observable::fromIterable)
                 .flatMap(fileSource -> {
                     if (fileSource instanceof FolderFileSource) {
                         return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());

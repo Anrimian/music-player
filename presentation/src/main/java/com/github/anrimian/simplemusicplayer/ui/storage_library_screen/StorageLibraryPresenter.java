@@ -5,6 +5,7 @@ import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
@@ -14,6 +15,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created on 23.10.2017.
@@ -22,14 +24,16 @@ import io.reactivex.Scheduler;
 @InjectViewState
 public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
-    private StorageLibraryInteractor interactor;
-    private ErrorParser errorParser;
-    private Scheduler uiScheduler;
+    private final StorageLibraryInteractor interactor;
+    private final ErrorParser errorParser;
+    private final Scheduler uiScheduler;
 
     @Nullable
     private String path;
 
     private List<FileSource> sourceList = new ArrayList<>();
+
+    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
 
     public StorageLibraryPresenter(@Nullable String path,
                                    StorageLibraryInteractor interactor,
@@ -52,6 +56,12 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         getViewState().bindList(sourceList);
 
         loadMusic();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenterDisposable.dispose();
     }
 
     void onTryAgainButtonClicked() {
@@ -83,23 +93,38 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
     private void loadMusic() {
         getViewState().showLoading();
-        interactor.getMusicInPath(path)
+        interactor.getCompositionsInPath(path)
                 .observeOn(uiScheduler)
                 .subscribe(this::onMusicLoaded, this::onMusicLoadingError);
     }
 
-    private void onMusicLoaded(List<FileSource> musicList) {
-        if (musicList.isEmpty()) {
-            getViewState().showEmptyList();
-            return;
-        }
-        sourceList.addAll(musicList);
-        getViewState().showList();
-        getViewState().notifyItemsLoaded(0, musicList.size());
+    private void onMusicLoaded(Folder folder) {
+        subscribeOnFolderMusic(folder);
     }
 
     private void onMusicLoadingError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showError(errorCommand);
+    }
+
+    private void subscribeOnFolderMusic(Folder folder) {
+        presenterDisposable.add(folder.getFilesObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onMusicOnFoldersReceived));
+    }
+
+    private void onMusicOnFoldersReceived(List<FileSource> sources) {
+        List<FileSource> oldList = new ArrayList<>(sourceList);
+
+        sourceList.clear();
+        sourceList.addAll(sources);
+
+        getViewState().updateList(oldList, sourceList);
+
+        if (sourceList.isEmpty()) {
+            getViewState().showEmptyList();
+        } else {
+            getViewState().showList();
+        }
     }
 }

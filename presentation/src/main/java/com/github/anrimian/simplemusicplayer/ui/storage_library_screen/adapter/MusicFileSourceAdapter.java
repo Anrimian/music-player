@@ -10,12 +10,17 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.utils.FolderHelper;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
 import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.OnTransitionItemClickListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.endless_scrolling.HeaderFooterRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.support.v7.util.DiffUtil.calculateDiff;
+import static com.github.anrimian.simplemusicplayer.domain.models.utils.CompositionHelper.hasChanges;
 
 /**
  * Created on 31.10.2017.
@@ -26,7 +31,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private static final int TYPE_MUSIC = 1;
     private static final int TYPE_FILE = 2;
 
-    private List<FileSource> musicList = new ArrayList<>();
+    private final List<FileSource> musicList;
     private OnItemClickListener<Composition> onCompositionClickListener;
     private OnTransitionItemClickListener<String> onFolderClickListener;
 
@@ -90,5 +95,24 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         } else {
             return TYPE_MUSIC;
         }
+    }
+
+    public void updateList(List<FileSource> oldList, List<FileSource> sourceList) {
+        calculateDiff(new SimpleDiffCallback<>(oldList, sourceList, this::areSourcedTheSame))
+                .dispatchUpdatesTo(this);
+    }
+
+    private boolean areSourcedTheSame(FileSource oldSource, FileSource newSource) {
+        if (oldSource.getClass().equals(newSource.getClass())) {
+            if (oldSource instanceof FolderFileSource) {
+                return FolderHelper.hasChanges(((FolderFileSource) oldSource),
+                        ((FolderFileSource) newSource));
+            }
+            if (oldSource instanceof MusicFileSource) {
+                return hasChanges(((MusicFileSource) oldSource).getComposition(),
+                        ((MusicFileSource) newSource).getComposition());
+            }
+        }
+        return false;
     }
 }

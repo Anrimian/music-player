@@ -4,6 +4,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.player.error.ErrorType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -17,8 +18,6 @@ import io.reactivex.Single;
  */
 
 public interface MusicProviderRepository {
-
-    Single<List<Composition>> getAllCompositions();
 
     Observable<List<Composition>> getAllCompositionsObservable();
 

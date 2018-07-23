@@ -63,6 +63,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
 
     @Override
     public Completable setPlayQueue(List<Composition> compositions) {
+        if (compositions.isEmpty()) {
+            return Completable.complete();
+        }
         return Single.fromCallable(() -> new PlayQueue(compositions, settingsPreferences.isRandomPlayingEnabled()))
                 .doOnSuccess(this::savePlayQueue)
                 .map(this::getSelectedPlayQueue)

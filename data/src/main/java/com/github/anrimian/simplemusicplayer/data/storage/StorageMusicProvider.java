@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import io.reactivex.Observable;
 
 import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
+import static java.util.Collections.emptyMap;
 
 public class StorageMusicProvider {
 
@@ -59,7 +60,7 @@ public class StorageMusicProvider {
                     null,
                     null);
             if (cursor == null) {
-                return new HashMap<>();
+                return emptyMap();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             Map<Long, Composition> compositions = new ConcurrentHashMap<>(cursor.getCount());
