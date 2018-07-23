@@ -67,9 +67,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
                 .doOnSuccess(this::savePlayQueue)
                 .map(this::getSelectedPlayQueue)
                 .doOnSuccess(playQueue -> {
-                    setCurrentComposition(playQueue.get(0));
                     Log.d("KEK", "setPlayQueue: onNext");
                     playQueueSubject.onNext(playQueue);
+                    setCurrentComposition(playQueue.get(0));
                 })
                 .toCompletable()
                 .subscribeOn(scheduler);
@@ -191,7 +191,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
                     .doOnNext(change -> {
                         Log.d("KEK", "receive change: " + change);
                     })
-                    .subscribeOn(scheduler)
+//                    .subscribeOn(scheduler)
                     .subscribe(this::processCompositionChange);
         }
     }
@@ -246,7 +246,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
                     newComposition = compositions.get(currentCompositionPosition);
                 }
                 Log.d("KEK", "new composition after delete: " + newComposition);
-                currentCompositionSubject.onNext(new CompositionEvent(newComposition));
+                setCurrentComposition(newComposition);
             }
         }
     }

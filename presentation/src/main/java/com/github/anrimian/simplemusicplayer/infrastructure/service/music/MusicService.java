@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
@@ -169,6 +170,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void onPlayerStateChanged(PlayerMetaState playerMetaState) {
+        Log.d("KEK", "onPlayerStateChanged: " + playerMetaState);
         currentComposition = playerMetaState.getComposition();
 
         PlayerState playerState = playerMetaState.getState();
@@ -192,9 +194,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 break;
             }
             case STOP: {
-                stopForeground(true);
-                mediaSession.setActive(false);
-                stopSelf();
+                stop();
                 break;
             }
         }
@@ -212,10 +212,24 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private void onCurrentCompositionChanged(PlayerMetaState playerMetaState) {
         Composition composition = playerMetaState.getComposition();
-        if (composition != null && !currentComposition.equals(composition)) {
+        Log.d("KEK", "onCurrentCompositionChanged: " + composition);
+        if (composition == null) {
+            Log.d("KEK", "onCurrentCompositionChanged stop service");
+            stop();
+            return;
+        }
+        if (!composition.equals(currentComposition)) {
             currentComposition = composition;
             notificationsDisplayer.updateForegroundNotification(playerMetaState);
         }
+    }
+
+    private void stop() {
+        Log.d("KEK", "stop");
+        notificationsDisplayer.removePlayerNotification();
+        stopForeground(true);
+        mediaSession.setActive(false);
+        stopSelf();
     }
 
     private Observable<CompositionEvent> getCurrentCompositionObservable() {

@@ -72,6 +72,10 @@ public class NotificationsDisplayer {
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
+    public void removePlayerNotification() {
+        notificationManager.cancel(FOREGROUND_NOTIFICATION_ID);
+    }
+
     private NotificationCompat.Builder getDefaultMusicNotification(@Nonnull PlayerMetaState state) {
         boolean play = state.getState() == PlayerState.PLAY;
         Composition composition = state.getComposition();

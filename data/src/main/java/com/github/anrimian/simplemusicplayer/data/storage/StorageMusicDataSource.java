@@ -42,6 +42,7 @@ public class StorageMusicDataSource {
     public StorageMusicDataSource(StorageMusicProvider musicProvider,
                                   FileManager fileManager,
                                   Scheduler scheduler) {
+        Log.d("KEK", "StorageMusicDataSource: call constructor");
         this.musicProvider = musicProvider;
         this.fileManager = fileManager;
         this.scheduler = scheduler;
@@ -72,7 +73,7 @@ public class StorageMusicDataSource {
     }
 
     public Observable<Change<List<Composition>>> getChangeObservable() {
-        return changeSubject.subscribeOn(scheduler).doOnNext(change -> {
+        return changeSubject/*.subscribeOn(scheduler)*/.doOnNext(change -> {
             Log.d("KEK", "send change: " + change);
         });
     }
