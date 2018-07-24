@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
 
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.utils.Objects;
 
 import java.util.Date;
 import java.util.List;
@@ -40,12 +41,12 @@ public class FolderNode extends NodeData {
                 updated = true;
             }
             Date date = getDateFromNode(nodeData, true);
-            if (latestCreateDate.equals(date)) {
+            if (Objects.equals(latestCreateDate, date)) {
                 dateChanged = true;
                 latestCreateDate = null;
             }
             date = getDateFromNode(nodeData, true);
-            if (earliestCreateDate.equals(date)) {
+            if (Objects.equals(earliestCreateDate, date)) {
                 dateChanged = true;
                 earliestCreateDate = null;
             }
