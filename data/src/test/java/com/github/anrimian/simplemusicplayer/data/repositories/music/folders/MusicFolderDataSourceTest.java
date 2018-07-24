@@ -115,7 +115,7 @@ public class MusicFolderDataSourceTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
-        TestObserver<Change<FileSource>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         Composition compositionTwo = new Composition();
@@ -130,9 +130,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValue(change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValue(data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(2, folderNode.getFilesCount());
             return true;
         });
@@ -149,7 +148,7 @@ public class MusicFolderDataSourceTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
-        TestObserver<Change<FileSource>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         Composition compositionTwo = new Composition();
@@ -177,9 +176,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValueAt(1, change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValueAt(1, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(2, folderNode.getFilesCount());
             return true;
         });
@@ -197,7 +195,7 @@ public class MusicFolderDataSourceTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
-        TestObserver<Change<FileSource>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
@@ -208,9 +206,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValue(change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValue(data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(1, folderNode.getFilesCount());
             return true;
         });
@@ -228,11 +225,12 @@ public class MusicFolderDataSourceTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
-        TestObserver<Change<FileSource>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         Folder basicFolder = musicFolderDataSource.getCompositionsInPath("root/music/basic").blockingGet();
-        TestObserver<Change<FileSource>> basicFolderSelfObserver = basicFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> basicFolderSelfObserver = basicFolder.getSelfChangeObservable().test();
+        TestObserver<Object> basicFolderDeleteSelfObserver = basicFolder.getSelfDeleteObservable().test();
         TestObserver<List<FileSource>> basicFolderChildObserver = basicFolder.getFilesObservable().test();
 
         changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
@@ -242,20 +240,14 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        basicFolderSelfObserver.assertValueAt(0, change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = ((FolderFileSource) change.getData());
+        basicFolderSelfObserver.assertValueAt(0, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals("root/music/basic", folderNode.getFullPath());
             assertEquals(0, folderNode.getFilesCount());
             return true;
         });
 
-        basicFolderSelfObserver.assertValueAt(1, change -> {
-            assertEquals(DELETED, change.getChangeType());
-            FolderFileSource folderNode = ((FolderFileSource) change.getData());
-            assertEquals("root/music/basic", folderNode.getFullPath());
-            return true;
-        });
+        basicFolderDeleteSelfObserver.assertValueAt(0, o -> true);
 
         childrenObserver.assertValueAt(1, list -> {
             assertEquals(1, list.size());
@@ -263,9 +255,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValue(change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValue(data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(1, folderNode.getFilesCount());
             return true;
         });
@@ -286,11 +277,11 @@ public class MusicFolderDataSourceTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
-        TestObserver<Change<FileSource>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         Folder basicFolder = musicFolderDataSource.getCompositionsInPath("root/music/basic").blockingGet();
-        TestObserver<Change<FileSource>> basicFolderSelfObserver = basicFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> basicFolderSelfObserver = basicFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> basicFolderChildObserver = basicFolder.getFilesObservable().test();
 
         changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
@@ -300,9 +291,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        basicFolderSelfObserver.assertValueAt(0, change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = ((FolderFileSource) change.getData());
+        basicFolderSelfObserver.assertValueAt(0, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals("root/music/basic", folderNode.getFullPath());
             assertEquals(1, folderNode.getFilesCount());
             assertEquals(5L, folderNode.getEarliestCreateDate().getTime());
@@ -315,9 +305,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValue(change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValue(data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(2, folderNode.getFilesCount());
             return true;
         });
@@ -373,11 +362,11 @@ public class MusicFolderDataSourceTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
-        TestObserver<Change<FileSource>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         Folder basicFolder = musicFolderDataSource.getCompositionsInPath("root/music/basic").blockingGet();
-        TestObserver<Change<FileSource>> basicFolderSelfObserver = basicFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> basicFolderSelfObserver = basicFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> basicFolderChildObserver = basicFolder.getFilesObservable().test();
 
         Composition compositionTwoChanged = fakeComposition(2L, "root/music/basic/two.dd", 7L);
@@ -388,9 +377,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        basicFolderSelfObserver.assertValue(change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = ((FolderFileSource) change.getData());
+        basicFolderSelfObserver.assertValue(data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(7L, folderNode.getLatestCreateDate().getTime());
             assertEquals(5L, folderNode.getEarliestCreateDate().getTime());
             return true;
@@ -403,9 +391,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValue(change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValue(data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(7L, folderNode.getLatestCreateDate().getTime());
             assertEquals(4L, folderNode.getEarliestCreateDate().getTime());
             return true;
@@ -423,7 +410,7 @@ public class MusicFolderDataSourceTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
-        TestObserver<Change<FileSource>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         Composition compositionTwo = new Composition();
@@ -438,9 +425,8 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValue(change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValue(data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(2, folderNode.getFilesCount());
             return true;
         });
@@ -458,7 +444,7 @@ public class MusicFolderDataSourceTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
-        TestObserver<Change<FileSource>> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         Composition compositionTwoChanged = fakeComposition(2L, "root/music/basic/two.dd", 4L);
@@ -478,16 +464,14 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValueAt(0, change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValueAt(0, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(1, folderNode.getFilesCount());
             return true;
         });
 
-        selfChangeObserver.assertValueAt(2, change -> {
-            assertEquals(MODIFY, change.getChangeType());
-            FolderFileSource folderNode = (FolderFileSource) change.getData();
+        selfChangeObserver.assertValueAt(2, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(2, folderNode.getFilesCount());
             return true;
         });

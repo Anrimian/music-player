@@ -11,20 +11,27 @@ import io.reactivex.Observable;
 public class Folder {
 
     private Observable<List<FileSource>> filesObservable;
-    private Observable<Change<FileSource>> selfChangeObservable;
+    private Observable<FileSource> selfChangeObservable;
+    private Observable<Object> selfDeleteObservable;
 
     public Folder(Observable<List<FileSource>> filesObservable,
-                  Observable<Change<FileSource>> selfChangeObservable) {
+                  Observable<FileSource> selfChangeObservable,
+                  Observable<Object> selfDeleteObservable) {
         this.filesObservable = filesObservable;
         this.selfChangeObservable = selfChangeObservable;
+        this.selfDeleteObservable = selfDeleteObservable;
     }
 
     public Observable<List<FileSource>> getFilesObservable() {
         return filesObservable;
     }
 
-    public Observable<Change<FileSource>> getSelfChangeObservable() {
+    public Observable<FileSource> getSelfChangeObservable() {
         return selfChangeObservable;
+    }
+
+    public Observable<Object> getSelfDeleteObservable() {
+        return selfDeleteObservable;
     }
 
     @SuppressWarnings("Java8ListSort")//lets wait:)

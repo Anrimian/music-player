@@ -46,8 +46,11 @@ public class MusicFolderDataSource {
 
     private Folder getFolderInPath(@Nullable String path) {
         RxNode<String> node = findNodeByPath(path);
-        return new Folder(node.getChildObservable().map(this::toFileSources),
-                node.getSelfChangeObservable().map(this::toChangeFileSource));
+        return new Folder(
+                node.getChildObservable().map(this::toFileSources),
+                node.getSelfChangeObservable().map(this::toFileSource),
+                node.getSelfDeleteObservable()
+        );
     }
 
     private List<FileSource> toFileSources(List<RxNode<String>> nodes) {

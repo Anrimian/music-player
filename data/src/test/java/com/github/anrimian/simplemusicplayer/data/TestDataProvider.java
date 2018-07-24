@@ -87,6 +87,7 @@ public class TestDataProvider {
 
     public static Folder getTestFolder(FileSource... fileSources) {
         return new Folder(Observable.create(emitter -> emitter.onNext(asList(fileSources))),
+                Observable.never(),
                 Observable.never());
     }
 }

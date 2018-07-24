@@ -24,6 +24,7 @@
 
     <dimen name="top_control_button_size">48dp</dimen>
 
+    <dimen name="content_spacing_margin">8dp</dimen>
     <dimen name="content_horizontal_margin">16dp</dimen>
     <dimen name="content_vertical_margin">16dp</dimen>
     <dimen name="content_margin">16dp</dimen>

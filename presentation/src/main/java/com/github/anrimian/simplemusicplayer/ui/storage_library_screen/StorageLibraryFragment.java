@@ -106,6 +106,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
 //        adapter.addHeader(headerView);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
+        adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
         recyclerView.setAdapter(adapter);
         startPostponedEnterTransition();
     }

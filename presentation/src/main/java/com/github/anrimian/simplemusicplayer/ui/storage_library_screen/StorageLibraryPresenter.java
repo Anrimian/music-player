@@ -6,6 +6,7 @@ import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibr
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
@@ -82,6 +83,16 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         if (path == null) {
             throw new IllegalStateException("can not go back in root screen");
         }
+        goBackToPreviousPath();
+    }
+
+    void onDeleteCompositionButtonClicked(Composition composition) {
+        interactor.deleteComposition(composition)
+                .observeOn(uiScheduler)
+                .subscribe();//TODO displayError
+    }
+
+    private void goBackToPreviousPath() {
         String targetPath = null;
         int lastSlashIndex = path.lastIndexOf('/');
         int firstSlashIndex = path.indexOf("/");
@@ -100,11 +111,27 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
 
     private void onMusicLoaded(Folder folder) {
         subscribeOnFolderMusic(folder);
+        subscribeOnSelfDeleting(folder);
     }
 
     private void onMusicLoadingError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showError(errorCommand);
+    }
+
+    private void subscribeOnSelfDeleting(Folder folder) {
+        presenterDisposable.add(folder.getSelfDeleteObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onFolderDeleted));
+    }
+
+    @SuppressWarnings("unused")
+    private void onFolderDeleted(Object o) {
+        if (path == null) {
+            getViewState().showEmptyList();
+        } else {
+            goBackToPreviousPath();
+        }
     }
 
     private void subscribeOnFolderMusic(Folder folder) {

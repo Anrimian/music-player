@@ -2,6 +2,7 @@ package com.github.anrimian.simplemusicplayer.ui.storage_library_screen.adapter;
 
 import android.content.Context;
 import android.support.annotation.StringRes;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -35,14 +36,42 @@ class MusicViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.clickable_item)
     View clickableItem;
 
+    @BindView(R.id.btn_actions_menu)
+    View btnActionsMenu;
+
     private Composition composition;
 
-    MusicViewHolder(View itemView, OnItemClickListener<Composition> onCompositionClickListener) {
+    private OnItemClickListener<Composition> onDeleteCompositionClickListener;
+
+    MusicViewHolder(View itemView,
+                    OnItemClickListener<Composition> onCompositionClickListener,
+                    OnItemClickListener<Composition> onDeleteCompositionClickListener) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         if (onCompositionClickListener != null) {
             clickableItem.setOnClickListener(v -> onCompositionClickListener.onItemClick(composition));
         }
+        btnActionsMenu.setOnClickListener(this::onActionsMenuButtonClicked);
+        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
+    }
+
+    private void onActionsMenuButtonClicked(View view) {
+        PopupMenu popup = new PopupMenu(getContext(), view);
+        popup.inflate(R.menu.composition_in_folder_actions_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_share: {
+//                    presenter.onShareCompositionButtonClicked();
+                    return true;
+                }
+                case R.id.menu_delete: {
+                    onDeleteCompositionClickListener.onItemClick(composition);
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
     }
 
     void bind(@Nonnull Composition composition) {

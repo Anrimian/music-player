@@ -23,7 +23,8 @@ import static java.util.Collections.singletonList;
 public class RxNode<K> {
 
     private final BehaviorSubject<List<RxNode<K>>> childSubject = BehaviorSubject.create();
-    private final PublishSubject<Change<NodeData>> selfChangeSubject = PublishSubject.create();
+    private final PublishSubject<NodeData> selfChangeSubject = PublishSubject.create();
+    private final PublishSubject<Object> selfDeleteSubject = PublishSubject.create();
 
     private final LinkedHashMap<K, RxNode<K>> nodes = new LinkedHashMap<>();
 
@@ -61,8 +62,12 @@ public class RxNode<K> {
         return withDefaultValue(childSubject, this::getNodes);
     }
 
-    public PublishSubject<Change<NodeData>> getSelfChangeObservable() {
+    public Observable<NodeData> getSelfChangeObservable() {
         return selfChangeSubject;
+    }
+
+    public Observable<Object> getSelfDeleteObservable() {
+        return selfDeleteSubject;
     }
 
     public void addNodes(List<RxNode<K>> newNodes) {
@@ -142,14 +147,14 @@ public class RxNode<K> {
     }
 
     private void notifySelfRemoved() {
-        selfChangeSubject.onNext(new Change<>(DELETED, data));
+        selfDeleteSubject.onNext(new Object());
     }
 
     private void notifyNodesChanged(List<NodeData> data) {
         if (this.data != null) {
             boolean updated = this.data.onNodesChanged(data, mapList(getNodes(), RxNode::getData));
             if (updated) {
-                selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
+                selfChangeSubject.onNext(this.data);
 
                 RxNode<K> parent = getParent();
                 if (parent != null) {
@@ -164,7 +169,7 @@ public class RxNode<K> {
         if (this.data != null) {
             boolean updated = this.data.onNodesRemoved(data, mapList(getNodes(), RxNode::getData));
             if (updated) {
-                selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
+                selfChangeSubject.onNext(this.data);
 
                 RxNode<K> parent = getParent();
                 if (parent != null) {
@@ -178,7 +183,7 @@ public class RxNode<K> {
         if (this.data != null) {
             boolean updated = this.data.onNodesAdded(data);
             if (updated) {
-                selfChangeSubject.onNext(new Change<>(MODIFY, this.data));
+                selfChangeSubject.onNext(this.data);
 
                 RxNode<K> parent = getParent();
                 if (parent != null) {

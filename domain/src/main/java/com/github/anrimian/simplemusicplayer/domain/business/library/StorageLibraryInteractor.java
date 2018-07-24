@@ -51,4 +51,8 @@ public class StorageLibraryInteractor {
         list.add(composition);
         return musicPlayerInteractor.startPlaying(list);
     }
+
+    public Completable deleteComposition(Composition composition) {
+        return musicProviderRepository.deleteComposition(composition);
+    }
 }
