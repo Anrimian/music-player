@@ -442,10 +442,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showTrackState(long currentPosition, long duration) {
+        int progress = 0;
         if (duration != 0) {
-            int progress = (int) (currentPosition * 100 / duration);
-            seekBarViewWrapper.setProgress(progress);
+            progress = (int) (currentPosition * 100 / duration);
         }
+        seekBarViewWrapper.setProgress(progress);
         tvPlayedTime.setText(formatMilliseconds(currentPosition));
     }
 

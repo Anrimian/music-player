@@ -40,15 +40,18 @@ public class FolderNode extends NodeData {
                 compositionsCount--;
                 updated = true;
             }
-            Date date = getDateFromNode(nodeData, true);
-            if (Objects.equals(latestCreateDate, date)) {
-                dateChanged = true;
-                latestCreateDate = null;
-            }
-            date = getDateFromNode(nodeData, true);
-            if (Objects.equals(earliestCreateDate, date)) {
-                dateChanged = true;
-                earliestCreateDate = null;
+
+            if (!allNodes.isEmpty()) {
+                Date date = getDateFromNode(nodeData, true);
+                if (Objects.equals(latestCreateDate, date)) {
+                    dateChanged = true;
+                    latestCreateDate = null;
+                }
+                date = getDateFromNode(nodeData, true);
+                if (Objects.equals(earliestCreateDate, date)) {
+                    dateChanged = true;
+                    earliestCreateDate = null;
+                }
             }
         }
         if (dateChanged) {
@@ -91,6 +94,8 @@ public class FolderNode extends NodeData {
         return "FolderNode{" +
                 "fullPath='" + fullPath + '\'' +
                 ", compositionsCount=" + compositionsCount +
+                ", latestCreateDate=" + latestCreateDate +
+                ", earliestCreateDate=" + earliestCreateDate +
                 '}';
     }
 

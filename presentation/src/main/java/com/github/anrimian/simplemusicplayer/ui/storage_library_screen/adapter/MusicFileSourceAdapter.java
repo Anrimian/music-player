@@ -112,11 +112,11 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private boolean areSourcedTheSame(FileSource oldSource, FileSource newSource) {
         if (oldSource.getClass().equals(newSource.getClass())) {
             if (oldSource instanceof FolderFileSource) {
-                return FolderHelper.hasChanges(((FolderFileSource) oldSource),
+                return !FolderHelper.hasChanges(((FolderFileSource) oldSource),
                         ((FolderFileSource) newSource));
             }
             if (oldSource instanceof MusicFileSource) {
-                return hasChanges(((MusicFileSource) oldSource).getComposition(),
+                return !hasChanges(((MusicFileSource) oldSource).getComposition(),
                         ((MusicFileSource) newSource).getComposition());
             }
         }

@@ -158,8 +158,8 @@ public class RxNode<K> {
 
                 RxNode<K> parent = getParent();
                 if (parent != null) {
-                    parent.notifyNodesChanged(data);
                     parent.notifyChildrenChanged();
+                    parent.notifyNodesChanged(data);
                 }
             }
         }
@@ -173,6 +173,7 @@ public class RxNode<K> {
 
                 RxNode<K> parent = getParent();
                 if (parent != null) {
+                    parent.notifyChildrenChanged();
                     parent.notifyNodesRemoved(data);
                 }
             }
@@ -187,8 +188,8 @@ public class RxNode<K> {
 
                 RxNode<K> parent = getParent();
                 if (parent != null) {
-                    parent.notifyNodesAdded(data);
                     parent.notifyChildrenChanged();
+                    parent.notifyNodesAdded(data);
                 }
             }
         }
