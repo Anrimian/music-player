@@ -1,12 +1,11 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.play_queue;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.github.anrimian.simplemusicplayer.data.database.dao.PlayQueueDaoWrapper;
 import com.github.anrimian.simplemusicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences;
-import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayQueueRepository;

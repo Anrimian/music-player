@@ -1,12 +1,10 @@
-package com.github.anrimian.simplemusicplayer.data.storage;
+package com.github.anrimian.simplemusicplayer.data.storage.providers.playlists;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.Playlists;
 
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.CompositionNotDeletedException;
@@ -14,6 +12,7 @@ import com.github.anrimian.simplemusicplayer.data.models.exceptions.CompositionN
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.PlayListNotDeletedException;
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.PlayListNotModifiedException;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.simplemusicplayer.data.utils.IOUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.simplemusicplayer.data.utils.rx.content_observer.RxContentObserver;

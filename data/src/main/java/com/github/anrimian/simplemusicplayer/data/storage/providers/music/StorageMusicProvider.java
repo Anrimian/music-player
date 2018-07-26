@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.storage;
+package com.github.anrimian.simplemusicplayer.data.storage.providers.music;
 
 import android.content.ContentResolver;
 import android.content.Context;

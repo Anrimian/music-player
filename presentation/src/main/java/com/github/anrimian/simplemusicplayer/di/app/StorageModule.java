@@ -3,8 +3,8 @@ package com.github.anrimian.simplemusicplayer.di.app;
 import android.content.Context;
 
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicProvider;
-import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.data.storage.files.FileManager;
 
 import javax.annotation.Nonnull;

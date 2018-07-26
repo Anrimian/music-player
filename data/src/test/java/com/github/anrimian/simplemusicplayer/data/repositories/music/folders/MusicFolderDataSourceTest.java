@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.repositories.music.folders;
 
-import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;

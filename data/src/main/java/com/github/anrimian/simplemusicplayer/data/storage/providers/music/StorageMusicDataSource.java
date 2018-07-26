@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.data.storage;
+package com.github.anrimian.simplemusicplayer.data.storage.providers.music;
 
 import com.github.anrimian.simplemusicplayer.data.storage.files.FileManager;
 import com.github.anrimian.simplemusicplayer.domain.utils.Objects;

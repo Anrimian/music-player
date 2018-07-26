@@ -1,6 +1,8 @@
-package com.github.anrimian.simplemusicplayer.data.storage;
+package com.github.anrimian.simplemusicplayer.data.storage.providers.music;
 
 import com.github.anrimian.simplemusicplayer.data.storage.files.FileManager;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;

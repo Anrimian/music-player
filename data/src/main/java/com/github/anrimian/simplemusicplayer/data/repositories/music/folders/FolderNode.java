@@ -65,12 +65,16 @@ public class FolderNode extends NodeData {
 
     @Override
     public boolean onNodesChanged(List<NodeData> nodes, List<NodeData> allNodes) {
-        latestCreateDate = null;
-        earliestCreateDate = null;
-        for (NodeData nodeData: allNodes) {
-            recalculateDate(nodeData);
+        if (allNodes.isEmpty()) {
+            return false;
+        } else {
+            latestCreateDate = null;
+            earliestCreateDate = null;
+            for (NodeData nodeData : allNodes) {
+                recalculateDate(nodeData);
+            }
+            return true;
         }
-        return true;
     }
 
     public String getFullPath() {

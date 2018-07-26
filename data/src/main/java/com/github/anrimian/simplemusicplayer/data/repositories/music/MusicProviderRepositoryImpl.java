@@ -10,7 +10,7 @@ import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators
 import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.CreateDateDescFileComparator;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.comparators.folder.CreateDateFileComparator;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
 

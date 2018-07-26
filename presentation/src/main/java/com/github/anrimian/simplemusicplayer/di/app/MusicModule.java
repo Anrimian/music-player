@@ -12,7 +12,7 @@ import com.github.anrimian.simplemusicplayer.data.preferences.UiStatePreferences
 import com.github.anrimian.simplemusicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.simplemusicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.simplemusicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
-import com.github.anrimian.simplemusicplayer.data.storage.StorageMusicDataSource;
+import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.simplemusicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.PlayerErrorParser;
