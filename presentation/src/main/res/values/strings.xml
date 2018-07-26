@@ -1,7 +1,7 @@
 <resources>
     <string name="file_provider_authorities" translatable="false">share_file_provider</string>
 
-    <string name="app_name">Simple Music Player</string>
+    <string name="app_name">Music Player</string>
     <string name="open_drawer">Открыть боковое меню</string>
     <string name="close_drawer">Закрыть блоковое меню</string>
     <string name="useless_image">Ничего не значащая картинка</string>
@@ -26,6 +26,11 @@
     <string name="unknown_author">Неизвестный исполнитель</string>
     <string name="preparing_for_launch">Подготовка к запуску…</string>
     <string name="delete">Удалить</string>
+    <string name="alphabetical_order">По алфавиту</string>
+    <string name="alphabetical_desc_order">По алфавиту в обратном направлении</string>
+    <string name="add_date_order">По дате добавления</string>
+    <string name="add_date_desc_order">По дате добавления в обратном направлении</string>
+    <string name="order">Сортировка</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

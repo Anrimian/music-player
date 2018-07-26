@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils;
+package com.github.anrimian.simplemusicplayer.ui.utils;
 
 /**
  * Created on 30.10.2017.

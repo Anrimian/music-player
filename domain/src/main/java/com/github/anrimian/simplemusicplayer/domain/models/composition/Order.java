@@ -6,8 +6,8 @@ import java.util.Map;
 public enum Order {
     ALPHABETICAL(1),
     ALPHABETICAL_DESC(2),
-    CREATE_TIME(3),
-    CREATE_TIME_DESC(4);
+    ADD_TIME(3),
+    ADD_TIME_DESC(4);
 
     private static Map<Integer, Order> map = new HashMap<>();
     private int id;

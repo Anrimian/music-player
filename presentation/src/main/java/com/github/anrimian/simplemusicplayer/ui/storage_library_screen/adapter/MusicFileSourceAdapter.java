@@ -12,11 +12,10 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.F
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
-import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
+import com.github.anrimian.simplemusicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.OnTransitionItemClickListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.endless_scrolling.HeaderFooterRecyclerViewAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.support.v7.util.DiffUtil.calculateDiff;

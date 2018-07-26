@@ -11,6 +11,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,8 +22,10 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
@@ -73,6 +78,12 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         return Components.getStorageLibraryComponent(getPath()).storageLibraryPresenter();
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -98,6 +109,26 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.storage_files_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(Order.ALPHABETICAL_DESC);
+                fragment.setOnCompleteListener(order -> {});
+                fragment.show(getChildFragmentManager(), null);
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

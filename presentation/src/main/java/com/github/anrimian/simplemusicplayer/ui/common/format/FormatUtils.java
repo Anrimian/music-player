@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 
 import java.util.Locale;
 
@@ -57,5 +58,15 @@ public class FormatUtils {
         long seconds = MILLISECONDS.toSeconds(millis) - MINUTES.toSeconds(MILLISECONDS.toMinutes(millis));
         sb.append(format(Locale.getDefault(), "%02d", seconds));
         return sb.toString();
+    }
+
+    public static int getOrderTitle(Order order) {
+        switch (order) {
+            case ALPHABETICAL: return R.string.alphabetical_order;
+            case ALPHABETICAL_DESC: return R.string.alphabetical_desc_order;
+            case ADD_TIME: return R.string.add_date_order;
+            case ADD_TIME_DESC: return R.string.add_date_desc_order;
+            default: throw new IllegalStateException("can not find title for order: " + order);
+        }
     }
 }

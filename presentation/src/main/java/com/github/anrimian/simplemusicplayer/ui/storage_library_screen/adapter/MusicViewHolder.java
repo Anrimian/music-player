@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.utils.OnItemClickListener;
+import com.github.anrimian.simplemusicplayer.ui.utils.OnItemClickListener;
 
 import javax.annotation.Nonnull;
 

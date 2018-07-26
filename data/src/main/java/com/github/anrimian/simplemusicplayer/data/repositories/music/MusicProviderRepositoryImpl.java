@@ -89,8 +89,8 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         switch (settingsPreferences.getFolderOrder()) {
             case ALPHABETICAL: return new AlphabeticalFileComparator();
             case ALPHABETICAL_DESC: return new AlphabeticalDescFileComparator();
-            case CREATE_TIME: return new CreateDateFileComparator();
-            case CREATE_TIME_DESC: return new CreateDateDescFileComparator();
+            case ADD_TIME: return new CreateDateFileComparator();
+            case ADD_TIME_DESC: return new CreateDateDescFileComparator();
             default: return new AlphabeticalFileComparator();
         }
     }
@@ -99,8 +99,8 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         switch (settingsPreferences.getCompositionsOrder()) {
             case ALPHABETICAL: return new AlphabeticalCompositionComparator();
             case ALPHABETICAL_DESC: return new AlphabeticalDescCompositionComparator();
-            case CREATE_TIME: return new CreateDateCompositionComparator();
-            case CREATE_TIME_DESC: return new CreateDateDescCompositionComparator();
+            case ADD_TIME: return new CreateDateCompositionComparator();
+            case ADD_TIME_DESC: return new CreateDateDescCompositionComparator();
             default: return new AlphabeticalCompositionComparator();
         }
     }
