@@ -28,7 +28,7 @@ public class OrderViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
 
         if (onItemClickListener != null) {
-            rbOrder.setOnClickListener(v -> onItemClickListener.onItemClick(order));
+            itemView.setOnClickListener(v -> onItemClickListener.onItemClick(order));
         }
     }
 

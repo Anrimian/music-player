@@ -34,8 +34,9 @@
     <dimen name="music_icon_size">48dp</dimen>
     <dimen name="target_title_text_size">15sp</dimen>
 
-    <dimen name="dialog_margin_content_vertical">6dp</dimen>
+    <dimen name="dialog_margin_content_vertical">12dp</dimen>
     <dimen name="dialog_margin_content_horizontal">8dp</dimen>
+    <dimen name="radio_button_text_margin_start">8dp</dimen>
 
     <!--specific sizes-->
 

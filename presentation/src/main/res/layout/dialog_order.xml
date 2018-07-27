@@ -6,10 +6,11 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_order"
-        android:layout_marginTop="@dimen/dialog_margin_content_vertical"
-        android:layout_marginBottom="@dimen/dialog_margin_content_vertical"
+        android:paddingBottom="@dimen/dialog_margin_content_vertical"
+        android:paddingTop="@dimen/dialog_margin_content_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:overScrollMode="never"
         tools:listitem="@layout/item_order"/>
 
 </FrameLayout>
