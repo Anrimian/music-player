@@ -19,4 +19,8 @@ public interface SettingsRepository {
     void setFolderOrder(Order order);
 
     void setCompositionsOrder(Order order);
+
+    Order getFolderOrder();
+
+    Order getCompositionsOrder();
 }

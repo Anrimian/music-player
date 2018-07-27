@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.storage_library_screen.adapter;
+package com.github.anrimian.simplemusicplayer.ui.library.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

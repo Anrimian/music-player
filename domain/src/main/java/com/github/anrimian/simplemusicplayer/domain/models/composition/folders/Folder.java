@@ -35,7 +35,11 @@ public class Folder {
     }
 
     @SuppressWarnings("Java8ListSort")//lets wait:)
-    public void applyFileOrder(Comparator<FileSource> comparator) {
-        filesObservable = filesObservable.doOnNext(files -> Collections.sort(files, comparator));
+    public void applyFileOrder(OrderProvider orderProvider) {
+        filesObservable = filesObservable.doOnNext(files -> Collections.sort(files, orderProvider.getComparator()));
+    }
+
+    public interface OrderProvider {
+        Comparator<FileSource> getComparator();
     }
 }

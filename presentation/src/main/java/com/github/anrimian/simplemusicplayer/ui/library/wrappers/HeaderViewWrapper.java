@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.storage_library_screen.wrappers;
+package com.github.anrimian.simplemusicplayer.ui.library.wrappers;
 
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;

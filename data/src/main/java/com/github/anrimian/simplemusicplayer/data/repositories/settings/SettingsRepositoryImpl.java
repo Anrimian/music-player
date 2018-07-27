@@ -45,4 +45,14 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public void setCompositionsOrder(Order order) {
         settingsPreferences.setCompositionsOrder(order);
     }
+
+    @Override
+    public Order getFolderOrder() {
+        return settingsPreferences.getFolderOrder();
+    }
+
+    @Override
+    public Order getCompositionsOrder() {
+        return settingsPreferences.getCompositionsOrder();
+    }
 }

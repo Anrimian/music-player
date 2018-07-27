@@ -67,7 +67,9 @@ public class SelectOrderDialogFragment extends DialogFragment {
     }
 
     private void onComplete(Order order) {
-        onCompleteListener.onComplete(order);
+        if (getOrder() != order && onCompleteListener != null) {
+            onCompleteListener.onComplete(order);
+        }
         dismiss();
     }
 }

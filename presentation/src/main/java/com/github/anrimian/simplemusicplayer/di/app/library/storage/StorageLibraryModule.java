@@ -1,7 +1,7 @@
 package com.github.anrimian.simplemusicplayer.di.app.library.storage;
 
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
-import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.StorageLibraryPresenter;
+import com.github.anrimian.simplemusicplayer.ui.library.StorageLibraryPresenter;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
 import javax.annotation.Nonnull;

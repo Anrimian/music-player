@@ -2,12 +2,14 @@ package com.github.anrimian.simplemusicplayer.domain.business.library;
 
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.simplemusicplayer.domain.utils.tree.visitors.CollectVisitor;
 
@@ -30,11 +32,14 @@ public class StorageLibraryInteractor {
 
     private final MusicProviderRepository musicProviderRepository;
     private final MusicPlayerInteractor musicPlayerInteractor;
+    private final SettingsRepository settingsRepository;
 
     public StorageLibraryInteractor(MusicProviderRepository musicProviderRepository,
-                                    MusicPlayerInteractor musicPlayerInteractor) {
+                                    MusicPlayerInteractor musicPlayerInteractor,
+                                    SettingsRepository settingsRepository) {
         this.musicProviderRepository = musicProviderRepository;
         this.musicPlayerInteractor = musicPlayerInteractor;
+        this.settingsRepository = settingsRepository;
     }
 
     public Single<Folder> getCompositionsInPath(@Nullable String path) {
@@ -54,5 +59,13 @@ public class StorageLibraryInteractor {
 
     public Completable deleteComposition(Composition composition) {
         return musicProviderRepository.deleteComposition(composition);
+    }
+
+    public void setFolderOrder(Order order) {
+        settingsRepository.setFolderOrder(order);
+    }
+
+    public Order getFolderOrder() {
+        return settingsRepository.getFolderOrder();
     }
 }

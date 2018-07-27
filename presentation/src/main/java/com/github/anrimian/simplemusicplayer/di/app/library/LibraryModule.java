@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.di.app.library;
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerPresenter;
 
 import javax.annotation.Nonnull;
@@ -24,8 +25,11 @@ public class LibraryModule {
     @Nonnull
     @LibraryScope
     StorageLibraryInteractor provideStorageLibraryInteractor(MusicProviderRepository musicProviderRepository,
-                                                             MusicPlayerInteractor musicPlayerInteractor) {
-        return new StorageLibraryInteractor(musicProviderRepository, musicPlayerInteractor);
+                                                             MusicPlayerInteractor musicPlayerInteractor,
+                                                             SettingsRepository settingsRepository) {
+        return new StorageLibraryInteractor(musicProviderRepository,
+                musicPlayerInteractor,
+                settingsRepository);
     }
 
     @Provides

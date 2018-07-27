@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.storage_library_screen;
+package com.github.anrimian.simplemusicplayer.ui.library;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.transition.Slide;
 import android.support.transition.Transition;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,8 +27,8 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
-import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.adapter.MusicFileSourceAdapter;
-import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.wrappers.HeaderViewWrapper;
+import com.github.anrimian.simplemusicplayer.ui.library.adapter.MusicFileSourceAdapter;
+import com.github.anrimian.simplemusicplayer.ui.library.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
@@ -36,6 +37,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.simplemusicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.simplemusicplayer.constants.Arguments.PATH;
 
 /**
@@ -109,6 +111,12 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
+
+        SelectOrderDialogFragment fragment = (SelectOrderDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(ORDER_TAG);
+        if (fragment != null) {
+            fragment.setOnCompleteListener(presenter::onOrderSelected);
+        }
     }
 
     @Override
@@ -122,9 +130,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_order: {
-                SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(Order.ALPHABETICAL_DESC);
-                fragment.setOnCompleteListener(order -> {});
-                fragment.show(getChildFragmentManager(), null);
+                presenter.onOrderMenuItemClicked();
                 return true;
             }
             default: return super.onOptionsItemSelected(item);
@@ -209,6 +215,13 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
     @Override
     public void updateList(List<FileSource> oldList, List<FileSource> sourceList) {
         adapter.updateList(oldList, sourceList);
+    }
+
+    @Override
+    public void showSelectOrderScreen(Order folderOrder) {
+        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder);
+        fragment.setOnCompleteListener(presenter::onOrderSelected);
+        fragment.show(getChildFragmentManager(), ORDER_TAG);
     }
 
     private void goToMusicStorageScreen(String path, View... sharedViews) {

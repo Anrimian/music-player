@@ -1,22 +1,26 @@
-package com.github.anrimian.simplemusicplayer.ui.storage_library_screen;
+package com.github.anrimian.simplemusicplayer.ui.library;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+
+import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.dispose;
 
 /**
  * Created on 23.10.2017.
@@ -32,9 +36,12 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
     @Nullable
     private String path;
 
+    private Folder folder;
+
     private List<FileSource> sourceList = new ArrayList<>();
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
+    private Disposable filesDisposable;
 
     public StorageLibraryPresenter(@Nullable String path,
                                    StorageLibraryInteractor interactor,
@@ -92,6 +99,17 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
                 .subscribe();//TODO displayError
     }
 
+    void onOrderMenuItemClicked() {
+        getViewState().showSelectOrderScreen(interactor.getFolderOrder());
+    }
+
+    void onOrderSelected(Order order) {
+        interactor.setFolderOrder(order);
+        if (folder != null) {
+            subscribeOnFolderData(folder);
+        }
+    }
+
     private void goBackToPreviousPath() {
         String targetPath = null;
         int lastSlashIndex = path.lastIndexOf('/');
@@ -110,7 +128,8 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
     }
 
     private void onMusicLoaded(Folder folder) {
-        subscribeOnFolderMusic(folder);
+        this.folder = folder;
+        subscribeOnFolderData(folder);
         subscribeOnSelfDeleting(folder);
     }
 
@@ -134,10 +153,12 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
         }
     }
 
-    private void subscribeOnFolderMusic(Folder folder) {
-        presenterDisposable.add(folder.getFilesObservable()
+    private void subscribeOnFolderData(Folder folder) {
+        dispose(filesDisposable, presenterDisposable);
+        filesDisposable = folder.getFilesObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onMusicOnFoldersReceived));
+                .subscribe(this::onMusicOnFoldersReceived);
+        presenterDisposable.add(filesDisposable);
     }
 
     private void onMusicOnFoldersReceived(List<FileSource> sources) {

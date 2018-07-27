@@ -63,7 +63,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Single<Folder> getCompositionsInPath(@Nullable String path) {
         return musicFolderDataSource.getCompositionsInPath(path)
-                .doOnSuccess(folder -> folder.applyFileOrder(getFileComparator()))
+                .doOnSuccess(folder -> folder.applyFileOrder(this::getFileComparator))
                 .subscribeOn(scheduler);
     }
 
@@ -107,7 +107,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {
         return musicFolderDataSource.getCompositionsInPath(path)
-                .doOnSuccess(folder -> folder.applyFileOrder(getFileComparator()))
+                .doOnSuccess(folder -> folder.applyFileOrder(this::getFileComparator))
                 .flatMap(folder -> folder.getFilesObservable().firstOrError())
                 .flatMapObservable(Observable::fromIterable)
                 .flatMap(fileSource -> {

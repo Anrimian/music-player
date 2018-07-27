@@ -20,12 +20,12 @@ public class BoundValuesDelegateTest {
     private BoundValuesDelegate boundValuesDelegate;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         boundValuesDelegate = new BoundValuesDelegate(0.3f, 0.5f, mockDelegate);
     }
 
     @Test
-    public void onSlideStartValuesTest() throws Exception {
+    public void onSlideStartValuesTest() {
         boundValuesDelegate.onSlide(0.0f);
         verify(mockDelegate).onSlide(eq(0.0f));
 
@@ -34,7 +34,7 @@ public class BoundValuesDelegateTest {
     }
 
     @Test
-    public void onSlideBorderValuesTest() throws Exception {
+    public void onSlideBorderValuesTest() {
         boundValuesDelegate.onSlide(0.2f);
         verify(mockDelegate).onSlide(eq(0.0f));
 
@@ -43,7 +43,7 @@ public class BoundValuesDelegateTest {
     }
 
     @Test
-    public void onSlideInRangeValuesTest() throws Exception {
+    public void onSlideInRangeValuesTest() {
         boundValuesDelegate.onSlide(0.3f);
         verify(mockDelegate).onSlide(eq(0.0f));
 

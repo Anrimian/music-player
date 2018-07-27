@@ -40,7 +40,7 @@ import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.vie
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
-import com.github.anrimian.simplemusicplayer.ui.storage_library_screen.StorageLibraryFragment;
+import com.github.anrimian.simplemusicplayer.ui.library.StorageLibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegateManager;
