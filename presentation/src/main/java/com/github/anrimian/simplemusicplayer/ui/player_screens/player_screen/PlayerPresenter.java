@@ -1,13 +1,12 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen;
 
-import android.util.Log;
-
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.utils.Objects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,8 +98,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showShareMusicDialog(composition.getFilePath());
     }
 
-    void onCompositionItemClicked(Composition composition) {
-        musicPlayerInteractor.skipToPosition(playQueue.indexOf(composition));//TODO optimise later
+    void onCompositionItemClicked(int position, Composition composition) {
+        this.composition = composition;
+        musicPlayerInteractor.skipToPosition(position);
+
+        onCurrentCompositionChanged(composition, 0);
     }
 
     void onTrackRewoundTo(int progress) {
@@ -126,12 +128,19 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void subscribeOnCurrentCompositionChanging() {
         currentCompositionDisposable = musicPlayerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onCurrentCompositionChanged);
+                .subscribe(this::onCompositionEventReceived);
         presenterDisposable.add(currentCompositionDisposable);
     }
 
-    private void onCurrentCompositionChanged(CompositionEvent compositionEvent) {
-        composition = compositionEvent.getComposition();
+    private void onCompositionEventReceived(CompositionEvent compositionEvent) {
+        Composition newComposition = compositionEvent.getComposition();
+        if (!Objects.equals(newComposition, composition)) {
+            onCurrentCompositionChanged(newComposition, compositionEvent.getTrackPosition());
+        }
+    }
+
+    private void onCurrentCompositionChanged(Composition composition, long trackPosition) {
+        this.composition = composition;
         if (trackStateDisposable != null) {
             trackStateDisposable.dispose();
             trackStateDisposable = null;
@@ -141,7 +150,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             if (position != null) {
                 getViewState().showCurrentComposition(composition, position);
             }
-            getViewState().showTrackState(compositionEvent.getPlayPosition(), composition.getDuration());
+            getViewState().showTrackState(trackPosition, composition.getDuration());
             subscribeOnTrackPositionChanging();
         }
     }

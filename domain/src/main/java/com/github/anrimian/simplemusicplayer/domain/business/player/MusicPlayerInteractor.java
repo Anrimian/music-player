@@ -208,7 +208,7 @@ public class MusicPlayerInteractor {
         if (currentComposition == null) {
             stop();
         } else {
-            musicPlayerController.prepareToPlay(currentComposition, compositionEvent.getPlayPosition());
+            musicPlayerController.prepareToPlay(currentComposition, compositionEvent.getTrackPosition());
         }
     }
 

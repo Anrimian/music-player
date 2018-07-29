@@ -1,6 +1,5 @@
 package com.github.anrimian.simplemusicplayer.domain.models.composition;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -11,11 +10,11 @@ public class CompositionEvent {
     @Nullable
     private Composition composition;
 
-    private long playPosition;
+    private long trackPosition;
 
-    public CompositionEvent(@Nullable Composition composition, long playPosition) {
+    public CompositionEvent(@Nullable Composition composition, long trackPosition) {
         this.composition = composition;
-        this.playPosition = playPosition;
+        this.trackPosition = trackPosition;
     }
 
     public CompositionEvent() {
@@ -30,15 +29,15 @@ public class CompositionEvent {
         return composition;
     }
 
-    public long getPlayPosition() {
-        return playPosition;
+    public long getTrackPosition() {
+        return trackPosition;
     }
 
     @Override
     public String toString() {
         return "CompositionEvent{" +
                 "composition=" + composition +
-                ", playPosition=" + playPosition +
+                ", trackPosition=" + trackPosition +
                 '}';
     }
 

@@ -145,7 +145,7 @@ public class PlayQueueRepositoryImplTest {
                 .test()
                 .assertValue(event -> {
                     assertEquals(fakeComposition(1), event.getComposition());
-                    assertEquals(4L, event.getPlayPosition());
+                    assertEquals(4L, event.getTrackPosition());
                     return true;
                 });
     }
