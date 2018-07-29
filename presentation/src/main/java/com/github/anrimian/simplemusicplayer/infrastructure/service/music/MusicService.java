@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 
 import com.github.anrimian.simplemusicplayer.di.Components;
@@ -84,6 +83,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         super.onCreate();
         Components.getAppComponent().inject(this);
 
+        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
+
         mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
         mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS | FLAG_HANDLES_TRANSPORT_CONTROLS);
 
@@ -96,8 +97,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
-
-        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
 
         subscribeOnPlayerChanges();
     }
@@ -222,9 +221,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void stop() {
-        Log.d("KEK", "stop");
-        notificationsDisplayer.removePlayerNotification();
-        stopForeground(true);
         mediaSession.setActive(false);
         stopSelf();
     }
