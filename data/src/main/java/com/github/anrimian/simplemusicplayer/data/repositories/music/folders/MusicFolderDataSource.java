@@ -5,8 +5,8 @@ import com.github.anrimian.simplemusicplayer.data.utils.FileUtils;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.simplemusicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
@@ -23,7 +23,6 @@ import io.reactivex.Single;
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getParentDirPath;
 import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
-import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static io.reactivex.Observable.fromIterable;
 
 public class MusicFolderDataSource {
@@ -59,10 +58,6 @@ public class MusicFolderDataSource {
             changedNodes.add(toFileSource(changedNode.getData()));
         }
         return changedNodes;
-    }
-
-    private Change<FileSource> toChangeFileSource(Change<NodeData> change) {
-        return new Change<>(change.getChangeType(), toFileSource(change.getData()));
     }
 
     private FileSource toFileSource(NodeData nodeData) {
@@ -195,11 +190,12 @@ public class MusicFolderDataSource {
 
     private void putCompositions(RxNode<String> root, String path, List<Composition> compositions) {
         getNode(root, path, (node, partialPath) ->
-                node.addNodes(mapList(compositions,
-                        newComposition ->
-                                new RxNode<>(partialPath, new CompositionNode(newComposition))
-                ))
+                node.addNodes(mapList(compositions, this::compositionToNode))
         );
+    }
+
+    private RxNode<String> compositionToNode(Composition composition) {
+        return new RxNode<>(getFileName(composition.getFilePath()), new CompositionNode(composition));
     }
 
     private RxNode<String> createMusicFileTree() {

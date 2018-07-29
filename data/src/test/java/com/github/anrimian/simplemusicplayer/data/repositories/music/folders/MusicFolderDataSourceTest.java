@@ -23,6 +23,7 @@ import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.fakeCo
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.ADDED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
@@ -119,21 +120,21 @@ public class MusicFolderDataSourceTest {
         TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
-        Composition compositionTwo = new Composition();
-        compositionTwo.setFilePath("root/music/two.dd");
-        compositionTwo.setId(2L);
-        changeSubject.onNext(new Change<>(ADDED, singletonList(compositionTwo)));
+        Composition compositionTwo = fakeComposition(2L, "root/music/two.dd");
+        Composition compositionThree = fakeComposition(3L, "root/music/three.dd");
+        changeSubject.onNext(new Change<>(ADDED, asList(compositionTwo, compositionThree)));
 
         childrenObserver.assertValueAt(1, list -> {
-            assertEquals(2, list.size());
+            assertEquals(3, list.size());
             assertEquals(compositionOne, ((MusicFileSource) list.get(0)).getComposition());
             assertEquals(compositionTwo, ((MusicFileSource) list.get(1)).getComposition());
+            assertEquals(compositionThree, ((MusicFileSource) list.get(2)).getComposition());
             return true;
         });
 
         selfChangeObserver.assertValue(data -> {
             FolderFileSource folderNode = (FolderFileSource) data;
-            assertEquals(2, folderNode.getFilesCount());
+            assertEquals(3, folderNode.getFilesCount());
             return true;
         });
     }

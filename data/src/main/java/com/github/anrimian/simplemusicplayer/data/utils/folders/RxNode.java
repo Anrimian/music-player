@@ -1,7 +1,5 @@
 package com.github.anrimian.simplemusicplayer.data.utils.folders;
 
-import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,9 +13,6 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
 import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
-import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.DELETED;
-import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
-import static io.reactivex.subjects.PublishSubject.create;
 import static java.util.Collections.singletonList;
 
 public class RxNode<K> {
