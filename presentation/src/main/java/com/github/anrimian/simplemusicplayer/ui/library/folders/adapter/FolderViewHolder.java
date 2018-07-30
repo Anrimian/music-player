@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.library.adapter;
+package com.github.anrimian.simplemusicplayer.ui.library.folders.adapter;
 
 import android.content.Context;
 import android.support.v4.view.ViewCompat;

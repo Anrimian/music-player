@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.di.app.library.storage;
 
-import com.github.anrimian.simplemusicplayer.ui.library.StorageLibraryPresenter;
+import com.github.anrimian.simplemusicplayer.ui.library.folders.StorageLibraryPresenter;
 
 import dagger.Subcomponent;
 

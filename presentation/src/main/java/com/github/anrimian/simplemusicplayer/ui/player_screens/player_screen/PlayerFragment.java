@@ -40,7 +40,7 @@ import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.vie
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
-import com.github.anrimian.simplemusicplayer.ui.library.StorageLibraryFragment;
+import com.github.anrimian.simplemusicplayer.ui.library.folders.StorageLibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegateManager;
@@ -183,6 +183,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         return Components.getLibraryComponent().libraryPresenter();
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -192,7 +198,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setHasOptionsMenu(true);
         ButterKnife.bind(this, view);
 
         RxPermissions rxPermissions = new RxPermissions(getActivity());
@@ -205,6 +210,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setTitle("");//setSupportActionBar() set app title to null title in action bar
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         ActionBar actionBar = activity.getSupportActionBar();
@@ -314,7 +320,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         playQueueLayoutManager = new LinearLayoutManager(getContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
-        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.drawer_fragment_container);
+        Fragment currentFragment = getChildFragmentManager().findFragmentById(R.id.drawer_fragment_container);
         if (currentFragment == null || savedInstanceState == null) {
             showLibraryScreen();
         } else {
@@ -504,7 +510,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void clearFragment() {
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getChildFragmentManager();
         Fragment currentFragment = fm.findFragmentById(R.id.drawer_fragment_container);
         if (currentFragment != null) {
             fm.beginTransaction()

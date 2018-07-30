@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.library;
+package com.github.anrimian.simplemusicplayer.ui.library.folders;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;

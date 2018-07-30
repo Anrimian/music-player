@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.library;
+package com.github.anrimian.simplemusicplayer.ui.library.folders;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
@@ -12,7 +12,6 @@ import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 

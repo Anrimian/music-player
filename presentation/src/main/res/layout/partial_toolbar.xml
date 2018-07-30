@@ -10,5 +10,6 @@
     android:elevation="4dp"
     app:theme="@style/ToolbarStyle"
     app:titleTextColor="?android:attr/textColorPrimaryInverse"
+    app:subtitleTextColor="?android:attr/textColorSecondaryInverse"
     tools:targetApi="lollipop"
     tools:title="ffff"/>

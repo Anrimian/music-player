@@ -31,6 +31,8 @@
     <string name="add_date_order">По дате добавления</string>
     <string name="add_date_desc_order">По дате добавления в обратном направлении</string>
     <string name="order">Сортировка</string>
+    <string name="files">Файлы</string>
+    <string name="compositions">Композиции</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
