@@ -13,7 +13,9 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.observers.TestObserver;
@@ -30,6 +32,7 @@ import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeT
 import static com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.shuffle;
+import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.any;
@@ -330,6 +333,24 @@ public class PlayQueueRepositoryImplTest {
 
         compositionObserver.assertValues(compositionEvent(fakeComposition(0)),
                 compositionEvent(fakeComposition(2)));
+    }
+
+    @Test
+    public void testDeleteChangeWithShuffledPlayQueue() {
+        playQueueRepositoryImpl.setPlayQueue(getFakeCompositions()).subscribe();
+
+        playQueueRepositoryImpl.setRandomPlayingEnabled(true);
+
+        List<Composition> compositions = playQueueRepositoryImpl.getPlayQueueObservable().blockingFirst();
+
+        List<Composition> expectedList = new ArrayList<>(compositions);
+        expectedList.remove(0);
+
+        changeSubject.onNext(new Change<>(DELETED, singletonList(fakeComposition(0))));
+
+        playQueueRepositoryImpl.getPlayQueueObservable()
+                .test()
+                .assertValue(expectedList);
     }
 
     @Test
