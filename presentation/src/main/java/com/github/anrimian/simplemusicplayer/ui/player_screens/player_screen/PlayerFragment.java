@@ -20,7 +20,6 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -41,7 +40,7 @@ import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.vie
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
-import com.github.anrimian.simplemusicplayer.ui.library.folders.StorageLibraryFragment;
+import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.FragmentUtils;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegate;
@@ -66,7 +65,6 @@ import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
-import static com.github.anrimian.simplemusicplayer.ui.utils.fragments.FragmentUtils.startFragment;
 import static com.github.anrimian.simplemusicplayer.utils.AndroidUtils.getColorFromAttr;
 
 /**
@@ -186,7 +184,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @ProvidePresenter
     PlayerPresenter providePresenter() {
-        return Components.getLibraryComponent().libraryPresenter();
+        return Components.getLibraryComponent().playerPresenter();
     }
 
     @Override
@@ -252,7 +250,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 if (itemIdToStart != NO_ITEM) {
                     switch (itemIdToStart) {
                         case R.id.menu_library : {
-                            startFragment(StorageLibraryFragment.newInstance(null));
+                            startFragment(LibraryFoldersFragment.newInstance(null));
                             break;
                         }
                         default: {
@@ -510,7 +508,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void showLibraryScreen() {
         selectedDrawerItemId = R.id.menu_library;
         navigationView.setCheckedItem(selectedDrawerItemId);
-        startFragment(StorageLibraryFragment.newInstance(null));
+        startFragment(LibraryFoldersFragment.newInstance(null));
     }
 
     private void clearFragment() {

@@ -11,7 +11,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
+import static com.github.anrimian.simplemusicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static java.util.Collections.singletonList;
 

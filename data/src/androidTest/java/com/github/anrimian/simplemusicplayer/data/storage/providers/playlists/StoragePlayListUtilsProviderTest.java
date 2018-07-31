@@ -23,7 +23,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
-public class StoragePlayListsProviderTest {
+public class StoragePlayListUtilsProviderTest {
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE);

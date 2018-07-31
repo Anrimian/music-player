@@ -1,7 +1,9 @@
 package com.github.anrimian.simplemusicplayer.di.app.library;
 
-import com.github.anrimian.simplemusicplayer.di.app.library.storage.StorageLibraryComponent;
-import com.github.anrimian.simplemusicplayer.di.app.library.storage.StorageLibraryModule;
+import com.github.anrimian.simplemusicplayer.di.app.library.compositions.LibraryCompositionsComponent;
+import com.github.anrimian.simplemusicplayer.di.app.library.compositions.LibraryCompositionsModule;
+import com.github.anrimian.simplemusicplayer.di.app.library.files.LibraryFilesComponent;
+import com.github.anrimian.simplemusicplayer.di.app.library.files.LibraryFilesModule;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerPresenter;
 
 import dagger.Subcomponent;
@@ -14,7 +16,8 @@ import dagger.Subcomponent;
 @Subcomponent(modules = LibraryModule.class)
 public interface LibraryComponent {
 
-    StorageLibraryComponent storageLibraryComponent(StorageLibraryModule storageLibraryModule);
+    LibraryFilesComponent libraryFilesComponent(LibraryFilesModule module);
+    LibraryCompositionsComponent libraryCompositionsComponent(LibraryCompositionsModule module);
 
-    PlayerPresenter libraryPresenter();
+    PlayerPresenter playerPresenter();
 }

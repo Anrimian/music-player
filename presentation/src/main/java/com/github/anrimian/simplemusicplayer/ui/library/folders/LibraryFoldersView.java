@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
  * Created on 23.10.2017.
  */
 
-interface StorageLibraryView extends MvpView {
+public interface LibraryFoldersView extends MvpView {
 
     String LIST_STATE = "list_state";
     String BACK_PATH_BUTTON_STATE = "back_path_button_state";
@@ -46,9 +46,6 @@ interface StorageLibraryView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goBackToMusicStorageScreen(String targetPath);
-
-    @StateStrategyType(OneExecutionStateStrategy.class)
-    void notifyItemsLoaded(int start, int size);
 
     @StateStrategyType(SkipStrategy.class)
     void updateList(List<FileSource> oldList, List<FileSource> sourceList);

@@ -2,7 +2,7 @@ package com.github.anrimian.simplemusicplayer.ui.library.folders;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
-import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
@@ -26,9 +26,9 @@ import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.dispos
  */
 
 @InjectViewState
-public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
+public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
-    private final StorageLibraryInteractor interactor;
+    private final LibraryFilesInteractor interactor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
@@ -42,8 +42,8 @@ public class StorageLibraryPresenter extends MvpPresenter<StorageLibraryView> {
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable filesDisposable;
 
-    public StorageLibraryPresenter(@Nullable String path,
-                                   StorageLibraryInteractor interactor,
+    public LibraryFoldersPresenter(@Nullable String path,
+                                   LibraryFilesInteractor interactor,
                                    ErrorParser errorParser,
                                    Scheduler uiScheduler) {
         this.path = path;

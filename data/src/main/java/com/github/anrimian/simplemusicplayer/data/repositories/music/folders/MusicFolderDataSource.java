@@ -22,7 +22,7 @@ import io.reactivex.Single;
 
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getParentDirPath;
-import static com.github.anrimian.simplemusicplayer.data.utils.Lists.mapList;
+import static com.github.anrimian.simplemusicplayer.domain.utils.ListUtils.mapList;
 import static io.reactivex.Observable.fromIterable;
 
 public class MusicFolderDataSource {

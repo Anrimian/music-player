@@ -24,19 +24,21 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import static com.github.anrimian.simplemusicplayer.domain.utils.ListUtils.asList;
+
 /**
  * Created on 24.10.2017.
  */
 
-public class StorageLibraryInteractor {
+public class LibraryFilesInteractor {
 
     private final MusicProviderRepository musicProviderRepository;
     private final MusicPlayerInteractor musicPlayerInteractor;
     private final SettingsRepository settingsRepository;
 
-    public StorageLibraryInteractor(MusicProviderRepository musicProviderRepository,
-                                    MusicPlayerInteractor musicPlayerInteractor,
-                                    SettingsRepository settingsRepository) {
+    public LibraryFilesInteractor(MusicProviderRepository musicProviderRepository,
+                                  MusicPlayerInteractor musicPlayerInteractor,
+                                  SettingsRepository settingsRepository) {
         this.musicProviderRepository = musicProviderRepository;
         this.musicPlayerInteractor = musicPlayerInteractor;
         this.settingsRepository = settingsRepository;
@@ -52,9 +54,7 @@ public class StorageLibraryInteractor {
     }
 
     public Completable playMusic(Composition composition) {
-        List<Composition> list = new ArrayList<>();
-        list.add(composition);
-        return musicPlayerInteractor.startPlaying(list);
+        return musicPlayerInteractor.startPlaying(asList(composition));
     }
 
     public Completable deleteComposition(Composition composition) {

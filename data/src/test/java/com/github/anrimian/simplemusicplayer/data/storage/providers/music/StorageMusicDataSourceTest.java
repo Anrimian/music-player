@@ -1,8 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.storage.providers.music;
 
 import com.github.anrimian.simplemusicplayer.data.storage.files.FileManager;
-import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicDataSource;
-import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.Change;
 import com.github.anrimian.simplemusicplayer.domain.utils.changes.ChangeType;
@@ -132,6 +130,7 @@ public class StorageMusicDataSourceTest {
     @Test
     public void deleteCompositionTest() {
         TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        TestObserver<Map<Long, Composition>> compositionObserver = storageMusicDataSource.getCompositions().test();
 
         storageMusicDataSource.deleteComposition(getFakeCompositionsMap().get(0L))
             .test()
@@ -143,9 +142,7 @@ public class StorageMusicDataSourceTest {
             return true;
         });
 
-        storageMusicDataSource.getCompositions()
-                .test()
-                .assertValue(compositions -> {
+        compositionObserver.assertValue(compositions -> {
                     assertEquals(null, compositions.get(0L));
                     return true;
                 });

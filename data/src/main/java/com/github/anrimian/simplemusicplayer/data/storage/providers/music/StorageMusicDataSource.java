@@ -83,6 +83,7 @@ public class StorageMusicDataSource {
                     musicProvider.deleteComposition(composition.getFilePath());
                     fileManager.deleteFile(composition.getFilePath());
                     compositions.remove(composition.getId());
+                    compositionSubject.onNext(compositions);
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
                 })
                 .toCompletable()

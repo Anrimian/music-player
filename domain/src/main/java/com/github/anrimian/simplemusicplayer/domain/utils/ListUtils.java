@@ -1,9 +1,15 @@
-package com.github.anrimian.simplemusicplayer.data.utils;
+package com.github.anrimian.simplemusicplayer.domain.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lists {
+public class ListUtils {
+
+    public static <T> List<T> asList(T object) {
+        List<T> list = new ArrayList<>();
+        list.add(object);
+        return list;
+    }
 
     public static <T, E> List<E> mapList(List<T> from, List<E> to, MapperFunction<T, E> mapper) {
         for (T t: from) {

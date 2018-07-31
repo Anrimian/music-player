@@ -1,6 +1,6 @@
 package com.github.anrimian.simplemusicplayer.di.app.library;
 
-import com.github.anrimian.simplemusicplayer.domain.business.library.StorageLibraryInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
@@ -23,18 +23,7 @@ public class LibraryModule {
 
     @Provides
     @Nonnull
-    @LibraryScope
-    StorageLibraryInteractor provideStorageLibraryInteractor(MusicProviderRepository musicProviderRepository,
-                                                             MusicPlayerInteractor musicPlayerInteractor,
-                                                             SettingsRepository settingsRepository) {
-        return new StorageLibraryInteractor(musicProviderRepository,
-                musicPlayerInteractor,
-                settingsRepository);
-    }
-
-    @Provides
-    @Nonnull
-    PlayerPresenter provideLibraryPresenter(MusicPlayerInteractor musicPlayerInteractor,
+    PlayerPresenter playerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new PlayerPresenter(musicPlayerInteractor, uiScheduler);
     }

@@ -7,6 +7,7 @@ import com.github.anrimian.simplemusicplayer.data.utils.preferences.SharedPrefer
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 
 import static com.github.anrimian.simplemusicplayer.domain.models.composition.Order.ADD_TIME;
+import static com.github.anrimian.simplemusicplayer.domain.models.composition.Order.ADD_TIME_DESC;
 import static com.github.anrimian.simplemusicplayer.domain.models.composition.Order.valueOf;
 
 /**
@@ -45,7 +46,7 @@ public class SettingsPreferences {
     }
 
     public Order getFolderOrder() {
-        return Order.fromId(preferences.getInt(FOLDER_ORDER, ADD_TIME.getId()));
+        return Order.fromId(preferences.getInt(FOLDER_ORDER, ADD_TIME_DESC.getId()));
     }
 
     public void setFolderOrder(Order order) {
@@ -53,7 +54,7 @@ public class SettingsPreferences {
     }
 
     public Order getCompositionsOrder() {
-        return Order.fromId(preferences.getInt(COMPOSITIONS_ORDER, ADD_TIME.getId()));
+        return Order.fromId(preferences.getInt(COMPOSITIONS_ORDER, ADD_TIME_DESC.getId()));
     }
 
     public void setCompositionsOrder(Order order) {

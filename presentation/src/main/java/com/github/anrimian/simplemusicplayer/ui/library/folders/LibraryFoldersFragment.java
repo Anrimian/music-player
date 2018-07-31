@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
@@ -46,10 +44,10 @@ import static com.github.anrimian.simplemusicplayer.constants.Arguments.PATH;
  * Created on 23.10.2017.
  */
 
-public class StorageLibraryFragment extends LibraryFragment implements StorageLibraryView, BackButtonListener {
+public class LibraryFoldersFragment extends LibraryFragment implements LibraryFoldersView, BackButtonListener {
 
     @InjectPresenter
-    StorageLibraryPresenter presenter;
+    LibraryFoldersPresenter presenter;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -64,10 +62,10 @@ public class StorageLibraryFragment extends LibraryFragment implements StorageLi
     private MusicFileSourceAdapter adapter;
     private HeaderViewWrapper headerViewWrapper;
 
-    public static StorageLibraryFragment newInstance(@Nullable String path) {
+    public static LibraryFoldersFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
         args.putString(PATH, path);
-        StorageLibraryFragment fragment = new StorageLibraryFragment();
+        LibraryFoldersFragment fragment = new LibraryFoldersFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,8 +76,8 @@ public class StorageLibraryFragment extends LibraryFragment implements StorageLi
     }
 
     @ProvidePresenter
-    StorageLibraryPresenter providePresenter() {
-        return Components.getStorageLibraryComponent(getPath()).storageLibraryPresenter();
+    LibraryFoldersPresenter providePresenter() {
+        return Components.getLibraryFilesComponent(getPath()).storageLibraryPresenter();
     }
 
     @Override
@@ -170,11 +168,6 @@ public class StorageLibraryFragment extends LibraryFragment implements StorageLi
     }
 
     @Override
-    public void notifyItemsLoaded(int start, int size) {
-        adapter.notifyItemRangeInserted(++start, size);
-    }
-
-    @Override
     public void showList() {
         fab.setVisibility(View.VISIBLE);
         progressViewWrapper.hideAll();
@@ -201,7 +194,7 @@ public class StorageLibraryFragment extends LibraryFragment implements StorageLi
         } else {
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                    .replace(R.id.drawer_fragment_container, StorageLibraryFragment.newInstance(path))
+                    .replace(R.id.drawer_fragment_container, LibraryFoldersFragment.newInstance(path))
                     .commit();
         }
     }
@@ -228,7 +221,7 @@ public class StorageLibraryFragment extends LibraryFragment implements StorageLi
     }
 
     private void goToMusicStorageScreen(String path, View... sharedViews) {
-        StorageLibraryFragment fragment = StorageLibraryFragment.newInstance(path);
+        LibraryFoldersFragment fragment = LibraryFoldersFragment.newInstance(path);
         headerViewWrapper.clearTransitionInfo();
         Transition transition = new Slide();
         transition.setDuration(1000);

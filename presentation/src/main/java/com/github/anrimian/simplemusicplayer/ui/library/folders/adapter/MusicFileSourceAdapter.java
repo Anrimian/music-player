@@ -56,8 +56,8 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (type) {
             case TYPE_MUSIC: {
-                View view = inflater.inflate(R.layout.item_storage_music, parent, false);
-                return new MusicViewHolder(view,
+                return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
+                        parent,
                         onCompositionClickListener,
                         onDeleteCompositionClickListener);
             }
