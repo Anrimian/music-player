@@ -65,7 +65,7 @@
         android:lines="2"
         app:layout_constraintBottom_toBottomOf="@+id/top_panel"
         app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
-        app:layout_constraintLeft_toRightOf="@id/music_icon_wrapper"
+        app:layout_constraintStart_toEndOf="@id/music_icon_wrapper"
         app:layout_constraintTop_toTopOf="@+id/top_panel"
         tools:text="testtesttststststtst" />
 

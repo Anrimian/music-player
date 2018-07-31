@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_compositions"
+        android:title="@string/compositions"/>
+    <item android:id="@+id/menu_files"
+        android:title="@string/files"/>
+</menu>

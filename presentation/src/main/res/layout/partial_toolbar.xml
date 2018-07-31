@@ -1,15 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+<com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="?attr/actionBarSize"
     android:minHeight="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
     android:elevation="4dp"
     app:theme="@style/ToolbarStyle"
     app:titleTextColor="?android:attr/textColorPrimaryInverse"
     app:subtitleTextColor="?android:attr/textColorSecondaryInverse"
-    tools:targetApi="lollipop"
-    tools:title="ffff"/>
+    tools:targetApi="lollipop">
+    <!--tools:title="ffff"-->
+    <!--tools:subtitle="dd">-->
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/title_container"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="?selectableItemBackgroundBorderless">
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+            android:textColor="?android:attr/textColorPrimaryInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/tv_subtitle"
+            tools:text="fflafff"/>
+
+        <TextView
+            android:id="@+id/tv_subtitle"
+            style="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle"
+            android:textColor="?android:attr/textColorSecondaryInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tv_title"
+            app:layout_constraintLeft_toLeftOf="@id/tv_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="dd"/>
+
+        <android.support.constraint.Barrier
+            android:id="@+id/titles_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="right"
+            app:constraint_referenced_ids="tv_title, tv_subtitle"/>
+
+        <View
+            android:id="@+id/action_icon"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/ic_triangle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/titles_barrier"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.6" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar>

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 
 /**
  * Created on 19.10.2017.
@@ -29,8 +30,9 @@ public class SettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.settings);
         toolbar.setSubtitle(null);
+        toolbar.setTitleClickListener(null);
     }
 }

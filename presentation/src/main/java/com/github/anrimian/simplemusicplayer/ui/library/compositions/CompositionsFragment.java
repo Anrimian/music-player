@@ -10,10 +10,11 @@ import android.view.ViewGroup;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.github.anrimian.simplemusicplayer.R;
+import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
 
 import butterknife.ButterKnife;
 
-public class CompositionsFragment extends MvpAppCompatFragment {
+public class CompositionsFragment extends LibraryFragment {
 
     @Nullable
     @Override

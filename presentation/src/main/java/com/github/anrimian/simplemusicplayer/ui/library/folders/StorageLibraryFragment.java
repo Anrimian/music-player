@@ -27,6 +27,8 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
+import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
@@ -44,7 +46,7 @@ import static com.github.anrimian.simplemusicplayer.constants.Arguments.PATH;
  * Created on 23.10.2017.
  */
 
-public class StorageLibraryFragment extends MvpAppCompatFragment implements StorageLibraryView, BackButtonListener {
+public class StorageLibraryFragment extends LibraryFragment implements StorageLibraryView, BackButtonListener {
 
     @InjectPresenter
     StorageLibraryPresenter presenter;
@@ -98,8 +100,7 @@ public class StorageLibraryFragment extends MvpAppCompatFragment implements Stor
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.library);
+        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.files);
 
         progressViewWrapper = new ProgressViewWrapper(view);

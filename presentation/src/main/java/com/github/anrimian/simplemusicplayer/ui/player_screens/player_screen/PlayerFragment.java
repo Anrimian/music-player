@@ -36,12 +36,14 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.StorageLibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.simplemusicplayer.ui.utils.fragments.FragmentUtils;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegateManager;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BoundValuesDelegate;
@@ -64,6 +66,7 @@ import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.simplemusicplayer.ui.utils.fragments.FragmentUtils.startFragment;
 import static com.github.anrimian.simplemusicplayer.utils.AndroidUtils.getColorFromAttr;
 
 /**
@@ -158,6 +161,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.tv_current_composition_author)
     TextView tvCurrentCompositionAuthor;
 
+    @BindView(R.id.play_queue_toolbar)
+    AdvancedToolbar advancedToolbar;
+
 //    @BindView(R.id.play_actions_top_shadow)
 //    View playActionsTopShadow;
 
@@ -209,7 +215,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return;
         }
 
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        AdvancedToolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.init();
         toolbar.setTitle("");//setSupportActionBar() set app title to null title in action bar
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
@@ -220,6 +227,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
+
+        advancedToolbar.init();
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
@@ -493,14 +502,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void startFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getChildFragmentManager();
-        Fragment existFragment = fragmentManager.findFragmentById(R.id.drawer_fragment_container);
-        if (existFragment == null || existFragment.getClass() != fragment.getClass()) {
-            fragmentManager.beginTransaction()
-                    .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                    .replace(R.id.drawer_fragment_container, fragment)
-                    .commit();
-        }
+        FragmentUtils.startFragment(fragment,
+                getChildFragmentManager(),
+                R.id.drawer_fragment_container);
     }
 
     private void showLibraryScreen() {
