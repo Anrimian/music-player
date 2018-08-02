@@ -1,10 +1,10 @@
-package com.github.anrimian.simplemusicplayer.domain.models.playlist;
+package com.github.anrimian.simplemusicplayer.data.models;
 
 import java.util.Date;
 
 import javax.annotation.Nonnull;
 
-public class PlayList {
+public class StoragePlayList {
 
     private long id;
 
@@ -17,30 +17,14 @@ public class PlayList {
     @Nonnull
     private Date dateModified;
 
-    private int compositionsCount;
-
-    private long totalDuration;
-
-    public PlayList(long id,
-                    @Nonnull String name,
-                    @Nonnull Date dateAdded,
-                    @Nonnull Date dateModified,
-                    int compositionsCount,
-                    long totalDuration) {
+    public StoragePlayList(long id,
+                           @Nonnull String name,
+                           @Nonnull Date dateAdded,
+                           @Nonnull Date dateModified) {
         this.id = id;
         this.name = name;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.compositionsCount = compositionsCount;
-        this.totalDuration = totalDuration;
-    }
-
-    public int getCompositionsCount() {
-        return compositionsCount;
-    }
-
-    public long getTotalDuration() {
-        return totalDuration;
     }
 
     public long getId() {
@@ -67,7 +51,7 @@ public class PlayList {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PlayList playList = (PlayList) o;
+        StoragePlayList playList = (StoragePlayList) o;
 
         return id == playList.id;
     }

@@ -4,6 +4,8 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.domain.utils.Objects;
 
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 public class CompositionHelper {
@@ -21,6 +23,14 @@ public class CompositionHelper {
                 || !Objects.equals(first.getTitle(), second.getTitle())
                 || !Objects.equals(first.getYear(), second.getYear())
                 || first.isCorrupted() != second.isCorrupted();
+    }
+
+    public static int getTotalDuration(List<Composition> compositions) {
+        int totalDuration = 0;
+        for (Composition composition: compositions) {
+            totalDuration += composition.getDuration();
+        }
+        return totalDuration;
     }
 
 }

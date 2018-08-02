@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore.Audio.Playlists;
 
+import com.github.anrimian.simplemusicplayer.data.models.StoragePlayList;
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.CompositionNotDeletedException;
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.CompositionNotMovedException;
 import com.github.anrimian.simplemusicplayer.data.models.exceptions.PlayListNotCreatedException;
@@ -34,19 +35,17 @@ import static java.util.Collections.emptyList;
 public class StoragePlayListsProvider {
 
     private final ContentResolver contentResolver;
-    private final StorageMusicProvider storageMusicProvider;
 
-    public StoragePlayListsProvider(Context context, StorageMusicProvider storageMusicProvider) {
+    public StoragePlayListsProvider(Context context) {
         contentResolver = context.getContentResolver();
-        this.storageMusicProvider = storageMusicProvider;
     }
 
-    public Observable<List<PlayList>> getChangeObservable() {
+    public Observable<List<StoragePlayList>> getChangeObservable() {
         return RxContentObserver.getObservable(contentResolver, Playlists.EXTERNAL_CONTENT_URI)
                 .map(o -> getPlayLists());
     }
 
-    public List<PlayList> getPlayLists() {
+    public List<StoragePlayList> getPlayLists() {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -59,24 +58,13 @@ public class StoragePlayListsProvider {
                 return emptyList();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-//            Map<Long, Composition> compositions = new HashMap<>(cursor.getCount());
 
-            List<PlayList> playLists = new ArrayList<>();
+            List<StoragePlayList> playLists = new ArrayList<>();
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
                 playLists.add(getPlayListFromCursor(cursorWrapper));
             }
             return playLists;
-//            for (long id : ids) {
-//
-//                //        MediaStore.Audio.Playlists.Members.AUDIO_ID //look at this
-//                Map<Long, Composition> compositions = storageMusicProvider.getCompositions(id);
-//                Log.d("KEK", "playlist: " + id);
-//                for (Composition composition: compositions.values()) {
-//                    Log.d("KEK", "composition: " + composition);
-//                }
-//            }
-
         } finally {
             IOUtils.closeSilently(cursor);
         }
@@ -226,13 +214,13 @@ public class StoragePlayListsProvider {
         }
     }
 
-    private PlayList getPlayListFromCursor(CursorWrapper cursorWrapper) {
+    private StoragePlayList getPlayListFromCursor(CursorWrapper cursorWrapper) {
         long id = cursorWrapper.getLong(Playlists._ID);
         String name = cursorWrapper.getString(Playlists.NAME);
         long dateAdded = cursorWrapper.getLong(Playlists.DATE_ADDED);
         long dateModified = cursorWrapper.getLong(Playlists.DATE_MODIFIED);
 
-        return new PlayList(id,
+        return new StoragePlayList(id,
                 requireNonNull(name),
                 new Date(dateAdded * 1000L),
                 new Date(dateModified * 1000L));

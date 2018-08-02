@@ -6,6 +6,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 import android.util.Log;
 
+import com.github.anrimian.simplemusicplayer.data.models.StoragePlayList;
 import com.github.anrimian.simplemusicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.simplemusicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
@@ -33,24 +34,23 @@ public class StoragePlayListUtilsProviderTest {
     @Before
     public void setUp() {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        storagePlayListsProvider = new StoragePlayListsProvider(appContext,
-                new StorageMusicProvider(appContext));
+        storagePlayListsProvider = new StoragePlayListsProvider(appContext);
     }
 
     @Test
     public void getPlayLists() {
-        List<PlayList> playLists = storagePlayListsProvider.getPlayLists();
+        List<StoragePlayList> playLists = storagePlayListsProvider.getPlayLists();
         assertNotNull(playLists);
     }
 
     @Test
     public void createAndDeletePlayListTest() {
-        TestObserver<List<PlayList>> playListsObserver = storagePlayListsProvider.getChangeObservable()
+        TestObserver<List<StoragePlayList>> playListsObserver = storagePlayListsProvider.getChangeObservable()
                 .test();
 
         storagePlayListsProvider.createPlayList("test playlist9");
 
-        for (PlayList playList: storagePlayListsProvider.getPlayLists()) {
+        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
             if (playList.getName().equals("test playlist9")) {
                 storagePlayListsProvider.deletePlayList(playList.getId());
             }
@@ -66,7 +66,7 @@ public class StoragePlayListUtilsProviderTest {
 
         storagePlayListsProvider.createPlayList("test playlist6");
 
-        PlayList playList = getPlayList("test playlist6");
+        StoragePlayList playList = getPlayList("test playlist6");
         try {
             storagePlayListsProvider.addCompositionInPlayList(composition.getId(),
                     playList.getId(),
@@ -93,7 +93,7 @@ public class StoragePlayListUtilsProviderTest {
 
         storagePlayListsProvider.createPlayList("test playlist7");
 
-        PlayList playList = getPlayList("test playlist7");
+        StoragePlayList playList = getPlayList("test playlist7");
 
         try {
             storagePlayListsProvider.addCompositionInPlayList(compositionOne.getId(),
@@ -124,8 +124,8 @@ public class StoragePlayListUtilsProviderTest {
         }
     }
 
-    private PlayList getPlayList(String name) {
-        for (PlayList playList: storagePlayListsProvider.getPlayLists()) {
+    private StoragePlayList getPlayList(String name) {
+        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
             if (playList.getName().equals(name)) {
                 return playList;
             }
@@ -134,7 +134,7 @@ public class StoragePlayListUtilsProviderTest {
     }
 
     private Composition findComposition(int index) {
-        for (PlayList playList: storagePlayListsProvider.getPlayLists()) {
+        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
             List<Composition> compositions = storagePlayListsProvider.getCompositions(playList.getId());
 
             if (index < compositions.size()) {
