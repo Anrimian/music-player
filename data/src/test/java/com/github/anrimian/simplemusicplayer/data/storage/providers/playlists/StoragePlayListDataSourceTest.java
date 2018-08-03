@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.data.storage.providers.playlists;
 import com.github.anrimian.simplemusicplayer.data.models.StoragePlayList;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.simplemusicplayer.domain.utils.ListUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,12 +11,13 @@ import org.junit.Test;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.fakeComposition;
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositions;
-import static com.github.anrimian.simplemusicplayer.domain.utils.ListUtils.asList;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -36,7 +38,7 @@ public class StoragePlayListDataSourceTest {
 
     @Before
     public void setUp() {
-        when(storagePlayListsProvider.getPlayLists()).thenReturn(asList(getTestPlayList()));
+        when(storagePlayListsProvider.getPlayLists()).thenReturn(ListUtils.asList(getTestPlayList()));
         when(storagePlayListsProvider.getCompositions(eq(1L))).thenReturn(getFakeCompositions());
         when(storagePlayListsProvider.getChangeObservable()).thenReturn(playListSubject);
         when(storagePlayListsProvider.getPlayListChangeObservable(anyLong())).thenReturn(compositionSubject);
@@ -55,7 +57,7 @@ public class StoragePlayListDataSourceTest {
             return true;
         });
 
-        playListSubject.onNext(asList(new StoragePlayList(1L, "test2", new Date(), new Date())));
+        playListSubject.onNext(ListUtils.asList(new StoragePlayList(1L, "test2", new Date(), new Date())));
 
         testObserver.assertValueAt(1, list -> {
             PlayList playList = list.get(0);
@@ -65,7 +67,7 @@ public class StoragePlayListDataSourceTest {
             return true;
         });
 
-        compositionSubject.onNext(asList(fakeComposition(0)));
+        compositionSubject.onNext(ListUtils.asList(fakeComposition(0)));
 
         testObserver.assertValueAt(2, list -> {
             PlayList playList = list.get(0);
@@ -74,6 +76,40 @@ public class StoragePlayListDataSourceTest {
             assertEquals(1, playList.getCompositionsCount());
             return true;
         });
+    }
+
+    @Test
+    public void testNewPlayListsAdded() {
+        TestObserver<List<PlayList>> testObserver = storagePlayListDataSource
+                .getPlayListsObservable()
+                .test();
+
+        List<StoragePlayList> newList = asList(
+                new StoragePlayList(1L, "test2", new Date(), new Date()),
+                new StoragePlayList(2L, "test3", new Date(), new Date())
+        );
+
+        playListSubject.onNext(newList);
+
+        Predicate<List<PlayList>> updatedListPredicate = list -> {
+            assertEquals(2, list.size());
+
+            PlayList playListOne = list.get(0);
+            assertEquals(1L, playListOne.getId());
+            assertEquals("test2", playListOne.getName());
+
+            PlayList playListTwo = list.get(1);
+            assertEquals(2L, playListTwo.getId());
+            assertEquals("test3", playListTwo.getName());
+            return true;
+        };
+
+        testObserver.assertValueAt(1, updatedListPredicate);
+
+        storagePlayListDataSource
+                .getPlayListsObservable()
+                .test()
+                .assertValue(updatedListPredicate);
     }
 
     private StoragePlayList getTestPlayList() {
