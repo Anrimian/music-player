@@ -20,11 +20,10 @@ public class StoragePlayListDataSource {
 
     private final StoragePlayListsProvider storagePlayListsProvider;
 
-    private PublishSubject<List<PlayList>> playListsSubject = PublishSubject.create();
-    private List<PlayList> playLists;
+    private final PublishSubject<List<PlayList>> playListsSubject = PublishSubject.create();
 
-    //TODO need clear
-    private Map<Long, PlayListChangeSubscription> playListSubscriptions = new HashMap<>();
+    private List<PlayList> playLists;
+    private List<PlayListChangeSubscription> playListSubscriptions = new ArrayList<>();
 
     public StoragePlayListDataSource(StoragePlayListsProvider storagePlayListsProvider) {
         this.storagePlayListsProvider = storagePlayListsProvider;
@@ -34,12 +33,13 @@ public class StoragePlayListDataSource {
         return storagePlayListsProvider.getChangeObservable()
                 .flatMapSingle(this::toPlayLists)
                 .startWith(getStartPlayLists().toObservable())
-                .doOnNext(playLists -> this.playLists = playLists)
+                .doOnNext(this::subscribeOnPlayListsContentChanging)
                 .mergeWith(playListsSubject);
     }
 
     public Observable<List<Composition>> getCompositionsObservable(long playlistId) {
-        return Observable.never();
+        return storagePlayListsProvider.getPlayListChangeObservable(playlistId)
+                .startWith(storagePlayListsProvider.getCompositions(playlistId));
     }
 
     private Single<List<PlayList>> getStartPlayLists() {
@@ -61,34 +61,23 @@ public class StoragePlayListDataSource {
         List<Composition> compositions = storagePlayListsProvider.getCompositions(
                 storagePlayList.getId());
 
-        long playListId = storagePlayList.getId();
-
-        PlayList playList = new PlayList(storagePlayList.getId(),
+        return new PlayList(storagePlayList.getId(),
                 storagePlayList.getName(),
                 storagePlayList.getDateAdded(),
                 storagePlayList.getDateModified(),
                 compositions.size(),
                 getTotalDuration(compositions));
-
-        PlayListChangeSubscription subscription = playListSubscriptions.get(playListId);
-        if (subscription == null) {
-            subscription = new PlayListChangeSubscription(playList);
-            playListSubscriptions.put(playListId, subscription);
-        } else {
-            updatePlayList(playList);
-            subscription.setPlayList(playList);
-        }
-
-        return playList;
     }
 
-    private void updatePlayList(PlayList newPlayList) {
-        for (int i = 0; i < playLists.size(); i++) {
-            PlayList playList = playLists.get(i);
-            if (newPlayList.equals(playList)) {
-                playLists.set(i, newPlayList);
-                return;
-            }
+    private void subscribeOnPlayListsContentChanging(List<PlayList> playLists) {
+        for (PlayListChangeSubscription subscription: playListSubscriptions) {
+            subscription.clear();
+        }
+        playListSubscriptions.clear();
+
+        this.playLists = playLists;
+        for (PlayList playList: playLists) {
+            playListSubscriptions.add(new PlayListChangeSubscription(playList));
         }
     }
 
@@ -96,7 +85,7 @@ public class StoragePlayListDataSource {
         private final Disposable disposable;
         private PlayList playList;
 
-        public PlayListChangeSubscription(PlayList playList) {
+        PlayListChangeSubscription(PlayList playList) {
             this.playList = playList;
 
             disposable = storagePlayListsProvider.getPlayListChangeObservable(playList.getId())
@@ -122,10 +111,6 @@ public class StoragePlayListDataSource {
                     return;
                 }
             }
-        }
-
-        public void setPlayList(PlayList playList) {
-            this.playList = playList;
         }
     }
 }

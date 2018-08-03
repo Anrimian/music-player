@@ -112,6 +112,19 @@ public class StoragePlayListDataSourceTest {
                 .assertValue(updatedListPredicate);
     }
 
+    @Test
+    public void getCompositionsObservableTest() {
+        TestObserver<List<Composition>> testObserver = storagePlayListDataSource
+                .getCompositionsObservable(1L)
+                .test();
+
+        testObserver.assertValue(getFakeCompositions());
+
+        compositionSubject.onNext(ListUtils.asList(fakeComposition(0)));
+
+        testObserver.assertValueAt(1, ListUtils.asList(fakeComposition(0)));
+    }
+
     private StoragePlayList getTestPlayList() {
         return new StoragePlayList(1L, "test", new Date(), new Date());
     }
