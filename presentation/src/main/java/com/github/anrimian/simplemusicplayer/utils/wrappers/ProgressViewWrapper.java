@@ -68,7 +68,7 @@ public class ProgressViewWrapper {
     }
 
     public void showMessage(String message, @DrawableRes int imageRes, boolean showTryAgainButton) {
-        progressBar.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.GONE);
         tvMessage.setVisibility(View.VISIBLE);
         if (message != null) {
             tvMessage.setText(message);
@@ -89,8 +89,8 @@ public class ProgressViewWrapper {
     public void showProgress() {
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
-        tvMessage.setVisibility(View.INVISIBLE);
-        btnTryAgain.setVisibility(View.INVISIBLE);
+        tvMessage.setVisibility(View.GONE);
+        btnTryAgain.setVisibility(View.GONE);
         ivEmpty.setVisibility(View.GONE);
     }
 }

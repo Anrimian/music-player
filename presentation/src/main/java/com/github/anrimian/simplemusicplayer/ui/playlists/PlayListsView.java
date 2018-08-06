@@ -1,18 +1,16 @@
-package com.github.anrimian.simplemusicplayer.ui.library.compositions;
+package com.github.anrimian.simplemusicplayer.ui.playlists;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
 
-public interface LibraryCompositionsView extends MvpView {
+public interface PlayListsView extends MvpView {
 
     String LIST_STATE = "list_state";
 
@@ -26,11 +24,8 @@ public interface LibraryCompositionsView extends MvpView {
     void showLoading();
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void bindList(List<Composition> compositions);
+    void bindList(List<PlayList> playLists);
 
     @StateStrategyType(SkipStrategy.class)
-    void updateList(List<Composition> oldList, List<Composition> newList);
-
-    @StateStrategyType(OneExecutionStateStrategy.class)
-    void showSelectOrderScreen(Order folderOrder);
+    void updateList(List<PlayList> oldList, List<PlayList> newList);
 }

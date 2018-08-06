@@ -38,6 +38,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
+import com.github.anrimian.simplemusicplayer.ui.playlists.PlayListsFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersFragment;
@@ -81,8 +82,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     static {
         fragmentIdMap.put(R.id.menu_settings, SettingsFragment::new);
+        fragmentIdMap.put(R.id.menu_play_lists, PlayListsFragment::new);
     }
-
 
     @InjectPresenter
     PlayerPresenter presenter;

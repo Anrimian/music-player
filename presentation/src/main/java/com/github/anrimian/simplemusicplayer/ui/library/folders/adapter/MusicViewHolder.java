@@ -58,6 +58,17 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
         this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
     }
 
+    public void bind(@Nonnull Composition composition) {
+        this.composition = composition;
+        tvMusicName.setText(formatCompositionName(composition));
+        showAdditionalInfo();
+
+        int textColorAttr = composition.isCorrupted()? android.R.attr.textColorSecondary:
+                android.R.attr.textColorPrimary;
+
+        tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
+    }
+
     private void onActionsMenuButtonClicked(View view) {
         PopupMenu popup = new PopupMenu(getContext(), view);
         popup.inflate(R.menu.composition_in_folder_actions_menu);
@@ -75,17 +86,6 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
             return false;
         });
         popup.show();
-    }
-
-    public void bind(@Nonnull Composition composition) {
-        this.composition = composition;
-        tvMusicName.setText(formatCompositionName(composition));
-        showAdditionalInfo();
-
-        int textColorAttr = composition.isCorrupted()? android.R.attr.textColorSecondary:
-                android.R.attr.textColorPrimary;
-
-        tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
     }
 
     private void showAdditionalInfo() {

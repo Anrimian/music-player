@@ -33,6 +33,8 @@
     <string name="order">Сортировка</string>
     <string name="files">Файлы</string>
     <string name="compositions">Композиции</string>
+    <string name="play_lists">Плейлисты</string>
+    <string name="play_lists_on_device_not_found">Плейлистов на устойстве не найдено</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
