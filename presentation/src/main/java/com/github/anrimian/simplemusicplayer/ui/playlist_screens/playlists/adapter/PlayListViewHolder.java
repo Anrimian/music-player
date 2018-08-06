@@ -1,9 +1,8 @@
-package com.github.anrimian.simplemusicplayer.ui.playlists.adapter;
+package com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -13,7 +12,6 @@ import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 
 public class PlayListViewHolder extends RecyclerView.ViewHolder {

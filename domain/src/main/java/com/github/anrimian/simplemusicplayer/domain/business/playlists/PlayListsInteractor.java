@@ -6,6 +6,7 @@ import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListsReposi
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class PlayListsInteractor {
@@ -22,5 +23,9 @@ public class PlayListsInteractor {
 
     public Observable<List<Composition>> getCompositionsObservable(long playlistId) {
         return playListsRepository.getCompositionsObservable(playlistId);
+    }
+
+    public Completable createPlayList(String name) {
+        return playListsRepository.createPlayList(name);
     }
 }

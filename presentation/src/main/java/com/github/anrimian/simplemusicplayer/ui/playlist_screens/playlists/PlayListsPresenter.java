@@ -1,21 +1,15 @@
-package com.github.anrimian.simplemusicplayer.ui.playlists;
+package com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
-import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-
-import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.dispose;
 
 @InjectViewState
 public class PlayListsPresenter extends MvpPresenter<PlayListsView> {

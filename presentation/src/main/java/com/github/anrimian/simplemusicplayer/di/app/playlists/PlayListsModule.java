@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.di.app;
+package com.github.anrimian.simplemusicplayer.di.app.playlists;
 
 import android.content.Context;
 
@@ -7,7 +7,9 @@ import com.github.anrimian.simplemusicplayer.data.storage.providers.playlists.St
 import com.github.anrimian.simplemusicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListsRepository;
-import com.github.anrimian.simplemusicplayer.ui.playlists.PlayListsPresenter;
+import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -32,13 +34,21 @@ public class PlayListsModule {
 
     @Provides
     @Nonnull
+    CreatePlayListPresenter createPlayListPresenter(PlayListsInteractor playListsInteractor,
+                                               @Named(UI_SCHEDULER) Scheduler uiSchedule,
+                                               ErrorParser errorParser) {
+        return new CreatePlayListPresenter(playListsInteractor, uiSchedule, errorParser);
+    }
+
+    @Provides
+    @Nonnull
     PlayListsInteractor playListsInteractor(PlayListsRepository playListsRepository) {
         return new PlayListsInteractor(playListsRepository);
     }
 
     @Provides
     @Nonnull
-    @Singleton
+    @PlayListsScope
     PlayListsRepository playListsRepository(StoragePlayListDataSource storagePlayListDataSource,
                                             @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new PlayListsRepositoryImpl(storagePlayListDataSource, scheduler);
@@ -46,7 +56,7 @@ public class PlayListsModule {
 
     @Provides
     @Nonnull
-    @Singleton
+    @PlayListsScope
     StoragePlayListDataSource storagePlayListDataSource(
             StoragePlayListsProvider storagePlayListDataSource) {
         return new StoragePlayListDataSource(storagePlayListDataSource);

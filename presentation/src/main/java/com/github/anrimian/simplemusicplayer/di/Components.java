@@ -12,6 +12,8 @@ import com.github.anrimian.simplemusicplayer.di.app.library.compositions.Library
 import com.github.anrimian.simplemusicplayer.di.app.library.compositions.LibraryCompositionsModule;
 import com.github.anrimian.simplemusicplayer.di.app.library.files.LibraryFilesComponent;
 import com.github.anrimian.simplemusicplayer.di.app.library.files.LibraryFilesModule;
+import com.github.anrimian.simplemusicplayer.di.app.playlists.PlayListsComponent;
+import com.github.anrimian.simplemusicplayer.di.app.playlists.PlayListsModule;
 
 import javax.annotation.Nullable;
 
@@ -26,6 +28,7 @@ public class Components {
 
     private AppComponent appComponent;
     private LibraryComponent libraryComponent;
+    private PlayListsComponent playListsComponent;
 
     public static void init(Context appContext) {
         instance = new Components(appContext);
@@ -58,11 +61,22 @@ public class Components {
         return getLibraryComponent().libraryCompositionsComponent(new LibraryCompositionsModule());
     }
 
+    public static PlayListsComponent getPlayListsComponent() {
+        return getInstance().buildPlayListsComponent();
+    }
+
     private LibraryComponent buildLibraryComponent() {
         if (libraryComponent == null) {
             libraryComponent = getAppComponent().libraryComponent(new LibraryModule());
         }
         return libraryComponent;
+    }
+
+    private PlayListsComponent buildPlayListsComponent() {
+        if (playListsComponent == null) {
+            playListsComponent = getAppComponent().playListsComponent(new PlayListsModule());
+        }
+        return playListsComponent;
     }
 
     private AppComponent buildAppComponent(Context appContext) {

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -40,6 +41,10 @@ public class StoragePlayListDataSource {
     public Observable<List<Composition>> getCompositionsObservable(long playlistId) {
         return storagePlayListsProvider.getPlayListChangeObservable(playlistId)
                 .startWith(storagePlayListsProvider.getCompositions(playlistId));
+    }
+
+    public Completable createPlayList(String name) {
+        return Completable.fromAction(() -> storagePlayListsProvider.createPlayList(name));
     }
 
     private Single<List<PlayList>> getStartPlayLists() {

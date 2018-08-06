@@ -1,10 +1,9 @@
-package com.github.anrimian.simplemusicplayer.ui.playlists.adapter;
+package com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
 
