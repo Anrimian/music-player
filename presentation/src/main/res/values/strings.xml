@@ -35,6 +35,13 @@
     <string name="compositions">Композиции</string>
     <string name="play_lists">Плейлисты</string>
     <string name="play_lists_on_device_not_found">Плейлистов на устойстве не найдено</string>
+    <string name="name">Название</string>
+    <string name="create">Создать</string>
+    <string name="create_playlist">Создание плейлиста</string>
+    <string name="create_playlist_error_template">Не удалось создать плейлист: %1$s</string>
+    <string name="name_can_not_be_empty">имя не может быть пустым</string>
+    <string name="create_progress">Создание…</string>
+    <string name="play_list_with_this_name_already_exists">плейлист с таким именем уже существует</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

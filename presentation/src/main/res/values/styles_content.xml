@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Content.Button" parent="AppTheme">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:background">?actionBarItemBackground</item>
+    </style>
+
+    <style name="Content.Button.Main" parent="AppTheme">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:foreground">?selectableItemBackground</item>
+    </style>
+
+    <style name="Content.Text" parent="@style/Base.TextAppearance.AppCompat.Body1">
+
+    </style>
+
+    <style name="Content.Text.Subtitle" parent="Content.Text">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Content.Text.Small">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="Content.Button.Main.Expanded">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">7dp</item>
+        <!--<item name="android:foreground">?selectableItemBackground</item>-->
+    </style>
+
+    <style name="Content.Image" parent="AppTheme">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+    </style>
+
+    <style name="Content.Image.Small" parent="Content.Image">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+    </style>
+
+    <style name="Content.Text.Error">
+        <item name="android:textColor">@color/colorError</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="Content.Text.Progress">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+</resources>

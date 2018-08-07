@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <EditText
+        android:id="@+id/et_playlist_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/content_margin"
+        android:hint="@string/name"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="dddddddddddddddddddddddddddddddddddddddddddddddddddddd"/>
+
+    <TextView
+        android:id="@+id/tv_error"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Content.Text.Error"
+        android:layout_marginLeft="@dimen/content_spacing_margin"
+        android:layout_marginRight="@dimen/content_spacing_margin"
+        app:layout_constraintTop_toBottomOf="@id/et_playlist_name"
+        app:layout_constraintStart_toStartOf="@id/et_playlist_name"
+        app:layout_constraintEnd_toEndOf="@id/et_playlist_name"
+        tools:text="test error"/>
+
+    <TextView
+        android:id="@+id/tv_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/create_progress"
+        style="@style/Content.Text.Progress"
+        android:layout_marginLeft="@dimen/content_spacing_margin"
+        android:layout_marginStart="@dimen/content_spacing_margin"
+        app:layout_constraintTop_toTopOf="@+id/progress_bar"
+        app:layout_constraintBottom_toBottomOf="@+id/progress_bar"
+        app:layout_constraintStart_toStartOf="@id/et_playlist_name"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="@dimen/content_spacing_margin"
+        android:layout_marginStart="@dimen/content_spacing_margin"
+        app:layout_constraintStart_toEndOf="@id/tv_progress"
+        app:layout_constraintLeft_toRightOf="@id/tv_progress"
+        app:layout_constraintTop_toBottomOf="@+id/et_playlist_name" />
+
+</android.support.constraint.ConstraintLayout>
