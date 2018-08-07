@@ -6,9 +6,11 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -68,6 +70,8 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         dialog.show();
 
+        etPlayListName.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        etPlayListName.setRawInputType(InputType.TYPE_CLASS_TEXT);
         etPlayListName.setOnEditorActionListener((v, actionId, event) -> {
             onCompleteButtonClicked();
             return true;
