@@ -21,6 +21,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
@@ -29,6 +30,7 @@ import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
@@ -145,6 +147,7 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
         adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
+        adapter.setOnAddToPlaylistClickListener(this::showSelectPlayListDialog);
         recyclerView.setAdapter(adapter);
         startPostponedEnterTransition();
     }
@@ -237,5 +240,10 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
         transaction.replace(R.id.drawer_fragment_container, fragment, path)
                 .addToBackStack(path)
                 .commit();
+    }
+
+    private void showSelectPlayListDialog(Composition composition) {
+        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+        dialog.show(getChildFragmentManager(), null);
     }
 }

@@ -37,7 +37,7 @@ public class PlayListsAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
     }
 
     public void updateList(List<PlayList> oldList, List<PlayList> sourceList) {
-        calculateDiff(new SimpleDiffCallback<>(oldList, sourceList, this::areSourcedTheSame))
+        calculateDiff(new SimpleDiffCallback<>(oldList, sourceList, this::areSourcedTheSame), false)
                 .dispatchUpdatesTo(this);
     }
 

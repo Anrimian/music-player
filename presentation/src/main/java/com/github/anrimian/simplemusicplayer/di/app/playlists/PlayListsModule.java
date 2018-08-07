@@ -8,6 +8,8 @@ import com.github.anrimian.simplemusicplayer.data.storage.providers.playlists.St
 import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
 
@@ -34,9 +36,16 @@ public class PlayListsModule {
 
     @Provides
     @Nonnull
+    ChoosePlayListPresenter choosePlayListPresenter(PlayListsInteractor playListsInteractor,
+                                                    @Named(UI_SCHEDULER) Scheduler uiSchedule) {
+        return new ChoosePlayListPresenter(playListsInteractor, uiSchedule);
+    }
+
+    @Provides
+    @Nonnull
     CreatePlayListPresenter createPlayListPresenter(PlayListsInteractor playListsInteractor,
-                                               @Named(UI_SCHEDULER) Scheduler uiSchedule,
-                                               ErrorParser errorParser) {
+                                                    @Named(UI_SCHEDULER) Scheduler uiSchedule,
+                                                    ErrorParser errorParser) {
         return new CreatePlayListPresenter(playListsInteractor, uiSchedule, errorParser);
     }
 

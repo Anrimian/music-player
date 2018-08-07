@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.di.app.playlists;
 
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
 
@@ -11,4 +12,5 @@ public interface PlayListsComponent {
 
     PlayListsPresenter playListsPresenter();
     CreatePlayListPresenter createPlayListsPresenter();
+    ChoosePlayListPresenter choosePlayListPresenter();
 }

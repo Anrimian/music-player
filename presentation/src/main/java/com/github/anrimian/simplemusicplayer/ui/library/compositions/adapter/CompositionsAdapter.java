@@ -23,6 +23,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     private final List<Composition> musicList;
     private OnItemClickListener<Composition> onCompositionClickListener;
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
+    private OnItemClickListener<Composition> onAddToPlaylistClickListener;
 
     public CompositionsAdapter(List<Composition> musicList) {
         this.musicList = musicList;
@@ -36,12 +37,17 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
     }
 
+    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
+        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+    }
+
     @Override
     public MusicViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
                 onCompositionClickListener,
-                onDeleteCompositionClickListener);
+                onDeleteCompositionClickListener,
+                onAddToPlaylistClickListener);
     }
 
     @Override

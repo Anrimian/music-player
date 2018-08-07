@@ -44,11 +44,13 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
     private Composition composition;
 
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
+    private OnItemClickListener<Composition> onAddToPlaylistClickListener;
 
     public MusicViewHolder(LayoutInflater inflater,
-                    ViewGroup parent,
-                    OnItemClickListener<Composition> onCompositionClickListener,
-                    OnItemClickListener<Composition> onDeleteCompositionClickListener) {
+                           ViewGroup parent,
+                           OnItemClickListener<Composition> onCompositionClickListener,
+                           OnItemClickListener<Composition> onDeleteCompositionClickListener,
+                           OnItemClickListener<Composition> onAddToPlaylistClickListener) {
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
         ButterKnife.bind(this, itemView);
         if (onCompositionClickListener != null) {
@@ -56,6 +58,7 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
         }
         btnActionsMenu.setOnClickListener(this::onActionsMenuButtonClicked);
         this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
+        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
     }
 
     public void bind(@Nonnull Composition composition) {
@@ -74,6 +77,10 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
         popup.inflate(R.menu.composition_in_folder_actions_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
+                case R.id.menu_add_to_playlist: {
+                    onAddToPlaylistClickListener.onItemClick(composition);
+                    return true;
+                }
                 case R.id.menu_share: {
 //                    presenter.onShareCompositionButtonClicked();
                     return true;

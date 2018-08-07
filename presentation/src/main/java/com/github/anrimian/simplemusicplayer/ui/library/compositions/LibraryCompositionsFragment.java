@@ -26,6 +26,7 @@ import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersPresenter;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
@@ -131,6 +132,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         adapter = new CompositionsAdapter(compositions);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
+        adapter.setOnAddToPlaylistClickListener(this::showSelectPlayListDialog);
         recyclerView.setAdapter(adapter);
     }
 
@@ -144,5 +146,10 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder);
         fragment.setOnCompleteListener(presenter::onOrderSelected);
         fragment.show(getChildFragmentManager(), ORDER_TAG);
+    }
+
+    private void showSelectPlayListDialog(Composition composition) {
+        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+        dialog.show(getChildFragmentManager(), null);
     }
 }

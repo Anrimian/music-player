@@ -42,6 +42,9 @@
     <string name="name_can_not_be_empty">имя не может быть пустым</string>
     <string name="create_progress">Создание…</string>
     <string name="play_list_with_this_name_already_exists">плейлист с таким именем уже существует</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="select_play_list">Выберите плейлист</string>
+    <string name="create_play_list">Создать плейлист</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

@@ -53,7 +53,7 @@ public class StoragePlayListsProvider {
                     null,
                     null,
                     null,
-                    null);
+                    Playlists.DATE_ADDED + " DESC");
             if (cursor == null) {
                 return emptyList();
             }

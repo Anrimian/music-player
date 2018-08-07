@@ -33,6 +33,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private final List<FileSource> musicList;
     private OnItemClickListener<Composition> onCompositionClickListener;
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
+    private OnItemClickListener<Composition> onAddToPlaylistClickListener;
     private OnTransitionItemClickListener<String> onFolderClickListener;
 
     public MusicFileSourceAdapter(List<FileSource> musicList) {
@@ -51,6 +52,10 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
     }
 
+    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
+        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+    }
+
     @Override
     public RecyclerView.ViewHolder createVH(ViewGroup parent, int type) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -59,7 +64,8 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
                 return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
                         parent,
                         onCompositionClickListener,
-                        onDeleteCompositionClickListener);
+                        onDeleteCompositionClickListener,
+                        onAddToPlaylistClickListener);
             }
             case TYPE_FILE: {
                 View view = inflater.inflate(R.layout.item_storage_folder, parent, false);

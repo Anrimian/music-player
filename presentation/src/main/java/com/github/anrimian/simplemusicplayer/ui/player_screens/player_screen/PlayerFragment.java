@@ -38,6 +38,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
@@ -527,6 +528,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         popup.inflate(R.menu.composition_full_actions_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
+                case R.id.menu_add_to_playlist: {
+                    ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+                    dialog.show(getChildFragmentManager(), null);
+                    return true;
+                }
                 case R.id.menu_share: {
                     presenter.onShareCompositionButtonClicked();
                     return true;
