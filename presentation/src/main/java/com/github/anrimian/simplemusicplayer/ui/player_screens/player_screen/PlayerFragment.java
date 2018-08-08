@@ -35,6 +35,7 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
@@ -64,6 +65,8 @@ import butterknife.ButterKnife;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static com.github.anrimian.simplemusicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
@@ -344,6 +347,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);
         seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart);
         seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
+
+        ChoosePlayListDialogFragment fragment = (ChoosePlayListDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(SELECT_PLAYLIST_TAG);
+        if (fragment != null) {
+            fragment.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        }
     }
 
     @Override
@@ -530,6 +539,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {
                     ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+                    dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
                     dialog.show(getChildFragmentManager(), null);
                     return true;
                 }

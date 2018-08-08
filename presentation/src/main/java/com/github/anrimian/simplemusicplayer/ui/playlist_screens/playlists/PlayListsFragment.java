@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -105,6 +106,8 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
 
     @Override
     public void updateList(List<PlayList> oldList, List<PlayList> newList) {
+        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
         adapter.updateList(oldList, newList);
+        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
 }

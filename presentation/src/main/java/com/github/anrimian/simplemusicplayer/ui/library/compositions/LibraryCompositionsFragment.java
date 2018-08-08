@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.library.compositions;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -137,8 +138,10 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
-    public void updateList(List<Composition> oldList, List<Composition> sourceList) {
-        adapter.updateList(oldList, sourceList);
+    public void updateList(List<Composition> oldList, List<Composition> newList) {
+        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+        adapter.updateList(oldList, newList);
+        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
 
     @Override

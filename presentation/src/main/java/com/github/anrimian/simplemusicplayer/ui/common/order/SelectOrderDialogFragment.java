@@ -27,6 +27,7 @@ public class SelectOrderDialogFragment extends DialogFragment {
     @BindView(R.id.rv_order)
     RecyclerView rvOrder;
 
+    @Nullable
     private OnCompleteListener<Order> onCompleteListener;
 
     public static SelectOrderDialogFragment newInstance(Order order) {
@@ -57,7 +58,7 @@ public class SelectOrderDialogFragment extends DialogFragment {
                 .create();
     }
 
-    public void setOnCompleteListener(OnCompleteListener<Order> onCompleteListener) {
+    public void setOnCompleteListener(@Nullable OnCompleteListener<Order> onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
     }
 

@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.simplemusicplayer.ui.utils.OnItemClickListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,9 +26,13 @@ public class PlayListViewHolder extends RecyclerView.ViewHolder {
     private PlayList playList;
 
     PlayListViewHolder(LayoutInflater inflater,
-                       ViewGroup parent) {
+                       ViewGroup parent,
+                       OnItemClickListener<PlayList> onItemClickListener) {
         super(inflater.inflate(R.layout.item_play_list, parent, false));
         ButterKnife.bind(this, itemView);
+        if (onItemClickListener != null) {
+            itemView.setOnClickListener(v -> onItemClickListener.onItemClick(playList));
+        }
     }
 
     void bind(PlayList playList) {

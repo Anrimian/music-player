@@ -6,6 +6,7 @@ import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerI
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.domain.utils.Objects;
 
 import java.util.ArrayList;
@@ -114,6 +115,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.deleteComposition(composition)
                 .observeOn(uiScheduler)
                 .subscribe();//TODO displayError
+    }
+
+    void onPlayListToAddingSelected(PlayList playList) {
+        //TODO finish
     }
 
     public void onSeekStart() {

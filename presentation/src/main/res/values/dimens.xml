@@ -4,6 +4,7 @@
     <!--specific sizes-->
     <dimen name="play_actions_panel_height">120dp</dimen>
     <dimen name="bottom_sheet_height">60dp</dimen>
+    <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
 
     <dimen name="text_size_xxsmall">12sp</dimen>
     <dimen name="text_size_xsmall">13sp</dimen>
