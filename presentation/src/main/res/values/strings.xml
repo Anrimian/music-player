@@ -45,6 +45,8 @@
     <string name="add_to_playlist">Добавить в плейлист</string>
     <string name="select_play_list">Выберите плейлист</string>
     <string name="create_play_list">Создать плейлист</string>
+    <string name="add_to_playlist_error_template">Не удалось добавить композицию в плейлист: %1$s</string>
+    <string name="add_to_playlist_success_template">Композиция "%1$s" добавлена в плейлист "%2$s"</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

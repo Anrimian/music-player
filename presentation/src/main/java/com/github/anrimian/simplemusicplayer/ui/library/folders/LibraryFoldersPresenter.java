@@ -3,10 +3,12 @@ package com.github.anrimian.simplemusicplayer.ui.library.folders;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.library.LibraryFilesInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
@@ -29,8 +31,12 @@ import static com.github.anrimian.simplemusicplayer.data.utils.rx.RxUtils.dispos
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final LibraryFilesInteractor interactor;
+    private final PlayListsInteractor playListsInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
+
+    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
+    private Disposable filesDisposable;
 
     @Nullable
     private String path;
@@ -39,15 +45,17 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private List<FileSource> sourceList = new ArrayList<>();
 
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-    private Disposable filesDisposable;
+    @Nullable
+    private Composition compositionToAddToPlayList;
 
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFilesInteractor interactor,
+                                   PlayListsInteractor playListsInteractor,
                                    ErrorParser errorParser,
                                    Scheduler uiScheduler) {
         this.path = path;
         this.interactor = interactor;
+        this.playListsInteractor = playListsInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
@@ -107,6 +115,28 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         if (folder != null) {
             subscribeOnFolderData(folder);
         }
+    }
+
+    void onAddToPlayListButtonClicked(Composition composition) {
+        compositionToAddToPlayList = composition;
+        getViewState().showSelectPlayListDialog();
+    }
+
+    void onPlayListToAddingSelected(PlayList playList) {
+        playListsInteractor.addCompositionToPlayList(compositionToAddToPlayList, playList)
+                .observeOn(uiScheduler)
+                .subscribe(() -> onAddingToPlayListCompleted(playList),
+                        this::onAddingToPlayListError);
+    }
+
+    private void onAddingToPlayListError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showAddingToPlayListError(errorCommand);
+    }
+
+    private void onAddingToPlayListCompleted(PlayList playList) {
+        getViewState().showAddingToPlayListComplete(playList, compositionToAddToPlayList);
+        compositionToAddToPlayList = null;
     }
 
     private void goBackToPreviousPath() {

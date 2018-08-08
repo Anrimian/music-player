@@ -52,7 +52,7 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
 
     @ProvidePresenter
     CreatePlayListPresenter providePresenter() {
-        return Components.getPlayListsComponent().createPlayListsPresenter();
+        return Components.getAppComponent().createPlayListsPresenter();
     }
 
     @NonNull

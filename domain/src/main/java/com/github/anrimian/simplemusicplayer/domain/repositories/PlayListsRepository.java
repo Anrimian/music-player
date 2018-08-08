@@ -15,4 +15,6 @@ public interface PlayListsRepository {
     Observable<List<Composition>> getCompositionsObservable(long playlistId);
 
     Completable createPlayList(String name);
+
+    Completable addCompositionToPlayList(Composition composition, PlayList playList);
 }

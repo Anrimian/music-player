@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.transition.Slide;
 import android.support.transition.Transition;
 import android.support.v4.app.FragmentManager;
@@ -25,6 +27,7 @@ import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -41,7 +44,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.simplemusicplayer.constants.Arguments.PATH;
+import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 
 /**
  * Created on 23.10.2017.
@@ -60,6 +65,9 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
 
     @BindView(R.id.header_container)
     View headerContainer;
+
+    @BindView(R.id.list_container)
+    CoordinatorLayout clListContainer;
 
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
@@ -121,6 +129,11 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
         if (fragment != null) {
             fragment.setOnCompleteListener(presenter::onOrderSelected);
         }
+        ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(SELECT_PLAYLIST_TAG);
+        if (playListDialog != null) {
+            playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        }
     }
 
     @Override
@@ -148,7 +161,7 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
         adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
-        adapter.setOnAddToPlaylistClickListener(this::showSelectPlayListDialog);
+        adapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
         recyclerView.setAdapter(adapter);
         startPostponedEnterTransition();
     }
@@ -220,10 +233,33 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
     }
 
     @Override
+    public void showAddingToPlayListError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showAddingToPlayListComplete(PlayList playList, Composition composition) {
+        String text = getString(R.string.add_to_playlist_success_template,
+                formatCompositionName(composition),
+                playList.getName());
+        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void showSelectOrderScreen(Order folderOrder) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder);
         fragment.setOnCompleteListener(presenter::onOrderSelected);
         fragment.show(getChildFragmentManager(), ORDER_TAG);
+    }
+
+    @Override
+    public void showSelectPlayListDialog() {
+        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+        dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        dialog.show(getChildFragmentManager(), null);
     }
 
     private void goToMusicStorageScreen(String path, View... sharedViews) {
@@ -243,10 +279,5 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
         transaction.replace(R.id.drawer_fragment_container, fragment, path)
                 .addToBackStack(path)
                 .commit();
-    }
-
-    private void showSelectPlayListDialog(Composition composition) {
-        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
-        dialog.show(getChildFragmentManager(), null);
     }
 }

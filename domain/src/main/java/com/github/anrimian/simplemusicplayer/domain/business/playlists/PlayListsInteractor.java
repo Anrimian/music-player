@@ -32,4 +32,8 @@ public class PlayListsInteractor {
         return nameValidator.validate(name)
                 .flatMapCompletable(playListsRepository::createPlayList);
     }
+
+    public Completable addCompositionToPlayList(Composition composition, PlayList playList) {
+        return playListsRepository.addCompositionToPlayList(composition, playList);
+    }
 }

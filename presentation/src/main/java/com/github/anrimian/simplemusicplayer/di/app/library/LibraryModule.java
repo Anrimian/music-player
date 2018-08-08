@@ -2,8 +2,10 @@ package com.github.anrimian.simplemusicplayer.di.app.library;
 
 import com.github.anrimian.simplemusicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerPresenter;
 
 import javax.annotation.Nonnull;
@@ -24,7 +26,12 @@ public class LibraryModule {
     @Provides
     @Nonnull
     PlayerPresenter playerPresenter(MusicPlayerInteractor musicPlayerInteractor,
-                                            @Named(UI_SCHEDULER) Scheduler uiScheduler) {
-        return new PlayerPresenter(musicPlayerInteractor, uiScheduler);
+                                    PlayListsInteractor playListsInteractor,
+                                    ErrorParser errorParser,
+                                    @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+        return new PlayerPresenter(musicPlayerInteractor,
+                playListsInteractor,
+                errorParser,
+                uiScheduler);
     }
 }

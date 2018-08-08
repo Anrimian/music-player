@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.di.app.playlists;
+package com.github.anrimian.simplemusicplayer.di.app;
 
 import android.content.Context;
 
@@ -8,7 +8,6 @@ import com.github.anrimian.simplemusicplayer.data.storage.providers.playlists.St
 import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.simplemusicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
@@ -57,7 +56,7 @@ public class PlayListsModule {
 
     @Provides
     @Nonnull
-    @PlayListsScope
+    @Singleton
     PlayListsRepository playListsRepository(StoragePlayListDataSource storagePlayListDataSource,
                                             @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new PlayListsRepositoryImpl(storagePlayListDataSource, scheduler);
@@ -65,7 +64,7 @@ public class PlayListsModule {
 
     @Provides
     @Nonnull
-    @PlayListsScope
+    @Singleton
     StoragePlayListDataSource storagePlayListDataSource(
             StoragePlayListsProvider storagePlayListDataSource) {
         return new StoragePlayListDataSource(storagePlayListDataSource);

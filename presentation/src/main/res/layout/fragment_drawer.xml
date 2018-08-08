@@ -50,10 +50,17 @@
                     android:id="@+id/play_queue_toolbar"
                     layout="@layout/partial_toolbar"/>
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rv_playlist"
+                <android.support.design.widget.CoordinatorLayout
+                    android:id="@+id/cl_play_queue_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_playlist"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </android.support.design.widget.CoordinatorLayout>
 
             </LinearLayout>
 

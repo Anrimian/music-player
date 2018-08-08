@@ -44,7 +44,7 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
 
     @ProvidePresenter
     PlayListsPresenter providePresenter() {
-        return Components.getPlayListsComponent().playListsPresenter();
+        return Components.getAppComponent().playListsPresenter();
     }
 
     @Override

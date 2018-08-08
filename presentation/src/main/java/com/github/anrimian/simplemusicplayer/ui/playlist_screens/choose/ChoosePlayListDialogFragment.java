@@ -49,7 +49,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @ProvidePresenter
     ChoosePlayListPresenter providePresenter() {
-        return Components.getPlayListsComponent().choosePlayListPresenter();
+        return Components.getAppComponent().choosePlayListPresenter();
     }
 
     @SuppressLint("RestrictedApi")

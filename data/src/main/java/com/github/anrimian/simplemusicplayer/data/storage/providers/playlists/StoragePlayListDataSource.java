@@ -47,6 +47,14 @@ public class StoragePlayListDataSource {
         return Completable.fromAction(() -> storagePlayListsProvider.createPlayList(name));
     }
 
+    public Completable addCompositionInPlayList(Composition composition, PlayList playList) {
+        return Completable.fromAction(() -> storagePlayListsProvider.addCompositionInPlayList(
+                composition.getId(),
+                playList.getId(),
+                playList.getCompositionsCount())
+        );
+    }
+
     private Single<List<PlayList>> getStartPlayLists() {
         if (playLists == null) {
             return toPlayLists(storagePlayListsProvider.getPlayLists());

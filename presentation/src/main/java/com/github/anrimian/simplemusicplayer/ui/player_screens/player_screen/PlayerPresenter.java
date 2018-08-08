@@ -3,11 +3,14 @@ package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.CompositionEvent;
 import com.github.anrimian.simplemusicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.domain.utils.Objects;
+import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,8 @@ import io.reactivex.disposables.Disposable;
 public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private final MusicPlayerInteractor musicPlayerInteractor;
+    private final PlayListsInteractor playListsInteractor;
+    private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
@@ -34,8 +39,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private Composition composition;
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
+                           PlayListsInteractor playListsInteractor,
+                           ErrorParser errorParser,
                            Scheduler uiScheduler) {
         this.musicPlayerInteractor = musicPlayerInteractor;
+        this.playListsInteractor = playListsInteractor;
+        this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
 
@@ -118,7 +127,19 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onPlayListToAddingSelected(PlayList playList) {
-        //TODO finish
+        playListsInteractor.addCompositionToPlayList(composition, playList)
+                .observeOn(uiScheduler)
+                .subscribe(() -> onAddingToPlayListCompleted(playList, composition),
+                        this::onAddingToPlayListError);
+    }
+
+    private void onAddingToPlayListError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showAddingToPlayListError(errorCommand);
+    }
+
+    private void onAddingToPlayListCompleted(PlayList playList, Composition composition) {
+        getViewState().showAddingToPlayListComplete(playList, composition);
     }
 
     public void onSeekStart() {

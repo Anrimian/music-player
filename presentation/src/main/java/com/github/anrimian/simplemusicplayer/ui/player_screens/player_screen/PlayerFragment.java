@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
@@ -35,6 +36,8 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
@@ -67,6 +70,7 @@ import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
@@ -167,6 +171,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.play_queue_toolbar)
     AdvancedToolbar advancedToolbar;
 
+    @BindView(R.id.cl_play_queue_container)
+    CoordinatorLayout clPlayQueueContainer;
+
 //    @BindView(R.id.play_actions_top_shadow)
 //    View playActionsTopShadow;
 
@@ -241,7 +248,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 clearFragment();
             }
             drawer.closeDrawer(Gravity.START);
-
             return true;
         });
 
@@ -486,8 +492,19 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void notifyPlayQueueItemRemoved(int index) {
-        playQueueAdapter.notifyItemRemoved(index);
+    public void showAddingToPlayListError(ErrorCommand errorCommand) {
+        Snackbar.make(clPlayQueueContainer,
+                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showAddingToPlayListComplete(PlayList playList, Composition composition) {
+        String text = getString(R.string.add_to_playlist_success_template,
+                formatCompositionName(composition),
+                playList.getName());
+        Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
     private void onBottomPanelClicked() {

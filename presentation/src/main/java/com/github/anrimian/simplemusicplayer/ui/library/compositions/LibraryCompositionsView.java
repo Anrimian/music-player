@@ -8,6 +8,8 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -33,4 +35,13 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order folderOrder);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showSelectPlayListDialog();
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddingToPlayListError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddingToPlayListComplete(PlayList playList, Composition composition);
 }

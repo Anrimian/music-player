@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +23,8 @@ import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
@@ -36,6 +40,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 
 public class LibraryCompositionsFragment extends LibraryFragment implements LibraryCompositionsView {
 
@@ -47,6 +53,9 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
+
+    @BindView(R.id.list_container)
+    CoordinatorLayout clListContainer;
 
     private CompositionsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
@@ -89,6 +98,11 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
                 .findFragmentByTag(ORDER_TAG);
         if (fragment != null) {
             fragment.setOnCompleteListener(presenter::onOrderSelected);
+        }
+        ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(SELECT_PLAYLIST_TAG);
+        if (playListDialog != null) {
+            playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
     }
 
@@ -133,7 +147,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         adapter = new CompositionsAdapter(compositions);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
-        adapter.setOnAddToPlaylistClickListener(this::showSelectPlayListDialog);
+        adapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
         recyclerView.setAdapter(adapter);
     }
 
@@ -145,14 +159,32 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
+    public void showAddingToPlayListError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showAddingToPlayListComplete(PlayList playList, Composition composition) {
+        String text = getString(R.string.add_to_playlist_success_template,
+                formatCompositionName(composition),
+                playList.getName());
+        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSelectPlayListDialog() {
+        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+        dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        dialog.show(getChildFragmentManager(), null);
+    }
+
+    @Override
     public void showSelectOrderScreen(Order folderOrder) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder);
         fragment.setOnCompleteListener(presenter::onOrderSelected);
         fragment.show(getChildFragmentManager(), ORDER_TAG);
-    }
-
-    private void showSelectPlayListDialog(Composition composition) {
-        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
-        dialog.show(getChildFragmentManager(), null);
     }
 }

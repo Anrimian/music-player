@@ -6,6 +6,8 @@ import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -48,6 +50,9 @@ public interface PlayerView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showShareMusicDialog(String filePath);
 
-    @StateStrategyType(SkipStrategy.class)
-    void notifyPlayQueueItemRemoved(int index);
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddingToPlayListError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddingToPlayListComplete(PlayList playList, Composition composition);
 }

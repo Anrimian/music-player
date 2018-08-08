@@ -5,8 +5,10 @@ import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
@@ -52,4 +54,14 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order folderOrder);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showSelectPlayListDialog();
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddingToPlayListError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddingToPlayListComplete(PlayList playList, Composition composition);
+
 }

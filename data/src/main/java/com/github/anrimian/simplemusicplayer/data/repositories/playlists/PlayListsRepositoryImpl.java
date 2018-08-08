@@ -39,4 +39,10 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         return storagePlayListDataSource.createPlayList(name)
                 .subscribeOn(scheduler);
     }
+
+    @Override
+    public Completable addCompositionToPlayList(Composition composition, PlayList playList) {
+        return storagePlayListDataSource.addCompositionInPlayList(composition, playList)
+                .subscribeOn(scheduler);
+    }
 }
