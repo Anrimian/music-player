@@ -380,8 +380,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             bottomSheetBehavior.setState(STATE_COLLAPSED);
             return true;
         }
-        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.drawer_fragment_container);
-        return fragment instanceof BackButtonListener && ((BackButtonListener) fragment).onBackPressed();
+        FragmentManager fm = getChildFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.drawer_fragment_container);
+        boolean processed = fragment instanceof BackButtonListener
+                && ((BackButtonListener) fragment).onBackPressed();
+        if (!processed) {
+            if (fm.getBackStackEntryCount() > 0) {
+                fm.popBackStack();
+                processed = true;
+            }
+        }
+        return processed;
     }
 
     @Override
@@ -541,6 +550,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private void clearFragment() {
         FragmentManager fm = getChildFragmentManager();
+        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {//TODO fix animation
+            fm.popBackStack();
+        }
         Fragment currentFragment = fm.findFragmentById(R.id.drawer_fragment_container);
         if (currentFragment != null) {
             fm.beginTransaction()

@@ -80,6 +80,8 @@ dependencies {
     implementation presentationDependencies.room
     annotationProcessor presentationDependencies.roomCompiler
 
+    implementation presentationDependencies.slidr
+
     compileOnly presentationDependencies.javaxAnnotation
 
     testImplementation presentationTestDependencies.junit

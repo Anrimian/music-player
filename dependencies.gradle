@@ -55,6 +55,7 @@ ext {
             dagger:              "com.google.dagger:dagger:$daggerVersion",
             daggerCompiler:      "com.google.dagger:dagger-compiler:$daggerVersion",
             javaxAnnotation:    "com.google.code.findbugs:jsr305:$javaxAnnotationVersion",
+            slidr:              "com.r0adkll:slidableactivity:2.0.6"
     ]
 
     presentationTestDependencies = [

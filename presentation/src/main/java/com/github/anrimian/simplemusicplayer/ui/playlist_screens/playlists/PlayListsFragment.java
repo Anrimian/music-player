@@ -20,6 +20,7 @@ import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
@@ -101,6 +102,7 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
     @Override
     public void bindList(List<PlayList> playLists) {
         adapter = new PlayListsAdapter(playLists);
+        adapter.setOnItemClickListener(this::goToPlayListScreen);
         recyclerView.setAdapter(adapter);
     }
 
@@ -109,5 +111,14 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
         Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
         adapter.updateList(oldList, newList);
         recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+    }
+
+    private void goToPlayListScreen(PlayList playList) {
+        getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.anim_alpha_appear, 0, 0, R.anim.anim_alpha_disappear)
+//                .remove(this)
+                .add(R.id.drawer_fragment_container, new PlayListFragment())
+                .addToBackStack(null)
+                .commit();
     }
 }
