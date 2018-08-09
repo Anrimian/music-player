@@ -11,6 +11,7 @@ import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersFragment;
+import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersRootFragment;
 
 import static com.github.anrimian.simplemusicplayer.ui.utils.fragments.FragmentUtils.startFragment;
 
@@ -36,7 +37,7 @@ public class LibraryFragment extends MvpAppCompatFragment {
                     break;
                 }
                 case R.id.menu_files: {
-                    fragment = LibraryFoldersFragment.newInstance(null);
+                    fragment = new LibraryFoldersRootFragment();
                     break;
                 }
             }

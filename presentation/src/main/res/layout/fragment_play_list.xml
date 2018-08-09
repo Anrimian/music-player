@@ -4,16 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/transparent">
+    android:layout_height="match_parent">
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/content_container"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?android:attr/colorBackground">
 
-    </android.support.constraint.ConstraintLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_storage_music" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_normal"
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:layout_marginRight="@dimen/margin_normal"
+            android:tint="@android:color/white"
+            app:fabSize="normal"
+            app:layout_anchor="@id/recycler_view"
+            app:layout_anchorGravity="bottom|right|end"
+            app:srcCompat="@drawable/ic_play"
+            app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.ScrollAwareFABBehavior"/>
+
+        <include layout="@layout/partial_progress_state"/>
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </FrameLayout>

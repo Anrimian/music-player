@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
@@ -52,7 +53,7 @@ import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils
  * Created on 23.10.2017.
  */
 
-public class LibraryFoldersFragment extends LibraryFragment implements LibraryFoldersView, BackButtonListener {
+public class LibraryFoldersFragment extends MvpAppCompatFragment implements LibraryFoldersView, BackButtonListener {
 
     @InjectPresenter
     LibraryFoldersPresenter presenter;
@@ -108,9 +109,6 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-
-        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle(R.string.files);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
@@ -211,7 +209,7 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
         } else {
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                    .replace(R.id.drawer_fragment_container, LibraryFoldersFragment.newInstance(path))
+                    .replace(R.id.library_folders_container, LibraryFoldersFragment.newInstance(path))
                     .commit();
         }
     }
@@ -276,7 +274,7 @@ public class LibraryFoldersFragment extends LibraryFragment implements LibraryFo
 //        for (View sharedView: sharedViews) {
 //            transaction.addSharedElement(sharedView, ViewCompat.getTransitionName(sharedView));
 //        }
-        transaction.replace(R.id.drawer_fragment_container, fragment, path)
+        transaction.replace(R.id.library_folders_container, fragment, path)
                 .addToBackStack(path)
                 .commit();
     }

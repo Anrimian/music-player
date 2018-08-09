@@ -116,8 +116,7 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
     private void goToPlayListScreen(PlayList playList) {
         getFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.anim_alpha_appear, 0, 0, R.anim.anim_alpha_disappear)
-//                .remove(this)
-                .add(R.id.drawer_fragment_container, new PlayListFragment())
+                .add(R.id.drawer_fragment_container, PlayListFragment.newInstance(playList.getId()))
                 .addToBackStack(null)
                 .commit();
     }

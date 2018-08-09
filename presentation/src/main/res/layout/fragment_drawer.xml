@@ -30,7 +30,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="@dimen/bottom_sheet_height"
-                android:background="@android:color/transparent"
                 app:layout_anchor="@id/toolbar"
                 app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.LinkedCoordinateViewBehavior"/>
 

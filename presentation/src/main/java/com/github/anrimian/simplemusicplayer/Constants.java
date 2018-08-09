@@ -5,6 +5,7 @@ public class Constants {
     public static class Arguments {
 
         public static final String ORDER_ARG = "order_arg";
+        public static final String PLAY_LIST_ID_ARG = "play_list_id_arg";
     }
 
     public static class Tags {

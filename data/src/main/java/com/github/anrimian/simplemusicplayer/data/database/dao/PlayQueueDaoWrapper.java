@@ -43,7 +43,7 @@ public class PlayQueueDaoWrapper {
         Iterator<PlayQueueEntity> iterator = playQueueEntities.iterator();
         while (iterator.hasNext()) {
             PlayQueueEntity playQueueEntity = iterator.next();
-            long id = playQueueEntity.getId();
+            long id = playQueueEntity.getAudioId();
             Composition composition = compositionMap.get(id);
             if (composition == null) {
                 playQueueDao.deletePlayQueueEntity(id);
@@ -53,7 +53,7 @@ public class PlayQueueDaoWrapper {
 
         List<Composition> compositions = new ArrayList<>();
         for (PlayQueueEntity playQueueEntity: playQueueEntities) {
-            long id = playQueueEntity.getId();
+            long id = playQueueEntity.getAudioId();
             Composition composition = compositionMap.get(id);
             compositions.add(composition);
         }
@@ -66,7 +66,7 @@ public class PlayQueueDaoWrapper {
         Iterator<ShuffledPlayQueueEntity> iterator = playQueueEntities.iterator();
         while (iterator.hasNext()) {
             ShuffledPlayQueueEntity playQueueEntity = iterator.next();
-            long id = playQueueEntity.getId();
+            long id = playQueueEntity.getAudioId();
             Composition composition = compositionMap.get(id);
             if (composition == null) {
                 playQueueDao.deleteShuffledPlayQueueEntity(id);
@@ -76,7 +76,7 @@ public class PlayQueueDaoWrapper {
 
         List<Composition> compositions = new ArrayList<>();
         for (ShuffledPlayQueueEntity playQueueEntity: playQueueEntities) {
-            long id = playQueueEntity.getId();
+            long id = playQueueEntity.getAudioId();
             Composition composition = compositionMap.get(id);
             compositions.add(composition);
         }
@@ -89,7 +89,7 @@ public class PlayQueueDaoWrapper {
         for (int i = 0; i < shuffledQueue.size(); i++) {
             Composition composition = shuffledQueue.get(i);
             ShuffledPlayQueueEntity playQueueEntity = new ShuffledPlayQueueEntity();
-            playQueueEntity.setId(composition.getId());
+            playQueueEntity.setAudioId(composition.getId());
             playQueueEntity.setPosition(i);
 
             entityList.add(playQueueEntity);
@@ -103,7 +103,7 @@ public class PlayQueueDaoWrapper {
         for (int i = 0; i < shuffledQueue.size(); i++) {
             Composition composition = shuffledQueue.get(i);
             PlayQueueEntity playQueueEntity = new PlayQueueEntity();
-            playQueueEntity.setId(composition.getId());
+            playQueueEntity.setAudioId(composition.getId());
             playQueueEntity.setPosition(i);
 
             entityList.add(playQueueEntity);

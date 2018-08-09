@@ -34,12 +34,12 @@ public interface PlayQueueDao {
     @Insert
     void insertShuffledPlayQueue(List<ShuffledPlayQueueEntity> entities);
 
-    @Query("DELETE FROM play_queue WHERE id = :id")
-    void deletePlayQueueEntity(long id);
+    @Query("DELETE FROM play_queue WHERE audioId = :audioId")
+    void deletePlayQueueEntity(long audioId);
 
-    @Query("DELETE FROM shuffled_play_queue WHERE id = :id")
-    void deleteShuffledPlayQueueEntity(long id);
+    @Query("DELETE FROM shuffled_play_queue WHERE audioId = :audioId")
+    void deleteShuffledPlayQueueEntity(long audioId);
 
-    @Query("UPDATE play_queue SET position = :newPosition WHERE id = :id")
-    void updatePosition(long id, int newPosition);
+    @Query("UPDATE play_queue SET position = :newPosition WHERE audioId = :audioId")
+    void updatePosition(long audioId, int newPosition);
 }

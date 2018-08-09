@@ -80,6 +80,7 @@ public class MusicPlayerInteractor {
                 .subscribe(this::onMusicPlayerEventReceived));
     }
 
+    //TODO return void
     public Completable startPlaying(List<Composition> compositions) {
         return playQueueRepository.setPlayQueue(compositions)
                 .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))

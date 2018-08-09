@@ -30,7 +30,7 @@ public class PlayQueueDaoWrapperTest {
     public void getPlayQueueWithUnexcitingCompositions() {
         ArrayList<PlayQueueEntity> entities = new ArrayList<>();
         PlayQueueEntity playQueueEntity = new PlayQueueEntity();
-        playQueueEntity.setId(Long.MAX_VALUE);
+        playQueueEntity.setAudioId(Long.MAX_VALUE);
         playQueueEntity.setPosition(0);
         entities.add(playQueueEntity);
 

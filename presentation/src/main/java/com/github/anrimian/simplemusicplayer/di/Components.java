@@ -12,6 +12,9 @@ import com.github.anrimian.simplemusicplayer.di.app.library.compositions.Library
 import com.github.anrimian.simplemusicplayer.di.app.library.compositions.LibraryCompositionsModule;
 import com.github.anrimian.simplemusicplayer.di.app.library.files.LibraryFilesComponent;
 import com.github.anrimian.simplemusicplayer.di.app.library.files.LibraryFilesModule;
+import com.github.anrimian.simplemusicplayer.di.app.play_list.PlayListComponent;
+import com.github.anrimian.simplemusicplayer.di.app.play_list.PlayListModule;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 
 import javax.annotation.Nullable;
 
@@ -56,6 +59,10 @@ public class Components {
 
     public static LibraryCompositionsComponent getLibraryCompositionsComponent() {
         return getLibraryComponent().libraryCompositionsComponent(new LibraryCompositionsModule());
+    }
+
+    public static PlayListComponent getPlayListComponent(long playListId) {
+        return getAppComponent().playListComponent(new PlayListModule(playListId));
     }
 
     private LibraryComponent buildLibraryComponent() {

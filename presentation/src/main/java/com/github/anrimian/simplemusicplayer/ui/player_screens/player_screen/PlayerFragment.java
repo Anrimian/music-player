@@ -38,10 +38,11 @@ import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersRootFragment;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
+import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
@@ -68,9 +69,7 @@ import butterknife.ButterKnife;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
-import static com.github.anrimian.simplemusicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.simplemusicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
@@ -91,6 +90,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     static {
         fragmentIdMap.put(R.id.menu_settings, SettingsFragment::new);
         fragmentIdMap.put(R.id.menu_play_lists, PlayListsFragment::new);
+        fragmentIdMap.put(R.id.menu_library, LibraryFoldersRootFragment::new);
     }
 
     @InjectPresenter
@@ -194,6 +194,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private LinearLayoutManager playQueueLayoutManager;
     private SeekBarViewWrapper seekBarViewWrapper;
 
+    private DrawerLockStateProcessor drawerLockStateProcessor;
+
     @ProvidePresenter
     PlayerPresenter providePresenter() {
         return Components.getLibraryComponent().playerPresenter();
@@ -240,6 +242,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         advancedToolbar.init();
 
+        drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
+
         navigationView.setNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (selectedDrawerItemId != itemId) {
@@ -259,20 +263,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 if (itemIdToStart != NO_ITEM) {
-                    switch (itemIdToStart) {
-                        case R.id.menu_library : {
-                            startFragment(LibraryFoldersFragment.newInstance(null));
-                            break;
-                        }
-                        default: {
-                            FragmentCreator fragmentCreator = fragmentIdMap.get(itemIdToStart);
-                            startFragment(fragmentCreator.createFragment());
-                        }
-                    }
+                    FragmentCreator fragmentCreator = fragmentIdMap.get(itemIdToStart);
+                    startFragment(fragmentCreator.createFragment());
                     itemIdToStart = NO_ITEM;
                 }
             }
         });
+
+        FragmentManager fm = getChildFragmentManager();
+        fm.addOnBackStackChangedListener(() ->
+                drawerLockStateProcessor.setOnRootNavigationState(fm.getBackStackEntryCount() == 0)
+        );
 
         BottomSheetDelegateManager bottomSheetDelegateManager = new BottomSheetDelegateManager();
         bottomSheetDelegateManager.addDelegate(new TargetViewDelegate(ivPlayPause, ivPlayPauseExpanded))
@@ -311,12 +312,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 switch (newState) {
                     case STATE_COLLAPSED: {
-                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                        drawerLockStateProcessor.setBottomSheetOpen(false);
                         bottomSheetDelegate.onSlide(0f);
                         return;
                     }
                     case STATE_EXPANDED: {
-                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                        drawerLockStateProcessor.setBottomSheetOpen(true);
                         bottomSheetDelegate.onSlide(1f);
                     }
                 }
@@ -545,14 +546,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void showLibraryScreen() {
         selectedDrawerItemId = R.id.menu_library;
         navigationView.setCheckedItem(selectedDrawerItemId);
-        startFragment(LibraryFoldersFragment.newInstance(null));
+        startFragment(new LibraryFoldersRootFragment());
     }
 
     private void clearFragment() {
         FragmentManager fm = getChildFragmentManager();
-        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {//TODO fix animation
-            fm.popBackStack();
-        }
         Fragment currentFragment = fm.findFragmentById(R.id.drawer_fragment_container);
         if (currentFragment != null) {
             fm.beginTransaction()
