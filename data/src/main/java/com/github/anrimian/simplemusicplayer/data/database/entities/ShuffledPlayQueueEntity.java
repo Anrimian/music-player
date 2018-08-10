@@ -9,18 +9,18 @@ import static com.github.anrimian.simplemusicplayer.data.database.AppDatabase.SH
 public class ShuffledPlayQueueEntity {
 
     @PrimaryKey(autoGenerate = true)
-    private long internalId;
+    private long id;
 
     private long audioId;
 
     private int position;
 
-    public long getInternalId() {
-        return internalId;
+    public long getId() {
+        return id;
     }
 
-    public void setInternalId(long internalId) {
-        this.internalId = internalId;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public long getAudioId() {

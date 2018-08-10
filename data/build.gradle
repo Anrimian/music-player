@@ -42,6 +42,7 @@ dependencies {
     compileOnly dataDependencies.javaxAnnotation
 
     implementation dataDependencies.room
+    implementation dataDependencies.roomRx
     annotationProcessor dataDependencies.roomCompiler
 
     testImplementation testDependencies.junit

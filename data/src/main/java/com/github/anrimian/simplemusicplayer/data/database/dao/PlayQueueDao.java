@@ -10,20 +10,27 @@ import com.github.anrimian.simplemusicplayer.data.database.entities.ShuffledPlay
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 @Dao
 public interface PlayQueueDao {
 
+    @Deprecated
     @Query("SELECT * FROM play_queue ORDER BY position")
     List<PlayQueueEntity> getPlayQueue();
 
+    @Query("SELECT * FROM play_queue ORDER BY position")
+    Flowable<List<PlayQueueEntity>> getPlayQueueObservable();
+
+    @Deprecated
     @Query("SELECT * FROM shuffled_play_queue ORDER BY position")
     List<ShuffledPlayQueueEntity> getShuffledPlayQueue();
 
+    @Query("SELECT * FROM shuffled_play_queue ORDER BY position")
+    Flowable<List<ShuffledPlayQueueEntity>> getShuffledPlayQueueObservable();
+
     @Insert
     void insertPlayQueue(List<PlayQueueEntity> playQueueEntityList);
-
-    @Update
-    void updatePlayQueue(List<PlayQueueEntity> playQueueEntityList);
 
     @Query("DELETE FROM play_queue")
     void deletePlayQueue();
@@ -35,11 +42,17 @@ public interface PlayQueueDao {
     void insertShuffledPlayQueue(List<ShuffledPlayQueueEntity> entities);
 
     @Query("DELETE FROM play_queue WHERE audioId = :audioId")
-    void deletePlayQueueEntity(long audioId);
+    void deleteComposition(long audioId);
 
     @Query("DELETE FROM shuffled_play_queue WHERE audioId = :audioId")
-    void deleteShuffledPlayQueueEntity(long audioId);
+    void deleteShuffledComposition(long audioId);
 
-    @Query("UPDATE play_queue SET position = :newPosition WHERE audioId = :audioId")
-    void updatePosition(long audioId, int newPosition);
+    @Query("DELETE FROM play_queue WHERE id = :id")
+    void deleteQueueItem(long id);
+
+    @Query("DELETE FROM shuffled_play_queue WHERE id = :id")
+    void deleteShuffledQueueItem(long id);
+
+    @Query("UPDATE play_queue SET position = :newPosition WHERE id = :id")
+    void updatePosition(long id, int newPosition);
 }

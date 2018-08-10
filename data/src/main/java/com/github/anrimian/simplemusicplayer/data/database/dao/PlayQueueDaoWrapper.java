@@ -4,11 +4,16 @@ import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
 import com.github.anrimian.simplemusicplayer.data.database.entities.PlayQueueEntity;
 import com.github.anrimian.simplemusicplayer.data.database.entities.ShuffledPlayQueueEntity;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
+import com.github.anrimian.simplemusicplayer.domain.models.composition.PlayQueueItem;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 
 /**
  * Created on 02.07.2018.
@@ -37,6 +42,60 @@ public class PlayQueueDaoWrapper {
         });
     }
 
+    public Flowable<List<PlayQueueItem>> getPlayQueueObservable(
+            Callable<Map<Long, Composition>> compositionsCallable) {
+        return playQueueDao.getPlayQueueObservable()
+                .map(entities -> toPlayQueueItem(entities, compositionsCallable.call()));
+    }
+
+    public Flowable<List<PlayQueueItem>> getShuffledPlayQueueObservable(
+            Callable<Map<Long, Composition>> compositionsCallable) {
+        return playQueueDao.getShuffledPlayQueueObservable()
+                .map(entities -> toShuffledPlayQueueItem(entities, compositionsCallable.call()));
+    }
+
+    private List<PlayQueueItem> toShuffledPlayQueueItem(List<ShuffledPlayQueueEntity> entities,
+                                                        Map<Long, Composition> compositionMap) {
+        Iterator<ShuffledPlayQueueEntity> iterator = entities.iterator();
+        while (iterator.hasNext()) {
+            ShuffledPlayQueueEntity playQueueEntity = iterator.next();
+            long id = playQueueEntity.getAudioId();
+            Composition composition = compositionMap.get(id);
+            if (composition == null) {
+                playQueueDao.deleteComposition(id);
+                iterator.remove();
+            }
+        }
+        List<PlayQueueItem> queueItems = new ArrayList<>();
+        for (ShuffledPlayQueueEntity playQueueEntity: entities) {
+            long id = playQueueEntity.getId();
+            Composition composition = compositionMap.get(id);
+            queueItems.add(new PlayQueueItem(id, composition));
+        }
+        return queueItems;
+    }
+
+    private List<PlayQueueItem> toPlayQueueItem(List<PlayQueueEntity> entities,
+                                                Map<Long, Composition> compositionMap) {
+        Iterator<PlayQueueEntity> iterator = entities.iterator();
+        while (iterator.hasNext()) {
+            PlayQueueEntity playQueueEntity = iterator.next();
+            long id = playQueueEntity.getAudioId();
+            Composition composition = compositionMap.get(id);
+            if (composition == null) {
+                playQueueDao.deleteComposition(id);
+                iterator.remove();
+            }
+        }
+        List<PlayQueueItem> queueItems = new ArrayList<>();
+        for (PlayQueueEntity playQueueEntity: entities) {
+            long id = playQueueEntity.getId();
+            Composition composition = compositionMap.get(id);
+            queueItems.add(new PlayQueueItem(id, composition));
+        }
+        return queueItems;
+    }
+
     public List<Composition> getPlayQueue(Map<Long, Composition> compositionMap) {
         List<PlayQueueEntity> playQueueEntities = playQueueDao.getPlayQueue();
 
@@ -46,7 +105,7 @@ public class PlayQueueDaoWrapper {
             long id = playQueueEntity.getAudioId();
             Composition composition = compositionMap.get(id);
             if (composition == null) {
-                playQueueDao.deletePlayQueueEntity(id);
+                playQueueDao.deleteComposition(id);
                 iterator.remove();
             }
         }
@@ -69,7 +128,7 @@ public class PlayQueueDaoWrapper {
             long id = playQueueEntity.getAudioId();
             Composition composition = compositionMap.get(id);
             if (composition == null) {
-                playQueueDao.deleteShuffledPlayQueueEntity(id);
+                playQueueDao.deleteShuffledComposition(id);
                 iterator.remove();
             }
         }

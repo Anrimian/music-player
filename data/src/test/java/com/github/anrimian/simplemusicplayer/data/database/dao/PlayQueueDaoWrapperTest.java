@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.data.database.dao;
 
+import com.github.anrimian.simplemusicplayer.data.TestDataProvider;
 import com.github.anrimian.simplemusicplayer.data.database.AppDatabase;
 import com.github.anrimian.simplemusicplayer.data.database.entities.PlayQueueEntity;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
@@ -8,6 +9,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Flowable;
 
 import static com.github.anrimian.simplemusicplayer.data.TestDataProvider.getFakeCompositionsMap;
 import static junit.framework.Assert.assertEquals;
@@ -34,10 +37,15 @@ public class PlayQueueDaoWrapperTest {
         playQueueEntity.setPosition(0);
         entities.add(playQueueEntity);
 
-        when(playQueueDao.getPlayQueue()).thenReturn(entities);
+        when(playQueueDao.getPlayQueueObservable()).thenReturn(Flowable.just(entities));
 
-        List<Composition> compositions = daoWrapper.getPlayQueue(getFakeCompositionsMap());
-        assertEquals(0, compositions.size());
-        verify(playQueueDao).deletePlayQueueEntity(eq(Long.MAX_VALUE));
+        daoWrapper.getPlayQueueObservable(TestDataProvider::getFakeCompositionsMap)
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(0, compositions.size());
+                    verify(playQueueDao).deleteComposition(eq(Long.MAX_VALUE));
+                    return true;
+                });
+
     }
 }
