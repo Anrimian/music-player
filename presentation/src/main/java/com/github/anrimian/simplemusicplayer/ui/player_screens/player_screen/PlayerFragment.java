@@ -271,6 +271,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         });
 
         FragmentManager fm = getChildFragmentManager();
+        drawerLockStateProcessor.setOnRootNavigationState(fm.getBackStackEntryCount() == 0);
         fm.addOnBackStackChangedListener(() ->
                 drawerLockStateProcessor.setOnRootNavigationState(fm.getBackStackEntryCount() == 0)
         );

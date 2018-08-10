@@ -10,7 +10,7 @@ public class DrawerLockStateProcessor {
     private final DrawerLayout drawer;
 
     private boolean openedBottomSheet = false;
-    private boolean inRoot = false;
+    private boolean inRoot = true;
 
     public DrawerLockStateProcessor(DrawerLayout drawer) {
         this.drawer = drawer;
