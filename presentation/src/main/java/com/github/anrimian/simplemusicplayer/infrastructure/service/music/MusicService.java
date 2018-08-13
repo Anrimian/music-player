@@ -108,7 +108,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             handleNotificationAction(requestCode);
         } else {
             KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession, intent);
-            if (keyEvent != null) {
+            if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
                 handleMediaButtonAction(keyEvent);
             }
         }
