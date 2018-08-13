@@ -7,12 +7,17 @@ import com.github.anrimian.simplemusicplayer.domain.utils.Objects;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class FolderNode extends NodeData {
 
     private final String fullPath;
     private int compositionsCount;
 
+    @Nullable
     private Date latestCreateDate;
+
+    @Nullable
     private Date earliestCreateDate;
 
     FolderNode(String fullPath) {
@@ -85,10 +90,12 @@ public class FolderNode extends NodeData {
         return compositionsCount;
     }
 
+    @Nullable
     public Date getLatestCreateDate() {
         return latestCreateDate;
     }
 
+    @Nullable
     public Date getEarliestCreateDate() {
         return earliestCreateDate;
     }

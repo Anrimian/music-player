@@ -142,9 +142,7 @@ public class MusicFolderDataSourceTest {
     @Test
     public void newCompositionChangeInChildNodeTest() {
         Map<Long, Composition> compositions = new HashMap<>();
-        Composition compositionOne = new Composition();
-        compositionOne.setFilePath("root/music/one.dd");
-        compositionOne.setId(1L);
+        Composition compositionOne = fakeComposition(1L, "root/music/one.dd", 4L);
         compositions.put(1L, compositionOne);
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
@@ -153,9 +151,7 @@ public class MusicFolderDataSourceTest {
         TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
-        Composition compositionTwo = new Composition();
-        compositionTwo.setFilePath("root/music/basic/two.dd");
-        compositionTwo.setId(2L);
+        Composition compositionTwo = fakeComposition(2L, "root/music/basic/two.dd", 4L);
         changeSubject.onNext(new Change<>(ADDED, singletonList(compositionTwo)));
 
         childrenObserver.assertValueAt(1, list -> {
@@ -165,6 +161,8 @@ public class MusicFolderDataSourceTest {
             FolderFileSource folderNode = ((FolderFileSource) list.get(1));
             assertEquals("root/music/basic", folderNode.getFullPath());
             assertEquals(0, folderNode.getFilesCount());
+            assertEquals(null, folderNode.getEarliestCreateDate());
+            assertEquals(null, folderNode.getLatestCreateDate());
             return true;
         });
 
@@ -175,6 +173,8 @@ public class MusicFolderDataSourceTest {
             FolderFileSource folderNode = ((FolderFileSource) list.get(1));
             assertEquals("root/music/basic", folderNode.getFullPath());
             assertEquals(1, folderNode.getFilesCount());
+            assertEquals(4L, folderNode.getEarliestCreateDate().getTime());
+            assertEquals(4L, folderNode.getLatestCreateDate().getTime());
             return true;
         });
 

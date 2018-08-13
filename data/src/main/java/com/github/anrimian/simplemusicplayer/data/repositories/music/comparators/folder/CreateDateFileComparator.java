@@ -5,6 +5,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.F
 import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.MusicFileSource;
 
 import java.util.Comparator;
+import java.util.Date;
 
 public class CreateDateFileComparator implements Comparator<FileSource> {
 
@@ -12,8 +13,15 @@ public class CreateDateFileComparator implements Comparator<FileSource> {
     public int compare(FileSource first, FileSource second) {
         if (first.getClass().equals(second.getClass())) {
             if (first instanceof FolderFileSource) {
-                return ((FolderFileSource) first).getLatestCreateDate()
-                        .compareTo(((FolderFileSource) second).getLatestCreateDate());
+                Date secondDate = ((FolderFileSource) second).getLatestCreateDate();
+                if (secondDate == null) {
+                    return -1;
+                }
+                Date firstDate = ((FolderFileSource) first).getLatestCreateDate();
+                if (firstDate == null) {
+                    return 1;
+                }
+                return firstDate.compareTo(secondDate);
             } else if (first instanceof MusicFileSource) {
                 return ((MusicFileSource) first).getComposition().getDateAdded()
                         .compareTo(((MusicFileSource) second).getComposition().getDateAdded());

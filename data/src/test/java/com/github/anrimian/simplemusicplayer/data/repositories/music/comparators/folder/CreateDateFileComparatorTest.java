@@ -26,14 +26,16 @@ public class CreateDateFileComparatorTest {
                 new MusicFileSource(compositionOne),
                 new FolderFileSource("basic", 1, new Date(101L), new Date(0)),
                 new MusicFileSource(compositionTwo),
-                new FolderFileSource("aby", 1, new Date(201L), new Date(0))
+                new FolderFileSource("aby", 1, new Date(201L), new Date(0)),
+                new FolderFileSource("nullabla", 1, null, null)
         );
 
         Collections.sort(fileSources, new CreateDateFileComparator());
 
         assertEquals("basic", ((FolderFileSource) fileSources.get(0)).getFullPath());
         assertEquals("aby", ((FolderFileSource) fileSources.get(1)).getFullPath());
-        assertEquals(compositionOne, ((MusicFileSource) fileSources.get(2)).getComposition());
-        assertEquals(compositionTwo, ((MusicFileSource) fileSources.get(3)).getComposition());
+        assertEquals("nullabla", ((FolderFileSource) fileSources.get(2)).getFullPath());
+        assertEquals(compositionOne, ((MusicFileSource) fileSources.get(3)).getComposition());
+        assertEquals(compositionTwo, ((MusicFileSource) fileSources.get(4)).getComposition());
     }
 }

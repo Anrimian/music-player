@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.domain.models.composition.folders;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Created on 31.10.2017.
@@ -15,13 +16,16 @@ public class FolderFileSource implements FileSource {
 
     private int filesCount;
 
+    @Nullable
     private Date latestCreateDate;
+
+    @Nullable
     private Date earliestCreateDate;
 
     public FolderFileSource(@Nonnull String fullPath,
                             int filesCount,
-                            @Nonnull Date newestCreateDate,
-                            @Nonnull Date earliestCreateDate) {
+                            @Nullable Date newestCreateDate,
+                            @Nullable Date earliestCreateDate) {
         this.fullPath = fullPath;
         this.filesCount = filesCount;
         this.latestCreateDate = newestCreateDate;
@@ -37,10 +41,12 @@ public class FolderFileSource implements FileSource {
         return filesCount;
     }
 
+    @Nullable
     public Date getLatestCreateDate() {
         return latestCreateDate;
     }
 
+    @Nullable
     public Date getEarliestCreateDate() {
         return earliestCreateDate;
     }
