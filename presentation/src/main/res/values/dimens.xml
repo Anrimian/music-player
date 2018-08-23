@@ -6,6 +6,10 @@
     <dimen name="bottom_sheet_height">60dp</dimen>
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
 
+    <dimen name="music_control_button_padding_collapsed">12dp</dimen>
+    <dimen name="music_control_button_padding_expanded">7dp</dimen>
+
+
     <dimen name="text_size_xxsmall">12sp</dimen>
     <dimen name="text_size_xsmall">13sp</dimen>
     <dimen name="text_size_small">14sp</dimen>
@@ -33,7 +37,10 @@
     <dimen name="subtitle_height">48dp</dimen>
 
     <dimen name="music_icon_size">48dp</dimen>
-    <dimen name="target_title_text_size">15sp</dimen>
+
+
+    <dimen name="current_composition_collapse_text_size">13sp</dimen>
+    <dimen name="current_composition_expand_text_size">15sp</dimen>
 
     <dimen name="dialog_margin_content_vertical">12dp</dimen>
     <dimen name="dialog_margin_content_horizontal">8dp</dimen>

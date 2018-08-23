@@ -13,10 +13,10 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
 
 public class ExpandViewDelegate implements BottomSheetDelegate {
 
-    private int expandWidth;
-    private int expandHeight;
+    private final int expandWidth;
+    private final int expandHeight;
 
-    private View view;
+    private final View view;
 
     public ExpandViewDelegate(@DimenRes int expandSize, View view) {
         this(expandSize, expandSize, view);

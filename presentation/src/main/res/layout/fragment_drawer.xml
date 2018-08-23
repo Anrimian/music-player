@@ -14,70 +14,61 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <android.support.design.widget.CoordinatorLayout
-            android:id="@+id/coordinator"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <include layout="@layout/partial_toolbar"
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.HidingViewWithBottomSheetBehavior"/>
+                android:id="@+id/toolbar"/>
 
-            <FrameLayout
-                android:id="@+id/drawer_fragment_container"
+            <android.support.design.widget.CoordinatorLayout
+                android:id="@+id/coordinator"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="@dimen/bottom_sheet_height"
-                app:layout_anchor="@id/toolbar"
-                app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.LinkedCoordinateViewBehavior"/>
+                android:layout_height="match_parent">
 
-            <View
-                android:id="@+id/bottom_sheet_top_shadow"
-                android:layout_width="match_parent"
-                android:layout_height="15dp"
-                android:background="@drawable/bg_shadow_top"
-                app:layout_anchor="@id/bottom_sheet"/>
+                <FrameLayout
+                    android:id="@+id/drawer_fragment_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/bottom_sheet_height"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.BoundViewBottomSheetBehavior">
-
-                <include
-                    android:id="@+id/play_queue_toolbar"
-                    layout="@layout/partial_toolbar"/>
+                <View
+                    android:id="@+id/bottom_sheet_top_shadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="15dp"
+                    android:background="@drawable/bg_shadow_top"
+                    app:layout_anchor="@id/bottom_sheet"/>
 
                 <android.support.design.widget.CoordinatorLayout
                     android:id="@+id/cl_play_queue_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.BoundViewBottomSheetBehavior">
 
-                    <android.support.v7.widget.RecyclerView
+                <android.support.v7.widget.RecyclerView
                         android:id="@+id/rv_playlist"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
 
                 </android.support.design.widget.CoordinatorLayout>
 
-            </LinearLayout>
+                <android.support.design.widget.CoordinatorLayout
+                    android:id="@+id/bottom_sheet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/windowBackground"
+                    app:behavior_hideable="false"
+                    app:behavior_peekHeight="@dimen/bottom_sheet_height"
+                    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
-            <android.support.design.widget.CoordinatorLayout
-                android:id="@+id/bottom_sheet"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?android:attr/windowBackground"
-                app:behavior_hideable="false"
-                app:behavior_peekHeight="@dimen/bottom_sheet_height"
-                app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+                    <include layout="@layout/partial_detailed_music" />
 
-                <include layout="@layout/partial_detailed_music"
-                    app:layout_behavior="android.support.design.widget.NestedScrollingBehavior"/>
+                </android.support.design.widget.CoordinatorLayout>
 
             </android.support.design.widget.CoordinatorLayout>
-        </android.support.design.widget.CoordinatorLayout>
+
+        </LinearLayout>
 
         <android.support.design.widget.NavigationView
             android:id="@+id/navigation_view"

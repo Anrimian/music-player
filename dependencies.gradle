@@ -15,8 +15,8 @@ ext {
     androidCompileSdkVersion = 27
 
     //Libraries
-    supportLibraryVersion = "27.0.2"
-    constraintLayoutVersion = "1.1.0"
+    supportLibraryVersion = "27.1.0"
+    constraintLayoutVersion = "2.0.0-alpha2"
     rxJavaVersion = "2.1.12"
     rxAndroidVersion = "2.0.1"
     rxPermissionsVersion = "0.9.4@aar"

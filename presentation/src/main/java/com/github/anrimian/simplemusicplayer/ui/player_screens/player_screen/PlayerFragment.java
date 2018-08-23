@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.motion.MotionLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -41,21 +42,20 @@ import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersRootFragment;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
-import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.delegate.ChangeTitleDelegate;
 import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
-import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.FragmentUtils;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegateManager;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ExpandViewDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ReverseDelegate;
-import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.TargetViewDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.view_pager.FragmentCreator;
@@ -103,7 +103,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     NavigationView navigationView;
 
     @BindView(R.id.bottom_sheet)
-    CoordinatorLayout bottomSheet;
+    View bottomSheet;
 
     @BindView(R.id.rv_playlist)
     RecyclerView rvPlayList;
@@ -117,14 +117,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.iv_skip_to_next)
     ImageView ivSkipToNext;
 
-    @BindView(R.id.iv_play_pause_expanded)
-    ImageView ivPlayPauseExpanded;
-
-    @BindView(R.id.iv_skip_to_previous_expanded)
-    ImageView ivSkipToPreviousExpanded;
-
-    @BindView(R.id.iv_skip_to_next_expanded)
-    ImageView ivSkipToNextExpanded;
+//    @BindView(R.id.iv_play_pause_expanded)
+//    ImageView ivPlayPauseExpanded;
+//
+//    @BindView(R.id.iv_skip_to_previous_expanded)
+//    ImageView ivSkipToPreviousExpanded;
+//
+//    @BindView(R.id.iv_skip_to_next_expanded)
+//    ImageView ivSkipToNextExpanded;
 
     @BindView(R.id.drawer_fragment_container)
     ViewGroup fragmentContainer;
@@ -162,17 +162,20 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.btn_actions_menu)
     ImageView btnActionsMenu;
 
-    @BindView(R.id.tv_current_composition_info)
-    TextView tvCurrentCompositionInfo;
+//    @BindView(R.id.tv_current_composition_info)
+//    TextView tvCurrentCompositionInfo;
 
     @BindView(R.id.tv_current_composition_author)
     TextView tvCurrentCompositionAuthor;
 
-    @BindView(R.id.play_queue_toolbar)
-    AdvancedToolbar advancedToolbar;
+//    @BindView(R.id.play_queue_toolbar)
+//    AdvancedToolbar advancedToolbar;
 
     @BindView(R.id.cl_play_queue_container)
     CoordinatorLayout clPlayQueueContainer;
+
+    @BindView(R.id.motion_layout)
+    MotionLayout motionLayout;
 
 //    @BindView(R.id.play_actions_top_shadow)
 //    View playActionsTopShadow;
@@ -180,7 +183,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 //    @BindView(R.id.bottom_panel)
 //    View bottomPanel;
 
-    private BottomSheetBehavior<CoordinatorLayout> bottomSheetBehavior;
+//    @BindView(R.id.bottom_sheet_play_panel_shadow)
+//    View bottomSheetPanelShadow;
+
+    private BottomSheetBehavior<View> bottomSheetBehavior;
 
     private PlayQueueAdapter playQueueAdapter;
 
@@ -209,7 +215,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_drawer, container, false);
     }
 
@@ -240,7 +248,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
 
-        advancedToolbar.init();
+//        advancedToolbar.init();
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
 
@@ -277,15 +285,24 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         );
 
         BottomSheetDelegateManager bottomSheetDelegateManager = new BottomSheetDelegateManager();
-        bottomSheetDelegateManager.addDelegate(new TargetViewDelegate(ivPlayPause, ivPlayPauseExpanded))
-                .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
-                .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
-//                .addDelegate(new VisibilityDelegate(rvPlayList))
+        bottomSheetDelegateManager
+//                .addDelegate(new PaddingDelegate(
+//                        ivPlayPause,
+//                        R.dimen.music_control_button_padding_collapsed,
+//                        R.dimen.music_control_button_padding_expanded)
+//                )
+//                .addDelegate(new TargetViewDelegate(ivPlayPause, ivPlayPauseExpanded))
+//                .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
+                .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
+                .addDelegate(new MotionLayoutDelegate(motionLayout))
+//                .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
+//                .addDelegate(new BoundValuesDelegate(0.8f, 0.9f, new VisibilityDelegate(bottomSheetPanelShadow)))
+                .addDelegate(new BoundValuesDelegate(0.9f, 0.95f, new VisibilityDelegate(rvPlayList)))
                 .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
-                .addDelegate(new ChangeTitleDelegate(tvCurrentComposition, btnActionsMenu, ivSkipToPrevious))
+//                .addDelegate(new ChangeTitleDelegate(tvCurrentComposition, btnActionsMenu, ivSkipToPrevious))
                 .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))
-                .addDelegate(new BoundValuesDelegate(0.8f, 1.0f, new VisibilityDelegate(tvCurrentCompositionInfo)))
+//                .addDelegate(new BoundValuesDelegate(0.8f, 1.0f, new VisibilityDelegate(tvCurrentCompositionInfo)))
                 .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
 //                .addDelegate(new BoundValuesDelegate(0.4f, 0.6f, new VisibilityDelegate(bottomSheetBottomShadow)))
 //                .addDelegate(new BoundValuesDelegate(0.9f, 1.0f, new VisibilityDelegate(rvPlayList)))
@@ -296,7 +313,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
-        bottomSheetDelegate = new BoundValuesDelegate(0.05f, 0.95f, bottomSheetDelegateManager);
+        bottomSheetDelegate = new BoundValuesDelegate(0.008f, 0.95f, bottomSheetDelegateManager);
 
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -433,7 +450,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showCurrentComposition(Composition composition, int position) {
         tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
-        tvCurrentCompositionInfo.setText(composition.getAlbum());
+//        tvCurrentCompositionInfo.setText(composition.getAlbum());
         tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, getContext()));
 
         playQueueAdapter.onCurrentCompositionChanged(composition);
