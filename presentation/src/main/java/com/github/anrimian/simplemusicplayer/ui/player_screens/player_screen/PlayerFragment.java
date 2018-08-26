@@ -52,7 +52,9 @@ import com.github.anrimian.simplemusicplayer.ui.utils.fragments.FragmentUtils;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegateManager;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BoundValuesDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ChangeWidthDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ExpandViewDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ReverseDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.TextSizeDelegate;
@@ -102,8 +104,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.navigation_view)
     NavigationView navigationView;
 
-    @BindView(R.id.bottom_sheet)
-    View bottomSheet;
+    @Nullable
+    @BindView(R.id.coordinator_bottom_sheet)
+    View bottomSheetCoordinator;
+
+    @Nullable
+    @BindView(R.id.bottom_sheet_left_shadow)
+    View bottomSheetLeftShadow;
+
+    @Nullable
+    @BindView(R.id.bottom_sheet_top_left_shadow)
+    View bottomSheetTopLeftShadow;
 
     @BindView(R.id.rv_playlist)
     RecyclerView rvPlayList;
@@ -174,8 +185,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.cl_play_queue_container)
     CoordinatorLayout clPlayQueueContainer;
 
-    @BindView(R.id.motion_layout)
-    MotionLayout motionLayout;
+    @BindView(R.id.ml_bottom_sheet)
+    MotionLayout mlBottomSheet;
 
 //    @BindView(R.id.play_actions_top_shadow)
 //    View playActionsTopShadow;
@@ -294,7 +305,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 //                .addDelegate(new TargetViewDelegate(ivPlayPause, ivPlayPauseExpanded))
 //                .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
-                .addDelegate(new MotionLayoutDelegate(motionLayout))
+                .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
 //                .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
 //                .addDelegate(new BoundValuesDelegate(0.8f, 0.9f, new VisibilityDelegate(bottomSheetPanelShadow)))
                 .addDelegate(new BoundValuesDelegate(0.9f, 0.95f, new VisibilityDelegate(rvPlayList)))
@@ -313,11 +324,22 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
+        if (bottomSheetCoordinator != null) {
+            bottomSheetDelegateManager.addDelegate(new ChangeWidthDelegate(
+                    0.5f,
+                    bottomSheetCoordinator));
+            bottomSheetDelegateManager.addDelegate(new LeftBottomShadowDelegate(
+                    bottomSheetLeftShadow,
+                    bottomSheetTopLeftShadow,
+                    mlBottomSheet,
+                    bottomSheetCoordinator));
+        }
+
         bottomSheetDelegate = new BoundValuesDelegate(0.008f, 0.95f, bottomSheetDelegateManager);
 
 
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheet.setClickable(true);
+        bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
+        mlBottomSheet.setClickable(true);
 
         int bottomSheetState = STATE_COLLAPSED;
         if (savedInstanceState != null) {

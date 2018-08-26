@@ -95,7 +95,7 @@
             android:layout_marginStart="8dp"
             app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_random_play"
             app:layout_constraintTop_toTopOf="@+id/iv_play_pause" />
 
         <Constraint
@@ -111,7 +111,7 @@
             style="@style/Content.Button.Main.Expanded"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_infinite_play"
             app:layout_constraintStart_toEndOf="@+id/iv_play_pause"
             app:layout_constraintTop_toTopOf="@+id/iv_play_pause"/>
 

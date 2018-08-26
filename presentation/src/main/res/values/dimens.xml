@@ -46,6 +46,10 @@
     <dimen name="dialog_margin_content_horizontal">8dp</dimen>
     <dimen name="radio_button_text_margin_start">8dp</dimen>
 
-    <!--specific sizes-->
+    <!--bottom sheet-->
+    <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>
+    <dimen name="bottom_sheet_shadow_height">8dp</dimen>
+    <dimen name="bottom_sheet_shadow_internal_margin">4dp</dimen>
+    <dimen name="bottom_sheet_portrait_expand_height">190dp</dimen>
 
 </resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/drawer_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/bottom_sheet_height"/>
+
+    <include layout="@layout/partial_bottom_sheet_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/ml_bottom_sheet"/>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/cl_play_queue_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.BoundViewBottomSheetBehavior">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_playlist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <include layout="@layout/partial_detailed_music"
+        android:id="@+id/ml_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_sheet_portrait_expand_height"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="@dimen/bottom_sheet_height"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
+
+</android.support.design.widget.CoordinatorLayout>
