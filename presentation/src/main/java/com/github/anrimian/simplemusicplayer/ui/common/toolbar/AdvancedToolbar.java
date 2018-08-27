@@ -37,6 +37,7 @@ public class AdvancedToolbar extends Toolbar {
         titleContainer = findViewById(R.id.title_container);
         actionIcon = findViewById(R.id.action_icon);
         actionIcon.setVisibility(GONE);
+        setTitle("");//setSupportActionBar() set app title to null title in action bar
     }
 
     @Override

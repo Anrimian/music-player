@@ -53,6 +53,7 @@ import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheet
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegateManager;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ChangeWidthDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.DrawerToggleBottomSheetDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
@@ -248,7 +249,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         AdvancedToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.init();
-        toolbar.setTitle("");//setSupportActionBar() set app title to null title in action bar
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         ActionBar actionBar = activity.getSupportActionBar();
@@ -258,8 +258,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
-
-//        advancedToolbar.init();
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
 
@@ -276,6 +274,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawerToggle = new ActionBarDrawerToggle(getActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
         drawerToggle.setDrawerIndicatorEnabled(true);
+        drawer.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 
             @Override
@@ -322,6 +323,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
+                .addDelegate(new DrawerToggleBottomSheetDelegate(drawerToggle))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
         if (bottomSheetCoordinator != null) {
@@ -404,8 +406,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean toggleSelected = drawerToggle.onOptionsItemSelected(item);
-        return toggleSelected || super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
+                bottomSheetBehavior.setState(STATE_COLLAPSED);
+            } else {
+                drawer.openDrawer(Gravity.START);
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
