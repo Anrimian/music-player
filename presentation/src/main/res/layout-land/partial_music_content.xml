@@ -50,7 +50,7 @@
             android:layout_height="match_parent"
             app:behavior_hideable="false"
             app:behavior_peekHeight="@dimen/bottom_sheet_height"
-            app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
+            app:layout_behavior="@string/bottom_sheet_behavior"/>
 
     </android.support.design.widget.CoordinatorLayout>
 
@@ -60,18 +60,10 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_shadow_left"/>
 
-    <FrameLayout
+    <View
         android:id="@+id/bottom_sheet_top_left_shadow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <View
-            android:id="@+id/bottom_sheet_top_shadow"
-            android:layout_width="@dimen/bottom_sheet_left_shadow_width"
-            android:layout_height="@dimen/bottom_sheet_shadow_height"
-            android:layout_marginBottom="@dimen/bottom_sheet_shadow_internal_margin"
-            android:background="@drawable/bg_shadow_top_left"/>
-
-    </FrameLayout>
+        android:layout_width="@dimen/bottom_sheet_left_shadow_width"
+        android:layout_height="@dimen/bottom_sheet_top_left_shadow_height"
+        android:background="@drawable/bg_shadow_top_left"/>
 
 </android.support.design.widget.CoordinatorLayout>

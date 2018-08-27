@@ -27,7 +27,10 @@ public class LeftBottomShadowDelegate implements BottomSheetDelegate {
 
     @Override
     public void onSlide(float slideOffset) {
-        if (isLaidOut(leftShadow) || isLaidOut(bottomSheet)) {
+        if (isLaidOut(leftShadow)
+                && isLaidOut(topLeftShadow)
+                && isLaidOut(bottomSheet)
+                && isLaidOut(bottomSheetCoordinator)) {
             moveView();
         } else {
             leftShadow.post(this::moveView);
@@ -40,6 +43,6 @@ public class LeftBottomShadowDelegate implements BottomSheetDelegate {
         topLeftShadow.setX(x);
 
         leftShadow.setY(bottomSheet.getY());
-        topLeftShadow.setY(bottomSheet.getY() - topLeftShadow.getWidth());
+        topLeftShadow.setY(bottomSheet.getY() - topLeftShadow.getHeight());
     }
 }

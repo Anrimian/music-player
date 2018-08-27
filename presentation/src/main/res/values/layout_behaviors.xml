@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="fab_behavior" translatable="false">
+        com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.ScrollAwareFABBehavior
+    </string>
 
+    <string name="bound_with_bottom_sheet_behavior" translatable="false">
+        com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.BoundViewBottomSheetBehavior
+    </string>
 </resources>
