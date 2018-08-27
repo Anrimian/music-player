@@ -14,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -53,7 +54,7 @@ import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheet
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegateManager;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ChangeWidthDelegate;
-import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.DrawerToggleBottomSheetDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.DrawerArrowBottomSheetDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
@@ -292,8 +293,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         FragmentManager fm = getChildFragmentManager();
         drawerLockStateProcessor.setOnRootNavigationState(fm.getBackStackEntryCount() == 0);
-        fm.addOnBackStackChangedListener(() ->
-                drawerLockStateProcessor.setOnRootNavigationState(fm.getBackStackEntryCount() == 0)
+        drawerToggle.getDrawerArrowDrawable().setProgress(fm.getBackStackEntryCount() == 0? 0f: 1f);//TODO with animation
+
+        fm.addOnBackStackChangedListener(() -> {
+                    drawerToggle.getDrawerArrowDrawable().setProgress(fm.getBackStackEntryCount() == 0? 0f: 1f);
+                    drawerLockStateProcessor.setOnRootNavigationState(fm.getBackStackEntryCount() == 0);
+                }
         );
 
         BottomSheetDelegateManager bottomSheetDelegateManager = new BottomSheetDelegateManager();
@@ -323,7 +328,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
-                .addDelegate(new DrawerToggleBottomSheetDelegate(drawerToggle))
+                .addDelegate(new DrawerArrowBottomSheetDelegate(drawerToggle.getDrawerArrowDrawable(), () -> fm.getBackStackEntryCount() != 0))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
         if (bottomSheetCoordinator != null) {
@@ -409,8 +414,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         if (item.getItemId() == android.R.id.home) {
             if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
                 bottomSheetBehavior.setState(STATE_COLLAPSED);
+            } else if (drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+                drawer.openDrawer(GravityCompat.START);
             } else {
-                drawer.openDrawer(Gravity.START);
+                onBackPressed();
             }
         }
         return super.onOptionsItemSelected(item);
