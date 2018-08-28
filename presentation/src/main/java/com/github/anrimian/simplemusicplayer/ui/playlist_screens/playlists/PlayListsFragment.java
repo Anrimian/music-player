@@ -19,7 +19,6 @@ import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.simplemusicplayer.ui.common.toolbar.BackStackListener;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;

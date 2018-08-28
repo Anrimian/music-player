@@ -27,7 +27,6 @@ public class AdvancedToolbar extends Toolbar {
 
     private FragmentManager fragmentManager;
     private DrawerArrowDrawable drawerArrowDrawable;
-    private int fragmentContainerId;
 
     public AdvancedToolbar(Context context) {
         super(context);
@@ -51,11 +50,9 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     public void setupWithFragmentManager(FragmentManager fragmentManager,
-                                         DrawerArrowDrawable drawerArrowDrawable,
-                                         int fragmentContainerId) {
+                                         DrawerArrowDrawable drawerArrowDrawable) {
         this.fragmentManager = fragmentManager;
         this.drawerArrowDrawable = drawerArrowDrawable;
-        this.fragmentContainerId = fragmentContainerId;
         onFragmentStackChanged();
         fragmentManager.addOnBackStackChangedListener(this::onFragmentStackChanged);
     }

@@ -86,47 +86,6 @@
 
     </ConstraintSet>
 
-    <ConstraintSet android:id="@id/end">
-
-        <Constraint
-            android:id="@id/iv_skip_to_previous"
-            style="@style/Content.Button.Main.Expanded"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@+id/btn_random_play"
-            app:layout_constraintTop_toTopOf="@+id/iv_play_pause" />
-
-        <Constraint
-            android:id="@id/iv_play_pause"
-            style="@style/Content.Button.Main.Expanded"
-            android:layout_marginBottom="14dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
-            app:layout_constraintStart_toEndOf="@+id/iv_skip_to_previous"/>
-
-        <Constraint
-            android:id="@id/iv_skip_to_next"
-            style="@style/Content.Button.Main.Expanded"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintEnd_toStartOf="@+id/btn_infinite_play"
-            app:layout_constraintStart_toEndOf="@+id/iv_play_pause"
-            app:layout_constraintTop_toTopOf="@+id/iv_play_pause"/>
-
-        <Constraint
-            android:id="@id/tv_current_composition"
-            style="@style/Content.Text.Small"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            app:layout_constraintVertical_chainStyle="packed"
-            app:layout_constraintTop_toTopOf="@+id/music_icon_wrapper"
-            app:layout_constraintBottom_toTopOf="@+id/tv_current_composition_author"
-            app:layout_constraintEnd_toEndOf="@+id/tv_current_composition_author"
-            app:layout_constraintStart_toStartOf="@+id/tv_current_composition_author" />
-
-    </ConstraintSet>
+    <ConstraintSet android:id="@id/end"/>
 
 </MotionScene>

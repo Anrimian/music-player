@@ -19,7 +19,7 @@ public class DrawerArrowBottomSheetDelegate implements BottomSheetDelegate {
     @Override
     public void onSlide(float slideOffset) {
         if (lockCallback == null || !lockCallback.isLocked()) {
-            drawerArrowDrawable.setProgress(slideOffset);
+            drawerArrowDrawable.setProgress(slideOffset);//TODO initial state
         }
     }
 
