@@ -101,15 +101,6 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     private void onFragmentStackChanged() {
-        Fragment fragment = fragmentManager.findFragmentById(fragmentContainerId);
-        if (fragment instanceof BackStackListener) {
-            ((BackStackListener) fragment).onRestoredFromBackStack();
-        }
-
-        setBackButtonState();
-    }
-
-    private void setBackButtonState() {
         float start = drawerArrowDrawable.getProgress();
         float end = fragmentManager.getBackStackEntryCount() == 0? 0f: 1f;
         ObjectAnimator objectAnimator = ofFloat(drawerArrowDrawable, "progress", start, end);
