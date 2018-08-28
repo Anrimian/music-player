@@ -87,7 +87,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrFragment.replace(this, clListContainer, slidrConfig);//TODO animate toolbar button
+        SlidrFragment.replace(this, clListContainer, slidrConfig, toolbar::onStackFragmentSlided);
     }
 
     @Override

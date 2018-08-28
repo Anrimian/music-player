@@ -14,9 +14,14 @@ class FragmentPanelSlideListener implements SliderPanel.OnPanelSlideListener {
     private final Fragment fragment;
     private final SlidrConfig config;
 
-    FragmentPanelSlideListener(@NonNull Fragment fragment, @NonNull SlidrConfig config) {
+    private SlidrFragment.SlideListener slideListener;
+
+    FragmentPanelSlideListener(@NonNull Fragment fragment,
+                               @NonNull SlidrConfig config,
+                               SlidrFragment.SlideListener slideListener) {
         this.fragment = fragment;
         this.config = config;
+        this.slideListener = slideListener;
     }
 
 
@@ -52,6 +57,9 @@ class FragmentPanelSlideListener implements SliderPanel.OnPanelSlideListener {
     public void onSlideChange(float percent) {
         if (config.getListener() != null) {
             config.getListener().onSlideChange(percent);
+        }
+        if (slideListener != null) {
+            slideListener.onSlideChange(percent);
         }
     }
 }

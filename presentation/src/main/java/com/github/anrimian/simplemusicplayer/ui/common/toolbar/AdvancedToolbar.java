@@ -1,7 +1,11 @@
 package com.github.anrimian.simplemusicplayer.ui.common.toolbar;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -10,7 +14,9 @@ import android.widget.TextView;
 
 import com.github.anrimian.simplemusicplayer.R;
 
+import static android.animation.ObjectAnimator.ofFloat;
 import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.simplemusicplayer.Constants.Animation.TOOLBAR_ARROW_ANIMATION_TIME;
 
 public class AdvancedToolbar extends Toolbar {
 
@@ -18,6 +24,9 @@ public class AdvancedToolbar extends Toolbar {
     private TextView tvSubtitle;
     private View titleContainer;
     private View actionIcon;
+
+    private FragmentManager fragmentManager;
+    private DrawerArrowDrawable drawerArrowDrawable;
 
     public AdvancedToolbar(Context context) {
         super(context);
@@ -38,6 +47,14 @@ public class AdvancedToolbar extends Toolbar {
         actionIcon = findViewById(R.id.action_icon);
         actionIcon.setVisibility(GONE);
         setTitle("");//setSupportActionBar() set app title to null title in action bar
+    }
+
+    public void setupWithFragmentManager(FragmentManager fragmentManager,
+                                         DrawerArrowDrawable drawerArrowDrawable) {
+        this.fragmentManager = fragmentManager;
+        this.drawerArrowDrawable = drawerArrowDrawable;
+        onFragmentStackChanged();
+        fragmentManager.addOnBackStackChangedListener(this::onFragmentStackChanged);
     }
 
     @Override
@@ -65,5 +82,19 @@ public class AdvancedToolbar extends Toolbar {
     public void setTitleClickListener(View.OnClickListener listener) {
         actionIcon.setVisibility(listener == null? GONE : VISIBLE);
         titleContainer.setOnClickListener(listener);
+    }
+
+    public void onStackFragmentSlided(float offset) {
+        if (fragmentManager.getBackStackEntryCount() == 1) {
+            drawerArrowDrawable.setProgress(offset);
+        }
+    }
+
+    private void onFragmentStackChanged() {
+        float start = drawerArrowDrawable.getProgress();
+        float end = fragmentManager.getBackStackEntryCount() == 0? 0f: 1f;
+        ObjectAnimator objectAnimator = ofFloat(drawerArrowDrawable, "progress", start, end);
+        objectAnimator.setDuration(TOOLBAR_ARROW_ANIMATION_TIME);
+        objectAnimator.start();
     }
 }

@@ -19,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -261,6 +262,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
+        drawerLockStateProcessor.setupWithFragmentManager(getChildFragmentManager());
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
@@ -274,9 +276,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         });
 
         drawerToggle = new ActionBarDrawerToggle(getActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
-        drawerToggle.setDrawerIndicatorEnabled(true);
-        drawer.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
+        DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(getActivity());
+        drawerArrowDrawable.setColor(getColorFromAttr(getActivity(), android.R.attr.textColorPrimaryInverse));
+        drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
+
+        toolbar.setupWithFragmentManager(getChildFragmentManager(), drawerArrowDrawable);
 
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 
@@ -290,16 +294,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 }
             }
         });
-
-        FragmentManager fm = getChildFragmentManager();
-        drawerLockStateProcessor.setOnRootNavigationState(fm.getBackStackEntryCount() == 0);
-        drawerToggle.getDrawerArrowDrawable().setProgress(fm.getBackStackEntryCount() == 0? 0f: 1f);//TODO with animation
-
-        fm.addOnBackStackChangedListener(() -> {
-                    drawerToggle.getDrawerArrowDrawable().setProgress(fm.getBackStackEntryCount() == 0? 0f: 1f);
-                    drawerLockStateProcessor.setOnRootNavigationState(fm.getBackStackEntryCount() == 0);
-                }
-        );
 
         BottomSheetDelegateManager bottomSheetDelegateManager = new BottomSheetDelegateManager();
         bottomSheetDelegateManager
@@ -328,7 +322,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
-                .addDelegate(new DrawerArrowBottomSheetDelegate(drawerToggle.getDrawerArrowDrawable(), () -> fm.getBackStackEntryCount() != 0))
+                .addDelegate(new DrawerArrowBottomSheetDelegate(
+                        drawerArrowDrawable,
+                        () -> getChildFragmentManager().getBackStackEntryCount() != 0))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
         if (bottomSheetCoordinator != null) {
@@ -359,12 +355,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 switch (newState) {
                     case STATE_COLLAPSED: {
-                        drawerLockStateProcessor.setBottomSheetOpen(false);
+                        drawerLockStateProcessor.onBottomSheetOpened(false);
                         bottomSheetDelegate.onSlide(0f);
                         return;
                     }
                     case STATE_EXPANDED: {
-                        drawerLockStateProcessor.setBottomSheetOpen(true);
+                        drawerLockStateProcessor.onBottomSheetOpened(true);
                         bottomSheetDelegate.onSlide(1f);
                     }
                 }
@@ -412,9 +408,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
-                bottomSheetBehavior.setState(STATE_COLLAPSED);
-            } else if (drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+            if (drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
                 drawer.openDrawer(GravityCompat.START);
             } else {
                 onBackPressed();

@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.utils.slidr;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +13,10 @@ import com.r0adkll.slidr.widget.SliderPanel;
 public class SlidrFragment {
 
     @NonNull
-    public static SlidrInterface replace(@NonNull final Fragment fragment,
-                                         @NonNull final View oldScreen,
-                                         @NonNull final SlidrConfig config) {
+    public static SlidrInterface replace(@NonNull Fragment fragment,
+                                         @NonNull View oldScreen,
+                                         @NonNull SlidrConfig config,
+                                         @Nullable SlideListener slideListener) {
         ViewGroup parent = (ViewGroup) oldScreen.getParent();
         ViewGroup.LayoutParams params = oldScreen.getLayoutParams();
         parent.removeView(oldScreen);
@@ -28,9 +30,13 @@ public class SlidrFragment {
         parent.addView(panel, 0, params);
 
         // Set the panel slide listener for when it becomes closed or opened
-        panel.setOnPanelSlideListener(new FragmentPanelSlideListener(fragment, config));
+        panel.setOnPanelSlideListener(new FragmentPanelSlideListener(fragment, config, slideListener));
 
         // Return the lock interface
         return panel.getDefaultInterface();
+    }
+
+    public interface SlideListener {
+        void onSlideChange(float percent);
     }
 }

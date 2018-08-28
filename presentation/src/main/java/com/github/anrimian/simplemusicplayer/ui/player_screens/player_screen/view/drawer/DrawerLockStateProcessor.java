@@ -1,6 +1,8 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.drawer;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 
 import static android.support.v4.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
 import static android.support.v4.widget.DrawerLayout.LOCK_MODE_UNLOCKED;
@@ -12,18 +14,30 @@ public class DrawerLockStateProcessor {
     private boolean openedBottomSheet = false;
     private boolean inRoot = true;
 
+    private FragmentManager fragmentManager;
+
     public DrawerLockStateProcessor(DrawerLayout drawer) {
         this.drawer = drawer;
     }
 
-    public void setBottomSheetOpen(boolean openedBottomSheet) {
+    public void setupWithFragmentManager(FragmentManager fragmentManager) {
+        this.fragmentManager = fragmentManager;
+        onFragmentStackChanged();
+        fragmentManager.addOnBackStackChangedListener(this::onFragmentStackChanged);
+    }
+
+    public void onBottomSheetOpened(boolean openedBottomSheet) {
         this.openedBottomSheet = openedBottomSheet;
         updateDrawerState();
     }
 
-    public void setOnRootNavigationState(boolean inRoot) {
+    private void setOnRootNavigationState(boolean inRoot) {
         this.inRoot = inRoot;
         updateDrawerState();
+    }
+
+    private void onFragmentStackChanged() {
+        setOnRootNavigationState(fragmentManager.getBackStackEntryCount() == 0);
     }
 
     private void updateDrawerState() {
