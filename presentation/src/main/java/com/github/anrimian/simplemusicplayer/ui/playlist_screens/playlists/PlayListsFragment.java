@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +17,7 @@ import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.simplemusicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
+import com.github.anrimian.simplemusicplayer.ui.common.toolbar.BackStackListener;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
@@ -29,7 +27,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlayListsFragment extends MvpAppCompatFragment implements PlayListsView {
+public class PlayListsFragment extends MvpAppCompatFragment implements PlayListsView, BackStackListener {
 
     @InjectPresenter
     PlayListsPresenter presenter;
@@ -37,8 +35,7 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
+    private AdvancedToolbar toolbar;
 
     private PlayListsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
@@ -67,20 +64,18 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.play_lists);
-        toolbar.setSubtitle(null);
-        toolbar.setTitleClickListener(null);
+        toolbar = getActivity().findViewById(R.id.toolbar);
+        bindToolbar(toolbar);
 
         progressViewWrapper = new ProgressViewWrapper(view);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+    }
 
-        fab.setOnClickListener(v -> {
-            DialogFragment dialogFragment = new CreatePlayListDialogFragment();
-            dialogFragment.show(getChildFragmentManager(), null);
-        });
+    @Override
+    public void onRestoredFromBackStack() {
+        bindToolbar(toolbar);
     }
 
     @Override
@@ -119,5 +114,11 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
                 .add(R.id.drawer_fragment_container, PlayListFragment.newInstance(playList.getId()))
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private void bindToolbar(AdvancedToolbar toolbar) {
+        toolbar.setTitle(R.string.play_lists);
+        toolbar.setSubtitle(null);
+        toolbar.setTitleClickListener(null);
     }
 }

@@ -27,6 +27,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -251,6 +253,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         AdvancedToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.init();
+
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         ActionBar actionBar = activity.getSupportActionBar();
@@ -277,10 +280,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawerToggle = new ActionBarDrawerToggle(getActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
         DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(getActivity());
+
+//        toolbar.setNavigationIcon(drawerArrowDrawable);
+//        toolbar.setNavigationOnClickListener(v -> onNavigationIconClicked());
+
         drawerArrowDrawable.setColor(getColorFromAttr(getActivity(), android.R.attr.textColorPrimaryInverse));
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
-        toolbar.setupWithFragmentManager(getChildFragmentManager(), drawerArrowDrawable);
+        toolbar.setupWithFragmentManager(getChildFragmentManager(), drawerArrowDrawable, R.id.drawer_fragment_container);
 
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 
@@ -353,6 +360,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                getActivity().invalidateOptionsMenu();
                 switch (newState) {
                     case STATE_COLLAPSED: {
                         drawerLockStateProcessor.onBottomSheetOpened(false);
@@ -415,6 +423,16 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
+//            menu.clear();
+//            inflater.inflate(R.menu.play_queue_menu, menu);
+        } else {
+            super.onCreateOptionsMenu(menu, inflater);
+        }
     }
 
     @Override
@@ -564,6 +582,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 formatCompositionName(composition),
                 playList.getName());
         Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onNavigationIconClicked() {
+        if (drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+            drawer.openDrawer(GravityCompat.START);
+        } else {
+            onBackPressed();
+        }
     }
 
     private void onBottomPanelClicked() {

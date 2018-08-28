@@ -110,6 +110,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+//        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
+//        toolbar.getMenu().clear();
+//        toolbar.inflateMenu(R.menu.storage_files_menu);
+//        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
 

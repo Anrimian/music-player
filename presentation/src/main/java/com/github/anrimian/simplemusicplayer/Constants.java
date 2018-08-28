@@ -14,6 +14,6 @@ public class Constants {
     }
 
     public static class Animation {
-        public static final int TOOLBAR_ARROW_ANIMATION_TIME = 300;
+        public static final int TOOLBAR_ARROW_ANIMATION_TIME = 200;
     }
 }

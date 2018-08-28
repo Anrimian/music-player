@@ -18,13 +18,11 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.di.Components;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
-import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.simplemusicplayer.ui.utils.slidr.SlidrFragment;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrInterface;
 import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
@@ -77,7 +75,9 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
         ButterKnife.bind(this, view);
 
         AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle("temporary title");
+        toolbar.setTitle("play list title");
+        toolbar.setSubtitle(null);
+        toolbar.setTitleClickListener(null);
 
         progressViewWrapper = new ProgressViewWrapper(view);
 
