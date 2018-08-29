@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen;
+package com.github.anrimian.simplemusicplayer.ui.player_screen;
 
 import android.Manifest;
 import android.content.Intent;
@@ -45,8 +45,8 @@ import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersRootFragment;
-import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter.PlayQueueAdapter;
-import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.drawer.DrawerLockStateProcessor;
+import com.github.anrimian.simplemusicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
+import com.github.anrimian.simplemusicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
@@ -330,6 +330,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
                 .addDelegate(new DrawerArrowBottomSheetDelegate(
+                        toolbar,
                         drawerArrowDrawable,
                         () -> getChildFragmentManager().getBackStackEntryCount() != 0))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));

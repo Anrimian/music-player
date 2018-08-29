@@ -12,7 +12,7 @@ import static android.view.View.VISIBLE;
 
 public class VisibilityDelegate implements BottomSheetDelegate {
 
-    private View view;
+    private final View view;
 
     public VisibilityDelegate(View view) {
         this.view = view;

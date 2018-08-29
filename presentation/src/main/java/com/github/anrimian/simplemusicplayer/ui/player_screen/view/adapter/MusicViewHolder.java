@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter;
+package com.github.anrimian.simplemusicplayer.ui.player_screen.view.adapter;
 
 import android.content.Context;
 import android.support.annotation.StringRes;

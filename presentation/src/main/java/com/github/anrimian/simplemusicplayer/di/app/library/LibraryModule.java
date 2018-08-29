@@ -1,12 +1,9 @@
 package com.github.anrimian.simplemusicplayer.di.app.library;
 
-import com.github.anrimian.simplemusicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
-import com.github.anrimian.simplemusicplayer.domain.repositories.MusicProviderRepository;
-import com.github.anrimian.simplemusicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerPresenter;
+import com.github.anrimian.simplemusicplayer.ui.player_screen.PlayerPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;

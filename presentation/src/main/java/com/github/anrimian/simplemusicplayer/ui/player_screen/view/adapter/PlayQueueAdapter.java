@@ -1,5 +1,6 @@
-package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.adapter;
+package com.github.anrimian.simplemusicplayer.ui.player_screen.view.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -35,22 +36,25 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.musicList = musicList;
     }
 
+    @NonNull
     @Override
-    public MusicViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.item_play_queue_music, parent, false);
         return new MusicViewHolder(view, onCompositionClickListener);
     }
 
     @Override
-    public void onBindViewHolder(MusicViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MusicViewHolder holder, int position) {
         Composition composition = musicList.get(position);
         holder.bind(composition);
         holder.showAsPlayingComposition(composition.equals(currentComposition));
     }
 
     @Override
-    public void onBindViewHolder(MusicViewHolder holder, int position, List<Object> payloads) {
+    public void onBindViewHolder(@NonNull MusicViewHolder holder,
+                                 int position,
+                                 @NonNull List<Object> payloads) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position);
         }

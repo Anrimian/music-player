@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen;
+package com.github.anrimian.simplemusicplayer.ui.player_screen;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;

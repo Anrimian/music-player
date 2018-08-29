@@ -5,15 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.github.anrimian.simplemusicplayer.R;
-import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerFragment;
+import com.github.anrimian.simplemusicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 

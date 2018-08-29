@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.infrastructure.service.MusicServiceManager;
-import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerFragment;
+import com.github.anrimian.simplemusicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.tbruyelle.rxpermissions2.RxPermissions;

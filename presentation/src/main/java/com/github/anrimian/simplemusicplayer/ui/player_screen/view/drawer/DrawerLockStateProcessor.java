@@ -1,8 +1,7 @@
-package com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.view.drawer;
+package com.github.anrimian.simplemusicplayer.ui.player_screen.view.drawer;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 
 import static android.support.v4.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
 import static android.support.v4.widget.DrawerLayout.LOCK_MODE_UNLOCKED;

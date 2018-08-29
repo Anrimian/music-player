@@ -4,7 +4,7 @@ import com.github.anrimian.simplemusicplayer.di.app.library.compositions.Library
 import com.github.anrimian.simplemusicplayer.di.app.library.compositions.LibraryCompositionsModule;
 import com.github.anrimian.simplemusicplayer.di.app.library.files.LibraryFilesComponent;
 import com.github.anrimian.simplemusicplayer.di.app.library.files.LibraryFilesModule;
-import com.github.anrimian.simplemusicplayer.ui.player_screens.player_screen.PlayerPresenter;
+import com.github.anrimian.simplemusicplayer.ui.player_screen.PlayerPresenter;
 
 import dagger.Subcomponent;
 
