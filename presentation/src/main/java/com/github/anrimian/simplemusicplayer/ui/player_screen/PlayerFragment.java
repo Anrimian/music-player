@@ -19,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.drawable.DrawableWrapper;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -287,8 +288,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         drawerArrowDrawable.setColor(getColorFromAttr(getActivity(), android.R.attr.textColorPrimaryInverse));
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
-        toolbar.setupWithFragmentManager(getChildFragmentManager(), drawerArrowDrawable);
-
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 
             @Override
@@ -330,7 +329,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
                 .addDelegate(new DrawerArrowBottomSheetDelegate(
-                        toolbar,
                         drawerArrowDrawable,
                         () -> getChildFragmentManager().getBackStackEntryCount() != 0))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
@@ -347,7 +345,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         bottomSheetDelegate = new BoundValuesDelegate(0.008f, 0.95f, bottomSheetDelegateManager);
-
 
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
         mlBottomSheet.setClickable(true);
@@ -384,6 +381,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         });
 
         bottomSheetBehavior.setState(bottomSheetState);
+
+        toolbar.setupWithFragmentManager(getChildFragmentManager(),
+                drawerArrowDrawable,
+                () -> bottomSheetBehavior.getState() == STATE_EXPANDED);
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());

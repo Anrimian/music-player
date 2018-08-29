@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.annotation.MenuRes;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +26,7 @@ public class AdvancedToolbar extends Toolbar {
 
     private FragmentManager fragmentManager;
     private DrawerArrowDrawable drawerArrowDrawable;
+    private LockArrowInBackStateFunction lockArrowFunction;
 
     public AdvancedToolbar(Context context) {
         super(context);
@@ -50,9 +50,11 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     public void setupWithFragmentManager(FragmentManager fragmentManager,
-                                         DrawerArrowDrawable drawerArrowDrawable) {
+                                         DrawerArrowDrawable drawerArrowDrawable,
+                                         LockArrowInBackStateFunction lockArrowFunction) {
         this.fragmentManager = fragmentManager;
         this.drawerArrowDrawable = drawerArrowDrawable;
+        this.lockArrowFunction = lockArrowFunction;
         onFragmentStackChanged();
         fragmentManager.addOnBackStackChangedListener(this::onFragmentStackChanged);
     }
@@ -98,10 +100,18 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     private void onFragmentStackChanged() {
-        float start = drawerArrowDrawable.getProgress();
         float end = fragmentManager.getBackStackEntryCount() == 0? 0f: 1f;
+        if (end == 0f && lockArrowFunction.isLocked()) {
+            return;
+        }
+
+        float start = drawerArrowDrawable.getProgress();
         ObjectAnimator objectAnimator = ofFloat(drawerArrowDrawable, "progress", start, end);
         objectAnimator.setDuration(TOOLBAR_ARROW_ANIMATION_TIME);
         objectAnimator.start();
+    }
+
+    public interface LockArrowInBackStateFunction {
+        boolean isLocked();
     }
 }
