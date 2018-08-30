@@ -3,4 +3,9 @@
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.6</item>
 
     <dimen name="bottom_sheet_content_margin">16dp</dimen>
+    <dimen name="play_button_expand_margin">8dp</dimen>
+    <dimen name="play_button_expand_size">56dp</dimen>
+    <dimen name="button_expand_size">48dp</dimen>
+
+
 </resources>
