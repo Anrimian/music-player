@@ -164,12 +164,13 @@
 
     <ImageView
         android:id="@+id/btn_actions_menu"
-        style="@style/Toolbar.Button"
+        style="@style/Toolbar.Button.Overflow"
         android:contentDescription="@string/content_description_menu"
         android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/music_icon_wrapper"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_current_composition_author"
         app:srcCompat="@drawable/ic_dots_vertical" />
 
     <TextView

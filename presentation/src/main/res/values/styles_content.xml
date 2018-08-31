@@ -7,10 +7,10 @@
         <item name="android:background">?actionBarItemBackground</item>
     </style>
 
-    <style name="Content.Button.Main" parent="AppTheme">
+    <style name="Content.Button.Main">
         <item name="android:layout_width">52dp</item>
         <item name="android:layout_height">@dimen/bottom_sheet_height</item>
-        <item name="android:padding">12dp</item>
+        <!--<item name="android:padding">12dp</item>-->
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
 
@@ -34,7 +34,6 @@
     <style name="Content.Button.Main.Expanded">
         <item name="android:layout_width">@dimen/play_button_expand_size</item>
         <item name="android:layout_height">@dimen/play_button_expand_size</item>
-        <item name="android:padding">0dp</item>
     </style>
 
     <style name="Content.Image" parent="AppTheme">
