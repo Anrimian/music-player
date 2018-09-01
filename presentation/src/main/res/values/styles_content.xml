@@ -18,6 +18,10 @@
 
     </style>
 
+    <style name="Content.Text.Time">
+
+    </style>
+
     <style name="Content.Text.Subtitle" parent="Content.Text">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:textSize">14sp</item>

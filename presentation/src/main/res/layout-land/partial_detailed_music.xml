@@ -86,10 +86,9 @@
         android:id="@+id/btn_random_play"
         style="@style/Content.Button"
         android:contentDescription="@string/content_description_shuffle"
-        android:layout_marginBottom="@dimen/content_horizontal_margin"
         android:layout_marginLeft="@dimen/bottom_sheet_content_margin"
         android:layout_marginStart="@dimen/bottom_sheet_content_margin"
-        app:layout_constraintTop_toBottomOf="@id/sb_track_state"
+        app:layout_constraintTop_toBottomOf="@id/group_time"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_shuffle"/>
@@ -106,7 +105,7 @@
 
     <TextView
         android:id="@+id/tv_played_time"
-        style="@style/Content.Text"
+        style="@style/Content.Text.Time"
         android:gravity="center_vertical|start"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -114,11 +113,12 @@
         app:layout_constraintTop_toBottomOf="@id/sb_track_state"
         app:layout_constraintStart_toStartOf="@+id/btn_random_play"
         app:layout_constraintEnd_toStartOf="@id/tv_total_time"
+        app:layout_constraintBottom_toBottomOf="@id/group_time"
         tools:text="00:11"/>
 
     <TextView
         android:id="@+id/tv_total_time"
-        style="@style/Content.Text"
+        style="@style/Content.Text.Time"
         android:gravity="center_vertical|end"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -133,11 +133,18 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="1.5dp"
         android:layout_marginRight="1.5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tv_played_time"
+        app:layout_constraintTop_toTopOf="@id/group_time"/>
+
+    <android.support.constraint.Group
+        android:id="@+id/group_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="sb_track_state, tv_played_time"
         app:layout_constraintBottom_toTopOf="@+id/btn_random_play"
         app:layout_constraintTop_toBottomOf="@id/music_icon_wrapper"/>
 
@@ -145,10 +152,9 @@
         android:id="@+id/music_icon_wrapper"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="@id/tv_played_time"
-        app:layout_constraintBottom_toTopOf="@id/sb_track_state">
+        app:layout_constraintBottom_toTopOf="@id/group_time">
 
         <ImageView
             android:id="@+id/iv_music_icon"

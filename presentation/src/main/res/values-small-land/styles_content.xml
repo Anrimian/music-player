@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Content.Text.Time">
+        <item name="android:textSize">13sp</item>
+    </style>
+</resources>
