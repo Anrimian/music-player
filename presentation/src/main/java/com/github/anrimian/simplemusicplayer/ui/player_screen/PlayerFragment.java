@@ -194,6 +194,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.ml_bottom_sheet)
     MotionLayout mlBottomSheet;
 
+    @BindView(R.id.toolbar)
+    AdvancedToolbar toolbar;
+
+    @BindView(R.id.toolbar_secondary)
+    AdvancedToolbar toolbarSecondary;
+
 //    @BindView(R.id.play_actions_top_shadow)
 //    View playActionsTopShadow;
 
@@ -252,8 +258,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return;
         }
 
-        AdvancedToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.init();
+        toolbarSecondary.init();
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
@@ -280,12 +286,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         });
 
         drawerToggle = new ActionBarDrawerToggle(getActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
-        DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(getActivity());
+        DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
 
-//        toolbar.setNavigationIcon(drawerArrowDrawable);
-//        toolbar.setNavigationOnClickListener(v -> onNavigationIconClicked());
+        DrawerArrowDrawable drawerArrowDrawableSecond = createDrawerArrowDrawable();
+        toolbarSecondary.setNavigationIcon(drawerArrowDrawableSecond);
+        toolbarSecondary.setNavigationOnClickListener(v -> onNavigationIconClicked());
+        toolbarSecondary.inflateMenu(R.menu.play_queue_menu);
 
-        drawerArrowDrawable.setColor(getColorFromAttr(getActivity(), android.R.attr.textColorPrimaryInverse));
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
@@ -310,6 +317,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 //                )
 //                .addDelegate(new TargetViewDelegate(ivPlayPause, ivPlayPauseExpanded))
 //                .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
+                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar)))
+                .addDelegate(new VisibilityDelegate(toolbarSecondary))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
 //                .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
@@ -330,6 +339,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
                 .addDelegate(new DrawerArrowBottomSheetDelegate(
                         drawerArrowDrawable,
+                        () -> getChildFragmentManager().getBackStackEntryCount() != 0))
+                .addDelegate(new DrawerArrowBottomSheetDelegate(
+                        drawerArrowDrawableSecond,
                         () -> getChildFragmentManager().getBackStackEntryCount() != 0))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
@@ -659,5 +671,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return false;
         });
         popup.show();
+    }
+
+    private DrawerArrowDrawable createDrawerArrowDrawable() {
+        DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(getActivity());
+        drawerArrowDrawable.setColor(getColorFromAttr(getActivity(), android.R.attr.textColorPrimaryInverse));
+        return drawerArrowDrawable;
     }
 }

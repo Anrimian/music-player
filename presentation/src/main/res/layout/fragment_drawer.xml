@@ -19,8 +19,19 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <include layout="@layout/partial_toolbar"
-                android:id="@+id/toolbar"/>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary">
+
+                <include layout="@layout/partial_toolbar"
+                    android:id="@+id/toolbar"/>
+
+                <include layout="@layout/partial_toolbar"
+                    android:id="@+id/toolbar_secondary"/>
+
+            </FrameLayout>
+
 
             <include layout="@layout/partial_music_content"/>
 
