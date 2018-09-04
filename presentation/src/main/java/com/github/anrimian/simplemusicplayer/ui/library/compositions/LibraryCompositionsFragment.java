@@ -9,7 +9,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,8 +28,6 @@ import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFr
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.compositions.adapter.CompositionsAdapter;
-import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersPresenter;
-import com.github.anrimian.simplemusicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
 
@@ -108,7 +105,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.storage_files_menu, menu);
+        inflater.inflate(R.menu.library_files_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

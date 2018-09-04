@@ -64,6 +64,7 @@ import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.LeftBottomS
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ReverseDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.TextSizeDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.view_pager.FragmentCreator;
@@ -197,8 +198,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.toolbar)
     AdvancedToolbar toolbar;
 
-    @BindView(R.id.toolbar_secondary)
-    AdvancedToolbar toolbarSecondary;
+//    @BindView(R.id.toolbar_secondary)
+//    AdvancedToolbar toolbarSecondary;
 
 //    @BindView(R.id.play_actions_top_shadow)
 //    View playActionsTopShadow;
@@ -208,6 +209,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
 //    @BindView(R.id.bottom_sheet_play_panel_shadow)
 //    View bottomSheetPanelShadow;
+
+    @BindView(R.id.title_container)
+    View titleContainer;
 
     private BottomSheetBehavior<View> bottomSheetBehavior;
 
@@ -259,7 +263,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         toolbar.init();
-        toolbarSecondary.init();
+//        toolbarSecondary.init();
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
@@ -289,9 +293,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
 
         DrawerArrowDrawable drawerArrowDrawableSecond = createDrawerArrowDrawable();
-        toolbarSecondary.setNavigationIcon(drawerArrowDrawableSecond);
-        toolbarSecondary.setNavigationOnClickListener(v -> onNavigationIconClicked());
-        toolbarSecondary.inflateMenu(R.menu.play_queue_menu);
+//        toolbarSecondary.setNavigationIcon(drawerArrowDrawableSecond);
+//        toolbarSecondary.setNavigationOnClickListener(v -> onNavigationIconClicked());
+//        toolbarSecondary.inflateMenu(R.menu.play_queue_menu);
 
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
@@ -317,8 +321,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 //                )
 //                .addDelegate(new TargetViewDelegate(ivPlayPause, ivPlayPauseExpanded))
 //                .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
-                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar)))
-                .addDelegate(new VisibilityDelegate(toolbarSecondary))
+//                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar)))
+//                .addDelegate(new VisibilityDelegate(toolbarSecondary))
+//                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar.getChildAt(2))))
+                .addDelegate(new ReverseDelegate(new ToolbarMenuVisibilityDelegate(toolbar)))
+                .addDelegate(new ReverseDelegate(new VisibilityDelegate(titleContainer)))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
 //                .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))

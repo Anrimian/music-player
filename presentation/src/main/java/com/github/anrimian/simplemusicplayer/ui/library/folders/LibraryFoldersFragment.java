@@ -31,8 +31,6 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.folders.F
 import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.order.SelectOrderDialogFragment;
-import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.simplemusicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
@@ -112,7 +110,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
 //        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
 //        toolbar.getMenu().clear();
-//        toolbar.inflateMenu(R.menu.storage_files_menu);
+//        toolbar.inflateMenu(R.menu.library_files_menu);
 //        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
         progressViewWrapper = new ProgressViewWrapper(view);
@@ -141,7 +139,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.storage_files_menu, menu);
+        inflater.inflate(R.menu.library_files_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
