@@ -11,6 +11,8 @@ public class Constants {
     public static class Tags {
         public static final String ORDER_TAG = "order_tag";
         public static final String SELECT_PLAYLIST_TAG = "select_playlist_tag";
+        public static final String CREATE_PLAYLIST_TAG = "create_playlist_tag";
+
     }
 
     public static class Animation {

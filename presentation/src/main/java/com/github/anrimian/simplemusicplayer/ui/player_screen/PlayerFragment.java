@@ -55,6 +55,7 @@ import com.github.anrimian.simplemusicplayer.ui.library.folders.LibraryFoldersRo
 import com.github.anrimian.simplemusicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.simplemusicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.simplemusicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
@@ -85,6 +86,7 @@ import butterknife.ButterKnife;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static com.github.anrimian.simplemusicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
@@ -591,7 +593,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showAddingToPlayListComplete(PlayList playList, Composition composition) {
+    public void showAddingToPlayListComplete(PlayList playList, Composition composition) {//TODO with multiple composition
         String text = getString(R.string.add_to_playlist_success_template,
                 formatCompositionName(composition),
                 playList.getName());
@@ -599,7 +601,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private boolean onPlayQueueMenuItemClicked(MenuItem menuItem) {
-        return false;
+        switch (menuItem.getItemId()) {
+            case R.id.menu_save_as_playlist: {
+                CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
+                fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
+                break;
+            }
+        }
+        return true;
     }
 
     private void onNavigationIconClicked() {
@@ -660,7 +669,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 case R.id.menu_add_to_playlist: {
                     ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
                     dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
-                    dialog.show(getChildFragmentManager(), null);
+                    dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_TAG);
                     return true;
                 }
                 case R.id.menu_share: {

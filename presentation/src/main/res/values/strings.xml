@@ -49,6 +49,7 @@
     <string name="add_to_playlist_success_template">Композиция "%1$s" добавлена в плейлист "%2$s"</string>
     <string name="play_list_is_empty">Плейлист пуст</string>
     <string name="save_as_play_list">Сохранить как плейлист</string>
+    <string name="cancel">Отмена</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

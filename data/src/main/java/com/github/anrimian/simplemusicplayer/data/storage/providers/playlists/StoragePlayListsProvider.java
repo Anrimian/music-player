@@ -70,7 +70,7 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public void createPlayList(String name) {
+    public void createPlayList(String name) {//TODO also return new playlist
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
         Uri uri = contentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, contentValues);

@@ -48,7 +48,7 @@ public class CreatePlayListPresenter extends MvpPresenter<CreatePlayListView> {
     }
 
     private void onPlayListCreated() {
-        getViewState().closeScreen();
+        getViewState().onPlayListCreated(null);
     }
 
     private void onPlayListCreatingError(Throwable throwable) {

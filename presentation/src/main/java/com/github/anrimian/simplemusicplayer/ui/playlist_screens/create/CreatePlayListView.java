@@ -3,6 +3,7 @@ package com.github.anrimian.simplemusicplayer.ui.playlist_screens.create;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
@@ -19,6 +20,6 @@ public interface CreatePlayListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CREATE_STATE)
     void showError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
-    void closeScreen();
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CREATE_STATE)
+    void onPlayListCreated(PlayList playList);
 }
