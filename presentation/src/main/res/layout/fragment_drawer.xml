@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -27,11 +28,16 @@
                 <include layout="@layout/partial_toolbar"
                     android:id="@+id/toolbar"/>
 
-                <!--<include layout="@layout/partial_toolbar"-->
-                    <!--android:id="@+id/toolbar_secondary"/>-->
+                <android.support.v7.widget.ActionMenuView
+                    android:id="@+id/acv_play_queue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:elevation="12dp"
+                    android:layout_gravity="end"
+                    app:theme="@style/ToolbarStyle"
+                    tools:targetApi="lollipop" />
 
             </FrameLayout>
-
 
             <include layout="@layout/partial_music_content"/>
 

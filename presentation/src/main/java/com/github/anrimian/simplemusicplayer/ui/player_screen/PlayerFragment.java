@@ -1,6 +1,7 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screen;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,10 +22,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawableWrapper;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
+import android.support.v7.view.SupportMenuInflater;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.PublicActionMenuPresenter;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -66,6 +72,7 @@ import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ReverseDele
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.VisibilityDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.menu.ActionMenuUtil;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -198,9 +205,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.toolbar)
     AdvancedToolbar toolbar;
 
-//    @BindView(R.id.toolbar_secondary)
-//    AdvancedToolbar toolbarSecondary;
-
 //    @BindView(R.id.play_actions_top_shadow)
 //    View playActionsTopShadow;
 
@@ -212,6 +216,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @BindView(R.id.title_container)
     View titleContainer;
+
+    @BindView(R.id.acv_play_queue)
+    ActionMenuView actionMenuView;
 
     private BottomSheetBehavior<View> bottomSheetBehavior;
 
@@ -263,7 +270,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         toolbar.init();
-//        toolbarSecondary.init();
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
@@ -292,10 +298,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         drawerToggle = new ActionBarDrawerToggle(getActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
         DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
 
-        DrawerArrowDrawable drawerArrowDrawableSecond = createDrawerArrowDrawable();
-//        toolbarSecondary.setNavigationIcon(drawerArrowDrawableSecond);
-//        toolbarSecondary.setNavigationOnClickListener(v -> onNavigationIconClicked());
-//        toolbarSecondary.inflateMenu(R.menu.play_queue_menu);
+        ActionMenuUtil.setupMenu(actionMenuView.getContext(),
+                actionMenuView,
+                R.menu.play_queue_menu,
+                this::onPlayQueueMenuItemClicked);
 
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
@@ -324,6 +330,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 //                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar)))
 //                .addDelegate(new VisibilityDelegate(toolbarSecondary))
 //                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar.getChildAt(2))))
+                .addDelegate(new VisibilityDelegate(actionMenuView))
                 .addDelegate(new ReverseDelegate(new ToolbarMenuVisibilityDelegate(toolbar)))
                 .addDelegate(new ReverseDelegate(new VisibilityDelegate(titleContainer)))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
@@ -346,9 +353,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
                 .addDelegate(new DrawerArrowBottomSheetDelegate(
                         drawerArrowDrawable,
-                        () -> getChildFragmentManager().getBackStackEntryCount() != 0))
-                .addDelegate(new DrawerArrowBottomSheetDelegate(
-                        drawerArrowDrawableSecond,
                         () -> getChildFragmentManager().getBackStackEntryCount() != 0))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
@@ -377,7 +381,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                getActivity().invalidateOptionsMenu();
                 switch (newState) {
                     case STATE_COLLAPSED: {
                         drawerLockStateProcessor.onBottomSheetOpened(false);
@@ -444,16 +447,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
-//            menu.clear();
-//            inflater.inflate(R.menu.play_queue_menu, menu);
-        } else {
-            super.onCreateOptionsMenu(menu, inflater);
-        }
     }
 
     @Override
@@ -603,6 +596,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 formatCompositionName(composition),
                 playList.getName());
         Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private boolean onPlayQueueMenuItemClicked(MenuItem menuItem) {
+        return false;
     }
 
     private void onNavigationIconClicked() {
