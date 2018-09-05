@@ -223,6 +223,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.acv_play_queue)
     ActionMenuView actionMenuView;
 
+    @BindView(R.id.play_queue_title_container)
+    View playQueueTitleContainer;
+
     private BottomSheetBehavior<View> bottomSheetBehavior;
 
     private PlayQueueAdapter playQueueAdapter;
@@ -333,7 +336,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 //                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar)))
 //                .addDelegate(new VisibilityDelegate(toolbarSecondary))
 //                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar.getChildAt(2))))
-                .addDelegate(new VisibilityDelegate(actionMenuView))
+                .addDelegate(new VisibilityDelegate(playQueueTitleContainer))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
                 .addDelegate(new ReverseDelegate(new VisibilityDelegate(titleContainer)))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))

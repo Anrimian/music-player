@@ -136,6 +136,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onPlayListForAddingCreated(PlayList playList) {
+        //play queue can change and we can receive wrong message, check this on big play queue
         playListsInteractor.addCompositionsToPlayList(playQueue, playList)
                 .observeOn(uiScheduler)
                 .subscribe(() -> getViewState().showAddingToPlayListComplete(playList, playQueue),

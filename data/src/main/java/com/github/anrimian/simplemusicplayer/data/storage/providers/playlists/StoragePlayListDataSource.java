@@ -60,7 +60,7 @@ public class StoragePlayListDataSource {
         if (playLists == null) {
             return toPlayLists(storagePlayListsProvider.getPlayLists());
         } else {
-            return Single.just(playLists);
+            return Single.just(playLists);//TODO update after unsubscribe
         }
     }
 

@@ -10,6 +10,7 @@
     app:theme="@style/ToolbarStyle"
     app:titleTextColor="?android:attr/textColorPrimaryInverse"
     app:subtitleTextColor="?android:attr/textColorSecondaryInverse"
+    tools:navigationIcon="@drawable/ic_menu"
     tools:targetApi="lollipop">
     <!--tools:title="ffff"-->
     <!--tools:subtitle="dd">-->
