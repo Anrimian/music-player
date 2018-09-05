@@ -10,6 +10,7 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
@@ -35,7 +36,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Completable createPlayList(String name) {
+    public Single<PlayList> createPlayList(String name) {
         return storagePlayListDataSource.createPlayList(name)
                 .subscribeOn(scheduler);
     }

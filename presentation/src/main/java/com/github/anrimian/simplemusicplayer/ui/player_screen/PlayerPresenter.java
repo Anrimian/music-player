@@ -19,6 +19,8 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
+import static com.github.anrimian.simplemusicplayer.domain.utils.ListUtils.asList;
+
 /**
  * Created on 02.11.2017.
  */
@@ -133,13 +135,20 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                         this::onAddingToPlayListError);
     }
 
+    void onPlayListForAddingCreated(PlayList playList) {
+        playListsInteractor.addCompositionsToPlayList(playQueue, playList)
+                .observeOn(uiScheduler)
+                .subscribe(() -> getViewState().showAddingToPlayListComplete(playList, playQueue),
+                        this::onAddingToPlayListError);
+    }
+
     private void onAddingToPlayListError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showAddingToPlayListError(errorCommand);
     }
 
     private void onAddingToPlayListCompleted(PlayList playList, Composition composition) {
-        getViewState().showAddingToPlayListComplete(playList, composition);
+        getViewState().showAddingToPlayListComplete(playList, asList(composition));
     }
 
     public void onSeekStart() {

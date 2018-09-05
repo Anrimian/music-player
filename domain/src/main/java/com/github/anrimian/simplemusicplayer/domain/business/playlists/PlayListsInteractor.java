@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class PlayListsInteractor {
 
@@ -28,12 +29,17 @@ public class PlayListsInteractor {
         return playListsRepository.getCompositionsObservable(playlistId);
     }
 
-    public Completable createPlayList(String name) {
+    public Single<PlayList> createPlayList(String name) {
         return nameValidator.validate(name)
-                .flatMapCompletable(playListsRepository::createPlayList);
+                .flatMap(playListsRepository::createPlayList);
     }
 
     public Completable addCompositionToPlayList(Composition composition, PlayList playList) {
         return playListsRepository.addCompositionToPlayList(composition, playList);
+    }
+
+    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
+        return Observable.fromIterable(compositions)
+                .flatMapCompletable(composition -> addCompositionToPlayList(composition, playList));
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface PlayListsRepository {
 
@@ -14,7 +15,7 @@ public interface PlayListsRepository {
 
     Observable<List<Composition>> getCompositionsObservable(long playlistId);
 
-    Completable createPlayList(String name);
+    Single<PlayList> createPlayList(String name);
 
     Completable addCompositionToPlayList(Composition composition, PlayList playList);
 }

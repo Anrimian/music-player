@@ -5,7 +5,9 @@ import android.content.Context;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Composition;
 import com.github.anrimian.simplemusicplayer.domain.models.composition.Order;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 
+import java.util.List;
 import java.util.Locale;
 
 import static android.text.TextUtils.isEmpty;
@@ -19,6 +21,20 @@ import static java.util.concurrent.TimeUnit.MINUTES;
  */
 
 public class FormatUtils {
+
+    public static String getAddToPlayListCompleteMessage(Context context,
+                                                         PlayList playList,
+                                                         List<Composition> compositions) {
+        if (compositions.size() == 1) {
+            return context.getString(R.string.add_to_playlist_success_template,
+                    formatCompositionName(compositions.get(0)),
+                    playList.getName());
+        } else {
+            return context.getString(R.string.add_to_playlist_count_success_template,
+                    compositions.size(),
+                    playList.getName());
+        }
+    }
 
     public static String formatCompositionName(Composition composition) {
         String name = composition.getDisplayName();

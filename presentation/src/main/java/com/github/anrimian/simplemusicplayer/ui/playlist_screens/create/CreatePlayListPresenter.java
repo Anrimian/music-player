@@ -3,12 +3,14 @@ package com.github.anrimian.simplemusicplayer.ui.playlist_screens.create;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.simplemusicplayer.domain.business.playlists.PlayListsInteractor;
+import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 
 @InjectViewState
@@ -47,8 +49,8 @@ public class CreatePlayListPresenter extends MvpPresenter<CreatePlayListView> {
                 .subscribe(this::onPlayListCreated, this::onPlayListCreatingError));
     }
 
-    private void onPlayListCreated() {
-        getViewState().onPlayListCreated(null);
+    private void onPlayListCreated(PlayList playList) {
+        getViewState().onPlayListCreated(playList);
     }
 
     private void onPlayListCreatingError(Throwable throwable) {

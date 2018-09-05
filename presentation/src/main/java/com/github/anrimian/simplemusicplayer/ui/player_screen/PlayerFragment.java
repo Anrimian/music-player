@@ -91,6 +91,7 @@ import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLI
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.simplemusicplayer.utils.AndroidUtils.getColorFromAttr;
 
 /**
@@ -333,7 +334,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 //                .addDelegate(new VisibilityDelegate(toolbarSecondary))
 //                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar.getChildAt(2))))
                 .addDelegate(new VisibilityDelegate(actionMenuView))
-                .addDelegate(new ReverseDelegate(new ToolbarMenuVisibilityDelegate(toolbar)))
+                .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
                 .addDelegate(new ReverseDelegate(new VisibilityDelegate(titleContainer)))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
@@ -436,6 +437,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (fragment != null) {
             fragment.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        }
+
+        CreatePlayListDialogFragment createPlayListFragment = (CreatePlayListDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(CREATE_PLAYLIST_TAG);
+        if (createPlayListFragment != null) {
+            createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
         }
     }
 
@@ -593,10 +600,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showAddingToPlayListComplete(PlayList playList, Composition composition) {//TODO with multiple composition
-        String text = getString(R.string.add_to_playlist_success_template,
-                formatCompositionName(composition),
-                playList.getName());
+    public void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions) {
+        String text = getAddToPlayListCompleteMessage(getActivity(), playList, compositions);
         Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
@@ -604,6 +609,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         switch (menuItem.getItemId()) {
             case R.id.menu_save_as_playlist: {
                 CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
+                fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
                 fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
                 break;
             }

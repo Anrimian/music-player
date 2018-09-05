@@ -48,10 +48,11 @@ public class StoragePlayListUtilsProviderTest {
         TestObserver<List<StoragePlayList>> playListsObserver = storagePlayListsProvider.getChangeObservable()
                 .test();
 
-        storagePlayListsProvider.createPlayList("test playlist9");
+        StoragePlayList createdPlayList = storagePlayListsProvider.createPlayList("test playlist10");
+        assertEquals("test playlist10", createdPlayList.getName());
 
         for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
-            if (playList.getName().equals("test playlist9")) {
+            if (playList.getName().equals("test playlist10")) {
                 storagePlayListsProvider.deletePlayList(playList.getId());
             }
         }

@@ -70,13 +70,15 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public void createPlayList(String name) {//TODO also return new playlist
+    public StoragePlayList createPlayList(String name) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
         Uri uri = contentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, contentValues);
         if (uri == null) {
             throw new PlayListNotCreatedException();
         }
+        long id = Long.valueOf(uri.getLastPathSegment());
+        return findPlayList(id);
     }
 
     public void deletePlayList(long id) {
@@ -149,6 +151,26 @@ public class StoragePlayListsProvider {
         boolean moved = Playlists.Members.moveItem(contentResolver, playListId, from, to);
         if (!moved) {
             throw new CompositionNotMovedException();
+        }
+    }
+
+    private StoragePlayList findPlayList(long id) {
+        Cursor cursor = null;
+        try {
+            cursor = contentResolver.query(
+                    Playlists.EXTERNAL_CONTENT_URI,
+                    null,
+                    Playlists._ID + " = ?",
+                    new String[] { String.valueOf(id) },
+                    Playlists.DATE_ADDED + " DESC");
+            if (cursor != null) {
+                cursor.moveToFirst();
+                CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+                return getPlayListFromCursor(cursorWrapper);
+            }
+            throw new PlayListNotCreatedException();
+        } finally {
+            IOUtils.closeSilently(cursor);
         }
     }
 

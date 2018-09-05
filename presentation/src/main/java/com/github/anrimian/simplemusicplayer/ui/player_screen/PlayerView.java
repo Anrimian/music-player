@@ -54,5 +54,5 @@ public interface PlayerView extends MvpView {
     void showAddingToPlayListError(ErrorCommand errorCommand);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showAddingToPlayListComplete(PlayList playList, Composition composition);
+    void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
 }
