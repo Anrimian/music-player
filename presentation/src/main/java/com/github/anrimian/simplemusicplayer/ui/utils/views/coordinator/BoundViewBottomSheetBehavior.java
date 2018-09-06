@@ -49,7 +49,7 @@ public class BoundViewBottomSheetBehavior extends LinkedBottomSheetBehavior{
         float childY = childStartY + (parent.getMeasuredHeight() * (1 - slideOffset));
         child.setY(childY);
 
-        slideOffset = filter(slideOffset, 0.5f, 1f);
+        slideOffset = filter(slideOffset, 0.95f, 1f);//TODO replace with delegate
         child.setAlpha(slideOffset);
     }
 

@@ -26,7 +26,7 @@ public class ToolbarMenuVisibilityDelegate implements BottomSheetDelegate {
     @Override
     public void onSlide(float slideOffset) {
         ActionMenuView view = getActionMenuView();
-        if (view != null) {
+        if (view != null) {//TODO call before create options menu in toolbar
             if (isLaidOut(view)) {
                 makeVisible(slideOffset);
             } else {

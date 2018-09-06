@@ -72,6 +72,13 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
         tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
     }
 
+    private void showAdditionalInfo() {
+        StringBuilder sb = formatCompositionAuthor(composition, getContext());
+        sb.append(" ● ");//TODO split problem
+        sb.append(formatMilliseconds(composition.getDuration()));
+        tvAdditionalInfo.setText(sb.toString());
+    }
+
     private void onActionsMenuButtonClicked(View view) {
         PopupMenu popup = new PopupMenu(getContext(), view);
         popup.inflate(R.menu.composition_in_folder_actions_menu);
@@ -93,13 +100,6 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
             return false;
         });
         popup.show();
-    }
-
-    private void showAdditionalInfo() {
-        StringBuilder sb = formatCompositionAuthor(composition, getContext());
-        sb.append(" ● ");//TODO split problem
-        sb.append(formatMilliseconds(composition.getDuration()));
-        tvAdditionalInfo.setText(sb.toString());
     }
 
     private String getString(@StringRes int resId) {

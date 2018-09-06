@@ -1,5 +1,6 @@
 package com.github.anrimian.simplemusicplayer.ui.library.compositions.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -29,20 +30,9 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.musicList = musicList;
     }
 
-    public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
-        this.onCompositionClickListener = onCompositionClickListener;
-    }
-
-    public void setOnDeleteCompositionClickListener(OnItemClickListener<Composition> onDeleteCompositionClickListener) {
-        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
-    }
-
-    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
-        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
-    }
-
+    @NonNull
     @Override
-    public MusicViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
                 onCompositionClickListener,
@@ -51,7 +41,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(MusicViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MusicViewHolder holder, int position) {
         Composition composition = musicList.get(position);
         holder.bind(composition);
     }
@@ -64,6 +54,18 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     public void updateList(List<Composition> oldList, List<Composition> sourceList) {
         calculateDiff(new SimpleDiffCallback<>(oldList, sourceList, this::areSourcedTheSame))
                 .dispatchUpdatesTo(this);
+    }
+
+    public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
+        this.onCompositionClickListener = onCompositionClickListener;
+    }
+
+    public void setOnDeleteCompositionClickListener(OnItemClickListener<Composition> onDeleteCompositionClickListener) {
+        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
+    }
+
+    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
+        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
     }
 
     private boolean areSourcedTheSame(Composition oldSource, Composition newSource) {

@@ -1,7 +1,6 @@
 package com.github.anrimian.simplemusicplayer.ui.player_screen;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,22 +19,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.drawable.DrawableWrapper;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
-import android.support.v7.view.SupportMenuInflater;
-import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.PublicActionMenuPresenter;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,6 +79,7 @@ import butterknife.ButterKnife;
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
+import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_QUEUE_TAG;
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
@@ -326,34 +319,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         BottomSheetDelegateManager bottomSheetDelegateManager = new BottomSheetDelegateManager();
         bottomSheetDelegateManager
-//                .addDelegate(new PaddingDelegate(
-//                        ivPlayPause,
-//                        R.dimen.music_control_button_padding_collapsed,
-//                        R.dimen.music_control_button_padding_expanded)
-//                )
-//                .addDelegate(new TargetViewDelegate(ivPlayPause, ivPlayPauseExpanded))
-//                .addDelegate(new TargetViewDelegate(ivSkipToPrevious, ivSkipToPreviousExpanded))
-//                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar)))
-//                .addDelegate(new VisibilityDelegate(toolbarSecondary))
-//                .addDelegate(new ReverseDelegate(new VisibilityDelegate(toolbar.getChildAt(2))))
                 .addDelegate(new VisibilityDelegate(playQueueTitleContainer))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
                 .addDelegate(new ReverseDelegate(new VisibilityDelegate(titleContainer)))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
-//                .addDelegate(new TargetViewDelegate(ivSkipToNext, ivSkipToNextExpanded))
-//                .addDelegate(new BoundValuesDelegate(0.8f, 0.9f, new VisibilityDelegate(bottomSheetPanelShadow)))
-                .addDelegate(new BoundValuesDelegate(0.9f, 0.95f, new VisibilityDelegate(rvPlayList)))
-                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
+                .addDelegate(new BoundValuesDelegate(0.95f, 1f, new VisibilityDelegate(rvPlayList)))
+                .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
-//                .addDelegate(new ChangeTitleDelegate(tvCurrentComposition, btnActionsMenu, ivSkipToPrevious))
                 .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))
-//                .addDelegate(new BoundValuesDelegate(0.8f, 1.0f, new VisibilityDelegate(tvCurrentCompositionInfo)))
                 .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
-//                .addDelegate(new BoundValuesDelegate(0.4f, 0.6f, new VisibilityDelegate(bottomSheetBottomShadow)))
-//                .addDelegate(new BoundValuesDelegate(0.9f, 1.0f, new VisibilityDelegate(rvPlayList)))
                 .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(sbTrackState)))
-//                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(playActionsTopShadow)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
@@ -442,6 +418,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             fragment.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
 
+        ChoosePlayListDialogFragment fragmentForQueue = (ChoosePlayListDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(SELECT_PLAYLIST_FOR_QUEUE_TAG);
+        if (fragmentForQueue != null) {
+            fragmentForQueue.setOnCompleteListener(presenter::onPlayListForPlayQueueItemSelected);
+        }
+
         CreatePlayListDialogFragment createPlayListFragment = (CreatePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(CREATE_PLAYLIST_TAG);
         if (createPlayListFragment != null) {
@@ -525,7 +507,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showCurrentComposition(Composition composition, int position) {
         tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
-//        tvCurrentCompositionInfo.setText(composition.getAlbum());
         tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, getContext()));
 
         playQueueAdapter.onCurrentCompositionChanged(composition);
@@ -541,6 +522,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void bindPlayList(List<Composition> currentPlayList) {
         playQueueAdapter = new PlayQueueAdapter(currentPlayList);
         playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
+        playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
+        playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
         rvPlayList.setAdapter(playQueueAdapter);
     }
 
@@ -608,12 +591,19 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void showSelectPlayListDialog() {
+        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+        dialog.setOnCompleteListener(presenter::onPlayListForPlayQueueItemSelected);
+        dialog.show(getChildFragmentManager(), null);
+    }
+
     private boolean onPlayQueueMenuItemClicked(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_save_as_playlist: {
                 CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
                 fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
-                fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
+                fragment.show(getChildFragmentManager(), SELECT_PLAYLIST_FOR_QUEUE_TAG);
                 break;
             }
         }
@@ -686,7 +676,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     return true;
                 }
                 case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked();//TODO also show dialog
+                    presenter.onDeleteCurrentCompositionButtonClicked();//TODO also show dialog
                     return true;
                 }
             }

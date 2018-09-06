@@ -18,6 +18,14 @@
 
     </style>
 
+    <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">
+
+    </style>
+
+    <style name="Content.SecondaryText.Small">
+        <item name="android:textSize">11sp</item>
+    </style>
+
     <style name="Content.Text.Time">
 
     </style>

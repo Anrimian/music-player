@@ -15,6 +15,9 @@ import com.github.anrimian.simplemusicplayer.ui.common.error.parser.ErrorParser;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -39,6 +42,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private final List<Composition> playQueue = new ArrayList<>();
     private Composition composition;
+
+    @Nullable
+    private Composition compositionToAddToPlayList;
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
@@ -122,17 +128,25 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.seekTo(position);
     }
 
-    void onDeleteCompositionButtonClicked() {
-        musicPlayerInteractor.deleteComposition(composition)
-                .observeOn(uiScheduler)
-                .subscribe();//TODO displayError
+    void onDeleteCompositionButtonClicked(Composition composition) {
+        deleteComposition(composition);
+    }
+
+    void onDeleteCurrentCompositionButtonClicked() {
+        deleteComposition(composition);
+    }
+
+    void onAddToPlayListButtonClicked(Composition composition) {
+        compositionToAddToPlayList = composition;
+        getViewState().showSelectPlayListDialog();
     }
 
     void onPlayListToAddingSelected(PlayList playList) {
-        playListsInteractor.addCompositionToPlayList(composition, playList)
-                .observeOn(uiScheduler)
-                .subscribe(() -> onAddingToPlayListCompleted(playList, composition),
-                        this::onAddingToPlayListError);
+        addCompositionToPlayList(composition, playList);
+    }
+
+    void onPlayListForPlayQueueItemSelected(PlayList playList) {
+        addCompositionToPlayList(compositionToAddToPlayList, playList);
     }
 
     void onPlayListForAddingCreated(PlayList playList) {
@@ -141,6 +155,19 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 .observeOn(uiScheduler)
                 .subscribe(() -> getViewState().showAddingToPlayListComplete(playList, playQueue),
                         this::onAddingToPlayListError);
+    }
+
+    private void addCompositionToPlayList(Composition composition, PlayList playList) {
+        playListsInteractor.addCompositionToPlayList(composition, playList)
+                .observeOn(uiScheduler)
+                .subscribe(() -> onAddingToPlayListCompleted(playList, composition),
+                        this::onAddingToPlayListError);
+    }
+
+    private void deleteComposition(Composition composition) {
+        musicPlayerInteractor.deleteComposition(composition)
+                .observeOn(uiScheduler)
+                .subscribe();//TODO displayError
     }
 
     private void onAddingToPlayListError(Throwable throwable) {
