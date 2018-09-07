@@ -9,7 +9,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 14.01.2018.
  */
 
-public class CollapseViewDelegate implements BottomSheetDelegate {
+public class CollapseViewDelegate implements SlideDelegate {
 
     private static final int UNDEFINED = -1;
 

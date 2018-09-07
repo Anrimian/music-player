@@ -11,7 +11,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 14.01.2018.
  */
 
-public class ExpandViewDelegate implements BottomSheetDelegate {
+public class ExpandViewDelegate implements SlideDelegate {
 
     private final int expandWidth;
     private final int expandHeight;

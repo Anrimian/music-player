@@ -21,7 +21,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
-import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
+import com.github.anrimian.simplemusicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
 

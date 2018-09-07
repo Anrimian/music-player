@@ -1,20 +1,14 @@
 package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
 
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
-import android.view.View;
 
-import java.util.concurrent.locks.Lock;
-
-import static android.support.v4.view.ViewCompat.isLaidOut;
-
-public class DrawerArrowBottomSheetDelegate implements BottomSheetDelegate {
+public class DrawerArrowDelegate implements SlideDelegate {
 
     private final DrawerArrowDrawable drawerArrowDrawable;
     private LockCallback lockCallback;
 
-    public DrawerArrowBottomSheetDelegate(DrawerArrowDrawable drawerArrowDrawable,
-                                          LockCallback lockCallback) {
+    public DrawerArrowDelegate(DrawerArrowDrawable drawerArrowDrawable,
+                               LockCallback lockCallback) {
         this.drawerArrowDrawable = drawerArrowDrawable;
         this.lockCallback = lockCallback;
     }

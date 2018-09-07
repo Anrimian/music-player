@@ -20,7 +20,7 @@ import com.github.anrimian.simplemusicplayer.ui.playlist_screens.create.CreatePl
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.simplemusicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.moxy.MvpBottomSheetDialogFragment;
-import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
+import com.github.anrimian.simplemusicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
 

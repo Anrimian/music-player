@@ -2,12 +2,8 @@ package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
 
 import android.content.res.Resources;
 import android.support.annotation.DimenRes;
-import android.support.constraint.ConstraintLayout;
 import android.util.TypedValue;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.github.anrimian.simplemusicplayer.R;
 
 import static android.support.v4.view.ViewCompat.isLaidOut;
 
@@ -15,7 +11,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 21.01.2018.
  */
 
-public class TextSizeDelegate implements BottomSheetDelegate {
+public class TextSizeDelegate implements SlideDelegate {
 
     private final float startTextSize;
     private final float targetTextSize;

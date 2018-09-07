@@ -4,11 +4,11 @@ package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
  * Created on 21.01.2018.
  */
 
-public class ReverseDelegate implements BottomSheetDelegate {
+public class ReverseDelegate implements SlideDelegate {
 
-    private BottomSheetDelegate delegate;
+    private SlideDelegate delegate;
 
-    public ReverseDelegate(BottomSheetDelegate delegate) {
+    public ReverseDelegate(SlideDelegate delegate) {
         this.delegate = delegate;
     }
 

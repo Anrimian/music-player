@@ -4,14 +4,14 @@ package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
  * Created on 21.01.2018.
  */
 
-public class BoundValuesDelegate implements BottomSheetDelegate {
+public class BoundValuesDelegate implements SlideDelegate {
 
     private float start;
     private float end;
 
-    private BottomSheetDelegate delegate;
+    private SlideDelegate delegate;
 
-    public BoundValuesDelegate(float start, float end, BottomSheetDelegate delegate) {
+    public BoundValuesDelegate(float start, float end, SlideDelegate delegate) {
         this.start = start;
         this.end = end;
         this.delegate = delegate;

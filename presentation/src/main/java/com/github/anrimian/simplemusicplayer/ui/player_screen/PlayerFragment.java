@@ -53,11 +53,11 @@ import com.github.anrimian.simplemusicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.simplemusicplayer.ui.start.StartFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.FragmentUtils;
-import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegate;
-import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BottomSheetDelegateManager;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.SlideDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.DelegateManager;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ChangeWidthDelegate;
-import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.DrawerArrowBottomSheetDelegate;
+import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.DrawerArrowDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.simplemusicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
@@ -223,7 +223,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private PlayQueueAdapter playQueueAdapter;
 
-    private BottomSheetDelegate bottomSheetDelegate;
+    private SlideDelegate bottomSheetDelegate;
 
     private ActionBarDrawerToggle drawerToggle;
 
@@ -317,8 +317,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             }
         });
 
-        BottomSheetDelegateManager bottomSheetDelegateManager = new BottomSheetDelegateManager();
-        bottomSheetDelegateManager
+        DelegateManager delegateManager = new DelegateManager();
+        delegateManager
                 .addDelegate(new VisibilityDelegate(playQueueTitleContainer))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
                 .addDelegate(new ReverseDelegate(new VisibilityDelegate(titleContainer)))
@@ -333,23 +333,23 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
-                .addDelegate(new DrawerArrowBottomSheetDelegate(
+                .addDelegate(new DrawerArrowDelegate(
                         drawerArrowDrawable,
                         () -> getChildFragmentManager().getBackStackEntryCount() != 0))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
         if (bottomSheetCoordinator != null) {
-            bottomSheetDelegateManager.addDelegate(new ChangeWidthDelegate(
+            delegateManager.addDelegate(new ChangeWidthDelegate(
                     0.5f,
                     bottomSheetCoordinator));
-            bottomSheetDelegateManager.addDelegate(new LeftBottomShadowDelegate(
+            delegateManager.addDelegate(new LeftBottomShadowDelegate(
                     bottomSheetLeftShadow,
                     bottomSheetTopLeftShadow,
                     mlBottomSheet,
                     bottomSheetCoordinator));
         }
 
-        bottomSheetDelegate = new BoundValuesDelegate(0.008f, 0.95f, bottomSheetDelegateManager);
+        bottomSheetDelegate = new BoundValuesDelegate(0.008f, 0.95f, delegateManager);
 
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
         mlBottomSheet.setClickable(true);

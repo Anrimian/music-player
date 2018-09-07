@@ -10,7 +10,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 13.01.2018.
  */
 
-public class PaddingDelegate implements BottomSheetDelegate {
+public class PaddingDelegate implements SlideDelegate {
 
     private final float startPadding;
     private final float endPadding;

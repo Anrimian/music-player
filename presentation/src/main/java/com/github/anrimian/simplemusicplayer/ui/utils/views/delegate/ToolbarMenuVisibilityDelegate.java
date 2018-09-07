@@ -13,7 +13,7 @@ import static android.view.View.VISIBLE;
  * Created on 21.01.2018.
  */
 
-public class ToolbarMenuVisibilityDelegate implements BottomSheetDelegate {
+public class ToolbarMenuVisibilityDelegate implements SlideDelegate {
 
     private final Toolbar toolbar;
 

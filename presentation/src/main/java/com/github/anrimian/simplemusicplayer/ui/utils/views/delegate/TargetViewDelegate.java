@@ -1,6 +1,5 @@
 package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
 
-import android.util.Log;
 import android.view.View;
 
 import static android.support.v4.view.ViewCompat.isLaidOut;
@@ -9,7 +8,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 13.01.2018.
  */
 
-public class TargetViewDelegate implements BottomSheetDelegate {
+public class TargetViewDelegate implements SlideDelegate {
 
     private static final float UNDEFINED = -1;
 

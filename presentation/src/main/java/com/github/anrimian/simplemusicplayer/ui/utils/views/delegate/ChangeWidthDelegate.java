@@ -1,7 +1,5 @@
 package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
 
-import android.content.res.Resources;
-import android.support.annotation.DimenRes;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -11,7 +9,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 14.01.2018.
  */
 
-public class ChangeWidthDelegate implements BottomSheetDelegate {
+public class ChangeWidthDelegate implements SlideDelegate {
 
     private int baseWidth = -1;
 

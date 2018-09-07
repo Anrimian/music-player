@@ -8,7 +8,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 14.01.2018.
  */
 
-public class MoveOutViewDelegate implements BottomSheetDelegate {
+public class MoveOutViewDelegate implements SlideDelegate {
 
     private static final float UNDEFINED = -1;
 

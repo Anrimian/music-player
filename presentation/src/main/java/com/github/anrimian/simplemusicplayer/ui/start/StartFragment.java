@@ -12,7 +12,7 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.ui.player_screen.PlayerFragment;
-import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
+import com.github.anrimian.simplemusicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 /**

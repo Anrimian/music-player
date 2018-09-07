@@ -21,7 +21,7 @@ import com.github.anrimian.simplemusicplayer.domain.models.composition.Compositi
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.simplemusicplayer.ui.utils.slidr.SlidrFragment;
-import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
+import com.github.anrimian.simplemusicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 

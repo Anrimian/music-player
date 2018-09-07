@@ -35,16 +35,16 @@ import com.github.anrimian.simplemusicplayer.ui.library.folders.adapter.MusicFil
 import com.github.anrimian.simplemusicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.simplemusicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
-import com.github.anrimian.simplemusicplayer.utils.wrappers.ProgressViewWrapper;
+import com.github.anrimian.simplemusicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.simplemusicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.simplemusicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.simplemusicplayer.constants.Arguments.PATH;
 import static com.github.anrimian.simplemusicplayer.ui.common.format.FormatUtils.formatCompositionName;
 
 /**
@@ -74,7 +74,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     public static LibraryFoldersFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
-        args.putString(PATH, path);
+        args.putString(PATH_ARG, path);
         LibraryFoldersFragment fragment = new LibraryFoldersFragment();
         fragment.setArguments(args);
         return fragment;
@@ -82,7 +82,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @Nullable
     private String getPath() {
-        return getArguments().getString(PATH);
+        return getArguments().getString(PATH_ARG);
     }
 
     @ProvidePresenter

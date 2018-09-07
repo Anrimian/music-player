@@ -10,7 +10,7 @@ import static android.view.View.VISIBLE;
  * Created on 21.01.2018.
  */
 
-public class VisibilityDelegate implements BottomSheetDelegate {
+public class VisibilityDelegate implements SlideDelegate {
 
     private final View view;
 

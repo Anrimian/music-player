@@ -1,4 +1,4 @@
-package com.github.anrimian.simplemusicplayer.utils.wrappers;
+package com.github.anrimian.simplemusicplayer.ui.utils.wrappers;
 
 import android.support.annotation.DrawableRes;
 import android.view.View;

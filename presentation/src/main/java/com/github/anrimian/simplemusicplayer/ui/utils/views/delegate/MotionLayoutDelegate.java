@@ -1,7 +1,6 @@
 package com.github.anrimian.simplemusicplayer.ui.utils.views.delegate;
 
 import android.support.constraint.motion.MotionLayout;
-import android.view.ViewGroup;
 
 import static android.support.v4.view.ViewCompat.isLaidOut;
 
@@ -9,7 +8,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 14.01.2018.
  */
 
-public class MotionLayoutDelegate implements BottomSheetDelegate {
+public class MotionLayoutDelegate implements SlideDelegate {
 
     private final MotionLayout motionLayout;
 
