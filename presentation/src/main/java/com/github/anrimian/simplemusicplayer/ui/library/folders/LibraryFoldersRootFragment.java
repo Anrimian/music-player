@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +12,9 @@ import android.view.ViewGroup;
 import com.github.anrimian.simplemusicplayer.R;
 import com.github.anrimian.simplemusicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.simplemusicplayer.ui.library.LibraryFragment;
+import com.github.anrimian.simplemusicplayer.ui.utils.fragments.BackButtonListener;
 
-public class LibraryFoldersRootFragment extends LibraryFragment {
+public class LibraryFoldersRootFragment extends LibraryFragment implements BackButtonListener {
 
     @Nullable
     @Override
@@ -32,5 +34,13 @@ public class LibraryFoldersRootFragment extends LibraryFragment {
                     .replace(R.id.library_folders_container, LibraryFoldersFragment.newInstance(null))
                     .commit();
         }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        FragmentManager fm = getChildFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.library_folders_container);
+        return fragment instanceof BackButtonListener
+                && ((BackButtonListener) fragment).onBackPressed();
     }
 }
