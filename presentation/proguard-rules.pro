@@ -37,7 +37,7 @@
 -dontwarn io.reactivex**
 
 #mapstruct
--keep public class com.github.anrimian.simplemusicplayer.data.mappers.**
+-keep public class com.github.anrimian.musicplayer.data.mappers.**
 
 #not working, keep search
 #-keep public class * implements @org.mapstruct.Mapper interface {}

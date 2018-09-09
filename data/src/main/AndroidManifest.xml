@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.anrimian.simplemusicplayer.data">
+    package="com.github.anrimian.musicplayer.data">
 
     <application android:allowBackup="false"/>
 

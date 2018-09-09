@@ -2,10 +2,10 @@
 <resources>
 
     <string name="fab_behavior" translatable="false">
-        com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.ScrollAwareFABBehavior
+        com.github.anrimian.musicplayer.ui.utils.views.coordinator.ScrollAwareFABBehavior
     </string>
 
     <string name="bound_with_bottom_sheet_behavior" translatable="false">
-        com.github.anrimian.simplemusicplayer.ui.utils.views.coordinator.BoundViewBottomSheetBehavior
+        com.github.anrimian.musicplayer.ui.utils.views.coordinator.BoundViewBottomSheetBehavior
     </string>
 </resources>
