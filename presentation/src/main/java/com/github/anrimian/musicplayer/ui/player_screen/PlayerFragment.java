@@ -258,10 +258,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-
-        RxPermissions rxPermissions = new RxPermissions(getActivity());
+        
+        RxPermissions rxPermissions = new RxPermissions(requireActivity());
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            getFragmentManager()
+            requireFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_activity_container, new StartFragment())
                     .commit();
@@ -270,7 +270,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         toolbar.init();
 
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        AppCompatActivity activity = (AppCompatActivity) requireActivity();
         activity.setSupportActionBar(toolbar);
         ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
@@ -294,7 +294,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return true;
         });
 
-        drawerToggle = new ActionBarDrawerToggle(getActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
+        drawerToggle = new ActionBarDrawerToggle(requireActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
         DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
 
         ActionMenuUtil.setupMenu(actionMenuView.getContext(),
@@ -393,7 +393,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
 
-        playQueueLayoutManager = new LinearLayoutManager(getContext());
+        playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
         Fragment currentFragment = getChildFragmentManager().findFragmentById(R.id.drawer_fragment_container);
@@ -497,6 +497,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showMusicControls(boolean show) {
         setContentBottomHeight(show ?
                 getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height) : 0);
+        bottomSheetTopShadow.setVisibility(show? View.VISIBLE: View.GONE);
 
         if (!show && bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
@@ -507,7 +508,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showCurrentComposition(Composition composition, int position) {
         tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
-        tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, getContext()));
+        tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
 
         playQueueAdapter.onCurrentCompositionChanged(composition);
 
@@ -535,7 +536,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showInfinitePlayingButton(boolean active) {
         if (active) {
-            int selectedColor = getColorFromAttr(getContext(), R.attr.colorAccent);
+            int selectedColor = getColorFromAttr(requireContext(), R.attr.colorAccent);
             btnInfinitePlay.setColorFilter(selectedColor);
             btnInfinitePlay.setOnClickListener(v -> presenter.onDisableInfinitePlayingButtonClicked());
         } else {
@@ -547,7 +548,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showRandomPlayingButton(boolean active) {
         if (active) {
-            int selectedColor = getColorFromAttr(getContext(), R.attr.colorAccent);
+            int selectedColor = getColorFromAttr(requireContext(), R.attr.colorAccent);
             btnRandomPlay.setColorFilter(selectedColor);
             btnRandomPlay.setOnClickListener(v -> presenter.onDisableRandomPlayingButtonClicked());
         } else {
@@ -570,7 +571,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showShareMusicDialog(String filePath) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("audio/*");
-        Uri fileUri = FileProvider.getUriForFile(getContext(), getString(R.string.file_provider_authorities), new File(filePath));
+        Uri fileUri = FileProvider.getUriForFile(requireContext(), getString(R.string.file_provider_authorities), new File(filePath));
         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -587,7 +588,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions) {
-        String text = getAddToPlayListCompleteMessage(getActivity(), playList, compositions);
+        String text = getAddToPlayListCompleteMessage(requireActivity(), playList, compositions);
         Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
@@ -661,7 +662,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onCompositionMenuClicked(View view) {
-        PopupMenu popup = new PopupMenu(getContext(), view);
+        PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.composition_full_actions_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -686,8 +687,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private DrawerArrowDrawable createDrawerArrowDrawable() {
-        DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(getActivity());
-        drawerArrowDrawable.setColor(getColorFromAttr(getActivity(), android.R.attr.textColorPrimaryInverse));
+        DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(requireActivity());
+        drawerArrowDrawable.setColor(getColorFromAttr(requireActivity(), android.R.attr.textColorPrimaryInverse));
         return drawerArrowDrawable;
     }
 }
