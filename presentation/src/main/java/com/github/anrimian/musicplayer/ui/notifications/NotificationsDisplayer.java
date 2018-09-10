@@ -60,7 +60,7 @@ public class NotificationsDisplayer {
     public Notification getStubNotification() {
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .setContentTitle(getString(R.string.preparing_for_launch))
-                .setSmallIcon(R.drawable.ic_menu)
+                .setSmallIcon(R.drawable.ic_music_box)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .build();
@@ -110,7 +110,7 @@ public class NotificationsDisplayer {
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .setContent(contentView)
 //                .setContentTitle("test")
-                .setSmallIcon(R.drawable.ic_menu)
+                .setSmallIcon(R.drawable.ic_music_box)
                 .setContentIntent(pIntent)
 //                .setStyle(style)
 //                .setShowWhen(false)
