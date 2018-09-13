@@ -8,8 +8,8 @@ import com.github.anrimian.musicplayer.R;
 public class FragmentUtils {
 
     public static void startFragment(Fragment fragment,
-                                      FragmentManager fragmentManager,
-                                      int container) {
+                                     FragmentManager fragmentManager,
+                                     int container) {
         Fragment existFragment = fragmentManager.findFragmentById(container);
         if (existFragment == null || existFragment.getClass() != fragment.getClass()) {
             fragmentManager.beginTransaction()
