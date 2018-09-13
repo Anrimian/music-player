@@ -19,7 +19,7 @@ import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.musicplayer.data.TestDataProvider.fakeComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.ADDED;
 import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.MODIFY;

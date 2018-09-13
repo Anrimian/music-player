@@ -1,15 +1,13 @@
 package com.github.anrimian.musicplayer.data.repositories.music.comparators.composition;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.data.TestDataProvider.fakeComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 

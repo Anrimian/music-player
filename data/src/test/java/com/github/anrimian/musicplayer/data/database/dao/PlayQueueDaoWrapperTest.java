@@ -1,18 +1,15 @@
 package com.github.anrimian.musicplayer.data.database.dao;
 
-import com.github.anrimian.musicplayer.data.TestDataProvider;
+import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.PlayQueueEntity;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Flowable;
-
-import static com.github.anrimian.musicplayer.data.TestDataProvider.getFakeCompositionsMap;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -37,15 +34,11 @@ public class PlayQueueDaoWrapperTest {
         playQueueEntity.setPosition(0);
         entities.add(playQueueEntity);
 
-        when(playQueueDao.getPlayQueueObservable()).thenReturn(Flowable.just(entities));
+        when(playQueueDao.getPlayQueue()).thenReturn(entities);
 
-        daoWrapper.getPlayQueueObservable(TestDataProvider::getFakeCompositionsMap)
-                .test()
-                .assertValue(compositions -> {
-                    assertEquals(0, compositions.size());
-                    verify(playQueueDao).deleteComposition(eq(Long.MAX_VALUE));
-                    return true;
-                });
+        List<PlayQueueItem> items = daoWrapper.getPlayQueue(TestDataProvider::getFakeCompositionsMap);
+        assertEquals(0, items.size());
+        verify(playQueueDao).deleteItem(eq(Long.MAX_VALUE));
 
     }
 }

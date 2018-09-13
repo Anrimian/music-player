@@ -1,19 +1,18 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
-import android.support.annotation.NonNull;
-
 import com.github.anrimian.musicplayer.data.database.dao.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CompositionEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,10 +28,7 @@ import static com.github.anrimian.musicplayer.data.preferences.UiStatePreference
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static io.reactivex.subjects.BehaviorSubject.create;
 
-/**
- * Created on 16.04.2018.
- */
-public class PlayQueueRepositoryImpl implements PlayQueueRepository{
+public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private final PlayQueueDaoWrapper playQueueDao;
     private final StorageMusicDataSource storageMusicDataSource;
@@ -40,8 +36,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler scheduler;
 
-    private final BehaviorSubject<List<Composition>> playQueueSubject = create();
-    private final BehaviorSubject<CompositionEvent> currentCompositionSubject = create();
+    private final BehaviorSubject<List<PlayQueueItem>> playQueueSubject = create();
+    private final BehaviorSubject<PlayQueueEvent> currentCompositionSubject = create();
 
     @Nullable
     private PlayQueue playQueue;
@@ -65,44 +61,69 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
         if (compositions.isEmpty()) {
             return Completable.complete();
         }
-        return Single.fromCallable(() -> new PlayQueue(compositions, settingsPreferences.isRandomPlayingEnabled()))
-                .doOnSuccess(this::savePlayQueue)
-                .map(this::getSelectedPlayQueue)
+        return Single.fromCallable(() -> createPlayQueue(compositions))
+                .doOnSuccess(playQueue -> {
+                    this.playQueue = playQueue;
+                    subscribeOnCompositionChanges();
+                })
+                .map(PlayQueue::getCurrentPlayQueue)
                 .doOnSuccess(playQueue -> {
                     playQueueSubject.onNext(playQueue);
-                    setCurrentComposition(playQueue.get(0));
+                    setCurrentItem(playQueue.get(0));
                 })
                 .toCompletable()
                 .subscribeOn(scheduler);
     }
 
+    @Nullable
     @Override
-    public Observable<CompositionEvent> getCurrentCompositionObservable() {
-        return withDefaultValue(currentCompositionSubject, this::getSavedCompositionEvent)
+    public Integer getCompositionPosition(@Nonnull PlayQueueItem playQueueItem) {
+        return getPlayQueue().getPosition(playQueueItem);
+    }
+
+    @Override
+    public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
+        return withDefaultValue(currentCompositionSubject, this::getSavedQueueEvent)
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Observable<List<Composition>> getPlayQueueObservable() {
-        return withDefaultValue(playQueueSubject, getPlayQueue())
+    public Observable<List<PlayQueueItem>> getPlayQueueObservable() {
+        return withDefaultValue(playQueueSubject, () -> getPlayQueue().getCurrentPlayQueue())
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public void setRandomPlayingEnabled(boolean enabled) {
+        Single.fromCallable(this::getPlayQueue)
+                .doOnSuccess(playQueue -> {
+                    PlayQueueItem item = getCurrentItem();
+                    settingsPreferences.setRandomPlayingEnabled(enabled);
+                    playQueue.changeShuffleMode(enabled);
+                    if (enabled) {
+                        playQueue.moveItemToTopInShuffledList(item);
+                        playQueueDao.setShuffledPlayQueueItems(playQueue.getShuffledQueue());
+                    }
+                    playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
+                }).subscribeOn(scheduler)
+                .subscribe();
     }
 
     @Override
     public Single<Integer> skipToNext() {
-        return getSavedPlayQueue()
+        return Single.fromCallable(this::getPlayQueue)
                 .map(playQueue -> {
-                    List<Composition> compositions = getSelectedPlayQueue(playQueue);
-                    Integer position = playQueue.getPosition(getCurrentComposition());
+                    List<PlayQueueItem> items = playQueue.getCurrentPlayQueue();
+                    Integer position = playQueue.getPosition(getCurrentItem());
                     if (position == null) {
                         return 0;
                     }
-                    if (position >= compositions.size() - 1) {
+                    if (position >= items.size() - 1) {
                         position = 0;
                     } else {
                         position++;
                     }
-                    setCurrentComposition(compositions.get(position));
+                    setCurrentItem(items.get(position));
                     return position;
                 })
                 .subscribeOn(scheduler);
@@ -110,10 +131,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
 
     @Override
     public Single<Integer> skipToPrevious() {
-        return getSavedPlayQueue()
+        return Single.fromCallable(this::getPlayQueue)
                 .map(playQueue -> {
-                    List<Composition> compositions = getSelectedPlayQueue(playQueue);
-                    Integer position = playQueue.getPosition(getCurrentComposition());
+                    List<PlayQueueItem> compositions = playQueue.getCurrentPlayQueue();
+                    Integer position = playQueue.getPosition(getCurrentItem());
                     if (position == null) {
                         return 0;
                     }
@@ -121,7 +142,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
                     if (position < 0) {
                         position = compositions.size() - 1;
                     }
-                    setCurrentComposition(compositions.get(position));
+                    setCurrentItem(compositions.get(position));
                     return position;
                 })
                 .subscribeOn(scheduler);
@@ -129,65 +150,29 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
 
     @Override
     public Completable skipToPosition(int position) {
-        return getSavedPlayQueue()
-                .map(this::getSelectedPlayQueue)
-                .doOnSuccess(list -> setCurrentComposition(list.get(position)))
+        return Single.fromCallable(this::getPlayQueue)
+                .map(PlayQueue::getCurrentPlayQueue)
+                .doOnSuccess(list -> setCurrentItem(list.get(position)))
                 .toCompletable()
                 .subscribeOn(scheduler);
     }
 
-    @Override
-    public void setRandomPlayingEnabled(boolean enabled) {
-        getSavedPlayQueue().doOnSuccess(playQueue -> {
-            Composition currentComposition = getCurrentComposition();
-            settingsPreferences.setRandomPlayingEnabled(enabled);
-            playQueue.changeShuffleMode(enabled);
-            if (enabled) {
-                playQueue.moveCompositionToTopInShuffledList(currentComposition);
-                playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
-            }
-            playQueueSubject.onNext(getSelectedPlayQueue(playQueue));
-        }).subscribeOn(scheduler)
-                .subscribe();
-    }
-
-    @Override
-    @Nullable
-    public Integer getCompositionPosition(@NonNull Composition composition) {
-        return playQueue.getPosition(composition);
-    }
-
-    private Single<List<Composition>> getPlayQueue() {
-        return getSavedPlayQueue()
-                .map(this::getSelectedPlayQueue);
-    }
-
-    private void setCurrentComposition(@Nullable Composition composition) {
-        long id = composition == null? NO_COMPOSITION: composition.getId();
-        uiStatePreferences.setCurrentCompositionId(id);
-        currentCompositionSubject.onNext(new CompositionEvent(composition));
-    }
-
-    private List<Composition> getSelectedPlayQueue(PlayQueue playQueue) {
-        return playQueue.getCurrentPlayQueue();
-    }
-
-    private Single<PlayQueue> getSavedPlayQueue() {
-        return Single.fromCallable(() -> {
-            if (playQueue == null) {
-                synchronized (this) {
-                    if (playQueue == null) {
-                        playQueue = loadPlayQueue();
+    private PlayQueue getPlayQueue() {
+        if (playQueue == null) {
+            synchronized (this) {
+                if (playQueue == null) {
+                    playQueue = loadPlayQueue();
+                    if (!playQueue.isEmpty()) {
                         subscribeOnCompositionChanges();
                     }
                 }
             }
-            return playQueue;
-        });
+        }
+        return playQueue;
     }
 
     private void subscribeOnCompositionChanges() {
-        if (changeDisposable == null && !playQueue.isEmpty()) {
+        if (changeDisposable == null) {
             changeDisposable = storageMusicDataSource.getChangeObservable()
                     .subscribe(this::processCompositionChange);
         }
@@ -207,104 +192,117 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository{
         }
     }
 
-    private void processDeleteChange(List<Composition> changedCompositions) {
-        List<Composition> compositionsToDelete = new ArrayList<>();
-        Integer currentCompositionPosition = playQueue.getPosition(getCurrentComposition());
-        boolean currentCompositionDeleted = false;
+    private void processDeleteChange(List<Composition> deletedCompositions) {
+        Integer currentPosition = getPlayQueue().getPosition(getCurrentItem());
+        boolean currentItemDeleted = false;
 
-        for (Composition deletedComposition : changedCompositions) {
-            long id = deletedComposition.getId();
-            if (playQueue.getCompositionById(id) != null) {
-                if (deletedComposition.equals(getCurrentComposition())) {
-                    currentCompositionDeleted = true;
-                }
-                compositionsToDelete.add(deletedComposition);
+        for (Composition deletedComposition : deletedCompositions) {
+            PlayQueueItem currentItem = getCurrentItem();
+            if (currentItem != null && currentItem.getComposition().equals(deletedComposition)) {
+                currentItemDeleted = true;
             }
         }
-        playQueue.deleteCompositions(compositionsToDelete);
-        if (!compositionsToDelete.isEmpty()) {
+
+        boolean updated = getPlayQueue().deleteCompositions(deletedCompositions);
+        if (updated) {
 
             //optimize later if need
-            playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
-            playQueueDao.setPlayQueue(playQueue.getCompositionQueue());
+            playQueueDao.setShuffledPlayQueueItems(getPlayQueue().getShuffledQueue());
+            playQueueDao.setPlayQueueItems(getPlayQueue().getCompositionQueue());
 
-            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
+            playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
 
-            if (currentCompositionDeleted) {
-                List<Composition> compositions = getSelectedPlayQueue(playQueue);
-                Composition newComposition = null;
-                if (!compositions.isEmpty()) {
-                    if (currentCompositionPosition >= compositions.size()) {
-                        currentCompositionPosition = 0;
+            if (currentItemDeleted) {
+                List<PlayQueueItem> items = getPlayQueue().getCurrentPlayQueue();
+                PlayQueueItem newItem = null;
+                if (!items.isEmpty()) {
+                    if (currentPosition == null || currentPosition >= items.size()) {
+                        currentPosition = 0;
                     }
-                    newComposition = compositions.get(currentCompositionPosition);
+                    newItem = items.get(currentPosition);
                 }
-                setCurrentComposition(newComposition);
+                setCurrentItem(newItem);
             }
         }
     }
 
     private void processModifyChange(List<Composition> changedCompositions) {
-        List<Composition> compositionsToNotify = new ArrayList<>();
-        Composition changedCurrentComposition = null;
+        boolean updatedCurrentComposition = false;
+        boolean updated = false;
 
         for (Composition modifiedComposition : changedCompositions) {
-            long id = modifiedComposition.getId();
-            if (playQueue.getCompositionById(id) != null) {
-                if (modifiedComposition.equals(getCurrentComposition())) {
-                    changedCurrentComposition = modifiedComposition;
-                }
+            boolean updatedItem = getPlayQueue().updateComposition(modifiedComposition);
+            if (!updated) {
+                updated = updatedItem;
+            }
 
-                playQueue.updateComposition(modifiedComposition);
-                compositionsToNotify.add(modifiedComposition);
+            PlayQueueItem currentItem = getCurrentItem();
+            if (currentItem != null && currentItem.getComposition().equals(modifiedComposition)) {
+                currentItem.setComposition(modifiedComposition);
+                updatedCurrentComposition = true;
             }
         }
-        if (!compositionsToNotify.isEmpty()) {
-            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
-
-            if (changedCurrentComposition != null) {
-                currentCompositionSubject.onNext(new CompositionEvent(changedCurrentComposition));
-            }
+        if (updated) {
+            playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
         }
-    }
-
-    private void savePlayQueue(PlayQueue playQueue) {
-        playQueueDao.setShuffledPlayQueue(playQueue.getShuffledQueue());
-        playQueueDao.setPlayQueue(playQueue.getCompositionQueue());
-
-        this.playQueue = playQueue;
-
-        subscribeOnCompositionChanges();
-    }
-
-    @SuppressWarnings("unchecked")
-    private PlayQueue loadPlayQueue() {
-        Map<Long, Composition> allCompositionMap = storageMusicDataSource.getCompositionsMap();
-        List<Composition> playQueue = playQueueDao.getPlayQueue(allCompositionMap);
-        List<Composition> shuffledQueue = playQueueDao.getShuffledPlayQueue(allCompositionMap);
-        return new PlayQueue(playQueue, shuffledQueue, settingsPreferences.isRandomPlayingEnabled());
+        if (updatedCurrentComposition) {
+            currentCompositionSubject.onNext(new PlayQueueEvent(getCurrentItem()));
+        }
     }
 
     @Nonnull
-    private CompositionEvent getSavedCompositionEvent() {
+    private PlayQueueEvent getSavedQueueEvent() {
         if (currentCompositionSubject.getValue() != null) {
             return currentCompositionSubject.getValue();
         }
 
-        return new CompositionEvent(getSavedComposition(), uiStatePreferences.getTrackPosition());
+        return new PlayQueueEvent(getSavedQueueItem(), uiStatePreferences.getTrackPosition());
     }
 
     @Nullable
-    private Composition getCurrentComposition() {
-        if (currentCompositionSubject.getValue() != null) {
-            return currentCompositionSubject.getValue().getComposition();
+    private PlayQueueItem getSavedQueueItem() {
+        long id = uiStatePreferences.getCurrentPlayQueueId();
+        Composition composition = storageMusicDataSource.getCompositionById(uiStatePreferences.getCurrentCompositionId());
+        if (composition == null) {
+            return null;
         }
-        return getSavedComposition();
+        return new PlayQueueItem(id, composition);
+    }
+
+    private PlayQueue loadPlayQueue() {
+        List<PlayQueueItem> playQueue = playQueueDao.getPlayQueue(storageMusicDataSource::getCompositionsMap);
+        List<PlayQueueItem> shuffledQueue = playQueueDao.getShuffledPlayQueue(storageMusicDataSource::getCompositionsMap);
+        return new PlayQueue(playQueue, shuffledQueue, settingsPreferences.isRandomPlayingEnabled());
+    }
+
+    private void setCurrentItem(@Nullable PlayQueueItem item) {
+        long itemId = NO_COMPOSITION;
+        long compositionId = NO_COMPOSITION;
+        if (item != null) {
+            itemId = item.getId();
+            compositionId = item.getComposition().getId();
+        }
+        uiStatePreferences.setCurrentPlayQueueItemId(itemId);
+        uiStatePreferences.setCurrentCompositionId(compositionId);
+        currentCompositionSubject.onNext(new PlayQueueEvent(item));
     }
 
     @Nullable
-    private Composition getSavedComposition() {
-        long id = uiStatePreferences.getCurrentCompositionId();
-        return storageMusicDataSource.getCompositionById(id);
+    private PlayQueueItem getCurrentItem() {
+        if (currentCompositionSubject.getValue() != null) {
+            return currentCompositionSubject.getValue().getPlayQueueItem();
+        }
+        return getSavedQueueItem();
+    }
+
+    private PlayQueue createPlayQueue(List<Composition> compositions) {
+        List<PlayQueueItem> items = playQueueDao.setPlayQueueNew(compositions);
+
+        List<Composition> shuffledList = new ArrayList<>(compositions);
+        Collections.shuffle(shuffledList);
+
+        List<PlayQueueItem> shuffledItems = playQueueDao.setShuffledPlayQueueNew(shuffledList);
+
+        return new PlayQueue(items, shuffledItems, settingsPreferences.isRandomPlayingEnabled());
     }
 }

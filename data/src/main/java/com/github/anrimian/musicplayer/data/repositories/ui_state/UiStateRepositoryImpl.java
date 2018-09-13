@@ -24,14 +24,4 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     public long getTrackPosition() {
         return uiStatePreferences.getTrackPosition();
     }
-
-    @Override
-    public void setPlayListPosition(int position) {
-        uiStatePreferences.setCurrentCompositionPosition(position);
-    }
-
-    @Override
-    public int getPlayListPosition() {
-        return uiStatePreferences.getCurrentCompositionPosition();
-    }
 }

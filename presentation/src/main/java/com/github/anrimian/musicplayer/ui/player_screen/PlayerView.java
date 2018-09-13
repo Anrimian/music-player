@@ -6,6 +6,7 @@ import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
@@ -30,13 +31,13 @@ public interface PlayerView extends MvpView {
     void showMusicControls(boolean show);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentComposition(Composition composition, int position);
+    void showCurrentQueueItem(PlayQueueItem item, int position);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void bindPlayList(List<Composition> currentPlayList);
+    void bindPlayList(List<PlayQueueItem> currentPlayList);
 
     @StateStrategyType(SkipStrategy.class)
-    void updatePlayQueue(List<Composition> currentPlayList, List<Composition> newPlayList);
+    void updatePlayQueue(List<PlayQueueItem> currentPlayList, List<PlayQueueItem> newPlayList);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showInfinitePlayingButton(boolean active);

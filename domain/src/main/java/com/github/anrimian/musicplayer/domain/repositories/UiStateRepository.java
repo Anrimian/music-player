@@ -10,7 +10,4 @@ public interface UiStateRepository {
 
     long getTrackPosition();
 
-    void setPlayListPosition(int position);
-
-    int getPlayListPosition();
 }

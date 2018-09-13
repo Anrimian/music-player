@@ -9,7 +9,7 @@ import android.content.Context;
 
 public class DatabaseManager {
 
-    private static final String DATABASE_NAME = "simple_music_player_database";
+    private static final String DATABASE_NAME = "music_player_database";
 
     private Context context;
 

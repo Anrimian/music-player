@@ -5,15 +5,12 @@ import com.github.anrimian.musicplayer.data.database.entities.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.ShuffledPlayQueueEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.utils.java.Function;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 
 /**
  * Created on 02.07.2018.
@@ -28,10 +25,10 @@ public class PlayQueueDaoWrapper {
         this.playQueueDao = playQueueDao;
     }
 
-    public void setShuffledPlayQueue(List<Composition> shuffledQueue) {
+    public void setShuffledPlayQueueItems(List<PlayQueueItem> shuffledQueue) {
         appDatabase.runInTransaction(() -> {
             playQueueDao.deleteShuffledPlayQueue();
-            playQueueDao.insertShuffledPlayQueue(toShuffledEntityList(shuffledQueue));
+            playQueueDao.insertShuffledPlayQueue(toShuffledEntityItemsList(shuffledQueue));
         });
     }
 
@@ -42,16 +39,37 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public Flowable<List<PlayQueueItem>> getPlayQueueObservable(
-            Callable<Map<Long, Composition>> compositionsCallable) {
-        return playQueueDao.getPlayQueueObservable()
-                .map(entities -> toPlayQueueItem(entities, compositionsCallable.call()));
+    public void setPlayQueueItems(List<PlayQueueItem> compositionQueue) {
+        appDatabase.runInTransaction(() -> {
+            playQueueDao.deletePlayQueue();
+            playQueueDao.insertPlayQueue(toEntityItemsList(compositionQueue));
+        });
     }
 
-    public Flowable<List<PlayQueueItem>> getShuffledPlayQueueObservable(
-            Callable<Map<Long, Composition>> compositionsCallable) {
-        return playQueueDao.getShuffledPlayQueueObservable()
-                .map(entities -> toShuffledPlayQueueItem(entities, compositionsCallable.call()));
+    public List<PlayQueueItem> setShuffledPlayQueueNew(List<Composition> compositionQueue) {
+        return appDatabase.runInTransaction(() -> {
+            playQueueDao.deleteShuffledPlayQueue();
+            long[] ids = playQueueDao.insertShuffledPlayQueue(toShuffledEntityList(compositionQueue));
+            return createPlayQueueItems(compositionQueue, ids);
+        });
+    }
+
+    public List<PlayQueueItem> setPlayQueueNew(List<Composition> compositionQueue) {
+        return appDatabase.runInTransaction(() -> {
+            playQueueDao.deletePlayQueue();
+            long[] ids = playQueueDao.insertPlayQueue(toEntityList(compositionQueue));
+            return createPlayQueueItems(compositionQueue, ids);
+        });
+    }
+
+    public List<PlayQueueItem> getPlayQueue(
+            Function<Map<Long, Composition>> compositionsCallable) {
+        return toPlayQueueItem(playQueueDao.getPlayQueue(), compositionsCallable.call());
+    }
+
+    public List<PlayQueueItem> getShuffledPlayQueue(
+            Function<Map<Long, Composition>> compositions) {
+        return toShuffledPlayQueueItem(playQueueDao.getShuffledPlayQueue(), compositions.call());
     }
 
     private List<PlayQueueItem> toShuffledPlayQueueItem(List<ShuffledPlayQueueEntity> entities,
@@ -60,17 +78,16 @@ public class PlayQueueDaoWrapper {
         while (iterator.hasNext()) {
             ShuffledPlayQueueEntity playQueueEntity = iterator.next();
             long id = playQueueEntity.getAudioId();
-            Composition composition = compositionMap.get(id);
+            Composition composition = compositionMap.get(playQueueEntity.getAudioId());
             if (composition == null) {
-                playQueueDao.deleteComposition(id);
+                playQueueDao.deleteShuffledItem(id);
                 iterator.remove();
             }
         }
         List<PlayQueueItem> queueItems = new ArrayList<>();
         for (ShuffledPlayQueueEntity playQueueEntity: entities) {
-            long id = playQueueEntity.getId();
-            Composition composition = compositionMap.get(id);
-            queueItems.add(new PlayQueueItem(id, composition));
+            Composition composition = compositionMap.get(playQueueEntity.getAudioId());
+            queueItems.add(new PlayQueueItem(playQueueEntity.getId(), composition));
         }
         return queueItems;
     }
@@ -81,65 +98,18 @@ public class PlayQueueDaoWrapper {
         while (iterator.hasNext()) {
             PlayQueueEntity playQueueEntity = iterator.next();
             long id = playQueueEntity.getAudioId();
-            Composition composition = compositionMap.get(id);
+            Composition composition = compositionMap.get(playQueueEntity.getAudioId());
             if (composition == null) {
-                playQueueDao.deleteComposition(id);
+                playQueueDao.deleteItem(id);
                 iterator.remove();
             }
         }
         List<PlayQueueItem> queueItems = new ArrayList<>();
         for (PlayQueueEntity playQueueEntity: entities) {
-            long id = playQueueEntity.getId();
-            Composition composition = compositionMap.get(id);
-            queueItems.add(new PlayQueueItem(id, composition));
+            Composition composition = compositionMap.get(playQueueEntity.getAudioId());
+            queueItems.add(new PlayQueueItem(playQueueEntity.getId(), composition));
         }
         return queueItems;
-    }
-
-    public List<Composition> getPlayQueue(Map<Long, Composition> compositionMap) {
-        List<PlayQueueEntity> playQueueEntities = playQueueDao.getPlayQueue();
-
-        Iterator<PlayQueueEntity> iterator = playQueueEntities.iterator();
-        while (iterator.hasNext()) {
-            PlayQueueEntity playQueueEntity = iterator.next();
-            long id = playQueueEntity.getAudioId();
-            Composition composition = compositionMap.get(id);
-            if (composition == null) {
-                playQueueDao.deleteComposition(id);
-                iterator.remove();
-            }
-        }
-
-        List<Composition> compositions = new ArrayList<>();
-        for (PlayQueueEntity playQueueEntity: playQueueEntities) {
-            long id = playQueueEntity.getAudioId();
-            Composition composition = compositionMap.get(id);
-            compositions.add(composition);
-        }
-        return compositions;
-    }
-
-    public List<Composition> getShuffledPlayQueue(Map<Long, Composition> compositionMap) {
-        List<ShuffledPlayQueueEntity> playQueueEntities = playQueueDao.getShuffledPlayQueue();
-
-        Iterator<ShuffledPlayQueueEntity> iterator = playQueueEntities.iterator();
-        while (iterator.hasNext()) {
-            ShuffledPlayQueueEntity playQueueEntity = iterator.next();
-            long id = playQueueEntity.getAudioId();
-            Composition composition = compositionMap.get(id);
-            if (composition == null) {
-                playQueueDao.deleteShuffledComposition(id);
-                iterator.remove();
-            }
-        }
-
-        List<Composition> compositions = new ArrayList<>();
-        for (ShuffledPlayQueueEntity playQueueEntity: playQueueEntities) {
-            long id = playQueueEntity.getAudioId();
-            Composition composition = compositionMap.get(id);
-            compositions.add(composition);
-        }
-        return compositions;
     }
 
     private List<ShuffledPlayQueueEntity> toShuffledEntityList(List<Composition> shuffledQueue) {
@@ -168,5 +138,52 @@ public class PlayQueueDaoWrapper {
             entityList.add(playQueueEntity);
         }
         return entityList;
+    }
+
+    private List<ShuffledPlayQueueEntity> toShuffledEntityItemsList(List<PlayQueueItem> playQueueItems) {
+        List<ShuffledPlayQueueEntity> entityList = new ArrayList<>();
+
+        for (int i = 0; i < playQueueItems.size(); i++) {
+            PlayQueueItem item = playQueueItems.get(i);
+            ShuffledPlayQueueEntity playQueueEntity = new ShuffledPlayQueueEntity();
+
+            Composition composition = item.getComposition();
+            playQueueEntity.setAudioId(composition.getId());
+
+            playQueueEntity.setId(item.getId());
+            playQueueEntity.setPosition(i);
+
+            entityList.add(playQueueEntity);
+        }
+        return entityList;
+    }
+
+    private List<PlayQueueEntity> toEntityItemsList(List<PlayQueueItem> playQueueItems) {
+        List<PlayQueueEntity> entityList = new ArrayList<>();
+
+        for (int i = 0; i < playQueueItems.size(); i++) {
+            PlayQueueItem item = playQueueItems.get(i);
+            PlayQueueEntity playQueueEntity = new PlayQueueEntity();
+
+            Composition composition = item.getComposition();
+            playQueueEntity.setAudioId(composition.getId());
+
+            playQueueEntity.setId(item.getId());
+            playQueueEntity.setPosition(i);
+
+            entityList.add(playQueueEntity);
+        }
+        return entityList;
+    }
+
+    private List<PlayQueueItem> createPlayQueueItems(List<Composition> compositions, long[] ids) {
+        List<PlayQueueItem> items = new ArrayList<>();
+
+        for (int i = 0; i < compositions.size(); i++) {
+            Composition composition = compositions.get(i);
+            PlayQueueItem playQueueItem = new PlayQueueItem(ids[i], composition);
+            items.add(playQueueItem);
+        }
+        return items;
     }
 }

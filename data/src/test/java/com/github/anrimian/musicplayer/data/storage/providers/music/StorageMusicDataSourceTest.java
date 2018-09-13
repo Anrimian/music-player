@@ -15,7 +15,7 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.musicplayer.data.TestDataProvider.getFakeCompositionsMap;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;

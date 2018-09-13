@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 
@@ -43,6 +44,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
+    private PlayQueueItem playQueueItem;
     private Composition composition;
 
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
@@ -50,22 +52,23 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
 
     PlayQueueViewHolder(LayoutInflater inflater,
                         ViewGroup parent,
-                        OnPositionItemClickListener<Composition> onCompositionClickListener,
+                        OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener,
                         OnItemClickListener<Composition> onDeleteCompositionClickListener,
                         OnItemClickListener<Composition> onAddToPlaylistClickListener) {
         super(inflater.inflate(R.layout.item_play_queue_music, parent, false));
         ButterKnife.bind(this, itemView);
         if (onCompositionClickListener != null) {
             clickableItem.setOnClickListener(v ->
-                    onCompositionClickListener.onItemClick(getAdapterPosition(), composition));
+                    onCompositionClickListener.onItemClick(getAdapterPosition(), playQueueItem));
         }
         btnActionsMenu.setOnClickListener(this::onActionsMenuButtonClicked);
         this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
         this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
     }
 
-    void bind(@Nonnull Composition composition) {
-        this.composition = composition;
+    void bind(@Nonnull PlayQueueItem item) {
+        this.playQueueItem = item;
+        this.composition = item.getComposition();
         tvMusicName.setText(formatCompositionName(composition));
         showAdditionalInfo();
 

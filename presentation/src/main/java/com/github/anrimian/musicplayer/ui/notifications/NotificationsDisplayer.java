@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.RemoteViews;
 
 import com.github.anrimian.musicplayer.R;
@@ -78,7 +77,7 @@ public class NotificationsDisplayer {
 
     private NotificationCompat.Builder getDefaultMusicNotification(@Nonnull PlayerMetaState state) {
         boolean play = state.getState() == PlayerState.PLAY;
-        Composition composition = state.getComposition();
+        Composition composition = state.getQueueItem().getComposition();
 
         RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_music);
         contentView.setImageViewResource(R.id.iv_play_stop, play? R.drawable.ic_pause : R.drawable.ic_play);
