@@ -15,10 +15,9 @@ import io.reactivex.functions.Predicate;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.musicplayer.data.TestDataProvider.fakeComposition;
-import static com.github.anrimian.musicplayer.data.TestDataProvider.getFakeCompositions;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositions;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;

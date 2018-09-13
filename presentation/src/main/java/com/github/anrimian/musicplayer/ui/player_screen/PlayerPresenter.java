@@ -5,7 +5,8 @@ import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CompositionEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
@@ -17,12 +18,12 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
  * Created on 02.11.2017.
@@ -40,8 +41,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private Disposable trackStateDisposable;
     private Disposable currentCompositionDisposable;
 
-    private final List<Composition> playQueue = new ArrayList<>();
-    private Composition composition;
+    private final List<PlayQueueItem> playQueue = new ArrayList<>();
+    private PlayQueueItem currentItem;
 
     @Nullable
     private Composition compositionToAddToPlayList;
@@ -113,18 +114,18 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onShareCompositionButtonClicked() {
-        getViewState().showShareMusicDialog(composition.getFilePath());
+        getViewState().showShareMusicDialog(currentItem.getComposition().getFilePath());
     }
 
-    void onCompositionItemClicked(int position, Composition composition) {
-        this.composition = composition;
+    void onCompositionItemClicked(int position, PlayQueueItem item) {
+        this.currentItem = item;
         musicPlayerInteractor.skipToPosition(position);
 
-        onCurrentCompositionChanged(composition, 0);
+        onCurrentCompositionChanged(item, 0);
     }
 
     void onTrackRewoundTo(int progress) {
-        long position = composition.getDuration() * progress / 100;
+        long position = currentItem.getComposition().getDuration() * progress / 100;
         musicPlayerInteractor.seekTo(position);
     }
 
@@ -133,7 +134,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onDeleteCurrentCompositionButtonClicked() {
-        deleteComposition(composition);
+        deleteComposition(currentItem.getComposition());
     }
 
     void onAddToPlayListButtonClicked(Composition composition) {
@@ -142,7 +143,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onPlayListToAddingSelected(PlayList playList) {
-        addCompositionToPlayList(composition, playList);
+        addCompositionToPlayList(currentItem.getComposition(), playList);
     }
 
     void onPlayListForPlayQueueItemSelected(PlayList playList) {
@@ -150,10 +151,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onPlayListForAddingCreated(PlayList playList) {
-        //play queue can change and we can receive wrong message, check this on big play queue
-        playListsInteractor.addCompositionsToPlayList(playQueue, playList)
+        List<Composition> compositionsToAdd = mapList(playQueue, PlayQueueItem::getComposition);
+        playListsInteractor.addCompositionsToPlayList(compositionsToAdd, playList)
                 .observeOn(uiScheduler)
-                .subscribe(() -> getViewState().showAddingToPlayListComplete(playList, playQueue),
+                .subscribe(() -> getViewState().showAddingToPlayListComplete(playList, compositionsToAdd),
                         this::onAddingToPlayListError);
     }
 
@@ -184,36 +185,36 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     public void onSeekStop(int progress) {
-        long position = composition.getDuration() * progress / 100;
+        long position = currentItem.getComposition().getDuration() * progress / 100;
         musicPlayerInteractor.onSeekFinished(position);
     }
 
     private void subscribeOnCurrentCompositionChanging() {
         currentCompositionDisposable = musicPlayerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onCompositionEventReceived);
+                .subscribe(this::onPlayQueueEventReceived);
         presenterDisposable.add(currentCompositionDisposable);
     }
 
-    private void onCompositionEventReceived(CompositionEvent compositionEvent) {
-        Composition newComposition = compositionEvent.getComposition();
-        if (!Objects.equals(newComposition, composition)) {
-            onCurrentCompositionChanged(newComposition, compositionEvent.getTrackPosition());
+    private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
+        PlayQueueItem newItem = playQueueEvent.getPlayQueueItem();
+        if (!Objects.equals(newItem, currentItem)) {
+            onCurrentCompositionChanged(newItem, playQueueEvent.getTrackPosition());
         }
     }
 
-    private void onCurrentCompositionChanged(Composition composition, long trackPosition) {
-        this.composition = composition;
+    private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
+        this.currentItem = newItem;
         if (trackStateDisposable != null) {
             trackStateDisposable.dispose();
             trackStateDisposable = null;
         }
-        if (composition != null) {
-            Integer position = musicPlayerInteractor.getQueuePosition(composition);
+        if (newItem != null) {
+            Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
-                getViewState().showCurrentComposition(composition, position);
+                getViewState().showCurrentQueueItem(newItem, position);
             }
-            getViewState().showTrackState(trackPosition, composition.getDuration());
+            getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
             subscribeOnTrackPositionChanging();
         }
     }
@@ -242,18 +243,18 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 .subscribe(this::onPlayListChanged));
     }
 
-    private void onPlayListChanged(List<Composition> newPlayQueue) {
+    private void onPlayListChanged(List<PlayQueueItem> newPlayQueue) {
         if (currentCompositionDisposable != null) {
             currentCompositionDisposable.dispose();
             currentCompositionDisposable = null;
-            composition = null;
+            currentItem = null;
         }
         if (trackStateDisposable != null) {
             trackStateDisposable.dispose();
             trackStateDisposable = null;
         }
 
-        List<Composition> oldPlayList = new ArrayList<>(playQueue);
+        List<PlayQueueItem> oldPlayList = new ArrayList<>(playQueue);
         playQueue.clear();
         playQueue.addAll(newPlayQueue);
 
@@ -272,7 +273,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onTrackPositionChanged(Long currentPosition) {
-        long duration = composition.getDuration();
+        long duration = currentItem.getComposition().getDuration();
         getViewState().showTrackState(currentPosition, duration);
     }
 }

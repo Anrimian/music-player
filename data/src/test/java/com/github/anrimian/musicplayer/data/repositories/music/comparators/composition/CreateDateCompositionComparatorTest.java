@@ -5,10 +5,9 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.data.TestDataProvider.fakeComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 

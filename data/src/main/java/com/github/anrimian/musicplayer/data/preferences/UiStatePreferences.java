@@ -11,12 +11,11 @@ import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesH
 public class UiStatePreferences {
 
     public static final long NO_COMPOSITION = Long.MIN_VALUE;
-    public static final int NO_POSITION = 0;
 
     private static final String PREFERENCES_NAME = "ui_preferences";
 
     private static final String TRACK_POSITION = "track_position";
-    private static final String CURRENT_COMPOSITION_POSITION = "current_composition_position";
+    private static final String CURRENT_PLAY_QUEUE_ID = "current_play_queue_id";
     private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
 
     private final SharedPreferencesHelper preferences;
@@ -39,15 +38,15 @@ public class UiStatePreferences {
         preferences.putLong(CURRENT_COMPOSITION_ID, id);
     }
 
+    public void setCurrentPlayQueueItemId(long id) {
+        preferences.putLong(CURRENT_PLAY_QUEUE_ID, id);
+    }
+
+    public Long getCurrentPlayQueueId() {
+        return preferences.getLong(CURRENT_PLAY_QUEUE_ID, NO_COMPOSITION);
+    }
+
     public Long getCurrentCompositionId() {
         return preferences.getLong(CURRENT_COMPOSITION_ID, NO_COMPOSITION);
-    }
-
-    public void setCurrentCompositionPosition(int position) {
-        preferences.putInt(CURRENT_COMPOSITION_POSITION, position);
-    }
-
-    public int getCurrentCompositionPosition() {
-        return preferences.getInt(CURRENT_COMPOSITION_POSITION, NO_POSITION);
     }
 }

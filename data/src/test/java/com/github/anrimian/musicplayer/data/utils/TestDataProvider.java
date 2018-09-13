@@ -1,7 +1,8 @@
-package com.github.anrimian.musicplayer.data;
+package com.github.anrimian.musicplayer.data.utils;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CompositionEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 
@@ -33,12 +34,26 @@ public class TestDataProvider {
         return compositions;
     }
 
+    public static List<PlayQueueItem> getFakeItems() {
+        List<PlayQueueItem> items = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+            Composition composition = new Composition();
+
+            composition.setFilePath("music-" + i);
+            composition.setId(i);
+
+            PlayQueueItem item = new PlayQueueItem(i, composition);
+            items.add(item);
+        }
+        return items;
+    }
+
     public static Composition fakeComposition(int index) {
         return getFakeCompositions().get(index);
     }
 
-    public static CompositionEvent compositionEvent(Composition composition) {
-        return new CompositionEvent(composition);
+    public static PlayQueueItem fakeItem(int index) {
+        return getFakeItems().get(index);
     }
 
     public static Map<Long, Composition> getFakeCompositionsMap() {
@@ -53,8 +68,8 @@ public class TestDataProvider {
         return compositions;
     }
 
-    public static CompositionEvent currentComposition(Composition composition) {
-        return new CompositionEvent(composition, 0L);
+    public static PlayQueueEvent currentItem(int pos) {
+        return new PlayQueueEvent(new PlayQueueItem(pos, fakeComposition(pos)), 0L);
     }
 
     public static Composition fakeComposition(long id, String filePath, long createDate) {

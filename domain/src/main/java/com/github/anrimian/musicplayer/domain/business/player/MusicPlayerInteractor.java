@@ -4,7 +4,8 @@ import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CompositionEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
@@ -57,7 +58,7 @@ public class MusicPlayerInteractor {
 
     private Disposable skipDisposable;
 
-    private Composition currentComposition;
+    private PlayQueueItem currentItem;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  SettingsRepository settingsRepository,
@@ -74,8 +75,8 @@ public class MusicPlayerInteractor {
         this.analytics = analytics;
         this.playerErrorParser = playerErrorParser;
 
-        playerDisposable.add(playQueueRepository.getCurrentCompositionObservable()
-                .subscribe(this::onCompositionChanged));
+        playerDisposable.add(playQueueRepository.getCurrentQueueItemObservable()
+                .subscribe(this::onQueueItemChanged));
         playerDisposable.add(musicPlayerController.getEventsObservable()
                 .subscribe(this::onMusicPlayerEventReceived));
     }
@@ -187,11 +188,11 @@ public class MusicPlayerInteractor {
                 .distinctUntilChanged();
     }
 
-    public Observable<CompositionEvent> getCurrentCompositionObservable() {
-        return playQueueRepository.getCurrentCompositionObservable();
+    public Observable<PlayQueueEvent> getCurrentCompositionObservable() {
+        return playQueueRepository.getCurrentQueueItemObservable();
     }
 
-    public Observable<List<Composition>> getPlayQueueObservable() {
+    public Observable<List<PlayQueueItem>> getPlayQueueObservable() {
         return playQueueRepository.getPlayQueueObservable();
     }
 
@@ -200,16 +201,16 @@ public class MusicPlayerInteractor {
     }
 
     @Nullable
-    public Integer getQueuePosition(Composition composition) {
-        return playQueueRepository.getCompositionPosition(composition);
+    public Integer getQueuePosition(PlayQueueItem item) {
+        return playQueueRepository.getCompositionPosition(item);
     }
 
-    private void onCompositionChanged(CompositionEvent compositionEvent) {
-        this.currentComposition = compositionEvent.getComposition();
-        if (currentComposition == null) {
+    private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
+        this.currentItem = compositionEvent.getPlayQueueItem();
+        if (currentItem == null) {
             stop();
         } else {
-            musicPlayerController.prepareToPlay(currentComposition, compositionEvent.getTrackPosition());
+            musicPlayerController.prepareToPlay(currentItem.getComposition(), compositionEvent.getTrackPosition());
         }
     }
 
@@ -233,14 +234,14 @@ public class MusicPlayerInteractor {
     private void handleErrorWithComposition(ErrorType errorType) {
         switch (errorType) {
             case DELETED: {
-                musicProviderRepository.deleteComposition(currentComposition)
+                musicProviderRepository.deleteComposition(currentItem.getComposition())
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
                         .subscribe();
                 break;
             }
             default: {
-                musicProviderRepository.writeErrorAboutComposition(errorType, currentComposition)
+                musicProviderRepository.writeErrorAboutComposition(errorType, currentItem.getComposition())
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
                         .andThen(playQueueRepository.skipToNext())

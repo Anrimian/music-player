@@ -40,6 +40,7 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -504,12 +505,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showCurrentComposition(Composition composition, int position) {
+    public void showCurrentQueueItem(PlayQueueItem item, int position) {
+        Composition composition = item.getComposition();
         tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
         tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, getContext()));
 
-        playQueueAdapter.onCurrentCompositionChanged(composition);
+        playQueueAdapter.onCurrentItemChanged(item);
 
         if (position >= playQueueLayoutManager.findLastVisibleItemPosition()) {
             playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
@@ -519,7 +521,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void bindPlayList(List<Composition> currentPlayList) {
+    public void bindPlayList(List<PlayQueueItem> currentPlayList) {
         playQueueAdapter = new PlayQueueAdapter(currentPlayList);
         playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
         playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
@@ -528,7 +530,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void updatePlayQueue(List<Composition> currentPlayList, List<Composition> newPlayList) {
+    public void updatePlayQueue(List<PlayQueueItem> currentPlayList, List<PlayQueueItem> newPlayList) {
         playQueueAdapter.updatePlayList(currentPlayList, newPlayList);
     }
 

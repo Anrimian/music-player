@@ -15,22 +15,17 @@ import io.reactivex.Flowable;
 @Dao
 public interface PlayQueueDao {
 
-    @Deprecated
     @Query("SELECT * FROM play_queue ORDER BY position")
     List<PlayQueueEntity> getPlayQueue();
 
-    @Query("SELECT * FROM play_queue ORDER BY position")
-    Flowable<List<PlayQueueEntity>> getPlayQueueObservable();
-
-    @Deprecated
     @Query("SELECT * FROM shuffled_play_queue ORDER BY position")
     List<ShuffledPlayQueueEntity> getShuffledPlayQueue();
 
-    @Query("SELECT * FROM shuffled_play_queue ORDER BY position")
-    Flowable<List<ShuffledPlayQueueEntity>> getShuffledPlayQueueObservable();
+    @Insert
+    long[] insertPlayQueue(List<PlayQueueEntity> playQueueEntityList);
 
     @Insert
-    void insertPlayQueue(List<PlayQueueEntity> playQueueEntityList);
+    long[] insertShuffledPlayQueue(List<ShuffledPlayQueueEntity> entities);
 
     @Query("DELETE FROM play_queue")
     void deletePlayQueue();
@@ -38,21 +33,9 @@ public interface PlayQueueDao {
     @Query("DELETE FROM shuffled_play_queue")
     void deleteShuffledPlayQueue();
 
-    @Insert
-    void insertShuffledPlayQueue(List<ShuffledPlayQueueEntity> entities);
-
-    @Query("DELETE FROM play_queue WHERE audioId = :audioId")
-    void deleteComposition(long audioId);
-
-    @Query("DELETE FROM shuffled_play_queue WHERE audioId = :audioId")
-    void deleteShuffledComposition(long audioId);
-
     @Query("DELETE FROM play_queue WHERE id = :id")
-    void deleteQueueItem(long id);
+    void deleteItem(long id);
 
     @Query("DELETE FROM shuffled_play_queue WHERE id = :id")
-    void deleteShuffledQueueItem(long id);
-
-    @Query("UPDATE play_queue SET position = :newPosition WHERE id = :id")
-    void updatePosition(long id, int newPosition);
+    void deleteShuffledItem(long id);
 }

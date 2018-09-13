@@ -13,7 +13,8 @@ import android.view.KeyEvent;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CompositionEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.infrastructure.service.music.models.PlayerMetaState;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
@@ -76,7 +77,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private MediaSessionCompat mediaSession;
 
     private Disposable currentCompositionDisposable;
-    private Composition currentComposition;
+    private PlayQueueItem currentItem;
 
     @Override
     public void onCreate() {
@@ -169,12 +170,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void onPlayerStateChanged(PlayerMetaState playerMetaState) {
-        currentComposition = playerMetaState.getComposition();
+        currentItem = playerMetaState.getQueueItem();
 
         PlayerState playerState = playerMetaState.getState();
         switch (playerState) {
             case PLAY: {//TODO error with often update notification
-                if (currentComposition == null) {
+                if (currentItem == null) {
                     return;
                 }
 
@@ -209,13 +210,13 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void onCurrentCompositionChanged(PlayerMetaState playerMetaState) {
-        Composition composition = playerMetaState.getComposition();
+        PlayQueueItem composition = playerMetaState.getQueueItem();
         if (composition == null) {
             stop();
             return;
         }
-        if (!composition.equals(currentComposition)) {
-            currentComposition = composition;
+        if (!composition.equals(currentItem)) {
+            currentItem = composition;
             notificationsDisplayer.updateForegroundNotification(playerMetaState);
         }
     }
@@ -225,12 +226,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         stopSelf();
     }
 
-    private Observable<CompositionEvent> getCurrentCompositionObservable() {
+    private Observable<PlayQueueEvent> getCurrentCompositionObservable() {
         return musicPlayerInteractor.getCurrentCompositionObservable();
     }
 
     private void updateMediaSession(PlayerMetaState playerMetaState) {
-        Composition composition = playerMetaState.getComposition();
+        Composition composition = playerMetaState.getQueueItem().getComposition();
 
         MediaMetadataCompat metadata = metadataBuilder
 //                .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,

@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.infrastructure.service.music.models;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CompositionEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 
 /**
@@ -11,17 +11,17 @@ import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 public class PlayerMetaState {
 
     private final PlayerState state;
-    private final Composition composition;
+    private final PlayQueueItem composition;
     private final long trackPosition;
 
-    public PlayerMetaState(PlayerState state, CompositionEvent compositionEvent, long trackPosition) {
+    public PlayerMetaState(PlayerState state, PlayQueueEvent playQueueEvent, long trackPosition) {
         this.state = state;
-        this.composition = compositionEvent.getComposition();
+        this.composition = playQueueEvent.getPlayQueueItem();
         this.trackPosition = trackPosition;
     }
 
-    public PlayerMetaState(CompositionEvent compositionEvent, PlayerState state) {
-        this(state, compositionEvent, 0);
+    public PlayerMetaState(PlayQueueEvent playQueueEvent, PlayerState state) {
+        this(state, playQueueEvent, 0);
     }
 
     public long getTrackPosition() {
@@ -32,7 +32,7 @@ public class PlayerMetaState {
         return state;
     }
 
-    public Composition getComposition() {
+    public PlayQueueItem getQueueItem() {
         return composition;
     }
 

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
@@ -25,15 +26,15 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
 
     private static final String CURRENT_COMPOSITION_CHANGED = "current_composition_changed";
 
-    private final List<Composition> musicList;
-    private OnPositionItemClickListener<Composition> onCompositionClickListener;
+    private final List<PlayQueueItem> musicList;
+    private OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener;
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
     private OnItemClickListener<Composition> onAddToPlaylistClickListener;
 
     @Nullable
-    private Composition currentComposition;
+    private PlayQueueItem currentItem;
 
-    public PlayQueueAdapter(List<Composition> musicList) {
+    public PlayQueueAdapter(List<PlayQueueItem> musicList) {
         this.musicList = musicList;
     }
 
@@ -49,9 +50,9 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull PlayQueueViewHolder holder, int position) {
-        Composition composition = musicList.get(position);
+        PlayQueueItem composition = musicList.get(position);
         holder.bind(composition);
-        holder.showAsPlayingComposition(composition.equals(currentComposition));
+        holder.showAsPlayingComposition(composition.equals(currentItem));
     }
 
     @Override
@@ -63,8 +64,8 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         }
         for (Object payload: payloads) {
             if (payload == CURRENT_COMPOSITION_CHANGED) {
-                Composition composition = musicList.get(position);
-                holder.showAsPlayingComposition(composition.equals(currentComposition));
+                PlayQueueItem item = musicList.get(position);
+                holder.showAsPlayingComposition(item.equals(currentItem));
             }
         }
     }
@@ -74,22 +75,23 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         return musicList.size();
     }
 
-    public void onCurrentCompositionChanged(Composition composition) {
-        int oldPosition = musicList.indexOf(currentComposition);
-        currentComposition = composition;
+    public void onCurrentItemChanged(PlayQueueItem item) {
+        int oldPosition = musicList.indexOf(currentItem);
+        currentItem = item;
         if (oldPosition != -1) {
             notifyItemChanged(oldPosition, CURRENT_COMPOSITION_CHANGED);
         }
-        notifyItemChanged(musicList.indexOf(composition), CURRENT_COMPOSITION_CHANGED);
+        notifyItemChanged(musicList.indexOf(item), CURRENT_COMPOSITION_CHANGED);
 
     }
 
-    public void updatePlayList(List<Composition> oldPlayList, List<Composition> newPlayList) {
+    public void updatePlayList(List<PlayQueueItem> oldPlayList, List<PlayQueueItem> newPlayList) {
+        //TODO detect modify
         DiffUtil.DiffResult result = calculateDiff(new SimpleDiffCallback<>(oldPlayList, newPlayList), false);
         result.dispatchUpdatesTo(this);
     }
 
-    public void setOnCompositionClickListener(OnPositionItemClickListener<Composition> onCompositionClickListener) {
+    public void setOnCompositionClickListener(OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 

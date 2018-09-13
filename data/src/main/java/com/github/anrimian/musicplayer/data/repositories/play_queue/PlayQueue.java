@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,23 +13,17 @@ import javax.annotation.Nullable;
 
 public class PlayQueue {
 
-    private final List<Composition> compositionQueue;
-    private final List<Composition> shuffledQueue;
-    private final Map<Long, Integer> positionMap = new HashMap<>();
-    private final Map<Long, Integer> shuffledPositionMap = new HashMap<>();
+    private final List<PlayQueueItem> compositionQueue;
+    private final List<PlayQueueItem> shuffledQueue;
+    private final Map<Long, Integer> itemPositionMap = new HashMap<>();
+    private final Map<Long, Integer> shuffledItemPositionMap = new HashMap<>();
+    private final Map<Long, List<Integer>> compositionPositionsMap = new HashMap<>();
+    private final Map<Long, List<Integer>> compositionShuffledPositionsMap = new HashMap<>();
 
     private boolean shuffled;
 
-    PlayQueue(List<Composition> compositions, boolean shuffled) {
-        compositionQueue = compositions;
-        shuffledQueue = new ArrayList<>(compositionQueue);
-        this.shuffled = shuffled;
-        Collections.shuffle(shuffledQueue);
-        fillPositionMap();
-    }
-
-    PlayQueue(List<Composition> compositionQueue,
-              List<Composition> shuffledQueue,
+    PlayQueue(List<PlayQueueItem> compositionQueue,
+              List<PlayQueueItem> shuffledQueue,
               boolean shuffled) {
         this.compositionQueue = compositionQueue;
         this.shuffledQueue = shuffledQueue;
@@ -37,23 +32,23 @@ public class PlayQueue {
     }
 
     @Nullable
-    public Integer getPosition(@Nullable Composition composition) {
-        if (composition == null) {
+    public Integer getPosition(@Nullable PlayQueueItem item) {
+        if (item == null) {
             return null;
         }
-        Map<Long, Integer> positionMap = shuffled? shuffledPositionMap: this.positionMap;
-        return positionMap.get(composition.getId());
+        Map<Long, Integer> positionMap = shuffled? shuffledItemPositionMap : this.itemPositionMap;
+        return positionMap.get(item.getId());
     }
 
-    public List<Composition> getCurrentPlayQueue() {
+    public List<PlayQueueItem> getCurrentPlayQueue() {
         return shuffled? shuffledQueue: compositionQueue;
     }
 
-    public List<Composition> getCompositionQueue() {
+    public List<PlayQueueItem> getCompositionQueue() {
         return compositionQueue;
     }
 
-    public List<Composition> getShuffledQueue() {
+    public List<PlayQueueItem> getShuffledQueue() {
         return shuffledQueue;
     }
 
@@ -65,82 +60,128 @@ public class PlayQueue {
         fillPositionMap();//TODO optimize
     }
 
-    public void moveCompositionToTopInShuffledList(Composition composition) {
+    public void moveItemToTopInShuffledList(PlayQueueItem item) {
         if (!shuffled) {
-            throw new IllegalStateException("move composition to top without shuffle mode");
+            throw new IllegalStateException("move item to top without shuffle mode");
         }
 
-        int previousPosition = shuffledPositionMap.get(composition.getId());
-        Composition firstComposition = shuffledQueue.set(0, composition);
-        shuffledQueue.set(previousPosition, firstComposition);
+        int previousPosition = shuffledItemPositionMap.get(item.getId());
+        PlayQueueItem firstItem = shuffledQueue.set(0, item);
+        shuffledQueue.set(previousPosition, firstItem);
 
-        shuffledPositionMap.put(composition.getId(), 0);
-        shuffledPositionMap.put(firstComposition.getId(), previousPosition);
-    }
+        shuffledItemPositionMap.put(item.getId(), 0);
+        shuffledItemPositionMap.put(firstItem.getId(), previousPosition);
 
-    @Nullable
-    public Composition getCompositionById(Long id) {
-        Integer position = positionMap.get(id);
-        if (position == null) {
-            return null;
-        }
-        return compositionQueue.get(position);
+        replacePosition(previousPosition, 0, item.getComposition(), compositionShuffledPositionsMap);
+        replacePosition(0, previousPosition, firstItem.getComposition(), compositionShuffledPositionsMap);
     }
 
     public boolean isEmpty() {
         return compositionQueue.isEmpty();
     }
 
-    public void deleteCompositions(List<Composition> compositions) {
-        Composition[] normalList = new Composition[compositionQueue.size()];
+    public boolean deleteCompositions(List<Composition> compositions) {
+        boolean updated = false;
+
+        PlayQueueItem[] normalList = new PlayQueueItem[compositionQueue.size()];
         compositionQueue.toArray(normalList);
 
-        Composition[] shuffledList = new Composition[shuffledQueue.size()];
+        PlayQueueItem[] shuffledList = new PlayQueueItem[shuffledQueue.size()];
         shuffledQueue.toArray(shuffledList);
 
         for (Composition composition: compositions) {
-            int position = positionMap.get(composition.getId());
-            normalList[position] = null;
-
-            int secondaryPosition = shuffledPositionMap.get(composition.getId());
-            shuffledList[secondaryPosition] = null;
+            List<Integer> positions = compositionPositionsMap.get(composition.getId());
+            if (positions == null) {
+                continue;
+            }
+            updated = true;
+            for (int position: positions) {
+                normalList[position] = null;
+            }
+            for (int position: compositionShuffledPositionsMap.get(composition.getId())) {
+                shuffledList[position] = null;
+            }
         }
 
         compositionQueue.clear();
-        for (Composition composition: normalList) {
+        for (PlayQueueItem composition: normalList) {
             if (composition != null) {
                 compositionQueue.add(composition);
             }
         }
 
         shuffledQueue.clear();
-        for (Composition composition: shuffledList) {
+        for (PlayQueueItem composition: shuffledList) {
             if (composition != null) {
                 shuffledQueue.add(composition);
             }
         }
 
         fillPositionMap();
+
+        return updated;
     }
 
-    public void updateComposition(Composition composition) {
-        compositionQueue.set(positionMap.get(composition.getId()), composition);
-        shuffledQueue.set(shuffledPositionMap.get(composition.getId()), composition);
+    public boolean updateComposition(Composition composition) {
+        List<Integer> positions = compositionPositionsMap.get(composition.getId());
+        if (positions == null) {
+            return false;
+        }
+        for (int position: positions) {
+            PlayQueueItem playQueueItem = compositionQueue.get(position);
+            playQueueItem.setComposition(composition);
+        }
+        for (int position: compositionShuffledPositionsMap.get(composition.getId())) {
+            PlayQueueItem playQueueItem = shuffledQueue.get(position);
+            playQueueItem.setComposition(composition);
+        }
+        return true;
+    }
+
+    private void replacePosition(int oldPosition,
+                                 int newPosition,
+                                 Composition composition,
+                                 Map<Long, List<Integer>> positionMap) {
+        List<Integer> positions = positionMap.get(composition.getId());
+        for (int i = 0; i < positions.size(); i++) {
+            int position = positions.get(i);
+            if (position == oldPosition) {
+                positions.set(i, newPosition);
+            }
+        }
     }
 
     private void fillPositionMap() {
-        positionMap.clear();
+        itemPositionMap.clear();
+        compositionPositionsMap.clear();
         for (int i = 0; i < compositionQueue.size(); i++) {
-            Composition composition = compositionQueue.get(i);
-            long id = composition.getId();
-            positionMap.put(id, i);
+            PlayQueueItem item = compositionQueue.get(i);
+            long id = item.getId();
+            itemPositionMap.put(id, i);
+
+            addToPositionMap(item.getComposition(), i, compositionPositionsMap);
         }
 
-        shuffledPositionMap.clear();
+        shuffledItemPositionMap.clear();
+        compositionShuffledPositionsMap.clear();
         for (int i = 0; i < shuffledQueue.size(); i++) {
-            Composition composition = shuffledQueue.get(i);
-            long id = composition.getId();
-            shuffledPositionMap.put(id, i);
+            PlayQueueItem item = shuffledQueue.get(i);
+            long id = item.getId();
+            shuffledItemPositionMap.put(id, i);
+
+            addToPositionMap(item.getComposition(), i, compositionShuffledPositionsMap);
         }
+    }
+
+    private void addToPositionMap(Composition composition,
+                                  int position,
+                                  Map<Long, List<Integer>> positionMap) {
+        long compositionId = composition.getId();
+        List<Integer> positions = positionMap.get(compositionId);
+        if (positions == null) {
+            positions = new ArrayList<>();
+            positionMap.put(compositionId, positions);
+        }
+        positions.add(position);
     }
 }

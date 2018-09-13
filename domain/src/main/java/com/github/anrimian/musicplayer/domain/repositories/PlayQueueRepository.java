@@ -1,7 +1,8 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CompositionEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 
 import java.util.List;
 
@@ -20,11 +21,11 @@ public interface PlayQueueRepository {
     Completable setPlayQueue(List<Composition> compositions);
 
     @Nullable
-    Integer getCompositionPosition(@Nonnull Composition composition);
+    Integer getCompositionPosition(@Nonnull PlayQueueItem playQueueItem);
 
-    Observable<CompositionEvent> getCurrentCompositionObservable();
+    Observable<PlayQueueEvent> getCurrentQueueItemObservable();
 
-    Observable<List<Composition>> getPlayQueueObservable();
+    Observable<List<PlayQueueItem>> getPlayQueueObservable();
 
     void setRandomPlayingEnabled(boolean enabled);
 
