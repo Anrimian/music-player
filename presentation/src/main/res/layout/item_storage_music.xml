@@ -9,14 +9,13 @@
         android:id="@+id/iv_music_icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:padding="@dimen/padding_small"
-        android:background="@drawable/bg_folder_round"
+        android:scaleType="centerCrop"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginLeft="@dimen/content_horizontal_margin"
         android:contentDescription="@string/folder"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_composition_name"
-        app:srcCompat="@drawable/ic_music_circle" />
+        tools:srcCompat="@drawable/ic_music_placeholder" />
 
     <TextView
         android:id="@+id/tv_composition_name"

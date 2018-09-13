@@ -7,10 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
 import javax.annotation.Nonnull;
@@ -41,6 +43,9 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
+    @BindView(R.id.iv_music_icon)
+    ImageView ivMusicIcon;
+
     private Composition composition;
 
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
@@ -70,6 +75,8 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
                 android.R.attr.textColorPrimary;
 
         tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
+
+        ImageFormatUtils.displayImage(ivMusicIcon, composition);
     }
 
     private void showAdditionalInfo() {
