@@ -34,26 +34,12 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private OnItemClickListener<Composition> onCompositionClickListener;
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
     private OnItemClickListener<Composition> onAddToPlaylistClickListener;
-    private OnTransitionItemClickListener<String> onFolderClickListener;
+    private OnItemClickListener<String> onFolderClickListener;
+    private OnItemClickListener<String> onDeleteFolderClickListener;
+    private OnItemClickListener<String> onAddFolderToPlaylistClickListener;
 
     public MusicFileSourceAdapter(List<FileSource> musicList) {
         this.musicList = musicList;
-    }
-
-    public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
-        this.onCompositionClickListener = onCompositionClickListener;
-    }
-
-    public void setOnFolderClickListener(OnTransitionItemClickListener<String> onFolderClickListener) {
-        this.onFolderClickListener = onFolderClickListener;
-    }
-
-    public void setOnDeleteCompositionClickListener(OnItemClickListener<Composition> onDeleteCompositionClickListener) {
-        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
-    }
-
-    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
-        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
     }
 
     @Override
@@ -61,15 +47,18 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (type) {
             case TYPE_MUSIC: {
-                return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
+                return new MusicViewHolder(inflater,
                         parent,
                         onCompositionClickListener,
                         onDeleteCompositionClickListener,
                         onAddToPlaylistClickListener);
             }
             case TYPE_FILE: {
-                View view = inflater.inflate(R.layout.item_storage_folder, parent, false);
-                return new FolderViewHolder(view, onFolderClickListener);
+                return new FolderViewHolder(inflater,
+                        parent,
+                        onFolderClickListener,
+                        onDeleteFolderClickListener,
+                        onAddFolderToPlaylistClickListener);
             }
             default: throw new IllegalStateException("unexpected item type: " + type);
         }
@@ -112,6 +101,30 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     public void updateList(List<FileSource> oldList, List<FileSource> sourceList) {
         calculateDiff(new SimpleDiffCallback<>(oldList, sourceList, this::areSourcedTheSame))
                 .dispatchUpdatesTo(this);
+    }
+
+    public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
+        this.onCompositionClickListener = onCompositionClickListener;
+    }
+
+    public void setOnFolderClickListener(OnItemClickListener<String> onFolderClickListener) {
+        this.onFolderClickListener = onFolderClickListener;
+    }
+
+    public void setOnDeleteCompositionClickListener(OnItemClickListener<Composition> onDeleteCompositionClickListener) {
+        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
+    }
+
+    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
+        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+    }
+
+    public void setOnDeleteFolderClickListener(OnItemClickListener<String> onDeleteFolderClickListener) {
+        this.onDeleteFolderClickListener = onDeleteFolderClickListener;
+    }
+
+    public void setOnAddFolderToPlaylistClickListener(OnItemClickListener<String> onAddFolderToPlaylistClickListener) {
+        this.onAddFolderToPlaylistClickListener = onAddFolderToPlaylistClickListener;
     }
 
     private boolean areSourcedTheSame(FileSource oldSource, FileSource newSource) {

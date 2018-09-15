@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInter
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersPresenter;
@@ -36,12 +37,10 @@ public class LibraryFilesModule {
     @Provides
     @Nonnull
     LibraryFoldersPresenter libraryFoldersPresenter(LibraryFilesInteractor interactor,
-                                                    PlayListsInteractor playListsInteractor,
                                                     @Named(STORAGE_ERROR_PARSER) ErrorParser errorParser,
                                                     @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new LibraryFoldersPresenter(path,
                 interactor,
-                playListsInteractor,
                 errorParser,
                 uiScheduler);
     }
@@ -50,9 +49,11 @@ public class LibraryFilesModule {
     @Nonnull
     LibraryFilesInteractor libraryFilesInteractor(MusicProviderRepository musicProviderRepository,
                                                   MusicPlayerInteractor musicPlayerInteractor,
+                                                  PlayListsRepository playListsRepository,
                                                   SettingsRepository settingsRepository) {
         return new LibraryFilesInteractor(musicProviderRepository,
                 musicPlayerInteractor,
+                playListsRepository,
                 settingsRepository);
     }
 }

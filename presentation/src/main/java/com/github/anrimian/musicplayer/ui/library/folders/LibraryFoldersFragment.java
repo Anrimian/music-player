@@ -44,8 +44,10 @@ import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getAddToPlayListCompleteMessage;
 
 /**
  * Created on 23.10.2017.
@@ -130,10 +132,17 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         if (fragment != null) {
             fragment.setOnCompleteListener(presenter::onOrderSelected);
         }
+
         ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (playListDialog != null) {
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        }
+
+        ChoosePlayListDialogFragment folderPlayListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(SELECT_PLAYLIST_FOR_FOLDER_TAG);
+        if (folderPlayListDialog != null) {
+            folderPlayListDialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
         }
     }
 
@@ -163,6 +172,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
         adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
         adapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
+        adapter.setOnAddFolderToPlaylistClickListener(presenter::onAddFolderToPlayListButtonClicked);
         recyclerView.setAdapter(adapter);
         startPostponedEnterTransition();
     }
@@ -242,11 +252,16 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     }
 
     @Override
-    public void showAddingToPlayListComplete(PlayList playList, Composition composition) {
-        String text = getString(R.string.add_to_playlist_success_template,
-                formatCompositionName(composition),
-                playList.getName());
+    public void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions) {
+        String text = getAddToPlayListCompleteMessage(requireActivity(), playList, compositions);
         Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSelectPlayListForFolderDialog() {
+        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+        dialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
+        dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_FOR_FOLDER_TAG);
     }
 
     @Override
@@ -260,23 +275,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     public void showSelectPlayListDialog() {
         ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
         dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
-        dialog.show(getChildFragmentManager(), null);
+        dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_TAG);
     }
 
-    private void goToMusicStorageScreen(String path, View... sharedViews) {
+    private void goToMusicStorageScreen(String path) {
         LibraryFoldersFragment fragment = LibraryFoldersFragment.newInstance(path);
-        headerViewWrapper.clearTransitionInfo();
-        Transition transition = new Slide();
-        transition.setDuration(1000);
-        fragment.setSharedElementEnterTransition(transition);
-        fragment.setSharedElementReturnTransition(transition);
-        //noinspection ConstantConditions
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-//        transaction.addSharedElement(recyclerView, ViewCompat.getTransitionName(recyclerView));
-//        for (View sharedView: sharedViews) {
-//            transaction.addSharedElement(sharedView, ViewCompat.getTransitionName(sharedView));
-//        }
+        FragmentTransaction transaction = requireFragmentManager().beginTransaction();
         transaction.replace(R.id.library_folders_container, fragment, path)
                 .addToBackStack(path)
                 .commit();

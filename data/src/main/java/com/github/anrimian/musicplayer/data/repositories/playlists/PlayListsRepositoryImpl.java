@@ -46,4 +46,10 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         return storagePlayListDataSource.addCompositionInPlayList(composition, playList)
                 .subscribeOn(scheduler);
     }
+
+    @Override
+    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
+        return Observable.fromIterable(compositions)
+                .flatMapCompletable(composition -> addCompositionToPlayList(composition, playList));
+    }
 }

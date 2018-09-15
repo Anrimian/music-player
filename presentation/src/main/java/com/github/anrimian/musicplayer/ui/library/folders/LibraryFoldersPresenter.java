@@ -22,6 +22,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 /**
  * Created on 23.10.2017.
@@ -31,7 +32,6 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final LibraryFilesInteractor interactor;
-    private final PlayListsInteractor playListsInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
@@ -48,14 +48,15 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     @Nullable
     private Composition compositionToAddToPlayList;
 
+    @Nullable
+    private String folderToAddToPlayList;
+
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFilesInteractor interactor,
-                                   PlayListsInteractor playListsInteractor,
                                    ErrorParser errorParser,
                                    Scheduler uiScheduler) {
         this.path = path;
         this.interactor = interactor;
-        this.playListsInteractor = playListsInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
@@ -123,9 +124,21 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onPlayListToAddingSelected(PlayList playList) {
-        playListsInteractor.addCompositionToPlayList(compositionToAddToPlayList, playList)
+        interactor.addCompositionToPlayList(compositionToAddToPlayList, playList)
                 .observeOn(uiScheduler)
-                .subscribe(() -> onAddingToPlayListCompleted(playList),
+                .subscribe(() -> onAddingToPlayListCompleted(playList), this::onAddingToPlayListError);
+    }
+
+    void onAddFolderToPlayListButtonClicked(String path) {
+        folderToAddToPlayList = path;
+        getViewState().showSelectPlayListForFolderDialog();
+    }
+
+    void onPlayListForFolderSelected(PlayList playList) {
+        interactor.addCompositionsToPlayList(folderToAddToPlayList, playList)
+                .observeOn(uiScheduler)
+                .subscribe(addedCompositions ->
+                                getViewState().showAddingToPlayListComplete(playList, addedCompositions),
                         this::onAddingToPlayListError);
     }
 
@@ -135,7 +148,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     private void onAddingToPlayListCompleted(PlayList playList) {
-        getViewState().showAddingToPlayListComplete(playList, compositionToAddToPlayList);
+        getViewState().showAddingToPlayListComplete(playList, asList(compositionToAddToPlayList));
         compositionToAddToPlayList = null;
     }
 

@@ -39,7 +39,6 @@ public class PlayListsInteractor {
     }
 
     public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
-        return Observable.fromIterable(compositions)
-                .flatMapCompletable(composition -> addCompositionToPlayList(composition, playList));
+        return playListsRepository.addCompositionsToPlayList(compositions, playList);
     }
 }
