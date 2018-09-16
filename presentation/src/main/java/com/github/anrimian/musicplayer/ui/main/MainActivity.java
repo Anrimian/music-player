@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (hasFilePermissions()) {
-            MusicServiceManager.initialize();
             goToMainScreen();
         } else {
             goToStartScreen();

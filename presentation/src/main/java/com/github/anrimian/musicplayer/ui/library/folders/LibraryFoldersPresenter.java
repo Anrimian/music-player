@@ -153,13 +153,15 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     private void goBackToPreviousPath() {
-        String targetPath = null;
-        int lastSlashIndex = path.lastIndexOf('/');
-        int firstSlashIndex = path.indexOf("/");
-        if (lastSlashIndex != -1 && firstSlashIndex != lastSlashIndex) {
-            targetPath = path.substring(0, lastSlashIndex);
+        if (path != null) {
+            String targetPath = null;
+            int lastSlashIndex = path.lastIndexOf('/');
+            int firstSlashIndex = path.indexOf("/");
+            if (lastSlashIndex != -1 && firstSlashIndex != lastSlashIndex) {
+                targetPath = path.substring(0, lastSlashIndex);
+            }
+            getViewState().goBackToMusicStorageScreen(targetPath);
         }
-        getViewState().goBackToMusicStorageScreen(targetPath);
     }
 
     private void loadMusic() {

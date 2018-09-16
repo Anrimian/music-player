@@ -110,18 +110,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-//        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
-//        toolbar.getMenu().clear();
-//        toolbar.inflateMenu(R.menu.library_files_menu);
-//        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
-
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-//        headerView = View.inflate(getContext(), R.layout.partial_storage_header, null);
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
 
@@ -166,15 +160,13 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @Override
     public void bindList(List<FileSource> musicList) {
-            adapter = new MusicFileSourceAdapter(musicList);
-//        adapter.addHeader(headerView);
+        adapter = new MusicFileSourceAdapter(musicList);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
         adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
         adapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
         adapter.setOnAddFolderToPlaylistClickListener(presenter::onAddFolderToPlayListButtonClicked);
         recyclerView.setAdapter(adapter);
-        startPostponedEnterTransition();
     }
 
     @Override
@@ -209,15 +201,13 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     @Override
     public void showError(ErrorCommand errorCommand) {
         progressViewWrapper.hideAll();
-        progressViewWrapper.showMessage(errorCommand.getMessage(), true);//TODO add default handler
+        progressViewWrapper.showMessage(errorCommand.getMessage(), true);
     }
 
     @Override
     public void goBackToMusicStorageScreen(String path) {
-        FragmentManager fragmentManager = getFragmentManager();
-        //noinspection ConstantConditions
+        FragmentManager fragmentManager = requireFragmentManager();
         if (fragmentManager.getBackStackEntryCount() > 0) {
-            headerViewWrapper.restoreTransitionInfo();
             fragmentManager.popBackStack();
         } else {
             fragmentManager.beginTransaction()
