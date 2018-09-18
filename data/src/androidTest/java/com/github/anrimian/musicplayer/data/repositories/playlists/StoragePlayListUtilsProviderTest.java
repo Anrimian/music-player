@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.storage.providers.playlists;
+package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 import android.Manifest;
 import android.content.Context;
@@ -7,10 +7,8 @@ import android.support.test.rule.GrantPermissionRule;
 import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
 import org.junit.Before;
 import org.junit.Rule;

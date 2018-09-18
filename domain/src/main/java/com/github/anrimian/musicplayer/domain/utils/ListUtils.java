@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ListUtils {
 
@@ -18,12 +19,19 @@ public class ListUtils {
         return to;
     }
 
-    public static <T, E> List<E> mapList(List<T> from, MapperFunction<T, E> mapper) {
-        List<E> to = new ArrayList<>(from.size());
-        for (T t: from) {
+    public static <K, E, T> List<T> mapToList(Map<K, E> from, List<T> to, MapperFunction<E, T> mapper) {
+        for (E t: from.values()) {
             to.add(mapper.map(t));
         }
         return to;
+    }
+
+    public static <K, E, T> List<T> mapToList(Map<K, E> from, MapperFunction<E, T> mapper) {
+        return mapToList(from, new ArrayList<>(from.size()), mapper);
+    }
+
+    public static <T, E> List<E> mapList(List<T> from, MapperFunction<T, E> mapper) {
+        return mapList(from, new ArrayList<>(from.size()), mapper);
     }
 
     public interface MapperFunction<T, E> {

@@ -5,6 +5,8 @@ import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.github.anrimian.musicplayer.R;
+
 import static android.support.v4.view.ViewCompat.isLaidOut;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -26,7 +28,11 @@ public class ToolbarMenuVisibilityDelegate implements SlideDelegate {
     @Override
     public void onSlide(float slideOffset) {
         ActionMenuView view = getActionMenuView();
-        if (view != null) {//TODO call before create options menu in toolbar
+        if (view == null) {
+            toolbar.inflateMenu(R.menu.empty_stub_menu);
+        }
+        view = getActionMenuView();
+        if (view != null) {
             if (isLaidOut(view)) {
                 makeVisible(slideOffset);
             } else {

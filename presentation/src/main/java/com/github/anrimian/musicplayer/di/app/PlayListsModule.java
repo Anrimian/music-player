@@ -3,16 +3,12 @@ package com.github.anrimian.musicplayer.di.app;
 import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepositoryImpl;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
 
 import javax.annotation.Nonnull;
@@ -60,17 +56,9 @@ public class PlayListsModule {
     @Provides
     @Nonnull
     @Singleton
-    PlayListsRepository playListsRepository(StoragePlayListDataSource storagePlayListDataSource,
-                                            @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new PlayListsRepositoryImpl(storagePlayListDataSource, scheduler);
-    }
-
-    @Provides
-    @Nonnull
-    @Singleton
-    StoragePlayListDataSource storagePlayListDataSource(
-            StoragePlayListsProvider storagePlayListDataSource) {
-        return new StoragePlayListDataSource(storagePlayListDataSource);
+    PlayListsRepository storagePlayListDataSource(StoragePlayListsProvider playListsProvider,
+                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
+        return new PlayListsRepositoryImpl(playListsProvider, scheduler);
     }
 
     @Provides

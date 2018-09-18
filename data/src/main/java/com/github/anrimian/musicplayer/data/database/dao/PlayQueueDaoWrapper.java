@@ -5,7 +5,7 @@ import com.github.anrimian.musicplayer.data.database.entities.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.ShuffledPlayQueueEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.utils.java.Function;
+import com.github.anrimian.musicplayer.domain.utils.java.Function;
 
 import java.util.ArrayList;
 import java.util.Iterator;

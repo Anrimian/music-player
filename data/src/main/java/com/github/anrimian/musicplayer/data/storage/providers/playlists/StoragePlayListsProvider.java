@@ -13,12 +13,10 @@ import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotMove
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotModifiedException;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,7 +51,7 @@ public class StoragePlayListsProvider {
                     null,
                     null,
                     null,
-                    Playlists.DATE_ADDED + " DESC");
+                    null);
             if (cursor == null) {
                 return emptyList();
             }
@@ -133,6 +131,7 @@ public class StoragePlayListsProvider {
         if (uri == null) {
             throw new PlayListNotModifiedException();
         }
+        updateModifyTime(playListId);
     }
 
     public void deleteCompositionFromPlayList(long compositionId, long playListId) {
@@ -152,6 +151,15 @@ public class StoragePlayListsProvider {
         if (!moved) {
             throw new CompositionNotMovedException();
         }
+    }
+
+    private void updateModifyTime(long playListId) {
+        ContentValues playListValues = new ContentValues();
+        playListValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
+        contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
+                playListValues,
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(playListId) });
     }
 
     private StoragePlayList findPlayList(long id) {
