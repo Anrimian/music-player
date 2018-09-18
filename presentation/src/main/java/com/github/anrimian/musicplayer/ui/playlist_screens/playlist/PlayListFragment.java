@@ -26,6 +26,7 @@ import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,7 +75,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
 
         ButterKnife.bind(this, view);
 
-        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitle("play list title");
         toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
@@ -123,7 +124,12 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
         recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
 
+    @Override
+    public void closeScreen() {
+        requireFragmentManager().popBackStack();
+    }
+
     private long getPlayListId() {
-        return getArguments().getLong(PLAY_LIST_ID_ARG);
+        return Objects.requireNonNull(getArguments()).getLong(PLAY_LIST_ID_ARG);
     }
 }

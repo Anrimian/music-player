@@ -65,7 +65,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         getViewState().showLoading();
         presenterDisposable.add(playListsInteractor.getCompositionsObservable(playListId)
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayListsReceived));
+                .subscribe(this::onPlayListsReceived, t -> getViewState().closeScreen()));
     }
 
     private void onPlayListsReceived(List<Composition> newCompositions) {

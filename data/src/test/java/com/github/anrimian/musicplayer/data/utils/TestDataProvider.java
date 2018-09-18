@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.utils;
 
+import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -104,5 +105,9 @@ public class TestDataProvider {
         return new Folder(Observable.create(emitter -> emitter.onNext(asList(fileSources))),
                 Observable.never(),
                 Observable.never());
+    }
+
+    public static StoragePlayList storagePlayList(long i) {
+        return new StoragePlayList(i, "test" + i, new Date(i), new Date(i));
     }
 }
