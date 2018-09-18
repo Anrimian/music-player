@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
-import com.github.anrimian.musicplayer.data.models.exceptions.DeleteFileException;
-
 import java.io.File;
 
 public class FileManager {
@@ -11,9 +9,7 @@ public class FileManager {
         if (!file.exists()) {
             return;
         }
-        boolean deleted = file.delete();
-        if (!deleted) {
-            throw new DeleteFileException("can not delete file: " + path);
-        }
+        //noinspection ResultOfMethodCallIgnored
+        file.delete();
     }
 }

@@ -82,7 +82,14 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Completable deleteComposition(Composition composition) {
-        return storageMusicDataSource.deleteComposition(composition);
+        return storageMusicDataSource.deleteComposition(composition)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable deleteCompositions(List<Composition> compositions) {
+        return storageMusicDataSource.deleteCompositions(compositions)
+                .subscribeOn(scheduler);
     }
 
     private Comparator<FileSource> getFileComparator() {

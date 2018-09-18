@@ -200,6 +200,10 @@ public class MusicPlayerInteractor {
         return musicProviderRepository.deleteComposition(composition);
     }
 
+    public Completable deleteCompositions(List<Composition> compositions) {
+        return musicProviderRepository.deleteCompositions(compositions);
+    }
+
     @Nullable
     public Integer getQueuePosition(PlayQueueItem item) {
         return playQueueRepository.getCompositionPosition(item);

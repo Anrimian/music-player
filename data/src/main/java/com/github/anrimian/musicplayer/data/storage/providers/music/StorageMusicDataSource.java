@@ -77,6 +77,21 @@ public class StorageMusicDataSource {
         return withDefaultValue(compositionSubject, getCompositions());
     }
 
+    public Completable deleteCompositions(List<Composition> compositionsToDelete) {
+        return getCompositions()
+                .doOnSuccess(compositions -> {
+                    for (Composition composition: compositionsToDelete) {
+                        musicProvider.deleteComposition(composition.getFilePath());
+                        fileManager.deleteFile(composition.getFilePath());
+                        compositions.remove(composition.getId());
+                    }
+                    compositionSubject.onNext(compositions);
+                    changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToDelete));
+                })
+                .toCompletable()
+                .subscribeOn(scheduler);
+    }
+
     public Completable deleteComposition(Composition composition) {
         return getCompositions()
                 .doOnSuccess(compositions -> {

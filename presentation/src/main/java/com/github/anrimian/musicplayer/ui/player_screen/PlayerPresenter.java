@@ -14,15 +14,13 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
@@ -44,8 +42,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final List<PlayQueueItem> playQueue = new ArrayList<>();
     private PlayQueueItem currentItem;
 
-    @Nullable
-    private Composition compositionToAddToPlayList;
+    private List<Composition> compositionsForPlayList = new LinkedList<>();
+    private List<Composition> compositionsToDelete = new LinkedList<>();
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
@@ -130,24 +128,31 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
-        deleteComposition(composition);
+        compositionsToDelete.clear();
+        compositionsToDelete.add(composition);
+        getViewState().showConfirmDeleteDialog(compositionsToDelete);
     }
 
     void onDeleteCurrentCompositionButtonClicked() {
-        deleteComposition(currentItem.getComposition());
+        compositionsToDelete.clear();
+        compositionsToDelete.add(currentItem.getComposition());
+        getViewState().showConfirmDeleteDialog(compositionsToDelete);
     }
 
-    void onAddToPlayListButtonClicked(Composition composition) {
-        compositionToAddToPlayList = composition;
+    void onAddQueueItemToPlayListButtonClicked(Composition composition) {
+        compositionsForPlayList.clear();
+        compositionsForPlayList.add(composition);
         getViewState().showSelectPlayListDialog();
     }
 
-    void onPlayListToAddingSelected(PlayList playList) {
-        addCompositionToPlayList(currentItem.getComposition(), playList);
+    void onAddCurrentCompositionToPlayListButtonClicked() {
+        compositionsForPlayList.clear();
+        compositionsForPlayList.add(currentItem.getComposition());
+        getViewState().showSelectPlayListDialog();
     }
 
-    void onPlayListForPlayQueueItemSelected(PlayList playList) {
-        addCompositionToPlayList(compositionToAddToPlayList, playList);
+    void onPlayListForAddingSelected(PlayList playList) {
+        addPreparedCompositionsToPlayList(playList);
     }
 
     void onPlayListForAddingCreated(PlayList playList) {
@@ -158,17 +163,40 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                         this::onAddingToPlayListError);
     }
 
-    private void addCompositionToPlayList(Composition composition, PlayList playList) {
-        playListsInteractor.addCompositionToPlayList(composition, playList)
+    void onDeleteCompositionsDialogConfirmed() {
+        deletePreparedCompositions();
+    }
+
+    void onSeekStart() {
+        musicPlayerInteractor.onSeekStarted();
+    }
+
+    void onSeekStop(int progress) {
+        long position = currentItem.getComposition().getDuration() * progress / 100;
+        musicPlayerInteractor.onSeekFinished(position);
+    }
+
+    private void addPreparedCompositionsToPlayList(PlayList playList) {
+        playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
                 .observeOn(uiScheduler)
-                .subscribe(() -> onAddingToPlayListCompleted(playList, composition),
+                .subscribe(() -> onAddingToPlayListCompleted(playList),
                         this::onAddingToPlayListError);
     }
 
-    private void deleteComposition(Composition composition) {
-        musicPlayerInteractor.deleteComposition(composition)
+    private void deletePreparedCompositions() {
+        musicPlayerInteractor.deleteCompositions(compositionsToDelete)
                 .observeOn(uiScheduler)
-                .subscribe();//TODO displayError
+                .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionError);
+    }
+
+    private void onDeleteCompositionsSuccess() {
+        getViewState().showDeleteCompositionMessage(compositionsToDelete);
+        compositionsToDelete.clear();
+    }
+
+    private void onDeleteCompositionError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showDeleteCompositionError(errorCommand);
     }
 
     private void onAddingToPlayListError(Throwable throwable) {
@@ -176,17 +204,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showAddingToPlayListError(errorCommand);
     }
 
-    private void onAddingToPlayListCompleted(PlayList playList, Composition composition) {
-        getViewState().showAddingToPlayListComplete(playList, asList(composition));
-    }
-
-    public void onSeekStart() {
-        musicPlayerInteractor.onSeekStarted();
-    }
-
-    public void onSeekStop(int progress) {
-        long position = currentItem.getComposition().getDuration() * progress / 100;
-        musicPlayerInteractor.onSeekFinished(position);
+    private void onAddingToPlayListCompleted(PlayList playList) {
+        getViewState().showAddingToPlayListComplete(playList, compositionsForPlayList);
+        compositionsForPlayList.clear();
     }
 
     private void subscribeOnCurrentCompositionChanging() {

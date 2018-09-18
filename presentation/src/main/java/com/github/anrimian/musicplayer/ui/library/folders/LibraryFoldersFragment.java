@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.transition.Slide;
-import android.support.transition.Transition;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,8 +44,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 
 /**
  * Created on 23.10.2017.
@@ -82,6 +79,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         return fragment;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Nullable
     private String getPath() {
         return getArguments().getString(PATH_ARG);

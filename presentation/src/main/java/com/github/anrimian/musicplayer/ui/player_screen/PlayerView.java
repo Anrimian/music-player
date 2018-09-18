@@ -59,4 +59,13 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteCompositionError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
 }

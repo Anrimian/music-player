@@ -2,11 +2,6 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Path;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,8 +14,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -50,6 +43,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.infrastructure.service.MusicServiceManager;
+import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -63,15 +57,15 @@ import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ChangeWidthDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DrawerArrowDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ReverseDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
@@ -89,12 +83,12 @@ import butterknife.ButterKnife;
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_QUEUE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
 
 /**
@@ -426,13 +420,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ChoosePlayListDialogFragment fragment = (ChoosePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (fragment != null) {
-            fragment.setOnCompleteListener(presenter::onPlayListToAddingSelected);
-        }
-
-        ChoosePlayListDialogFragment fragmentForQueue = (ChoosePlayListDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(SELECT_PLAYLIST_FOR_QUEUE_TAG);
-        if (fragmentForQueue != null) {
-            fragmentForQueue.setOnCompleteListener(presenter::onPlayListForPlayQueueItemSelected);
+            fragment.setOnCompleteListener(presenter::onPlayListForAddingSelected);
         }
 
         CreatePlayListDialogFragment createPlayListFragment = (CreatePlayListDialogFragment) getChildFragmentManager()
@@ -538,7 +526,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         playQueueAdapter = new PlayQueueAdapter(currentPlayList);
         playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
         playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
-        playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
+        playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
         rvPlayList.setAdapter(playQueueAdapter);
     }
 
@@ -609,8 +597,29 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showSelectPlayListDialog() {
         ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
-        dialog.setOnCompleteListener(presenter::onPlayListForPlayQueueItemSelected);
-        dialog.show(getChildFragmentManager(), null);
+        dialog.setOnCompleteListener(presenter::onPlayListForAddingSelected);
+        dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_TAG);
+    }
+
+    @Override
+    public void showConfirmDeleteDialog(List<Composition> compositionsToDelete) {
+        DialogUtils.showConfirmDeleteDialog(requireContext(),
+                compositionsToDelete,
+                presenter::onDeleteCompositionsDialogConfirmed);
+    }
+
+    @Override
+    public void showDeleteCompositionError(ErrorCommand errorCommand) {
+        Snackbar.make(clPlayQueueContainer,
+                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
+        String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
+        Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
     private boolean onPlayQueueMenuItemClicked(MenuItem menuItem) {
@@ -618,7 +627,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             case R.id.menu_save_as_playlist: {
                 CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
                 fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
-                fragment.show(getChildFragmentManager(), SELECT_PLAYLIST_FOR_QUEUE_TAG);
+                fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
                 break;
             }
         }
@@ -681,9 +690,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {
-                    ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
-                    dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
-                    dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_TAG);
+                    presenter.onAddCurrentCompositionToPlayListButtonClicked();
                     return true;
                 }
                 case R.id.menu_share: {

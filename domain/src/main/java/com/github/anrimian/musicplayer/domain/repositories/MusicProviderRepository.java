@@ -28,4 +28,6 @@ public interface MusicProviderRepository {
     Completable writeErrorAboutComposition(ErrorType errorType, Composition composition);
 
     Completable deleteComposition(Composition composition);
+
+    Completable deleteCompositions(List<Composition> compositions);
 }
