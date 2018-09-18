@@ -62,6 +62,9 @@ public interface LibraryFoldersView extends MvpView {
     void showAddingToPlayListError(ErrorCommand errorCommand);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showAddingToPlayListComplete(PlayList playList, Composition composition);
+    void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showSelectPlayListForFolderDialog();
 
 }

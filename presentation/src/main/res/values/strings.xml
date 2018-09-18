@@ -26,6 +26,7 @@
     <string name="unknown_author">Неизвестный исполнитель</string>
     <string name="preparing_for_launch">Подготовка к запуску…</string>
     <string name="delete">Удалить</string>
+    <string name="delete_folder">Удалить папку</string>
     <string name="alphabetical_order">По алфавиту</string>
     <string name="alphabetical_desc_order">По алфавиту в обратном направлении</string>
     <string name="add_date_order">По дате добавления</string>

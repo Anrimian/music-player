@@ -29,7 +29,7 @@
         android:layout_marginTop="@dimen/margin_normal"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginLeft="@dimen/content_horizontal_margin"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
         app:layout_constraintStart_toEndOf="@+id/iv_folder_icon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="pathpathpathpathpathpathpathpathpathpathpapathpathpath"
@@ -62,8 +62,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/divider">
+        app:layout_constraintBottom_toTopOf="@id/divider"/>
 
-    </FrameLayout>
+    <ImageView
+        android:id="@+id/btn_actions_menu"
+        style="@style/Toolbar.Button"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:contentDescription="@string/content_description_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_dots_vertical" />
 
 </android.support.constraint.ConstraintLayout>

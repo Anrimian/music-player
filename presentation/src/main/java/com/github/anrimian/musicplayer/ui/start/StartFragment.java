@@ -41,7 +41,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
     @Override
     public void requestFilesPermissions() {
-        new RxPermissions(getActivity())
+        new RxPermissions(requireActivity())
                 .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .subscribe(presenter::onFilesPermissionResult);
     }
@@ -58,7 +58,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
     @Override
     public void goToMainScreen() {
-        getFragmentManager()
+        requireFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
                 .replace(R.id.main_activity_container, new PlayerFragment())

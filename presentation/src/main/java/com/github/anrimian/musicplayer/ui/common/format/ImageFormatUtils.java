@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.ui.common.format;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.github.anrimian.musicplayer.R;
@@ -22,6 +21,7 @@ public class ImageFormatUtils {
     public static void displayImage(ImageView imageView, Composition composition) {
         imageView.setImageResource(R.drawable.ic_music_placeholder);
         Single.fromCallable(() -> getCompositionImage(composition))
+                .timeout(5, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageView::setImageBitmap,

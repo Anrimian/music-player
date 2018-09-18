@@ -8,7 +8,9 @@ import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFound
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.utils.tree.FileTree;
 import com.github.anrimian.musicplayer.domain.utils.tree.visitors.CollectVisitor;
@@ -34,13 +36,16 @@ public class LibraryFilesInteractor {
 
     private final MusicProviderRepository musicProviderRepository;
     private final MusicPlayerInteractor musicPlayerInteractor;
+    private final PlayListsRepository playListsRepository;
     private final SettingsRepository settingsRepository;
 
     public LibraryFilesInteractor(MusicProviderRepository musicProviderRepository,
                                   MusicPlayerInteractor musicPlayerInteractor,
+                                  PlayListsRepository playListsRepository,
                                   SettingsRepository settingsRepository) {
         this.musicProviderRepository = musicProviderRepository;
         this.musicPlayerInteractor = musicPlayerInteractor;
+        this.playListsRepository = playListsRepository;
         this.settingsRepository = settingsRepository;
     }
 
@@ -59,6 +64,16 @@ public class LibraryFilesInteractor {
 
     public Completable deleteComposition(Composition composition) {
         return musicProviderRepository.deleteComposition(composition);
+    }
+
+    public Single<List<Composition>> addCompositionsToPlayList(String path, PlayList playList) {
+        return musicProviderRepository.getAllCompositionsInPath(path)
+                .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
+                                .toSingleDefault(compositions));
+    }
+
+    public Completable addCompositionToPlayList(Composition composition, PlayList playList) {
+        return playListsRepository.addCompositionToPlayList(composition, playList);
     }
 
     public void setFolderOrder(Order order) {

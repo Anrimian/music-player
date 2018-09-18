@@ -18,4 +18,6 @@ public interface PlayListsRepository {
     Single<PlayList> createPlayList(String name);
 
     Completable addCompositionToPlayList(Composition composition, PlayList playList);
+
+    Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList);
 }

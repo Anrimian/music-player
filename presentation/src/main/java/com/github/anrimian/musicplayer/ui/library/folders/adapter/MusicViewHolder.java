@@ -88,7 +88,7 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
 
     private void onActionsMenuButtonClicked(View view) {
         PopupMenu popup = new PopupMenu(getContext(), view);
-        popup.inflate(R.menu.composition_in_folder_actions_menu);
+        popup.inflate(R.menu.composition_item_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {
