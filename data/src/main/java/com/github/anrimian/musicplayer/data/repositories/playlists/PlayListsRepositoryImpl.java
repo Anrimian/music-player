@@ -28,7 +28,7 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.getTotalDuration;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToList;
 
-public class PlayListRepositoryImpl implements PlayListsRepository {
+public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     private final StoragePlayListsProvider storagePlayListsProvider;
     private final Scheduler scheduler;
@@ -38,8 +38,8 @@ public class PlayListRepositoryImpl implements PlayListsRepository {
     private Disposable changeDisposable;
     private Map<Long, PlayListFullModel> playListMap;
 
-    public PlayListRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
-                                  Scheduler scheduler) {
+    public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
+                                   Scheduler scheduler) {
         this.storagePlayListsProvider = storagePlayListsProvider;
         this.scheduler = scheduler;
     }
@@ -77,6 +77,12 @@ public class PlayListRepositoryImpl implements PlayListsRepository {
                 playList.getId(),
                 playList.getCompositionsCount())
         ).subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
+        return Observable.fromIterable(compositions)
+                .flatMapCompletable(composition -> addCompositionToPlayList(composition, playList));
     }
 
     private List<PlayList> toSortedPlayLists(Map<Long, PlayListFullModel> playListMap) {

@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
-import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
@@ -58,7 +58,7 @@ public class PlayListsModule {
     @Singleton
     PlayListsRepository storagePlayListDataSource(StoragePlayListsProvider playListsProvider,
                                                   @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new PlayListRepositoryImpl(playListsProvider, scheduler);
+        return new PlayListsRepositoryImpl(playListsProvider, scheduler);
     }
 
     @Provides

@@ -27,14 +27,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PlayListRepositoryImplTest {
+public class PlayListsRepositoryImplTest {
 
     private StoragePlayListsProvider storagePlayListsProvider = mock(StoragePlayListsProvider.class);
 
     private PublishSubject<List<StoragePlayList>> playListSubject = PublishSubject.create();
     private PublishSubject<List<Composition>> compositionSubject = PublishSubject.create();
 
-    private PlayListRepositoryImpl playListRepositoryImpl = new PlayListRepositoryImpl(
+    private PlayListsRepositoryImpl playListsRepositoryImpl = new PlayListsRepositoryImpl(
             storagePlayListsProvider, Schedulers.trampoline());
 
     @Before
@@ -47,7 +47,7 @@ public class PlayListRepositoryImplTest {
 
     @Test
     public void testPlayListsReceiving() {
-        TestObserver<List<PlayList>> testObserver = playListRepositoryImpl
+        TestObserver<List<PlayList>> testObserver = playListsRepositoryImpl
                 .getPlayListsObservable()
                 .test();
 
@@ -72,7 +72,7 @@ public class PlayListRepositoryImplTest {
 
         compositionSubject.onNext(ListUtils.asList(fakeComposition(0)));
 
-        testObserver = playListRepositoryImpl
+        testObserver = playListsRepositoryImpl
                 .getPlayListsObservable()
                 .test();
 
@@ -87,7 +87,7 @@ public class PlayListRepositoryImplTest {
 
     @Test
     public void testNewPlayListsAdded() {
-        TestObserver<List<PlayList>> testObserver = playListRepositoryImpl
+        TestObserver<List<PlayList>> testObserver = playListsRepositoryImpl
                 .getPlayListsObservable()
                 .test();
 
@@ -110,7 +110,7 @@ public class PlayListRepositoryImplTest {
 
         testObserver.assertValueAt(1, updatedListPredicate);
 
-        playListRepositoryImpl
+        playListsRepositoryImpl
                 .getPlayListsObservable()
                 .test()
                 .assertValue(updatedListPredicate);
@@ -118,7 +118,7 @@ public class PlayListRepositoryImplTest {
 
     @Test
     public void getCompositionsObservableTest() {
-        TestObserver<List<Composition>> testObserver = playListRepositoryImpl
+        TestObserver<List<Composition>> testObserver = playListsRepositoryImpl
                 .getCompositionsObservable(1L)
                 .test();
 
