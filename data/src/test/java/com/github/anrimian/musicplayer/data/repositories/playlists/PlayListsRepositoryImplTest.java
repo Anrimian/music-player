@@ -70,11 +70,29 @@ public class PlayListsRepositoryImplTest {
 
         testObserver.dispose();
 
+        TestObserver<PlayList> playListTestObserver = playListsRepositoryImpl
+                .getPlayListObservable(2L)
+                .test();
+
+        playListTestObserver.assertValueAt(0, playList -> {
+            assertEquals(2L, playList.getId());
+            assertEquals("test2", playList.getName());
+            assertEquals(getFakeCompositions().size(), playList.getCompositionsCount());
+            return true;
+        });
+
         compositionSubject.onNext(ListUtils.asList(fakeComposition(0)));
 
         testObserver = playListsRepositoryImpl
                 .getPlayListsObservable()
                 .test();
+
+        playListTestObserver.assertValueAt(1, playList -> {
+            assertEquals(2L, playList.getId());
+            assertEquals("test2", playList.getName());
+            assertEquals(1, playList.getCompositionsCount());
+            return true;
+        });
 
         testObserver.assertValueAt(0, list -> {
             PlayList playList = list.get(0);

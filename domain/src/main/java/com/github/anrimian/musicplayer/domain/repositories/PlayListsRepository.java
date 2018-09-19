@@ -13,6 +13,8 @@ public interface PlayListsRepository {
 
     Observable<List<PlayList>> getPlayListsObservable();
 
+    Observable<PlayList> getPlayListObservable(long playlistId);
+
     Observable<List<Composition>> getCompositionsObservable(long playlistId);
 
     Single<PlayList> createPlayList(String name);

@@ -43,6 +43,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         super.onFirstViewAttach();
         getViewState().bindList(compositions);
         subscribeOnCompositions();
+        subscribePlayList();
     }
 
     @Override
@@ -65,7 +66,17 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         getViewState().showLoading();
         presenterDisposable.add(playListsInteractor.getCompositionsObservable(playListId)
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayListsReceived, t -> getViewState().closeScreen()));
+                .subscribe(this::onPlayListsReceived,
+                        t -> getViewState().closeScreen(),
+                        getViewState()::closeScreen));
+    }
+
+    private void subscribePlayList() {
+        presenterDisposable.add(playListsInteractor.getPlayListObservable(playListId)
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showPlayListInfo,
+                        t -> getViewState().closeScreen(),
+                        getViewState()::closeScreen));
     }
 
     private void onPlayListsReceived(List<Composition> newCompositions) {

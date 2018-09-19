@@ -18,6 +18,7 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrFragment;
@@ -47,6 +48,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
     @BindView(R.id.list_container)
     CoordinatorLayout clListContainer;
 
+    private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
 
@@ -75,9 +77,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
 
         ButterKnife.bind(this, view);
 
-        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTitle("play list title");
-        toolbar.setSubtitle(null);
+        toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitleClickListener(null);
 
         progressViewWrapper = new ProgressViewWrapper(view);
@@ -127,6 +127,15 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
     @Override
     public void closeScreen() {
         requireFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void showPlayListInfo(PlayList playList) {
+        toolbar.setTitle(playList.getName());
+        toolbar.setSubtitle(getResources().getQuantityString(
+                R.plurals.compositions_count,
+                playList.getCompositionsCount(),
+                playList.getCompositionsCount()));
     }
 
     private long getPlayListId() {
