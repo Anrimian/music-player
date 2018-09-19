@@ -52,6 +52,18 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
+    public Observable<PlayList> getPlayListObservable(long playlistId) {
+        PlayListFullModel playListFullModel = getPlayListsMap().get(playlistId);
+        Observable<PlayList> observable;
+        if (playListFullModel == null) {
+            observable = Observable.error(new PlayListNotFoundException());
+        } else {
+            observable = playListFullModel.getPlayListObservable();
+        }
+        return observable.subscribeOn(scheduler);
+    }
+
+    @Override
     public Observable<List<Composition>> getCompositionsObservable(long playlistId) {
         PlayListFullModel playListFullModel = getPlayListsMap().get(playlistId);
         Observable<List<Composition>> observable;
@@ -175,12 +187,14 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         private Disposable disposable;
 
         private final BehaviorSubject<List<Composition>> compositionsSubject;
+        private final BehaviorSubject<PlayList> playListSubject;
 
         private PlayList playList;
 
         PlayListFullModel(PlayList playList, List<Composition> compositions) {
             this.playList = playList;
             compositionsSubject = BehaviorSubject.createDefault(compositions);
+            playListSubject = BehaviorSubject.createDefault(playList);
 
             disposable = storagePlayListsProvider.getPlayListChangeObservable(playList.getId())
                     .subscribe(this::onPlayListCompositionsChanged);
@@ -189,10 +203,15 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         PlayListFullModel(PlayList playList) {
             this.playList = playList;
             compositionsSubject = BehaviorSubject.create();
+            playListSubject = BehaviorSubject.create();
         }
 
         Observable<List<Composition>> getCompositionsObservable() {
             return compositionsSubject;
+        }
+
+        Observable<PlayList> getPlayListObservable() {
+            return playListSubject;
         }
 
         PlayList getPlayList() {
@@ -206,10 +225,13 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                     newPlayList.getDateModified(),
                     playList.getCompositionsCount(),
                     playList.getTotalDuration());
+            playListSubject.onNext(playList);
         }
 
         void dispose() {
             disposable.dispose();
+            compositionsSubject.onComplete();
+            playListSubject.onComplete();
         }
 
         private void onPlayListCompositionsChanged(List<Composition> compositions) {
@@ -220,6 +242,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                     compositions.size(),
                     getTotalDuration(compositions));
 
+            playListSubject.onNext(playList);
             playListsSubject.onNext(playListMap);
             compositionsSubject.onNext(compositions);
         }

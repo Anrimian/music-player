@@ -32,4 +32,7 @@ public interface PlayListView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void closeScreen();
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showPlayListInfo(PlayList playList);
 }

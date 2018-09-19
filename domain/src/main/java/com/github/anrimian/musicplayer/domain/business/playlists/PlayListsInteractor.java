@@ -25,6 +25,10 @@ public class PlayListsInteractor {
         return playListsRepository.getPlayListsObservable();
     }
 
+    public Observable<PlayList> getPlayListObservable(long playListId) {
+        return playListsRepository.getPlayListObservable(playListId);
+    }
+
     public Observable<List<Composition>> getCompositionsObservable(long playlistId) {
         return playListsRepository.getCompositionsObservable(playlistId);
     }
