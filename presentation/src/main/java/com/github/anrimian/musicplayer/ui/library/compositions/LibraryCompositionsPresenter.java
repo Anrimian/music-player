@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -39,6 +40,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     @Nullable
     private Composition compositionToAddToPlayList;
+    private List<Composition> compositionsToDelete = new LinkedList<>();
 
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
@@ -74,9 +76,13 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
-        interactor.deleteComposition(composition)
-                .observeOn(uiScheduler)
-                .subscribe();//TODO displayError
+        compositionsToDelete.clear();
+        compositionsToDelete.add(composition);
+        getViewState().showConfirmDeleteDialog(compositionsToDelete);
+    }
+
+    void onDeleteCompositionsDialogConfirmed() {
+        deletePreparedCompositions();
     }
 
     void onOrderMenuItemClicked() {
@@ -98,6 +104,22 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
                 .observeOn(uiScheduler)
                 .subscribe(() -> onAddingToPlayListCompleted(playList),
                         this::onAddingToPlayListError);
+    }
+
+    private void deletePreparedCompositions() {
+        interactor.deleteCompositions(compositionsToDelete)
+                .observeOn(uiScheduler)
+                .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionError);
+    }
+
+    private void onDeleteCompositionsSuccess() {
+        getViewState().showDeleteCompositionMessage(compositionsToDelete);
+        compositionsToDelete.clear();
+    }
+
+    private void onDeleteCompositionError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showDeleteCompositionError(errorCommand);
     }
 
     private void onAddingToPlayListError(Throwable throwable) {
