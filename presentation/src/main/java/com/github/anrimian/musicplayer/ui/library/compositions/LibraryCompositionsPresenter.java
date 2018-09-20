@@ -38,9 +38,8 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     private List<Composition> compositions = new ArrayList<>();
 
-    @Nullable
-    private Composition compositionToAddToPlayList;
-    private List<Composition> compositionsToDelete = new LinkedList<>();
+    private final List<Composition> compositionsForPlayList = new LinkedList<>();
+    private final List<Composition> compositionsToDelete = new LinkedList<>();
 
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
@@ -95,12 +94,13 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     void onAddToPlayListButtonClicked(Composition composition) {
-        compositionToAddToPlayList = composition;
+        compositionsForPlayList.clear();
+        compositionsForPlayList.add(composition);
         getViewState().showSelectPlayListDialog();
     }
 
     void onPlayListToAddingSelected(PlayList playList) {
-        playListsInteractor.addCompositionToPlayList(compositionToAddToPlayList, playList)
+        playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
                 .observeOn(uiScheduler)
                 .subscribe(() -> onAddingToPlayListCompleted(playList),
                         this::onAddingToPlayListError);
@@ -128,8 +128,8 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     private void onAddingToPlayListCompleted(PlayList playList) {
-        getViewState().showAddingToPlayListComplete(playList, compositionToAddToPlayList);
-        compositionToAddToPlayList = null;
+        getViewState().showAddingToPlayListComplete(playList, compositionsForPlayList);
+        compositionsForPlayList.clear();
     }
 
     private void subscribeOnCompositions() {

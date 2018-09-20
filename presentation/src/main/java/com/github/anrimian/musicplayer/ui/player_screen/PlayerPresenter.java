@@ -42,8 +42,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final List<PlayQueueItem> playQueue = new ArrayList<>();
     private PlayQueueItem currentItem;
 
-    private List<Composition> compositionsForPlayList = new LinkedList<>();
-    private List<Composition> compositionsToDelete = new LinkedList<>();
+    private final List<Composition> compositionsForPlayList = new LinkedList<>();
+    private final List<Composition> compositionsToDelete = new LinkedList<>();
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,

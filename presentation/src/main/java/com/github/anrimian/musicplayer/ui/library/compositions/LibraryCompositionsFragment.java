@@ -40,6 +40,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
 public class LibraryCompositionsFragment extends LibraryFragment implements LibraryCompositionsView {
@@ -166,10 +167,8 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
-    public void showAddingToPlayListComplete(PlayList playList, Composition composition) {
-        String text = getString(R.string.add_to_playlist_success_template,
-                formatCompositionName(composition),
-                playList.getName());
+    public void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions) {
+        String text = getAddToPlayListCompleteMessage(requireActivity(), playList, compositions);
         Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
