@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -47,13 +48,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private List<FileSource> sourceList = new ArrayList<>();
 
     @Nullable
-    private Composition compositionToAddToPlayList;
-
-    @Nullable
     private String folderToAddToPlayList;
 
     @Nullable
     private String searchText;
+
+    private final List<Composition> compositionsForPlayList = new LinkedList<>();
+    private final List<Composition> compositionsToDelete = new LinkedList<>();
 
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFilesInteractor interactor,
@@ -106,9 +107,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
-        interactor.deleteComposition(composition)
-                .observeOn(uiScheduler)
-                .subscribe();//TODO displayError
+        compositionsToDelete.clear();
+        compositionsToDelete.add(composition);
+        getViewState().showConfirmDeleteDialog(compositionsToDelete);
+    }
+
+    void onDeleteCompositionsDialogConfirmed() {
+        deletePreparedCompositions();
     }
 
     void onOrderMenuItemClicked() {
@@ -123,14 +128,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onAddToPlayListButtonClicked(Composition composition) {
-        compositionToAddToPlayList = composition;
+        compositionsForPlayList.clear();
+        compositionsForPlayList.add(composition);
         getViewState().showSelectPlayListDialog();
     }
 
     void onPlayListToAddingSelected(PlayList playList) {
-        interactor.addCompositionToPlayList(compositionToAddToPlayList, playList)
-                .observeOn(uiScheduler)
-                .subscribe(() -> onAddingToPlayListCompleted(playList), this::onAddingToPlayListError);
+        addPreparedCompositionsToPlayList(playList);
     }
 
     void onAddFolderToPlayListButtonClicked(String path) {
@@ -151,14 +155,37 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         loadMusic();
     }
 
+    private void deletePreparedCompositions() {
+        interactor.deleteCompositions(compositionsToDelete)
+                .observeOn(uiScheduler)
+                .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionError);
+    }
+
+    private void onDeleteCompositionsSuccess() {
+        getViewState().showDeleteCompositionMessage(compositionsToDelete);
+        compositionsToDelete.clear();
+    }
+
+    private void onDeleteCompositionError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showDeleteCompositionError(errorCommand);
+    }
+
+    private void addPreparedCompositionsToPlayList(PlayList playList) {
+        interactor.addCompositionsToPlayList(compositionsForPlayList, playList)
+                .observeOn(uiScheduler)
+                .subscribe(() -> onAddingToPlayListCompleted(playList),
+                        this::onAddingToPlayListError);
+    }
+
     private void onAddingToPlayListError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showAddingToPlayListError(errorCommand);
     }
 
     private void onAddingToPlayListCompleted(PlayList playList) {
-        getViewState().showAddingToPlayListComplete(playList, asList(compositionToAddToPlayList));
-        compositionToAddToPlayList = null;
+        getViewState().showAddingToPlayListComplete(playList, compositionsForPlayList);
+        compositionsForPlayList.clear();
     }
 
     private void goBackToPreviousPath() {

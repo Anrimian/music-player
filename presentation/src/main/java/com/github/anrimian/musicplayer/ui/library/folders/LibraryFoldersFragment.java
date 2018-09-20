@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
@@ -46,6 +47,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
 /**
  * Created on 23.10.2017.
@@ -295,6 +297,27 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
         dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_TAG);
+    }
+
+    @Override
+    public void showConfirmDeleteDialog(List<Composition> compositionsToDelete) {
+        DialogUtils.showConfirmDeleteDialog(requireContext(),
+                compositionsToDelete,
+                presenter::onDeleteCompositionsDialogConfirmed);
+    }
+
+    @Override
+    public void showDeleteCompositionError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
+        String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
+        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
     private void goToMusicStorageScreen(String path) {

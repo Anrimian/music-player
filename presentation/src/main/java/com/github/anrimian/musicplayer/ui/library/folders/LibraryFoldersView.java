@@ -70,4 +70,13 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectPlayListForFolderDialog();
 
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteCompositionError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
+
 }

@@ -62,8 +62,8 @@ public class LibraryFilesInteractor {
         return musicPlayerInteractor.startPlaying(asList(composition));
     }
 
-    public Completable deleteComposition(Composition composition) {
-        return musicProviderRepository.deleteComposition(composition);
+    public Completable deleteCompositions(List<Composition> compositions) {
+        return musicProviderRepository.deleteCompositions(compositions);
     }
 
     public Single<List<Composition>> addCompositionsToPlayList(String path, PlayList playList) {
@@ -72,8 +72,8 @@ public class LibraryFilesInteractor {
                                 .toSingleDefault(compositions));
     }
 
-    public Completable addCompositionToPlayList(Composition composition, PlayList playList) {
-        return playListsRepository.addCompositionToPlayList(composition, playList);
+    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
+        return playListsRepository.addCompositionsToPlayList(compositions, playList);
     }
 
     public void setFolderOrder(Order order) {
