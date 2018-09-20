@@ -34,8 +34,8 @@ public class LibraryCompositionsInteractor {
         return musicPlayerInteractor.startPlaying(list);
     }
 
-    public Completable deleteComposition(Composition composition) {
-        return musicProviderRepository.deleteComposition(composition);
+    public Completable deleteCompositions(List<Composition> compositions) {
+        return musicProviderRepository.deleteCompositions(compositions);
     }
 
     public void setOrder(Order order) {

@@ -44,4 +44,13 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showAddingToPlayListComplete(PlayList playList, Composition composition);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteCompositionError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
 }

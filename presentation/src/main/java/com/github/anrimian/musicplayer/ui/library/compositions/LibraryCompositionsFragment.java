@@ -23,6 +23,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -39,6 +40,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
 public class LibraryCompositionsFragment extends LibraryFragment implements LibraryCompositionsView {
 
@@ -81,7 +83,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.compositions);
 
         progressViewWrapper = new ProgressViewWrapper(view);
@@ -183,5 +185,26 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder);
         fragment.setOnCompleteListener(presenter::onOrderSelected);
         fragment.show(getChildFragmentManager(), ORDER_TAG);
+    }
+
+    @Override
+    public void showConfirmDeleteDialog(List<Composition> compositionsToDelete) {
+        DialogUtils.showConfirmDeleteDialog(requireContext(),
+                compositionsToDelete,
+                presenter::onDeleteCompositionsDialogConfirmed);
+    }
+
+    @Override
+    public void showDeleteCompositionError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
+        String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
+        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 }
