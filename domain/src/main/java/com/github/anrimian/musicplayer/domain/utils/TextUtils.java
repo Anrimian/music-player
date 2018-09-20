@@ -3,6 +3,36 @@ package com.github.anrimian.musicplayer.domain.utils;
 
 public class TextUtils {
 
+    public static String getLastPathSegment(String text) {
+        String result = text;
+        int lastSlashIndex = text.lastIndexOf('/');
+        if (lastSlashIndex != -1) {
+            result = text.substring(++lastSlashIndex, text.length());
+        }
+        return result;
+    }
+
+    public static boolean containsIgnoreCase(String src, String what) {
+        final int length = what.length();
+        if (length == 0)
+            return true; // Empty string is contained
+
+        final char firstLo = Character.toLowerCase(what.charAt(0));
+        final char firstUp = Character.toUpperCase(what.charAt(0));
+
+        for (int i = src.length() - length; i >= 0; i--) {
+            // Quick check before calling the more expensive regionMatches() method:
+            final char ch = src.charAt(i);
+            if (ch != firstLo && ch != firstUp)
+                continue;
+
+            if (src.regionMatches(true, i, what, 0, length))
+                return true;
+        }
+
+        return false;
+    }
+
     /**
      * copied from android package for using in non-device specific layers
      */

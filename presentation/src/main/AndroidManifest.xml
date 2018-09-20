@@ -22,6 +22,7 @@
 
         <activity android:name=".ui.main.MainActivity"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustNothing"
             android:theme="@style/AppTheme.Drawer">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

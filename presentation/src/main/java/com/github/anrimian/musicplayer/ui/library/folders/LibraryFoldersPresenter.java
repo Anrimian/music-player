@@ -3,12 +3,12 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
-import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -37,6 +37,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable filesDisposable;
+    private Disposable deleteSelfDisposable;
 
     @Nullable
     private String path;
@@ -50,6 +51,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     @Nullable
     private String folderToAddToPlayList;
+
+    @Nullable
+    private String searchText;
 
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFilesInteractor interactor,
@@ -142,6 +146,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
                         this::onAddingToPlayListError);
     }
 
+    void onSearchTextChanged(String text) {
+        searchText = text;
+        loadMusic();
+    }
+
     private void onAddingToPlayListError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showAddingToPlayListError(errorCommand);
@@ -165,8 +174,10 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     private void loadMusic() {
-        getViewState().showLoading();
-        interactor.getCompositionsInPath(path)
+        if (folder == null) {
+            getViewState().showLoading();
+        }
+        interactor.getCompositionsInPath(path, searchText)
                 .observeOn(uiScheduler)
                 .subscribe(this::onMusicLoaded, this::onMusicLoadingError);
     }
@@ -183,9 +194,12 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     private void subscribeOnSelfDeleting(Folder folder) {
-        presenterDisposable.add(folder.getSelfDeleteObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onFolderDeleted));
+        if (deleteSelfDisposable == null) {
+            deleteSelfDisposable = folder.getSelfDeleteObservable()
+                    .observeOn(uiScheduler)
+                    .subscribe(this::onFolderDeleted);
+            presenterDisposable.add(deleteSelfDisposable);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -214,7 +228,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         getViewState().updateList(oldList, sourceList);
 
         if (sourceList.isEmpty()) {
-            getViewState().showEmptyList();
+            if (TextUtils.isEmpty(searchText)) {
+                getViewState().showEmptyList();
+            } else {
+                getViewState().showEmptySearchResult();
+            }
         } else {
             getViewState().showList();
         }

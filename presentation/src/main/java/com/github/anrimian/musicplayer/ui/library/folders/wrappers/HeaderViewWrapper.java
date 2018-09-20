@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.wrappers;
 
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,6 +12,7 @@ import butterknife.ButterKnife;
 import static android.view.View.GONE;
 import static android.view.View.OnClickListener;
 import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
 
 /**
  * Created on 01.11.2017.
@@ -34,14 +34,7 @@ public class HeaderViewWrapper {
     }
 
     public void bind(@NonNull String path) {
-        String displayPath = path;
-        int lastSlashIndex = path.lastIndexOf('/');
-        if (lastSlashIndex != -1) {
-            displayPath = path.substring(++lastSlashIndex, path.length());
-        }
-//        int firstSlashIndex = path.indexOf('/');
-//        displayPath = path.substring(++firstSlashIndex, path.length());
-        tvParentPath.setText(displayPath);
+        tvParentPath.setText(getLastPathSegment(path));
     }
 
     public void setOnClickListener(OnClickListener listener) {

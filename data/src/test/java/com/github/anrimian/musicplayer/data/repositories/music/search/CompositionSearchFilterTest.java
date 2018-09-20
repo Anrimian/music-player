@@ -4,8 +4,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class CompositionSearchFilterTest {
 
     private CompositionSearchFilter searchFilter = new CompositionSearchFilter();
@@ -18,6 +16,7 @@ public class CompositionSearchFilterTest {
 
         assert searchFilter.isSuitForSearch(composition, "mary");
         assert searchFilter.isSuitForSearch(composition, "son");
+        assert searchFilter.isSuitForSearch(composition, "SON");
         assert searchFilter.isSuitForSearch(composition, "ek");
         assert !searchFilter.isSuitForSearch(composition, "some");
         assert !searchFilter.isSuitForSearch(composition, "mp3");

@@ -8,7 +8,10 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderF
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.utils.search.SearchFilter;
 
-public class FileSourceSearchFilter implements SearchFilter<FileSource, String> {
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.containsIgnoreCase;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
+
+public class FileSourceSearchFilter implements SearchFilter<FileSource> {
 
     private CompositionSearchFilter compositionSearchFilter = new CompositionSearchFilter();
 
@@ -20,11 +23,8 @@ public class FileSourceSearchFilter implements SearchFilter<FileSource, String> 
         }
         if (data instanceof FolderFileSource) {
             String path = ((FolderFileSource) data).getFullPath();
-            int lastSlashIndex = path.lastIndexOf("/");
-            if (lastSlashIndex != -1) {
-                path = path.substring(++lastSlashIndex, path.length());
-            }
-            return path.contains(search);
+            path = getLastPathSegment(path);
+            return containsIgnoreCase(path, search);
         }
         return false;
     }

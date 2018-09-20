@@ -9,8 +9,6 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
-
 public class FileSourceSearchFilterTest {
 
     private FileSourceSearchFilter searchFilter = new FileSourceSearchFilter();
@@ -21,6 +19,7 @@ public class FileSourceSearchFilterTest {
                 1, new Date(1), new Date(2));
 
         assert searchFilter.isSuitForSearch(fileSource, "kek");
+        assert searchFilter.isSuitForSearch(fileSource, "KEK");
         assert !searchFilter.isSuitForSearch(fileSource, "/kek");
         assert !searchFilter.isSuitForSearch(fileSource, "some");
     }
@@ -34,6 +33,7 @@ public class FileSourceSearchFilterTest {
         FileSource fileSource = new MusicFileSource(composition);
         assert searchFilter.isSuitForSearch(fileSource, "mary");
         assert searchFilter.isSuitForSearch(fileSource, "son");
+        assert searchFilter.isSuitForSearch(fileSource, "SON");
         assert searchFilter.isSuitForSearch(fileSource, "ek");
         assert !searchFilter.isSuitForSearch(fileSource, "some");
         assert !searchFilter.isSuitForSearch(fileSource, "mp3");
