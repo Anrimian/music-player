@@ -19,9 +19,9 @@ import io.reactivex.Single;
 
 public interface MusicProviderRepository {
 
-    Observable<List<Composition>> getAllCompositionsObservable();
+    Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText);
 
-    Single<Folder> getCompositionsInPath(@Nullable String path);
+    Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
 

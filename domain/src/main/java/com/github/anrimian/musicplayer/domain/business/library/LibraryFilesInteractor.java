@@ -49,8 +49,8 @@ public class LibraryFilesInteractor {
         this.settingsRepository = settingsRepository;
     }
 
-    public Single<Folder> getCompositionsInPath(@Nullable String path) {
-        return musicProviderRepository.getCompositionsInPath(path);
+    public Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText) {
+        return musicProviderRepository.getCompositionsInPath(path, searchText);
     }
 
     public Completable playAllMusicInPath(@Nullable String path) {
