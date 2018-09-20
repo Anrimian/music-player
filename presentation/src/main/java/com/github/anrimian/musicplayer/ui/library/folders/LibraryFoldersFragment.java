@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -141,6 +142,31 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.library_files_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.menu_action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+//        String searchQuery = presenter.getSearchQuery();
+//        if (!TextUtils.isEmpty(searchQuery)) {
+//            searchItem.expandActionView();
+//            searchView.setQuery(searchQuery, false);
+//            searchView.clearFocus();
+//        }
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String text) {
+                presenter.onSearchTextChanged(text);
+//                AndroidUtils.hideKeyboard(getActivity());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String text) {
+                presenter.onSearchTextChanged(text);
+                //presenter.startSearchWithDelay(newText);it notify when search view closed, first fix this
+                return true;
+            }
+        });
+//        searchView.setOnSearchClickListener(v -> searchView.setQuery(presenter.getSearchQuery(), false));
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -181,8 +207,13 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.hideAll();
         progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
+    }
+
+    @Override
+    public void showEmptySearchResult() {
+        fab.setVisibility(View.GONE);
+        progressViewWrapper.showMessage(R.string.compositions_and_folders_for_search_not_found, false);
     }
 
     @Override

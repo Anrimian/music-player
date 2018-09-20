@@ -14,6 +14,8 @@
     <string name="unexpected_error">Необработанная ошибка</string>
     <string name="file_not_found">Файл не найден</string>
     <string name="compositions_on_device_not_found">Композиций на устройстве не найдено</string>
+    <string name="compositions_and_folders_for_search_not_found">Композиций и папок, подходящих под результаты поиска, не найдено</string>
+    <string name="compositions_for_search_not_found">Композиций, подходящих под результаты поиска, не найдено</string>
     <string name="foreground_channel_id">Уведомления о проигрывании музыки</string>
     <string name="play_stop">Играть или остановить</string>
     <string name="previous_track">Предыдущий трек</string>
@@ -58,6 +60,7 @@
     <string name="delete_compositions_template">Удалить %1$d композиций?</string>
     <string name="delete_composition_success">Композиция "%1$s" удалена</string>
     <string name="delete_compositions_success">%1$d композиций удалено</string>
+    <string name="search">Поиск</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

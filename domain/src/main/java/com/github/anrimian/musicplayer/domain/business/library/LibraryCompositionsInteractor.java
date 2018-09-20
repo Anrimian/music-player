@@ -27,7 +27,7 @@ public class LibraryCompositionsInteractor {
     }
 
     public Observable<List<Composition>> getCompositionsObservable() {
-        return musicProviderRepository.getAllCompositionsObservable();
+        return musicProviderRepository.getAllCompositionsObservable(null);
     }
 
     public Completable play(List<Composition> list) {

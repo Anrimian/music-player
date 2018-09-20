@@ -32,6 +32,9 @@ public interface LibraryFoldersView extends MvpView {
     void showEmptyList();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
+    void showEmptySearchResult();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showList();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
