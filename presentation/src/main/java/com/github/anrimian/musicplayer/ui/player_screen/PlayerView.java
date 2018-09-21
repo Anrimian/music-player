@@ -68,4 +68,7 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showPlayQueueSubtitle(int size);
 }

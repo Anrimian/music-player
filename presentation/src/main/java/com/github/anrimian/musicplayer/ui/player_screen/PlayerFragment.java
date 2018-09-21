@@ -223,6 +223,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.play_queue_title_container)
     View playQueueTitleContainer;
 
+    @BindView(R.id.tv_queue_subtitle)
+    TextView tvQueueSubtitle;
+
     private BottomSheetBehavior<View> bottomSheetBehavior;
 
     private PlayQueueAdapter playQueueAdapter;
@@ -324,9 +327,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         DelegateManager delegateManager = new DelegateManager();
         delegateManager
-                .addDelegate(new VisibilityDelegate(playQueueTitleContainer))
+                .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
-                .addDelegate(new ReverseDelegate(new VisibilityDelegate(titleContainer)))
+                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
                 .addDelegate(new BoundValuesDelegate(0.95f, 1f, new VisibilityDelegate(rvPlayList)))
@@ -578,6 +581,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         startActivity(Intent.createChooser(intent, getString(R.string.share)));
+    }
+
+    @Override
+    public void showPlayQueueSubtitle(int size) {
+        tvQueueSubtitle.setText(getResources().getQuantityString(R.plurals.compositions_count, size, size));
     }
 
     @Override

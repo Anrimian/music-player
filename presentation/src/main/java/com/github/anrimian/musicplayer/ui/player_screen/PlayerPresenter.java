@@ -274,6 +274,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             trackStateDisposable = null;
         }
 
+        getViewState().showPlayQueueSubtitle(newPlayQueue.size());
+
         List<PlayQueueItem> oldPlayList = new ArrayList<>(playQueue);
         playQueue.clear();
         playQueue.addAll(newPlayQueue);
