@@ -83,18 +83,12 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Completable addCompositionToPlayList(Composition composition, PlayList playList) {
-        return Completable.fromAction(() -> storagePlayListsProvider.addCompositionInPlayList(
-                composition.getId(),
+    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
+        return Completable.fromAction(() -> storagePlayListsProvider.addCompositionsToPlayList(
+                compositions,
                 playList.getId(),
                 playList.getCompositionsCount())
         ).subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
-        return Observable.fromIterable(compositions)
-                .flatMapCompletable(composition -> addCompositionToPlayList(composition, playList));
     }
 
     private List<PlayList> toSortedPlayLists(Map<Long, PlayListFullModel> playListMap) {

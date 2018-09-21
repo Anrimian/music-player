@@ -67,7 +67,7 @@ public class StoragePlayListUtilsProviderTest {
 
         StoragePlayList playList = getPlayList("test playlist6");
         try {
-            storagePlayListsProvider.addCompositionInPlayList(composition.getId(),
+            storagePlayListsProvider.addCompositionToPlayList(composition.getId(),
                     playList.getId(),
                     0);
 
@@ -95,15 +95,15 @@ public class StoragePlayListUtilsProviderTest {
         StoragePlayList playList = getPlayList("test playlist7");
 
         try {
-            storagePlayListsProvider.addCompositionInPlayList(compositionOne.getId(),
+            storagePlayListsProvider.addCompositionToPlayList(compositionOne.getId(),
                     playList.getId(),
                     0);
 
-            storagePlayListsProvider.addCompositionInPlayList(compositionTwo.getId(),
+            storagePlayListsProvider.addCompositionToPlayList(compositionTwo.getId(),
                     playList.getId(),
                     1);
 
-            storagePlayListsProvider.addCompositionInPlayList(compositionThree.getId(),
+            storagePlayListsProvider.addCompositionToPlayList(compositionThree.getId(),
                     playList.getId(),
                     2);
 

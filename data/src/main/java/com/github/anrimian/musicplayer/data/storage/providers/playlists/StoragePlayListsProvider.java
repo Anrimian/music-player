@@ -121,7 +121,7 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public void addCompositionInPlayList(long compositionId, long playListId, int position) {
+    public void addCompositionToPlayList(long compositionId, long playListId, int position) {
         ContentValues values = new ContentValues();
         values.put(Playlists.Members.PLAY_ORDER, position);
         values.put(Playlists.Members.AUDIO_ID, compositionId);
@@ -129,6 +129,26 @@ public class StoragePlayListsProvider {
 
         Uri uri = contentResolver.insert(getContentUri("external", playListId), values);
         if (uri == null) {
+            throw new PlayListNotModifiedException();
+        }
+        updateModifyTime(playListId);
+    }
+
+    public void addCompositionsToPlayList(List<Composition> compositions, long playListId, int startPosition) {
+        int position = startPosition;
+        ContentValues[] valuesList = new ContentValues[compositions.size()];
+        for (int i = 0; i < compositions.size(); i++) {
+            long compositionId = compositions.get(i).getId();
+            ContentValues values = new ContentValues();
+            values.put(Playlists.Members.PLAY_ORDER, position);
+            values.put(Playlists.Members.AUDIO_ID, compositionId);
+            values.put(Playlists.Members.PLAYLIST_ID, playListId);
+            valuesList[i] = values;
+            position++;
+        }
+
+        int inserted = contentResolver.bulkInsert(getContentUri("external", playListId), valuesList);
+        if (inserted == 0) {
             throw new PlayListNotModifiedException();
         }
         updateModifyTime(playListId);
