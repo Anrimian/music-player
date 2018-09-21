@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.common.toolbar;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.support.annotation.MenuRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
@@ -79,12 +78,6 @@ public class AdvancedToolbar extends Toolbar {
     public void setSubtitle(CharSequence subtitle) {
         tvSubtitle.setVisibility(isEmpty(subtitle) ? GONE : VISIBLE);
         tvSubtitle.setText(subtitle);
-    }
-
-    public void setUpMenu(@MenuRes int menuId, OnMenuItemClickListener listener) {
-        getMenu().clear();
-        inflateMenu(menuId);
-        setOnMenuItemClickListener(listener);
     }
 
     public void setTitleClickListener(View.OnClickListener listener) {

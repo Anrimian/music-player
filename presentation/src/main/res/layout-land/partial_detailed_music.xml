@@ -160,11 +160,10 @@
             android:id="@+id/iv_music_icon"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/bg_folder_round"
             android:contentDescription="@string/folder"
-            android:padding="@dimen/padding_small"
             android:layout_gravity="center|start"
-            app:srcCompat="@drawable/ic_music_circle" />
+            android:scaleType="centerCrop"
+            tools:srcCompat="@drawable/ic_music_placeholder" />
 
     </FrameLayout>
 
