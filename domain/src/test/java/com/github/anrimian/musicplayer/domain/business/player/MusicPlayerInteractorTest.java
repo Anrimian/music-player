@@ -339,6 +339,25 @@ public class MusicPlayerInteractorTest {
     }
 
     @Test
+    public void onAudioBecomingNoisyThenLossFocusAndGainFocusTest() {
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
+        inOrder.verify(musicPlayerController).resume();
+
+        noisyAudioSubject.onNext(new Object());
+
+        inOrder.verify(musicPlayerController).pause();
+
+        audioFocusSubject.onNext(LOSS);
+        audioFocusSubject.onNext(GAIN);
+
+        inOrder.verify(musicPlayerController, never()).resume();
+
+        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
+    }
+
+    @Test
     public void onCurrentCompositionDeletedChangeTest() {
         musicPlayerInteractor.play();
 

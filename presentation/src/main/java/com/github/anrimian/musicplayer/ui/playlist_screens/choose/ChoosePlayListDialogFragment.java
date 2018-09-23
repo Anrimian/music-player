@@ -59,7 +59,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         View view = View.inflate(getContext(), R.layout.dialog_select_play_list, null);
         dialog.setContentView(view);
 
-        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = requireActivity().getResources().getDisplayMetrics();
 
         int height = displayMetrics.heightPixels;
 

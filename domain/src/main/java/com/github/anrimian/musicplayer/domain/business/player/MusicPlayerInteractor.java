@@ -282,9 +282,11 @@ public class MusicPlayerInteractor {
             }
             case LOSS_SHORTLY:
             case LOSS: {
-                musicPlayerController.pause();
-                playerStateSubject.onNext(PAUSED_EXTERNALLY);
-                break;
+                if (playerStateSubject.getValue() == PLAY) {
+                    musicPlayerController.pause();
+                    playerStateSubject.onNext(PAUSED_EXTERNALLY);
+                    break;
+                }
             }
         }
     }
