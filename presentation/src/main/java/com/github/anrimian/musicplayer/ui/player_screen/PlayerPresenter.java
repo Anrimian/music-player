@@ -37,7 +37,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable trackStateDisposable;
-    private Disposable currentCompositionDisposable;
 
     private final List<PlayQueueItem> playQueue = new ArrayList<>();
     private PlayQueueItem currentItem;
@@ -66,6 +65,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     void onStart() {
         subscribeOnPlayerStateChanges();
         subscribeOnPlayQueue();
+        subscribeOnCurrentCompositionChanging();
     }
 
     void onStop() {
@@ -210,10 +210,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnCurrentCompositionChanging() {
-        currentCompositionDisposable = musicPlayerInteractor.getCurrentCompositionObservable()
+        presenterDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayQueueEventReceived);
-        presenterDisposable.add(currentCompositionDisposable);
+                .subscribe(this::onPlayQueueEventReceived));
     }
 
     private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
@@ -229,6 +228,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             trackStateDisposable.dispose();
             trackStateDisposable = null;
         }
+        getViewState().showMusicControls(currentItem != null);
         if (newItem != null) {
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
@@ -264,16 +264,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onPlayListChanged(List<PlayQueueItem> newPlayQueue) {
-        if (currentCompositionDisposable != null) {
-            currentCompositionDisposable.dispose();
-            currentCompositionDisposable = null;
-            currentItem = null;
-        }
-        if (trackStateDisposable != null) {
-            trackStateDisposable.dispose();
-            trackStateDisposable = null;
-        }
-
         getViewState().showPlayQueueSubtitle(newPlayQueue.size());
 
         List<PlayQueueItem> oldPlayList = new ArrayList<>(playQueue);
@@ -281,11 +271,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         playQueue.addAll(newPlayQueue);
 
         getViewState().updatePlayQueue(oldPlayList, playQueue);
-        getViewState().showMusicControls(!playQueue.isEmpty());
-
-        if (!playQueue.isEmpty()) {
-            subscribeOnCurrentCompositionChanging();
-        }
     }
 
     private void subscribeOnTrackPositionChanging() {
