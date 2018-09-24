@@ -27,6 +27,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -189,6 +190,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         adapter = new MusicFileSourceAdapter(musicList);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
+        adapter.setOnDeleteFolderClickListener(presenter::onDeleteFolderButtonClicked);
         adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
         adapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
         adapter.setOnAddFolderToPlaylistClickListener(presenter::onAddFolderToPlayListButtonClicked);
@@ -304,6 +306,13 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         DialogUtils.showConfirmDeleteDialog(requireContext(),
                 compositionsToDelete,
                 presenter::onDeleteCompositionsDialogConfirmed);
+    }
+
+    @Override
+    public void showConfirmDeleteDialog(FolderFileSource folder) {
+        DialogUtils.showConfirmDeleteDialog(requireContext(),
+                folder,
+                presenter::onDeleteFolderDialogConfirmed);
     }
 
     @Override

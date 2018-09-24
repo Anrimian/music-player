@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -23,7 +24,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 /**
  * Created on 23.10.2017.
@@ -52,6 +52,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     @Nullable
     private String searchText;
+
+    @Nullable
+    private FolderFileSource folderToDelete;
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
@@ -112,8 +115,19 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         getViewState().showConfirmDeleteDialog(compositionsToDelete);
     }
 
+    void onDeleteFolderButtonClicked(FolderFileSource folder) {
+        folderToDelete = folder;
+        getViewState().showConfirmDeleteDialog(folder);
+    }
+
     void onDeleteCompositionsDialogConfirmed() {
         deletePreparedCompositions();
+    }
+
+    void onDeleteFolderDialogConfirmed() {
+        interactor.deleteFolder(folderToDelete)
+                .observeOn(uiScheduler)
+                .subscribe(this::onDeleteFolderSuccess, this::onDeleteCompositionsError);
     }
 
     void onOrderMenuItemClicked() {
@@ -158,7 +172,12 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private void deletePreparedCompositions() {
         interactor.deleteCompositions(compositionsToDelete)
                 .observeOn(uiScheduler)
-                .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionError);
+                .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionsError);
+    }
+
+    private void onDeleteFolderSuccess(List<Composition> deletedCompositions) {
+        getViewState().showDeleteCompositionMessage(deletedCompositions);
+        folderToDelete = null;
     }
 
     private void onDeleteCompositionsSuccess() {
@@ -166,7 +185,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         compositionsToDelete.clear();
     }
 
-    private void onDeleteCompositionError(Throwable throwable) {
+    private void onDeleteCompositionsError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showDeleteCompositionError(errorCommand);
     }

@@ -8,6 +8,7 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
@@ -79,4 +80,6 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
 
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showConfirmDeleteDialog(FolderFileSource folder);
 }

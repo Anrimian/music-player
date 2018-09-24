@@ -66,6 +66,11 @@ public class LibraryFilesInteractor {
         return musicProviderRepository.deleteCompositions(compositions);
     }
 
+    public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
+        return musicProviderRepository.getAllCompositionsInPath(folder.getFullPath())
+                .doOnSuccess(o -> {});//delete recursive TODO finish
+    }
+
     public Single<List<Composition>> addCompositionsToPlayList(String path, PlayList playList) {
         return musicProviderRepository.getAllCompositionsInPath(path)
                 .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)

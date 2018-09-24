@@ -35,8 +35,8 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
     private OnItemClickListener<Composition> onAddToPlaylistClickListener;
     private OnItemClickListener<String> onFolderClickListener;
-    private OnItemClickListener<String> onDeleteFolderClickListener;
     private OnItemClickListener<String> onAddFolderToPlaylistClickListener;
+    private OnItemClickListener<FolderFileSource> onDeleteFolderClickListener;
 
     public MusicFileSourceAdapter(List<FileSource> musicList) {
         this.musicList = musicList;
@@ -119,7 +119,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
     }
 
-    public void setOnDeleteFolderClickListener(OnItemClickListener<String> onDeleteFolderClickListener) {
+    public void setOnDeleteFolderClickListener(OnItemClickListener<FolderFileSource> onDeleteFolderClickListener) {
         this.onDeleteFolderClickListener = onDeleteFolderClickListener;
     }
 

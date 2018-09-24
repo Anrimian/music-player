@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
 import android.content.Context;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.OnTransitionItemClickListener;
 
 import javax.annotation.Nonnull;
 
@@ -37,15 +35,16 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
+    private FolderFileSource folder;
     private String path;
 
-    private OnItemClickListener<String> onDeleteCompositionClickListener;
+    private OnItemClickListener<FolderFileSource> onDeleteCompositionClickListener;
     private OnItemClickListener<String> onAddToPlaylistClickListener;
 
     FolderViewHolder(LayoutInflater inflater,
                      ViewGroup parent,
                      OnItemClickListener<String> onFolderClickListener,
-                     OnItemClickListener<String> onDeleteCompositionClickListener,
+                     OnItemClickListener<FolderFileSource> onDeleteCompositionClickListener,
                      OnItemClickListener<String> onAddToPlaylistClickListener) {
         super(inflater.inflate(R.layout.item_storage_folder, parent, false));
         ButterKnife.bind(this, itemView);
@@ -58,6 +57,7 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
     }
 
     void bind(@Nonnull FolderFileSource folderFileSource) {
+        this.folder = folderFileSource;
         this.path = folderFileSource.getFullPath();
         String displayPath = path;
         int lastSlashIndex = path.lastIndexOf('/');
@@ -85,7 +85,7 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
                     return true;
                 }
                 case R.id.menu_delete: {
-                    onDeleteCompositionClickListener.onItemClick(path);
+                    onDeleteCompositionClickListener.onItemClick(folder);
                     return true;
                 }
             }
