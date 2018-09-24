@@ -181,14 +181,14 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
                 mediaSession.setActive(true);
                 updateMediaSession(playerMetaState);
-                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(playerMetaState));
+                startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getForegroundNotification(playerMetaState, mediaSession));
                 subscribeOnCurrentCompositionChanging();
                 break;
             }
             case PAUSE: {
                 updateMediaSession(playerMetaState);
                 mediaSession.setActive(false);
-                notificationsDisplayer.updateForegroundNotification(playerMetaState);
+                notificationsDisplayer.updateForegroundNotification(playerMetaState, mediaSession);
                 stopForeground(false);
                 break;
             }
@@ -217,7 +217,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         }
         if (!composition.equals(currentItem)) {
             currentItem = composition;
-            notificationsDisplayer.updateForegroundNotification(playerMetaState);
+            notificationsDisplayer.updateForegroundNotification(playerMetaState, mediaSession);
         }
     }
 
@@ -234,8 +234,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Composition composition = playerMetaState.getQueueItem().getComposition();
 
         MediaMetadataCompat metadata = metadataBuilder
-//                .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
-//                        BitmapFactory.decodeResource(getResources(), track.getBitmapResId()))
+//                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, getCompositionImage(composition))
                 .putString(METADATA_KEY_TITLE, composition.getTitle())
                 .putString(METADATA_KEY_ALBUM, composition.getAlbum())
                 .putString(METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())

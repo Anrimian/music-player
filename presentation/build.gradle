@@ -62,6 +62,7 @@ dependencies {
     implementation presentationDependencies.recyclerView
     implementation presentationDependencies.constraintLayout
     implementation presentationDependencies.supportMedia
+    implementation presentationDependencies.palette
 
     implementation presentationDependencies.rxAndroid
     implementation presentationDependencies.rxPermissions

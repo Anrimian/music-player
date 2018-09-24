@@ -62,6 +62,8 @@
     <string name="delete_compositions_success">%1$d композиций удалено</string>
     <string name="search">Поиск</string>
     <string name="play_queue">Очередь воспроизведения</string>
+    <string name="pause">Пауза</string>
+    <string name="play">Играть</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
