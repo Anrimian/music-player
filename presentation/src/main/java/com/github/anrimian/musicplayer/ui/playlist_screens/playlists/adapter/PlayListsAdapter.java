@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -23,15 +24,16 @@ public class PlayListsAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
         this.playLists = playLists;
     }
 
+    @NonNull
     @Override
-    public PlayListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PlayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new PlayListViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
                 onItemClickListener);
     }
 
     @Override
-    public void onBindViewHolder(PlayListViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PlayListViewHolder holder, int position) {
         PlayList playList = playLists.get(position);
         holder.bind(playList);
     }

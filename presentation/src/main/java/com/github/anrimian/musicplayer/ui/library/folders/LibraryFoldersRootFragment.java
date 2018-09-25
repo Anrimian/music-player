@@ -26,7 +26,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment implements BackB
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        AdvancedToolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.files);
 
         if (savedInstanceState == null) {

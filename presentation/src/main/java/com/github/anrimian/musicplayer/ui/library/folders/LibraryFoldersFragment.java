@@ -144,6 +144,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.library_files_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.menu_action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
@@ -244,7 +245,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
             fragmentManager.popBackStack();
         } else {
             fragmentManager.beginTransaction()
-                    .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
+                    .setCustomAnimations(0, R.anim.anim_slide_out_right)
                     .replace(R.id.library_folders_container, LibraryFoldersFragment.newInstance(path))
                     .commit();
         }
@@ -332,7 +333,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     private void goToMusicStorageScreen(String path) {
         LibraryFoldersFragment fragment = LibraryFoldersFragment.newInstance(path);
         FragmentTransaction transaction = requireFragmentManager().beginTransaction();
-        transaction.replace(R.id.library_folders_container, fragment, path)
+        transaction.setCustomAnimations(R.anim.anim_slide_in_right, 0, 0, R.anim.anim_slide_out_right)
+                .add(R.id.library_folders_container, fragment, path)
                 .addToBackStack(path)
                 .commit();
     }

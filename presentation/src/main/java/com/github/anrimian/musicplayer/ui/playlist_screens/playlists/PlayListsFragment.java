@@ -65,7 +65,7 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar = requireActivity().findViewById(R.id.toolbar);
         bindToolbar(toolbar);
 
         progressViewWrapper = new ProgressViewWrapper(view);
@@ -73,7 +73,7 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = requireFragmentManager();
         fm.addOnBackStackChangedListener(() -> {
             Fragment fragment = fm.findFragmentById(R.id.drawer_fragment_container);
             if (fragment == this) {
@@ -113,8 +113,8 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
     }
 
     private void goToPlayListScreen(PlayList playList) {
-        getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.anim_alpha_appear, 0, 0, R.anim.anim_alpha_disappear)
+        requireFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.anim_slide_in_right, 0, 0, R.anim.anim_slide_out_right)
                 .add(R.id.drawer_fragment_container, PlayListFragment.newInstance(playList.getId()))
                 .addToBackStack(null)
                 .commit();
