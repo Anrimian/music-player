@@ -15,68 +15,82 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary">
+            <include layout="@layout/partial_toolbar"
+                android:id="@+id/toolbar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-                <include layout="@layout/partial_toolbar"
-                    android:id="@+id/toolbar"/>
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/play_queue_title_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="72dp"
+                android:layout_marginLeft="72dp"
+                app:layout_constraintTop_toTopOf="@id/toolbar"
+                app:layout_constraintStart_toStartOf="@id/toolbar"
+                app:layout_constraintEnd_toEndOf="@id/toolbar"
+                app:layout_constraintBottom_toBottomOf="@id/toolbar">
 
-                <android.support.constraint.ConstraintLayout
-                    android:id="@+id/play_queue_title_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:elevation="12dp"
-                    android:layout_marginStart="72dp"
-                    android:layout_marginLeft="72dp"
-                    tools:targetApi="lollipop">
+                <TextView
+                    android:id="@+id/tv_queue_title"
+                    style="@style/ToolbarTitleStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/play_queue"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/tv_queue_subtitle"
+                    app:layout_constraintEnd_toEndOf="@id/acv_play_queue"
+                    tools:text="fflafff"/>
 
-                    <TextView
-                        android:id="@+id/tv_queue_title"
-                        style="@style/ToolbarTitleStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/play_queue"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toTopOf="@id/tv_queue_subtitle"
-                        app:layout_constraintEnd_toEndOf="@id/acv_play_queue"
-                        tools:text="fflafff"/>
+                <TextView
+                    android:id="@+id/tv_queue_subtitle"
+                    style="@style/ToolbarSubtitleStyle"
+                    android:textColor="?android:attr/textColorSecondaryInverse"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/tv_queue_title"
+                    app:layout_constraintStart_toStartOf="@id/tv_queue_title"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/acv_play_queue"
+                    tools:text="dd"/>
 
-                    <TextView
-                        android:id="@+id/tv_queue_subtitle"
-                        style="@style/ToolbarSubtitleStyle"
-                        android:textColor="?android:attr/textColorSecondaryInverse"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="@id/tv_queue_title"
-                        app:layout_constraintStart_toStartOf="@id/tv_queue_title"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@id/acv_play_queue"
-                        tools:text="dd"/>
+                <android.support.v7.widget.ActionMenuView
+                    android:id="@+id/acv_play_queue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:theme="@style/ToolbarStyle"/>
 
-                    <android.support.v7.widget.ActionMenuView
-                        android:id="@+id/acv_play_queue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:theme="@style/ToolbarStyle"/>
+            </android.support.constraint.ConstraintLayout>
 
-                </android.support.constraint.ConstraintLayout>
+            <include layout="@layout/partial_music_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:layout_constraintStart_toStartOf="@id/toolbar"
+                app:layout_constraintEnd_toEndOf="@id/toolbar"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-            </FrameLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_shadow_bottom"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:layout_constraintStart_toStartOf="@id/toolbar"
+                app:layout_constraintEnd_toEndOf="@id/toolbar"/>
 
-            <include layout="@layout/partial_music_content"/>
-
-        </LinearLayout>
+        </android.support.constraint.ConstraintLayout>
 
         <android.support.design.widget.NavigationView
             android:id="@+id/navigation_view"

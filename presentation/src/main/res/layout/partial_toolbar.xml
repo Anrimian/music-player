@@ -6,14 +6,10 @@
     android:layout_height="?attr/actionBarSize"
     android:minHeight="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
-    android:elevation="4dp"
     app:theme="@style/ToolbarStyle"
     app:titleTextColor="?android:attr/textColorPrimaryInverse"
     app:subtitleTextColor="?android:attr/textColorSecondaryInverse"
-    tools:navigationIcon="@drawable/ic_menu"
-    tools:targetApi="lollipop">
-    <!--tools:title="ffff"-->
-    <!--tools:subtitle="dd">-->
+    tools:navigationIcon="@drawable/ic_menu">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/title_container"
