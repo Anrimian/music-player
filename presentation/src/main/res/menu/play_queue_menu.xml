@@ -4,7 +4,7 @@
 
     <item android:id="@+id/menu_save_as_playlist"
         android:title="@string/save_as_play_list"
-        android:icon="@drawable/ic_save"
+        android:icon="@drawable/ic_playlist_plus"
         app:showAsAction="always"/>
 
 </menu>

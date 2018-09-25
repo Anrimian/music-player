@@ -302,6 +302,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return true;
         });
 
+//        View headerView = View.inflate(requireActivity(), R.layout.partial_drawer_headre, null);
+//        navigationView.addHeaderView(headerView);
+        navigationView.inflateHeaderView(R.layout.partial_drawer_header);
+
         drawerToggle = new ActionBarDrawerToggle(requireActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
         DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
 

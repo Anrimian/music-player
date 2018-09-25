@@ -9,7 +9,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -217,7 +216,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem newItem = playQueueEvent.getPlayQueueItem();
-        if (!Objects.equals(newItem, currentItem)) {
+        if (currentItem == null || !currentItem.equals(newItem)) {
             onCurrentCompositionChanged(newItem, playQueueEvent.getTrackPosition());
         }
     }
