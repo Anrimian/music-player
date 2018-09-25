@@ -4,26 +4,17 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
-import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFoundException;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.utils.tree.FileTree;
-import com.github.anrimian.musicplayer.domain.utils.tree.visitors.CollectVisitor;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
@@ -68,13 +59,14 @@ public class LibraryFilesInteractor {
 
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
         return musicProviderRepository.getAllCompositionsInPath(folder.getFullPath())
-                .doOnSuccess(o -> {});//delete recursive TODO finish
+                .flatMap(compositions -> musicProviderRepository.deleteCompositions(compositions)
+                        .toSingleDefault(compositions));
     }
 
     public Single<List<Composition>> addCompositionsToPlayList(String path, PlayList playList) {
         return musicProviderRepository.getAllCompositionsInPath(path)
                 .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
-                                .toSingleDefault(compositions));
+                        .toSingleDefault(compositions));
     }
 
     public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {

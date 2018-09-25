@@ -1,11 +1,12 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 import com.github.anrimian.musicplayer.domain.utils.changes.ChangeType;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,9 +82,7 @@ public class StorageMusicDataSource {
         return getCompositions()
                 .doOnSuccess(compositions -> {
                     for (Composition composition: compositionsToDelete) {
-                        musicProvider.deleteComposition(composition.getFilePath());
-                        fileManager.deleteFile(composition.getFilePath());
-                        compositions.remove(composition.getId());
+                        deleteCompositionInternal(compositions, composition);
                     }
                     compositionSubject.onNext(compositions);
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToDelete));
@@ -95,14 +94,24 @@ public class StorageMusicDataSource {
     public Completable deleteComposition(Composition composition) {
         return getCompositions()
                 .doOnSuccess(compositions -> {
-                    musicProvider.deleteComposition(composition.getFilePath());
-                    fileManager.deleteFile(composition.getFilePath());
-                    compositions.remove(composition.getId());
+                    deleteCompositionInternal(compositions, composition);
                     compositionSubject.onNext(compositions);
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
                 })
                 .toCompletable()
                 .subscribeOn(scheduler);
+    }
+
+    private void deleteCompositionInternal(Map<Long, Composition> compositions,
+                                           Composition composition) {
+        String filePath = composition.getFilePath();
+        File parentDirectory = new File(filePath).getParentFile();
+
+        musicProvider.deleteComposition(filePath);
+        fileManager.deleteFile(filePath);
+        compositions.remove(composition.getId());
+
+        fileManager.deleteEmptyDirectory(parentDirectory);
     }
 
     private void subscribeOnCompositionChanges() {

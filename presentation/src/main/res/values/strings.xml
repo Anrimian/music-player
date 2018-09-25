@@ -57,7 +57,7 @@
     <string name="cancel">Отмена</string>
     <string name="deleting">Удаление</string>
     <string name="delete_composition_template">Удалить композицию %1$s?</string>
-    <string name="delete_folder_template">Удалить папку %1$s и всё её содержимое(%2$s)?</string>
+    <string name="delete_folder_template">Удалить %2$s из папки %1$s?</string>
     <string name="delete_compositions_template">Удалить %1$d композиций?</string>
     <string name="delete_composition_success">Композиция %1$s удалена</string>
     <string name="delete_compositions_success">%1$d композиций удалено</string>

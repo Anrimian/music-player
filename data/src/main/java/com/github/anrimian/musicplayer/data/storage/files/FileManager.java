@@ -12,4 +12,19 @@ public class FileManager {
         //noinspection ResultOfMethodCallIgnored
         file.delete();
     }
+
+
+    public void deleteEmptyDirectory(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                if (fileOrDirectory.isDirectory()) {
+                    deleteEmptyDirectory(child);
+                }
+            }
+            if (fileOrDirectory.listFiles().length == 0) {
+                //noinspection ResultOfMethodCallIgnored
+                fileOrDirectory.delete();
+            }
+        }
+    }
 }
