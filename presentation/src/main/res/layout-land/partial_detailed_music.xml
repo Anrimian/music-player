@@ -169,7 +169,7 @@
 
     <ImageView
         android:id="@+id/btn_actions_menu"
-        style="@style/Toolbar.Button.Overflow"
+        style="@style/Content.Button.Menu"
         android:contentDescription="@string/content_description_menu"
         android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
