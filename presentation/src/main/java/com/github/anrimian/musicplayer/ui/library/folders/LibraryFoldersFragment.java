@@ -47,6 +47,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.AnimationUtils.getDefaultItemAnimator;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -117,6 +118,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(getDefaultItemAnimator());
 
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());

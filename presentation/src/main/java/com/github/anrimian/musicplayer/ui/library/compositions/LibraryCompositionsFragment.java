@@ -39,7 +39,7 @@ import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.AnimationUtils.getDefaultItemAnimator;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -91,6 +91,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(getDefaultItemAnimator());
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 

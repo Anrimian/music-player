@@ -64,6 +64,8 @@ dependencies {
     implementation presentationDependencies.supportMedia
     implementation presentationDependencies.palette
 
+    implementation presentationDependencies.recyclerViewAnimation
+
     implementation presentationDependencies.rxAndroid
     implementation presentationDependencies.rxPermissions
 
