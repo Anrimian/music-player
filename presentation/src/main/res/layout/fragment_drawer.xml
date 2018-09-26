@@ -48,7 +48,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/tv_queue_subtitle"
-                    app:layout_constraintEnd_toEndOf="@id/acv_play_queue"
+                    app:layout_constraintEnd_toStartOf="@id/acv_play_queue"
                     tools:text="fflafff"/>
 
                 <TextView
