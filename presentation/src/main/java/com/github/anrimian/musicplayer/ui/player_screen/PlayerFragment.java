@@ -25,7 +25,6 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -38,7 +37,9 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -53,7 +54,6 @@ import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockSt
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
-import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils;
@@ -71,7 +71,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarMenuVisibi
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
-import com.github.anrimian.musicplayer.ui.utils.views.view_pager.FragmentCreator;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
@@ -100,14 +99,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private static final int NO_ITEM = -1;
     private static final String SELECTED_DRAWER_ITEM = "selected_drawer_item";
     private static final String BOTTOM_SHEET_STATE = "bottom_sheet_state";
-
-    private static final SparseArray<FragmentCreator> fragmentIdMap = new SparseArray<>();
-
-    static {
-        fragmentIdMap.put(R.id.menu_settings, SettingsFragment::new);
-        fragmentIdMap.put(R.id.menu_play_lists, PlayListsFragment::new);
-        fragmentIdMap.put(R.id.menu_library, LibraryFoldersRootFragment::new);
-    }
 
     @InjectPresenter
     PlayerPresenter presenter;
@@ -242,6 +233,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private DrawerLockStateProcessor drawerLockStateProcessor;
 
+    private UiStatePreferences uiStatePreferences;
+
     @ProvidePresenter
     PlayerPresenter providePresenter() {
         return Components.getLibraryComponent().playerPresenter();
@@ -265,7 +258,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        
+
         RxPermissions rxPermissions = new RxPermissions(requireActivity());
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             requireFragmentManager()
@@ -275,6 +268,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return;
         }
         MusicServiceManager.initialize();
+        uiStatePreferences = Components.getAppComponent().uiStatePreferences();
 
         toolbar.init();
 
@@ -302,8 +296,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return true;
         });
 
-//        View headerView = View.inflate(requireActivity(), R.layout.partial_drawer_headre, null);
-//        navigationView.addHeaderView(headerView);
         navigationView.inflateHeaderView(R.layout.partial_drawer_header);
 
         drawerToggle = new ActionBarDrawerToggle(requireActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
@@ -322,9 +314,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 if (itemIdToStart != NO_ITEM) {
-                    FragmentCreator fragmentCreator = fragmentIdMap.get(itemIdToStart);
-                    startFragment(fragmentCreator.createFragment());
-                    itemIdToStart = NO_ITEM;
+                    showScreen(itemIdToStart);
                 }
             }
         });
@@ -410,7 +400,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         Fragment currentFragment = getChildFragmentManager().findFragmentById(R.id.drawer_fragment_container);
         if (currentFragment == null || savedInstanceState == null) {
-            showLibraryScreen();
+            showDrawerScreen(uiStatePreferences.getSelectedDrawerScreen());
         } else {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
         }
@@ -680,10 +670,44 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 R.id.drawer_fragment_container);
     }
 
-    private void showLibraryScreen() {
-        selectedDrawerItemId = R.id.menu_library;
-        navigationView.setCheckedItem(selectedDrawerItemId);
-        startFragment(new LibraryFoldersRootFragment());
+    private void showScreen(int menuItemId) {
+        Fragment fragment = null;
+        int screenId = 0;
+        switch (menuItemId) {
+            case R.id.menu_library: {
+                fragment = new LibraryFoldersRootFragment();
+                screenId = Screens.LIBRARY;
+                break;
+            }
+            case R.id.menu_play_lists: {
+                fragment = new PlayListsFragment();
+                screenId = Screens.PLAY_LISTS;
+                break;
+            }
+        }
+        uiStatePreferences.setSelectedDrawerScreen(screenId);
+        startFragment(fragment);
+    }
+
+    private void showDrawerScreen(int screenId) {
+        int itemId = 0;
+        Fragment fragment = null;
+        switch (screenId) {
+            case Screens.LIBRARY: {
+                itemId = R.id.menu_library;
+                fragment = new LibraryFoldersRootFragment();
+                break;
+            }
+            case Screens.PLAY_LISTS: {
+                itemId = R.id.menu_play_lists;
+                fragment = new PlayListsFragment();
+                break;
+            }
+        }
+
+        selectedDrawerItemId = itemId;
+        navigationView.setCheckedItem(itemId);
+        startFragment(fragment);
     }
 
     private void clearFragment() {
