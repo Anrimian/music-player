@@ -356,8 +356,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
         mlBottomSheet.setClickable(true);
 
-        int bottomSheetState = STATE_COLLAPSED;
-        if (savedInstanceState != null) {
+        int bottomSheetState;
+        if (savedInstanceState == null) {
+            bottomSheetState = uiStatePreferences.isPlayerPanelOpen()?
+                    STATE_EXPANDED: STATE_COLLAPSED;
+            drawerLockStateProcessor.onBottomSheetOpened(uiStatePreferences.isPlayerPanelOpen());
+        } else {
             bottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
         }
         bottomSheetDelegate.onSlide(bottomSheetState == STATE_COLLAPSED ? 0f : 1f);
@@ -369,11 +373,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     case STATE_COLLAPSED: {
                         drawerLockStateProcessor.onBottomSheetOpened(false);
                         bottomSheetDelegate.onSlide(0f);
+                        uiStatePreferences.setPlayerPanelOpen(false);
                         return;
                     }
                     case STATE_EXPANDED: {
                         drawerLockStateProcessor.onBottomSheetOpened(true);
                         bottomSheetDelegate.onSlide(1f);
+                        uiStatePreferences.setPlayerPanelOpen(true);
                     }
                 }
             }

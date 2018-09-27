@@ -19,6 +19,7 @@ public class UiStatePreferences {
     private static final String CURRENT_PLAY_QUEUE_ID = "current_play_queue_id";
     private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
     private static final String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
+    private static final String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
 
     private final SharedPreferencesHelper preferences;
 
@@ -26,6 +27,14 @@ public class UiStatePreferences {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
         this.preferences = new SharedPreferencesHelper(sharedPreferences);
+    }
+
+    public void setPlayerPanelOpen(boolean open) {
+        preferences.putBoolean(IS_PLAYER_PANEL_OPEN, open);
+    }
+
+    public boolean isPlayerPanelOpen() {
+        return preferences.getBoolean(IS_PLAYER_PANEL_OPEN, false);
     }
 
     public void setSelectedDrawerScreen(int screenId) {
