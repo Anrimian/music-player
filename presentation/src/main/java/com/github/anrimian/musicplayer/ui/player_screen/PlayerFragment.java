@@ -48,6 +48,7 @@ import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
@@ -681,7 +682,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         int screenId = 0;
         switch (menuItemId) {
             case R.id.menu_library: {
-                fragment = new LibraryFoldersRootFragment();
+                fragment = getLibraryFragment();
                 screenId = Screens.LIBRARY;
                 break;
             }
@@ -701,7 +702,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         switch (screenId) {
             case Screens.LIBRARY: {
                 itemId = R.id.menu_library;
-                fragment = new LibraryFoldersRootFragment();
+                fragment = getLibraryFragment();
                 break;
             }
             case Screens.PLAY_LISTS: {
@@ -714,6 +715,20 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         selectedDrawerItemId = itemId;
         navigationView.setCheckedItem(itemId);
         startFragment(fragment);
+    }
+
+    private Fragment getLibraryFragment() {
+        switch (uiStatePreferences.getSelectedLibraryScreen()) {
+            case Screens.LIBRARY_COMPOSITIONS: {
+                return new LibraryCompositionsFragment();
+            }
+            case Screens.LIBRARY_FOLDERS: {
+                return new LibraryFoldersRootFragment();
+            }
+            default: {
+                return new LibraryCompositionsFragment();
+            }
+        }
     }
 
     private void clearFragment() {

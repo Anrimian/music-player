@@ -19,6 +19,7 @@ public class UiStatePreferences {
     private static final String CURRENT_PLAY_QUEUE_ID = "current_play_queue_id";
     private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
     private static final String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
+    private static final String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
     private static final String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
 
     private final SharedPreferencesHelper preferences;
@@ -43,6 +44,14 @@ public class UiStatePreferences {
 
     public int getSelectedDrawerScreen() {
         return preferences.getInt(SELECTED_DRAWER_SCREEN, Screens.LIBRARY);
+    }
+
+    public void setSelectedLibraryScreen(int screenId) {
+        preferences.putInt(SELECTED_LIBRARY_SCREEN, screenId);
+    }
+
+    public int getSelectedLibraryScreen() {
+        return preferences.getInt(SELECTED_LIBRARY_SCREEN, Screens.LIBRARY_COMPOSITIONS);
     }
 
     public void setTrackPosition(long position) {
