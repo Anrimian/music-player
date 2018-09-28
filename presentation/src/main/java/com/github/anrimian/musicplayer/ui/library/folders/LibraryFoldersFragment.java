@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +31,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment;
+import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
@@ -72,6 +72,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     @BindView(R.id.list_container)
     CoordinatorLayout clListContainer;
 
+    private AdvancedToolbar advancedToolbar;
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
     private HeaderViewWrapper headerViewWrapper;
@@ -113,6 +114,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        advancedToolbar = requireActivity().findViewById(R.id.toolbar);
+
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
 
@@ -148,7 +151,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.library_files_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.menu_action_search);
+/*        MenuItem searchItem = menu.findItem(R.id.menu_action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
 //        String searchQuery = presenter.getSearchQuery();
 //        if (!TextUtils.isEmpty(searchQuery)) {
@@ -171,7 +174,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
                 //presenter.startSearchWithDelay(newText);it notify when search view closed, first fix this
                 return true;
             }
-        });
+        });*/
 //        searchView.setOnSearchClickListener(v -> searchView.setQuery(presenter.getSearchQuery(), false));
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -182,6 +185,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         switch (id) {
             case R.id.menu_order: {
                 presenter.onOrderMenuItemClicked();
+                return true;
+            }
+            case R.id.menu_action_search: {
+                advancedToolbar.setSearchModeEnabled(true);
                 return true;
             }
             default: return super.onOptionsItemSelected(item);

@@ -1,11 +1,8 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
-import android.support.annotation.Nullable;
 import android.support.v7.widget.ActionMenuView;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 
-import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 
 import static android.support.v4.view.ViewCompat.isLaidOut;
 import static android.view.View.INVISIBLE;
@@ -17,21 +14,19 @@ import static android.view.View.VISIBLE;
 
 public class ToolbarMenuVisibilityDelegate implements SlideDelegate {
 
-    private final Toolbar toolbar;
+    private final AdvancedToolbar toolbar;
 
-    private ActionMenuView actionMenuView;
+    private ActionMenuView view;
 
-    public ToolbarMenuVisibilityDelegate(Toolbar toolbar) {
+    public ToolbarMenuVisibilityDelegate(AdvancedToolbar toolbar) {
         this.toolbar = toolbar;
     }
 
     @Override
     public void onSlide(float slideOffset) {
-        ActionMenuView view = getActionMenuView();
         if (view == null) {
-            toolbar.inflateMenu(R.menu.empty_stub_menu);
+            view = toolbar.getActionMenuView();
         }
-        view = getActionMenuView();
         if (view != null) {
             if (isLaidOut(view)) {
                 makeVisible(slideOffset);
@@ -42,21 +37,9 @@ public class ToolbarMenuVisibilityDelegate implements SlideDelegate {
     }
 
     private void makeVisible(float slideOffset) {
-        actionMenuView.setVisibility(slideOffset == 0 ? INVISIBLE : VISIBLE);
-        actionMenuView.setAlpha(slideOffset);
-    }
-
-    @Nullable
-    private ActionMenuView getActionMenuView() {
-        if (actionMenuView == null) {
-            for (int i = 0; i < toolbar.getChildCount(); i++) {
-                View child = toolbar.getChildAt(i);
-                if (child instanceof ActionMenuView) {
-                    actionMenuView = (ActionMenuView) child;
-                    break;
-                }
-            }
+        if (!toolbar.isInSearchMode()) {
+            view.setVisibility(slideOffset == 0 ? INVISIBLE : VISIBLE);
+            view.setAlpha(slideOffset);
         }
-        return actionMenuView;
     }
 }
