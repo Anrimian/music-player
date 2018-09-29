@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
@@ -9,7 +10,6 @@ import com.github.anrimian.musicplayer.infrastructure.service.MusicServiceManage
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
 
 import javax.inject.Singleton;
@@ -40,6 +40,8 @@ public interface AppComponent {
     PlayListsPresenter playListsPresenter();
     CreatePlayListPresenter createPlayListsPresenter();
     ChoosePlayListPresenter choosePlayListPresenter();
+
+    UiStatePreferences uiStatePreferences();
 
     void inject(MusicService musicService);
 }

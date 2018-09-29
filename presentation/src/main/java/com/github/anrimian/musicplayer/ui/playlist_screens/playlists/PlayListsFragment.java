@@ -28,6 +28,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.ui.common.AnimationUtils.getDefaultItemAnimator;
+
 public class PlayListsFragment extends MvpAppCompatFragment implements PlayListsView {
 
     @InjectPresenter
@@ -72,6 +74,7 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(getDefaultItemAnimator());
 
         FragmentManager fm = requireFragmentManager();
         fm.addOnBackStackChangedListener(() -> {

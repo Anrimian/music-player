@@ -33,6 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
+import static com.github.anrimian.musicplayer.ui.common.AnimationUtils.getDefaultItemAnimator;
 
 public class PlayListFragment extends MvpAppCompatFragment implements PlayListView {
 
@@ -84,6 +85,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(getDefaultItemAnimator());
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
