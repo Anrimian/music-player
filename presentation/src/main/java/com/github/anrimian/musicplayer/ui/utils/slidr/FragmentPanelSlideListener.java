@@ -39,7 +39,7 @@ class FragmentPanelSlideListener implements SliderPanel.OnPanelSlideListener {
             config.getListener().onSlideClosed();
         }
 
-        FragmentManager fm = fragment.getFragmentManager();
+        FragmentManager fm = fragment.requireFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
             fm.popBackStack();
         }

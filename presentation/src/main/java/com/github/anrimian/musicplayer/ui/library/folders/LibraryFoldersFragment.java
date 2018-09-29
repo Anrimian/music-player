@@ -36,7 +36,10 @@ import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourc
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrFragment;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
+import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
 
@@ -70,6 +73,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @BindView(R.id.list_container)
     CoordinatorLayout clListContainer;
+
+    @BindView(R.id.content_container)
+    View contentContainer;
 
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
@@ -139,6 +145,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
                 .findFragmentByTag(SELECT_PLAYLIST_FOR_FOLDER_TAG);
         if (folderPlayListDialog != null) {
             folderPlayListDialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
+        }
+
+        if (getPath() != null) {//TODO root path -> not root path change case
+            SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
+            SlidrFragment.replace(this, contentContainer, slidrConfig);
         }
     }
 

@@ -15,6 +15,13 @@ public class SlidrFragment {
     @NonNull
     public static SlidrInterface replace(@NonNull Fragment fragment,
                                          @NonNull View oldScreen,
+                                         @NonNull SlidrConfig config) {
+        return replace(fragment, oldScreen, config, null);
+    }
+
+    @NonNull
+    public static SlidrInterface replace(@NonNull Fragment fragment,
+                                         @NonNull View oldScreen,
                                          @NonNull SlidrConfig config,
                                          @Nullable SlideListener slideListener) {
         ViewGroup parent = (ViewGroup) oldScreen.getParent();

@@ -11,7 +11,6 @@ public class Constants {
     public interface Tags {
         String ORDER_TAG = "order_tag";
         String SELECT_PLAYLIST_TAG = "select_playlist_tag";
-        @Deprecated
         String SELECT_PLAYLIST_FOR_FOLDER_TAG = "select_playlist_for_folder_tag";
         String CREATE_PLAYLIST_TAG = "create_playlist_tag";
     }
