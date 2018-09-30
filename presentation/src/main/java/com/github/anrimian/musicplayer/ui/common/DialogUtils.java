@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.common;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -20,20 +19,16 @@ public class DialogUtils {
                                         Runnable deleteCallback) {
         String message = compositions.size() == 1?
                 context.getString(R.string.delete_composition_template, formatCompositionName(compositions.get(0))):
-                context.getString(R.string.delete_compositions_template, compositions.size());
+                context.getString(R.string.delete_template, getDativCompositionsMessage(context, compositions.size()));
         showConfirmDeleteDialog(context, message, deleteCallback);
     }
 
     public static void showConfirmDeleteDialog(Context context,
                                                FolderFileSource folderFileSource,
                                                Runnable deleteCallback) {
-        String compositionsCount = context.getResources().getQuantityString(
-                R.plurals.compositions_count,
-                folderFileSource.getFilesCount(),
-                folderFileSource.getFilesCount());
         String message = context.getString(R.string.delete_folder_template,
                 getLastPathSegment(folderFileSource.getFullPath()),
-                compositionsCount);
+                getDativCompositionsMessage(context, folderFileSource.getFilesCount()));
         showConfirmDeleteDialog(context, message, deleteCallback);
     }
 
@@ -46,5 +41,9 @@ public class DialogUtils {
                 .setPositiveButton(R.string.delete, (dialog, which) -> deleteCallback.run())
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private static String getDativCompositionsMessage(Context context, int count) {
+        return context.getResources().getQuantityString(R.plurals.compositions_count_dativ, count, count);
     }
 }

@@ -58,7 +58,7 @@
     <string name="deleting">Удаление</string>
     <string name="delete_composition_template">Удалить композицию %1$s?</string>
     <string name="delete_folder_template">Удалить %2$s из папки %1$s?</string>
-    <string name="delete_compositions_template">Удалить %1$d композиций?</string>
+    <string name="delete_template">Удалить %1$s?</string>
     <string name="delete_composition_success">Композиция %1$s удалена</string>
     <string name="delete_compositions_success">%1$d композиций удалено</string>
     <string name="search">Поиск</string>
@@ -68,6 +68,13 @@
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
+        <item quantity="few">%1$s композиции</item>
+        <item quantity="many">%1$s композиций</item>
+        <item quantity="other">%1$s композиций</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s композицию</item>
         <item quantity="few">%1$s композиции</item>
         <item quantity="many">%1$s композиций</item>
         <item quantity="other">%1$s композиций</item>
