@@ -457,12 +457,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public boolean onBackPressed() {
-        if (toolbar.isInSearchMode()) {
-            toolbar.setSearchModeEnabled(false);
-            return true;
-        }
         if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
+            return true;
+        }
+        if (toolbar.isInSearchMode()) {
+            toolbar.setSearchModeEnabled(false);
             return true;
         }
         FragmentManager fm = getChildFragmentManager();

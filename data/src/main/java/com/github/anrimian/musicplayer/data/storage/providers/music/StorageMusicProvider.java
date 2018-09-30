@@ -56,8 +56,8 @@ public class StorageMusicProvider {
             cursor = contentResolver.query(
                     uri,
                     null,
-                    null,
-                    null,
+                    MediaStore.Audio.Media.IS_MUSIC + " = ?",
+                    new String[] { String.valueOf(1) },
                     null);
             if (cursor == null) {
                 return emptyMap();
