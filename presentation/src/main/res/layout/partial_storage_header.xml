@@ -8,30 +8,33 @@
     <ImageView
         android:id="@+id/iv_folder"
         style="@style/Content.Image.Small"
-        android:layout_margin="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="8dp"
         android:tint="@android:color/darker_gray"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="@string/folder"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_folder_open"
-        android:contentDescription="@string/folder" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:srcCompat="@drawable/ic_folder_open"/>
 
     <TextView
         android:id="@+id/tv_parent_path"
-        android:transitionName="@string/path_transition_element"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
         android:singleLine="true"
         android:ellipsize="end"
-        style="@style/Content.Text.Subtitle"
+        style="@style/Content.Text.Small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_folder"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_folder"
         tools:text="path/path"
         tools:targetApi="lollipop" />
 
