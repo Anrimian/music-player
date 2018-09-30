@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlists;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,17 +17,17 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayListHelper;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.github.anrimian.musicplayer.ui.common.AnimationUtils.getDefaultItemAnimator;
 
 public class PlayListsFragment extends MvpAppCompatFragment implements PlayListsView {
 
@@ -74,7 +73,6 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(getDefaultItemAnimator());
 
         FragmentManager fm = requireFragmentManager();
         fm.addOnBackStackChangedListener(() -> {
@@ -110,9 +108,7 @@ public class PlayListsFragment extends MvpAppCompatFragment implements PlayLists
 
     @Override
     public void updateList(List<PlayList> oldList, List<PlayList> newList) {
-        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
-        adapter.updateList(oldList, newList);
-        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+        DiffUtilHelper.update(oldList, newList, PlayListHelper::areSourcesTheSame, recyclerView);
     }
 
     private void goToPlayListScreen(PlayList playList) {

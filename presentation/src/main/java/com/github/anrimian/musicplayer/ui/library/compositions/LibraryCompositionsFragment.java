@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -23,6 +22,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment;
@@ -30,6 +30,7 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
@@ -39,7 +40,6 @@ import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.AnimationUtils.getDefaultItemAnimator;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -91,7 +91,6 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(getDefaultItemAnimator());
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
@@ -154,9 +153,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
     @Override
     public void updateList(List<Composition> oldList, List<Composition> newList) {
-        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
-        adapter.updateList(oldList, newList);
-        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+        DiffUtilHelper.update(oldList, newList, CompositionHelper::areSourcesTheSame, recyclerView);
     }
 
     @Override

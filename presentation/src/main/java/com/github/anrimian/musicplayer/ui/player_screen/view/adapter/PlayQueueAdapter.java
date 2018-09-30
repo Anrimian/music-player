@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
@@ -75,6 +76,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         return musicList.size();
     }
 
+    //TODO optimize
     public void onCurrentItemChanged(PlayQueueItem item) {
         int oldPosition = musicList.indexOf(currentItem);
         currentItem = item;
@@ -86,9 +88,9 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
     }
 
     public void updatePlayList(List<PlayQueueItem> oldPlayList, List<PlayQueueItem> newPlayList) {
-        //TODO detect modify
-        DiffUtil.DiffResult result = calculateDiff(new SimpleDiffCallback<>(oldPlayList, newPlayList), false);
-        result.dispatchUpdatesTo(this);
+        calculateDiff(new SimpleDiffCallback<>(
+                oldPlayList, newPlayList, PlayQueueItemHelper::areSourcesTheSame), false)
+                .dispatchUpdatesTo(this);
     }
 
     public void setOnCompositionClickListener(OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener) {

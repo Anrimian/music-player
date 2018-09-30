@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
@@ -18,8 +20,12 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.endless_scro
 
 import java.util.List;
 
+import io.reactivex.Scheduler;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 import static android.support.v7.util.DiffUtil.calculateDiff;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.hasChanges;
 
 /**
  * Created on 31.10.2017.
@@ -98,11 +104,6 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         }
     }
 
-    public void updateList(List<FileSource> oldList, List<FileSource> sourceList) {
-        calculateDiff(new SimpleDiffCallback<>(oldList, sourceList, this::areSourcedTheSame))
-                .dispatchUpdatesTo(this);
-    }
-
     public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
     }
@@ -125,19 +126,5 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
 
     public void setOnAddFolderToPlaylistClickListener(OnItemClickListener<String> onAddFolderToPlaylistClickListener) {
         this.onAddFolderToPlaylistClickListener = onAddFolderToPlaylistClickListener;
-    }
-
-    private boolean areSourcedTheSame(FileSource oldSource, FileSource newSource) {
-        if (oldSource.getClass().equals(newSource.getClass())) {
-            if (oldSource instanceof FolderFileSource) {
-                return !FolderHelper.hasChanges(((FolderFileSource) oldSource),
-                        ((FolderFileSource) newSource));
-            }
-            if (oldSource instanceof MusicFileSource) {
-                return !hasChanges(((MusicFileSource) oldSource).getComposition(),
-                        ((MusicFileSource) newSource).getComposition());
-            }
-        }
-        return false;
     }
 }

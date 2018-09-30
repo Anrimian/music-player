@@ -20,6 +20,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -514,7 +515,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showCurrentQueueItem(PlayQueueItem item, int position) {
+    public void showCurrentQueueItem(PlayQueueItem item) {
         Composition composition = item.getComposition();
         tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
@@ -523,7 +524,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ImageFormatUtils.displayImage(ivMusicIcon, composition);
 
         playQueueAdapter.onCurrentItemChanged(item);
+    }
 
+    @Override
+    public void scrollQueueToPosition(int position) {
         if (position >= playQueueLayoutManager.findLastVisibleItemPosition()) {
             playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
         } else {
@@ -550,10 +554,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         if (active) {
             int selectedColor = getColorFromAttr(requireContext(), R.attr.colorAccent);
             btnInfinitePlay.setColorFilter(selectedColor);
-            btnInfinitePlay.setOnClickListener(v -> presenter.onDisableInfinitePlayingButtonClicked());
+            btnInfinitePlay.setOnClickListener(v -> presenter.onInfiniteButtonClicked(false));
         } else {
             btnInfinitePlay.clearColorFilter();
-            btnInfinitePlay.setOnClickListener(v -> presenter.onEnableInfinitePlayingButtonClicked());
+            btnInfinitePlay.setOnClickListener(v -> presenter.onInfiniteButtonClicked(true));
         }
     }
 
@@ -562,10 +566,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         if (active) {
             int selectedColor = getColorFromAttr(requireContext(), R.attr.colorAccent);
             btnRandomPlay.setColorFilter(selectedColor);
-            btnRandomPlay.setOnClickListener(v -> presenter.onDisableRandomPlayingButtonClicked());
+            btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(false));
         } else {
             btnRandomPlay.clearColorFilter();
-            btnRandomPlay.setOnClickListener(v -> presenter.onEnableRandomPlayingButtonClicked());
+            btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(true));
         }
     }
 

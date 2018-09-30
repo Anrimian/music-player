@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -28,6 +27,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment;
@@ -37,6 +37,7 @@ import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWra
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrFragment;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -50,7 +51,6 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.AnimationUtils.getDefaultItemAnimator;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -127,7 +127,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(getDefaultItemAnimator());
 
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
@@ -282,9 +281,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @Override
     public void updateList(List<FileSource> oldList, List<FileSource> newList) {
-        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
-        adapter.updateList(oldList, newList);
-        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+        DiffUtilHelper.update(oldList, newList, FolderHelper::areSourcesTheSame, recyclerView);
     }
 
     @Override

@@ -51,11 +51,6 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         return musicList.size();
     }
 
-    public void updateList(List<Composition> oldList, List<Composition> sourceList) {
-        calculateDiff(new SimpleDiffCallback<>(oldList, sourceList, this::areSourcedTheSame))
-                .dispatchUpdatesTo(this);
-    }
-
     public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
     }
@@ -66,9 +61,5 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
         this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
-    }
-
-    private boolean areSourcedTheSame(Composition oldSource, Composition newSource) {
-        return !hasChanges(oldSource, newSource);
     }
 }

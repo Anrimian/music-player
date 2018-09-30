@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -19,9 +18,11 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrFragment;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -33,7 +34,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
-import static com.github.anrimian.musicplayer.ui.common.AnimationUtils.getDefaultItemAnimator;
 
 public class PlayListFragment extends MvpAppCompatFragment implements PlayListView {
 
@@ -85,7 +85,6 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(getDefaultItemAnimator());
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
@@ -121,9 +120,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
 
     @Override
     public void updateList(List<Composition> oldList, List<Composition> newList) {
-        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
-        adapter.updateList(oldList, newList);
-        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+        DiffUtilHelper.update(oldList, newList, CompositionHelper::areSourcesTheSame, recyclerView);
     }
 
     @Override

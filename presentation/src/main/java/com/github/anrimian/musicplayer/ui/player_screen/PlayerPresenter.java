@@ -9,13 +9,16 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.ListChangeCalculator;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -61,7 +64,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
     }
 
-    void onStart() {
+    void onStart() {//TODO unnecessary scroll to position
         subscribeOnPlayerStateChanges();
         subscribeOnPlayQueue();
         subscribeOnCurrentCompositionChanging();
@@ -90,24 +93,14 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.skipToNext();
     }
 
-    void onEnableInfinitePlayingButtonClicked() {
-        musicPlayerInteractor.setInfinitePlayingEnabled(true);
-        getViewState().showInfinitePlayingButton(true);
+    void onInfiniteButtonClicked(boolean enable) {
+        musicPlayerInteractor.setInfinitePlayingEnabled(enable);
+        getViewState().showInfinitePlayingButton(enable);
     }
 
-    void onDisableInfinitePlayingButtonClicked() {
-        musicPlayerInteractor.setInfinitePlayingEnabled(false);
-        getViewState().showInfinitePlayingButton(false);
-    }
-
-    void onEnableRandomPlayingButtonClicked() {
-        musicPlayerInteractor.setRandomPlayingEnabled(true);
-        getViewState().showRandomPlayingButton(true);
-    }
-
-    void onDisableRandomPlayingButtonClicked() {
-        musicPlayerInteractor.setRandomPlayingEnabled(false);
-        getViewState().showRandomPlayingButton(false);
+    void onRandomPlayingButtonClicked(boolean enable) {
+        musicPlayerInteractor.setRandomPlayingEnabled(enable);
+        getViewState().showRandomPlayingButton(enable);
     }
 
     void onShareCompositionButtonClicked() {
@@ -229,12 +222,14 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         }
         getViewState().showMusicControls(currentItem != null);
         if (newItem != null) {
-            Integer position = musicPlayerInteractor.getQueuePosition(newItem);
-            if (position != null) {
-                getViewState().showCurrentQueueItem(newItem, position);
-            }
+            getViewState().showCurrentQueueItem(newItem);
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
             subscribeOnTrackPositionChanging();
+
+            Integer position = musicPlayerInteractor.getQueuePosition(newItem);
+            if (position != null) {
+                getViewState().scrollQueueToPosition(position);
+            }
         }
     }
 
@@ -270,6 +265,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         playQueue.addAll(newPlayQueue);
 
         getViewState().updatePlayQueue(oldPlayList, playQueue);
+
+        Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
+        if (position != null) {
+            getViewState().scrollQueueToPosition(position);
+        }
     }
 
     private void subscribeOnTrackPositionChanging() {

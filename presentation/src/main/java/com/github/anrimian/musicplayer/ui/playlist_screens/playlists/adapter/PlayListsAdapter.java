@@ -46,13 +46,4 @@ public class PlayListsAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
     public void setOnItemClickListener(OnItemClickListener<PlayList> onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
-
-    public void updateList(List<PlayList> oldList, List<PlayList> sourceList) {
-        calculateDiff(new SimpleDiffCallback<>(oldList, sourceList, this::areSourcedTheSame), false)
-                .dispatchUpdatesTo(this);
-    }
-
-    private boolean areSourcedTheSame(PlayList oldSource, PlayList newSource) {
-        return !hasChanges(oldSource, newSource);
-    }
 }

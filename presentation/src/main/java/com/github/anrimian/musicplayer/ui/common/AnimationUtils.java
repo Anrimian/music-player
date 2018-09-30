@@ -8,7 +8,7 @@ public class AnimationUtils {
 
     private static final int ANIMATION_DURATION = 250;
 
-    public static RecyclerView.ItemAnimator getDefaultItemAnimator() {
+    public static RecyclerView.ItemAnimator getStartItemAnimator() {
         RecyclerView.ItemAnimator itemAnimator = new SlideInUpAnimator();
         itemAnimator.setAddDuration(ANIMATION_DURATION);
         itemAnimator.setChangeDuration(ANIMATION_DURATION);

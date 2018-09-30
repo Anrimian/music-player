@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
+import android.support.v7.util.DiffUtil;
+
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
@@ -31,7 +33,10 @@ public interface PlayerView extends MvpView {
     void showMusicControls(boolean show);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentQueueItem(PlayQueueItem item, int position);
+    void showCurrentQueueItem(PlayQueueItem item);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void scrollQueueToPosition(int position);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void bindPlayList(List<PlayQueueItem> currentPlayList);

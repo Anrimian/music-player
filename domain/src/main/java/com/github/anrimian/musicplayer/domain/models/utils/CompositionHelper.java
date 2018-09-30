@@ -10,6 +10,11 @@ import javax.annotation.Nonnull;
 
 public class CompositionHelper {
 
+
+    public static boolean areSourcesTheSame(@Nonnull Composition first, @Nonnull Composition second) {
+        return !hasChanges(first, second);
+    }
+
     public static boolean hasChanges(@Nonnull Composition first, @Nonnull Composition second) {
         return !Objects.equals(first.getAlbum(), second.getAlbum())
                 || !Objects.equals(first.getArtist(), second.getArtist())

@@ -8,6 +8,10 @@ import javax.annotation.Nonnull;
 
 public class PlayListHelper {
 
+    public static boolean areSourcesTheSame(PlayList oldSource, PlayList newSource) {
+        return !hasChanges(oldSource, newSource);
+    }
+
     public static boolean hasChanges(@Nonnull PlayList first, @Nonnull PlayList second) {
         return !Objects.equals(first.getName(), second.getName())
                 || !Objects.equals(first.getDateAdded(), second.getDateAdded())
