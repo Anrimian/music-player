@@ -126,21 +126,12 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     private void onFragmentStackChanged() {
-//        float end = fragmentManager.getBackStackEntryCount() == 0? 0f: 1f;
-//        if (end == 0f && lockArrowFunction.isLocked()) {
-//            return;
-//        }
         boolean isRoot = fragmentManager.getBackStackEntryCount() == 0;
-        if (!isRoot && lockArrowFunction.isLocked()) {
+        if (isRoot && lockArrowFunction.isLocked()) {
             return;
         }
 
         setCommandButtonMode(isRoot);
-
-//        float start = drawerArrowDrawable.getProgress();
-//        ObjectAnimator objectAnimator = ofFloat(drawerArrowDrawable, "progress", start, end);
-//        objectAnimator.setDuration(TOOLBAR_ARROW_ANIMATION_TIME);
-//        objectAnimator.start();
     }
 
     private void setCommandButtonMode(boolean isNormal) {
