@@ -7,7 +7,6 @@ import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
@@ -20,6 +19,9 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
+    void showEmptySearchResult();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showList();

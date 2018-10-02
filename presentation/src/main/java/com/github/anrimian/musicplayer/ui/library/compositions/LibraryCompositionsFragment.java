@@ -57,6 +57,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     @BindView(R.id.list_container)
     CoordinatorLayout clListContainer;
 
+    private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
 
@@ -84,8 +85,10 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.compositions);
+        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
+        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
 
         progressViewWrapper = new ProgressViewWrapper(view);
 
@@ -120,6 +123,10 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
                 presenter.onOrderMenuItemClicked();
                 return true;
             }
+            case R.id.menu_search: {
+                toolbar.setSearchModeEnabled(true);
+                return true;
+            }
             default: return super.onOptionsItemSelected(item);
         }
     }
@@ -129,6 +136,12 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         fab.setVisibility(View.GONE);
         progressViewWrapper.hideAll();
         progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
+    }
+
+    @Override
+    public void showEmptySearchResult() {
+        fab.setVisibility(View.GONE);
+        progressViewWrapper.showMessage(R.string.compositions_for_search_not_found, false);
     }
 
     @Override

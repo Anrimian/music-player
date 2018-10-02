@@ -7,6 +7,9 @@ import android.support.annotation.DimenRes;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 /**
  * Created on 16.02.2017.
@@ -41,5 +44,28 @@ public class AndroidUtils {
         TypedValue typedValue = new TypedValue();
         resources.getValue(resId, typedValue, true);
         return typedValue.getFloat();
+    }
+
+    public static boolean isKeyboardWasShown(View view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            return imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+        return false;
+    }
+
+    public static void showKeyboard(Context context) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
+    }
+
+    public static void hideKeyboard(EditText editText) {
+        InputMethodManager imm = (InputMethodManager) editText.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null && imm.isActive()) {
+            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        }
     }
 }

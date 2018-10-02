@@ -20,7 +20,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -285,6 +284,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
 
+        //TODO  also lock when toolbar is in search mode
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
         drawerLockStateProcessor.setupWithFragmentManager(getChildFragmentManager());
 
@@ -460,6 +460,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public boolean onBackPressed() {
         if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
+            return true;
+        }
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
             return true;
         }
         if (toolbar.isInSearchMode()) {

@@ -3,12 +3,11 @@ package com.github.anrimian.musicplayer.ui.library.compositions;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryCompositionsInteractor;
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -40,6 +39,9 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
+
+    @Nullable
+    private String searchText;
 
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
@@ -106,6 +108,13 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
                         this::onAddingToPlayListError);
     }
 
+    void onSearchTextChanged(String text) {
+        if (!TextUtils.equals(searchText, text)) {
+            searchText = text;
+            subscribeOnCompositions();
+        }
+    }
+
     private void deletePreparedCompositions() {
         interactor.deleteCompositions(compositionsToDelete)
                 .observeOn(uiScheduler)
@@ -137,7 +146,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
             getViewState().showLoading();
         }
         dispose(compositionsDisposable, presenterDisposable);
-        compositionsDisposable = interactor.getCompositionsObservable()
+        compositionsDisposable = interactor.getCompositionsObservable(searchText)
                 .observeOn(uiScheduler)
                 .subscribe(this::onCompositionsReceived);
         presenterDisposable.add(compositionsDisposable);
@@ -152,7 +161,11 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         getViewState().updateList(oldList, newCompositions);
 
         if (newCompositions.isEmpty()) {
-            getViewState().showEmptyList();
+            if (TextUtils.isEmpty(searchText)) {
+                getViewState().showEmptyList();
+            } else {
+                getViewState().showEmptySearchResult();
+            }
         } else {
             getViewState().showList();
         }

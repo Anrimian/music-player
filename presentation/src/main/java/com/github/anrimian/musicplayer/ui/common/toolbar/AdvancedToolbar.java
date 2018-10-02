@@ -2,23 +2,32 @@ package com.github.anrimian.musicplayer.ui.common.toolbar;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher;
+import com.github.anrimian.musicplayer.utils.AndroidUtils;
 
 import static android.animation.ObjectAnimator.ofFloat;
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.Constants.Animation.TOOLBAR_ARROW_ANIMATION_TIME;
 
 public class AdvancedToolbar extends Toolbar {
+
+    private static final String IS_IN_SEARCH_MODE = "is_in_search_mode";
+    private static final String IS_KEYBOARD_SHOWN = "is_keyboard_shown";
 
     private TextView tvTitle;
     private TextView tvSubtitle;
@@ -30,6 +39,9 @@ public class AdvancedToolbar extends Toolbar {
     private FragmentManager fragmentManager;
     private DrawerArrowDrawable drawerArrowDrawable;
     private LockArrowInBackStateFunction lockArrowFunction;
+
+    private Callback<String> textChangeListener;
+    private Callback<String> textConfirmListener;
 
     private boolean isInSearchMode;
 
@@ -51,6 +63,8 @@ public class AdvancedToolbar extends Toolbar {
         titleContainer = findViewById(R.id.title_container);
         actionIcon = findViewById(R.id.action_icon);
         etSearch = findViewById(R.id.et_search);
+        etSearch.addTextChangedListener(new SimpleTextWatcher(this::onSearchTextChanged));
+        etSearch.setOnEditorActionListener(this::onSearchTextViewAction);
         etSearch.setVisibility(INVISIBLE);
         actionIcon.setVisibility(GONE);
         setTitle("");//setSupportActionBar() set app title to null title in action bar
@@ -67,6 +81,10 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     public void setSearchModeEnabled(boolean enabled) {
+        setSearchModeEnabled(enabled, true);
+    }
+
+    public void setSearchModeEnabled(boolean enabled, boolean showKeyboard) {
         isInSearchMode = enabled;
         etSearch.setVisibility(enabled? VISIBLE: GONE);
         tvTitle.setVisibility(enabled? GONE: VISIBLE);
@@ -74,6 +92,36 @@ public class AdvancedToolbar extends Toolbar {
         actionIcon.setVisibility(enabled? GONE: VISIBLE);
         getActionMenuView().setVisibility(enabled? GONE: VISIBLE);
         setCommandButtonMode(!enabled);
+        if (enabled) {
+            etSearch.requestFocus();
+            if (showKeyboard){
+                AndroidUtils.showKeyboard(etSearch.getContext());
+            }
+        } else {
+            etSearch.setText(null);
+            AndroidUtils.hideKeyboard(etSearch);//TODO also hide in onPause() or smth
+        }
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("superState", super.onSaveInstanceState());
+        bundle.putBoolean(IS_IN_SEARCH_MODE, isInSearchMode);
+        bundle.putBoolean(IS_KEYBOARD_SHOWN, AndroidUtils.isKeyboardWasShown(etSearch));
+        return bundle;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
+            Bundle bundle = (Bundle) state;
+            boolean isInSearchMode = bundle.getBoolean(IS_IN_SEARCH_MODE);
+            boolean isKeyboardShown = bundle.getBoolean(IS_KEYBOARD_SHOWN);
+            setSearchModeEnabled(isInSearchMode, isKeyboardShown);
+            state = bundle.getParcelable("superState");
+        }
+        super.onRestoreInstanceState(state);
     }
 
     @Override
@@ -125,6 +173,14 @@ public class AdvancedToolbar extends Toolbar {
         return actionMenuView;
     }
 
+    public void setTextChangeListener(Callback<String> textChangeListener) {
+        this.textChangeListener = textChangeListener;
+    }
+
+    public void setTextConfirmListener(Callback<String> textConfirmListener) {
+        this.textConfirmListener = textConfirmListener;
+    }
+
     private void onFragmentStackChanged() {
         boolean isRoot = fragmentManager.getBackStackEntryCount() == 0;
         if (isRoot && lockArrowFunction.isLocked()) {
@@ -151,6 +207,20 @@ public class AdvancedToolbar extends Toolbar {
             }
         }
         return null;
+    }
+
+    private boolean onSearchTextViewAction(TextView v, int actionId, KeyEvent event) {
+        if (textConfirmListener != null) {
+            textConfirmListener.call(v.getText().toString());
+            return true;
+        }
+        return true;
+    }
+
+    private void onSearchTextChanged(String text) {
+        if (textChangeListener != null) {
+            textChangeListener.call(text);
+        }
     }
 
     public interface LockArrowInBackStateFunction {

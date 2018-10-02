@@ -6,7 +6,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -26,8 +25,8 @@ public class LibraryCompositionsInteractor {
         this.settingsRepository = settingsRepository;
     }
 
-    public Observable<List<Composition>> getCompositionsObservable() {
-        return musicProviderRepository.getAllCompositionsObservable(null);
+    public Observable<List<Composition>> getCompositionsObservable(String searchText) {
+        return musicProviderRepository.getAllCompositionsObservable(searchText);
     }
 
     public Completable play(List<Composition> list) {

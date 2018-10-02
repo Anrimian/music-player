@@ -78,7 +78,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     @BindView(R.id.content_container)
     View contentContainer;
 
-    private AdvancedToolbar advancedToolbar;
+    private AdvancedToolbar toolbar;
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
     private HeaderViewWrapper headerViewWrapper;
@@ -120,7 +120,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        advancedToolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar = requireActivity().findViewById(R.id.toolbar);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
@@ -197,8 +197,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
                 presenter.onOrderMenuItemClicked();
                 return true;
             }
-            case R.id.menu_action_search: {
-                advancedToolbar.setSearchModeEnabled(true);
+            case R.id.menu_search: {
+                presenter.onSearchButtonClicked();
                 return true;
             }
             default: return super.onOptionsItemSelected(item);
@@ -272,11 +272,20 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @Override
     public boolean onBackPressed() {
+        if (toolbar.isInSearchMode()) {
+            toolbar.setSearchModeEnabled(false);
+            return true;
+        }
         if (getPath() != null) {
             presenter.onBackPathButtonClicked();
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void showSearchMode(boolean show) {
+        toolbar.setSearchModeEnabled(show);
     }
 
     @Override

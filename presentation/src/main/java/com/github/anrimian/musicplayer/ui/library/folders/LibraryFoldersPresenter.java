@@ -77,6 +77,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         } else {
             getViewState().showBackPathButton(path);
         }
+        getViewState().showSearchMode(false);
         getViewState().bindList(sourceList);
 
         loadMusic();
@@ -165,8 +166,14 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onSearchTextChanged(String text) {
-        searchText = text;
-        loadMusic();
+        if (!TextUtils.equals(searchText, text)) {
+            searchText = text;
+            loadMusic();
+        }
+    }
+
+    void onSearchButtonClicked() {
+        getViewState().showSearchMode(true);
     }
 
     private void deletePreparedCompositions() {

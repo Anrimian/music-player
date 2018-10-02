@@ -82,4 +82,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showConfirmDeleteDialog(FolderFileSource folder);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showSearchMode(boolean show);
 }
