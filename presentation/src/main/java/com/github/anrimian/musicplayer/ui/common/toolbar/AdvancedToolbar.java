@@ -42,6 +42,7 @@ public class AdvancedToolbar extends Toolbar {
 
     private Callback<String> textChangeListener;
     private Callback<String> textConfirmListener;
+    private Callback<Boolean> searchModeListener;
 
     private boolean isInSearchMode;
 
@@ -86,6 +87,9 @@ public class AdvancedToolbar extends Toolbar {
 
     public void setSearchModeEnabled(boolean enabled, boolean showKeyboard) {
         isInSearchMode = enabled;
+        if (searchModeListener != null) {
+            searchModeListener.call(enabled);
+        }
         etSearch.setVisibility(enabled? VISIBLE: GONE);
         tvTitle.setVisibility(enabled? GONE: VISIBLE);
         tvSubtitle.setVisibility(enabled? GONE: VISIBLE);
@@ -181,6 +185,10 @@ public class AdvancedToolbar extends Toolbar {
 
     public void setTextConfirmListener(Callback<String> textConfirmListener) {
         this.textConfirmListener = textConfirmListener;
+    }
+
+    public void setSearchModeListener(Callback<Boolean> searchModeListener) {
+        this.searchModeListener = searchModeListener;
     }
 
     private void onFragmentStackChanged() {

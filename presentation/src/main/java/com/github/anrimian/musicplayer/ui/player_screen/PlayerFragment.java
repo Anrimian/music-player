@@ -284,9 +284,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
 
-        //TODO  also lock when toolbar is in search mode
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
         drawerLockStateProcessor.setupWithFragmentManager(getChildFragmentManager());
+        toolbar.setSearchModeListener(drawerLockStateProcessor::onSearchModeChanged);
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();

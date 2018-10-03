@@ -67,6 +67,8 @@
             android:inputType="text"
             android:imeOptions="actionSearch|flagNoExtractUi"
             android:importantForAutofill="no"
+            android:background="@android:color/transparent"
+            android:textColorHint="?android:attr/textColorSecondaryInverse"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
