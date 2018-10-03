@@ -9,7 +9,6 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 
 /**
  * Created on 16.02.2017.
@@ -61,11 +60,11 @@ public class AndroidUtils {
         }
     }
 
-    public static void hideKeyboard(EditText editText) {
-        InputMethodManager imm = (InputMethodManager) editText.getContext()
+    public static void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null && imm.isActive()) {
-            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 }

@@ -7,10 +7,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.infrastructure.service.MusicServiceManager;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.utils.AndroidUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void setTitle(int titleId) {
-        super.setTitle(titleId);
+    protected void onStop() {
+        super.onStop();
+        AndroidUtils.hideKeyboard(getWindow().getDecorView());
     }
 
     private boolean hasFilePermissions() {

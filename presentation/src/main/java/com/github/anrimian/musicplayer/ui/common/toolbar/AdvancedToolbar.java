@@ -99,7 +99,7 @@ public class AdvancedToolbar extends Toolbar {
             }
         } else {
             etSearch.setText(null);
-            AndroidUtils.hideKeyboard(etSearch);//TODO also hide in onPause() or smth
+            AndroidUtils.hideKeyboard(etSearch);
         }
     }
 
@@ -116,9 +116,11 @@ public class AdvancedToolbar extends Toolbar {
     protected void onRestoreInstanceState(Parcelable state) {
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
+
             boolean isInSearchMode = bundle.getBoolean(IS_IN_SEARCH_MODE);
             boolean isKeyboardShown = bundle.getBoolean(IS_KEYBOARD_SHOWN);
             setSearchModeEnabled(isInSearchMode, isKeyboardShown);
+
             state = bundle.getParcelable("superState");
         }
         super.onRestoreInstanceState(state);
