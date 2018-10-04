@@ -296,7 +296,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private PlayQueue createPlayQueue(List<Composition> compositions) {
-        List<PlayQueueItem> items = playQueueDao.setPlayQueueNew(compositions);
+        List<PlayQueueItem> items = playQueueDao.setPlayQueue(compositions);
 
         List<Composition> shuffledList = new ArrayList<>(compositions);
         Collections.shuffle(shuffledList);

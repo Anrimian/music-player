@@ -2,9 +2,7 @@ package com.github.anrimian.musicplayer.ui.utils.views.menu;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.MenuRes;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v7.view.SupportMenuInflater;
 import android.support.v7.view.menu.MenuBuilder;
@@ -12,15 +10,13 @@ import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.PublicActionMenuPresenter;
 import android.view.MenuItem;
 
-import com.github.anrimian.musicplayer.R;
-
 public class ActionMenuUtil {
 
     @SuppressLint("RestrictedApi")
-    public static void setupMenu(Context context,
-                                 ActionMenuView actionMenuView,
+    public static void setupMenu(ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  NavigationView.OnNavigationItemSelectedListener listener) {
+        Context context = actionMenuView.getContext();
         PublicActionMenuPresenter actionMenuPresenter = new PublicActionMenuPresenter(context);
         actionMenuPresenter.setReserveOverflow(true);
         actionMenuPresenter.setWidthLimit(context.getResources().getDisplayMetrics().widthPixels, true);

@@ -57,6 +57,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFr
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils;
+import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ChangeWidthDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
@@ -69,7 +70,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil;
+import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -89,6 +90,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
 
 /**
@@ -285,95 +287,27 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
-        drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+        drawer.addDrawerListener(new SimpleDrawerListener(this::onDrawerClosed));
 
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                if (itemIdToStart != NO_ITEM) {
-                    showScreen(itemIdToStart);
-                }
-            }
-        });
-
-        ActionMenuUtil.setupMenu(actionMenuView.getContext(),
-                actionMenuView,
-                R.menu.play_queue_menu,
-                this::onPlayQueueMenuItemClicked);
-
-        DelegateManager delegateManager = new DelegateManager();
-        delegateManager
-                .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
-                .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
-                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
-                .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
-                .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
-                .addDelegate(new BoundValuesDelegate(0.95f, 1f, new VisibilityDelegate(rvPlayList)))
-                .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
-                .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
-                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))
-                .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
-                .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(sbTrackState)))
-                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
-                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
-                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
-                .addDelegate(new DrawerArrowDelegate(
-                        drawerArrowDrawable,
-                        () -> getChildFragmentManager().getBackStackEntryCount() != 0 || toolbar.isInSearchMode()))
-                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
-
-        if (bottomSheetCoordinator != null) {
-            delegateManager.addDelegate(new ChangeWidthDelegate(
-                    0.5f,
-                    bottomSheetCoordinator));
-            delegateManager.addDelegate(new LeftBottomShadowDelegate(
-                    bottomSheetLeftShadow,
-                    bottomSheetTopLeftShadow,
-                    mlBottomSheet,
-                    bottomSheetCoordinator));
-        }
-
-        bottomSheetDelegate = new BoundValuesDelegate(0.008f, 0.95f, delegateManager);
-
-        bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
-        mlBottomSheet.setClickable(true);
+        setupMenu(actionMenuView, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
         int bottomSheetState;
         if (savedInstanceState == null) {
-            bottomSheetState = uiStatePreferences.isPlayerPanelOpen()?
-                    STATE_EXPANDED: STATE_COLLAPSED;
+            bottomSheetState = uiStatePreferences.isPlayerPanelOpen()? STATE_EXPANDED: STATE_COLLAPSED;
             drawerLockStateProcessor.onBottomSheetOpened(uiStatePreferences.isPlayerPanelOpen());
         } else {
             bottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
         }
+
+        bottomSheetDelegate = getBottomSheetDelegate(drawerArrowDrawable);
         bottomSheetDelegate.onSlide(bottomSheetState == STATE_COLLAPSED ? 0f : 1f);
 
-        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                switch (newState) {
-                    case STATE_COLLAPSED: {
-                        drawerLockStateProcessor.onBottomSheetOpened(false);
-                        bottomSheetDelegate.onSlide(0f);
-                        uiStatePreferences.setPlayerPanelOpen(false);
-                        return;
-                    }
-                    case STATE_EXPANDED: {
-                        drawerLockStateProcessor.onBottomSheetOpened(true);
-                        bottomSheetDelegate.onSlide(1f);
-                        uiStatePreferences.setPlayerPanelOpen(true);
-                    }
-                }
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                if (slideOffset > 0F && slideOffset < 1f) {
-                    bottomSheetDelegate.onSlide(slideOffset);
-                }
-            }
-        });
-
+        bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
+        mlBottomSheet.setClickable(true);
+        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
+                this::onBottomSheetStateChanged,
+                this::onBottomSheetSlided
+        ));
         bottomSheetBehavior.setState(bottomSheetState);
 
         toolbar.setupWithFragmentManager(getChildFragmentManager(),
@@ -394,7 +328,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked);
-//        bottomPanel.setOnClickListener(v -> onBottomPanelClicked());
         topBottomSheetPanel.setOnClickListener(v -> onTopPanelClicked());
 
         seekBarViewWrapper = new SeekBarViewWrapper(sbTrackState);
@@ -748,7 +681,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     return true;
                 }
                 case R.id.menu_delete: {
-                    presenter.onDeleteCurrentCompositionButtonClicked();//TODO also show dialog
+                    presenter.onDeleteCurrentCompositionButtonClicked();
                     return true;
                 }
             }
@@ -772,5 +705,68 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
         drawer.closeDrawer(Gravity.START);
         return true;
+    }
+
+    private void onDrawerClosed() {
+        if (itemIdToStart != NO_ITEM) {
+            showScreen(itemIdToStart);
+        }
+    }
+
+    private SlideDelegate getBottomSheetDelegate(DrawerArrowDrawable drawerArrowDrawable) {
+        DelegateManager delegateManager = new DelegateManager();
+        delegateManager
+                .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
+                .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
+                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
+                .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
+                .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
+                .addDelegate(new BoundValuesDelegate(0.95f, 1f, new VisibilityDelegate(rvPlayList)))
+                .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
+                .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
+                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))
+                .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
+                .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(sbTrackState)))
+                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
+                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
+                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
+                .addDelegate(new DrawerArrowDelegate(
+                        drawerArrowDrawable,
+                        () -> getChildFragmentManager().getBackStackEntryCount() != 0 || toolbar.isInSearchMode()))
+                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
+
+        if (bottomSheetCoordinator != null) {
+            delegateManager.addDelegate(new ChangeWidthDelegate(
+                    0.5f,
+                    bottomSheetCoordinator));
+            delegateManager.addDelegate(new LeftBottomShadowDelegate(
+                    bottomSheetLeftShadow,
+                    bottomSheetTopLeftShadow,
+                    mlBottomSheet,
+                    bottomSheetCoordinator));
+        }
+        return new BoundValuesDelegate(0.008f, 0.95f, delegateManager);
+    }
+
+    private void onBottomSheetStateChanged(Integer newState) {
+        switch (newState) {
+            case STATE_COLLAPSED: {
+                drawerLockStateProcessor.onBottomSheetOpened(false);
+                bottomSheetDelegate.onSlide(0f);
+                uiStatePreferences.setPlayerPanelOpen(false);
+                return;
+            }
+            case STATE_EXPANDED: {
+                drawerLockStateProcessor.onBottomSheetOpened(true);
+                bottomSheetDelegate.onSlide(1f);
+                uiStatePreferences.setPlayerPanelOpen(true);
+            }
+        }
+    }
+
+    private void onBottomSheetSlided(Float slideOffset) {
+        if (slideOffset > 0F && slideOffset < 1f) {
+            bottomSheetDelegate.onSlide(slideOffset);
+        }
     }
 }

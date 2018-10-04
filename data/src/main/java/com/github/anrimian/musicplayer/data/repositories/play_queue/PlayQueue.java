@@ -32,27 +32,27 @@ public class PlayQueue {
     }
 
     @Nullable
-    public Integer getPosition(@Nullable PlayQueueItem item) {
+    Integer getPosition(@Nullable PlayQueueItem item) {
         if (item == null) {
             return null;
         }
-        Map<Long, Integer> positionMap = shuffled? shuffledItemPositionMap : this.itemPositionMap;
+        Map<Long, Integer> positionMap = shuffled? shuffledItemPositionMap : itemPositionMap;
         return positionMap.get(item.getId());
     }
 
-    public List<PlayQueueItem> getCurrentPlayQueue() {
+    List<PlayQueueItem> getCurrentPlayQueue() {
         return shuffled? shuffledQueue: compositionQueue;
     }
 
-    public List<PlayQueueItem> getCompositionQueue() {
+    List<PlayQueueItem> getCompositionQueue() {
         return compositionQueue;
     }
 
-    public List<PlayQueueItem> getShuffledQueue() {
+    List<PlayQueueItem> getShuffledQueue() {
         return shuffledQueue;
     }
 
-    public void changeShuffleMode(boolean shuffled) {
+    void changeShuffleMode(boolean shuffled) {
         this.shuffled = shuffled;
         if (shuffled) {
             Collections.shuffle(shuffledQueue);
@@ -60,7 +60,7 @@ public class PlayQueue {
         fillPositionMap();//TODO optimize
     }
 
-    public void moveItemToTopInShuffledList(PlayQueueItem item) {
+    void moveItemToTopInShuffledList(PlayQueueItem item) {
         if (!shuffled) {
             throw new IllegalStateException("move item to top without shuffle mode");
         }
@@ -80,7 +80,7 @@ public class PlayQueue {
         return compositionQueue.isEmpty();
     }
 
-    public boolean deleteCompositions(List<Composition> compositions) {
+    boolean deleteCompositions(List<Composition> compositions) {
         boolean updated = false;
 
         PlayQueueItem[] normalList = new PlayQueueItem[compositionQueue.size()];
@@ -122,7 +122,7 @@ public class PlayQueue {
         return updated;
     }
 
-    public boolean updateComposition(Composition composition) {
+    boolean updateComposition(Composition composition) {
         List<Integer> positions = compositionPositionsMap.get(composition.getId());
         if (positions == null) {
             return false;

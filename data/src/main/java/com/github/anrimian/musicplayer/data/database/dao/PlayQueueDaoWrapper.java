@@ -32,13 +32,6 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public void setPlayQueue(List<Composition> compositionQueue) {
-        appDatabase.runInTransaction(() -> {
-            playQueueDao.deletePlayQueue();
-            playQueueDao.insertPlayQueue(toEntityList(compositionQueue));
-        });
-    }
-
     public void setPlayQueueItems(List<PlayQueueItem> compositionQueue) {
         appDatabase.runInTransaction(() -> {
             playQueueDao.deletePlayQueue();
@@ -54,7 +47,7 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public List<PlayQueueItem> setPlayQueueNew(List<Composition> compositionQueue) {
+    public List<PlayQueueItem> setPlayQueue(List<Composition> compositionQueue) {
         return appDatabase.runInTransaction(() -> {
             playQueueDao.deletePlayQueue();
             long[] ids = playQueueDao.insertPlayQueue(toEntityList(compositionQueue));

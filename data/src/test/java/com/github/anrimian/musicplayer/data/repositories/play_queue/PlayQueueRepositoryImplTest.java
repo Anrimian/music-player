@@ -23,20 +23,19 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.currentItem;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeItem;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeItems;
-import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.shuffle;
 import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
@@ -70,7 +69,7 @@ public class PlayQueueRepositoryImplTest {
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(getFakeCompositionsMap());
         when(storageMusicDataSource.getChangeObservable()).thenReturn(changeSubject);
 
-        when(playQueueDao.setPlayQueueNew(any())).thenReturn(getFakeItems());
+        when(playQueueDao.setPlayQueue(any())).thenReturn(getFakeItems());
         when(playQueueDao.setShuffledPlayQueueNew(any())).thenReturn(getFakeItems());
 
         when(uiStatePreferences.getCurrentPlayQueueId()).thenReturn(NO_COMPOSITION);
@@ -90,7 +89,7 @@ public class PlayQueueRepositoryImplTest {
 
         playQueueRepository.getCurrentQueueItemObservable()
                 .test()
-                .assertValue(new PlayQueueEvent(new PlayQueueItem(anyLong(), fakeComposition(0))));
+                .assertValue(new PlayQueueEvent(new PlayQueueItem(0, fakeComposition(0))));
     }
 
     @Test
@@ -113,6 +112,34 @@ public class PlayQueueRepositoryImplTest {
                     assertEquals(getFakeCompositions().size(), compositions.size());
                     return true;
                 });
+    }
+
+    @Test
+    public void setPlayQueueInShuffleModeAndThenSwitchMode() {
+        when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(true);
+
+        playQueueRepository.setPlayQueue(getFakeCompositions())
+                .test()
+                .assertComplete();
+
+        verify(uiStatePreferences).setCurrentCompositionId(anyLong());
+
+        playQueueRepository.getCurrentQueueItemObservable()
+                .test()
+                .assertValueCount(1);
+
+        playQueueRepository.getPlayQueueObservable()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(getFakeCompositions().size(), compositions.size());
+                    return true;
+                });
+
+        playQueueRepository.setRandomPlayingEnabled(false);
+
+        playQueueRepository.getCurrentQueueItemObservable()
+                .test()
+                .assertValue(new PlayQueueEvent(new PlayQueueItem(0, fakeComposition(0))));
     }
 
     @Test

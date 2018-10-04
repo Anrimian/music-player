@@ -110,8 +110,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        postponeEnterTransition();
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_library_folders, container, false);
     }
 
@@ -161,31 +162,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.library_files_menu, menu);
-/*        MenuItem searchItem = menu.findItem(R.id.menu_action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-//        String searchQuery = presenter.getSearchQuery();
-//        if (!TextUtils.isEmpty(searchQuery)) {
-//            searchItem.expandActionView();
-//            searchView.setQuery(searchQuery, false);
-//            searchView.clearFocus();
-//        }
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String text) {
-                presenter.onSearchTextChanged(text);
-//                AndroidUtils.hideKeyboard(getActivity());
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String text) {
-                presenter.onSearchTextChanged(text);
-                //presenter.startSearchWithDelay(newText);it notify when search view closed, first fix this
-                return true;
-            }
-        });*/
-//        searchView.setOnSearchClickListener(v -> searchView.setQuery(presenter.getSearchQuery(), false));
         super.onCreateOptionsMenu(menu, inflater);
     }
 
