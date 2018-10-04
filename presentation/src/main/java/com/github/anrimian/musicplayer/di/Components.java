@@ -14,7 +14,6 @@ import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesComponen
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
 import javax.annotation.Nullable;
 
@@ -36,7 +35,7 @@ public class Components {
 
     private static Components getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("components must be init first");
+            throw new IllegalStateException("components must be initializeViews first");
         }
         return instance;
     }

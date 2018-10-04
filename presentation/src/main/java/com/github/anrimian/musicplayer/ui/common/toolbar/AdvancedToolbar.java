@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
@@ -58,7 +60,7 @@ public class AdvancedToolbar extends Toolbar {
         super(context, attrs, defStyleAttr);
     }
 
-    public void init() {
+    public void initializeViews() {
         tvTitle = findViewById(R.id.tv_title);
         tvSubtitle = findViewById(R.id.tv_subtitle);
         titleContainer = findViewById(R.id.title_container);
@@ -68,7 +70,18 @@ public class AdvancedToolbar extends Toolbar {
         etSearch.setOnEditorActionListener(this::onSearchTextViewAction);
         etSearch.setVisibility(INVISIBLE);
         actionIcon.setVisibility(GONE);
-        setTitle("");//setSupportActionBar() set app title to null title in action bar
+    }
+
+    public void setupWithActivity(AppCompatActivity activity) {
+        setTitle("");//replace null to prevent auto title setting from action bar
+        activity.setSupportActionBar(this);
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
     }
 
     public void setupWithFragmentManager(FragmentManager fragmentManager,

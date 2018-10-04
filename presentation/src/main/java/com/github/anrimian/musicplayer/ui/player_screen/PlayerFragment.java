@@ -16,7 +16,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
@@ -272,43 +271,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         MusicServiceManager.initialize();
         uiStatePreferences = Components.getAppComponent().uiStatePreferences();
 
-        toolbar.init();
-
-        AppCompatActivity activity = (AppCompatActivity) requireActivity();
-        activity.setSupportActionBar(toolbar);
-        ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-        }
+        toolbar.initializeViews();
+        toolbar.setupWithActivity((AppCompatActivity) requireActivity());
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
         drawerLockStateProcessor.setupWithFragmentManager(getChildFragmentManager());
         toolbar.setSearchModeListener(drawerLockStateProcessor::onSearchModeChanged);
 
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (selectedDrawerItemId != itemId) {
-                selectedDrawerItemId = itemId;
-                itemIdToStart = itemId;
-                clearFragment();
-            }
-            drawer.closeDrawer(Gravity.START);
-            return true;
-        });
-
+        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
         navigationView.inflateHeaderView(R.layout.partial_drawer_header);
 
         drawerToggle = new ActionBarDrawerToggle(requireActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
         DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
-
-        ActionMenuUtil.setupMenu(actionMenuView.getContext(),
-                actionMenuView,
-                R.menu.play_queue_menu,
-                this::onPlayQueueMenuItemClicked);
-
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
@@ -321,6 +295,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 }
             }
         });
+
+        ActionMenuUtil.setupMenu(actionMenuView.getContext(),
+                actionMenuView,
+                R.menu.play_queue_menu,
+                this::onPlayQueueMenuItemClicked);
 
         DelegateManager delegateManager = new DelegateManager();
         delegateManager
@@ -782,5 +761,16 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(requireActivity());
         drawerArrowDrawable.setColor(getColorFromAttr(requireActivity(), android.R.attr.textColorPrimaryInverse));
         return drawerArrowDrawable;
+    }
+
+    private boolean onNavigationItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (selectedDrawerItemId != itemId) {
+            selectedDrawerItemId = itemId;
+            itemIdToStart = itemId;
+            clearFragment();
+        }
+        drawer.closeDrawer(Gravity.START);
+        return true;
     }
 }
