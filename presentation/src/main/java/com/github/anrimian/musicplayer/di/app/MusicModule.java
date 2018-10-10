@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
-import com.github.anrimian.musicplayer.data.database.dao.PlayQueueDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.MusicProviderRepositoryImpl;

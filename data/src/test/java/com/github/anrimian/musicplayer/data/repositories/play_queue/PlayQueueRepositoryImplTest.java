@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
-import com.github.anrimian.musicplayer.data.database.dao.PlayQueueDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;

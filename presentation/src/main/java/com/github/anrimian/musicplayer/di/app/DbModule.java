@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.DatabaseManager;
-import com.github.anrimian.musicplayer.data.database.dao.PlayQueueDao;
-import com.github.anrimian.musicplayer.data.database.dao.PlayQueueDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
+import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;

@@ -31,7 +31,7 @@ public class PlayQueue {
         fillPositionMap();
     }
 
-    @Nullable
+    @Nullable//идентификаторы из разных таблиц!!!!
     Integer getPosition(@Nullable PlayQueueItem item) {
         if (item == null) {
             return null;

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.utils;
 
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntityNew;
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
@@ -109,5 +110,17 @@ public class TestDataProvider {
 
     public static StoragePlayList storagePlayList(long i) {
         return new StoragePlayList(i, "test" + i, new Date(i), new Date(i));
+    }
+
+    public static PlayQueueEntityNew queueEntity(long id,
+                                                 long audioId,
+                                                 int position,
+                                                 int shuffledPosition) {
+        PlayQueueEntityNew entity = new PlayQueueEntityNew();
+        entity.setId(id);
+        entity.setAudioId(audioId);
+        entity.setPosition(position);
+        entity.setShuffledPosition(shuffledPosition);
+        return entity;
     }
 }

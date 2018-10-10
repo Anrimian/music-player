@@ -5,6 +5,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 import static com.github.anrimian.musicplayer.data.database.AppDatabase.SHUFFLED_PLAY_QUEUE;
 
+@Deprecated
 @Entity(tableName = SHUFFLED_PLAY_QUEUE)
 public class ShuffledPlayQueueEntity {
 
