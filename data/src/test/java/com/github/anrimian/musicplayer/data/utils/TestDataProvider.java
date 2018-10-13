@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.data.utils;
 
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntityNew;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSou
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,12 @@ public class TestDataProvider {
             PlayQueueItem item = new PlayQueueItem(i, composition);
             items.add(item);
         }
+        return items;
+    }
+
+    public static List<PlayQueueItem> getReversedFakeItems() {
+        List<PlayQueueItem> items = getFakeItems();
+        Collections.reverse(items);
         return items;
     }
 
@@ -112,11 +119,11 @@ public class TestDataProvider {
         return new StoragePlayList(i, "test" + i, new Date(i), new Date(i));
     }
 
-    public static PlayQueueEntityNew queueEntity(long id,
-                                                 long audioId,
-                                                 int position,
-                                                 int shuffledPosition) {
-        PlayQueueEntityNew entity = new PlayQueueEntityNew();
+    public static PlayQueueEntity queueEntity(long id,
+                                              long audioId,
+                                              int position,
+                                              int shuffledPosition) {
+        PlayQueueEntity entity = new PlayQueueEntity();
         entity.setId(id);
         entity.setAudioId(audioId);
         entity.setPosition(position);

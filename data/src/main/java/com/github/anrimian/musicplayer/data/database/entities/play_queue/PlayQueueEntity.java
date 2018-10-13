@@ -1,12 +1,9 @@
-package com.github.anrimian.musicplayer.data.database.entities;
+package com.github.anrimian.musicplayer.data.database.entities.play_queue;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-import static com.github.anrimian.musicplayer.data.database.AppDatabase.PLAY_QUEUE;
-
-@Deprecated
-@Entity(tableName = PLAY_QUEUE)
+@Entity(tableName = "play_queue")
 public class PlayQueueEntity {
 
     @PrimaryKey(autoGenerate = true)
@@ -15,6 +12,7 @@ public class PlayQueueEntity {
     private long audioId;
 
     private int position;
+    private int shuffledPosition;
 
     public long getId() {
         return id;
@@ -38,5 +36,13 @@ public class PlayQueueEntity {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public int getShuffledPosition() {
+        return shuffledPosition;
+    }
+
+    public void setShuffledPosition(int shuffledPosition) {
+        this.shuffledPosition = shuffledPosition;
     }
 }

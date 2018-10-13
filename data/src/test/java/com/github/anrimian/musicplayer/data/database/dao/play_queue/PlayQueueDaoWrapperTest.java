@@ -1,11 +1,9 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
-import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
-import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntityNew;
+import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
 import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 
@@ -18,6 +16,7 @@ import java.util.Random;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.queueEntity;
+import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -38,15 +37,15 @@ public class PlayQueueDaoWrapperTest {
 
     @Test
     public void getPlayQueueNewTest() {
-        ArrayList<PlayQueueEntityNew> entities = new ArrayList<>();
+        ArrayList<PlayQueueEntity> entities = new ArrayList<>();
         entities.add(queueEntity(1, Long.MAX_VALUE, 0, 2));
         entities.add(queueEntity(2, 1, 1, 3));
         entities.add(queueEntity(3, 2, 30, 8));
         entities.add(queueEntity(4, 3, 2, 1));
-        when(playQueueDao.getPlayQueueNew()).thenReturn(entities);
+        when(playQueueDao.getPlayQueue()).thenReturn(entities);
 
-        PlayQueueLists lists = daoWrapper.getPlayQueueNew(TestDataProvider::getFakeCompositionsMap);
-        verify(playQueueDao).deleteItemNew(eq(Long.MAX_VALUE));
+        PlayQueueLists lists = daoWrapper.getPlayQueue(TestDataProvider::getFakeCompositionsMap);
+        verify(playQueueDao).deleteItem(eq(Long.MAX_VALUE));
 
         List<PlayQueueItem> items = lists.getQueue();
         assertEquals(3, items.size());
@@ -69,21 +68,31 @@ public class PlayQueueDaoWrapperTest {
         list.add(fakeComposition(2));
 
         ArrayList<Composition> shuffledList = new ArrayList<>(list);
-        Random rnd = new Random();
-        Collections.shuffle(shuffledList, rnd);
+        long randomSeed = System.nanoTime();
+        Collections.shuffle(shuffledList, new Random(randomSeed));
 
-        when(playQueueDao.insertPlayQueueNew(any())).thenReturn(new long[]{1L, 2L, 3L});
+        List<Long> ids = asList(1L, 2L, 3L);
+        List<Long> shuffledIds = new ArrayList<>(ids);
+        Collections.shuffle(shuffledIds, new Random(randomSeed));
 
-        PlayQueueLists queueLists = daoWrapper.insertNewPlayQueue(list, shuffledList, rnd);
+        when(playQueueDao.insertPlayQueue(any())).thenReturn(ids);
+
+        PlayQueueLists queueLists = daoWrapper.insertNewPlayQueue(list, shuffledList, randomSeed);
 
         List<PlayQueueItem> items = queueLists.getQueue();
         assertEquals(list.get(0), items.get(0).getComposition());
         assertEquals(list.get(1), items.get(1).getComposition());
         assertEquals(list.get(2), items.get(2).getComposition());
+        assertEquals((long) ids.get(0), items.get(0).getId());
+        assertEquals((long) ids.get(1), items.get(1).getId());
+        assertEquals((long) ids.get(2), items.get(2).getId());
 
         List<PlayQueueItem> shuffledItems = queueLists.getShuffledQueue();
         assertEquals(shuffledList.get(0), shuffledItems.get(0).getComposition());
         assertEquals(shuffledList.get(1), shuffledItems.get(1).getComposition());
         assertEquals(shuffledList.get(2), shuffledItems.get(2).getComposition());
+        assertEquals((long) shuffledIds.get(0), shuffledItems.get(0).getId());
+        assertEquals((long) shuffledIds.get(1), shuffledItems.get(1).getId());
+        assertEquals((long) shuffledIds.get(2), shuffledItems.get(2).getId());
     }
 }

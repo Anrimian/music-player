@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
 import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
@@ -10,8 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -102,7 +101,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     playQueue.changeShuffleMode(enabled);
                     if (enabled) {
                         playQueue.moveItemToTopInShuffledList(item);
-                        playQueueDao.setShuffledPlayQueueItems(playQueue.getShuffledQueue());
+                        playQueueDao.moveShuffledPositionToTop(item);
                     }
                     playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
                 }).subscribeOn(scheduler)
@@ -205,11 +204,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
         boolean updated = getPlayQueue().deleteCompositions(deletedCompositions);
         if (updated) {
-
-            //optimize later if need
-            playQueueDao.setShuffledPlayQueueItems(getPlayQueue().getShuffledQueue());
-            playQueueDao.setPlayQueueItems(getPlayQueue().getCompositionQueue());
-
+            playQueueDao.deleteCompositionsFromQueue(deletedCompositions);
             playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
 
             if (currentItemDeleted) {
@@ -270,9 +265,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private PlayQueue loadPlayQueue() {
-        List<PlayQueueItem> playQueue = playQueueDao.getPlayQueue(storageMusicDataSource::getCompositionsMap);
-        List<PlayQueueItem> shuffledQueue = playQueueDao.getShuffledPlayQueue(storageMusicDataSource::getCompositionsMap);
-        return new PlayQueue(playQueue, shuffledQueue, settingsPreferences.isRandomPlayingEnabled());
+        PlayQueueLists lists = playQueueDao.getPlayQueue(storageMusicDataSource::getCompositionsMap);
+        return new PlayQueue(
+                lists.getQueue(),
+                lists.getShuffledQueue(),
+                settingsPreferences.isRandomPlayingEnabled());
     }
 
     private void setCurrentItem(@Nullable PlayQueueItem item) {
@@ -296,13 +293,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private PlayQueue createPlayQueue(List<Composition> compositions) {
-        List<PlayQueueItem> items = playQueueDao.setPlayQueue(compositions);
-
-        List<Composition> shuffledList = new ArrayList<>(compositions);
-        Collections.shuffle(shuffledList);
-
-        List<PlayQueueItem> shuffledItems = playQueueDao.setShuffledPlayQueueNew(shuffledList);
-
-        return new PlayQueue(items, shuffledItems, settingsPreferences.isRandomPlayingEnabled());
+        PlayQueueLists lists = playQueueDao.insertNewPlayQueue(compositions);
+        return new PlayQueue(lists.getQueue(),
+                lists.getShuffledQueue(),
+                settingsPreferences.isRandomPlayingEnabled());
     }
 }
