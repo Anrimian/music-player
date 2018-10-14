@@ -65,6 +65,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.DrawerArrowDelega
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveYDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ReverseDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
@@ -694,7 +695,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
-                .addDelegate(new BoundValuesDelegate(0.95f, 1f, new VisibilityDelegate(rvPlayList)))
+                .addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)))
+                .addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f))
                 .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
                 .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))

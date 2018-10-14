@@ -5,7 +5,4 @@
         com.github.anrimian.musicplayer.ui.utils.views.coordinator.ScrollAwareFABBehavior
     </string>
 
-    <string name="bound_with_bottom_sheet_behavior" translatable="false">
-        com.github.anrimian.musicplayer.ui.utils.views.coordinator.BoundViewBottomSheetBehavior
-    </string>
 </resources>

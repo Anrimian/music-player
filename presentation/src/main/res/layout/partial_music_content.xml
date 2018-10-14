@@ -19,8 +19,7 @@
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/cl_play_queue_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/bound_with_bottom_sheet_behavior">
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_playlist"
