@@ -136,15 +136,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.iv_skip_to_next)
     ImageView ivSkipToNext;
 
-//    @BindView(R.id.iv_play_pause_expanded)
-//    ImageView ivPlayPauseExpanded;
-//
-//    @BindView(R.id.iv_skip_to_previous_expanded)
-//    ImageView ivSkipToPreviousExpanded;
-//
-//    @BindView(R.id.iv_skip_to_next_expanded)
-//    ImageView ivSkipToNextExpanded;
-
     @BindView(R.id.drawer_fragment_container)
     ViewGroup fragmentContainer;
 
@@ -172,23 +163,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.top_panel)
     View topBottomSheetPanel;
 
-//    @BindView(R.id.bottom_sheet_bottom_shadow)
-//    View bottomSheetBottomShadow;
-
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
     @BindView(R.id.btn_actions_menu)
     ImageView btnActionsMenu;
 
-//    @BindView(R.id.tv_current_composition_info)
-//    TextView tvCurrentCompositionInfo;
-
     @BindView(R.id.tv_current_composition_author)
     TextView tvCurrentCompositionAuthor;
-
-//    @BindView(R.id.play_queue_toolbar)
-//    AdvancedToolbar advancedToolbar;
 
     @BindView(R.id.cl_play_queue_container)
     CoordinatorLayout clPlayQueueContainer;
@@ -198,15 +180,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @BindView(R.id.toolbar)
     AdvancedToolbar toolbar;
-
-//    @BindView(R.id.play_actions_top_shadow)
-//    View playActionsTopShadow;
-
-//    @BindView(R.id.bottom_panel)
-//    View bottomPanel;
-
-//    @BindView(R.id.bottom_sheet_play_panel_shadow)
-//    View bottomSheetPanelShadow;
 
     @BindView(R.id.title_container)
     View titleContainer;

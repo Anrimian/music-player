@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
@@ -33,10 +34,10 @@ public class AdvancedToolbar extends Toolbar {
 
     private TextView tvTitle;
     private TextView tvSubtitle;
-    private View titleContainer;
     private View actionIcon;
     private EditText etSearch;
     private ActionMenuView actionMenuView;
+    private FrameLayout flTitleArea;
 
     private FragmentManager fragmentManager;
     private DrawerArrowDrawable drawerArrowDrawable;
@@ -63,9 +64,9 @@ public class AdvancedToolbar extends Toolbar {
     public void initializeViews() {
         tvTitle = findViewById(R.id.tv_title);
         tvSubtitle = findViewById(R.id.tv_subtitle);
-        titleContainer = findViewById(R.id.title_container);
         actionIcon = findViewById(R.id.action_icon);
         etSearch = findViewById(R.id.et_search);
+        flTitleArea = findViewById(R.id.fl_title_area);
         etSearch.addTextChangedListener(new SimpleTextWatcher(this::onSearchTextChanged));
         etSearch.setOnEditorActionListener(this::onSearchTextViewAction);
         etSearch.setVisibility(INVISIBLE);
@@ -108,7 +109,9 @@ public class AdvancedToolbar extends Toolbar {
         tvSubtitle.setVisibility(enabled? GONE: VISIBLE);
         actionIcon.setVisibility(enabled? GONE: VISIBLE);
         getActionMenuView().setVisibility(enabled? GONE: VISIBLE);
-        setCommandButtonMode(!enabled);
+        if (!lockArrowFunction.isLocked()) {
+            setCommandButtonMode(!enabled);
+        }
         if (enabled) {
             etSearch.requestFocus();
             if (showKeyboard){
@@ -167,8 +170,8 @@ public class AdvancedToolbar extends Toolbar {
 
     public void setTitleClickListener(View.OnClickListener listener) {
         actionIcon.setVisibility(listener == null? GONE : VISIBLE);
-        titleContainer.setEnabled(listener != null);
-        titleContainer.setOnClickListener(listener);
+        flTitleArea.setEnabled(listener != null);
+        flTitleArea.setOnClickListener(listener);
     }
 
     public void onStackFragmentSlided(float offset) {
