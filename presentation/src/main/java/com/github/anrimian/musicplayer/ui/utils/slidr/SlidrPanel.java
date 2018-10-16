@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.utils.slidr;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -10,19 +9,19 @@ import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrInterface;
 import com.r0adkll.slidr.widget.SliderPanel;
 
-public class SlidrFragment {
+public class SlidrPanel {
 
     @NonNull
-    public static SlidrInterface replace(@NonNull Fragment fragment,
-                                         @NonNull View oldScreen,
+    public static SlidrInterface replace(@NonNull View oldScreen,
+                                         @NonNull Runnable onClose,
                                          @NonNull SlidrConfig config) {
-        return replace(fragment, oldScreen, config, null);
+        return replace(oldScreen, config, onClose, null);
     }
 
     @NonNull
-    public static SlidrInterface replace(@NonNull Fragment fragment,
-                                         @NonNull View oldScreen,
+    public static SlidrInterface replace(@NonNull View oldScreen,
                                          @NonNull SlidrConfig config,
+                                         @NonNull Runnable onClose,
                                          @Nullable SlideListener slideListener) {
         ViewGroup parent = (ViewGroup) oldScreen.getParent();
         ViewGroup.LayoutParams params = oldScreen.getLayoutParams();
@@ -37,7 +36,7 @@ public class SlidrFragment {
         parent.addView(panel, 0, params);
 
         // Set the panel slide listener for when it becomes closed or opened
-        panel.setOnPanelSlideListener(new FragmentPanelSlideListener(fragment, config, slideListener));
+        panel.setOnPanelSlideListener(new PanelSlideListener(onClose, config, slideListener));
 
         // Return the lock interface
         return panel.getDefaultInterface();

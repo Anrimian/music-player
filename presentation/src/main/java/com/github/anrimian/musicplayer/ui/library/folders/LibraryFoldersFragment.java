@@ -36,7 +36,7 @@ import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourc
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
-import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrFragment;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -154,7 +154,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
         if (getPath() != null) {//TODO root path -> not root path change case
             SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-            SlidrFragment.replace(this, contentContainer, slidrConfig);
+            SlidrPanel.replace(contentContainer, () -> {
+                FragmentManager fm = requireFragmentManager();
+                if (fm.getBackStackEntryCount() > 0) {
+                    fm.popBackStack();
+                }
+            }, slidrConfig);
         }
     }
 

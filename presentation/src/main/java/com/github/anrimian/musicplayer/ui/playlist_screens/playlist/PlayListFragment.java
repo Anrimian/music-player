@@ -21,7 +21,8 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
-import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -89,7 +90,9 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrFragment.replace(this, clListContainer, slidrConfig, toolbar::onStackFragmentSlided);
+        SlidrPanel.replace(clListContainer, slidrConfig, () ->
+                FragmentNavigation.from(requireFragmentManager()).goBack(0),
+                toolbar::onStackFragmentSlided);
     }
 
     @Override
@@ -125,7 +128,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
 
     @Override
     public void closeScreen() {
-        requireFragmentManager().popBackStack();
+        FragmentNavigation.from(requireFragmentManager()).goBack();
     }
 
     @Override
