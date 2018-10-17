@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +12,18 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class LibraryFoldersRootFragment extends LibraryFragment implements BackButtonListener {
+
+    @BindView(R.id.library_folders_container)
+    JugglerView gvFoldersContainer;
+
+    private FragmentNavigation navigation;
 
     @Nullable
     @Override
@@ -25,21 +34,24 @@ public class LibraryFoldersRootFragment extends LibraryFragment implements BackB
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.files);
 
+        navigation = FragmentNavigation.from(getChildFragmentManager());
+        navigation.initialize(gvFoldersContainer);
+        navigation.setExitAnimation(R.anim.anim_slide_out_right);
+        navigation.setEnterAnimation(R.anim.anim_slide_in_right);
+
         if (savedInstanceState == null) {
-            getChildFragmentManager().beginTransaction()
-                    .replace(R.id.library_folders_container, LibraryFoldersFragment.newInstance(null))
-                    .commit();
+            navigation.newRootFragment(() -> LibraryFoldersFragment.newInstance(null));
         }
     }
 
     @Override
     public boolean onBackPressed() {
-        FragmentManager fm = getChildFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.library_folders_container);
+        Fragment fragment = navigation.getFragmentOnTop();
         return fragment instanceof BackButtonListener
                 && ((BackButtonListener) fragment).onBackPressed();
     }

@@ -2,12 +2,15 @@ package com.github.anrimian.musicplayer.ui.utils.fragments.navigation;
 
 import android.content.res.Resources;
 import android.support.annotation.AnimRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -47,8 +50,8 @@ public class FragmentNavigation {
         this.fragmentManagerProvider = fragmentManagerProvider;
     }
 
-    public void initialize(JugglerView jugglerView) {
-        this.jugglerView = jugglerView;
+    public void initialize(@NonNull JugglerView jugglerView) {
+        this.jugglerView = Objects.requireNonNull(jugglerView);
         jugglerView.setPresenter(jugglerViewPresenter);
         jugglerViewPresenter.initializeView(jugglerView);
 
