@@ -722,7 +722,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                         () -> navigation.getScreensCount() > 1 || toolbar.isInSearchMode()))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
-        if (bottomSheetCoordinator != null) {
+        if (bottomSheetCoordinator != null) {//landscape
             delegateManager.addDelegate(new ChangeWidthDelegate(
                     0.5f,
                     bottomSheetCoordinator));
