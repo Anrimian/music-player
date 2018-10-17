@@ -56,7 +56,7 @@ public class FragmentNavigation {
         jugglerViewPresenter.initializeView(jugglerView);
 
         hideBottomFragmentMenu();
-        notifyFragmentVisible(getFragmentOnTop());
+        notifyFragmentMovedToTop(getFragmentOnTop());
     }
 
     public void addNewFragment(FragmentCreator fragmentCreator) {
@@ -83,7 +83,7 @@ public class FragmentNavigation {
                     isNavigationEnabled = true;
                     hideBottomFragmentMenu();
                     notifyStackListeners();
-                    notifyFragmentVisible(getFragmentOnTop());
+                    notifyFragmentMovedToTop(getFragmentOnTop());
                 })
                 .commit();
     }
@@ -144,7 +144,7 @@ public class FragmentNavigation {
                 .runOnCommit(() -> {
                     isNavigationEnabled = true;
                     notifyStackListeners();
-                    notifyFragmentVisible(getFragmentOnTop());
+                    notifyFragmentMovedToTop(getFragmentOnTop());
                 })
                 .commit();
     }
@@ -251,9 +251,9 @@ public class FragmentNavigation {
                 .findFragmentById(jugglerViewPresenter.getBottomViewId());
     }
 
-    private void notifyFragmentVisible(Fragment fragment) {
-        if (fragment instanceof FragmentVisibilityListener) {
-            ((FragmentVisibilityListener) fragment).onFragmentVisible();
+    private void notifyFragmentMovedToTop(Fragment fragment) {
+        if (fragment instanceof FragmentLayerListener) {
+            ((FragmentLayerListener) fragment).onFragmentMovedOnTop();
         }
     }
 
@@ -266,7 +266,7 @@ public class FragmentNavigation {
     private void replaceBottomFragment(@AnimRes int exitAnimation) {
         Fragment fragment = requireFragmentAtBottom();
         fragment.setMenuVisibility(true);
-        notifyFragmentVisible(fragment);
+        notifyFragmentMovedToTop(fragment);
 
         jugglerView.postDelayed(() -> {
             int id = jugglerView.prepareBottomView();

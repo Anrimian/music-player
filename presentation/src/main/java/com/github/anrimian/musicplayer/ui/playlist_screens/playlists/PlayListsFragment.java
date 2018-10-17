@@ -19,8 +19,8 @@ import com.github.anrimian.musicplayer.domain.models.utils.PlayListHelper;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentVisibilityListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
@@ -30,15 +30,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class PlayListsFragment extends MvpAppCompatFragment
-        implements PlayListsView, FragmentVisibilityListener {
+        implements PlayListsView, FragmentLayerListener {
 
     @InjectPresenter
     PlayListsPresenter presenter;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
-
-    private AdvancedToolbar toolbar;
 
     private PlayListsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
@@ -67,8 +65,6 @@ public class PlayListsFragment extends MvpAppCompatFragment
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        toolbar = requireActivity().findViewById(R.id.toolbar);
-
         progressViewWrapper = new ProgressViewWrapper(view);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -76,7 +72,8 @@ public class PlayListsFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void onFragmentVisible() {
+    public void onFragmentMovedOnTop() {
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         bindToolbar(toolbar);
     }
 
