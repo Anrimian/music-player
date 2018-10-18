@@ -35,6 +35,7 @@ public class AdvancedToolbar extends Toolbar {
 
     private final FragmentStackListener stackChangeListener = new StackChangeListenerImpl();
 
+    private View clTitleContainer;
     private TextView tvTitle;
     private TextView tvSubtitle;
     private View actionIcon;
@@ -65,6 +66,7 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     public void initializeViews() {
+        clTitleContainer = findViewById(R.id.title_container);
         tvTitle = findViewById(R.id.tv_title);
         tvSubtitle = findViewById(R.id.tv_subtitle);
         actionIcon = findViewById(R.id.action_icon);
@@ -109,9 +111,8 @@ public class AdvancedToolbar extends Toolbar {
             searchModeListener.call(enabled);
         }
         etSearch.setVisibility(enabled? VISIBLE: GONE);
-        tvTitle.setVisibility(enabled? GONE: VISIBLE);
-        tvSubtitle.setVisibility(enabled? GONE: VISIBLE);
-        actionIcon.setVisibility(enabled? GONE: VISIBLE);
+        clTitleContainer.post(() -> clTitleContainer.setVisibility(enabled? INVISIBLE: VISIBLE));
+        clTitleContainer.setVisibility(enabled? INVISIBLE: VISIBLE);
         getActionMenuView().setVisibility(enabled? GONE: VISIBLE);
         if (!lockArrowFunction.isLocked()) {
             setCommandButtonMode(!enabled);

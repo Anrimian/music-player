@@ -74,7 +74,9 @@ public class PlayListsFragment extends MvpAppCompatFragment
     @Override
     public void onFragmentMovedOnTop() {
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
-        bindToolbar(toolbar);
+        toolbar.setTitle(R.string.play_lists);
+        toolbar.setSubtitle(null);
+        toolbar.setTitleClickListener(null);
     }
 
     @Override
@@ -108,11 +110,5 @@ public class PlayListsFragment extends MvpAppCompatFragment
     private void goToPlayListScreen(PlayList playList) {
         FragmentNavigation.from(requireFragmentManager())
                 .addNewFragment(() -> PlayListFragment.newInstance(playList.getId()));
-    }
-
-    private void bindToolbar(AdvancedToolbar toolbar) {
-        toolbar.setTitle(R.string.play_lists);
-        toolbar.setSubtitle(null);
-        toolbar.setTitleClickListener(null);
     }
 }
