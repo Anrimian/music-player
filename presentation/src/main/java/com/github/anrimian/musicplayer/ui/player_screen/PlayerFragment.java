@@ -12,7 +12,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -56,7 +55,8 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
-import com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ChangeWidthDelegate;
@@ -138,7 +138,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     ImageView ivSkipToNext;
 
     @BindView(R.id.drawer_fragment_container)
-    ViewGroup fragmentContainer;
+    JugglerView fragmentContainer;
 
     @BindView(R.id.tv_current_composition)
     TextView tvCurrentComposition;
@@ -212,6 +212,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private UiStatePreferences uiStatePreferences;
 
+    private FragmentNavigation navigation;
+
     @ProvidePresenter
     PlayerPresenter providePresenter() {
         return Components.getLibraryComponent().playerPresenter();
@@ -250,8 +252,15 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         toolbar.initializeViews();
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
 
+        navigation = FragmentNavigation.from(getChildFragmentManager());
+        navigation.initialize(fragmentContainer);
+        navigation.checkForEqualityOnReplace(true);
+        navigation.setExitAnimation(R.anim.anim_slide_out_right);
+        navigation.setEnterAnimation(R.anim.anim_slide_in_right);
+        navigation.setRootExitAnimation(R.anim.anim_alpha_disappear);
+
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
-        drawerLockStateProcessor.setupWithFragmentManager(getChildFragmentManager());
+        drawerLockStateProcessor.setupWithFragmentManager(navigation);
         toolbar.setSearchModeListener(drawerLockStateProcessor::onSearchModeChanged);
 
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
@@ -284,7 +293,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ));
         bottomSheetBehavior.setState(bottomSheetState);
 
-        toolbar.setupWithFragmentManager(getChildFragmentManager(),
+        toolbar.setupWithNavigation(navigation,
                 drawerArrowDrawable,
                 () -> bottomSheetBehavior.getState() == STATE_EXPANDED);
 
@@ -294,8 +303,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
-        Fragment currentFragment = getChildFragmentManager().findFragmentById(R.id.drawer_fragment_container);
-        if (currentFragment == null || savedInstanceState == null) {
+        //Fragment currentFragment = getChildFragmentManager().findFragmentById(R.id.drawer_fragment_container);
+        if (/*currentFragment == null || */savedInstanceState == null) {
             showDrawerScreen(uiStatePreferences.getSelectedDrawerScreen());
         } else {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
@@ -343,6 +352,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        drawerLockStateProcessor.release();
+    }
+
+    @Override
     public boolean onBackPressed() {
         if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
@@ -356,15 +371,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             toolbar.setSearchModeEnabled(false);
             return true;
         }
-        FragmentManager fm = getChildFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.drawer_fragment_container);
+
+        Fragment fragment = navigation.getFragmentOnTop();
         boolean processed = fragment instanceof BackButtonListener
                 && ((BackButtonListener) fragment).onBackPressed();
         if (!processed) {
-            if (fm.getBackStackEntryCount() > 0) {
-                fm.popBackStack();
-                processed = true;
-            }
+            processed = FragmentNavigation.from(getChildFragmentManager()).goBack();
         }
         return processed;
     }
@@ -572,9 +584,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void startFragment(Fragment fragment) {
-        FragmentUtils.startFragment(fragment,
-                getChildFragmentManager(),
-                R.id.drawer_fragment_container);
+        navigation.newRootFragment(() -> fragment, 0, R.anim.anim_alpha_appear);
     }
 
     private void showScreen(int menuItemId) {
@@ -632,13 +642,15 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void clearFragment() {
-        FragmentManager fm = getChildFragmentManager();
-        Fragment currentFragment = fm.findFragmentById(R.id.drawer_fragment_container);
-        if (currentFragment != null) {
-            fm.beginTransaction()
-                    .remove(currentFragment)
-                    .commit();
-        }
+        navigation.clearRootFragment(R.anim.anim_alpha_disappear);
+
+//        FragmentManager fm = getChildFragmentManager();
+//        Fragment currentFragment = fm.findFragmentById(R.id.drawer_fragment_container);
+//        if (currentFragment != null) {
+//            fm.beginTransaction()
+//                    .remove(currentFragment)
+//                    .commit();
+//        }
     }
 
     private void onCompositionMenuClicked(View view) {
@@ -707,10 +719,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
                 .addDelegate(new DrawerArrowDelegate(
                         drawerArrowDrawable,
-                        () -> getChildFragmentManager().getBackStackEntryCount() != 0 || toolbar.isInSearchMode()))
+                        () -> navigation.getScreensCount() > 1 || toolbar.isInSearchMode()))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
-        if (bottomSheetCoordinator != null) {
+        if (bottomSheetCoordinator != null) {//landscape
             delegateManager.addDelegate(new ChangeWidthDelegate(
                     0.5f,
                     bottomSheetCoordinator));

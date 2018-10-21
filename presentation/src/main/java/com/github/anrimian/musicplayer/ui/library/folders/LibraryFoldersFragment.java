@@ -6,8 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -37,7 +35,8 @@ import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourc
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
-import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -155,7 +154,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
         if (getPath() != null) {//TODO root path -> not root path change case
             SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-            SlidrFragment.replace(this, contentContainer, slidrConfig);
+            SlidrPanel.replace(contentContainer,
+                    () -> FragmentNavigation.from(requireFragmentManager()).goBack(),
+                    slidrConfig);
         }
     }
 
@@ -235,15 +236,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @Override
     public void goBackToMusicStorageScreen(String path) {
-        FragmentManager fragmentManager = requireFragmentManager();
-        if (fragmentManager.getBackStackEntryCount() > 0) {
-            fragmentManager.popBackStack();
-        } else {
-            fragmentManager.beginTransaction()
-                    .setCustomAnimations(0, R.anim.anim_slide_out_right)
-                    .replace(R.id.library_folders_container, LibraryFoldersFragment.newInstance(path))
-                    .commit();
-        }
+        FragmentNavigation.from(requireFragmentManager()).goBack();
     }
 
     @Override
@@ -356,11 +349,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     }
 
     private void goToMusicStorageScreen(String path) {
-        LibraryFoldersFragment fragment = LibraryFoldersFragment.newInstance(path);
-        FragmentTransaction transaction = requireFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.anim_slide_in_right, 0, 0, R.anim.anim_slide_out_right)
-                .add(R.id.library_folders_container, fragment, path)
-                .addToBackStack(path)
-                .commit();
+        FragmentNavigation.from(requireFragmentManager())
+                .addNewFragment(() -> LibraryFoldersFragment.newInstance(path));
     }
 }

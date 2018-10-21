@@ -1,25 +1,21 @@
 package com.github.anrimian.musicplayer.ui.utils.slidr;
 
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.view.View;
 
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.widget.SliderPanel;
 
-class FragmentPanelSlideListener implements SliderPanel.OnPanelSlideListener {
+class PanelSlideListener implements SliderPanel.OnPanelSlideListener {
 
-    private final Fragment fragment;
+    private final Runnable closeAction;
     private final SlidrConfig config;
 
-    private SlidrFragment.SlideListener slideListener;
+    private SlidrPanel.SlideListener slideListener;
 
-    FragmentPanelSlideListener(@NonNull Fragment fragment,
-                               @NonNull SlidrConfig config,
-                               SlidrFragment.SlideListener slideListener) {
-        this.fragment = fragment;
+    PanelSlideListener(@NonNull Runnable closeAction,
+                       @NonNull SlidrConfig config,
+                       SlidrPanel.SlideListener slideListener) {
+        this.closeAction = closeAction;
         this.config = config;
         this.slideListener = slideListener;
     }
@@ -39,10 +35,7 @@ class FragmentPanelSlideListener implements SliderPanel.OnPanelSlideListener {
             config.getListener().onSlideClosed();
         }
 
-        FragmentManager fm = fragment.requireFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.popBackStack();
-        }
+        closeAction.run();
     }
 
     @Override

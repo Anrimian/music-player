@@ -14,8 +14,7 @@ import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersRootFragment;
-
-import static com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils.startFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 
 public class LibraryFragment extends MvpAppCompatFragment {
 
@@ -36,20 +35,20 @@ public class LibraryFragment extends MvpAppCompatFragment {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.library_categories_menu);
         popup.setOnMenuItemClickListener(item -> {
-            LibraryFragment fragment = null;
             switch (item.getItemId()) {
                 case R.id.menu_compositions: {
-                    fragment = new LibraryCompositionsFragment();
                     uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_COMPOSITIONS);
+                    FragmentNavigation.from(requireFragmentManager())
+                            .newRootFragment(LibraryCompositionsFragment::new);
                     break;
                 }
                 case R.id.menu_files: {
-                    fragment = new LibraryFoldersRootFragment();
+                    FragmentNavigation.from(requireFragmentManager())
+                            .newRootFragment(LibraryFoldersRootFragment::new);
                     uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_FOLDERS);
                     break;
                 }
             }
-            startFragment(fragment, requireFragmentManager(), R.id.drawer_fragment_container);
             return true;
         });
         popup.show();

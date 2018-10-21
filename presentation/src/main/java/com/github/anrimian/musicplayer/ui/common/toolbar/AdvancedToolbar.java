@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
@@ -20,6 +19,8 @@ import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentStackListener;
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher;
 import com.github.anrimian.musicplayer.utils.AndroidUtils;
 
@@ -32,6 +33,9 @@ public class AdvancedToolbar extends Toolbar {
     private static final String IS_IN_SEARCH_MODE = "is_in_search_mode";
     private static final String IS_KEYBOARD_SHOWN = "is_keyboard_shown";
 
+    private final FragmentStackListener stackChangeListener = new StackChangeListenerImpl();
+
+    private View clTitleContainer;
     private TextView tvTitle;
     private TextView tvSubtitle;
     private View actionIcon;
@@ -39,7 +43,7 @@ public class AdvancedToolbar extends Toolbar {
     private ActionMenuView actionMenuView;
     private FrameLayout flTitleArea;
 
-    private FragmentManager fragmentManager;
+    private FragmentNavigation navigation;
     private DrawerArrowDrawable drawerArrowDrawable;
     private LockArrowInBackStateFunction lockArrowFunction;
 
@@ -62,6 +66,7 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     public void initializeViews() {
+        clTitleContainer = findViewById(R.id.title_container);
         tvTitle = findViewById(R.id.tv_title);
         tvSubtitle = findViewById(R.id.tv_subtitle);
         actionIcon = findViewById(R.id.action_icon);
@@ -85,14 +90,15 @@ public class AdvancedToolbar extends Toolbar {
         }
     }
 
-    public void setupWithFragmentManager(FragmentManager fragmentManager,
-                                         DrawerArrowDrawable drawerArrowDrawable,
-                                         LockArrowInBackStateFunction lockArrowFunction) {
-        this.fragmentManager = fragmentManager;
+    public void setupWithNavigation(FragmentNavigation navigation,
+                                    DrawerArrowDrawable drawerArrowDrawable,
+                                    LockArrowInBackStateFunction lockArrowFunction) {
+        this.navigation = navigation;
         this.drawerArrowDrawable = drawerArrowDrawable;
         this.lockArrowFunction = lockArrowFunction;
-        onFragmentStackChanged();
-        fragmentManager.addOnBackStackChangedListener(this::onFragmentStackChanged);
+
+        onFragmentStackChanged(navigation.getScreensCount());
+        navigation.addStackChangeListener(stackChangeListener);
     }
 
     public void setSearchModeEnabled(boolean enabled) {
@@ -105,9 +111,8 @@ public class AdvancedToolbar extends Toolbar {
             searchModeListener.call(enabled);
         }
         etSearch.setVisibility(enabled? VISIBLE: GONE);
-        tvTitle.setVisibility(enabled? GONE: VISIBLE);
-        tvSubtitle.setVisibility(enabled? GONE: VISIBLE);
-        actionIcon.setVisibility(enabled? GONE: VISIBLE);
+        clTitleContainer.post(() -> clTitleContainer.setVisibility(enabled? INVISIBLE: VISIBLE));
+        clTitleContainer.setVisibility(enabled? INVISIBLE: VISIBLE);
         getActionMenuView().setVisibility(enabled? GONE: VISIBLE);
         if (!lockArrowFunction.isLocked()) {
             setCommandButtonMode(!enabled);
@@ -125,6 +130,8 @@ public class AdvancedToolbar extends Toolbar {
 
     @Override
     protected Parcelable onSaveInstanceState() {
+        navigation.removeStackChangeListener(stackChangeListener);
+
         Bundle bundle = new Bundle();
         bundle.putParcelable("superState", super.onSaveInstanceState());
         bundle.putBoolean(IS_IN_SEARCH_MODE, isInSearchMode);
@@ -175,7 +182,7 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     public void onStackFragmentSlided(float offset) {
-        if (fragmentManager.getBackStackEntryCount() == 1) {
+        if (navigation.getScreensCount() == 2) {
             drawerArrowDrawable.setProgress(offset);
         }
     }
@@ -207,8 +214,8 @@ public class AdvancedToolbar extends Toolbar {
         this.searchModeListener = searchModeListener;
     }
 
-    private void onFragmentStackChanged() {
-        boolean isRoot = fragmentManager.getBackStackEntryCount() == 0;
+    private void onFragmentStackChanged(int stackSize) {
+        boolean isRoot = stackSize <= 1;
         if (isRoot && lockArrowFunction.isLocked()) {
             return;
         }
@@ -251,5 +258,13 @@ public class AdvancedToolbar extends Toolbar {
 
     public interface LockArrowInBackStateFunction {
         boolean isLocked();
+    }
+
+    private class StackChangeListenerImpl implements FragmentStackListener {
+
+        @Override
+        public void onStackChanged(int stackSize) {
+            onFragmentStackChanged(navigation.getScreensCount());
+        }
     }
 }
