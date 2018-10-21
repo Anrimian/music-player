@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.data.controllers.music;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
@@ -54,6 +53,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences, Context context) {
         this.uiStatePreferences = uiStatePreferences;
         player = ExoPlayerFactory.newSimpleInstance(
+                context,
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
