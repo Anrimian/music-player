@@ -7,6 +7,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -159,8 +160,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     public void bindList(List<Composition> compositions) {
         adapter = new CompositionsAdapter(compositions);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-        adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
-        adapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
+        adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
         recyclerView.setAdapter(adapter);
     }
 
@@ -216,5 +216,28 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
         String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
         Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onCompositionMenuClicked(View view, Composition composition) {
+        PopupMenu popup = new PopupMenu(requireContext(), view);
+        popup.inflate(R.menu.composition_item_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_add_to_playlist: {
+                    presenter.onAddToPlayListButtonClicked(composition);
+                    return true;
+                }
+                case R.id.menu_share: {
+                    presenter.onDeleteCompositionButtonClicked(composition);
+                    return true;
+                }
+                case R.id.menu_delete: {
+                    presenter.onDeleteCompositionButtonClicked(composition);
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
     }
 }

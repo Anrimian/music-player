@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
 import android.content.Context;
 import android.support.annotation.StringRes;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +13,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import javax.annotation.Nonnull;
 
@@ -48,22 +48,16 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
 
     private Composition composition;
 
-    private OnItemClickListener<Composition> onDeleteCompositionClickListener;
-    private OnItemClickListener<Composition> onAddToPlaylistClickListener;
-
     public MusicViewHolder(LayoutInflater inflater,
                            ViewGroup parent,
                            OnItemClickListener<Composition> onCompositionClickListener,
-                           OnItemClickListener<Composition> onDeleteCompositionClickListener,
-                           OnItemClickListener<Composition> onAddToPlaylistClickListener) {
+                           OnViewItemClickListener<Composition> onMenuClickListener) {
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
         ButterKnife.bind(this, itemView);
         if (onCompositionClickListener != null) {
             clickableItem.setOnClickListener(v -> onCompositionClickListener.onItemClick(composition));
         }
-        btnActionsMenu.setOnClickListener(this::onActionsMenuButtonClicked);
-        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
-        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+        btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, composition));
     }
 
     public void bind(@Nonnull Composition composition) {
@@ -84,29 +78,6 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
         sb.append(" ● ");//TODO split problem
         sb.append(formatMilliseconds(composition.getDuration()));
         tvAdditionalInfo.setText(sb.toString());
-    }
-
-    private void onActionsMenuButtonClicked(View view) {
-        PopupMenu popup = new PopupMenu(getContext(), view);
-        popup.inflate(R.menu.composition_item_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_add_to_playlist: {
-                    onAddToPlaylistClickListener.onItemClick(composition);
-                    return true;
-                }
-                case R.id.menu_share: {
-//                    presenter.onShareCompositionButtonClicked();
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    onDeleteCompositionClickListener.onItemClick(composition);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
     }
 
     private String getString(@StringRes int resId) {

@@ -8,12 +8,9 @@ import android.view.ViewGroup;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicViewHolder;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import java.util.List;
-
-import static android.support.v7.util.DiffUtil.calculateDiff;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.hasChanges;
 
 /**
  * Created on 31.10.2017.
@@ -23,8 +20,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     private final List<Composition> musicList;
     private OnItemClickListener<Composition> onCompositionClickListener;
-    private OnItemClickListener<Composition> onDeleteCompositionClickListener;
-    private OnItemClickListener<Composition> onAddToPlaylistClickListener;
+    private OnViewItemClickListener<Composition> onMenuItemClickListener;
 
     public CompositionsAdapter(List<Composition> musicList) {
         this.musicList = musicList;
@@ -36,8 +32,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
                 onCompositionClickListener,
-                onDeleteCompositionClickListener,
-                onAddToPlaylistClickListener);
+                onMenuItemClickListener);
     }
 
     @Override
@@ -55,11 +50,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
-    public void setOnDeleteCompositionClickListener(OnItemClickListener<Composition> onDeleteCompositionClickListener) {
-        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
-    }
-
-    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
-        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+    public void setOnMenuItemClickListener(OnViewItemClickListener<Composition> onMenuItemClickListener) {
+        this.onMenuItemClickListener = onMenuItemClickListener;
     }
 }

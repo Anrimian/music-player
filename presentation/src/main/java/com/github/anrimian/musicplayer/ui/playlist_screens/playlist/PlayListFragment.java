@@ -114,7 +114,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
     public void bindList(List<Composition> compositions) {
         adapter = new CompositionsAdapter(compositions);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-//        adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
+        adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
         recyclerView.setAdapter(adapter);
     }
 
@@ -135,6 +135,10 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
                 R.plurals.compositions_count,
                 playList.getCompositionsCount(),
                 playList.getCompositionsCount()));
+    }
+
+    private void onCompositionMenuClicked(View view, Composition composition) {
+        //TODO finish
     }
 
     private long getPlayListId() {

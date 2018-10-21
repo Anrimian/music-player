@@ -1,31 +1,18 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
-import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
-import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
-import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.OnTransitionItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.endless_scrolling.HeaderFooterRecyclerViewAdapter;
 
 import java.util.List;
-
-import io.reactivex.Scheduler;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-
-import static android.support.v7.util.DiffUtil.calculateDiff;
 
 /**
  * Created on 31.10.2017.
@@ -38,11 +25,10 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
 
     private final List<FileSource> musicList;
     private OnItemClickListener<Composition> onCompositionClickListener;
-    private OnItemClickListener<Composition> onDeleteCompositionClickListener;
-    private OnItemClickListener<Composition> onAddToPlaylistClickListener;
     private OnItemClickListener<String> onFolderClickListener;
     private OnItemClickListener<String> onAddFolderToPlaylistClickListener;
     private OnItemClickListener<FolderFileSource> onDeleteFolderClickListener;
+    private OnViewItemClickListener<Composition> onCompositionMenuItemClicked;
 
     public MusicFileSourceAdapter(List<FileSource> musicList) {
         this.musicList = musicList;
@@ -56,8 +42,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
                 return new MusicViewHolder(inflater,
                         parent,
                         onCompositionClickListener,
-                        onDeleteCompositionClickListener,
-                        onAddToPlaylistClickListener);
+                        onCompositionMenuItemClicked);
             }
             case TYPE_FILE: {
                 return new FolderViewHolder(inflater,
@@ -112,12 +97,8 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         this.onFolderClickListener = onFolderClickListener;
     }
 
-    public void setOnDeleteCompositionClickListener(OnItemClickListener<Composition> onDeleteCompositionClickListener) {
-        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
-    }
-
-    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
-        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+    public void setOnCompositionMenuItemClicked(OnViewItemClickListener<Composition> onCompositionMenuItemClicked) {
+        this.onCompositionMenuItemClicked = onCompositionMenuItemClicked;
     }
 
     public void setOnDeleteFolderClickListener(OnItemClickListener<FolderFileSource> onDeleteFolderClickListener) {

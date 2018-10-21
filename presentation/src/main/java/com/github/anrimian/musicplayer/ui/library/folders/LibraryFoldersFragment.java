@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -187,8 +188,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
         adapter.setOnDeleteFolderClickListener(presenter::onDeleteFolderButtonClicked);
-        adapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
-        adapter.setOnAddToPlaylistClickListener(presenter::onAddToPlayListButtonClicked);
+        adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
         adapter.setOnAddFolderToPlaylistClickListener(presenter::onAddFolderToPlayListButtonClicked);
         recyclerView.setAdapter(adapter);
     }
@@ -330,6 +330,29 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
         String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
         Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onCompositionMenuClicked(View view, Composition composition) {
+        PopupMenu popup = new PopupMenu(requireContext(), view);
+        popup.inflate(R.menu.composition_item_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_add_to_playlist: {
+                    presenter.onAddToPlayListButtonClicked(composition);
+                    return true;
+                }
+                case R.id.menu_share: {
+                    presenter.onDeleteCompositionButtonClicked(composition);
+                    return true;
+                }
+                case R.id.menu_delete: {
+                    presenter.onDeleteCompositionButtonClicked(composition);
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
     }
 
     private void goToMusicStorageScreen(String path) {
