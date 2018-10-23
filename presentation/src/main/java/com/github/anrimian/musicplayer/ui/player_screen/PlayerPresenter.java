@@ -3,22 +3,20 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.business.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.ListChangeCalculator;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.reactivex.BackpressureStrategy;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -34,6 +32,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private final MusicPlayerInteractor musicPlayerInteractor;
     private final PlayListsInteractor playListsInteractor;
+    private final PlayerScreenInteractor playerScreenInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
@@ -48,10 +47,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
+                           PlayerScreenInteractor playerScreenInteractor,
                            ErrorParser errorParser,
                            Scheduler uiScheduler) {
         this.musicPlayerInteractor = musicPlayerInteractor;
         this.playListsInteractor = playListsInteractor;
+        this.playerScreenInteractor = playerScreenInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
@@ -62,6 +63,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().bindPlayList(playQueue);
         getViewState().showInfinitePlayingButton(musicPlayerInteractor.isInfinitePlayingEnabled());
         getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
+        if (playerScreenInteractor.isPlayerPanelOpen()) {
+            getViewState().expandBottomPanel();
+        } else {
+            getViewState().collapseBottomPanel();
+        }
+        getViewState().showDrawerScreen(playerScreenInteractor.getSelectedDrawerScreen());
     }
 
     void onStart() {//TODO unnecessary scroll to position
@@ -75,6 +82,25 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (trackStateDisposable != null) {
             trackStateDisposable.dispose();
         }
+    }
+
+    void onBottomPanelExpanded() {
+        playerScreenInteractor.setPlayerPanelOpen(true);
+        getViewState().expandBottomPanel();
+    }
+
+    void onBottomPanelCollapsed() {
+        playerScreenInteractor.setPlayerPanelOpen(false);
+        getViewState().collapseBottomPanel();
+    }
+
+    void onDrawerScreenSelected(int screenId) {
+        playerScreenInteractor.setSelectedDrawerScreen(screenId);
+        getViewState().showDrawerScreen(screenId);
+    }
+
+    void onLibraryScreenSelected() {
+        getViewState().showLibraryScreen(playerScreenInteractor.getSelectedLibraryScreen());
     }
 
     void onPlayButtonClicked() {

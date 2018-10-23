@@ -97,15 +97,17 @@ public class AdvancedToolbar extends Toolbar {
         this.drawerArrowDrawable = drawerArrowDrawable;
         this.lockArrowFunction = lockArrowFunction;
 
-        onFragmentStackChanged(navigation.getScreensCount());
+        onFragmentStackChanged(navigation.getScreensCount(), true);
         navigation.addStackChangeListener(stackChangeListener);
     }
 
     public void setSearchModeEnabled(boolean enabled) {
-        setSearchModeEnabled(enabled, true);
+        setSearchModeEnabled(enabled, true, false);
     }
 
-    public void setSearchModeEnabled(boolean enabled, boolean showKeyboard) {
+    public void setSearchModeEnabled(boolean enabled,
+                                     boolean showKeyboard,
+                                     boolean jumpToState) {
         isInSearchMode = enabled;
         if (searchModeListener != null) {
             searchModeListener.call(enabled);
@@ -114,8 +116,8 @@ public class AdvancedToolbar extends Toolbar {
         clTitleContainer.post(() -> clTitleContainer.setVisibility(enabled? INVISIBLE: VISIBLE));
         clTitleContainer.setVisibility(enabled? INVISIBLE: VISIBLE);
         getActionMenuView().setVisibility(enabled? GONE: VISIBLE);
-        if (!lockArrowFunction.isLocked()) {
-            setCommandButtonMode(!enabled);
+        if (!lockArrowFunction.isLocked() && navigation.getScreensCount() <= 1) {
+            setCommandButtonMode(!enabled, !jumpToState);
         }
         if (enabled) {
             etSearch.requestFocus();
@@ -146,7 +148,7 @@ public class AdvancedToolbar extends Toolbar {
 
             boolean isInSearchMode = bundle.getBoolean(IS_IN_SEARCH_MODE);
             boolean isKeyboardShown = bundle.getBoolean(IS_KEYBOARD_SHOWN);
-            setSearchModeEnabled(isInSearchMode, isKeyboardShown);
+            setSearchModeEnabled(isInSearchMode, isKeyboardShown, true);
 
             state = bundle.getParcelable("superState");
         }
@@ -182,7 +184,7 @@ public class AdvancedToolbar extends Toolbar {
     }
 
     public void onStackFragmentSlided(float offset) {
-        if (navigation.getScreensCount() == 2) {
+        if (navigation.getScreensCount() >= 2) {
             drawerArrowDrawable.setProgress(offset);
         }
     }
@@ -214,21 +216,25 @@ public class AdvancedToolbar extends Toolbar {
         this.searchModeListener = searchModeListener;
     }
 
-    private void onFragmentStackChanged(int stackSize) {
+    private void onFragmentStackChanged(int stackSize, boolean jumpToState) {
         boolean isRoot = stackSize <= 1;
         if (isRoot && lockArrowFunction.isLocked()) {
             return;
         }
 
-        setCommandButtonMode(isRoot);
+        setCommandButtonMode(isRoot, !jumpToState);
     }
 
-    private void setCommandButtonMode(boolean isNormal) {
+    private void setCommandButtonMode(boolean isNormal, boolean animate) {
         float end = isNormal? 0f : 1f;
-        float start = drawerArrowDrawable.getProgress();
-        ObjectAnimator objectAnimator = ofFloat(drawerArrowDrawable, "progress", start, end);
-        objectAnimator.setDuration(TOOLBAR_ARROW_ANIMATION_TIME);
-        objectAnimator.start();
+        if (animate) {
+            float start = drawerArrowDrawable.getProgress();
+            ObjectAnimator objectAnimator = ofFloat(drawerArrowDrawable, "progress", start, end);
+            objectAnimator.setDuration(TOOLBAR_ARROW_ANIMATION_TIME);
+            objectAnimator.start();
+        } else {
+            drawerArrowDrawable.setProgress(end);
+        }
     }
 
     @Nullable
@@ -264,7 +270,7 @@ public class AdvancedToolbar extends Toolbar {
 
         @Override
         public void onStackChanged(int stackSize) {
-            onFragmentStackChanged(navigation.getScreensCount());
+            onFragmentStackChanged(navigation.getScreensCount(), false);
         }
     }
 }

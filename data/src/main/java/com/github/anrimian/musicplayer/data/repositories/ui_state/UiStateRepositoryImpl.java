@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 public class UiStateRepositoryImpl implements UiStateRepository {
 
-    private UiStatePreferences uiStatePreferences;
+    private final UiStatePreferences uiStatePreferences;
 
     public UiStateRepositoryImpl(UiStatePreferences uiStatePreferences) {
         this.uiStatePreferences = uiStatePreferences;
@@ -23,5 +23,35 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     @Override
     public long getTrackPosition() {
         return uiStatePreferences.getTrackPosition();
+    }
+
+    @Override
+    public void setPlayerPanelOpen(boolean open) {
+        uiStatePreferences.setPlayerPanelOpen(open);
+    }
+
+    @Override
+    public boolean isPlayerPanelOpen() {
+        return uiStatePreferences.isPlayerPanelOpen();
+    }
+
+    @Override
+    public void setSelectedDrawerScreen(int screenId) {
+        uiStatePreferences.setSelectedDrawerScreen(screenId);
+    }
+
+    @Override
+    public int getSelectedDrawerScreen() {
+        return uiStatePreferences.getSelectedDrawerScreen();
+    }
+
+    @Override
+    public void setSelectedLibraryScreen(int screenId) {
+        uiStatePreferences.setSelectedLibraryScreen(screenId);
+    }
+
+    @Override
+    public int getSelectedLibraryScreen() {
+        return uiStatePreferences.getSelectedLibraryScreen();
     }
 }

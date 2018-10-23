@@ -24,7 +24,7 @@ public class DrawerLockStateProcessor {
         this.drawer = drawer;
     }
 
-    public void setupWithFragmentManager(FragmentNavigation navigation) {
+    public void setupWithNavigation(FragmentNavigation navigation) {
         this.navigation = navigation;
         onFragmentStackChanged(navigation.getScreensCount());
         navigation.addStackChangeListener(stackChangeListener);

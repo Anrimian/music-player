@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import android.support.v7.util.DiffUtil;
-
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
@@ -22,12 +20,19 @@ import java.util.List;
 public interface PlayerView extends MvpView {
 
     String PLAYER_STATE = "player_state";
+    String BOTTOM_PANEL_STATE = "bottom_panel_state";
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
     void showStopState();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
     void showPlayState();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BOTTOM_PANEL_STATE)
+    void expandBottomPanel();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BOTTOM_PANEL_STATE)
+    void collapseBottomPanel();
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showMusicControls(boolean show);
@@ -76,4 +81,10 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showPlayQueueSubtitle(int size);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDrawerScreen(int selectedDrawerScreen);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showLibraryScreen(int selectedLibraryScreen);
 }

@@ -35,13 +35,13 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.infrastructure.service.MusicServiceManager;
+import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
@@ -182,7 +182,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.toolbar)
     AdvancedToolbar toolbar;
 
-    @BindView(R.id.title_container)
+    @BindView(R.id.toolbar_content_container)
     View titleContainer;
 
     @BindView(R.id.acv_play_queue)
@@ -200,8 +200,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private SlideDelegate bottomSheetDelegate;
 
-    private ActionBarDrawerToggle drawerToggle;
-
     private int selectedDrawerItemId = NO_ITEM;
     private int itemIdToStart = NO_ITEM;
 
@@ -209,8 +207,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private SeekBarViewWrapper seekBarViewWrapper;
 
     private DrawerLockStateProcessor drawerLockStateProcessor;
-
-    private UiStatePreferences uiStatePreferences;
 
     private FragmentNavigation navigation;
 
@@ -247,7 +243,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return;
         }
         MusicServiceManager.initialize();
-        uiStatePreferences = Components.getAppComponent().uiStatePreferences();
 
         toolbar.initializeViews();
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
@@ -260,13 +255,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         navigation.setRootExitAnimation(R.anim.anim_alpha_disappear);
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
-        drawerLockStateProcessor.setupWithFragmentManager(navigation);
+        drawerLockStateProcessor.setupWithNavigation(navigation);
         toolbar.setSearchModeListener(drawerLockStateProcessor::onSearchModeChanged);
 
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
         navigationView.inflateHeaderView(R.layout.partial_drawer_header);
 
-        drawerToggle = new ActionBarDrawerToggle(requireActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(requireActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
         DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
@@ -274,24 +269,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         setupMenu(actionMenuView, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
-        int bottomSheetState;
-        if (savedInstanceState == null) {
-            bottomSheetState = uiStatePreferences.isPlayerPanelOpen()? STATE_EXPANDED: STATE_COLLAPSED;
-            drawerLockStateProcessor.onBottomSheetOpened(uiStatePreferences.isPlayerPanelOpen());
-        } else {
-            bottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
-        }
-
         bottomSheetDelegate = getBottomSheetDelegate(drawerArrowDrawable);
-        bottomSheetDelegate.onSlide(bottomSheetState == STATE_COLLAPSED ? 0f : 1f);
-
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
         mlBottomSheet.setClickable(true);
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
                 this::onBottomSheetStateChanged,
                 this::onBottomSheetSlided
         ));
-        bottomSheetBehavior.setState(bottomSheetState);
 
         toolbar.setupWithNavigation(navigation,
                 drawerArrowDrawable,
@@ -303,10 +287,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
-        //Fragment currentFragment = getChildFragmentManager().findFragmentById(R.id.drawer_fragment_container);
-        if (/*currentFragment == null || */savedInstanceState == null) {
-            showDrawerScreen(uiStatePreferences.getSelectedDrawerScreen());
-        } else {
+        if (savedInstanceState != null) {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
         }
 
@@ -391,6 +372,61 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void onStop() {
         super.onStop();
         presenter.onStop();
+    }
+
+    @Override
+    public void expandBottomPanel() {
+        drawerLockStateProcessor.onBottomSheetOpened(true);
+        bottomSheetDelegate.onSlide(1f);
+        if (bottomSheetBehavior.getState() != STATE_EXPANDED) {
+            bottomSheetBehavior.setState(STATE_EXPANDED);
+        }
+    }
+
+    @Override
+    public void collapseBottomPanel() {
+        drawerLockStateProcessor.onBottomSheetOpened(false);
+        bottomSheetDelegate.onSlide(0f);
+        if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
+            bottomSheetBehavior.setState(STATE_COLLAPSED);
+        }
+    }
+
+    @Override
+    public void showDrawerScreen(int screenId) {
+        int itemId = ScreensMap.getMenuIdId(screenId);
+        selectedDrawerItemId = itemId;
+        navigationView.setCheckedItem(itemId);
+
+        switch (screenId) {
+            case Screens.LIBRARY: {
+                presenter.onLibraryScreenSelected();
+                break;
+            }
+            case Screens.PLAY_LISTS: {
+                startFragment(new PlayListsFragment());
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void showLibraryScreen(int selectedLibraryScreen) {
+        Fragment fragment;
+        switch (selectedLibraryScreen) {
+            case Screens.LIBRARY_COMPOSITIONS: {
+                fragment = new LibraryCompositionsFragment();
+                break;
+            }
+            case Screens.LIBRARY_FOLDERS: {
+                fragment = new LibraryFoldersRootFragment();
+                break;
+            }
+            default: {
+                fragment = new LibraryCompositionsFragment();
+            }
+        }
+        startFragment(fragment);
     }
 
     @Override
@@ -587,70 +623,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         navigation.newRootFragment(() -> fragment, 0, R.anim.anim_alpha_appear);
     }
 
-    private void showScreen(int menuItemId) {
-        Fragment fragment = null;
-        int screenId = 0;
-        switch (menuItemId) {
-            case R.id.menu_library: {
-                fragment = getLibraryFragment();
-                screenId = Screens.LIBRARY;
-                break;
-            }
-            case R.id.menu_play_lists: {
-                fragment = new PlayListsFragment();
-                screenId = Screens.PLAY_LISTS;
-                break;
-            }
-        }
-        uiStatePreferences.setSelectedDrawerScreen(screenId);
-        startFragment(fragment);
-    }
-
-    private void showDrawerScreen(int screenId) {
-        int itemId = 0;
-        Fragment fragment = null;
-        switch (screenId) {
-            case Screens.LIBRARY: {
-                itemId = R.id.menu_library;
-                fragment = getLibraryFragment();
-                break;
-            }
-            case Screens.PLAY_LISTS: {
-                itemId = R.id.menu_play_lists;
-                fragment = new PlayListsFragment();
-                break;
-            }
-        }
-
-        selectedDrawerItemId = itemId;
-        navigationView.setCheckedItem(itemId);
-        startFragment(fragment);
-    }
-
-    private Fragment getLibraryFragment() {
-        switch (uiStatePreferences.getSelectedLibraryScreen()) {
-            case Screens.LIBRARY_COMPOSITIONS: {
-                return new LibraryCompositionsFragment();
-            }
-            case Screens.LIBRARY_FOLDERS: {
-                return new LibraryFoldersRootFragment();
-            }
-            default: {
-                return new LibraryCompositionsFragment();
-            }
-        }
-    }
-
     private void clearFragment() {
         navigation.clearRootFragment(R.anim.anim_alpha_disappear);
-
-//        FragmentManager fm = getChildFragmentManager();
-//        Fragment currentFragment = fm.findFragmentById(R.id.drawer_fragment_container);
-//        if (currentFragment != null) {
-//            fm.beginTransaction()
-//                    .remove(currentFragment)
-//                    .commit();
-//        }
     }
 
     private void onCompositionMenuClicked(View view) {
@@ -695,7 +669,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private void onDrawerClosed() {
         if (itemIdToStart != NO_ITEM) {
-            showScreen(itemIdToStart);
+            int screenId = ScreensMap.getScreenId(itemIdToStart);
+            presenter.onDrawerScreenSelected(screenId);
         }
     }
 
@@ -738,15 +713,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onBottomSheetStateChanged(Integer newState) {
         switch (newState) {
             case STATE_COLLAPSED: {
-                drawerLockStateProcessor.onBottomSheetOpened(false);
-                bottomSheetDelegate.onSlide(0f);
-                uiStatePreferences.setPlayerPanelOpen(false);
+                presenter.onBottomPanelCollapsed();
                 return;
             }
             case STATE_EXPANDED: {
-                drawerLockStateProcessor.onBottomSheetOpened(true);
-                bottomSheetDelegate.onSlide(1f);
-                uiStatePreferences.setPlayerPanelOpen(true);
+                presenter.onBottomPanelExpanded();
             }
         }
     }

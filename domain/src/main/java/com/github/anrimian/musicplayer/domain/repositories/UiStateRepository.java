@@ -10,4 +10,15 @@ public interface UiStateRepository {
 
     long getTrackPosition();
 
+    void setPlayerPanelOpen(boolean open);
+
+    boolean isPlayerPanelOpen();
+
+    void setSelectedDrawerScreen(int screenId);
+
+    int getSelectedDrawerScreen();
+
+    void setSelectedLibraryScreen(int screenId);
+
+    int getSelectedLibraryScreen();
 }
