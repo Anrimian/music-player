@@ -10,4 +10,6 @@
     <color name="colorError">#c62828</color>
     <color name="icon_color">#252728</color>
     <color name="divider_color">#BDBDBD</color>
+    <color name="primary_button_color">#212121</color>
+    <color name="secondary_button_color">#616161</color>
 </resources>
