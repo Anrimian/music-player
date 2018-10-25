@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
@@ -19,10 +20,10 @@ public class PlayerEventListener implements Player.EventListener {
         this.subject = subject;
     }
 
-//    @Override
-//    public void onTimelineChanged(Timeline timeline, Object manifest) {
-//
-//    }
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+    }
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
@@ -66,10 +67,10 @@ public class PlayerEventListener implements Player.EventListener {
         subject.onNext(new ErrorEvent(error));
     }
 
-//    @Override
-//    public void onPositionDiscontinuity() {
-//
-//    }
+    @Override
+    public void onPositionDiscontinuity() {
+
+    }
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {

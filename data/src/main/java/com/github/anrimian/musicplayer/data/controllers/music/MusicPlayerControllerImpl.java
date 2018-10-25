@@ -53,7 +53,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences, Context context) {
         this.uiStatePreferences = uiStatePreferences;
         player = ExoPlayerFactory.newSimpleInstance(
-                context,
+//                context,
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
@@ -71,7 +71,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public void prepareToPlay(Composition composition, long startPosition) {
         checkComposition(composition)
                 .flatMap(this::prepareMediaSource)
-                .toCompletable()
+                .ignoreElement()
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
                 .subscribe();

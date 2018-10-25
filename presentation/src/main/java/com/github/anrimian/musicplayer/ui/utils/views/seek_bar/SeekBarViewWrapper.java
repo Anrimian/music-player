@@ -39,10 +39,14 @@ public class SeekBarViewWrapper {
         });
     }
 
-    public void setProgress(int progress) {
+    public void setProgress(long progress) {
         if (!isOnTouch) {
-            seekBar.setProgress(progress);
+            seekBar.setProgress((int) progress);
         }
+    }
+
+    public void setMax(long max) {
+        seekBar.setMax((int) max);
     }
 
     public void setOnSeekStartListener(OnSeekStartListener onSeekStartListener) {
@@ -62,7 +66,7 @@ public class SeekBarViewWrapper {
     }
 
     public interface OnSeekStartListener {
-         void onSeekStart();
+        void onSeekStart();
     }
 
     public interface OnSeekStopListener {

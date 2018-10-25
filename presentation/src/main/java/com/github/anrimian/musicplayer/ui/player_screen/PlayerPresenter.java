@@ -141,8 +141,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onTrackRewoundTo(int progress) {
-        long position = currentItem.getComposition().getDuration() * progress / 100;
-        musicPlayerInteractor.seekTo(position);
+        musicPlayerInteractor.seekTo(progress);
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
@@ -190,8 +189,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onSeekStop(int progress) {
-        long position = currentItem.getComposition().getDuration() * progress / 100;
-        musicPlayerInteractor.onSeekFinished(position);
+        musicPlayerInteractor.onSeekFinished(progress);
     }
 
     private void addPreparedCompositionsToPlayList(PlayList playList) {

@@ -24,7 +24,7 @@ ext {
     moxyVersion = "1.5.3"
     butterKnifeVersion = "8.8.1"
     daggerVersion = "2.18"
-    exoPlayerVersion = "2.9.0"
+    exoPlayerVersion = "r2.5.4"//"2.9.0"
     roomVersion = "1.1.0"
 
     //Testing

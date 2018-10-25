@@ -431,7 +431,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showStopState() {
-
         ivPlayPause.setImageResource(R.drawable.ic_play);
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
     }
@@ -459,6 +458,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
         tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
+        seekBarViewWrapper.setMax(composition.getDuration());
 
         ImageFormatUtils.displayImage(ivMusicIcon, composition);
 
@@ -514,11 +514,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showTrackState(long currentPosition, long duration) {
-        int progress = 0;
-        if (duration != 0) {
-            progress = (int) (currentPosition * 100 / duration);
-        }
-        seekBarViewWrapper.setProgress(progress);
+        seekBarViewWrapper.setProgress(currentPosition);
         tvPlayedTime.setText(formatMilliseconds(currentPosition));
     }
 
