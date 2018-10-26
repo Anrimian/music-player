@@ -59,12 +59,12 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNav
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.ChangeWidthDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DrawerArrowDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveXDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveYDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ReverseDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
@@ -84,6 +84,7 @@ import butterknife.ButterKnife;
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.v4.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
+import static android.view.View.INVISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
@@ -115,7 +116,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Nullable
     @BindView(R.id.coordinator_bottom_sheet)
-    View bottomSheetCoordinator;
+    CoordinatorLayout bottomSheetCoordinator;
 
     @Nullable
     @BindView(R.id.bottom_sheet_left_shadow)
@@ -233,6 +234,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        setViewStartState();
 
         RxPermissions rxPermissions = new RxPermissions(requireActivity());
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -310,6 +312,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         if (createPlayListFragment != null) {
             createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
         }
+    }
+
+    private void setViewStartState() {
+        playQueueTitleContainer.setVisibility(INVISIBLE);
+        titleContainer.setVisibility(INVISIBLE);
     }
 
     @Override
@@ -679,8 +686,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_collapse_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
-                .addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)))
-                .addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f))
                 .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.music_icon_size, ivMusicIcon)))
                 .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))
@@ -695,7 +700,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
         if (bottomSheetCoordinator != null) {//landscape
-            delegateManager.addDelegate(new ChangeWidthDelegate(
+            delegateManager.addDelegate(new MoveXDelegate(
                     0.5f,
                     bottomSheetCoordinator));
             delegateManager.addDelegate(new LeftBottomShadowDelegate(
@@ -703,6 +708,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     bottomSheetTopLeftShadow,
                     mlBottomSheet,
                     bottomSheetCoordinator));
+            delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.85f));
+        } else {
+            delegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)))
+                    .addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
         }
         return new BoundValuesDelegate(0.008f, 0.95f, delegateManager);
     }

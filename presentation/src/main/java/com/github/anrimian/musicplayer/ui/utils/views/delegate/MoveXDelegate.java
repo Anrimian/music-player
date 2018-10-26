@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
 import android.view.View;
-import android.view.ViewGroup;
 
 import static android.support.v4.view.ViewCompat.isLaidOut;
 
@@ -9,7 +8,7 @@ import static android.support.v4.view.ViewCompat.isLaidOut;
  * Created on 14.01.2018.
  */
 
-public class ChangeWidthDelegate implements SlideDelegate {
+public class MoveXDelegate implements SlideDelegate {
 
     private int baseWidth = -1;
 
@@ -17,7 +16,7 @@ public class ChangeWidthDelegate implements SlideDelegate {
 
     private final View view;
 
-    public ChangeWidthDelegate(float expandPercent, View view) {
+    public MoveXDelegate(float expandPercent, View view) {
         this.expandPercent = expandPercent;
         this.view = view;
     }
@@ -36,12 +35,6 @@ public class ChangeWidthDelegate implements SlideDelegate {
             baseWidth = view.getWidth();
         }
         int width = (int) (baseWidth * (1 - slideOffset * expandPercent));
-
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        params.width = width;
-
-        view.setLayoutParams(params);
-
         view.setTranslationX(baseWidth - width);
     }
 }

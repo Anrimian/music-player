@@ -10,6 +10,15 @@
     tools:showPaths="true"
     tools:progress="1">
 
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_left"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!--uses to catch unnecessary clicks-->
     <View
         android:id="@+id/bottom_panel"
@@ -18,7 +27,7 @@
         android:clickable="true"
         android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_left"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -100,7 +109,7 @@
         android:layout_marginEnd="@dimen/bottom_sheet_content_margin"
         android:layout_marginRight="@dimen/bottom_sheet_content_margin"
         app:layout_constraintBottom_toBottomOf="@id/btn_random_play"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_left"
         app:srcCompat="@drawable/ic_repeat" />
 
     <TextView
@@ -135,7 +144,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="1.5dp"
         android:layout_marginRight="1.5dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_left"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tv_played_time"
         app:layout_constraintTop_toTopOf="@id/group_time"/>
@@ -174,7 +183,7 @@
         android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_left"
         app:layout_constraintBottom_toBottomOf="@+id/tv_current_composition_author"
         app:srcCompat="@drawable/ic_dots_vertical" />
 
