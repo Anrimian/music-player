@@ -679,8 +679,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private SlideDelegate getBottomSheetDelegate(DrawerArrowDrawable drawerArrowDrawable) {
-        DelegateManager delegateManager = new DelegateManager();
-        delegateManager
+        DelegateManager boundDelegateManager = new DelegateManager();
+        boundDelegateManager
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
                 .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
@@ -699,21 +699,23 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                         () -> navigation.getScreensCount() > 1 || toolbar.isInSearchMode()))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
+        DelegateManager delegateManager = new DelegateManager();
         if (bottomSheetCoordinator != null) {//landscape
-            delegateManager.addDelegate(new MoveXDelegate(
+            boundDelegateManager.addDelegate(new MoveXDelegate(
                     0.5f,
                     bottomSheetCoordinator));
-            delegateManager.addDelegate(new LeftBottomShadowDelegate(
+            boundDelegateManager.addDelegate(new LeftBottomShadowDelegate(
                     bottomSheetLeftShadow,
                     bottomSheetTopLeftShadow,
                     mlBottomSheet,
                     bottomSheetCoordinator));
             delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.85f));
         } else {
-            delegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)))
+            boundDelegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)))
                     .addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
         }
-        return new BoundValuesDelegate(0.008f, 0.95f, delegateManager);
+        delegateManager.addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegateManager));
+        return delegateManager;
     }
 
     private void onBottomSheetStateChanged(Integer newState) {

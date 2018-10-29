@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.common.format;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
@@ -21,7 +22,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ImageFormatUtils {
 
-    public static void displayImage(ImageView imageView, Composition composition) {
+    public static void displayImage(@NonNull ImageView imageView,
+                                    @NonNull Composition composition) {
         imageView.setImageResource(R.drawable.ic_music_placeholder);
         Single.fromCallable(() -> getCompositionImageOrThrow(composition))
                 .map(ImageUtils::toCircleBitmap)

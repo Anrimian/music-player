@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.adapter;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -46,6 +47,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
+    @Nullable
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
@@ -60,7 +62,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
                         OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener,
                         OnItemClickListener<Composition> onDeleteCompositionClickListener,
                         OnItemClickListener<Composition> onAddToPlaylistClickListener) {
-        super(inflater.inflate(R.layout.item_play_queue_music, parent, false));
+        super(inflater.inflate(R.layout.item_play_queue, parent, false));
         ButterKnife.bind(this, itemView);
         if (onCompositionClickListener != null) {
             clickableItem.setOnClickListener(v ->
@@ -82,7 +84,9 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
 
         tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
 
-        ImageFormatUtils.displayImage(ivMusicIcon, composition);
+        if (ivMusicIcon != null) {
+            ImageFormatUtils.displayImage(ivMusicIcon, composition);
+        }
     }
 
     void showAsPlayingComposition(boolean show) {
