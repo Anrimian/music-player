@@ -11,9 +11,7 @@
     <style name="Content.Button.Main">
         <item name="android:layout_width">52dp</item>
         <item name="android:layout_height">@dimen/bottom_sheet_height</item>
-        <!--<item name="android:background">?selectableItemBackgroundBorderless</item>-->
-        <item name="android:background">@drawable/bg_selectable_round_shape</item>
-
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
 
     <style name="Content.Button.Menu">

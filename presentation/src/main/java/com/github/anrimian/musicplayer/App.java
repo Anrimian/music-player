@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer;
 
 import android.app.Application;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.utils.acra.AcraReportDialog;
@@ -18,6 +19,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         Components.init(getApplicationContext());
         initAcra();
     }
