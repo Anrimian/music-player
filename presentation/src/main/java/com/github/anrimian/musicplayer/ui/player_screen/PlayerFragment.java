@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.motion.MotionLayout;
@@ -94,6 +95,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.utils.AndroidUtils.getResourceIdFromAttr;
 
 /**
  * Created on 19.10.2017.
@@ -383,6 +385,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void expandBottomPanel() {
+        setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
+
         drawerLockStateProcessor.onBottomSheetOpened(true);
         bottomSheetDelegate.onSlide(1f);
         if (bottomSheetBehavior.getState() != STATE_EXPANDED) {
@@ -392,6 +396,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void collapseBottomPanel() {
+        setButtonsSelectableBackground(
+                getResourceIdFromAttr(requireContext(),
+                R.attr.selectableItemBackgroundBorderless)
+        );
+
         drawerLockStateProcessor.onBottomSheetOpened(false);
         bottomSheetDelegate.onSlide(0f);
         if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
@@ -581,6 +590,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
         String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
         Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void setButtonsSelectableBackground(@DrawableRes int resId) {
+        ivPlayPause.setBackgroundResource(resId);
+        ivSkipToNext.setBackgroundResource(resId);
+        ivSkipToPrevious.setBackgroundResource(resId);
     }
 
     private boolean onPlayQueueMenuItemClicked(MenuItem menuItem) {
