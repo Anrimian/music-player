@@ -130,10 +130,12 @@ public class AdvancedToolbar extends Toolbar {
         }
     }
 
+    public void release() {
+        navigation.removeStackChangeListener(stackChangeListener);
+    }
+
     @Override
     protected Parcelable onSaveInstanceState() {
-        navigation.removeStackChangeListener(stackChangeListener);
-
         Bundle bundle = new Bundle();
         bundle.putParcelable("superState", super.onSaveInstanceState());
         bundle.putBoolean(IS_IN_SEARCH_MODE, isInSearchMode);

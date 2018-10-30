@@ -344,6 +344,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        toolbar.release();
         drawerLockStateProcessor.release();
     }
 
