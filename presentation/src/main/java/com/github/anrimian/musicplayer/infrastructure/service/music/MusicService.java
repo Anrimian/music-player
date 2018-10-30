@@ -109,9 +109,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             handleNotificationAction(requestCode);
         } else {
             KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession, intent);
-            if (keyEvent == null || keyEvent.getAction() != KeyEvent.ACTION_UP
-                    || !handleMediaButtonAction(keyEvent)) {
-                stopSelf();//check how it works
+            if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
+                handleMediaButtonAction(keyEvent);
             }
         }
         return START_NOT_STICKY;
@@ -130,14 +129,13 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         serviceDisposable.dispose();
     }
 
-    private boolean handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
+    private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.KEYCODE_MEDIA_PLAY: {
                 musicPlayerInteractor.play();
-                return true;
+                break;
             }
         }
-        return false;
     }
 
     private void handleNotificationAction(int requestCode) {
