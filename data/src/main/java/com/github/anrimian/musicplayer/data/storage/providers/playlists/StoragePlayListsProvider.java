@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -89,12 +90,12 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public Observable<List<Composition>> getPlayListChangeObservable(long playListId) {
+    public Observable<List<PlayListItem>> getPlayListChangeObservable(long playListId) {
         return RxContentObserver.getObservable(contentResolver, getContentUri("external", playListId))
-                .map(o -> getCompositions(playListId));
+                .map(o -> getPlayListItems(playListId));
     }
 
-    public List<Composition> getCompositions(long playListId) {
+    public List<PlayListItem> getPlayListItems(long playListId) {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -107,13 +108,12 @@ public class StoragePlayListsProvider {
                 return emptyList();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            List<Composition> compositions = new ArrayList<>(cursor.getCount());
+            List<PlayListItem> compositions = new ArrayList<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
-                Composition composition = getCompositionFromCursor(cursorWrapper);
-                checkCorruptedComposition(composition);
-                compositions.add(composition);
+                PlayListItem item = getPlayListItemFromCursor(cursorWrapper);
+                compositions.add(item);
             }
             return compositions;
         } finally {
@@ -154,11 +154,11 @@ public class StoragePlayListsProvider {
         updateModifyTime(playListId);
     }
 
-    public void deleteCompositionFromPlayList(long compositionId, long playListId) {
+    public void deleteItemFromPlayList(long itemId, long playListId) {
         int deletedRows = contentResolver.delete(
                 getContentUri("external", playListId),
-                Playlists.Members.AUDIO_ID + " = ?",
-                new String[] { String.valueOf(compositionId) }
+                Playlists.Members._ID + " = ?",
+                new String[] { String.valueOf(itemId) }
         );
 
         if (deletedRows == 0) {
@@ -166,8 +166,8 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public void moveItemInPlayList(long playListId, int from, int to) {
-        boolean moved = Playlists.Members.moveItem(contentResolver, playListId, from, to);
+    public void moveItemInPlayList(long playListId, int fromId, int toId) {
+        boolean moved = Playlists.Members.moveItem(contentResolver, playListId, fromId, toId);
         if (!moved) {
             throw new CompositionNotMovedException();
         }
@@ -202,7 +202,7 @@ public class StoragePlayListsProvider {
         }
     }
 
-    private Composition getCompositionFromCursor(CursorWrapper cursorWrapper) {
+    private PlayListItem getPlayListItemFromCursor(CursorWrapper cursorWrapper) {
         String artist = cursorWrapper.getString(Playlists.Members.ARTIST);
         String title = cursorWrapper.getString(Playlists.Members.TITLE);
         String album = cursorWrapper.getString(Playlists.Members.ALBUM);
@@ -212,9 +212,10 @@ public class StoragePlayListsProvider {
         String displayName = cursorWrapper.getString(Playlists.Members.DISPLAY_NAME);
         String mimeType = cursorWrapper.getString(Playlists.Members.MIME_TYPE);
 
+        long itemId = cursorWrapper.getLong(Playlists.Members._ID);
         long duration = cursorWrapper.getLong(Playlists.Members.DURATION);
         long size = cursorWrapper.getLong(Playlists.Members.SIZE);
-        long id = cursorWrapper.getLong(Playlists.Members.AUDIO_ID);
+        long audioId = cursorWrapper.getLong(Playlists.Members.AUDIO_ID);
         long artistId = cursorWrapper.getLong(Playlists.Members.ARTIST_ID);
         long bookmark = cursorWrapper.getLong(Playlists.Members.BOOKMARK);
         long albumId = cursorWrapper.getLong(Playlists.Members.ALBUM_ID);
@@ -244,7 +245,7 @@ public class StoragePlayListsProvider {
 
         composition.setDuration(duration);
         composition.setSize(size);
-        composition.setId(id);
+        composition.setId(audioId);
         composition.setDateAdded(new Date(dateAdded * 1000L));
         composition.setDateModified(new Date(dateModified * 1000L));
 
@@ -255,7 +256,10 @@ public class StoragePlayListsProvider {
         composition.setRingtone(isRingtone);
 
         composition.setYear(year);
-        return composition;
+
+        checkCorruptedComposition(composition);
+
+        return new PlayListItem(itemId, composition);
     }
 
     private void checkCorruptedComposition(Composition composition) {

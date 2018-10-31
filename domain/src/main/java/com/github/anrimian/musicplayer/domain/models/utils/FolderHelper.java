@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.domain.models.utils;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
@@ -17,7 +16,7 @@ public class FolderHelper {
                         ((FolderFileSource) newSource));
             }
             if (oldSource instanceof MusicFileSource) {
-                return !CompositionHelper.hasChanges(((MusicFileSource) oldSource).getComposition(),
+                return CompositionHelper.areSourcesTheSame(((MusicFileSource) oldSource).getComposition(),
                         ((MusicFileSource) newSource).getComposition());
             }
         }

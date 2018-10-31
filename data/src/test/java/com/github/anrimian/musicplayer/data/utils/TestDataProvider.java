@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +38,20 @@ public class TestDataProvider {
         return compositions;
     }
 
+    public static List<PlayListItem> getFakePlayListItems() {
+        List<PlayListItem> items = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+            Composition composition = new Composition();
+
+            composition.setFilePath("music-" + i);
+            composition.setId(i);
+
+            PlayListItem item = new PlayListItem(i, composition);
+            items.add(item);
+        }
+        return items;
+    }
+
     public static List<PlayQueueItem> getFakeItems() {
         List<PlayQueueItem> items = new ArrayList<>();
         for (int i = 0; i < 100000; i++) {
@@ -59,6 +74,10 @@ public class TestDataProvider {
 
     public static Composition fakeComposition(int index) {
         return getFakeCompositions().get(index);
+    }
+
+    public static PlayListItem fakePlayListItem(int index) {
+        return getFakePlayListItems().get(index);
     }
 
     public static PlayQueueItem fakeItem(int index) {

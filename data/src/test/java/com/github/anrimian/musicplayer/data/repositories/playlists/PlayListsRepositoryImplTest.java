@@ -2,8 +2,8 @@ package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import org.junit.Before;
@@ -16,14 +16,13 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakePlayListItem;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositions;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakePlayListItems;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayList;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +31,7 @@ public class PlayListsRepositoryImplTest {
     private StoragePlayListsProvider storagePlayListsProvider = mock(StoragePlayListsProvider.class);
 
     private PublishSubject<List<StoragePlayList>> playListSubject = PublishSubject.create();
-    private PublishSubject<List<Composition>> compositionSubject = PublishSubject.create();
+    private PublishSubject<List<PlayListItem>> compositionSubject = PublishSubject.create();
 
     private PlayListsRepositoryImpl playListsRepositoryImpl = new PlayListsRepositoryImpl(
             storagePlayListsProvider, Schedulers.trampoline());
@@ -40,7 +39,7 @@ public class PlayListsRepositoryImplTest {
     @Before
     public void setUp() {
         when(storagePlayListsProvider.getPlayLists()).thenReturn(ListUtils.asList(storagePlayList(1L)));
-        when(storagePlayListsProvider.getCompositions(anyLong())).thenReturn(getFakeCompositions());
+        when(storagePlayListsProvider.getPlayListItems(anyLong())).thenReturn(getFakePlayListItems());
         when(storagePlayListsProvider.getChangeObservable()).thenReturn(playListSubject);
         when(storagePlayListsProvider.getPlayListChangeObservable(anyLong())).thenReturn(compositionSubject);
     }
@@ -81,7 +80,7 @@ public class PlayListsRepositoryImplTest {
             return true;
         });
 
-        compositionSubject.onNext(ListUtils.asList(fakeComposition(0)));
+        compositionSubject.onNext(ListUtils.asList(fakePlayListItem(0)));
 
         testObserver = playListsRepositoryImpl
                 .getPlayListsObservable()
@@ -136,14 +135,14 @@ public class PlayListsRepositoryImplTest {
 
     @Test
     public void getCompositionsObservableTest() {
-        TestObserver<List<Composition>> testObserver = playListsRepositoryImpl
+        TestObserver<List<PlayListItem>> testObserver = playListsRepositoryImpl
                 .getCompositionsObservable(1L)
                 .test();
 
-        testObserver.assertValue(getFakeCompositions());
+        testObserver.assertValue(getFakePlayListItems());
 
-        compositionSubject.onNext(ListUtils.asList(fakeComposition(0)));
+        compositionSubject.onNext(ListUtils.asList(fakePlayListItem(0)));
 
-        testObserver.assertValueAt(1, ListUtils.asList(fakeComposition(0)));
+        testObserver.assertValueAt(1, ListUtils.asList(fakePlayListItem(0)));
     }
 }

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.business.playlists;
 import com.github.anrimian.musicplayer.domain.business.playlists.validators.PlayListNameValidator;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class PlayListsInteractor {
         return playListsRepository.getPlayListObservable(playListId);
     }
 
-    public Observable<List<Composition>> getCompositionsObservable(long playlistId) {
+    public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId) {
         return playListsRepository.getCompositionsObservable(playlistId);
     }
 

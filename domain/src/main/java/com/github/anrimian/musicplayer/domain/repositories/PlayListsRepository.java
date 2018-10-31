@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface PlayListsRepository {
 
     Observable<PlayList> getPlayListObservable(long playlistId);
 
-    Observable<List<Composition>> getCompositionsObservable(long playlistId);
+    Observable<List<PlayListItem>> getCompositionsObservable(long playlistId);
 
     Single<PlayList> createPlayList(String name);
 

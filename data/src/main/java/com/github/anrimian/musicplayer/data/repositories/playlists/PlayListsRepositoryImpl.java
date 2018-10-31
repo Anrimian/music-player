@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.data.repositories.playlists.comparators.P
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.MapChangeProcessor;
@@ -25,7 +26,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.getTotalDuration;
+import static com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper.getTotalDuration;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToList;
 
 public class PlayListsRepositoryImpl implements PlayListsRepository {
@@ -64,9 +65,9 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Observable<List<Composition>> getCompositionsObservable(long playlistId) {
+    public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId) {
         PlayListFullModel playListFullModel = getPlayListsMap().get(playlistId);
-        Observable<List<Composition>> observable;
+        Observable<List<PlayListItem>> observable;
         if (playListFullModel == null) {
             observable = Observable.error(new PlayListNotFoundException());
         } else {
@@ -137,14 +138,14 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     private void onNewPlayListReceived(Map.Entry<Long, PlayListFullModel> entry) {
         PlayList oldPlayList = entry.getValue().getPlayList();
-        List<Composition> compositions = storagePlayListsProvider.getCompositions(oldPlayList.getId());
+        List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(oldPlayList.getId());
         PlayList playList = new PlayList(oldPlayList.getId(),
                 oldPlayList.getName(),
                 oldPlayList.getDateAdded(),
                 oldPlayList.getDateModified(),
-                compositions.size(),
-                getTotalDuration(compositions));
-        playListMap.put(entry.getKey(), new PlayListFullModel(playList, compositions));
+                items.size(),
+                getTotalDuration(items));
+        playListMap.put(entry.getKey(), new PlayListFullModel(playList, items));
     }
 
     private boolean hasDirectChanges(@Nonnull PlayListFullModel firstModel,
@@ -160,48 +161,48 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         Map<Long, PlayListFullModel> playListMap = new HashMap<>();
         for (StoragePlayList storagePlayList: storagePlayLists) {
             long id = storagePlayList.getId();
-            List<Composition> compositions = storagePlayListsProvider.getCompositions(id);
-            PlayList playList = toPlayList(storagePlayList, compositions);
-            playListMap.put(id, new PlayListFullModel(playList, compositions));
+            List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(id);
+            PlayList playList = toPlayList(storagePlayList, items);
+            playListMap.put(id, new PlayListFullModel(playList, items));
         }
         return playListMap;
     }
 
-    private PlayList toPlayList(StoragePlayList storagePlayList, List<Composition> compositions) {
+    private PlayList toPlayList(StoragePlayList storagePlayList, List<PlayListItem> items) {
         return new PlayList(storagePlayList.getId(),
                 storagePlayList.getName(),
                 storagePlayList.getDateAdded(),
                 storagePlayList.getDateModified(),
-                compositions.size(),
-                getTotalDuration(compositions));
+                items.size(),
+                getTotalDuration(items));
     }
 
     private class PlayListFullModel {
 
         private Disposable disposable;
 
-        private final BehaviorSubject<List<Composition>> compositionsSubject;
+        private final BehaviorSubject<List<PlayListItem>> itemsSubject;
         private final BehaviorSubject<PlayList> playListSubject;
 
         private PlayList playList;
 
-        PlayListFullModel(PlayList playList, List<Composition> compositions) {
+        PlayListFullModel(PlayList playList, List<PlayListItem> items) {
             this.playList = playList;
-            compositionsSubject = BehaviorSubject.createDefault(compositions);
+            itemsSubject = BehaviorSubject.createDefault(items);
             playListSubject = BehaviorSubject.createDefault(playList);
 
             disposable = storagePlayListsProvider.getPlayListChangeObservable(playList.getId())
-                    .subscribe(this::onPlayListCompositionsChanged);
+                    .subscribe(this::onPlayListItemsChanged);
         }
 
         PlayListFullModel(PlayList playList) {
             this.playList = playList;
-            compositionsSubject = BehaviorSubject.create();
+            itemsSubject = BehaviorSubject.create();
             playListSubject = BehaviorSubject.create();
         }
 
-        Observable<List<Composition>> getCompositionsObservable() {
-            return compositionsSubject;
+        Observable<List<PlayListItem>> getCompositionsObservable() {
+            return itemsSubject;
         }
 
         Observable<PlayList> getPlayListObservable() {
@@ -224,11 +225,11 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
         void dispose() {
             disposable.dispose();
-            compositionsSubject.onComplete();
+            itemsSubject.onComplete();
             playListSubject.onComplete();
         }
 
-        private void onPlayListCompositionsChanged(List<Composition> compositions) {
+        private void onPlayListItemsChanged(List<PlayListItem> compositions) {
             playList = new PlayList(playList.getId(),
                     playList.getName(),
                     playList.getDateAdded(),
@@ -238,7 +239,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
             playListSubject.onNext(playList);
             playListsSubject.onNext(playListMap);
-            compositionsSubject.onNext(compositions);
+            itemsSubject.onNext(compositions);
         }
     }
 }

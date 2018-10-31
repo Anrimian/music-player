@@ -5,8 +5,8 @@ import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -25,10 +25,10 @@ public interface PlayListView extends MvpView {
     void showLoading();
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void bindList(List<Composition> compositions);
+    void bindList(List<PlayListItem> compositions);
 
     @StateStrategyType(SkipStrategy.class)
-    void updateList(List<Composition> oldList, List<Composition> newList);
+    void updateList(List<PlayListItem> oldList, List<PlayListItem> newList);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void closeScreen();

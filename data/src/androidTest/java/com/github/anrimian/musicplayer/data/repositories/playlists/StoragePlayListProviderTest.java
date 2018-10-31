@@ -9,6 +9,7 @@ import android.util.Log;
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,7 +23,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
-public class StoragePlayListUtilsProviderTest {
+public class StoragePlayListProviderTest {
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE);
@@ -71,14 +72,14 @@ public class StoragePlayListUtilsProviderTest {
                     playList.getId(),
                     0);
 
-            List<Composition> compositions = storagePlayListsProvider.getCompositions(playList.getId());
-            assertEquals(1, compositions.size());
-            assert compositions.contains(composition);
+            List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
+            assertEquals(1, items.size());
+            assertEquals(composition, items.get(0).getComposition());
 
-            storagePlayListsProvider.deleteCompositionFromPlayList(composition.getId(), playList.getId());
+            storagePlayListsProvider.deleteItemFromPlayList(items.get(0).getItemId(), playList.getId());
 
-            List<Composition> deletedCompositions = storagePlayListsProvider.getCompositions(playList.getId());
-            assertEquals(0, deletedCompositions.size());
+            List<PlayListItem> deletedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
+            assertEquals(0, deletedItems.size());
         } finally {
             storagePlayListsProvider.deletePlayList(playList.getId());
         }
@@ -107,17 +108,17 @@ public class StoragePlayListUtilsProviderTest {
                     playList.getId(),
                     2);
 
-            List<Composition> compositions = storagePlayListsProvider.getCompositions(playList.getId());
-            assertEquals(compositionOne, compositions.get(0));
-            assertEquals(compositionTwo, compositions.get(1));
-            assertEquals(compositionThree, compositions.get(2));
+            List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
+            assertEquals(compositionOne, items.get(0).getComposition());
+            assertEquals(compositionTwo, items.get(1).getComposition());
+            assertEquals(compositionThree, items.get(2).getComposition());
 
             storagePlayListsProvider.moveItemInPlayList(playList.getId(), 2, 0);
 
-            List<Composition> movedCompositions = storagePlayListsProvider.getCompositions(playList.getId());
-            assertEquals(compositionOne, movedCompositions.get(1));
-            assertEquals(compositionTwo, movedCompositions.get(2));
-            assertEquals(compositionThree, movedCompositions.get(0));
+            List<PlayListItem> movedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
+            assertEquals(compositionOne, movedItems.get(1).getComposition());
+            assertEquals(compositionTwo, movedItems.get(2).getComposition());
+            assertEquals(compositionThree, movedItems.get(0).getComposition());
         } finally {
             storagePlayListsProvider.deletePlayList(playList.getId());
         }
@@ -134,10 +135,10 @@ public class StoragePlayListUtilsProviderTest {
 
     private Composition findComposition(int index) {
         for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
-            List<Composition> compositions = storagePlayListsProvider.getCompositions(playList.getId());
+            List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
 
-            if (index < compositions.size()) {
-                return compositions.get(index);
+            if (index < items.size()) {
+                return items.get(index).getComposition();
             }
         }
         throw new IllegalStateException("composition not found");

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,11 +15,11 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
@@ -45,13 +44,13 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
     RecyclerView recyclerView;
 
     @BindView(R.id.fab)
-    FloatingActionButton fab;
+    View fab;
 
     @BindView(R.id.list_container)
     CoordinatorLayout clListContainer;
 
     private AdvancedToolbar toolbar;
-    private CompositionsAdapter adapter;
+    private PlayListItemAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
 
     public static PlayListFragment newInstance(long playListId) {
@@ -114,16 +113,16 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
     }
 
     @Override
-    public void bindList(List<Composition> compositions) {
-        adapter = new CompositionsAdapter(compositions);
+    public void bindList(List<PlayListItem> compositions) {
+        adapter = new PlayListItemAdapter(compositions);
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
         recyclerView.setAdapter(adapter);
     }
 
     @Override
-    public void updateList(List<Composition> oldList, List<Composition> newList) {
-        DiffUtilHelper.update(oldList, newList, CompositionHelper::areSourcesTheSame, recyclerView);
+    public void updateList(List<PlayListItem> oldList, List<PlayListItem> newList) {
+        DiffUtilHelper.update(oldList, newList, PlayListItemHelper::areSourcesTheSame, recyclerView);
     }
 
     @Override
@@ -140,7 +139,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
                 playList.getCompositionsCount()));
     }
 
-    private void onCompositionMenuClicked(View view, Composition composition) {
+    private void onCompositionMenuClicked(View view, PlayListItem item) {
         //TODO finish
     }
 

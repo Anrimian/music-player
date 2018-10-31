@@ -4,8 +4,7 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +13,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 @InjectViewState
 public class PlayListPresenter extends MvpPresenter<PlayListView> {
@@ -26,7 +26,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private final long playListId;
 
-    private List<Composition> compositions = new ArrayList<>();
+    private List<PlayListItem> items = new ArrayList<>();
 
     public PlayListPresenter(long playListId,
                              MusicPlayerInteractor musicPlayerInteractor,
@@ -41,7 +41,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().bindList(compositions);
+        getViewState().bindList(items);
         subscribeOnCompositions();
         subscribePlayList();
     }
@@ -52,13 +52,13 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         presenterDisposable.dispose();
     }
 
-    void onCompositionClicked(Composition composition) {
-        musicPlayerInteractor.startPlaying(asList(composition))
+    void onCompositionClicked(PlayListItem item) {
+        musicPlayerInteractor.startPlaying(asList(item.getComposition()))
                 .subscribe();//TODO handle error later
     }
 
     void onPlayAllButtonClicked() {
-        musicPlayerInteractor.startPlaying(compositions)
+        musicPlayerInteractor.startPlaying(mapList(items, PlayListItem::getComposition))
                 .subscribe();//TODO handle error later
     }
 
@@ -79,11 +79,11 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
                         getViewState()::closeScreen));
     }
 
-    private void onPlayListsReceived(List<Composition> newCompositions) {
-        List<Composition> oldList = new ArrayList<>(compositions);
+    private void onPlayListsReceived(List<PlayListItem> newCompositions) {
+        List<PlayListItem> oldList = new ArrayList<>(items);
 
-        compositions.clear();
-        compositions.addAll(newCompositions);
+        items.clear();
+        items.addAll(newCompositions);
 
         getViewState().updateList(oldList, newCompositions);
 
