@@ -7,16 +7,12 @@ import android.view.ViewGroup;
 
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
 
 import java.util.List;
 
-import static android.support.v7.util.DiffUtil.calculateDiff;
-import static com.github.anrimian.musicplayer.domain.models.utils.PlayListHelper.hasChanges;
-
 public class PlayListsAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
 
-    private final List<PlayList> playLists;
+    private List<PlayList> playLists;
 
     private OnItemClickListener<PlayList> onItemClickListener;
 
@@ -43,7 +39,13 @@ public class PlayListsAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
         return playLists.size();
     }
 
+    public void setItems(List<PlayList> list) {
+        playLists = list;
+    }
+
     public void setOnItemClickListener(OnItemClickListener<PlayList> onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 }
+
+

@@ -4,6 +4,9 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayListHelper;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,10 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
 
     private List<PlayList> playLists = new ArrayList<>();
 
+    private final DiffCalculator<PlayList> diffCalculator = new DiffCalculator<>(
+            () -> playLists,
+            PlayListHelper::areSourcesTheSame);
+
     public PlayListsPresenter(PlayListsInteractor playListsInteractor, Scheduler uiScheduler) {
         this.playListsInteractor = playListsInteractor;
         this.uiScheduler = uiScheduler;
@@ -29,7 +36,6 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().bindList(playLists);
         subscribeOnPlayLists();
     }
 
@@ -42,19 +48,15 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
     private void subscribeOnPlayLists() {
         getViewState().showLoading();
         presenterDisposable.add(playListsInteractor.getPlayListsObservable()
+                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayListsReceived));
     }
 
-    private void onPlayListsReceived(List<PlayList> newPlayLists) {
-        List<PlayList> oldList = new ArrayList<>(playLists);
-
-        playLists.clear();
-        playLists.addAll(newPlayLists);
-
-        getViewState().updateList(oldList, newPlayLists);
-
-        if (newPlayLists.isEmpty()) {
+    private void onPlayListsReceived(ListUpdate<PlayList> listUpdate) {
+        playLists = listUpdate.getNewList();
+        getViewState().updateList(listUpdate);
+        if (playLists.isEmpty()) {
             getViewState().showEmptyList();
         } else {
             getViewState().showList();
