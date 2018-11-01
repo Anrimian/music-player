@@ -17,7 +17,7 @@ import java.util.List;
 
 public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHolder> {
 
-    private final List<PlayListItem> musicList;
+    private List<PlayListItem> musicList;
     private OnItemClickListener<PlayListItem> onCompositionClickListener;
     private OnViewItemClickListener<PlayListItem> onMenuItemClickListener;
 
@@ -43,6 +43,10 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
     @Override
     public int getItemCount() {
         return musicList.size();
+    }
+
+    public void setItems(List<PlayListItem> list) {
+        musicList = list;
     }
 
     public void setOnCompositionClickListener(OnItemClickListener<PlayListItem> onCompositionClickListener) {

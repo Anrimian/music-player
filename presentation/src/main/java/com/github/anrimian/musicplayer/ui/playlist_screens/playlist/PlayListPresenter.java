@@ -5,6 +5,9 @@ import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,10 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private List<PlayListItem> items = new ArrayList<>();
 
+    private final DiffCalculator<PlayListItem> diffCalculator = new DiffCalculator<>(
+            () -> items,
+            PlayListItemHelper::areSourcesTheSame);
+
     public PlayListPresenter(long playListId,
                              MusicPlayerInteractor musicPlayerInteractor,
                              PlayListsInteractor playListsInteractor,
@@ -41,7 +48,6 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().bindList(items);
         subscribeOnCompositions();
         subscribePlayList();
     }
@@ -65,6 +71,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private void subscribeOnCompositions() {
         getViewState().showLoading();
         presenterDisposable.add(playListsInteractor.getCompositionsObservable(playListId)
+                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayListsReceived,
                         t -> getViewState().closeScreen(),
@@ -79,15 +86,10 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
                         getViewState()::closeScreen));
     }
 
-    private void onPlayListsReceived(List<PlayListItem> newCompositions) {
-        List<PlayListItem> oldList = new ArrayList<>(items);
-
-        items.clear();
-        items.addAll(newCompositions);
-
-        getViewState().updateList(oldList, newCompositions);
-
-        if (newCompositions.isEmpty()) {
+    private void onPlayListsReceived(ListUpdate<PlayListItem> listUpdate) {
+        items = listUpdate.getNewList();
+        getViewState().updateItemsList(listUpdate);
+        if (items.isEmpty()) {
             getViewState().showEmptyList();
         } else {
             getViewState().showList();

@@ -17,12 +17,12 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
-import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -113,16 +113,17 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
     }
 
     @Override
-    public void bindList(List<PlayListItem> compositions) {
-        adapter = new PlayListItemAdapter(compositions);
-        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-        adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
-        recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void updateList(List<PlayListItem> oldList, List<PlayListItem> newList) {
-        DiffUtilHelper.update(oldList, newList, PlayListItemHelper::areSourcesTheSame, recyclerView);
+    public void updateItemsList(ListUpdate<PlayListItem> update) {
+        List<PlayListItem> list = update.getNewList();
+        if (adapter == null) {
+            adapter = new PlayListItemAdapter(list);
+            adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
+            adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.setItems(list);
+            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
+        }
     }
 
     @Override

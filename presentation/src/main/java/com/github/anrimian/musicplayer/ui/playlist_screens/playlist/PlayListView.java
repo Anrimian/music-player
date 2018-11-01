@@ -3,13 +3,12 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-
-import java.util.List;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 public interface PlayListView extends MvpView {
 
@@ -24,11 +23,8 @@ public interface PlayListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void bindList(List<PlayListItem> compositions);
-
-    @StateStrategyType(SkipStrategy.class)
-    void updateList(List<PlayListItem> oldList, List<PlayListItem> newList);
+    @StateStrategyType(AddToStartSingleStrategy.class)
+    void updateItemsList(ListUpdate<PlayListItem> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void closeScreen();
