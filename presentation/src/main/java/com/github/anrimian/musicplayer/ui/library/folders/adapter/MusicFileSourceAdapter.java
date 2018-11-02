@@ -23,7 +23,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private static final int TYPE_MUSIC = 1;
     private static final int TYPE_FILE = 2;
 
-    private final List<FileSource> musicList;
+    private List<FileSource> musicList;
     private OnItemClickListener<Composition> onCompositionClickListener;
     private OnItemClickListener<String> onFolderClickListener;
     private OnItemClickListener<String> onAddFolderToPlaylistClickListener;
@@ -87,6 +87,10 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         } else {
             return TYPE_MUSIC;
         }
+    }
+
+    public void setItems(List<FileSource> musicList) {
+        this.musicList = musicList;
     }
 
     public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {

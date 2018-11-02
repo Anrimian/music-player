@@ -7,9 +7,12 @@ import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsIntera
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -37,6 +40,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     private List<Composition> compositions = new ArrayList<>();
 
+    private final DiffCalculator<Composition> diffCalculator = new DiffCalculator<>(
+            () -> compositions,
+            CompositionHelper::areSourcesTheSame);
+
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
 
@@ -56,7 +63,6 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().bindList(compositions);
         subscribeOnCompositions();
     }
 
@@ -147,20 +153,16 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         }
         dispose(compositionsDisposable, presenterDisposable);
         compositionsDisposable = interactor.getCompositionsObservable(searchText)
+                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onCompositionsReceived);
         presenterDisposable.add(compositionsDisposable);
     }
 
-    private void onCompositionsReceived(List<Composition> newCompositions) {
-        List<Composition> oldList = new ArrayList<>(compositions);
-
-        compositions.clear();
-        compositions.addAll(newCompositions);
-
-        getViewState().updateList(oldList, newCompositions);
-
-        if (newCompositions.isEmpty()) {
+    private void onCompositionsReceived(ListUpdate<Composition> listUpdate) {
+        compositions = listUpdate.getNewList();
+        getViewState().updateList(listUpdate);
+        if (compositions.isEmpty()) {
             if (TextUtils.isEmpty(searchText)) {
                 getViewState().showEmptyList();
             } else {

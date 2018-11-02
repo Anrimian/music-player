@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -26,7 +25,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment;
@@ -38,6 +36,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -67,7 +66,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     RecyclerView recyclerView;
 
     @BindView(R.id.fab)
-    FloatingActionButton fab;
+    View fab;
 
     @BindView(R.id.header_container)
     View headerContainer;
@@ -184,14 +183,20 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     }
 
     @Override
-    public void bindList(List<FileSource> musicList) {
-        adapter = new MusicFileSourceAdapter(musicList);
-        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-        adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
-        adapter.setOnDeleteFolderClickListener(presenter::onDeleteFolderButtonClicked);
-        adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
-        adapter.setOnAddFolderToPlaylistClickListener(presenter::onAddFolderToPlayListButtonClicked);
-        recyclerView.setAdapter(adapter);
+    public void updateList(ListUpdate<FileSource> update) {
+        List<FileSource> musicList = update.getNewList();
+        if (adapter == null) {
+            adapter = new MusicFileSourceAdapter(musicList);
+            adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
+            adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
+            adapter.setOnDeleteFolderClickListener(presenter::onDeleteFolderButtonClicked);
+            adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
+            adapter.setOnAddFolderToPlaylistClickListener(presenter::onAddFolderToPlayListButtonClicked);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.setItems(musicList);
+            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
+        }
     }
 
     @Override
@@ -255,11 +260,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     @Override
     public void showSearchMode(boolean show) {
         toolbar.setSearchModeEnabled(show);
-    }
-
-    @Override
-    public void updateList(List<FileSource> oldList, List<FileSource> newList) {
-        DiffUtilHelper.update(oldList, newList, FolderHelper::areSourcesTheSame, recyclerView);
     }
 
     @Override

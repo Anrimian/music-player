@@ -15,12 +15,12 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.PlayListHelper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.moxy.MvpBottomSheetDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
@@ -98,15 +98,16 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     }
 
     @Override
-    public void bindList(List<PlayList> playLists) {
-        adapter = new PlayListsAdapter(playLists);
-        adapter.setOnItemClickListener(this::onPlayListSelected);
-        recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void updateList(List<PlayList> oldList, List<PlayList> newList) {
-        DiffUtilHelper.update(oldList, newList, PlayListHelper::areSourcesTheSame, recyclerView);
+    public void updateList(ListUpdate<PlayList> update) {
+        List<PlayList> list = update.getNewList();
+        if (adapter == null) {
+            adapter = new PlayListsAdapter(list);
+            adapter.setOnItemClickListener(this::onPlayListSelected);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.setItems(list);
+            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
+        }
     }
 
     public void setOnCompleteListener(@Nullable OnCompleteListener<PlayList> onCompleteListener) {

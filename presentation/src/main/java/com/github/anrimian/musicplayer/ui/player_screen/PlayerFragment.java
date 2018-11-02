@@ -73,6 +73,8 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -479,7 +481,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         ImageFormatUtils.displayImage(ivMusicIcon, composition);
 
-        playQueueAdapter.onCurrentItemChanged(item);
+        playQueueAdapter.onCurrentItemChanged(item, rvPlayList);
     }
 
     @Override
@@ -492,17 +494,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void bindPlayList(List<PlayQueueItem> currentPlayList) {
-        playQueueAdapter = new PlayQueueAdapter(currentPlayList);
-        playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
-        playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
-        playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
-        rvPlayList.setAdapter(playQueueAdapter);
-    }
-
-    @Override
-    public void updatePlayQueue(List<PlayQueueItem> currentPlayList, List<PlayQueueItem> newPlayList) {
-        playQueueAdapter.updatePlayList(currentPlayList, newPlayList);
+    public void updatePlayQueue(ListUpdate<PlayQueueItem> update) {
+        List<PlayQueueItem> list = update.getNewList();
+        if (playQueueAdapter == null) {
+            playQueueAdapter = new PlayQueueAdapter(list);
+            playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
+            playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
+            playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
+            rvPlayList.setAdapter(playQueueAdapter);
+        } else {
+            playQueueAdapter.setItems(list);
+            DiffUtilHelper.update(update.getDiffResult(), rvPlayList);
+        }
     }
 
     @Override

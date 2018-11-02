@@ -10,8 +10,11 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -39,7 +42,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable trackStateDisposable;
 
-    private final List<PlayQueueItem> playQueue = new ArrayList<>();
+    private List<PlayQueueItem> playQueue = new ArrayList<>();
+
+    private final DiffCalculator<PlayQueueItem> diffCalculator = new DiffCalculator<>(
+            () -> playQueue,
+            PlayQueueItemHelper::areSourcesTheSame);
+
     private PlayQueueItem currentItem;
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
@@ -60,7 +68,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().bindPlayList(playQueue);
         getViewState().showInfinitePlayingButton(musicPlayerInteractor.isInfinitePlayingEnabled());
         getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
         if (playerScreenInteractor.isPlayerPanelOpen()) {
@@ -277,19 +284,15 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void subscribeOnPlayQueue() {
         presenterDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
+                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayListChanged));
     }
 
-    private void onPlayListChanged(List<PlayQueueItem> newPlayQueue) {
-        getViewState().showPlayQueueSubtitle(newPlayQueue.size());
-
-        List<PlayQueueItem> oldPlayList = new ArrayList<>(playQueue);
-        playQueue.clear();
-        playQueue.addAll(newPlayQueue);
-
-        getViewState().updatePlayQueue(oldPlayList, playQueue);
-
+    private void onPlayListChanged(ListUpdate<PlayQueueItem> update) {
+        playQueue = update.getNewList();
+        getViewState().showPlayQueueSubtitle(playQueue.size());
+        getViewState().updatePlayQueue(update);
         Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
         if (position != null) {
             getViewState().scrollQueueToPosition(position);

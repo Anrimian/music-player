@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
@@ -11,7 +10,9 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSou
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.List;
 
@@ -25,9 +26,6 @@ public interface LibraryFoldersView extends MvpView {
 
     String LIST_STATE = "list_state";
     String BACK_PATH_BUTTON_STATE = "back_path_button_state";
-
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void bindList(List<FileSource> musicList);
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
@@ -53,8 +51,8 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goBackToMusicStorageScreen(String targetPath);
 
-    @StateStrategyType(SkipStrategy.class)
-    void updateList(List<FileSource> oldList, List<FileSource> sourceList);
+    @StateStrategyType(AddToStartSingleStrategy.class)
+    void updateList(ListUpdate<FileSource> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order folderOrder);

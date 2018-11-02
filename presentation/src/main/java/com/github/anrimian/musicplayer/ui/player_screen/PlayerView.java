@@ -3,13 +3,14 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.List;
 
@@ -43,11 +44,8 @@ public interface PlayerView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void scrollQueueToPosition(int position);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void bindPlayList(List<PlayQueueItem> currentPlayList);
-
-    @StateStrategyType(SkipStrategy.class)
-    void updatePlayQueue(List<PlayQueueItem> currentPlayList, List<PlayQueueItem> newPlayList);
+    @StateStrategyType(AddToStartSingleStrategy.class)
+    void updatePlayQueue(ListUpdate<PlayQueueItem> update);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showInfinitePlayingButton(boolean active);

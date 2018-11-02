@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -23,7 +22,6 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment;
@@ -32,6 +30,7 @@ import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
@@ -53,7 +52,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     RecyclerView recyclerView;
 
     @BindView(R.id.fab)
-    FloatingActionButton fab;
+    View fab;
 
     @BindView(R.id.list_container)
     CoordinatorLayout clListContainer;
@@ -157,16 +156,17 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
-    public void bindList(List<Composition> compositions) {
-        adapter = new CompositionsAdapter(compositions);
-        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-        adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
-        recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void updateList(List<Composition> oldList, List<Composition> newList) {
-        DiffUtilHelper.update(oldList, newList, CompositionHelper::areSourcesTheSame, recyclerView);
+    public void updateList(ListUpdate<Composition> update) {
+        List<Composition> list = update.getNewList();
+        if (adapter == null) {
+            adapter = new CompositionsAdapter(list);
+            adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
+            adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.setItems(list);
+            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
+        }
     }
 
     @Override

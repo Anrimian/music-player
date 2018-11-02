@@ -72,6 +72,7 @@ public class StoragePlayListsProvider {
     public StoragePlayList createPlayList(String name) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
+        contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
         Uri uri = contentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, contentValues);
         if (uri == null) {
             throw new PlayListNotCreatedException();
