@@ -84,7 +84,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         super.onCreate();
         Components.getAppComponent().inject(this);
 
-        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
+//        startForeground(FOREGROUND_NOTIFICATION_ID, notificationsDisplayer.getStubNotification());
 
         mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
         mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS | FLAG_HANDLES_TRANSPORT_CONTROLS);

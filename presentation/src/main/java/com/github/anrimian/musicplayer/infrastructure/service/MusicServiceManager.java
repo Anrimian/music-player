@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.infrastructure.service;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
@@ -47,11 +46,11 @@ public class MusicServiceManager {
         switch (playerState) {
             case PLAY: {
                 Intent intent = new Intent(context, MusicService.class);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(intent);
-                } else {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {//check how it works
+//                    context.startForegroundService(intent);
+//                } else {
                     context.startService(intent);
-                }
+//                }
                 break;
             }
             default: {
