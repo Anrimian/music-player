@@ -70,7 +70,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     playQueueSubject.onNext(playQueue);
                     setCurrentItem(playQueue.get(0));
                 })
-                .toCompletable()
+                .ignoreElement()
                 .subscribeOn(scheduler);
     }
 
@@ -152,8 +152,27 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Single.fromCallable(this::getPlayQueue)
                 .map(PlayQueue::getCurrentPlayQueue)
                 .doOnSuccess(list -> setCurrentItem(list.get(position)))
-                .toCompletable()
+                .ignoreElement()
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable removeQueueItem(PlayQueueItem item) {
+        return Completable.fromRunnable(() -> {
+            Integer currentPosition = null;
+            PlayQueueItem currentItem = getCurrentItem();
+            if (item.equals(currentItem)) {
+                currentPosition = getPlayQueue().getPosition(currentItem);
+            }
+
+            getPlayQueue().removeQueueItem(item);
+            playQueueDao.deleteItem(item.getId());
+            playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
+
+            if (currentPosition != null) {
+                setCurrentItem(currentPosition);
+            }
+        }).subscribeOn(scheduler);
     }
 
     private PlayQueue getPlayQueue() {
@@ -208,17 +227,21 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
 
             if (currentItemDeleted) {
-                List<PlayQueueItem> items = getPlayQueue().getCurrentPlayQueue();
-                PlayQueueItem newItem = null;
-                if (!items.isEmpty()) {
-                    if (currentPosition == null || currentPosition >= items.size()) {
-                        currentPosition = 0;
-                    }
-                    newItem = items.get(currentPosition);
-                }
-                setCurrentItem(newItem);
+                setCurrentItem(currentPosition);
             }
         }
+    }
+
+    private void setCurrentItem(Integer currentPosition) {
+        List<PlayQueueItem> items = getPlayQueue().getCurrentPlayQueue();
+        PlayQueueItem newItem = null;
+        if (!items.isEmpty()) {
+            if (currentPosition == null || currentPosition >= items.size()) {
+                currentPosition = 0;
+            }
+            newItem = items.get(currentPosition);
+        }
+        setCurrentItem(newItem);
     }
 
     private void processModifyChange(List<Composition> changedCompositions) {

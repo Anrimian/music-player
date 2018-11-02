@@ -411,4 +411,29 @@ public class PlayQueueRepositoryImplTest {
             return true;
         });
     }
+
+    @Test
+    public void testDeleteItem() {
+        playQueueRepository.setPlayQueue(getFakeCompositions()).subscribe();
+
+        TestObserver<PlayQueueEvent> compositionObserver = playQueueRepository.getCurrentQueueItemObservable()
+                .test();
+
+        TestObserver<List<PlayQueueItem>> playQueueObserver = playQueueRepository
+                .getPlayQueueObservable()
+                .test();
+
+        playQueueRepository.removeQueueItem(fakeItem(0)).subscribe();
+
+        verify(playQueueDao).deleteItem(0L);
+
+        compositionObserver.assertValues(currentItem(0), currentItem(1));
+
+        playQueueObserver.assertValueAt(1, list -> {
+            assertEquals(getFakeCompositions().size() - 1, list.size());
+            assertEquals(fakeItem(1), list.get(0));
+            return true;
+        });
+
+    }
 }

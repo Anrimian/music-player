@@ -58,6 +58,10 @@ public class PlayQueueDaoWrapper {
         return toPlayQueueLists(playQueueDao.getPlayQueue(), compositionsCallable.call());
     }
 
+    public void deleteItem(long itemId) {
+        playQueueDao.deleteItem(itemId);
+    }
+
     PlayQueueLists insertNewPlayQueue(List<Composition> compositions,
                                       List<Composition> shuffledCompositions,
                                       long randomSeed) {

@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -78,6 +79,29 @@ public class PlayQueue {
 
     public boolean isEmpty() {
         return compositionQueue.isEmpty();
+    }
+
+    void removeQueueItem(PlayQueueItem playQueueItem) {
+        removeItem(playQueueItem, compositionQueue, itemPositionMap, compositionPositionsMap);
+        removeItem(playQueueItem, shuffledQueue, shuffledItemPositionMap, compositionShuffledPositionsMap);
+
+    }
+
+    private void removeItem(PlayQueueItem playQueueItem,
+                            List<PlayQueueItem> list,
+                            Map<Long, Integer> itemPositionMap,
+                            Map<Long, List<Integer>> compositionPositionsMap) {
+        int position = itemPositionMap.get(playQueueItem.getId());
+        if (position != -1) {
+            list.remove(position);
+            List<Integer> positions = compositionPositionsMap.get(playQueueItem.getComposition().getId());
+            Iterator<Integer> positionIterator = positions.iterator();
+            while (positionIterator.hasNext()) {
+                if (position == positionIterator.next()) {
+                    positionIterator.remove();
+                }
+            }
+        }
     }
 
     boolean deleteCompositions(List<Composition> compositions) {
