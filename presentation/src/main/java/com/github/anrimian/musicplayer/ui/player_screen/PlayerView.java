@@ -48,7 +48,7 @@ public interface PlayerView extends MvpView {
     void updatePlayQueue(ListUpdate<PlayQueueItem> update);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showInfinitePlayingButton(boolean active);
+    void showRepeatMode(int mode);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showRandomPlayingButton(boolean active);

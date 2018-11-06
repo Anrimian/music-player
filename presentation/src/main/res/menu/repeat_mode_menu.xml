@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_repeat_playlist"
+        android:title="@string/repeat_playlist"
+        android:icon="@drawable/ic_repeat"/>
+    <item android:id="@+id/menu_repeat_composition"
+        android:title="@string/repeat_composition"
+        android:icon="@drawable/ic_repeat_once"/>
+    <item android:id="@+id/menu_do_not_repeat"
+        android:title="@string/do_not_repeat"
+        android:icon="@drawable/ic_repeat_off"/>
+</menu>

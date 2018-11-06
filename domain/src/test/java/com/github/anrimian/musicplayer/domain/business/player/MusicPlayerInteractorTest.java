@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -159,9 +160,9 @@ public class MusicPlayerInteractorTest {
     }
 
     @Test
-    public void onPlayToEndWithInfiniteModeTest() {
+    public void onPlayToEndWithRepeatPlayListModeTest() {
         when(playQueueRepository.skipToNext()).thenReturn(Single.just(0));
-        when(settingsRepository.isInfinitePlayingEnabled()).thenReturn(true);
+        when(settingsRepository.getRepeatMode()).thenReturn(RepeatMode.REPEAT_PLAY_LIST);
 
         musicPlayerInteractor.play();
 

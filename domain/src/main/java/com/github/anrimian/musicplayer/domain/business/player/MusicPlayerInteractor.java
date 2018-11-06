@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -109,6 +110,9 @@ public class MusicPlayerInteractor {
         }
     }
 
+    /**
+     * Use it only with empty play queue as final result
+     */
     public void stop() {
         musicPlayerController.stop();
         playerStateSubject.onNext(STOP);
@@ -145,8 +149,8 @@ public class MusicPlayerInteractor {
         }
     }
 
-    public boolean isInfinitePlayingEnabled() {
-        return settingsRepository.isInfinitePlayingEnabled();
+    public Observable<Integer> getRepeatModeObservable() {
+        return settingsRepository.getRepeatModeObservable();
     }
 
     public boolean isRandomPlayingEnabled() {
@@ -174,8 +178,8 @@ public class MusicPlayerInteractor {
         musicPlayerController.seekTo(position);
     }
 
-    public void setInfinitePlayingEnabled(boolean enabled) {
-        settingsRepository.setInfinitePlayingEnabled(enabled);
+    public void setRepeatMode(int mode) {
+        settingsRepository.setRepeatMode(mode);
     }
 
     public Observable<Long> getTrackPositionObservable() {
@@ -260,12 +264,17 @@ public class MusicPlayerInteractor {
     }
 
     private void onCompositionPlayFinished() {
+        if (settingsRepository.getRepeatMode() == RepeatMode.REPEAT_COMPOSITION) {
+            musicPlayerController.seekTo(0);
+            return;
+        }
+
         if (skipDisposable == null) {
             skipDisposable = playQueueRepository.skipToNext()
                     .doFinally(() -> skipDisposable = null)
                     .subscribe(currentPosition -> {
-                        if (currentPosition == 0 && !settingsRepository.isInfinitePlayingEnabled()) {
-                            stop();
+                        if (currentPosition == 0 && !(settingsRepository.getRepeatMode() == RepeatMode.REPEAT_PLAY_LIST)) {
+                            pause();
                         }
                     });
         }

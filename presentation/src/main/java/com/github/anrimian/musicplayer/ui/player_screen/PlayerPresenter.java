@@ -68,7 +68,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().showInfinitePlayingButton(musicPlayerInteractor.isInfinitePlayingEnabled());
         getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
         if (playerScreenInteractor.isPlayerPanelOpen()) {
             getViewState().expandBottomPanel();
@@ -79,6 +78,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onStart() {//TODO unnecessary scroll to position
+        subscribeOnRepeatMode();
         subscribeOnPlayerStateChanges();
         subscribeOnPlayQueue();
         subscribeOnCurrentCompositionChanging();
@@ -126,9 +126,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.skipToNext();
     }
 
-    void onInfiniteButtonClicked(boolean enable) {
-        musicPlayerInteractor.setInfinitePlayingEnabled(enable);
-        getViewState().showInfinitePlayingButton(enable);
+    void onRepeatModeChanged(int mode) {
+        musicPlayerInteractor.setRepeatMode(mode);
     }
 
     void onRandomPlayingButtonClicked(boolean enable) {
@@ -197,6 +196,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onSeekStop(int progress) {
         musicPlayerInteractor.onSeekFinished(progress);
+    }
+
+    private void subscribeOnRepeatMode() {
+        musicPlayerInteractor.getRepeatModeObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showRepeatMode);
     }
 
     private void addPreparedCompositionsToPlayList(PlayList playList) {

@@ -2,7 +2,12 @@ package com.github.anrimian.musicplayer.data.repositories.settings;
 
 import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+
+import io.reactivex.Observable;
+
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
 /**
  * Created on 14.11.2017.
@@ -27,13 +32,18 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public void setInfinitePlayingEnabled(boolean enabled) {
-        settingsPreferences.setInfinitePlayingEnabled(enabled);
+    public void setRepeatMode(int mode) {
+        settingsPreferences.setRepeatMode(mode);
     }
 
     @Override
-    public boolean isInfinitePlayingEnabled() {
-        return settingsPreferences.isInfinitePlayingEnabled();
+    public int getRepeatMode() {
+        return settingsPreferences.getRepeatMode();
+    }
+
+    @Override
+    public Observable<Integer> getRepeatModeObservable() {
+        return settingsPreferences.getRepeatModeObservable();
     }
 
     @Override

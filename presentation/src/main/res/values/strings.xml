@@ -63,6 +63,9 @@
     <string name="pause">Pause</string>
     <string name="play">Play</string>
     <string name="play_all">Play all</string>
+    <string name="repeat_playlist">Repeat playlist</string>
+    <string name="repeat_composition">Repeat song</string>
+    <string name="do_not_repeat">Не повторять</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

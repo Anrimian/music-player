@@ -5,7 +5,12 @@ import android.content.SharedPreferences;
 
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
+
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.models.composition.Order.ADD_TIME;
 import static com.github.anrimian.musicplayer.domain.models.composition.Order.ADD_TIME_DESC;
 import static com.github.anrimian.musicplayer.domain.models.composition.Order.valueOf;
@@ -18,9 +23,11 @@ public class SettingsPreferences {
     private static final String PREFERENCES_NAME = "settings_preferences";
 
     private static final String RANDOM_PLAYING_ENABLED = "random_playing_enabled";
-    private static final String INFINITE_PLAYING_ENABLED = "infinite_playing_enabled";
+    private static final String REPEAT_MODE = "repeat_mode";
     private static final String FOLDER_ORDER = "folder_order";
     private static final String COMPOSITIONS_ORDER = "compositions_order";
+
+    private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
 
     private SharedPreferencesHelper preferences;
 
@@ -37,12 +44,17 @@ public class SettingsPreferences {
         return preferences.getBoolean(RANDOM_PLAYING_ENABLED);
     }
 
-    public void setInfinitePlayingEnabled(boolean enabled) {
-        preferences.putBoolean(INFINITE_PLAYING_ENABLED, enabled);
+    public void setRepeatMode(int mode) {
+        preferences.putInt(REPEAT_MODE, mode);
+        repeatModeSubject.onNext(mode);
     }
 
-    public boolean isInfinitePlayingEnabled() {
-        return preferences.getBoolean(INFINITE_PLAYING_ENABLED);
+    public int getRepeatMode() {
+        return preferences.getInt(REPEAT_MODE, RepeatMode.NONE);
+    }
+
+    public Observable<Integer> getRepeatModeObservable() {
+        return withDefaultValue(repeatModeSubject, this::getRepeatMode);
     }
 
     public Order getFolderOrder() {

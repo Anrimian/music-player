@@ -40,6 +40,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.infrastructure.service.MusicServiceManager;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
@@ -98,6 +99,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getResourceIdFromAttr;
+import static com.github.anrimian.musicplayer.utils.ViewUtils.showWithIcons;
 
 /**
  * Created on 19.10.2017.
@@ -149,7 +151,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     TextView tvCurrentComposition;
 
     @BindView(R.id.btn_infinite_play)
-    ImageView btnInfinitePlay;
+    ImageView btnRepeatMode;
 
     @BindView(R.id.btn_random_play)
     ImageView btnRandomPlay;
@@ -289,6 +291,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
+        btnRepeatMode.setOnClickListener(this::onRepeatModeButtonClicked);
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
@@ -511,15 +514,23 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showInfinitePlayingButton(boolean active) {
-        if (active) {
-            int selectedColor = getColorFromAttr(requireContext(), R.attr.colorAccent);
-            btnInfinitePlay.setColorFilter(selectedColor);
-            btnInfinitePlay.setOnClickListener(v -> presenter.onInfiniteButtonClicked(false));
-        } else {
-            btnInfinitePlay.clearColorFilter();
-            btnInfinitePlay.setOnClickListener(v -> presenter.onInfiniteButtonClicked(true));
+    public void showRepeatMode(int mode) {
+        @DrawableRes int iconRes = R.drawable.ic_repeat_off;
+        switch (mode) {
+            case RepeatMode.NONE: {
+                iconRes = R.drawable.ic_repeat_off;
+                break;
+            }
+            case RepeatMode.REPEAT_COMPOSITION: {
+                iconRes = R.drawable.ic_repeat_once;
+                break;
+            }
+            case RepeatMode.REPEAT_PLAY_LIST: {
+                iconRes = R.drawable.ic_repeat;
+                break;
+            }
         }
+        btnRepeatMode.setImageResource(iconRes);
     }
 
     @Override
@@ -699,6 +710,31 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
     }
 
+    private void onRepeatModeButtonClicked(View view) {
+        PopupMenu popup = new PopupMenu(requireContext(), view);
+        popup.inflate(R.menu.repeat_mode_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            int repeatMode = RepeatMode.NONE;
+            switch (item.getItemId()) {
+                case R.id.menu_repeat_playlist: {
+                    repeatMode = RepeatMode.REPEAT_PLAY_LIST;
+                    break;
+                }
+                case R.id.menu_repeat_composition: {
+                    repeatMode = RepeatMode.REPEAT_COMPOSITION;
+                    break;
+                }
+                case R.id.menu_do_not_repeat: {
+                    repeatMode = RepeatMode.NONE;
+                    break;
+                }
+            }
+            presenter.onRepeatModeChanged(repeatMode);
+            return true;
+        });
+        showWithIcons(popup, view, requireContext());
+    }
+
     private SlideDelegate getBottomSheetDelegate(DrawerArrowDrawable drawerArrowDrawable) {
         DelegateManager boundDelegateManager = new DelegateManager();
         boundDelegateManager
@@ -712,7 +748,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))
                 .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
                 .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(sbTrackState)))
-                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnInfinitePlay)))
+                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRepeatMode)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
                 .addDelegate(new DrawerArrowDelegate(
