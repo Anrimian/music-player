@@ -62,6 +62,7 @@
     <string name="play_queue">Play queue</string>
     <string name="pause">Pause</string>
     <string name="play">Play</string>
+    <string name="play_all">Play all</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

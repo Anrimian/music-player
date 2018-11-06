@@ -15,8 +15,8 @@
     </style>
 
     <style name="Content.Button.Menu">
-        <item name="android:layout_width">40dp</item>
-        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
         <item name="android:tint">@color/secondary_button_color</item>
     </style>
 

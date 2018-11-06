@@ -166,6 +166,7 @@ public class AdvancedToolbar extends Toolbar {
     public void setTitle(CharSequence title) {
         tvTitle.setVisibility(isEmpty(title) ? GONE : VISIBLE);
         tvTitle.setText(title);
+        flTitleArea.setContentDescription(title);
     }
 
     @Override

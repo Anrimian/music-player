@@ -65,9 +65,7 @@
     <ImageView
         android:id="@+id/btn_actions_menu"
         style="@style/Content.Button.Menu"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp"
+        android:layout_marginTop="2dp"
         android:contentDescription="@string/content_description_menu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

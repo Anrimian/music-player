@@ -21,6 +21,7 @@
         android:layout_marginEnd="@dimen/margin_normal"
         android:layout_marginRight="@dimen/margin_normal"
         android:tint="@android:color/white"
+        android:contentDescription="@string/play_all"
         app:fabSize="normal"
         app:layout_anchor="@id/recycler_view"
         app:layout_anchorGravity="bottom|right|end"
