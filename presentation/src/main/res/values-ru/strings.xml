@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Music Player</string>
+    <string name="open_drawer">Открыть боковое меню</string>
+    <string name="close_drawer">Закрыть блоковое меню</string>
+    <string name="useless_image">Ничего не значащая картинка</string>
+    <string name="try_again">Попробовать снова</string>
+    <string name="can_not_work_without_file_permission">Приложение не может работать без разрешения на доступ к файлам</string>
+    <string name="close">Закрыть</string>
+    <string name="library">Библиотека</string>
+    <string name="settings">Настройки</string>
+    <string name="internal_app_error">Внутренняя ошибка приложения</string>
+    <string name="unexpected_error">Необработанная ошибка</string>
+    <string name="file_not_found">Файл не найден</string>
+    <string name="compositions_on_device_not_found">Композиций на устройстве не найдено</string>
+    <string name="compositions_and_folders_for_search_not_found">Композиций и папок, подходящих под результаты поиска, не найдено</string>
+    <string name="compositions_for_search_not_found">Композиций, подходящих под результаты поиска, не найдено</string>
+    <string name="foreground_channel_id">Уведомление о проигрывании музыки</string>
+    <string name="previous_track">Предыдущий трек</string>
+    <string name="next_track">Следующий трек</string>
+    <string name="folder">Папка</string>
+    <string name="content_description_menu">Открыть меню текущей композиции</string>
+    <string name="share">Отправить</string>
+    <string name="content_description_repeat_mode">Меню режима повтора</string>
+    <string name="content_description_shuffle">Перемешать композиции</string>
+    <string name="unknown_author">Неизвестный исполнитель</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_folder">Удалить папку</string>
+    <string name="alphabetical_order">По алфавиту</string>
+    <string name="alphabetical_desc_order">По алфавиту в обратном направлении</string>
+    <string name="add_date_order">По дате добавления</string>
+    <string name="add_date_desc_order">По дате добавления в обратном направлении</string>
+    <string name="order">Сортировка</string>
+    <string name="files">Файлы</string>
+    <string name="compositions">Композиции</string>
+    <string name="play_lists">Плейлисты</string>
+    <string name="play_lists_on_device_not_found">Плейлистов на устройстве не найдено</string>
+    <string name="name">Название</string>
+    <string name="create">Создать</string>
+    <string name="create_playlist">Создание плейлиста</string>
+    <string name="create_playlist_error_template">Не удалось создать плейлист: %1$s</string>
+    <string name="name_can_not_be_empty">имя не может быть пустым</string>
+    <string name="create_progress">Создание…</string>
+    <string name="play_list_with_this_name_already_exists">плейлист с таким именем уже существует</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="select_play_list">Выберите плейлист</string>
+    <string name="add_to_playlist_error_template">Не удалось добавить композицию в плейлист: %1$s</string>
+    <string name="delete_composition_error_template">Не удалось удалить композицию: %1$s</string>
+    <string name="add_to_playlist_success_template">Композиция %1$s добавлена в плейлист %2$s</string>
+    <string name="add_to_playlist_count_success_template">%1$d композиций добавлены в плейлист %2$s</string>
+    <string name="play_list_is_empty">Плейлист пуст</string>
+    <string name="save_as_play_list">Сохранить как плейлист</string>
+    <string name="cancel">Отмена</string>
+    <string name="deleting">Удаление</string>
+    <string name="delete_composition_template">Удалить композицию %1$s?</string>
+    <string name="delete_folder_template">Удалить %2$s из папки %1$s? Если в папке больше нет файлов, то она тоже будет удалена.</string>
+    <string name="delete_template">Удалить %1$s?</string>
+    <string name="delete_composition_success">Композиция %1$s удалена</string>
+    <string name="delete_compositions_success">%1$d композиций удалено</string>
+    <string name="search">Поиск</string>
+    <string name="play_queue">Очередь воспроизведения</string>
+    <string name="pause">Пауза</string>
+    <string name="play">Играть</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s композиция</item>
+        <item quantity="few">%1$s композиции</item>
+        <item quantity="many">%1$s композиций</item>
+        <item quantity="other">%1$s композиций</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s композицию</item>
+        <item quantity="few">%1$s композиции</item>
+        <item quantity="many">%1$s композиций</item>
+        <item quantity="other">%1$s композиций</item>
+    </plurals>
+</resources>

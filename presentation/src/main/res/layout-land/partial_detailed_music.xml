@@ -55,12 +55,12 @@
     <ImageView
         android:id="@+id/iv_play_pause"
         style="@style/Content.Button.Main.Expanded"
-        android:contentDescription="@string/play_stop"
         app:layout_constraintBottom_toBottomOf="@id/btn_random_play"
         app:layout_constraintTop_toTopOf="@id/btn_random_play"
         app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
         app:layout_constraintStart_toEndOf="@+id/iv_skip_to_previous"
-        app:srcCompat="@drawable/ic_pause" />
+        app:srcCompat="@drawable/ic_pause"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/iv_skip_to_next"
@@ -105,7 +105,7 @@
     <ImageView
         android:id="@+id/btn_infinite_play"
         style="@style/Content.Button"
-        android:contentDescription="@string/content_description_infinite_play"
+        android:contentDescription="@string/content_description_repeat_mode"
         android:layout_marginEnd="@dimen/bottom_sheet_content_margin"
         android:layout_marginRight="@dimen/bottom_sheet_content_margin"
         app:layout_constraintBottom_toBottomOf="@id/btn_random_play"

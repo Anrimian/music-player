@@ -59,14 +59,14 @@ public class NotificationsDisplayer {
         return getDefaultMusicNotification(state, mediaSession).build();
     }
 
-    public Notification getStubNotification() {
-        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
-                .setContentTitle(getString(R.string.preparing_for_launch))
-                .setSmallIcon(R.drawable.ic_music_box)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .build();
-    }
+//    public Notification getStubNotification() {
+//        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
+//                .setContentTitle(getString(R.string.preparing_for_launch))
+//                .setSmallIcon(R.drawable.ic_music_box)
+//                .setPriority(NotificationCompat.PRIORITY_HIGH)
+//                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//                .build();
+//    }
 
 
     public void updateForegroundNotification(@Nonnull PlayerMetaState state,

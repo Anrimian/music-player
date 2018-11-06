@@ -32,7 +32,7 @@
                 android:layout_height="28dp"
                 android:layout_margin="@dimen/content_margin"
                 android:background="?attr/actionBarItemBackground"
-                android:contentDescription="@string/create_play_list"
+                android:contentDescription="@string/create_playlist"
                 android:tint="@color/icon_color"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"

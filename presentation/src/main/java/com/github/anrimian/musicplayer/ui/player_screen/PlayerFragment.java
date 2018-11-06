@@ -451,12 +451,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showStopState() {
         ivPlayPause.setImageResource(R.drawable.ic_play);
+        ivPlayPause.setContentDescription(getString(R.string.play));
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
     }
 
     @Override
     public void showPlayState() {
         ivPlayPause.setImageResource(R.drawable.ic_pause);
+        ivPlayPause.setContentDescription(getString(R.string.pause));
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
     }
 

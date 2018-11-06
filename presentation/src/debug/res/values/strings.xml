@@ -1,3 +1,3 @@
 <resources>
-    <string name="app_name">Music Player(debug)</string>
+    <string name="app_name" translatable="false">Music Player(debug)</string>
 </resources>
