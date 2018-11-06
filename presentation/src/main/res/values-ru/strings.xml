@@ -61,6 +61,10 @@
     <string name="play_queue">Очередь воспроизведения</string>
     <string name="pause">Пауза</string>
     <string name="play">Играть</string>
+    <string name="play_all">Играть всё</string>
+    <string name="repeat_playlist">Повторять плейлист</string>
+    <string name="repeat_composition">Повторять композицию</string>
+    <string name="do_not_repeat">Не повторять</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
