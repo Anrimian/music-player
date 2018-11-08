@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -99,6 +101,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getResourceIdFromAttr;
+import static com.github.anrimian.musicplayer.utils.ViewUtils.insertMenuItemIcons;
 import static com.github.anrimian.musicplayer.utils.ViewUtils.showWithIcons;
 
 /**
@@ -732,7 +735,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             presenter.onRepeatModeChanged(repeatMode);
             return true;
         });
-        showWithIcons(popup, view, requireContext());
+        insertMenuItemIcons(requireContext(), popup);
+        popup.show();
     }
 
     private SlideDelegate getBottomSheetDelegate(DrawerArrowDrawable drawerArrowDrawable) {

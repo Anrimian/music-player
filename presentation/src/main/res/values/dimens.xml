@@ -57,6 +57,7 @@
     <dimen name="play_button_expand_margin">8dp</dimen>
     <dimen name="play_button_expand_size">56dp</dimen>
     <dimen name="button_expand_size">48dp</dimen>
+    <dimen name="popup_menu_item_icon_size">20dp</dimen>
 
 
 </resources>
