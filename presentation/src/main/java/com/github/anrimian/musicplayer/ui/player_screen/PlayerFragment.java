@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
@@ -14,6 +15,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -568,6 +570,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showPlayQueueSubtitle(int size) {
         tvQueueSubtitle.setText(getResources().getQuantityString(R.plurals.compositions_count, size, size));
+    }
+
+    @Override
+    public void setSkipToNextButtonEnabled(boolean enabled) {
+        int color = enabled? ContextCompat.getColor(requireContext(), R.color.icon_color) :
+                getColorFromAttr(requireContext(), R.attr.colorControlNormal);
+        ivSkipToNext.setColorFilter(color);
+        ivSkipToNext.setEnabled(enabled);
     }
 
     @Override

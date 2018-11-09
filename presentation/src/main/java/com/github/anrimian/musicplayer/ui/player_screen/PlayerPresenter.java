@@ -68,6 +68,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
+        getViewState().setSkipToNextButtonEnabled(true);
         getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
         if (playerScreenInteractor.isPlayerPanelOpen()) {
             getViewState().expandBottomPanel();
@@ -297,6 +298,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void onPlayListChanged(ListUpdate<PlayQueueItem> update) {
         playQueue = update.getNewList();
         getViewState().showPlayQueueSubtitle(playQueue.size());
+        getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
         getViewState().updatePlayQueue(update);
         Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
         if (position != null) {
