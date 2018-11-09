@@ -198,6 +198,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.onSeekFinished(progress);
     }
 
+    void onItemSwipedToDelete(Integer position) {
+        musicPlayerInteractor.removeQueueItem(playQueue.get(position))
+                .observeOn(uiScheduler)
+                .subscribe();
+    }
+
     private void subscribeOnRepeatMode() {
         musicPlayerInteractor.getRepeatModeObservable()
                 .observeOn(uiScheduler)

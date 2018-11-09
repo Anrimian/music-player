@@ -213,6 +213,10 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getCompositionPosition(item);
     }
 
+    public Completable removeQueueItem(PlayQueueItem item) {
+        return playQueueRepository.removeQueueItem(item);
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {

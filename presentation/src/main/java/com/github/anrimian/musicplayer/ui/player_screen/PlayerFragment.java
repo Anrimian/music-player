@@ -3,7 +3,11 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
@@ -28,6 +32,7 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -80,6 +85,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegat
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.SwipeToDeleteTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -300,6 +306,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteTouchHelperCallback(
+                requireContext(), presenter::onItemSwipedToDelete));
+        itemTouchHelper.attachToRecyclerView(rvPlayList);
 
         if (savedInstanceState != null) {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
