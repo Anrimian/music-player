@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -40,7 +42,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-    private Disposable trackStateDisposable;
 
     private List<PlayQueueItem> playQueue = new ArrayList<>();
 
@@ -83,13 +84,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         subscribeOnPlayerStateChanges();
         subscribeOnPlayQueue();
         subscribeOnCurrentCompositionChanging();
+        subscribeOnTrackPositionChanging();
     }
 
     void onStop() {
         presenterDisposable.clear();
-        if (trackStateDisposable != null) {
-            trackStateDisposable.dispose();
-        }
     }
 
     void onBottomPanelExpanded() {
@@ -253,15 +252,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
         this.currentItem = newItem;
-        if (trackStateDisposable != null) {
-            trackStateDisposable.dispose();
-            trackStateDisposable = null;
-        }
         getViewState().showMusicControls(currentItem != null);
         if (newItem != null) {
             getViewState().showCurrentQueueItem(newItem);
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
-            subscribeOnTrackPositionChanging();
 
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
@@ -307,13 +301,15 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnTrackPositionChanging() {
-        trackStateDisposable = musicPlayerInteractor.getTrackPositionObservable()
+        presenterDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onTrackPositionChanged);
+                .subscribe(this::onTrackPositionChanged));
     }
 
     private void onTrackPositionChanged(Long currentPosition) {
-        long duration = currentItem.getComposition().getDuration();
-        getViewState().showTrackState(currentPosition, duration);
+        if (currentItem != null) {
+            long duration = currentItem.getComposition().getDuration();
+            getViewState().showTrackState(currentPosition, duration);
+        }
     }
 }
