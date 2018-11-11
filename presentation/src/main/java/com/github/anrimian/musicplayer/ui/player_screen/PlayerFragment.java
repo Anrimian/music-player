@@ -1,9 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
@@ -22,7 +20,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -78,6 +75,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
@@ -104,7 +102,6 @@ import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getResourceIdFromAttr;
 import static com.github.anrimian.musicplayer.utils.ViewUtils.insertMenuItemIcons;
-import static com.github.anrimian.musicplayer.utils.ViewUtils.showWithIcons;
 
 /**
  * Created on 19.10.2017.
@@ -496,8 +493,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void scrollQueueToPosition(int position) {
-        if (position >= playQueueLayoutManager.findLastVisibleItemPosition()) {
-            playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
+        if (position == playQueueLayoutManager.findLastCompletelyVisibleItemPosition() + 1
+                || position == playQueueLayoutManager.findFirstVisibleItemPosition() - 1) {//FIXME up scroll
+            RecyclerViewUtils.smoothScrollToTop(position, playQueueLayoutManager, requireContext());
+//            playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
         } else {
             playQueueLayoutManager.scrollToPosition(position);
         }
