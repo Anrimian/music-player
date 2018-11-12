@@ -406,7 +406,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void collapseBottomPanel() {
         setButtonsSelectableBackground(
                 getResourceIdFromAttr(requireContext(),
-                R.attr.selectableItemBackgroundBorderless)
+                        R.attr.selectableItemBackgroundBorderless)
         );
 
         drawerLockStateProcessor.onBottomSheetOpened(false);
@@ -479,7 +479,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showCurrentQueueItem(PlayQueueItem item) {
+    public void showCurrentQueueItem(PlayQueueItem item, int position) {
         Composition composition = item.getComposition();
         tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
@@ -488,18 +488,20 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         ImageFormatUtils.displayImage(ivMusicIcon, composition);
 
-        playQueueAdapter.onCurrentItemChanged(item, rvPlayList);
+        playQueueAdapter.onCurrentItemChanged(item, position);
     }
 
     @Override
-    public void scrollQueueToPosition(int position) {
-        if (position == playQueueLayoutManager.findLastCompletelyVisibleItemPosition() + 1
-                || position == playQueueLayoutManager.findFirstVisibleItemPosition() - 1) {//FIXME up scroll
-            RecyclerViewUtils.smoothScrollToTop(position, playQueueLayoutManager, requireContext());
-//            playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
-        } else {
-            playQueueLayoutManager.scrollToPosition(position);
+    public void scrollQueueToPosition(int position, boolean smoothScroll) {
+        if (position > playQueueLayoutManager.findFirstCompletelyVisibleItemPosition() &&
+                position < playQueueLayoutManager.findLastVisibleItemPosition()) {
+            return;
         }
+
+        RecyclerViewUtils.smoothScrollToTop(position,
+                playQueueLayoutManager,
+                requireContext(),
+                smoothScroll? 200: 1);
     }
 
     @Override

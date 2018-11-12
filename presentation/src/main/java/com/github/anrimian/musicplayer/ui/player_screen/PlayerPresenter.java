@@ -20,11 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
@@ -251,15 +248,16 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
+        boolean smoothScroll = currentItem != null;
+
         this.currentItem = newItem;
         getViewState().showMusicControls(currentItem != null);
         if (newItem != null) {
-            getViewState().showCurrentQueueItem(newItem);
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
-
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
-                getViewState().scrollQueueToPosition(position);
+                getViewState().showCurrentQueueItem(newItem, position);
+                getViewState().scrollQueueToPosition(position, smoothScroll);
             }
         }
     }
@@ -294,9 +292,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
         getViewState().updatePlayQueue(update);
-        Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
-        if (position != null) {
-            getViewState().scrollQueueToPosition(position);
+        if (currentItem != null) {
+            Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
+            if (position != null) {
+                getViewState().scrollQueueToPosition(position, false);
+            }
         }
     }
 
