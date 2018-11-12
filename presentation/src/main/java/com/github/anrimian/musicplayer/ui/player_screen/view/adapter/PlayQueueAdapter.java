@@ -9,7 +9,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 
 import java.util.List;
 
@@ -30,6 +29,8 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
 
     @Nullable
     private PlayQueueItem currentItem;
+
+    private int oldPosition = RecyclerView.NO_POSITION;
 
     public PlayQueueAdapter(List<PlayQueueItem> musicList) {
         this.musicList = musicList;
@@ -72,16 +73,24 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         return musicList.size();
     }
 
-    public void onCurrentItemChanged(PlayQueueItem currentItem, RecyclerView recyclerView) {
-        this.currentItem = currentItem;
+    public void onCurrentItemChanged(PlayQueueItem currentItem, int position) {
+        int oldPosition = getOldPosition();
 
-        RecyclerViewUtils.<PlayQueueViewHolder>viewHolders(recyclerView, holder -> {
-            int position = holder.getAdapterPosition();
-            if (position != -1 && position < musicList.size()) {
-                PlayQueueItem item = musicList.get(position);
-                holder.showAsPlayingComposition(item.equals(currentItem));
-            }
-        });
+        this.currentItem = currentItem;
+        if (oldPosition != -1) {
+            notifyItemChanged(oldPosition, CURRENT_COMPOSITION_CHANGED);
+        }
+        this.oldPosition = position;
+        notifyItemChanged(position, CURRENT_COMPOSITION_CHANGED);
+    }
+
+    private int getOldPosition() {
+        if (oldPosition != -1
+                && currentItem != null
+                && currentItem.equals(musicList.get(oldPosition))) {
+            return oldPosition;
+        }
+        return musicList.indexOf(this.currentItem);
     }
 
     public void setItems(List<PlayQueueItem> list) {

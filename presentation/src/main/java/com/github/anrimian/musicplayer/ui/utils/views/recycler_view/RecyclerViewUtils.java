@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view;
 
+import android.content.Context;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -15,5 +17,24 @@ public class RecyclerViewUtils {
             //noinspection unchecked
             callback.call((T) viewHolder);
         }
+    }
+
+    public static void smoothScrollToTop(int position,
+                                         RecyclerView.LayoutManager layoutManager,
+                                         Context context,
+                                         int duration) {
+        RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(context) {
+
+            @Override protected int getVerticalSnapPreference() {
+                return LinearSmoothScroller.SNAP_TO_START;
+            }
+
+            @Override
+            protected int calculateTimeForScrolling(int dx) {
+                return duration;
+            }
+        };
+        smoothScroller.setTargetPosition(position);
+        layoutManager.startSmoothScroll(smoothScroller);
     }
 }
