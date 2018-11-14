@@ -94,6 +94,22 @@ public class PlayQueueRepositoryImplTest {
     }
 
     @Test
+    public void setPlayQueueInNormalModeWithStartPosition() {
+        playQueueRepository.setPlayQueue(getFakeCompositions(), 1000)
+                .test()
+                .assertComplete();
+
+        verify(playQueueDao).insertNewPlayQueue(getFakeCompositions());
+        verify(storageMusicDataSource).getChangeObservable();
+
+        verify(uiStatePreferences).setCurrentCompositionId(1000L);
+
+        playQueueRepository.getCurrentQueueItemObservable()
+                .test()
+                .assertValue(new PlayQueueEvent(new PlayQueueItem(1000, fakeComposition(1000))));
+    }
+
+    @Test
     public void setPlayQueueInShuffleMode() {
         when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(true);
 
@@ -102,6 +118,28 @@ public class PlayQueueRepositoryImplTest {
                 .assertComplete();
 
         verify(uiStatePreferences).setCurrentCompositionId(anyLong());
+
+        playQueueRepository.getCurrentQueueItemObservable()
+                .test()
+                .assertValueCount(1);
+
+        playQueueRepository.getPlayQueueObservable()
+                .test()
+                .assertValue(compositions -> {
+                    assertEquals(getReversedFakeItems(), compositions);
+                    return true;
+                });
+    }
+
+    @Test
+    public void setPlayQueueInShuffleModeWithStartPosition() {
+        when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(true);
+
+        playQueueRepository.setPlayQueue(getFakeCompositions(), 1000)
+                .test()
+                .assertComplete();
+
+        verify(uiStatePreferences).setCurrentCompositionId(1000L);
 
         playQueueRepository.getCurrentQueueItemObservable()
                 .test()

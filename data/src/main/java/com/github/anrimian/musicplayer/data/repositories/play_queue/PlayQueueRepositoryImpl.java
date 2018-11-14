@@ -29,6 +29,8 @@ import static io.reactivex.subjects.BehaviorSubject.create;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
+    private static final int NO_POSITION = -1;
+
     private final PlayQueueDaoWrapper playQueueDao;
     private final StorageMusicDataSource storageMusicDataSource;
     private final SettingsPreferences settingsPreferences;
@@ -57,6 +59,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Completable setPlayQueue(List<Composition> compositions) {
+        return setPlayQueue(compositions, NO_POSITION);
+    }
+
+    @Override
+    public Completable setPlayQueue(List<Composition> compositions, int firstPosition) {
         if (compositions.isEmpty()) {
             return Completable.complete();
         }
@@ -65,10 +72,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     this.playQueue = playQueue;
                     subscribeOnCompositionChanges();
                 })
-                .map(PlayQueue::getCurrentPlayQueue)
                 .doOnSuccess(playQueue -> {
-                    playQueueSubject.onNext(playQueue);
-                    setCurrentItem(playQueue.get(0));
+                    List<PlayQueueItem> currentQueue = playQueue.getCurrentPlayQueue();
+                    playQueueSubject.onNext(currentQueue);
+
+                    PlayQueueItem item;
+                    if (firstPosition == NO_POSITION) {
+                        item = currentQueue.get(0);
+                    } else {
+                        item = playQueue.getCompositionQueue().get(firstPosition);
+                    }
+                    setCurrentItem(item);
                 })
                 .ignoreElement()
                 .subscribeOn(scheduler);
