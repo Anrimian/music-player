@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import javax.annotation.Nonnull;
 
@@ -56,12 +57,14 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
 
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
     private OnItemClickListener<Composition> onAddToPlaylistClickListener;
+    private OnItemClickListener<PlayQueueItem> onDeleteItemClickListener;
 
     PlayQueueViewHolder(LayoutInflater inflater,
                         ViewGroup parent,
                         OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener,
                         OnItemClickListener<Composition> onDeleteCompositionClickListener,
-                        OnItemClickListener<Composition> onAddToPlaylistClickListener) {
+                        OnItemClickListener<Composition> onAddToPlaylistClickListener,
+                        OnItemClickListener<PlayQueueItem> onDeleteItemClickListener) {
         super(inflater.inflate(R.layout.item_play_queue, parent, false));
         ButterKnife.bind(this, itemView);
         if (onCompositionClickListener != null) {
@@ -71,6 +74,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
         btnActionsMenu.setOnClickListener(this::onActionsMenuButtonClicked);
         this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
         this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+        this.onDeleteItemClickListener = onDeleteItemClickListener;
     }
 
     void bind(@Nonnull PlayQueueItem item) {
@@ -105,7 +109,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
 
     private void onActionsMenuButtonClicked(View view) {
         PopupMenu popup = new PopupMenu(getContext(), view);
-        popup.inflate(R.menu.composition_item_menu);
+        popup.inflate(R.menu.play_queue_item_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {
@@ -114,6 +118,10 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
                 }
                 case R.id.menu_share: {
 //                    presenter.onShareCompositionButtonClicked();
+                    return true;
+                }
+                case R.id.menu_delete_from_queue: {
+                    onDeleteItemClickListener.onItemClick(playQueueItem);
                     return true;
                 }
                 case R.id.menu_delete: {

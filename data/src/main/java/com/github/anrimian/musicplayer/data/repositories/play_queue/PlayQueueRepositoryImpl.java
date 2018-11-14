@@ -161,13 +161,14 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Completable.fromRunnable(() -> {
             Integer currentPosition = null;
             PlayQueueItem currentItem = getCurrentItem();
+            PlayQueue playQueue = getPlayQueue();
             if (item.equals(currentItem)) {
-                currentPosition = getPlayQueue().getPosition(currentItem);
+                currentPosition = playQueue.getPosition(currentItem);
             }
 
-            getPlayQueue().removeQueueItem(item);
+            playQueue.removeQueueItem(item);
             playQueueDao.deleteItem(item.getId());
-            playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
+            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
 
             if (currentPosition != null) {
                 setCurrentItem(currentPosition);

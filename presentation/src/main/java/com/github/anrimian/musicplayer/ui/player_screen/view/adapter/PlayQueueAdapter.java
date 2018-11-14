@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
     private OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener;
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
     private OnItemClickListener<Composition> onAddToPlaylistClickListener;
+    private OnItemClickListener<PlayQueueItem> onDeleteItemClickListener;
 
     @Nullable
     private PlayQueueItem currentItem;
@@ -43,7 +45,8 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
                 parent,
                 onCompositionClickListener,
                 onDeleteCompositionClickListener,
-                onAddToPlaylistClickListener);
+                onAddToPlaylistClickListener,
+                onDeleteItemClickListener);
     }
 
     @Override
@@ -86,6 +89,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
 
     private int getOldPosition() {
         if (oldPosition != -1
+                && oldPosition < musicList.size()
                 && currentItem != null
                 && currentItem.equals(musicList.get(oldPosition))) {
             return oldPosition;
@@ -109,5 +113,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
     }
 
-
+    public void setOnDeleteItemClickListener(OnItemClickListener<PlayQueueItem> onDeleteItemClickListener) {
+        this.onDeleteItemClickListener = onDeleteItemClickListener;
+    }
 }

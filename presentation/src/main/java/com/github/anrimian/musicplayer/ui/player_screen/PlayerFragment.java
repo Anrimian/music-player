@@ -2,13 +2,9 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,6 +32,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -84,7 +82,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListene
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.SwipeToDeleteTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -304,9 +301,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteTouchHelperCallback(
-                requireContext(), presenter::onItemSwipedToDelete));
-        itemTouchHelper.attachToRecyclerView(rvPlayList);
+        RecyclerViewUtils.attachSwipeToDelete(rvPlayList,
+                getColorFromAttr(requireContext(), R.attr.colorAccent),
+                presenter::onItemSwipedToDelete);
 
         if (savedInstanceState != null) {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
@@ -503,15 +500,15 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void scrollQueueToPosition(int position, boolean smoothScroll) {
-        if (position > playQueueLayoutManager.findFirstCompletelyVisibleItemPosition() &&
+        if (position > playQueueLayoutManager.findFirstVisibleItemPosition() &&
                 position < playQueueLayoutManager.findLastVisibleItemPosition()) {
             return;
         }
 
-        RecyclerViewUtils.smoothScrollToTop(position,
+        rvPlayList.post(() -> RecyclerViewUtils.smoothScrollToTop(position,
                 playQueueLayoutManager,
                 requireContext(),
-                smoothScroll? 200: 1);
+                smoothScroll? 200: 1));
     }
 
     @Override
@@ -522,6 +519,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
             playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
             playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
+            playQueueAdapter.setOnDeleteItemClickListener(presenter::onDeleteQueueItemClicked);
             rvPlayList.setAdapter(playQueueAdapter);
         } else {
             playQueueAdapter.setItems(list);

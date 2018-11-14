@@ -196,7 +196,15 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onItemSwipedToDelete(Integer position) {
-        musicPlayerInteractor.removeQueueItem(playQueue.get(position))
+        deletePlayQueueItem(playQueue.get(position));
+    }
+
+    void onDeleteQueueItemClicked(PlayQueueItem item) {
+        deletePlayQueueItem(item);
+    }
+
+    private void deletePlayQueueItem(PlayQueueItem item) {
+        musicPlayerInteractor.removeQueueItem(item)
                 .observeOn(uiScheduler)
                 .subscribe();
     }
@@ -290,20 +298,14 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         presenterDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
                 .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayListChanged));
+                .subscribe(this::onPlayQueueChanged));
     }
 
-    private void onPlayListChanged(ListUpdate<PlayQueueItem> update) {
+    private void onPlayQueueChanged(ListUpdate<PlayQueueItem> update) {
         playQueue = update.getNewList();
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
         getViewState().updatePlayQueue(update);
-        if (currentItem != null) {
-            Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
-            if (position != null) {
-                getViewState().scrollQueueToPosition(position, false);
-            }
-        }
     }
 
     private void subscribeOnTrackPositionChanging() {

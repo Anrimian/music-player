@@ -65,6 +65,7 @@
     <string name="repeat_playlist">Повторять плейлист</string>
     <string name="repeat_composition">Повторять композицию</string>
     <string name="do_not_repeat">Не повторять</string>
+    <string name="delete_from_queue">Удалить из очереди</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
