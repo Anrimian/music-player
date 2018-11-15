@@ -45,7 +45,7 @@ public interface PlayerView extends MvpView {
     void scrollQueueToPosition(int position, boolean smoothScroll);
 
     @StateStrategyType(AddToStartSingleStrategy.class)
-    void updatePlayQueue(ListUpdate<PlayQueueItem> update);
+    void updatePlayQueue(ListUpdate<PlayQueueItem> update, boolean keepPosition);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showRepeatMode(int mode);

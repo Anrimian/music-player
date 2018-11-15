@@ -51,6 +51,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
 
+    private boolean scrollToPositionAfterUpdate = false;
+
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
                            PlayerScreenInteractor playerScreenInteractor,
@@ -128,6 +130,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onRandomPlayingButtonClicked(boolean enable) {
+        scrollToPositionAfterUpdate = true;
         musicPlayerInteractor.setRandomPlayingEnabled(enable);
         getViewState().showRandomPlayingButton(enable);
     }
@@ -305,7 +308,16 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         playQueue = update.getNewList();
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
-        getViewState().updatePlayQueue(update);
+        getViewState().updatePlayQueue(update, !scrollToPositionAfterUpdate);
+        if (scrollToPositionAfterUpdate) {
+            scrollToPositionAfterUpdate = false;
+            if (currentItem != null) {
+                Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
+                if (position != null) {
+                    getViewState().scrollQueueToPosition(position, true);
+                }
+            }
+        }
     }
 
     private void subscribeOnTrackPositionChanging() {

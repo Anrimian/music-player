@@ -512,7 +512,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void updatePlayQueue(ListUpdate<PlayQueueItem> update) {
+    public void updatePlayQueue(ListUpdate<PlayQueueItem> update, boolean keepPosition) {
         List<PlayQueueItem> list = update.getNewList();
         if (playQueueAdapter == null) {
             playQueueAdapter = new PlayQueueAdapter(list);
@@ -523,7 +523,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             rvPlayList.setAdapter(playQueueAdapter);
         } else {
             playQueueAdapter.setItems(list);
-            DiffUtilHelper.update(update.getDiffResult(), rvPlayList);
+            if (keepPosition) {
+                DiffUtilHelper.update(update.getDiffResult(), rvPlayList);
+            } else {
+                update.getDiffResult().dispatchUpdatesTo(playQueueAdapter);
+            }
         }
     }
 
