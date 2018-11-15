@@ -247,7 +247,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         }
     }
 
-    private void setCurrentItem(Integer currentPosition) {
+    private void setCurrentItem(Integer currentPosition) {//TODO not by position, by item, items can be many!
         List<PlayQueueItem> items = getPlayQueue().getCurrentPlayQueue();
         PlayQueueItem newItem = null;
         if (!items.isEmpty()) {

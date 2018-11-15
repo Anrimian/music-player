@@ -42,6 +42,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
                 return new MusicViewHolder(inflater,
                         parent,
                         onCompositionClickListener,
+                        null,
                         onCompositionMenuItemClicked);
             }
             case TYPE_FILE: {

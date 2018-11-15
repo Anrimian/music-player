@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
@@ -44,13 +45,19 @@ public class LibraryFilesInteractor {
         return musicProviderRepository.getCompositionsInPath(path, searchText);
     }
 
-    public Completable playAllMusicInPath(@Nullable String path) {
-        return musicProviderRepository.getAllCompositionsInPath(path)
-                .flatMapCompletable(musicPlayerInteractor::startPlaying);
+    public void playAllMusicInPath(@Nullable String path) {
+        musicProviderRepository.getAllCompositionsInPath(path)
+                .doOnSuccess(musicPlayerInteractor::startPlaying)
+                .subscribe();
     }
 
-    public Completable playMusic(Composition composition) {
-        return musicPlayerInteractor.startPlaying(asList(composition));
+    public void playMusic(String path, Composition composition) {
+        musicProviderRepository.getAllCompositionsInPath(path)
+                .doOnSuccess(compositions -> {
+                        int firstPosition = compositions.indexOf(composition);
+                        musicPlayerInteractor.startPlaying(compositions, firstPosition);
+                })
+                .subscribe();
     }
 
     public Completable deleteCompositions(List<Composition> compositions) {

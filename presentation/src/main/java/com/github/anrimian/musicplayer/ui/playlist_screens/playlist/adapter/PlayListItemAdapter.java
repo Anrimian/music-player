@@ -18,7 +18,7 @@ import java.util.List;
 public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHolder> {
 
     private List<PlayListItem> musicList;
-    private OnItemClickListener<PlayListItem> onCompositionClickListener;
+    private OnItemClickListener<Integer> onCompositionClickListener;
     private OnViewItemClickListener<PlayListItem> onMenuItemClickListener;
 
     public PlayListItemAdapter(List<PlayListItem> musicList) {
@@ -49,7 +49,7 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
         musicList = list;
     }
 
-    public void setOnCompositionClickListener(OnItemClickListener<PlayListItem> onCompositionClickListener) {
+    public void setOnCompositionClickListener(OnItemClickListener<Integer> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 

@@ -82,12 +82,16 @@ public class MusicPlayerInteractor {
                 .subscribe(this::onMusicPlayerEventReceived));
     }
 
-    //TODO return void
-    public Completable startPlaying(List<Composition> compositions) {
-        return playQueueRepository.setPlayQueue(compositions)
+    public void startPlaying(List<Composition> compositions) {
+        startPlaying(compositions, 0);
+    }
+
+    public void startPlaying(List<Composition> compositions, int firstPosition) {
+        playQueueRepository.setPlayQueue(compositions, firstPosition)
                 .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
                 .doOnError(t -> playerStateSubject.onNext(STOP))
-                .doOnComplete(this::play);
+                .doOnComplete(this::play)
+                .subscribe();
     }
 
     public void play() {

@@ -58,14 +58,12 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         presenterDisposable.dispose();
     }
 
-    void onCompositionClicked(PlayListItem item) {
-        musicPlayerInteractor.startPlaying(asList(item.getComposition()))
-                .subscribe();//TODO handle error later
+    void onCompositionClicked(int position) {
+        musicPlayerInteractor.startPlaying(mapList(items, PlayListItem::getComposition), position);
     }
 
     void onPlayAllButtonClicked() {
-        musicPlayerInteractor.startPlaying(mapList(items, PlayListItem::getComposition))
-                .subscribe();//TODO handle error later
+        musicPlayerInteractor.startPlaying(mapList(items, PlayListItem::getComposition));
     }
 
     private void subscribeOnCompositions() {

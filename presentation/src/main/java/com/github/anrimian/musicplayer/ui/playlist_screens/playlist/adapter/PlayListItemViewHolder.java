@@ -52,12 +52,14 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder {
 
     PlayListItemViewHolder(LayoutInflater inflater,
                            ViewGroup parent,
-                           OnItemClickListener<PlayListItem> onCompositionClickListener,
+                           OnItemClickListener<Integer> onCompositionClickListener,
                            OnViewItemClickListener<PlayListItem> onMenuClickListener) {
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
         ButterKnife.bind(this, itemView);
         if (onCompositionClickListener != null) {
-            clickableItem.setOnClickListener(v -> onCompositionClickListener.onItemClick(item));
+            clickableItem.setOnClickListener(v ->
+                    onCompositionClickListener.onItemClick(getAdapterPosition())
+            );
         }
         btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, item));
     }

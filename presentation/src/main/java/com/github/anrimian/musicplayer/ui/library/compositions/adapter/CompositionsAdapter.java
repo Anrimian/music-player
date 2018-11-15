@@ -19,7 +19,7 @@ import java.util.List;
 public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     private List<Composition> musicList;
-    private OnItemClickListener<Composition> onCompositionClickListener;
+    private OnItemClickListener<Integer> onCompositionClickListener;
     private OnViewItemClickListener<Composition> onMenuItemClickListener;
 
     public CompositionsAdapter(List<Composition> musicList) {
@@ -31,6 +31,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
+                null,
                 onCompositionClickListener,
                 onMenuItemClickListener);
     }
@@ -50,7 +51,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         musicList = list;
     }
 
-    public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
+    public void setOnCompositionClickListener(OnItemClickListener<Integer> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
