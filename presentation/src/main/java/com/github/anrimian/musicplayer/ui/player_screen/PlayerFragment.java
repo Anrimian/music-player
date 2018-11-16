@@ -795,8 +795,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     bottomSheetCoordinator));
             delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.85f));
         } else {
-            boundDelegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)))
-                    .addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
+            boundDelegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)));
+            delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
         }
         delegateManager.addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegateManager));
         return delegateManager;
