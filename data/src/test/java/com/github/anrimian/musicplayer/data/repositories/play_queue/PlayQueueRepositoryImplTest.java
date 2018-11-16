@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import org.junit.Before;
@@ -18,6 +19,7 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.observers.TestObserver;
@@ -380,6 +382,46 @@ public class PlayQueueRepositoryImplTest {
                 .assertValue(expectedList);
 
         compositionObserver.assertValues(currentItem(0), currentItem(2));
+    }
+
+    @Test
+    public void testDeletedChangesWithManyItems() {
+        List<PlayQueueItem> items = ListUtils.asList(
+                new PlayQueueItem(0, fakeComposition(0)),
+                new PlayQueueItem(1, fakeComposition(1)),
+                new PlayQueueItem(2, fakeComposition(1)),
+                new PlayQueueItem(3, fakeComposition(2)),
+                new PlayQueueItem(4, fakeComposition(3)));
+
+        when(playQueueDao.insertNewPlayQueue(any())).thenReturn(
+                new PlayQueueLists(items, items));
+
+        List<PlayQueueItem> expectedList = new ArrayList<>(items);
+        expectedList.remove(1);
+        expectedList.remove(1);
+        expectedList.remove(1);
+
+        playQueueRepository.setPlayQueue(Arrays.asList(
+                fakeComposition(0),
+                fakeComposition(1),
+                fakeComposition(1),
+                fakeComposition(2),
+                fakeComposition(3)), 2).subscribe();
+
+        TestObserver<PlayQueueEvent> compositionObserver = playQueueRepository.getCurrentQueueItemObservable()
+                .test();
+
+        List<Composition> deletedCompositions = ListUtils.asList(fakeComposition(1), fakeComposition(2));
+
+        changeSubject.onNext(new Change<>(DELETED, deletedCompositions));
+
+        inOrder.verify(playQueueDao).deleteCompositionsFromQueue(eq(deletedCompositions));
+
+        playQueueRepository.getPlayQueueObservable()
+                .test()
+                .assertValue(expectedList);
+
+        compositionObserver.assertValues(currentItem(2, 1), currentItem(4, 3));
     }
 
     @Test

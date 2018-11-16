@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,11 @@ public class ListUtils {
     public static <T> List<T> asList(T object) {
         List<T> list = new ArrayList<>();
         list.add(object);
+        return list;
+    }
+
+    public static <T> List<T> asList(T... objects) {
+        List<T> list = new ArrayList<>(Arrays.asList(objects));
         return list;
     }
 
