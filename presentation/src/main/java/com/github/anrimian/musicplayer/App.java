@@ -26,11 +26,11 @@ public class App extends Application {
 
     private void initAcra() {
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder(this);
-        //if (BuildConfig.DEBUG) {
-        configurationBuilder
-                .setReportDialogClass(AcraReportDialog.class)
-                .setReportingInteractionMode(ReportingInteractionMode.DIALOG);
-        //}
+        if (BuildConfig.DEBUG) {
+            configurationBuilder
+                    .setReportDialogClass(AcraReportDialog.class)
+                    .setReportingInteractionMode(ReportingInteractionMode.DIALOG);
+        }
         ACRA.init(this, configurationBuilder);
     }
 }
