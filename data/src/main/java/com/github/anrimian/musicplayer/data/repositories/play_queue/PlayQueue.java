@@ -42,7 +42,7 @@ public class PlayQueue {
     }
 
     List<PlayQueueItem> getCurrentPlayQueue() {
-        return shuffled? shuffledQueue: compositionQueue;
+        return new ArrayList<>(shuffled? shuffledQueue: compositionQueue);
     }
 
     List<PlayQueueItem> getCompositionQueue() {
@@ -82,25 +82,17 @@ public class PlayQueue {
     }
 
     void removeQueueItem(PlayQueueItem playQueueItem) {
-        removeItem(playQueueItem, compositionQueue, itemPositionMap, compositionPositionsMap);
-        removeItem(playQueueItem, shuffledQueue, shuffledItemPositionMap, compositionShuffledPositionsMap);
-
+        removeItem(playQueueItem, compositionQueue, itemPositionMap);
+        removeItem(playQueueItem, shuffledQueue, shuffledItemPositionMap);
+        fillPositionMap();
     }
 
     private void removeItem(PlayQueueItem playQueueItem,
                             List<PlayQueueItem> list,
-                            Map<Long, Integer> itemPositionMap,
-                            Map<Long, List<Integer>> compositionPositionsMap) {
+                            Map<Long, Integer> itemPositionMap) {
         int position = itemPositionMap.get(playQueueItem.getId());
         if (position != -1) {
             list.remove(position);
-            List<Integer> positions = compositionPositionsMap.get(playQueueItem.getComposition().getId());
-            Iterator<Integer> positionIterator = positions.iterator();
-            while (positionIterator.hasNext()) {
-                if (position == positionIterator.next()) {
-                    positionIterator.remove();
-                }
-            }
         }
     }
 

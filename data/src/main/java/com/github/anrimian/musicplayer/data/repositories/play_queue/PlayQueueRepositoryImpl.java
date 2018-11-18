@@ -29,6 +29,8 @@ import static io.reactivex.subjects.BehaviorSubject.create;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
+    private static final int NO_POSITION = -1;
+
     private final PlayQueueDaoWrapper playQueueDao;
     private final StorageMusicDataSource storageMusicDataSource;
     private final SettingsPreferences settingsPreferences;
@@ -57,6 +59,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Completable setPlayQueue(List<Composition> compositions) {
+        return setPlayQueue(compositions, NO_POSITION);
+    }
+
+    @Override
+    public Completable setPlayQueue(List<Composition> compositions, int firstPosition) {
         if (compositions.isEmpty()) {
             return Completable.complete();
         }
@@ -65,10 +72,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     this.playQueue = playQueue;
                     subscribeOnCompositionChanges();
                 })
-                .map(PlayQueue::getCurrentPlayQueue)
                 .doOnSuccess(playQueue -> {
-                    playQueueSubject.onNext(playQueue);
-                    setCurrentItem(playQueue.get(0));
+                    List<PlayQueueItem> currentQueue = playQueue.getCurrentPlayQueue();
+                    playQueueSubject.onNext(currentQueue);
+
+                    PlayQueueItem item;
+                    if (firstPosition == NO_POSITION) {
+                        item = currentQueue.get(0);
+                    } else {
+                        item = playQueue.getCompositionQueue().get(firstPosition);
+                    }
+                    setCurrentItem(item);
                 })
                 .ignoreElement()
                 .subscribeOn(scheduler);
@@ -161,16 +175,25 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Completable.fromRunnable(() -> {
             Integer currentPosition = null;
             PlayQueueItem currentItem = getCurrentItem();
+            PlayQueue playQueue = getPlayQueue();
             if (item.equals(currentItem)) {
-                currentPosition = getPlayQueue().getPosition(currentItem);
+                currentPosition = playQueue.getPosition(currentItem);
             }
 
-            getPlayQueue().removeQueueItem(item);
+            playQueue.removeQueueItem(item);
             playQueueDao.deleteItem(item.getId());
-            playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
+            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
 
             if (currentPosition != null) {
-                setCurrentItem(currentPosition);
+                List<PlayQueueItem> items = playQueue.getCurrentPlayQueue();
+                PlayQueueItem newItem = null;
+                if (!items.isEmpty()) {
+                    if (currentPosition >= items.size()) {
+                        currentPosition = 0;
+                    }
+                    newItem = items.get(currentPosition);
+                }
+                setCurrentItem(newItem);
             }
         }).subscribeOn(scheduler);
     }
@@ -211,13 +234,22 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private void processDeleteChange(List<Composition> deletedCompositions) {
-        Integer currentPosition = getPlayQueue().getPosition(getCurrentItem());
         boolean currentItemDeleted = false;
+        PlayQueueItem currentItem = getCurrentItem();
 
         for (Composition deletedComposition : deletedCompositions) {
-            PlayQueueItem currentItem = getCurrentItem();
             if (currentItem != null && currentItem.getComposition().equals(deletedComposition)) {
                 currentItemDeleted = true;
+
+                List<PlayQueueItem> items = getPlayQueue().getCurrentPlayQueue();
+                int nextCurrentPosition;
+                Integer currentPosition = getPlayQueue().getPosition(currentItem);
+                if (currentPosition == null || currentPosition >= items.size() - 1) {
+                    nextCurrentPosition = 0;
+                } else {
+                    nextCurrentPosition = currentPosition + 1;
+                }
+                currentItem = items.get(nextCurrentPosition);
             }
         }
 
@@ -227,21 +259,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
 
             if (currentItemDeleted) {
-                setCurrentItem(currentPosition);
+                if (getPlayQueue().isEmpty()) {
+                    currentItem = null;
+                }
+                setCurrentItem(currentItem);
             }
         }
-    }
-
-    private void setCurrentItem(Integer currentPosition) {
-        List<PlayQueueItem> items = getPlayQueue().getCurrentPlayQueue();
-        PlayQueueItem newItem = null;
-        if (!items.isEmpty()) {
-            if (currentPosition == null || currentPosition >= items.size()) {
-                currentPosition = 0;
-            }
-            newItem = items.get(currentPosition);
-        }
-        setCurrentItem(newItem);
     }
 
     private void processModifyChange(List<Composition> changedCompositions) {

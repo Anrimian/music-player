@@ -38,6 +38,7 @@ import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.P
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -74,6 +75,7 @@ public class MusicPlayerInteractorTest {
     @Before
     public void setUp() {
         when(playQueueRepository.setPlayQueue(any())).thenReturn(Completable.complete());
+        when(playQueueRepository.setPlayQueue(any(), anyInt())).thenReturn(Completable.complete());
         when(playQueueRepository.getCurrentQueueItemObservable())
                 .thenReturn(currentCompositionSubject);
         when(playQueueRepository.skipToNext()).thenReturn(Single.just(1));
@@ -101,11 +103,9 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void startPlayingTest() {
-        musicPlayerInteractor.startPlaying(getFakeCompositions())
-                .test()
-                .assertComplete();
+        musicPlayerInteractor.startPlaying(getFakeCompositions());
 
-        verify(playQueueRepository).setPlayQueue(getFakeCompositions());
+        verify(playQueueRepository).setPlayQueue(getFakeCompositions(), 0);
         verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
         verify(musicPlayerController).resume();
         playerStateSubscriber.assertValues(IDLE, LOADING, PLAY);
@@ -154,9 +154,9 @@ public class MusicPlayerInteractorTest {
 
         currentCompositionSubject.onNext(currentItem(1));
         inOrder.verify(musicPlayerController, never()).resume();
-        inOrder.verify(musicPlayerController).stop();
+        inOrder.verify(musicPlayerController).pause();
 
-        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
+        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
     }
 
     @Test

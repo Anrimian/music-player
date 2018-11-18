@@ -100,6 +100,10 @@ public class TestDataProvider {
         return new PlayQueueEvent(new PlayQueueItem(pos, fakeComposition(pos)), 0L);
     }
 
+    public static PlayQueueEvent currentItem(int itemId, int compositionId) {
+        return new PlayQueueEvent(new PlayQueueItem(itemId, fakeComposition(compositionId)), 0L);
+    }
+
     public static Composition fakeComposition(long id, String filePath, long createDate) {
         Composition composition = new Composition();
         composition.setId(id);

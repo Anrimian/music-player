@@ -20,11 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
@@ -53,6 +50,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
+
+    private boolean scrollToPositionAfterUpdate = false;
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
@@ -131,6 +130,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onRandomPlayingButtonClicked(boolean enable) {
+        scrollToPositionAfterUpdate = true;
         musicPlayerInteractor.setRandomPlayingEnabled(enable);
         getViewState().showRandomPlayingButton(enable);
     }
@@ -198,6 +198,20 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         musicPlayerInteractor.onSeekFinished(progress);
     }
 
+    void onItemSwipedToDelete(Integer position) {
+        deletePlayQueueItem(playQueue.get(position));
+    }
+
+    void onDeleteQueueItemClicked(PlayQueueItem item) {
+        deletePlayQueueItem(item);
+    }
+
+    private void deletePlayQueueItem(PlayQueueItem item) {
+        musicPlayerInteractor.removeQueueItem(item)
+                .observeOn(uiScheduler)
+                .subscribe();
+    }
+
     private void subscribeOnRepeatMode() {
         musicPlayerInteractor.getRepeatModeObservable()
                 .observeOn(uiScheduler)
@@ -251,15 +265,16 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
+        boolean smoothScroll = currentItem != null;
+
         this.currentItem = newItem;
         getViewState().showMusicControls(currentItem != null);
         if (newItem != null) {
-            getViewState().showCurrentQueueItem(newItem);
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
-
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
-                getViewState().scrollQueueToPosition(position);
+                getViewState().showCurrentQueueItem(newItem, position);
+                getViewState().scrollQueueToPosition(position, smoothScroll);
             }
         }
     }
@@ -286,17 +301,22 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         presenterDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
                 .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayListChanged));
+                .subscribe(this::onPlayQueueChanged));
     }
 
-    private void onPlayListChanged(ListUpdate<PlayQueueItem> update) {
+    private void onPlayQueueChanged(ListUpdate<PlayQueueItem> update) {
         playQueue = update.getNewList();
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
-        getViewState().updatePlayQueue(update);
-        Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
-        if (position != null) {
-            getViewState().scrollQueueToPosition(position);
+        getViewState().updatePlayQueue(update, !scrollToPositionAfterUpdate);
+        if (scrollToPositionAfterUpdate) {
+            scrollToPositionAfterUpdate = false;
+            if (currentItem != null) {
+                Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
+                if (position != null) {
+                    getViewState().scrollQueueToPosition(position, true);
+                }
+            }
         }
     }
 

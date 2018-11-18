@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,11 +23,14 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -294,6 +298,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
+        RecyclerViewUtils.attachSwipeToDelete(rvPlayList,
+                getColorFromAttr(requireContext(), R.attr.colorAccent),
+                presenter::onItemSwipedToDelete);
 
         if (savedInstanceState != null) {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
@@ -403,7 +410,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void collapseBottomPanel() {
         setButtonsSelectableBackground(
                 getResourceIdFromAttr(requireContext(),
-                R.attr.selectableItemBackgroundBorderless)
+                        R.attr.selectableItemBackgroundBorderless)
         );
 
         drawerLockStateProcessor.onBottomSheetOpened(false);
@@ -476,7 +483,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showCurrentQueueItem(PlayQueueItem item) {
+    public void showCurrentQueueItem(PlayQueueItem item, int position) {
         Composition composition = item.getComposition();
         tvCurrentComposition.setText(formatCompositionName(composition));
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
@@ -485,32 +492,39 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         ImageFormatUtils.displayImage(ivMusicIcon, composition);
 
-        playQueueAdapter.onCurrentItemChanged(item, rvPlayList);
+        playQueueAdapter.onCurrentItemChanged(item, position);
     }
 
     @Override
-    public void scrollQueueToPosition(int position) {
-        if (position == playQueueLayoutManager.findLastCompletelyVisibleItemPosition() + 1
-                || position == playQueueLayoutManager.findFirstVisibleItemPosition() - 1) {//FIXME up scroll
-            RecyclerViewUtils.smoothScrollToTop(position, playQueueLayoutManager, requireContext());
-//            playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
-        } else {
-            playQueueLayoutManager.scrollToPosition(position);
+    public void scrollQueueToPosition(int position, boolean smoothScroll) {
+        if (position > playQueueLayoutManager.findFirstVisibleItemPosition() &&
+                position < playQueueLayoutManager.findLastVisibleItemPosition()) {
+            return;
         }
+
+        rvPlayList.post(() -> RecyclerViewUtils.smoothScrollToTop(position,
+                playQueueLayoutManager,
+                requireContext(),
+                smoothScroll? 200: 1));
     }
 
     @Override
-    public void updatePlayQueue(ListUpdate<PlayQueueItem> update) {
+    public void updatePlayQueue(ListUpdate<PlayQueueItem> update, boolean keepPosition) {
         List<PlayQueueItem> list = update.getNewList();
         if (playQueueAdapter == null) {
             playQueueAdapter = new PlayQueueAdapter(list);
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
             playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
             playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
+            playQueueAdapter.setOnDeleteItemClickListener(presenter::onDeleteQueueItemClicked);
             rvPlayList.setAdapter(playQueueAdapter);
         } else {
             playQueueAdapter.setItems(list);
-            DiffUtilHelper.update(update.getDiffResult(), rvPlayList);
+            if (keepPosition) {
+                DiffUtilHelper.update(update.getDiffResult(), rvPlayList);
+            } else {
+                update.getDiffResult().dispatchUpdatesTo(playQueueAdapter);
+            }
         }
     }
 
@@ -772,8 +786,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     bottomSheetCoordinator));
             delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.85f));
         } else {
-            boundDelegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)))
-                    .addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
+            boundDelegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)));
+            delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
         }
         delegateManager.addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegateManager));
         return delegateManager;

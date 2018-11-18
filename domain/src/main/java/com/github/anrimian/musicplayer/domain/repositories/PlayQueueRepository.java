@@ -20,6 +20,8 @@ public interface PlayQueueRepository {
 
     Completable setPlayQueue(List<Composition> compositions);
 
+    Completable setPlayQueue(List<Composition> compositions, int firstPosition);
+
     @Nullable
     Integer getCompositionPosition(@Nonnull PlayQueueItem playQueueItem);
 

@@ -72,14 +72,12 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         presenterDisposable.dispose();
     }
 
-    void onCompositionClicked(Composition composition) {
-        interactor.play(asList(composition))
-                .subscribe();//TODO handle error later
+    void onCompositionClicked(int position) {
+        interactor.play(compositions, position);
     }
 
     void onPlayAllButtonClicked() {
-        interactor.play(compositions)
-                .subscribe();//TODO handle error later
+        interactor.play(compositions);
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {

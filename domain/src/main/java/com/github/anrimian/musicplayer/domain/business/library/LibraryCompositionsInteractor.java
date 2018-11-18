@@ -29,8 +29,12 @@ public class LibraryCompositionsInteractor {
         return musicProviderRepository.getAllCompositionsObservable(searchText);
     }
 
-    public Completable play(List<Composition> list) {
-        return musicPlayerInteractor.startPlaying(list);
+    public void play(List<Composition> list) {
+        musicPlayerInteractor.startPlaying(list);
+    }
+
+    public void play(List<Composition> compositions, int position) {
+        musicPlayerInteractor.startPlaying(compositions, position);
     }
 
     public Completable deleteCompositions(List<Composition> compositions) {
@@ -44,4 +48,6 @@ public class LibraryCompositionsInteractor {
     public Order getOrder() {
         return settingsRepository.getCompositionsOrder();
     }
+
+
 }

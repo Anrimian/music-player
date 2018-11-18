@@ -51,11 +51,19 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
     public MusicViewHolder(LayoutInflater inflater,
                            ViewGroup parent,
                            OnItemClickListener<Composition> onCompositionClickListener,
+                           OnItemClickListener<Integer> onPositionClickListener,
                            OnViewItemClickListener<Composition> onMenuClickListener) {
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
         ButterKnife.bind(this, itemView);
         if (onCompositionClickListener != null) {
-            clickableItem.setOnClickListener(v -> onCompositionClickListener.onItemClick(composition));
+            clickableItem.setOnClickListener(v ->
+                    onCompositionClickListener.onItemClick(composition)
+            );
+        }
+        if (onPositionClickListener != null) {
+            clickableItem.setOnClickListener(v ->
+                    onPositionClickListener.onItemClick(getAdapterPosition())
+            );
         }
         btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, composition));
     }

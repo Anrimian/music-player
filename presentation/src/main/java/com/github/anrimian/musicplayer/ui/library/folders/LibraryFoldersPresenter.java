@@ -100,13 +100,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onCompositionClicked(Composition composition) {
-        interactor.playMusic(composition)
-                .subscribe();//TODO handle error later
+        interactor.playMusic(path, composition);
     }
 
     void onPlayAllButtonClicked() {
-        interactor.playAllMusicInPath(path)
-                .subscribe();//TODO handle error later
+        interactor.playAllMusicInPath(path);
     }
 
     void onBackPathButtonClicked() {

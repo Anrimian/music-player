@@ -66,6 +66,7 @@
     <string name="repeat_playlist">Repeat playlist</string>
     <string name="repeat_composition">Repeat song</string>
     <string name="do_not_repeat">Do not repeat</string>
+    <string name="delete_from_queue">Delete from play queue</string>
     <string name="delete_from_play_list">Delete from playlist</string>
     <string name="add_item_to_playlist_error_template">Can not add song to playlist: %1$s</string>
     <string name="delete_from_playlist_success_template">Song %1$s deleted from playlist %2$s</string>
