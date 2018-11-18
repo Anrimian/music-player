@@ -2,11 +2,15 @@ package com.github.anrimian.musicplayer.ui.common;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.v4.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 
+import java.io.File;
 import java.util.List;
 
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
@@ -41,6 +45,18 @@ public class DialogUtils {
                 .setPositiveButton(R.string.delete, (dialog, which) -> deleteCallback.run())
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    public static void shareFile(Context context, String filePath) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("audio/*");
+        Uri fileUri = FileProvider.getUriForFile(context,
+                context.getString(R.string.file_provider_authorities),
+                new File(filePath));
+        intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share)));
     }
 
     private static String getDativCompositionsMessage(Context context, int count) {

@@ -4,11 +4,15 @@ import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
+
+import java.util.List;
 
 public interface PlayListView extends MvpView {
 
@@ -27,8 +31,32 @@ public interface PlayListView extends MvpView {
     void updateItemsList(ListUpdate<PlayListItem> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
+    void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
     void closeScreen();
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showPlayListInfo(PlayList playList);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteCompositionError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showSelectPlayListDialog();
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddingToPlayListError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteItemError(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items);
 }

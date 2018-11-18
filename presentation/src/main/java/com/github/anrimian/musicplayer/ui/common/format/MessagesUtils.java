@@ -5,6 +5,7 @@ import android.content.Context;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.List;
 
@@ -22,6 +23,20 @@ public class MessagesUtils {
         } else {
             return context.getString(R.string.add_to_playlist_count_success_template,
                     compositions.size(),
+                    playList.getName());
+        }
+    }
+
+    public static String getDeletePlayListItemCompleteMessage(Context context,
+                                                              PlayList playList,
+                                                              List<PlayListItem> items) {
+        if (items.size() == 1) {
+            return context.getString(R.string.delete_from_playlist_success_template,
+                    formatCompositionName(items.get(0).getComposition()),
+                    playList.getName());
+        } else {
+            return context.getString(R.string.delete_from_playlist_count_success_template,
+                    items.size(),
                     playList.getName());
         }
     }

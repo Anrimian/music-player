@@ -21,4 +21,6 @@ public interface PlayListsRepository {
     Single<PlayList> createPlayList(String name);
 
     Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList);
+
+    Completable deleteItemFromPlayList(long itemId, long playListId);
 }

@@ -42,4 +42,8 @@ public class PlayListsInteractor {
     public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
         return playListsRepository.addCompositionsToPlayList(compositions, playList);
     }
+
+    public Completable deleteItemFromPlayList(long itemId, long playListId) {
+        return playListsRepository.deleteItemFromPlayList(itemId, playListId);
+    }
 }

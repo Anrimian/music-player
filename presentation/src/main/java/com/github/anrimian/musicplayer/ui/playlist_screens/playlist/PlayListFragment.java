@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +17,13 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.ui.common.DialogUtils;
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
@@ -34,6 +40,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
 
 public class PlayListFragment extends MvpAppCompatFragment implements PlayListView {
 
@@ -92,6 +103,12 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
         SlidrPanel.replace(clListContainer, slidrConfig, () ->
                 FragmentNavigation.from(requireFragmentManager()).goBack(0),
                 toolbar::onStackFragmentSlided);
+
+        ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(SELECT_PLAYLIST_TAG);
+        if (playListDialog != null) {
+            playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        }
     }
 
     @Override
@@ -140,8 +157,88 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
                 playList.getCompositionsCount()));
     }
 
-    private void onCompositionMenuClicked(View view, PlayListItem item) {
-        //TODO finish
+    @Override
+    public void showConfirmDeleteDialog(List<Composition> compositionsToDelete) {
+        DialogUtils.showConfirmDeleteDialog(requireContext(),
+                compositionsToDelete,
+                presenter::onDeleteCompositionsDialogConfirmed);
+    }
+
+    @Override
+    public void showSelectPlayListDialog() {
+        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+        dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_TAG);
+    }
+
+
+    @Override
+    public void showDeleteCompositionError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
+        String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
+        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showAddingToPlayListError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions) {
+        String text = getAddToPlayListCompleteMessage(requireActivity(), playList, compositions);
+        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showDeleteItemError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.add_item_to_playlist_error_template, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items) {
+        String text = getDeletePlayListItemCompleteMessage(requireActivity(), playList, items);
+        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onCompositionMenuClicked(View view, PlayListItem playListItem) {
+        PopupMenu popup = new PopupMenu(requireContext(), view);
+        popup.inflate(R.menu.play_list_item_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_add_to_playlist: {
+                    presenter.onAddToPlayListButtonClicked(playListItem.getComposition());
+                    return true;
+                }
+                case R.id.menu_share: {
+                    shareFile(requireContext(), playListItem.getComposition().getFilePath());
+                    return true;
+                }
+                case R.id.menu_delete_from_play_list: {
+                    presenter.onDeleteFromPlayListButtonClicked(playListItem);
+                    return true;
+                }
+                case R.id.menu_delete: {
+                    presenter.onDeleteCompositionButtonClicked(playListItem.getComposition());
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
     }
 
     private long getPlayListId() {

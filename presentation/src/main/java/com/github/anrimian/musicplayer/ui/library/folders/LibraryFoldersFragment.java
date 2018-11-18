@@ -335,7 +335,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
                     return true;
                 }
                 case R.id.menu_share: {
-                    presenter.onDeleteCompositionButtonClicked(composition);
+//                    presenter.onDeleteCompositionButtonClicked(composition);
                     return true;
                 }
                 case R.id.menu_delete: {

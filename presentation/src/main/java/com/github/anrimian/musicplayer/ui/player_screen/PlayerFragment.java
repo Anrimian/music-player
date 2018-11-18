@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -14,7 +12,6 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -81,7 +78,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.c
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -93,6 +89,7 @@ import static android.support.v4.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
 import static android.view.View.INVISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
@@ -557,13 +554,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showShareMusicDialog(String filePath) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("audio/*");
-        Uri fileUri = FileProvider.getUriForFile(requireContext(), getString(R.string.file_provider_authorities), new File(filePath));
-        intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        startActivity(Intent.createChooser(intent, getString(R.string.share)));
+        shareFile(requireContext(), filePath);
     }
 
     @Override

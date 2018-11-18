@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.di.app.play_list;
 
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListPresenter;
 
 import javax.annotation.Nonnull;
@@ -27,10 +27,12 @@ public class PlayListModule {
     @Nonnull
     PlayListPresenter playListsPresenter(MusicPlayerInteractor musicPlayerInteractor,
                                          PlayListsInteractor playListsInteractor,
-                                         @Named(UI_SCHEDULER) Scheduler uiSchedule) {
+                                         @Named(UI_SCHEDULER) Scheduler uiSchedule,
+                                         ErrorParser errorParser) {
         return new PlayListPresenter(playListId,
                 musicPlayerInteractor,
                 playListsInteractor,
+                errorParser,
                 uiSchedule);
     }
 }

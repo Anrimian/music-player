@@ -4,13 +4,20 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper;
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -23,6 +30,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private final MusicPlayerInteractor musicPlayerInteractor;
     private final PlayListsInteractor playListsInteractor;
+    private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
@@ -35,13 +43,21 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
             () -> items,
             PlayListItemHelper::areSourcesTheSame);
 
+    @Nullable
+    private PlayList playList;
+
+    private final List<Composition> compositionsForPlayList = new LinkedList<>();
+    private final List<Composition> compositionsToDelete = new LinkedList<>();
+
     public PlayListPresenter(long playListId,
                              MusicPlayerInteractor musicPlayerInteractor,
                              PlayListsInteractor playListsInteractor,
+                             ErrorParser errorParser,
                              Scheduler uiScheduler) {
         this.playListId = playListId;
         this.musicPlayerInteractor = musicPlayerInteractor;
         this.playListsInteractor = playListsInteractor;
+        this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
 
@@ -68,6 +84,76 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
                 .subscribe();//TODO handle error later
     }
 
+    void onDeleteCompositionButtonClicked(Composition composition) {
+        compositionsToDelete.clear();
+        compositionsToDelete.add(composition);
+        getViewState().showConfirmDeleteDialog(compositionsToDelete);
+    }
+
+    void onDeleteCompositionsDialogConfirmed() {
+        deletePreparedCompositions();
+    }
+
+    void onAddToPlayListButtonClicked(Composition composition) {
+        compositionsForPlayList.clear();
+        compositionsForPlayList.add(composition);
+        getViewState().showSelectPlayListDialog();
+    }
+
+    void onPlayListToAddingSelected(PlayList playList) {
+        addPreparedCompositionsToPlayList(playList);
+    }
+
+    void onDeleteFromPlayListButtonClicked(PlayListItem playListItem) {
+        playListsInteractor.deleteItemFromPlayList(playListItem.getItemId(), playListId)
+                .observeOn(uiScheduler)
+                .subscribe(() -> onDeleteItemCompleted(playListItem), this::onDeleteItemError);
+    }
+
+    private void onDeleteItemCompleted(PlayListItem item) {
+        if (playList != null) {
+            getViewState().showDeleteItemCompleted(playList, asList(item));
+        }
+    }
+
+    private void onDeleteItemError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showDeleteItemError(errorCommand);
+    }
+
+    private void addPreparedCompositionsToPlayList(PlayList playList) {
+        playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
+                .observeOn(uiScheduler)
+                .subscribe(() -> onAddingToPlayListCompleted(playList),
+                        this::onAddingToPlayListError);
+    }
+
+    private void onAddingToPlayListError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showAddingToPlayListError(errorCommand);
+    }
+
+    private void onAddingToPlayListCompleted(PlayList playList) {
+        getViewState().showAddingToPlayListComplete(playList, compositionsForPlayList);
+        compositionsForPlayList.clear();
+    }
+
+    private void deletePreparedCompositions() {
+        musicPlayerInteractor.deleteCompositions(compositionsToDelete)
+                .observeOn(uiScheduler)
+                .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionsError);
+    }
+
+    private void onDeleteCompositionsSuccess() {
+        getViewState().showDeleteCompositionMessage(compositionsToDelete);
+        compositionsToDelete.clear();
+    }
+
+    private void onDeleteCompositionsError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showDeleteCompositionError(errorCommand);
+    }
+
     private void subscribeOnCompositions() {
         getViewState().showLoading();
         presenterDisposable.add(playListsInteractor.getCompositionsObservable(playListId)
@@ -81,9 +167,14 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private void subscribePlayList() {
         presenterDisposable.add(playListsInteractor.getPlayListObservable(playListId)
                 .observeOn(uiScheduler)
-                .subscribe(getViewState()::showPlayListInfo,
+                .subscribe(this::onPlayListInfoReceived,
                         t -> getViewState().closeScreen(),
                         getViewState()::closeScreen));
+    }
+
+    private void onPlayListInfoReceived(PlayList playList) {
+        this.playList = playList;
+        getViewState().showPlayListInfo(playList);
     }
 
     private void onPlayListsReceived(ListUpdate<PlayListItem> listUpdate) {
