@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.di.app.library;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerScreenInteractor;

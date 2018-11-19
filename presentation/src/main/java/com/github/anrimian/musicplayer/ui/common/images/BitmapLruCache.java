@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
 import android.graphics.Bitmap;
-import android.support.v4.graphics.BitmapCompat;
+import androidx.core.graphics.BitmapCompat;
 import android.util.LruCache;
 
 public class BitmapLruCache<K> extends LruCache<K, Bitmap> {

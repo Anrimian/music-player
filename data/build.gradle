@@ -50,4 +50,5 @@ dependencies {
     androidTestImplementation testDependencies.junit
     androidTestImplementation testDependencies.supportTest
     androidTestImplementation testDependencies.espresso
+    androidTestImplementation testDependencies.rules
 }

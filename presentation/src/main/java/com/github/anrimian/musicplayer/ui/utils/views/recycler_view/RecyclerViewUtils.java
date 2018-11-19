@@ -1,10 +1,10 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view;
 
 import android.content.Context;
-import android.support.annotation.ColorInt;
-import android.support.v7.widget.LinearSmoothScroller;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.ColorInt;
+import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.View;
 
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;

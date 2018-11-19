@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music.search;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;

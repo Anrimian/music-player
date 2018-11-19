@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.motion.MotionLayout
+<androidx.constraintlayout.motion.widget.MotionLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,7 +10,7 @@
     tools:showPaths="true"
     tools:progress="1">
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_left"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -150,7 +150,7 @@
         app:layout_constraintBottom_toTopOf="@+id/tv_played_time"
         app:layout_constraintTop_toTopOf="@id/group_time"/>
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/group_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -201,5 +201,5 @@
         app:layout_constraintStart_toEndOf="@+id/music_icon_wrapper"
         tools:text="ddddddddddddddddddddd"/>
 
-</android.support.constraint.motion.MotionLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>
 

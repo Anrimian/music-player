@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;

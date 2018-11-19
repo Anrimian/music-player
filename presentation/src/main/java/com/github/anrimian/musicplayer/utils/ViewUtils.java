@@ -5,10 +5,10 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.design.widget.Snackbar;
-import android.support.v7.view.menu.MenuBuilder;
-import android.support.v7.view.menu.MenuPopupHelper;
-import android.support.v7.widget.PopupMenu;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.view.menu.MenuPopupHelper;
+import androidx.appcompat.widget.PopupMenu;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.view.Menu;
@@ -22,7 +22,7 @@ public class ViewUtils {
 
     public static void showAsMultiline(Snackbar snackbar) {
         View view = snackbar.getView();
-        TextView textView = view.findViewById(android.support.design.R.id.snackbar_text);
+        TextView textView = view.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setMaxLines(3);
         snackbar.show();
     }

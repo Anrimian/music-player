@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.slidr;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.widget.SliderPanel;

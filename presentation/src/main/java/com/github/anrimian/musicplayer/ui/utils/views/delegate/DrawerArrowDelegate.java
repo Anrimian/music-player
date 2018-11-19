@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 
 public class DrawerArrowDelegate implements SlideDelegate {
 

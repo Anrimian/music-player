@@ -7,8 +7,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.StringRes;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import com.github.anrimian.musicplayer.R;
@@ -19,6 +17,9 @@ import com.github.anrimian.musicplayer.infrastructure.service.music.models.Playe
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 
 import javax.annotation.Nonnull;
+
+import androidx.annotation.StringRes;
+import androidx.core.app.NotificationCompat;
 
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.PAUSE;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.PLAY;
@@ -80,7 +81,7 @@ public class NotificationsDisplayer {
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(@Nonnull PlayerMetaState state,
-                                                                   MediaSessionCompat mediaSession) {
+                                                                                     MediaSessionCompat mediaSession) {
         boolean play = state.getState() == PlayerState.PLAY;
         Composition composition = state.getQueueItem().getComposition();
 
@@ -100,7 +101,7 @@ public class NotificationsDisplayer {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        android.support.v4.media.app.NotificationCompat.DecoratedMediaCustomViewStyle style = new android.support.v4.media.app.NotificationCompat.DecoratedMediaCustomViewStyle();
+        androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle style = new androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle();
         style.setShowActionsInCompactView(0, 1, 2);
 //        style.setMediaSession(mediaSession.getSessionToken());
 

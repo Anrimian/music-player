@@ -57,8 +57,8 @@ dependencies {
     def presentationDependencies = rootProject.ext.presentationDependencies
     def presentationTestDependencies = rootProject.ext.presentationTestDependencies
 
-    implementation presentationDependencies.supportLibrary
-    implementation presentationDependencies.supportLibraryDesign
+    implementation presentationDependencies.appCompat
+    implementation presentationDependencies.material
     implementation presentationDependencies.cardView
     implementation presentationDependencies.recyclerView
     implementation presentationDependencies.constraintLayout

@@ -2,8 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 import android.Manifest;
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.GrantPermissionRule;
+import androidx.test.platform.app.InstrumentationRegistry;
 import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
@@ -17,6 +16,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import androidx.test.rule.GrantPermissionRule;
 import io.reactivex.observers.TestObserver;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -32,7 +32,7 @@ public class StoragePlayListProviderTest {
 
     @Before
     public void setUp() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         storagePlayListsProvider = new StoragePlayListsProvider(appContext);
     }
 

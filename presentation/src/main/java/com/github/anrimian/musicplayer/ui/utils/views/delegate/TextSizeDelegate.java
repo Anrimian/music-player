@@ -1,11 +1,11 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
 import android.content.res.Resources;
-import android.support.annotation.DimenRes;
+import androidx.annotation.DimenRes;
 import android.util.TypedValue;
 import android.widget.TextView;
 
-import static android.support.v4.view.ViewCompat.isLaidOut;
+import static androidx.core.view.ViewCompat.isLaidOut;
 
 /**
  * Created on 21.01.2018.

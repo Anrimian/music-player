@@ -1,10 +1,10 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.adapter;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +17,13 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import javax.annotation.Nonnull;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.support.v4.graphics.ColorUtils.setAlphaComponent;
+import static androidx.core.graphics.ColorUtils.setAlphaComponent;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;

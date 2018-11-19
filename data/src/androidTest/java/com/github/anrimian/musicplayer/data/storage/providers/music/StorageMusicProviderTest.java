@@ -2,12 +2,8 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import android.Manifest;
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.GrantPermissionRule;
 
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +11,11 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Map;
+
+import androidx.test.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
+
+import static androidx.test.platform.app.InstrumentationRegistry.*;
 
 public class StorageMusicProviderTest {
 
@@ -25,7 +26,7 @@ public class StorageMusicProviderTest {
 
     @Before
     public void before() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
+        Context appContext = getInstrumentation().getTargetContext();
         storageMusicProvider = new StorageMusicProvider(appContext);
     }
 

@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.endless_scrolling;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;

@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.adapter;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -9,7 +9,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import java.util.List;
 

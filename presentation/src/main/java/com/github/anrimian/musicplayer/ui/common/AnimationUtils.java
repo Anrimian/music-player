@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 

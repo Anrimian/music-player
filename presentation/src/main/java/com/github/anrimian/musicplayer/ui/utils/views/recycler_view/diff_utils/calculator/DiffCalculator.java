@@ -7,7 +7,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.S
 
 import java.util.List;
 
-import static android.support.v7.util.DiffUtil.calculateDiff;
+import static androidx.recyclerview.widget.DiffUtil.calculateDiff;
 
 public class DiffCalculator<T> {
 

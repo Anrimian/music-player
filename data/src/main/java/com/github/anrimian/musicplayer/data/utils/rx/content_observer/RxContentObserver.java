@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.data.utils.rx.content_observer;
 import android.content.ContentResolver;
 import android.database.ContentObserver;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import io.reactivex.Emitter;
 import io.reactivex.Observable;

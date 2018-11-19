@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
 
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 

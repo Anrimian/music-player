@@ -1,12 +1,12 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils;
 
 import android.os.Parcelable;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import static android.support.v7.util.DiffUtil.calculateDiff;
+import static androidx.recyclerview.widget.DiffUtil.calculateDiff;
 
 public class DiffUtilHelper {
 

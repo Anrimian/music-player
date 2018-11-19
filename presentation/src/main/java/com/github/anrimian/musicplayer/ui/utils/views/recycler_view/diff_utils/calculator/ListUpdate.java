@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator;
 
-import android.support.v7.util.DiffUtil;
+import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.List;
 

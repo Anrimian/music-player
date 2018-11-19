@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.fragments.navigation;
 
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.FragmentManager;
 
 public interface FragmentManagerProvider {
 

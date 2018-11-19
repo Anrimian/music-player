@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.views.drawer;
 
-import android.support.annotation.NonNull;
-import android.support.v4.widget.DrawerLayout;
+import androidx.annotation.NonNull;
+import androidx.drawerlayout.widget.DrawerLayout;
 import android.view.View;
 
 public class SimpleDrawerListener implements DrawerLayout.DrawerListener {

@@ -16,7 +16,7 @@ allprojects {
         androidApplicationId = 'com.github.anrimian.musicplayer'
         androidVersionCode = 4
         androidVersionName = "0.2.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId = 'com.github.anrimian.musicplayer.test'
     }
 }

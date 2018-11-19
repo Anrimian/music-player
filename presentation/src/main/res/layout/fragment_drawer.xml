@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <android.support.v4.widget.DrawerLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/drawer"
@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -28,7 +28,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/play_queue_title_container"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -63,7 +63,7 @@
                     app:layout_constraintEnd_toEndOf="@id/acv_play_queue"
                     tools:text="dd"/>
 
-                <android.support.v7.widget.ActionMenuView
+                <androidx.appcompat.widget.ActionMenuView
                     android:id="@+id/acv_play_queue"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -72,7 +72,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:theme="@style/ToolbarStyle"/>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <include layout="@layout/partial_music_content"
                 android:layout_width="0dp"
@@ -90,15 +90,15 @@
                 app:layout_constraintStart_toStartOf="@id/toolbar"
                 app:layout_constraintEnd_toEndOf="@id/toolbar"/>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <android.support.design.widget.NavigationView
+        <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigation_view"
             android:layout_width="280dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             app:menu="@menu/drawer_menu"/>
 
-    </android.support.v4.widget.DrawerLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

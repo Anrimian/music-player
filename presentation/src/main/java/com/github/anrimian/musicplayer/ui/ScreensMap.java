@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui;
 
-import android.support.annotation.MenuRes;
+import androidx.annotation.MenuRes;
 import android.util.SparseIntArray;
 
 import com.github.anrimian.musicplayer.R;

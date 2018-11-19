@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 

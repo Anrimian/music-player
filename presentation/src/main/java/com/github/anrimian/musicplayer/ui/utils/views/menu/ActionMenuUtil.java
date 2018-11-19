@@ -2,12 +2,12 @@ package com.github.anrimian.musicplayer.ui.utils.views.menu;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.MenuRes;
-import android.support.design.widget.NavigationView;
-import android.support.v7.view.SupportMenuInflater;
-import android.support.v7.view.menu.MenuBuilder;
-import android.support.v7.widget.ActionMenuView;
-import android.support.v7.widget.PublicActionMenuPresenter;
+import androidx.annotation.MenuRes;
+import com.google.android.material.navigation.NavigationView;
+import androidx.appcompat.view.SupportMenuInflater;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.ActionMenuView;
+import androidx.appcompat.widget.PublicActionMenuPresenter;
 import android.view.MenuItem;
 
 public class ActionMenuUtil {

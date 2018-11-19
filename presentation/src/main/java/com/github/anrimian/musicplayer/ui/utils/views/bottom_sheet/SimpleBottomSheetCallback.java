@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet;
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import android.view.View;
 
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
