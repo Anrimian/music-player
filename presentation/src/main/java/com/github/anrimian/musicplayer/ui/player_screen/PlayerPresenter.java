@@ -52,6 +52,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final List<Composition> compositionsToDelete = new LinkedList<>();
 
     private boolean scrollToPositionAfterUpdate = false;
+    private boolean jumpToNewItem = true;
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
@@ -78,7 +79,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showDrawerScreen(playerScreenInteractor.getSelectedDrawerScreen());
     }
 
-    void onStart() {//TODO unnecessary scroll to position
+    void onStart() {
         subscribeOnRepeatMode();
         subscribeOnPlayerStateChanges();
         subscribeOnPlayQueue();
@@ -87,6 +88,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onStop() {
+        jumpToNewItem = true;
         presenterDisposable.clear();
     }
 
@@ -265,8 +267,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
-        boolean smoothScroll = currentItem != null;
-
         this.currentItem = newItem;
         getViewState().showMusicControls(currentItem != null);
         if (newItem != null) {
@@ -274,7 +274,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
                 getViewState().showCurrentQueueItem(newItem, position);
-                getViewState().scrollQueueToPosition(position, smoothScroll);
+                getViewState().scrollQueueToPosition(position, !jumpToNewItem);
+                jumpToNewItem = false;
             }
         }
     }
