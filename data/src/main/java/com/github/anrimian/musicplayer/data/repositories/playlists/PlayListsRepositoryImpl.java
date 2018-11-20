@@ -99,6 +99,12 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         ).subscribeOn(scheduler);
     }
 
+    @Override
+    public Completable deletePlayList(long playListId) {
+        return Completable.fromAction(() -> storagePlayListsProvider.deletePlayList(playListId))
+                .subscribeOn(scheduler);
+    }
+
     private List<PlayList> toSortedPlayLists(Map<Long, PlayListFullModel> playListMap) {
         List<PlayList> list = mapToList(playListMap, PlayListFullModel::getPlayList);
         Collections.sort(list, new PlayListModifyDateComparator());

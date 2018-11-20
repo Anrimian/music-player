@@ -46,4 +46,8 @@ public class PlayListsInteractor {
     public Completable deleteItemFromPlayList(long itemId, long playListId) {
         return playListsRepository.deleteItemFromPlayList(itemId, playListId);
     }
+
+    public Completable deletePlayList(long playListId) {
+        return playListsRepository.deletePlayList(playListId);
+    }
 }

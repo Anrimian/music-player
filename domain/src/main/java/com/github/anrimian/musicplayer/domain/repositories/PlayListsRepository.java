@@ -23,4 +23,6 @@ public interface PlayListsRepository {
     Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList);
 
     Completable deleteItemFromPlayList(long itemId, long playListId);
+
+    Completable deletePlayList(long playListId);
 }

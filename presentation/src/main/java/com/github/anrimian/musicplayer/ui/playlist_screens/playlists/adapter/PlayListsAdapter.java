@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -10,11 +8,15 @@ import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class PlayListsAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
 
     private List<PlayList> playLists;
 
     private OnItemClickListener<PlayList> onItemClickListener;
+    private OnItemClickListener<PlayList> onItemLongClickListener;
 
     public PlayListsAdapter(List<PlayList> playLists) {
         this.playLists = playLists;
@@ -45,6 +47,10 @@ public class PlayListsAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
 
     public void setOnItemClickListener(OnItemClickListener<PlayList> onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    public void setOnItemLongClickListener(OnItemClickListener<PlayList> onItemLongClickListener) {
+        this.onItemLongClickListener = onItemLongClickListener;
     }
 }
 
