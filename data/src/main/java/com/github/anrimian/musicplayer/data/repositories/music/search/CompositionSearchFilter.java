@@ -13,7 +13,10 @@ public class CompositionSearchFilter implements SearchFilter<Composition> {
     public boolean isSuitForSearch(@NonNull Composition data, @NonNull String search) {
         String artist = data.getArtist();
         String displayName = data.getDisplayName();
-        displayName = displayName.substring(0, displayName.lastIndexOf('.'));
+        int cropIndex = displayName.lastIndexOf('.');
+        if (cropIndex != -1) {
+            displayName = displayName.substring(0, cropIndex);
+        }
         return containsIgnoreCase(displayName, search)
                 || (artist != null && containsIgnoreCase(artist, search));
     }
