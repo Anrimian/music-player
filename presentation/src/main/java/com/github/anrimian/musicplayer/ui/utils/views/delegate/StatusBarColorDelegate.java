@@ -1,18 +1,11 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
 import android.animation.ArgbEvaluator;
-import android.content.Context;
 import android.os.Build;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.TextView;
 
-import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
-
-import static androidx.core.view.ViewCompat.isLaidOut;
-import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
 
 /**
  * Created on 21.01.2018.

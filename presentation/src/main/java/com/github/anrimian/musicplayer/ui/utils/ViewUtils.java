@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.utils;
+package com.github.anrimian.musicplayer.ui.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -22,7 +22,17 @@ import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
 
+import static androidx.core.view.ViewCompat.isLaidOut;
+
 public class ViewUtils {
+
+    public static void run(View view, Runnable runnable) {
+        if (isLaidOut(view)) {
+            runnable.run();
+        } else {
+            view.post(runnable);
+        }
+    }
 
     public static void animateVisibility(View view, int visibility) {
         if ((view.getAlpha() == 1f || view.getAlpha() == 0f) && view.getVisibility() != visibility) {

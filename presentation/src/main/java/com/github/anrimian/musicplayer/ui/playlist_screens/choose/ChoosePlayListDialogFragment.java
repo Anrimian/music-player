@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDelegate;
@@ -19,7 +18,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegat
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -50,9 +48,9 @@ import butterknife.ButterKnife;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static androidx.core.content.ContextCompat.getColor;
-import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.utils.AndroidUtils.getFloat;
-import static com.github.anrimian.musicplayer.utils.ViewUtils.animateVisibility;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getFloat;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         implements ChoosePlayListView {

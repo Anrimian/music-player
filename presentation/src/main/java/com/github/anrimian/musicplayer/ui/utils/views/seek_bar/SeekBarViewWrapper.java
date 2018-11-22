@@ -2,6 +2,8 @@ package com.github.anrimian.musicplayer.ui.utils.views.seek_bar;
 
 import android.widget.SeekBar;
 
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
+
 /**
  * Created on 03.06.2018.
  */
@@ -41,7 +43,7 @@ public class SeekBarViewWrapper {
 
     public void setProgress(long progress) {
         if (!isOnTouch) {
-            seekBar.setProgress((int) progress);
+            run(seekBar, () -> seekBar.setProgress((int) progress));
         }
     }
 

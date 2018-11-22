@@ -93,9 +93,9 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
-import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.utils.AndroidUtils.getResourceIdFromAttr;
-import static com.github.anrimian.musicplayer.utils.ViewUtils.insertMenuItemIcons;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getResourceIdFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 

@@ -10,7 +10,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
-import com.github.anrimian.musicplayer.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 public class MainActivity extends AppCompatActivity {
