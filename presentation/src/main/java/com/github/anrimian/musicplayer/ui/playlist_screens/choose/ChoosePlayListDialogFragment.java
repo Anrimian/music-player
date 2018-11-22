@@ -2,13 +2,32 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.choose;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.ExpandViewDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextColorDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.DialogInterface;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
@@ -28,7 +47,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+import static androidx.core.content.ContextCompat.getColor;
+import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.utils.AndroidUtils.getFloat;
+import static com.github.anrimian.musicplayer.utils.ViewUtils.animateVisibility;
 
 public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         implements ChoosePlayListView {
@@ -42,11 +66,24 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     @BindView(R.id.iv_create_playlist)
     ImageView ivCreatePlaylist;
 
+    @BindView(R.id.iv_close)
+    ImageView ivClose;
+
+    @BindView(R.id.title_shadow)
+    View titleShadow;
+
+    @BindView(R.id.motion_layout)
+    MotionLayout motionLayout;
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+
     @Nullable
     private OnCompleteListener<PlayList> onCompleteListener;
 
     private PlayListsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
+    private SlideDelegate slideDelegate;
 
     @ProvidePresenter
     ChoosePlayListPresenter providePresenter() {
@@ -78,7 +115,57 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        titleShadow.setVisibility(
+                recyclerView.computeVerticalScrollOffset() > 0? VISIBLE: INVISIBLE
+        );
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                animateVisibility(
+                        titleShadow,
+                        recyclerView.computeVerticalScrollOffset() > 0? VISIBLE: INVISIBLE
+                );
+            }
+        });
+
+        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                dismiss();
+            }
+        }, presenter::onBottomSheetSlided));
+
+        slideDelegate = buildSlideDelegate();
+
+        ivClose.setOnClickListener(v -> dismiss());
         ivCreatePlaylist.setOnClickListener(v -> onCreatePlayListButtonClicked());
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        slideDelegate.onSlide(0f);
+    }
+
+    @Override
+    public void showBottomSheetSlided(float slideOffset) {
+        //TODO filter in non-full-expand case
+//        int decorViewHeight = getDialog().getWindow().getDecorView().getHeight() - getStatusBarHeight();
+//        Log.d("KEK", "onSlide, decorViewHeight: " + decorViewHeight);
+//        Log.d("KEK", "onSlide, view.getHeight(): " + getView().getHeight());
+//        if (decorViewHeight == getView().getHeight()) {
+        slideDelegate.onSlide(slideOffset);
+//        }
+    }
+
+    private int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     @Override
@@ -124,5 +211,35 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     private void onCreatePlayListButtonClicked() {
         CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
         fragment.show(getChildFragmentManager(), null);
+    }
+
+    private SlideDelegate buildSlideDelegate() {
+        SlideDelegate boundDelegate = new DelegateManager()
+                .addDelegate(
+                        new BoundValuesDelegate(0.85f, 1f,
+                                new VisibilityDelegate(ivClose)
+                        )
+                )
+                .addDelegate(
+                        new BoundValuesDelegate(0.7f, 1f,
+                                new DelegateManager()
+                                        .addDelegate(new MotionLayoutDelegate(motionLayout))
+                                        .addDelegate(new TextSizeDelegate(tvTitle,
+                                                R.dimen.sheet_dialog_title_collapsed_size,
+                                                R.dimen.sheet_dialog_title_expanded_size))
+                                        .addDelegate(new TextColorDelegate(tvTitle,
+                                                android.R.attr.textColorSecondary,
+                                                android.R.attr.textColorPrimary)
+                                        )
+                        )
+                );
+        return new DelegateManager()
+                .addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegate))
+                .addDelegate(new BoundValuesDelegate(0.85f, 1f,
+                                new StatusBarColorDelegate(getActivity().getWindow(),
+                                        getColorFromAttr(getContext(), R.attr.colorPrimaryDark),
+                                        getColor(getContext(), R.color.colorPrimaryDarkSecondary))
+                        )
+                );
     }
 }

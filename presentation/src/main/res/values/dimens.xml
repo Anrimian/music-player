@@ -36,7 +36,7 @@
 
     <dimen name="subtitle_height">48dp</dimen>
 
-    <dimen name="music_icon_size">48dp</dimen>
+    <dimen name="icon_size">48dp</dimen>
 
 
     <dimen name="current_composition_collapse_text_size">13sp</dimen>
@@ -59,5 +59,7 @@
     <dimen name="button_expand_size">48dp</dimen>
     <dimen name="popup_menu_item_icon_size">20dp</dimen>
 
+    <dimen name="sheet_dialog_title_collapsed_size">14sp</dimen>
+    <dimen name="sheet_dialog_title_expanded_size">18sp</dimen>
 
 </resources>
