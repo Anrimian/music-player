@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Playlists;
 
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
@@ -27,7 +28,16 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
 
+import static android.provider.BaseColumns._ID;
+import static android.provider.MediaStore.Audio.AudioColumns.ALBUM;
+import static android.provider.MediaStore.Audio.AudioColumns.ARTIST;
+import static android.provider.MediaStore.Audio.AudioColumns.DURATION;
+import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
+import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
+import static android.provider.MediaStore.MediaColumns.DATE_MODIFIED;
+import static android.provider.MediaStore.MediaColumns.DISPLAY_NAME;
+import static android.provider.MediaStore.MediaColumns.TITLE;
 import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 import static java.util.Collections.emptyList;
 
@@ -101,7 +111,18 @@ public class StoragePlayListsProvider {
         try {
             cursor = contentResolver.query(
                     getContentUri("external", playListId),
-                    null,
+                    new String[] {
+                            ARTIST,
+                            TITLE,
+                            ALBUM,
+                            MediaStore.Images.Media.DATA,
+                            DISPLAY_NAME,
+                            DURATION,
+                            MediaStore.Images.Media.SIZE,
+                            AUDIO_ID,
+                            _ID,
+                            DATE_ADDED,
+                            DATE_MODIFIED},
                     null,
                     null,
                     Playlists.Members.PLAY_ORDER);
@@ -208,28 +229,28 @@ public class StoragePlayListsProvider {
         String title = cursorWrapper.getString(Playlists.Members.TITLE);
         String album = cursorWrapper.getString(Playlists.Members.ALBUM);
         String filePath = cursorWrapper.getString(Playlists.Members.DATA);
-        String albumKey = cursorWrapper.getString(Playlists.Members.ALBUM_KEY);
-        String composer = cursorWrapper.getString(Playlists.Members.COMPOSER);
+//        String albumKey = cursorWrapper.getString(Playlists.Members.ALBUM_KEY);
+//        String composer = cursorWrapper.getString(Playlists.Members.COMPOSER);
         String displayName = cursorWrapper.getString(Playlists.Members.DISPLAY_NAME);
-        String mimeType = cursorWrapper.getString(Playlists.Members.MIME_TYPE);
+//        String mimeType = cursorWrapper.getString(Playlists.Members.MIME_TYPE);
 
         long itemId = cursorWrapper.getLong(Playlists.Members._ID);
         long duration = cursorWrapper.getLong(Playlists.Members.DURATION);
         long size = cursorWrapper.getLong(Playlists.Members.SIZE);
         long audioId = cursorWrapper.getLong(Playlists.Members.AUDIO_ID);
-        long artistId = cursorWrapper.getLong(Playlists.Members.ARTIST_ID);
-        long bookmark = cursorWrapper.getLong(Playlists.Members.BOOKMARK);
-        long albumId = cursorWrapper.getLong(Playlists.Members.ALBUM_ID);
+//        long artistId = cursorWrapper.getLong(Playlists.Members.ARTIST_ID);
+//        long bookmark = cursorWrapper.getLong(Playlists.Members.BOOKMARK);
+//        long albumId = cursorWrapper.getLong(Playlists.Members.ALBUM_ID);
         long dateAdded = cursorWrapper.getLong(Playlists.Members.DATE_ADDED);
         long dateModified = cursorWrapper.getLong(Playlists.Members.DATE_MODIFIED);
 
-        boolean isAlarm = cursorWrapper.getBoolean(Playlists.Members.IS_ALARM);
-        boolean isMusic = cursorWrapper.getBoolean(Playlists.Members.IS_MUSIC);
-        boolean isNotification = cursorWrapper.getBoolean(Playlists.Members.IS_NOTIFICATION);
-        boolean isPodcast = cursorWrapper.getBoolean(Playlists.Members.IS_PODCAST);
-        boolean isRingtone = cursorWrapper.getBoolean(Playlists.Members.IS_RINGTONE);
+//        boolean isAlarm = cursorWrapper.getBoolean(Playlists.Members.IS_ALARM);
+//        boolean isMusic = cursorWrapper.getBoolean(Playlists.Members.IS_MUSIC);
+//        boolean isNotification = cursorWrapper.getBoolean(Playlists.Members.IS_NOTIFICATION);
+//        boolean isPodcast = cursorWrapper.getBoolean(Playlists.Members.IS_PODCAST);
+//        boolean isRingtone = cursorWrapper.getBoolean(Playlists.Members.IS_RINGTONE);
 
-        @Nullable Integer year = cursorWrapper.getInt(Playlists.Members.YEAR);
+//        @Nullable Integer year = cursorWrapper.getInt(Playlists.Members.YEAR);
 
         if (artist.equals("<unknown>")) {
             artist = null;
@@ -241,7 +262,7 @@ public class StoragePlayListsProvider {
         composition.setTitle(title);
         composition.setAlbum(album);
         composition.setFilePath(filePath);
-        composition.setComposer(composer);
+//        composition.setComposer(composer);
         composition.setDisplayName(displayName);
 
         composition.setDuration(duration);
@@ -250,13 +271,13 @@ public class StoragePlayListsProvider {
         composition.setDateAdded(new Date(dateAdded * 1000L));
         composition.setDateModified(new Date(dateModified * 1000L));
 
-        composition.setAlarm(isAlarm);
-        composition.setMusic(isMusic);
-        composition.setNotification(isNotification);
-        composition.setPodcast(isPodcast);
-        composition.setRingtone(isRingtone);
+//        composition.setAlarm(isAlarm);
+//        composition.setMusic(isMusic);
+//        composition.setNotification(isNotification);
+//        composition.setPodcast(isPodcast);
+//        composition.setRingtone(isRingtone);
 
-        composition.setYear(year);
+//        composition.setYear(year);
 
         checkCorruptedComposition(composition);
 

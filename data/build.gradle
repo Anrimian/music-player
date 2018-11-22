@@ -51,4 +51,5 @@ dependencies {
     androidTestImplementation testDependencies.supportTest
     androidTestImplementation testDependencies.espresso
     androidTestImplementation testDependencies.rules
+    androidTestImplementation testDependencies.rxJava2Ext
 }

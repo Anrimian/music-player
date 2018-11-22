@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 import com.github.anrimian.musicplayer.domain.utils.changes.ChangeType;
@@ -23,6 +24,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
 import static java.util.Collections.singletonList;
 
 
@@ -145,7 +147,7 @@ public class StorageMusicDataSource {
                 if (existComposition == null) {
                     addedCompositions.add(newComposition);
                     existsCompositions.put(newComposition.getId(), newComposition);
-                } else if (hasChanges(newComposition, existComposition)) {
+                } else if (!areSourcesTheSame(newComposition, existComposition)) {
                     changedCompositions.add(newComposition);
                     existsCompositions.put(newComposition.getId(), newComposition);
                 }
@@ -167,20 +169,5 @@ public class StorageMusicDataSource {
                 compositionSubject.onNext(existsCompositions);
             }
         });
-    }
-
-    private boolean hasChanges(@Nonnull Composition first, @Nonnull Composition second) {
-        return !Objects.equals(first.getAlbum(), second.getAlbum())
-                || !Objects.equals(first.getArtist(), second.getArtist())
-                || !Objects.equals(first.getComposer(), second.getComposer())
-                || !Objects.equals(first.getDateAdded(), second.getDateAdded())
-                || !Objects.equals(first.getDateModified(), second.getDateModified())
-                || !Objects.equals(first.getDisplayName(), second.getDisplayName())
-                || first.getDuration() != second.getDuration()
-                || !Objects.equals(first.getFilePath(), second.getFilePath())
-                || first.getSize() != second.getSize()
-                || !Objects.equals(first.getTitle(), second.getTitle())
-                || !Objects.equals(first.getYear(), second.getYear())
-                || first.isCorrupted() != second.isCorrupted();
     }
 }
