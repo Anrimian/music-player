@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 import android.animation.ArgbEvaluator;
 import android.os.Build;
 import android.view.Window;
-import android.view.WindowManager;
 
 import androidx.annotation.ColorInt;
 
@@ -36,8 +35,6 @@ public class StatusBarColorDelegate implements SlideDelegate {
     private void moveView(float slideOffset) {
         int resultColor = (int) argbEvaluator.evaluate(slideOffset, startColor, endColor);
         if (Build.VERSION.SDK_INT >= 21) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(resultColor);
         }
     }

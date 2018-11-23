@@ -2,25 +2,6 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.choose;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextColorDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.DialogInterface;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -36,12 +17,27 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpBottomSheetDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextColorDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -235,7 +231,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
                 .addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegate))
                 .addDelegate(new BoundValuesDelegate(0.85f, 1f,
                                 new StatusBarColorDelegate(getActivity().getWindow(),
-                                        getColorFromAttr(getContext(), R.attr.colorPrimaryDark),
+                                        getColorFromAttr(getContext(), android.R.attr.statusBarColor),
                                         getColor(getContext(), R.color.colorPrimaryDarkSecondary))
                         )
                 );
