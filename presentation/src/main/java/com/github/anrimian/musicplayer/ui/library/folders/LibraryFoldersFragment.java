@@ -52,6 +52,8 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
+import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFiles;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -191,9 +193,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
             adapter = new MusicFileSourceAdapter(musicList);
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
             adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
-            adapter.setOnDeleteFolderClickListener(presenter::onDeleteFolderButtonClicked);
+            adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
             adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
-            adapter.setOnAddFolderToPlaylistClickListener(presenter::onAddFolderToPlayListButtonClicked);
             recyclerView.setAdapter(adapter);
         } else {
             adapter.setItems(musicList);
@@ -327,6 +328,19 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void sendCompositions(List<String> paths) {
+        shareFiles(requireContext(), paths);
+    }
+
+    @Override
+    public void showReceiveCompositionsForSendError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.can_not_receive_file_for_send, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
     private void onCompositionMenuClicked(View view, Composition composition) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.composition_item_menu);
@@ -337,11 +351,34 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
                     return true;
                 }
                 case R.id.menu_share: {
-//                    presenter.onDeleteCompositionButtonClicked(composition);
+                    shareFile(requireContext(), composition.getFilePath());
                     return true;
                 }
                 case R.id.menu_delete: {
                     presenter.onDeleteCompositionButtonClicked(composition);
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
+    }
+
+    private void onFolderMenuClicked(View view, FolderFileSource folder) {
+        PopupMenu popup = new PopupMenu(getContext(), view);
+        popup.inflate(R.menu.folder_item_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_add_to_playlist: {
+                    presenter.onAddFolderToPlayListButtonClicked(folder.getFullPath());
+                    return true;
+                }
+                case R.id.menu_share: {
+                    presenter.onShareFolderClicked(folder);
+                    return true;
+                }
+                case R.id.menu_delete: {
+                    presenter.onDeleteFolderButtonClicked(folder);
                     return true;
                 }
             }

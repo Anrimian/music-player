@@ -1,10 +1,6 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.adapter;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +16,10 @@ import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 
 import javax.annotation.Nonnull;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -56,6 +56,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
 
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
     private OnItemClickListener<Composition> onAddToPlaylistClickListener;
+    private OnItemClickListener<Composition> onShareClickListener;
     private OnItemClickListener<PlayQueueItem> onDeleteItemClickListener;
 
     PlayQueueViewHolder(LayoutInflater inflater,
@@ -63,6 +64,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
                         OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener,
                         OnItemClickListener<Composition> onDeleteCompositionClickListener,
                         OnItemClickListener<Composition> onAddToPlaylistClickListener,
+                        OnItemClickListener<Composition> onShareClickListener,
                         OnItemClickListener<PlayQueueItem> onDeleteItemClickListener) {
         super(inflater.inflate(R.layout.item_play_queue, parent, false));
         ButterKnife.bind(this, itemView);
@@ -73,6 +75,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
         btnActionsMenu.setOnClickListener(this::onActionsMenuButtonClicked);
         this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
         this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+        this.onShareClickListener = onShareClickListener;
         this.onDeleteItemClickListener = onDeleteItemClickListener;
     }
 
@@ -116,7 +119,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
                     return true;
                 }
                 case R.id.menu_share: {
-//                    presenter.onShareCompositionButtonClicked();
+                    onShareClickListener.onItemClick(composition);
                     return true;
                 }
                 case R.id.menu_delete_from_queue: {

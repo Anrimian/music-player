@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -178,6 +179,18 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onSearchButtonClicked() {
         getViewState().showSearchMode(true);
+    }
+
+    void onShareFolderClicked(FolderFileSource folder) {
+        interactor.getAllCompositionsInPath(folder.getFullPath())
+                .map(compositions -> ListUtils.mapList(compositions, Composition::getFilePath))
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::sendCompositions, this::onReceiveCompositionsError);
+    }
+
+    private void onReceiveCompositionsError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showReceiveCompositionsForSendError(errorCommand);
     }
 
     private void deletePreparedCompositions() {

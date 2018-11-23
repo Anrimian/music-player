@@ -16,9 +16,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import io.reactivex.functions.Consumer;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 /**
  * Created on 24.10.2017.
@@ -49,6 +46,10 @@ public class LibraryFilesInteractor {
         musicProviderRepository.getAllCompositionsInPath(path)
                 .doOnSuccess(musicPlayerInteractor::startPlaying)
                 .subscribe();
+    }
+
+    public Single<List<Composition>> getAllCompositionsInPath(@Nullable String path) {
+        return musicProviderRepository.getAllCompositionsInPath(path);
     }
 
     public void playMusic(String path, Composition composition) {

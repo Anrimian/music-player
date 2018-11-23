@@ -92,10 +92,10 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getResourceIdFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
+import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 
@@ -517,6 +517,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
             playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
             playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
+            playQueueAdapter.setOnShareClickListener(this::onShareCompositionClicked);
             playQueueAdapter.setOnDeleteItemClickListener(presenter::onDeleteQueueItemClicked);
             rvPlayList.setAdapter(playQueueAdapter);
         } else {
@@ -804,6 +805,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 presenter.onBottomPanelExpanded();
             }
         }
+    }
+
+    private void onShareCompositionClicked(Composition composition) {
+        shareFile(requireContext(), composition.getFilePath());
     }
 
     private void onBottomSheetSlided(Float slideOffset) {

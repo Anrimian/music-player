@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.adapter;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -13,6 +11,9 @@ import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import java.util.List;
 
 import javax.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created on 31.10.2017.
@@ -26,6 +27,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
     private OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener;
     private OnItemClickListener<Composition> onDeleteCompositionClickListener;
     private OnItemClickListener<Composition> onAddToPlaylistClickListener;
+    private OnItemClickListener<Composition> onShareClickListener;
     private OnItemClickListener<PlayQueueItem> onDeleteItemClickListener;
 
     @Nullable
@@ -45,6 +47,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
                 onCompositionClickListener,
                 onDeleteCompositionClickListener,
                 onAddToPlaylistClickListener,
+                onShareClickListener,
                 onDeleteItemClickListener);
     }
 
@@ -110,6 +113,10 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
 
     public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
         this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+    }
+
+    public void setOnShareClickListener(OnItemClickListener<Composition> onShareClickListener) {
+        this.onShareClickListener = onShareClickListener;
     }
 
     public void setOnDeleteItemClickListener(OnItemClickListener<PlayQueueItem> onDeleteItemClickListener) {
