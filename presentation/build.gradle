@@ -64,6 +64,7 @@ dependencies {
     implementation presentationDependencies.constraintLayout
     implementation presentationDependencies.supportMedia
     implementation presentationDependencies.palette
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
 
     implementation presentationDependencies.recyclerViewAnimation
 

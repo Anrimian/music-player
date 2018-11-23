@@ -166,7 +166,7 @@
         app:layout_constraintLeft_toLeftOf="@id/tv_played_time"
         app:layout_constraintBottom_toTopOf="@id/group_time">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_music_icon"
             android:layout_width="0dp"
             android:layout_height="0dp"
