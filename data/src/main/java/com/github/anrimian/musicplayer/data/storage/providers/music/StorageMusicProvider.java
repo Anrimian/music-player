@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
 
+import static android.provider.MediaStore.Audio.Media.*;
 import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
 import static java.util.Collections.emptyMap;
 
@@ -36,18 +37,14 @@ public class StorageMusicProvider {
     }
 
     public Observable<Map<Long, Composition>> getChangeObservable() {
-        return RxContentObserver.getObservable(contentResolver, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
+        return RxContentObserver.getObservable(contentResolver, EXTERNAL_CONTENT_URI)
 //                .doOnNext(o -> Log.d("KEK", "received update"))
 //                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)//TODO not this, ask on so
                 .map(o -> getCompositions());
     }
 
     public Map<Long, Composition> getCompositions() {
-        return getCompositions(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-    }
-
-    public Map<Long, Composition> getCompositionsInPlayList(long playListId) {
-        return getCompositions(getContentUri("external", playListId));
+        return getCompositions(EXTERNAL_CONTENT_URI);
     }
 
     private Map<Long, Composition> getCompositions(Uri uri) {
@@ -55,8 +52,18 @@ public class StorageMusicProvider {
         try {
             cursor = contentResolver.query(
                     uri,
-                    null,
-                    MediaStore.Audio.Media.IS_MUSIC + " = ?",
+                    new String[] {
+                            ARTIST,
+                            TITLE,
+                            ALBUM,
+                            MediaStore.Images.Media.DATA,
+                            DISPLAY_NAME,
+                            DURATION,
+                            MediaStore.Images.Media.SIZE,
+                            _ID,
+                            DATE_ADDED,
+                            DATE_MODIFIED},
+                    IS_MUSIC + " = ?",
                     new String[] { String.valueOf(1) },
                     null);
             if (cursor == null) {
@@ -78,7 +85,7 @@ public class StorageMusicProvider {
     }
 
     public void deleteComposition(String path) {//TODO not become update
-        contentResolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        contentResolver.delete(EXTERNAL_CONTENT_URI,
                 MediaStore.Images.Media.DATA + " = ?",
                 new String[] { path });
     }
@@ -88,7 +95,7 @@ public class StorageMusicProvider {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    EXTERNAL_CONTENT_URI,
                     null,
                     MediaStore.Images.Media._ID + " = ?",
                     new String[] { String.valueOf(id) },
@@ -106,31 +113,31 @@ public class StorageMusicProvider {
     }
 
     private Composition getCompositionFromCursor(CursorWrapper cursorWrapper) {
-        String artist = cursorWrapper.getString(MediaStore.Audio.Media.ARTIST);
-        String title = cursorWrapper.getString(MediaStore.Audio.Media.TITLE);
-        String album = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM);
+        String artist = cursorWrapper.getString(ARTIST);
+        String title = cursorWrapper.getString(TITLE);
+        String album = cursorWrapper.getString(ALBUM);
         String filePath = cursorWrapper.getString(MediaStore.Images.Media.DATA);
-        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
-        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
-        String displayName = cursorWrapper.getString(MediaStore.Audio.Media.DISPLAY_NAME);
-        String mimeType = cursorWrapper.getString(MediaStore.Audio.Media.MIME_TYPE);
+//        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
+//        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
+        String displayName = cursorWrapper.getString(DISPLAY_NAME);
+//        String mimeType = cursorWrapper.getString(MediaStore.Audio.Media.MIME_TYPE);
 
-        long duration = cursorWrapper.getLong(MediaStore.Audio.Media.DURATION);
+        long duration = cursorWrapper.getLong(DURATION);
         long size = cursorWrapper.getLong(MediaStore.Images.Media.SIZE);
-        long id = cursorWrapper.getLong(MediaStore.Audio.Media._ID);
-        long artistId = cursorWrapper.getLong(MediaStore.Audio.Media.ARTIST_ID);
-        long bookmark = cursorWrapper.getLong(MediaStore.Audio.Media.BOOKMARK);
-        long albumId = cursorWrapper.getLong(MediaStore.Audio.Media.ALBUM_ID);
-        long dateAdded = cursorWrapper.getLong(MediaStore.Audio.Media.DATE_ADDED);
-        long dateModified = cursorWrapper.getLong(MediaStore.Audio.Media.DATE_MODIFIED);
+        long id = cursorWrapper.getLong(_ID);
+//        long artistId = cursorWrapper.getLong(MediaStore.Audio.Media.ARTIST_ID);
+//        long bookmark = cursorWrapper.getLong(MediaStore.Audio.Media.BOOKMARK);
+//        long albumId = cursorWrapper.getLong(MediaStore.Audio.Media.ALBUM_ID);
+        long dateAdded = cursorWrapper.getLong(DATE_ADDED);
+        long dateModified = cursorWrapper.getLong(DATE_MODIFIED);
 
-        boolean isAlarm = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_ALARM);
-        boolean isMusic = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_MUSIC);
-        boolean isNotification = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_NOTIFICATION);
-        boolean isPodcast = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_PODCAST);
-        boolean isRingtone = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_RINGTONE);
+//        boolean isAlarm = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_ALARM);
+//        boolean isMusic = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_MUSIC);
+//        boolean isNotification = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_NOTIFICATION);
+//        boolean isPodcast = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_PODCAST);
+//        boolean isRingtone = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_RINGTONE);
 
-        @Nullable Integer year = cursorWrapper.getInt(MediaStore.Audio.Media.YEAR);
+//        @Nullable Integer year = cursorWrapper.getInt(YEAR);
 
         if (artist.equals("<unknown>")) {
             artist = null;
@@ -142,7 +149,7 @@ public class StorageMusicProvider {
         composition.setTitle(title);
         composition.setAlbum(album);
         composition.setFilePath(filePath);
-        composition.setComposer(composer);
+//        composition.setComposer(composer);
         composition.setDisplayName(displayName);
 
         composition.setDuration(duration);
@@ -151,13 +158,13 @@ public class StorageMusicProvider {
         composition.setDateAdded(new Date(dateAdded * 1000L));
         composition.setDateModified(new Date(dateModified * 1000L));
 
-        composition.setAlarm(isAlarm);
-        composition.setMusic(isMusic);
-        composition.setNotification(isNotification);
-        composition.setPodcast(isPodcast);
-        composition.setRingtone(isRingtone);
+//        composition.setAlarm(isAlarm);
+//        composition.setMusic(isMusic);
+//        composition.setNotification(isNotification);
+//        composition.setPodcast(isPodcast);
+//        composition.setRingtone(isRingtone);
 
-        composition.setYear(year);
+//        composition.setYear(year);
         return composition;
     }
 

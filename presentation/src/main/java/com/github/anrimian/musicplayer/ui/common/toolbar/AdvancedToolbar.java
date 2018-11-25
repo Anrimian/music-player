@@ -22,7 +22,7 @@ import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentStackListener;
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher;
-import com.github.anrimian.musicplayer.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 import static android.animation.ObjectAnimator.ofFloat;
 import static android.text.TextUtils.isEmpty;

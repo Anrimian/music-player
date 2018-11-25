@@ -26,7 +26,6 @@ public class ImageFormatUtils {
                                     @NonNull Composition composition) {
         imageView.setImageResource(R.drawable.ic_music_placeholder);
         Single.fromCallable(() -> getCompositionImageOrThrow(composition))
-                .map(ImageUtils::toCircleBitmap)
                 .timeout(5, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())

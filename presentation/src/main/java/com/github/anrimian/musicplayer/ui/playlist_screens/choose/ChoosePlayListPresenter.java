@@ -36,6 +36,7 @@ public class ChoosePlayListPresenter extends MvpPresenter<ChoosePlayListView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
+        getViewState().showBottomSheetSlided(0f);
         subscribeOnPlayLists();
     }
 
@@ -43,6 +44,10 @@ public class ChoosePlayListPresenter extends MvpPresenter<ChoosePlayListView> {
     public void onDestroy() {
         super.onDestroy();
         presenterDisposable.dispose();
+    }
+
+    void onBottomSheetSlided(float slideOffset) {
+        getViewState().showBottomSheetSlided(slideOffset);
     }
 
     private void subscribeOnPlayLists() {

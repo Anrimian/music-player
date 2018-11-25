@@ -100,7 +100,8 @@ ext {
             espresso:           "androidx.test.espresso:espresso-core:$espressoVersion",
             supportTest:        "androidx.test:runner:1.1.0",
             mockito:            "org.mockito:mockito-core:${mockitoVersion}",
-            rules:              "androidx.test:rules:1.1.0"
+            rules:              "androidx.test:rules:1.1.0",
+            rxJava2Ext:         "com.github.akarnokd:rxjava2-extensions:0.20.4"
     ]
 
 }

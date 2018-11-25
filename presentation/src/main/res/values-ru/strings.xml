@@ -74,6 +74,7 @@
     <string name="play_list_delete_error">Не удалось удалить плейлист: %1$s </string>
     <string name="play_not_exists">плейлист не существует</string>
     <string name="play_list_deleted">Плейлист %1$s удалён</string>
+    <string name="can_not_receive_file_for_send">Не удалось получить файлы для отправки: %1$s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
@@ -87,5 +88,12 @@
         <item quantity="few">%1$s композиции</item>
         <item quantity="many">%1$s композиций</item>
         <item quantity="other">%1$s композиций</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s файл</item>
+        <item quantity="few">%1$s файла</item>
+        <item quantity="many">%1$s файлов</item>
+        <item quantity="other">%1$s файлов</item>
     </plurals>
 </resources>

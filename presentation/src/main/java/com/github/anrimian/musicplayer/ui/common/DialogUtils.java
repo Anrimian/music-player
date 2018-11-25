@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderF
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.core.content.FileProvider;
@@ -67,6 +68,29 @@ public class DialogUtils {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.share)));
+    }
+
+    public static void shareFiles(Context context, List<String> filePaths) {
+        Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        intent.setType("audio/*");
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (String path : filePaths) {
+            uris.add(FileProvider.getUriForFile(context,
+                    context.getString(R.string.file_provider_authorities),
+                    new File(path)));
+        }
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        StringBuilder sbTitle = new StringBuilder(context.getString(R.string.share));
+        sbTitle.append(" (");
+        sbTitle.append(context.getResources().getQuantityString(
+                R.plurals.files_count,
+                filePaths.size(),
+                filePaths.size()));
+        sbTitle.append(")");
+
+        context.startActivity(Intent.createChooser(intent, sbTitle.toString()));
     }
 
     private static String getDativCompositionsMessage(Context context, int count) {

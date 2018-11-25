@@ -2,9 +2,9 @@ package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
 import android.view.View;
 
-import static androidx.core.view.ViewCompat.isLaidOut;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static androidx.core.view.ViewCompat.isLaidOut;
 
 /**
  * Created on 21.01.2018.

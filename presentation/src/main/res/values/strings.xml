@@ -75,6 +75,7 @@
     <string name="play_list_delete_error">Can not delete playlist: %1$s </string>
     <string name="play_not_exists">Playlist don\'t exists</string>
     <string name="play_list_deleted">Playlist %1$s was deleted</string>
+    <string name="can_not_receive_file_for_send">Can\'t receive files for send: %1$s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
@@ -88,5 +89,12 @@
         <item quantity="few">%1$s songs</item>
         <item quantity="many">%1$s songs</item>
         <item quantity="other">%1$s songs</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s file</item>
+        <item quantity="few">%1$s files</item>
+        <item quantity="many">%1$s files</item>
+        <item quantity="other">%1$s files</item>
     </plurals>
 </resources>

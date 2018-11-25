@@ -12,7 +12,6 @@
         android:padding="@dimen/padding_small"
         android:background="@drawable/bg_folder_round"
         android:layout_marginStart="@dimen/content_horizontal_margin"
-        android:layout_marginLeft="@dimen/content_horizontal_margin"
         android:contentDescription="@string/folder"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_folder_name"

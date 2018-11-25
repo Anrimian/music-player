@@ -1,5 +1,7 @@
-package com.github.anrimian.musicplayer.utils;
+package com.github.anrimian.musicplayer.ui.utils;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
@@ -14,11 +16,41 @@ import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
 
+import static androidx.core.view.ViewCompat.isLaidOut;
+
 public class ViewUtils {
+
+    public static void run(View view, Runnable runnable) {
+        if (isLaidOut(view)) {
+            runnable.run();
+        } else {
+            view.post(runnable);
+        }
+    }
+
+    public static void animateVisibility(View view, int visibility) {
+        if ((view.getAlpha() == 1f || view.getAlpha() == 0f) && view.getVisibility() != visibility) {
+            view.animate()
+                    .alpha(visibility == View.VISIBLE ? 1f : 0f)
+                    .setDuration(visibility == View.VISIBLE ? 150: 120)
+                    .setInterpolator(visibility == View.VISIBLE ? new DecelerateInterpolator(): new AccelerateInterpolator())
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            view.clearAnimation();
+                            view.setVisibility(visibility);
+                        }
+                    })
+                    .start();
+        }
+    }
 
     public static void showAsMultiline(Snackbar snackbar) {
         View view = snackbar.getView();

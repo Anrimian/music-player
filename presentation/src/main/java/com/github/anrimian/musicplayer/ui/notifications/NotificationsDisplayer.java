@@ -27,7 +27,7 @@ import static com.github.anrimian.musicplayer.infrastructure.service.music.Music
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
-import static com.github.anrimian.musicplayer.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 
 /**

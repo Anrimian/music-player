@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -14,6 +13,8 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.endless_scro
 
 import java.util.List;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * Created on 31.10.2017.
  */
@@ -26,8 +27,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private List<FileSource> musicList;
     private OnItemClickListener<Composition> onCompositionClickListener;
     private OnItemClickListener<String> onFolderClickListener;
-    private OnItemClickListener<String> onAddFolderToPlaylistClickListener;
-    private OnItemClickListener<FolderFileSource> onDeleteFolderClickListener;
+    private OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener;
     private OnViewItemClickListener<Composition> onCompositionMenuItemClicked;
 
     public MusicFileSourceAdapter(List<FileSource> musicList) {
@@ -49,8 +49,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
                 return new FolderViewHolder(inflater,
                         parent,
                         onFolderClickListener,
-                        onDeleteFolderClickListener,
-                        onAddFolderToPlaylistClickListener);
+                        onFolderMenuClickListener);
             }
             default: throw new IllegalStateException("unexpected item type: " + type);
         }
@@ -106,11 +105,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         this.onCompositionMenuItemClicked = onCompositionMenuItemClicked;
     }
 
-    public void setOnDeleteFolderClickListener(OnItemClickListener<FolderFileSource> onDeleteFolderClickListener) {
-        this.onDeleteFolderClickListener = onDeleteFolderClickListener;
-    }
-
-    public void setOnAddFolderToPlaylistClickListener(OnItemClickListener<String> onAddFolderToPlaylistClickListener) {
-        this.onAddFolderToPlaylistClickListener = onAddFolderToPlaylistClickListener;
+    public void setOnFolderMenuClickListener(OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener) {
+        this.onFolderMenuClickListener = onFolderMenuClickListener;
     }
 }

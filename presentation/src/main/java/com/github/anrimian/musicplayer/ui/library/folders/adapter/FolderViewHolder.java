@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
 import android.content.Context;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +9,11 @@ import android.widget.TextView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import javax.annotation.Nonnull;
 
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -38,22 +38,16 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
     private FolderFileSource folder;
     private String path;
 
-    private OnItemClickListener<FolderFileSource> onDeleteCompositionClickListener;
-    private OnItemClickListener<String> onAddToPlaylistClickListener;
-
     FolderViewHolder(LayoutInflater inflater,
                      ViewGroup parent,
                      OnItemClickListener<String> onFolderClickListener,
-                     OnItemClickListener<FolderFileSource> onDeleteCompositionClickListener,
-                     OnItemClickListener<String> onAddToPlaylistClickListener) {
+                     OnViewItemClickListener<FolderFileSource> onMenuClickListener) {
         super(inflater.inflate(R.layout.item_storage_folder, parent, false));
         ButterKnife.bind(this, itemView);
         if (onFolderClickListener != null) {
             clickableItemView.setOnClickListener(v -> onFolderClickListener.onItemClick(path));
         }
-        btnActionsMenu.setOnClickListener(this::onActionsMenuButtonClicked);
-        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
-        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
+        btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));
     }
 
     void bind(@Nonnull FolderFileSource folderFileSource) {
@@ -69,29 +63,6 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
         int filesCount = folderFileSource.getFilesCount();
         String text = getContext().getResources().getQuantityString(R.plurals.compositions_count, filesCount, filesCount);
         tvCompositionsCount.setText(text);
-    }
-
-    private void onActionsMenuButtonClicked(View view) {
-        PopupMenu popup = new PopupMenu(getContext(), view);
-        popup.inflate(R.menu.folder_item_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_add_to_playlist: {
-                    onAddToPlaylistClickListener.onItemClick(path);
-                    return true;
-                }
-                case R.id.menu_share: {
-//                    presenter.onShareCompositionButtonClicked();
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    onDeleteCompositionClickListener.onItemClick(folder);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
     }
 
     private Context getContext() {

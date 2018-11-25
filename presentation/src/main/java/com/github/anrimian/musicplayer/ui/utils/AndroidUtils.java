@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.utils;
+package com.github.anrimian.musicplayer.ui.utils;
 
 import android.content.Context;
 import android.content.res.Resources;

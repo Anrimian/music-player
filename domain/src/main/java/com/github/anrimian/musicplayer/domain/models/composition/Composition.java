@@ -15,7 +15,6 @@ public class Composition {
     private String title;
     private String album;
     private String filePath;
-    private String composer;
     private String displayName;
 
     private long duration;
@@ -25,11 +24,6 @@ public class Composition {
     private Date dateAdded;
     private Date dateModified;
 
-    private boolean isAlarm;
-    private boolean isMusic;
-    private boolean isNotification;
-    private boolean isPodcast;
-    private boolean isRingtone;
     private boolean isCorrupted;
 
     public boolean isCorrupted() {
@@ -39,9 +33,6 @@ public class Composition {
     public void setCorrupted(boolean corrupted) {
         isCorrupted = corrupted;
     }
-
-    @Nullable
-    private Integer year;
 
     @Nullable
     public String getArtist() {
@@ -74,14 +65,6 @@ public class Composition {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
-    }
-
-    public String getComposer() {
-        return composer;
-    }
-
-    public void setComposer(String composer) {
-        this.composer = composer;
     }
 
     public String getDisplayName() {
@@ -130,55 +113,6 @@ public class Composition {
 
     public void setDateModified(Date dateModified) {
         this.dateModified = dateModified;
-    }
-
-    public boolean isAlarm() {
-        return isAlarm;
-    }
-
-    public void setAlarm(boolean alarm) {
-        isAlarm = alarm;
-    }
-
-    public boolean isMusic() {
-        return isMusic;
-    }
-
-    public void setMusic(boolean music) {
-        isMusic = music;
-    }
-
-    public boolean isNotification() {
-        return isNotification;
-    }
-
-    public void setNotification(boolean notification) {
-        isNotification = notification;
-    }
-
-    public boolean isPodcast() {
-        return isPodcast;
-    }
-
-    public void setPodcast(boolean podcast) {
-        isPodcast = podcast;
-    }
-
-    public boolean isRingtone() {
-        return isRingtone;
-    }
-
-    public void setRingtone(boolean ringtone) {
-        isRingtone = ringtone;
-    }
-
-    @Nullable
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(@Nullable Integer year) {
-        this.year = year;
     }
 
     @Override
