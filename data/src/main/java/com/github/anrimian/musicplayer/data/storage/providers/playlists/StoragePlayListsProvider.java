@@ -10,6 +10,7 @@ import android.provider.MediaStore.Audio.Playlists;
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotMovedException;
+import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotModifiedException;
@@ -78,7 +79,11 @@ public class StoragePlayListsProvider {
             throw new PlayListNotCreatedException();
         }
         long id = Long.valueOf(uri.getLastPathSegment());
-        return findPlayList(id);
+        StoragePlayList playList = findPlayList(id);
+        if (playList == null) {
+            throw new PlayListNotCreatedException();
+        }
+        return playList;
     }
 
     public void deletePlayList(long id) {
@@ -87,6 +92,10 @@ public class StoragePlayListsProvider {
                 new String[] { String.valueOf(id) });
 
         if (deletedRows == 0) {
+            StoragePlayList storagePlayList = findPlayList(id);
+            if (storagePlayList == null) {
+                throw new PlayListAlreadyDeletedException();
+            }
             throw new PlayListNotDeletedException();
         }
     }
@@ -183,6 +192,7 @@ public class StoragePlayListsProvider {
                 new String[] { String.valueOf(playListId) });
     }
 
+    @Nullable
     private StoragePlayList findPlayList(long id) {
         Cursor cursor = null;
         try {
@@ -192,12 +202,11 @@ public class StoragePlayListsProvider {
                     Playlists._ID + " = ?",
                     new String[] { String.valueOf(id) },
                     Playlists.DATE_ADDED + " DESC");
-            if (cursor != null) {
-                cursor.moveToFirst();
+            if (cursor != null && cursor.moveToFirst()) {
                 CursorWrapper cursorWrapper = new CursorWrapper(cursor);
                 return getPlayListFromCursor(cursorWrapper);
             }
-            throw new PlayListNotCreatedException();
+            return null;
         } finally {
             IOUtils.closeSilently(cursor);
         }

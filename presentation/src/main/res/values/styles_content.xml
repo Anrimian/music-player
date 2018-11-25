@@ -24,6 +24,11 @@
 
     </style>
 
+    <style name="Content.Dialog.Text" parent="@style/Content.Text">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+
     <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">
 
     </style>

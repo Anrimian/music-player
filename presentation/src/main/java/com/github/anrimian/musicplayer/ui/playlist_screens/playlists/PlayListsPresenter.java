@@ -5,6 +5,8 @@ import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.utils.PlayListHelper;
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
@@ -19,6 +21,7 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
 
     private final PlayListsInteractor playListsInteractor;
     private final Scheduler uiScheduler;
+    private final ErrorParser errorParser;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
 
@@ -28,9 +31,15 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
             () -> playLists,
             PlayListHelper::areSourcesTheSame);
 
-    public PlayListsPresenter(PlayListsInteractor playListsInteractor, Scheduler uiScheduler) {
+    private PlayList playListInMenu;
+    private PlayList playListToDelete;
+
+    public PlayListsPresenter(PlayListsInteractor playListsInteractor,
+                              Scheduler uiScheduler,
+                              ErrorParser errorParser) {
         this.playListsInteractor = playListsInteractor;
         this.uiScheduler = uiScheduler;
+        this.errorParser = errorParser;
     }
 
     @Override
@@ -43,6 +52,34 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
     public void onDestroy() {
         super.onDestroy();
         presenterDisposable.dispose();
+    }
+
+    void onPlayListLongClick(PlayList playList) {
+        playListInMenu = playList;
+        getViewState().showPlayListMenu(playList);
+    }
+
+    void onDeletePlayListButtonClicked() {
+        playListToDelete = playListInMenu;
+        getViewState().showConfirmDeletePlayListDialog(playListToDelete);
+        playListInMenu = null;
+    }
+
+    void onDeletePlayListDialogConfirmed() {
+        playListsInteractor.deletePlayList(playListToDelete.getId())
+                .observeOn(uiScheduler)
+                .subscribe(this::onPlayListDeleted, this::onPlayListDeletingError);
+    }
+
+    private void onPlayListDeletingError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showDeletePlayListError(errorCommand);
+        playListToDelete = null;
+    }
+
+    private void onPlayListDeleted() {
+        getViewState().showPlayListDeleteSuccess(playListToDelete);
+        playListToDelete = null;
     }
 
     private void subscribeOnPlayLists() {

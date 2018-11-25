@@ -27,7 +27,8 @@ public class PlayListsAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
     public PlayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new PlayListViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
-                onItemClickListener);
+                onItemClickListener,
+                onItemLongClickListener);
     }
 
     @Override

@@ -13,6 +13,7 @@ public class Constants {
         String SELECT_PLAYLIST_TAG = "select_playlist_tag";
         String SELECT_PLAYLIST_FOR_FOLDER_TAG = "select_playlist_for_folder_tag";
         String CREATE_PLAYLIST_TAG = "create_playlist_tag";
+        String PLAY_LIST_MENU = "play_list_menu";
     }
 
     public interface Animation {

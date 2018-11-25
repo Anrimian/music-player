@@ -70,6 +70,10 @@
     <string name="add_item_to_playlist_error_template">Не удалось добавить композицию в плейлист: %1$s</string>
     <string name="delete_from_playlist_success_template">Композиция %1$s удалена из плейлиста %2$s</string>
     <string name="delete_from_playlist_count_success_template">%1$d композиций удалено из плейлиста %2$s</string>
+    <string name="delete_playlist_template">Удалить плейлист %1$s?</string>
+    <string name="play_list_delete_error">Не удалось удалить плейлист: %1$s </string>
+    <string name="play_not_exists">плейлист не существует</string>
+    <string name="play_list_deleted">Плейлист %1$s удалён</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

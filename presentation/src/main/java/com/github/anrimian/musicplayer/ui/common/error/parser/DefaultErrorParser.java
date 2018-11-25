@@ -1,9 +1,9 @@
 package com.github.anrimian.musicplayer.ui.common.error.parser;
 
 import android.content.Context;
-import androidx.annotation.StringRes;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
@@ -11,6 +11,8 @@ import com.github.anrimian.musicplayer.domain.utils.validation.ValidateException
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 
 import java.util.List;
+
+import androidx.annotation.StringRes;
 
 /**
  * Created on 29.10.2017.
@@ -41,6 +43,9 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof PlayListNotCreatedException) {
             return new ErrorCommand(getString(R.string.play_list_with_this_name_already_exists));
+        }
+        if (throwable instanceof PlayListAlreadyDeletedException) {
+            return new ErrorCommand(getString(R.string.play_not_exists));
         }
         if (throwable instanceof NullPointerException) {
             logException(throwable);

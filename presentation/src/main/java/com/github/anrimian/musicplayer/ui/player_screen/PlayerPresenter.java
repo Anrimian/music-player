@@ -241,6 +241,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void onDeleteCompositionError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showDeleteCompositionError(errorCommand);
+        compositionsToDelete.clear();
     }
 
     private void onAddingToPlayListError(Throwable throwable) {

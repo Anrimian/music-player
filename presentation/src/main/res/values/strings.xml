@@ -71,6 +71,10 @@
     <string name="add_item_to_playlist_error_template">Can not add song to playlist: %1$s</string>
     <string name="delete_from_playlist_success_template">Song %1$s deleted from playlist %2$s</string>
     <string name="delete_from_playlist_count_success_template">%1$d songs deleted from playlist %2$s</string>
+    <string name="delete_playlist_template">Delete playlist %1$s?</string>
+    <string name="play_list_delete_error">Can not delete playlist: %1$s </string>
+    <string name="play_not_exists">Playlist don\'t exists</string>
+    <string name="play_list_deleted">Playlist %1$s was deleted</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

@@ -4,14 +4,16 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import androidx.core.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
 import java.io.File;
 import java.util.List;
+
+import androidx.core.content.FileProvider;
 
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
@@ -33,6 +35,14 @@ public class DialogUtils {
         String message = context.getString(R.string.delete_folder_template,
                 getLastPathSegment(folderFileSource.getFullPath()),
                 getDativCompositionsMessage(context, folderFileSource.getFilesCount()));
+        showConfirmDeleteDialog(context, message, deleteCallback);
+    }
+
+
+    public static void showConfirmDeleteDialog(Context context,
+                                               PlayList playList,
+                                               Runnable deleteCallback) {
+        String message = context.getString(R.string.delete_playlist_template, playList.getName());
         showConfirmDeleteDialog(context, message, deleteCallback);
     }
 
