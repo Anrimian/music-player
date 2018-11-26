@@ -105,6 +105,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                 .subscribeOn(scheduler);
     }
 
+    //TODO concurrent modification exception
     private List<PlayList> toSortedPlayLists(Map<Long, PlayListFullModel> playListMap) {
         List<PlayList> list = mapToList(playListMap, PlayListFullModel::getPlayList);
         Collections.sort(list, new PlayListModifyDateComparator());

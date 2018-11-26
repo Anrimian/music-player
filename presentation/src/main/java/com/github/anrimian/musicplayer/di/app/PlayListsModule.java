@@ -36,8 +36,9 @@ public class PlayListsModule {
     @Provides
     @Nonnull
     ChoosePlayListPresenter choosePlayListPresenter(PlayListsInteractor playListsInteractor,
-                                                    @Named(UI_SCHEDULER) Scheduler uiSchedule) {
-        return new ChoosePlayListPresenter(playListsInteractor, uiSchedule);
+                                                    @Named(UI_SCHEDULER) Scheduler uiSchedule,
+                                                    ErrorParser errorParser) {
+        return new ChoosePlayListPresenter(playListsInteractor, uiSchedule, errorParser);
     }
 
     @Provides
