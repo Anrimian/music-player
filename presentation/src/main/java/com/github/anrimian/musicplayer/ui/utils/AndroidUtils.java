@@ -3,12 +3,13 @@ package com.github.anrimian.musicplayer.ui.utils;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.DimenRes;
-import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.annotation.DimenRes;
+import androidx.core.content.ContextCompat;
 
 /**
  * Created on 16.02.2017.
@@ -66,5 +67,15 @@ public class AndroidUtils {
         if (imm != null && imm.isActive()) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    public static int getStatusBarHeight(Context context) {
+        Resources resources = context.getResources();
+        int result = 0;
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = resources.getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 }

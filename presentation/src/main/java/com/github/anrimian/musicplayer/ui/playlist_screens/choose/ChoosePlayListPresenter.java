@@ -31,6 +31,8 @@ public class ChoosePlayListPresenter extends MvpPresenter<ChoosePlayListView> {
             () -> playLists,
             PlayListHelper::areSourcesTheSame);
 
+    private float slideOffset;
+
     private PlayList playListInMenu;
     private PlayList playListToDelete;
 
@@ -56,6 +58,7 @@ public class ChoosePlayListPresenter extends MvpPresenter<ChoosePlayListView> {
     }
 
     void onBottomSheetSlided(float slideOffset) {
+        this.slideOffset = slideOffset;
         getViewState().showBottomSheetSlided(slideOffset);
     }
 
@@ -103,5 +106,6 @@ public class ChoosePlayListPresenter extends MvpPresenter<ChoosePlayListView> {
         } else {
             getViewState().showList();
         }
+        getViewState().showBottomSheetSlided(slideOffset);
     }
 }

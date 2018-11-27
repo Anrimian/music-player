@@ -53,6 +53,7 @@ import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getFloat;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getStatusBarHeight;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
@@ -143,6 +144,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         slideDelegate = buildSlideDelegate();
 
         ivClose.setOnClickListener(v -> dismiss());
+        ivClose.setVisibility(INVISIBLE);//start state
         ivCreatePlaylist.setOnClickListener(v -> onCreatePlayListButtonClicked());
 
         MenuDialogFragment fragment = (MenuDialogFragment) getChildFragmentManager()
@@ -160,22 +162,18 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showBottomSheetSlided(float slideOffset) {
-        //TODO filter in non-full-expand case
-//        int decorViewHeight = getDialog().getWindow().getDecorView().getHeight() - getStatusBarHeight();
-//        Log.d("KEK", "onSlide, decorViewHeight: " + decorViewHeight);
-//        Log.d("KEK", "onSlide, view.getHeight(): " + getView().getHeight());
-//        if (decorViewHeight == getView().getHeight()) {
-        slideDelegate.onSlide(slideOffset);
-//        }
-    }
+        recyclerView.post(() -> {
+            float usableSlideOffset = slideOffset;
+            View decorView = getActivity().getWindow().getDecorView();
+            int activityHeight = decorView.findViewById(android.R.id.content).getHeight()
+                    - getStatusBarHeight(getContext());
+            int viewHeight = clListContainer.getHeight();
+            if (activityHeight > viewHeight) {
+                usableSlideOffset = 0;
+            }
+            slideDelegate.onSlide(usableSlideOffset);
+        });
 
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
 
     @Override

@@ -280,7 +280,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         mlBottomSheet.setClickable(true);
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
                 this::onBottomSheetStateChanged,
-                this::onBottomSheetSlided
+                bottomSheetDelegate::onSlide
         ));
 
         toolbar.setupWithNavigation(navigation,
@@ -809,11 +809,5 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private void onShareCompositionClicked(Composition composition) {
         shareFile(requireContext(), composition.getFilePath());
-    }
-
-    private void onBottomSheetSlided(Float slideOffset) {
-        if (slideOffset > 0F && slideOffset < 1f) {
-            bottomSheetDelegate.onSlide(slideOffset);
-        }
     }
 }
