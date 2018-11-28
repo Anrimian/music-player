@@ -480,10 +480,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showCurrentQueueItem(PlayQueueItem item, int position) {
         Composition composition = item.getComposition();
-        tvCurrentComposition.setText(formatCompositionName(composition));
+        String compositionName = formatCompositionName(composition);
+        tvCurrentComposition.setText(compositionName);
         tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
         tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
         seekBarViewWrapper.setMax(composition.getDuration());
+        topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, compositionName));
 
         ImageFormatUtils.displayImage(ivMusicIcon, composition);
 
@@ -565,7 +567,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showTrackState(long currentPosition, long duration) {
         seekBarViewWrapper.setProgress(currentPosition);
-        tvPlayedTime.setText(formatMilliseconds(currentPosition));
+        String formattedTime = formatMilliseconds(currentPosition);
+        sbTrackState.setContentDescription(getString(R.string.position_template, formattedTime));
+        tvPlayedTime.setText(formattedTime);
     }
 
     @Override

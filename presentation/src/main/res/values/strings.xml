@@ -76,6 +76,9 @@
     <string name="play_not_exists">Playlist don\'t exists</string>
     <string name="play_list_deleted">Playlist %1$s was deleted</string>
     <string name="can_not_receive_file_for_send">Can\'t receive files for send: %1$s</string>
+    <string name="position_template">Current play time: %1$s</string>
+    <string name="now_playing_template">Now playing: %1$s. Open play queue.</string>
+    <string name="play_all_in_folder">Play all in folder</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

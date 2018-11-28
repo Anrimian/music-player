@@ -75,6 +75,9 @@
     <string name="play_not_exists">плейлист не существует</string>
     <string name="play_list_deleted">Плейлист %1$s удалён</string>
     <string name="can_not_receive_file_for_send">Не удалось получить файлы для отправки: %1$s</string>
+    <string name="position_template">Текущее время воспроизведения: %1$s</string>
+    <string name="now_playing_template">Сейчас проигрывает: %1$s. Открыть очередь воспроизведения.</string>
+    <string name="play_all_in_folder">Проиграть всё в папке</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
