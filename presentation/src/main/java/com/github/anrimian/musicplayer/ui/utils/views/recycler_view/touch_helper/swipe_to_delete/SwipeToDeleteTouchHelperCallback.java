@@ -2,13 +2,14 @@ package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helpe
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.View;
 
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class SwipeToDeleteTouchHelperCallback extends ItemTouchHelper.SimpleCallback {
 
@@ -32,6 +33,11 @@ public class SwipeToDeleteTouchHelperCallback extends ItemTouchHelper.SimpleCall
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
         swipeCallback.call(viewHolder.getAdapterPosition());
+    }
+
+    @Override
+    public float getSwipeEscapeVelocity(float defaultValue) {
+        return defaultValue * 8;
     }
 
     @Override
