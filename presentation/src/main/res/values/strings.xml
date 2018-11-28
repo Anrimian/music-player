@@ -79,6 +79,7 @@
     <string name="position_template">Current play time: %1$s</string>
     <string name="now_playing_template">Now playing: %1$s. Open play queue.</string>
     <string name="play_all_in_folder">Play all in folder</string>
+    <string name="delete_playlist">Delete playlist</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

@@ -1,18 +1,13 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
@@ -26,16 +21,24 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
+import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -77,6 +80,11 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
         return Components.getPlayListComponent(getPlayListId()).playListPresenter();
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -108,6 +116,24 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (playListDialog != null) {
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.play_list_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_delete_play_list: {
+                presenter.onDeletePlayListButtonClicked();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
         }
     }
 
@@ -155,6 +181,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
                 R.plurals.compositions_count,
                 playList.getCompositionsCount(),
                 playList.getCompositionsCount()));
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -212,6 +239,29 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
     public void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items) {
         String text = getDeletePlayListItemCompleteMessage(requireActivity(), playList, items);
         Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showConfirmDeletePlayListDialog(PlayList playList) {
+        DialogUtils.showConfirmDeleteDialog(requireContext(),
+                playList,
+                presenter::onDeletePlayListDialogConfirmed);
+    }
+
+    @Override
+    public void showPlayListDeleteSuccess(PlayList playList) {
+        Snackbar.make(clListContainer,
+                getString(R.string.play_list_deleted, playList.getName()),
+                Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showDeletePlayListError(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer,
+                getString(R.string.play_list_delete_error, errorCommand.getMessage()),
+                Snackbar.LENGTH_SHORT)
+                .show();
     }
 
     private void onCompositionMenuClicked(View view, PlayListItem playListItem) {

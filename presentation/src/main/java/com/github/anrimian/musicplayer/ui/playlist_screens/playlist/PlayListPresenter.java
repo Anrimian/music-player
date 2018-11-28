@@ -24,6 +24,7 @@ import io.reactivex.disposables.CompositeDisposable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static java.util.Objects.requireNonNull;
 
 @InjectViewState
 public class PlayListPresenter extends MvpPresenter<PlayListView> {
@@ -106,6 +107,25 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         playListsInteractor.deleteItemFromPlayList(playListItem.getItemId(), playListId)
                 .observeOn(uiScheduler)
                 .subscribe(() -> onDeleteItemCompleted(playListItem), this::onDeleteItemError);
+    }
+
+    void onDeletePlayListButtonClicked() {
+        getViewState().showConfirmDeletePlayListDialog(playList);
+    }
+
+    void onDeletePlayListDialogConfirmed() {
+        playListsInteractor.deletePlayList(requireNonNull(playList).getId())
+                .observeOn(uiScheduler)
+                .subscribe(this::onPlayListDeleted, this::onPlayListDeletingError);
+    }
+
+    private void onPlayListDeletingError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showDeletePlayListError(errorCommand);
+    }
+
+    private void onPlayListDeleted() {
+        getViewState().showPlayListDeleteSuccess(playList);
     }
 
     private void onDeleteItemCompleted(PlayListItem item) {
