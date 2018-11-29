@@ -158,7 +158,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     private void onPlayListMenuItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.menu_delete: {
+            case R.id.menu_delete_play_list: {
                 presenter.onDeletePlayListButtonClicked();
                 break;
             }
