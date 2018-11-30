@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 
@@ -172,7 +173,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     private Map<Long, PlayListFullModel> createPlayListMap(List<StoragePlayList> storagePlayLists) {
-        Map<Long, PlayListFullModel> playListMap = new HashMap<>();
+        Map<Long, PlayListFullModel> playListMap = new ConcurrentHashMap<>();
         for (StoragePlayList storagePlayList: storagePlayLists) {
             long id = storagePlayList.getId();
             List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(id);

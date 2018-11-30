@@ -142,6 +142,14 @@ public class TestDataProvider {
         return new StoragePlayList(i, "test" + i, new Date(i), new Date(i));
     }
 
+    public static List<StoragePlayList> storagePlayLists(long count) {
+        List<StoragePlayList> compositions = new ArrayList<>((int) count);
+        for (long i = 0; i < count; i++) {
+            compositions.add(storagePlayList(i));
+        }
+        return compositions;
+    }
+
     public static PlayQueueEntity queueEntity(long id,
                                               long audioId,
                                               int position,
