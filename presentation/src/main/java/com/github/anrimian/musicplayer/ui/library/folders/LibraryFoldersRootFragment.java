@@ -1,9 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +12,9 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -44,7 +44,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment implements BackB
         navigation.setExitAnimation(R.anim.anim_slide_out_right);
         navigation.setEnterAnimation(R.anim.anim_slide_in_right);
 
-        if (savedInstanceState == null) {
+        if (navigation.getScreensCount() == 0) {//check how it solve problem with periodically white screen
             navigation.newRootFragment(() -> LibraryFoldersFragment.newInstance(null));
         }
     }
