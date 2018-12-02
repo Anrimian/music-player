@@ -52,6 +52,7 @@ import static android.view.View.VISIBLE;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getContentView;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getFloat;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getStatusBarHeight;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
@@ -163,10 +164,12 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     @Override
     public void showBottomSheetSlided(float slideOffset) {
         recyclerView.post(() -> {
+            View contentView = getContentView(getActivity());
+            if (contentView == null) {
+                return;
+            }
             float usableSlideOffset = slideOffset;
-            View decorView = getActivity().getWindow().getDecorView();
-            int activityHeight = decorView.findViewById(android.R.id.content).getHeight()
-                    - getStatusBarHeight(getContext());
+            int activityHeight = contentView.getHeight() - getStatusBarHeight(getContext());
             int viewHeight = clListContainer.getHeight();
             if (activityHeight > viewHeight) {
                 usableSlideOffset = 0;

@@ -1,14 +1,17 @@
 package com.github.anrimian.musicplayer.ui.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.DimenRes;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 /**
@@ -77,5 +80,19 @@ public class AndroidUtils {
             result = resources.getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    @Nullable
+    public static View getContentView(@Nullable Activity activity) {
+        if (activity != null) {
+            Window window = activity.getWindow();
+            if (window != null) {
+                View decorView = window.getDecorView();
+                if (decorView != null) {
+                    return decorView.findViewById(android.R.id.content);
+                }
+            }
+        }
+        return null;
     }
 }
