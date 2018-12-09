@@ -176,7 +176,6 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
             }
             slideDelegate.onSlide(usableSlideOffset);
         });
-
     }
 
     @Override

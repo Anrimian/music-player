@@ -66,7 +66,7 @@ public class CompositionItemWrapper {
 
     private void showAdditionalInfo() {
         StringBuilder sb = formatCompositionAuthor(composition, getContext());
-        sb.append(" ● ");//TODO split problem
+        sb.append(" ● ");//TODO split problem • ●
         sb.append(formatMilliseconds(composition.getDuration()));
         tvAdditionalInfo.setText(sb.toString());
     }
