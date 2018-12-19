@@ -35,7 +35,7 @@ public class Components {
 
     private static Components getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("components must be initializeViews first");
+            throw new IllegalStateException("components must be initialized first");
         }
         return instance;
     }

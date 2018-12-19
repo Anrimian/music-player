@@ -62,6 +62,7 @@ public class ProgressViewWrapper {
     }
 
     public void showMessage(String message, @DrawableRes int imageRes, boolean showTryAgainButton) {
+        progressStateContainer.setVisibility(VISIBLE);
         progressBar.setVisibility(GONE);
         tvMessage.setVisibility(VISIBLE);
         progressStateContainer.setContentDescription(message);
