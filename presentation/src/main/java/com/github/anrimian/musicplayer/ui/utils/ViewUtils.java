@@ -2,15 +2,24 @@ package com.github.anrimian.musicplayer.ui.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.ColorInt;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
+
+import android.renderscript.Sampler;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.view.Menu;
@@ -50,6 +59,17 @@ public class ViewUtils {
                     })
                     .start();
         }
+    }
+
+    public static void animateColor(@ColorInt int from,
+                                    @ColorInt int to,
+                                    Callback<Integer> onAnimate) {
+        ValueAnimator animator = ValueAnimator.ofArgb(from, to);
+        animator.setDuration(150);
+        animator.addUpdateListener(animation ->
+                onAnimate.call((Integer) animation.getAnimatedValue())
+        );
+        animator.start();
     }
 
     public static void showAsMultiline(Snackbar snackbar) {

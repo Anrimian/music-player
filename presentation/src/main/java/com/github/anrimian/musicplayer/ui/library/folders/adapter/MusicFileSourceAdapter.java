@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSou
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.endless_scrolling.HeaderFooterRecyclerViewAdapter;
 
@@ -25,7 +26,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
     private static final int TYPE_FILE = 2;
 
     private List<FileSource> musicList;
-    private OnItemClickListener<Composition> onCompositionClickListener;
+    private OnPositionItemClickListener<Composition> onCompositionClickListener;
     private OnItemClickListener<String> onFolderClickListener;
     private OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener;
     private OnViewItemClickListener<Composition> onCompositionMenuItemClicked;
@@ -42,8 +43,8 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
                 return new MusicViewHolder(inflater,
                         parent,
                         onCompositionClickListener,
-                        null,
-                        onCompositionMenuItemClicked);
+                        onCompositionMenuItemClicked,
+                        null);
             }
             case TYPE_FILE: {
                 return new FolderViewHolder(inflater,
@@ -93,7 +94,7 @@ public class MusicFileSourceAdapter extends HeaderFooterRecyclerViewAdapter {
         this.musicList = musicList;
     }
 
-    public void setOnCompositionClickListener(OnItemClickListener<Composition> onCompositionClickListener) {
+    public void setOnCompositionClickListener(OnPositionItemClickListener<Composition> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 

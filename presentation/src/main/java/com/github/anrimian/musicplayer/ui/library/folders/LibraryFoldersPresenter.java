@@ -100,7 +100,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         loadMusic();
     }
 
-    void onCompositionClicked(Composition composition) {
+    void onCompositionClicked(int position, Composition composition) {
         interactor.playMusic(path, composition);
     }
 
