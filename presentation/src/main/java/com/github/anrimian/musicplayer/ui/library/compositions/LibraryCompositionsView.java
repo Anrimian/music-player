@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.library.compositions;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
@@ -11,7 +12,9 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public interface LibraryCompositionsView extends MvpView {
 
@@ -30,7 +33,7 @@ public interface LibraryCompositionsView extends MvpView {
     void showLoading();
 
     @StateStrategyType(AddToStartSingleStrategy.class)
-    void updateList(ListUpdate<Composition> update);
+    void updateList(ListUpdate<Composition> update, HashSet<Composition> selectedCompositionsMap);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order folderOrder);
@@ -52,4 +55,13 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
+
+    @StateStrategyType(SkipStrategy.class)
+    void onCompositionSelected(Composition composition, int position);
+
+    @StateStrategyType(SkipStrategy.class)
+    void onCompositionUnselected(Composition composition, int position);
+
+    @StateStrategyType(SkipStrategy.class)
+    void clearSelectedItems();
 }

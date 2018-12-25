@@ -41,6 +41,11 @@ public class SwipeToDeleteTouchHelperCallback extends ItemTouchHelper.SimpleCall
     }
 
     @Override
+    public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+        return 0.33f;
+    }
+
+    @Override
     public void onChildDraw(@NonNull Canvas c,
                             @NonNull RecyclerView recyclerView,
                             @NonNull RecyclerView.ViewHolder viewHolder,

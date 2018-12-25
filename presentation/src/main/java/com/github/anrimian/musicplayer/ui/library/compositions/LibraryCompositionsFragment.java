@@ -21,13 +21,18 @@ import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
+import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicViewHolder;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,7 +49,7 @@ import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
-public class LibraryCompositionsFragment extends LibraryFragment implements LibraryCompositionsView {
+public class LibraryCompositionsFragment extends LibraryFragment implements LibraryCompositionsView, BackButtonListener {
 
     @InjectPresenter
     LibraryCompositionsPresenter presenter;
@@ -133,9 +138,13 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
+    public boolean onBackPressed() {
+        return presenter.onBackPressed();
+    }
+
+    @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.hideAll();
         progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
     }
 
@@ -157,17 +166,34 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
-    public void updateList(ListUpdate<Composition> update) {
+    public void updateList(ListUpdate<Composition> update,
+                           HashSet<Composition> selectedCompositionsMap) {
         List<Composition> list = update.getNewList();
         if (adapter == null) {
-            adapter = new CompositionsAdapter(list);
+            adapter = new CompositionsAdapter(list, selectedCompositionsMap);
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
             adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
+            adapter.setOnLongClickListener(presenter::onCompositionLongClick);
             recyclerView.setAdapter(adapter);
         } else {
             adapter.setItems(list);
             DiffUtilHelper.update(update.getDiffResult(), recyclerView);
         }
+    }
+
+    @Override
+    public void onCompositionSelected(Composition composition, int position) {
+        adapter.setItemSelected(position);
+    }
+
+    @Override
+    public void onCompositionUnselected(Composition composition, int position) {
+        adapter.setItemUnselected(position);
+    }
+
+    @Override
+    public void clearSelectedItems() {
+        adapter.clearSelectedItems();
     }
 
     @Override

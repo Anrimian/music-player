@@ -1,16 +1,19 @@
 package com.github.anrimian.musicplayer.ui.library.compositions.adapter;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicViewHolder;
-import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created on 31.10.2017.
@@ -18,12 +21,21 @@ import java.util.List;
 
 public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
-    private List<Composition> musicList;
-    private OnItemClickListener<Integer> onCompositionClickListener;
-    private OnViewItemClickListener<Composition> onMenuItemClickListener;
+    private static final Object ITEM_SELECTED = new Object();
+    private static final Object ITEM_UNSELECTED = new Object();
 
-    public CompositionsAdapter(List<Composition> musicList) {
+    private final Set<MusicViewHolder> viewHolders = new HashSet<>();
+
+    private List<Composition> musicList;
+    private final HashSet<Composition> selectedCompositions;
+    private OnPositionItemClickListener<Composition> onCompositionClickListener;
+    private OnViewItemClickListener<Composition> onMenuItemClickListener;
+    private OnPositionItemClickListener<Composition> onLongClickListener;
+
+    public CompositionsAdapter(List<Composition> musicList,
+                               HashSet<Composition> selectedCompositions) {
         this.musicList = musicList;
+        this.selectedCompositions = selectedCompositions;
     }
 
     @NonNull
@@ -31,15 +43,39 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
-                null,
                 onCompositionClickListener,
-                onMenuItemClickListener);
+                onMenuItemClickListener,
+                onLongClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MusicViewHolder holder, int position) {
+        viewHolders.add(holder);
+
         Composition composition = musicList.get(position);
         holder.bind(composition);
+        boolean selected = selectedCompositions.contains(composition);
+        holder.setSelected(selected);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MusicViewHolder holder,
+                                 int position,
+                                 @NonNull List<Object> payloads) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads);
+            return;
+        }
+        for (Object payload: payloads) {
+            if (payload == ITEM_SELECTED) {
+                holder.setSelected(true);
+                return;
+            }
+            if (payload == ITEM_UNSELECTED) {
+                holder.setSelected(false);
+                return;
+            }
+        }
     }
 
     @Override
@@ -47,11 +83,31 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         return musicList.size();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull MusicViewHolder holder) {
+        super.onViewRecycled(holder);
+        viewHolders.remove(holder);
+    }
+
     public void setItems(List<Composition> list) {
         musicList = list;
     }
 
-    public void setOnCompositionClickListener(OnItemClickListener<Integer> onCompositionClickListener) {
+    public void setItemSelected(int position) {
+        notifyItemChanged(position, ITEM_SELECTED);
+    }
+
+    public void setItemUnselected(int position) {
+        notifyItemChanged(position, ITEM_UNSELECTED);
+    }
+
+    public void clearSelectedItems() {
+        for (MusicViewHolder holder: viewHolders) {
+            holder.setSelected(false);
+        }
+    }
+
+    public void setOnCompositionClickListener(OnPositionItemClickListener<Composition> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
@@ -59,4 +115,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.onMenuItemClickListener = onMenuItemClickListener;
     }
 
+    public void setOnLongClickListener(OnPositionItemClickListener<Composition> onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
+    }
 }

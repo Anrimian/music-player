@@ -15,8 +15,11 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.c
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 
@@ -25,7 +28,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 @InjectViewState
 public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositionsView> {
@@ -39,10 +41,11 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private Disposable compositionsDisposable;
 
     private List<Composition> compositions = new ArrayList<>();
+    private LinkedHashSet<Composition> selectedCompositions = new LinkedHashSet<>();
 
     private final DiffCalculator<Composition> diffCalculator = new DiffCalculator<>(
             () -> compositions,
-            CompositionHelper::areSourcesTheSame);
+            CompositionHelper::areSourcesTheSame);//TODO update calculator with onDelete feature
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
@@ -72,12 +75,26 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         presenterDisposable.dispose();
     }
 
-    void onCompositionClicked(int position) {
-        interactor.play(compositions, position);
+    void onCompositionClicked(int position, Composition composition) {
+        if (selectedCompositions.isEmpty()) {
+            interactor.play(compositions, position);
+        } else {
+            if (selectedCompositions.contains(composition)) {
+                selectedCompositions.remove(composition);
+                getViewState().onCompositionUnselected(composition, position);
+            } else {
+                selectedCompositions.add(composition);
+                getViewState().onCompositionSelected(composition, position);
+            }
+        }
     }
 
     void onPlayAllButtonClicked() {
-        interactor.play(compositions);
+        if (selectedCompositions.isEmpty()) {
+            interactor.play(compositions);
+        } else {
+            interactor.play(new ArrayList<>(selectedCompositions));
+        }
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
@@ -117,6 +134,20 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
             searchText = text;
             subscribeOnCompositions();
         }
+    }
+
+    void onCompositionLongClick(int position, Composition composition) {
+        selectedCompositions.add(composition);
+        getViewState().onCompositionSelected(composition, position);
+    }
+
+    boolean onBackPressed() {
+        if (selectedCompositions.isEmpty()) {
+            return false;
+        }
+        selectedCompositions.clear();
+        getViewState().clearSelectedItems();
+        return true;
     }
 
     private void deletePreparedCompositions() {
@@ -159,7 +190,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     private void onCompositionsReceived(ListUpdate<Composition> listUpdate) {
         compositions = listUpdate.getNewList();
-        getViewState().updateList(listUpdate);
+        getViewState().updateList(listUpdate, selectedCompositions);
         if (compositions.isEmpty()) {
             if (TextUtils.isEmpty(searchText)) {
                 getViewState().showEmptyList();
