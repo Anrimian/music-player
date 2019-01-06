@@ -170,13 +170,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 //        menu.clear();//what fix was it?
         inflater.inflate(R.menu.library_files_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
         orderMenuItem.setMenuItem(menu, R.id.menu_order);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

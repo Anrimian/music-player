@@ -122,14 +122,9 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.library_compositions_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
         searchMenuItem.setMenuItem(menu, R.id.menu_search);
         orderMenuItem.setMenuItem(menu, R.id.menu_order);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
