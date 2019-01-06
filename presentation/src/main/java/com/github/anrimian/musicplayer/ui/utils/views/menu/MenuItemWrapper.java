@@ -1,12 +1,17 @@
 package com.github.anrimian.musicplayer.ui.utils.views.menu;
 
+import android.view.Menu;
 import android.view.MenuItem;
 
+import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 
 import java.util.LinkedList;
 
 import javax.annotation.Nullable;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.MenuRes;
 
 public class MenuItemWrapper {
 
@@ -14,6 +19,12 @@ public class MenuItemWrapper {
     private MenuItem menuItem;
 
     private LinkedList<Callback<MenuItem>> deferredFunctions = new LinkedList<>();
+
+    public void setMenuItem(Menu menu, @IdRes int resId) {
+        MenuItem searchItem = menu.findItem(resId);
+        searchItem.setVisible(false);
+        setMenuItem(searchItem);
+    }
 
     public void setMenuItem(@Nullable MenuItem menuItem) {
         this.menuItem = menuItem;

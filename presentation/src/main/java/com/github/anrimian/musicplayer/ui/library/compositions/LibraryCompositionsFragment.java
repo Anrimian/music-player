@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.ui.library.compositions.adapter.Compositi
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicViewHolder;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
@@ -66,6 +67,9 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
+
+    private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
+    private final MenuItemWrapper searchMenuItem = new MenuItemWrapper();
 
     @ProvidePresenter
     LibraryCompositionsPresenter providePresenter() {
@@ -122,6 +126,13 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        searchMenuItem.setMenuItem(menu, R.id.menu_search);
+        orderMenuItem.setMenuItem(menu, R.id.menu_order);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
@@ -144,24 +155,32 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
     @Override
     public void showEmptyList() {
+        searchMenuItem.call(item -> item.setVisible(false));
+        orderMenuItem.call(item -> item.setVisible(false));
         fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
     }
 
     @Override
     public void showEmptySearchResult() {
+        searchMenuItem.call(item -> item.setVisible(true));
+        orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_for_search_not_found, false);
     }
 
     @Override
     public void showList() {
+        searchMenuItem.call(item -> item.setVisible(true));
+        orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(View.VISIBLE);
         progressViewWrapper.hideAll();
     }
 
     @Override
     public void showLoading() {
+        searchMenuItem.call(item -> item.setVisible(false));
+        orderMenuItem.call(item -> item.setVisible(false));
         progressViewWrapper.showProgress();
     }
 
