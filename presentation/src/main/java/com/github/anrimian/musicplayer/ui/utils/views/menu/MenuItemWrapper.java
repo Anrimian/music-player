@@ -21,9 +21,11 @@ public class MenuItemWrapper {
     private LinkedList<Callback<MenuItem>> deferredFunctions = new LinkedList<>();
 
     public void setMenuItem(Menu menu, @IdRes int resId) {
-        MenuItem searchItem = menu.findItem(resId);
-        searchItem.setVisible(false);
-        setMenuItem(searchItem);
+        if (menuItem == null) {
+            MenuItem searchItem = menu.findItem(resId);
+            searchItem.setVisible(false);
+            setMenuItem(searchItem);
+        }
     }
 
     public void setMenuItem(@Nullable MenuItem menuItem) {
