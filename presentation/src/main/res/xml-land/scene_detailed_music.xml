@@ -41,14 +41,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
-            android:id="@+id/sb_track_state"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <Constraint
             android:id="@+id/music_icon_wrapper"
             android:layout_width="50dp"
             android:layout_height="50dp"

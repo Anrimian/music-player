@@ -82,7 +82,6 @@
         style="@style/Content.Button"
         android:contentDescription="@string/content_description_shuffle"
         android:layout_marginBottom="@dimen/content_horizontal_margin"
-        android:layout_marginLeft="@dimen/bottom_sheet_content_margin"
         android:layout_marginStart="@dimen/bottom_sheet_content_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,7 +93,6 @@
         android:contentDescription="@string/content_description_repeat_mode"
         android:layout_marginBottom="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/bottom_sheet_content_margin"
-        android:layout_marginRight="@dimen/bottom_sheet_content_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_repeat" />

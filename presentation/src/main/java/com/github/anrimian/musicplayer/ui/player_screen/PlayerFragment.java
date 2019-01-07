@@ -83,6 +83,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
@@ -94,6 +95,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getResourceIdFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
@@ -325,6 +327,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void setViewStartState() {
         playQueueTitleContainer.setVisibility(INVISIBLE);
         titleContainer.setVisibility(INVISIBLE);
+        mlBottomSheet.setVisibility(INVISIBLE);
     }
 
     @Override
@@ -479,6 +482,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showCurrentQueueItem(PlayQueueItem item, int position) {
+        animateVisibility(mlBottomSheet, VISIBLE);
+
         Composition composition = item.getComposition();
         String compositionName = formatCompositionName(composition);
         tvCurrentComposition.setText(compositionName);
