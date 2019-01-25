@@ -303,7 +303,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         presenterDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
                 .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayQueueChanged));
+                .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError));
     }
 
     private void onPlayQueueChanged(ListUpdate<PlayQueueItem> update) {
@@ -320,6 +320,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 }
             }
         }
+    }
+
+    private void onPlayQueueReceivingError(Throwable throwable) {
+        errorParser.parseError(throwable);
+        getViewState().showMusicControls(false);
     }
 
     private void subscribeOnTrackPositionChanging() {

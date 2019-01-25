@@ -79,6 +79,10 @@
     <string name="now_playing_template">Сейчас проигрывает: %1$s. Открыть очередь воспроизведения.</string>
     <string name="play_all_in_folder">Проиграть всё в папке</string>
     <string name="delete_playlist">Удалить плейлист</string>
+    <string name="storage_timeout_error_message">Ошибка тайм-аута при загрузке музыки из системного носителя.
+        Это действительно странная и редкая ошибка.
+        Мы сталкивались с этим на некоторых устройствах Xiaomi.
+        Попробуйте перезагрузить телефон, возможно, это решит эту ошибку.</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

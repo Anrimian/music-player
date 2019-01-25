@@ -29,9 +29,13 @@ public class RxUtils {
     public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Creator<T> creator) {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
-                T value = creator.create();
-                if (value != null) {
-                    subject.onNext(value);
+                try {
+                    T value = creator.create();
+                    if (value != null) {
+                        subject.onNext(value);
+                    }
+                } catch (Exception e) {
+                    emitter.onError(e);
                 }
             }
         }).mergeWith(subject);
@@ -41,7 +45,7 @@ public class RxUtils {
     public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Single<T> creator) {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
-                creator.subscribe(subject::onNext);
+                creator.subscribe(subject::onNext, emitter::onError);
             }
         }).mergeWith(subject);
     }
@@ -50,7 +54,7 @@ public class RxUtils {
     public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Maybe<T> creator) {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
-                creator.subscribe(subject::onNext);
+                creator.subscribe(subject::onNext, emitter::onError);
             }
         }).mergeWith(subject);
     }

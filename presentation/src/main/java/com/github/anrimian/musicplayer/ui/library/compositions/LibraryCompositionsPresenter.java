@@ -45,7 +45,8 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     private final DiffCalculator<Composition> diffCalculator = new DiffCalculator<>(
             () -> compositions,
-            CompositionHelper::areSourcesTheSame);//TODO update calculator with onDelete feature
+            CompositionHelper::areSourcesTheSame,
+            selectedCompositions::remove);
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
@@ -73,6 +74,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     public void onDestroy() {
         super.onDestroy();
         presenterDisposable.dispose();
+    }
+
+    void onTryAgainLoadCompositionsClicked() {
+        subscribeOnCompositions();
     }
 
     void onCompositionClicked(int position, Composition composition) {
@@ -177,15 +182,20 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     private void subscribeOnCompositions() {
-        if (compositionsDisposable == null) {
+        if (compositions.isEmpty()) {
             getViewState().showLoading();
         }
         dispose(compositionsDisposable, presenterDisposable);
         compositionsDisposable = interactor.getCompositionsObservable(searchText)
                 .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
-                .subscribe(this::onCompositionsReceived);
+                .subscribe(this::onCompositionsReceived, this::onCompositionsReceivingError);
         presenterDisposable.add(compositionsDisposable);
+    }
+
+    private void onCompositionsReceivingError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showLoadingError(errorCommand);
     }
 
     private void onCompositionsReceived(ListUpdate<Composition> listUpdate) {

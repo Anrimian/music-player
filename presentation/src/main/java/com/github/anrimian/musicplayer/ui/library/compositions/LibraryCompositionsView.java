@@ -32,6 +32,9 @@ public interface LibraryCompositionsView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();
 
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
+    void showLoadingError(ErrorCommand errorCommand);
+
     @StateStrategyType(AddToStartSingleStrategy.class)
     void updateList(ListUpdate<Composition> update, HashSet<Composition> selectedCompositionsMap);
 
