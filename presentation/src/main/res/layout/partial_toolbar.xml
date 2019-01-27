@@ -98,6 +98,7 @@
                 android:importantForAutofill="no"
                 android:background="@android:color/transparent"
                 android:textColorHint="?android:attr/textColorSecondaryInverse"
+                android:maxLines="1"
                 tools:ignore="UnusedAttribute" />
 
             <androidx.constraintlayout.widget.ConstraintLayout

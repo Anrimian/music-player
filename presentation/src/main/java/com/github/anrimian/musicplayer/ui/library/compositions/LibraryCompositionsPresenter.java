@@ -76,6 +76,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         presenterDisposable.dispose();
     }
 
+    void onTryAgainLoadCompositionsClicked() {
+        subscribeOnCompositions();
+    }
+
     void onCompositionClicked(int position, Composition composition) {
         if (selectedCompositions.isEmpty()) {
             interactor.play(compositions, position);
@@ -193,15 +197,20 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     private void subscribeOnCompositions() {
-        if (compositionsDisposable == null) {
+        if (compositions.isEmpty()) {
             getViewState().showLoading();
         }
         dispose(compositionsDisposable, presenterDisposable);
         compositionsDisposable = interactor.getCompositionsObservable(searchText)
                 .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
-                .subscribe(this::onCompositionsReceived);
+                .subscribe(this::onCompositionsReceived, this::onCompositionsReceivingError);
         presenterDisposable.add(compositionsDisposable);
+    }
+
+    private void onCompositionsReceivingError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showLoadingError(errorCommand);
     }
 
     private void onCompositionsReceived(ListUpdate<Composition> listUpdate) {

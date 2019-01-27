@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateException;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -50,6 +51,9 @@ public class DefaultErrorParser implements ErrorParser {
         if (throwable instanceof NullPointerException) {
             logException(throwable);
             return new ErrorCommand(getString(R.string.internal_app_error));
+        }
+        if (throwable instanceof StorageTimeoutException) {
+            return new ErrorCommand(getString(R.string.storage_timeout_error_message));
         }
         logException(throwable);
         return new ErrorCommand(getString(R.string.unexpected_error));

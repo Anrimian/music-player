@@ -25,14 +25,14 @@ import androidx.core.content.ContextCompat;
 @SuppressWarnings("WeakerAccess")
 public class AndroidUtils {
 
-    public static int getColorFromAttr(Context ctx, int attributeId) {
-        int colorId = getResourceIdFromAttr(ctx, attributeId);
-        return ContextCompat.getColor(ctx, colorId);
-    }
-
     public static int dpToPx(int dp, Context ctx) {
         DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
+    public static int getColorFromAttr(Context ctx, int attributeId) {
+        int colorId = getResourceIdFromAttr(ctx, attributeId);
+        return ContextCompat.getColor(ctx, colorId);
     }
 
     public static Drawable getDrawableFromAttr(Context ctx, int attributeId) {

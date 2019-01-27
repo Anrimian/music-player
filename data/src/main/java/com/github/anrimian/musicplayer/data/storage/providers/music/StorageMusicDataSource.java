@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -24,6 +26,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.musicplayer.domain.Constants.TIMEOUTS.STORAGE_LOADING_TIMEOUT_SECONDS;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
 import static java.util.Collections.singletonList;
 
@@ -50,6 +53,8 @@ public class StorageMusicDataSource {
 
     public Single<Map<Long, Composition>> getCompositions() {
         return Single.fromCallable(this::getCompositionsMap)
+//                .delay(3, TimeUnit.SECONDS)//test timeout error
+                .timeout(STORAGE_LOADING_TIMEOUT_SECONDS, TimeUnit.SECONDS, Single.error(new StorageTimeoutException()))
                 .subscribeOn(scheduler);
     }
 
@@ -89,7 +94,7 @@ public class StorageMusicDataSource {
                     compositionSubject.onNext(compositions);
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToDelete));
                 })
-                .toCompletable()
+                .ignoreElement()
                 .subscribeOn(scheduler);
     }
 
@@ -100,7 +105,7 @@ public class StorageMusicDataSource {
                     compositionSubject.onNext(compositions);
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
                 })
-                .toCompletable()
+                .ignoreElement()
                 .subscribeOn(scheduler);
     }
 

@@ -103,6 +103,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
                 this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
+        progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainLoadCompositionsClicked());
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -188,6 +189,13 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         searchMenuItem.call(item -> item.setVisible(false));
         orderMenuItem.call(item -> item.setVisible(false));
         progressViewWrapper.showProgress();
+    }
+
+    @Override
+    public void showLoadingError(ErrorCommand errorCommand) {
+        searchMenuItem.call(item -> item.setVisible(false));
+        orderMenuItem.call(item -> item.setVisible(false));
+        progressViewWrapper.showMessage(errorCommand.getMessage(), true);
     }
 
     @Override
