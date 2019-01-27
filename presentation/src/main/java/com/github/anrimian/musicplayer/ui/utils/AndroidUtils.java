@@ -3,13 +3,17 @@ package com.github.anrimian.musicplayer.ui.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DimenRes;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -94,5 +98,11 @@ public class AndroidUtils {
             }
         }
         return null;
+    }
+
+    public static void setStatusBarColor(Window window, @ColorInt int color) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            window.setStatusBarColor(color);
+        }
     }
 }

@@ -21,19 +21,18 @@ import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
-import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicViewHolder;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +46,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
+import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFiles;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -99,6 +99,8 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         toolbar.setSubtitle(R.string.compositions);
         toolbar.setTextChangeListener(presenter::onSearchTextChanged);
         toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
+        toolbar.setUpSelectionModeMenu(R.menu.library_compositions_selection_menu,
+                this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
 
@@ -118,6 +120,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -145,7 +148,15 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
     @Override
     public boolean onBackPressed() {
-        return presenter.onBackPressed();
+        if (toolbar.isInSelectionMode()) {
+            presenter.onSelectionModeBackPressed();
+            return true;
+        }
+        if (toolbar.isInSearchMode()) {
+            toolbar.setSearchModeEnabled(false);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -211,6 +222,11 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
+    public void showSelectionMode(int count) {
+        toolbar.showSelectionMode(count);
+    }
+
+    @Override
     public void showAddingToPlayListError(ErrorCommand errorCommand) {
         Snackbar.make(clListContainer,
                 getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
@@ -257,6 +273,29 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
         String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
         Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void shareCompositions(Collection<Composition> selectedCompositions) {
+        DialogUtils.shareCompositions(requireContext(), selectedCompositions);
+    }
+
+    private boolean onActionModeItemClicked(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_add_to_playlist: {
+                presenter.onAddSelectedCompositionToPlayListClicked();
+                return true;
+            }
+            case R.id.menu_share: {
+                presenter.onShareSelectedCompositionsClicked();
+                return true;
+            }
+            case R.id.menu_delete: {
+                presenter.onDeleteSelectedCompositionButtonClicked();
+                return true;
+            }
+        }
+        return false;
     }
 
     private void onCompositionMenuClicked(View view, Composition composition) {

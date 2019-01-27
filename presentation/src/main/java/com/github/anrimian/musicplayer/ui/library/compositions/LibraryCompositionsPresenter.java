@@ -41,11 +41,12 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private Disposable compositionsDisposable;
 
     private List<Composition> compositions = new ArrayList<>();
-    private LinkedHashSet<Composition> selectedCompositions = new LinkedHashSet<>();
+    private final LinkedHashSet<Composition> selectedCompositions = new LinkedHashSet<>();
 
     private final DiffCalculator<Composition> diffCalculator = new DiffCalculator<>(
             () -> compositions,
-            CompositionHelper::areSourcesTheSame);//TODO update calculator with onDelete feature
+            CompositionHelper::areSourcesTheSame,
+            selectedCompositions::remove);
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
@@ -86,6 +87,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
                 selectedCompositions.add(composition);
                 getViewState().onCompositionSelected(composition, position);
             }
+            getViewState().showSelectionMode(selectedCompositions.size());
         }
     }
 
@@ -100,6 +102,12 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     void onDeleteCompositionButtonClicked(Composition composition) {
         compositionsToDelete.clear();
         compositionsToDelete.add(composition);
+        getViewState().showConfirmDeleteDialog(compositionsToDelete);
+    }
+
+    void onDeleteSelectedCompositionButtonClicked() {
+        compositionsToDelete.clear();
+        compositionsToDelete.addAll(selectedCompositions);
         getViewState().showConfirmDeleteDialog(compositionsToDelete);
     }
 
@@ -122,6 +130,12 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         getViewState().showSelectPlayListDialog();
     }
 
+    void onAddSelectedCompositionToPlayListClicked() {
+        compositionsForPlayList.clear();
+        compositionsForPlayList.addAll(selectedCompositions);
+        getViewState().showSelectPlayListDialog();
+    }
+
     void onPlayListToAddingSelected(PlayList playList) {
         playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
                 .observeOn(uiScheduler)
@@ -138,16 +152,18 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     void onCompositionLongClick(int position, Composition composition) {
         selectedCompositions.add(composition);
+        getViewState().showSelectionMode(selectedCompositions.size());
         getViewState().onCompositionSelected(composition, position);
     }
 
-    boolean onBackPressed() {
-        if (selectedCompositions.isEmpty()) {
-            return false;
-        }
+    void onSelectionModeBackPressed() {
         selectedCompositions.clear();
+        getViewState().showSelectionMode(0);
         getViewState().clearSelectedItems();
-        return true;
+    }
+
+    void onShareSelectedCompositionsClicked() {
+        getViewState().shareCompositions(selectedCompositions);
     }
 
     private void deletePreparedCompositions() {

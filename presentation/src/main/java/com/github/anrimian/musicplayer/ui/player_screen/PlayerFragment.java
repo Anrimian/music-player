@@ -39,7 +39,7 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.DrawerArrowDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
@@ -252,7 +252,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
         MusicServiceManager.initialize();
 
-        toolbar.initializeViews();
+        toolbar.initializeViews(requireActivity().getWindow());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
 
         navigation = FragmentNavigation.from(getChildFragmentManager());
@@ -264,7 +264,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
         drawerLockStateProcessor.setupWithNavigation(navigation);
-        toolbar.setSearchModeListener(drawerLockStateProcessor::onSearchModeChanged);
+        toolbar.getSearchModeObservable().subscribe(drawerLockStateProcessor::onSearchModeChanged);
+        toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionodeChanged);
 
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
         navigationView.inflateHeaderView(R.layout.partial_drawer_header);
@@ -333,8 +334,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            if (drawer.getDrawerLockMode(GravityCompat.START) != LOCK_MODE_LOCKED_CLOSED
-                    && !toolbar.isInSearchMode()) {
+            if (drawer.getDrawerLockMode(GravityCompat.START) != LOCK_MODE_LOCKED_CLOSED) {
                 drawer.openDrawer(GravityCompat.START);
             } else {
                 onBackPressed();
@@ -365,10 +365,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-            return true;
-        }
-        if (toolbar.isInSearchMode()) {
-            toolbar.setSearchModeEnabled(false);
             return true;
         }
 
@@ -780,9 +776,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRepeatMode)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
-                .addDelegate(new DrawerArrowDelegate(
-                        drawerArrowDrawable,
-                        () -> navigation.getScreensCount() > 1 || toolbar.isInSearchMode()))
+                .addDelegate(new ToolbarDelegate(navigation, toolbar, requireActivity().getWindow()))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
         DelegateManager delegateManager = new DelegateManager();

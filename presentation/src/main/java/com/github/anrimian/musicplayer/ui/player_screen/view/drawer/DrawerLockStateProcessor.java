@@ -15,6 +15,7 @@ public class DrawerLockStateProcessor {
     private boolean openedBottomSheet = false;
     private boolean inRoot = true;
     private boolean isInSearchMode = false;
+    private boolean isInSelectionMode = false;
 
     private final FragmentStackListener stackChangeListener = new StackChangeListenerImpl();
 
@@ -36,25 +37,30 @@ public class DrawerLockStateProcessor {
 
     public void onSearchModeChanged(boolean isInSearchMode) {
         this.isInSearchMode = isInSearchMode;
-        updateDrawerState();
+        updateDrawerLockState();
     }
 
     public void onBottomSheetOpened(boolean openedBottomSheet) {
         this.openedBottomSheet = openedBottomSheet;
-        updateDrawerState();
+        updateDrawerLockState();
+    }
+
+    public void onSelectionodeChanged(boolean isInSelection) {
+        this.isInSelectionMode = isInSelection;
+        updateDrawerLockState();
     }
 
     private void setOnRootNavigationState(boolean inRoot) {
         this.inRoot = inRoot;
-        updateDrawerState();
+        updateDrawerLockState();
     }
 
     private void onFragmentStackChanged(int stackSize) {
         setOnRootNavigationState(stackSize <= 1);
     }
 
-    private void updateDrawerState() {
-        boolean lock = openedBottomSheet || !inRoot || isInSearchMode;
+    private void updateDrawerLockState() {
+        boolean lock = openedBottomSheet || !inRoot || isInSearchMode || isInSelectionMode;
         drawer.setDrawerLockMode(lock? LOCK_MODE_LOCKED_CLOSED: LOCK_MODE_UNLOCKED);
     }
 

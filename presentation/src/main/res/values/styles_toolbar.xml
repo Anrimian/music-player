@@ -20,10 +20,20 @@
         <item name="editTextColor">?android:attr/textColorPrimaryInverse</item>
     </style>
 
+    <style name="ToolbarStyle.Selection">
+        <item name="colorControlNormal">?android:attr/textColorPrimary</item>
+        <item name="android:editTextColor">?android:attr/textColorPrimary</item>
+        <item name="editTextColor">?android:attr/textColorPrimary</item>
+    </style>
+
     <style name="ToolbarTitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="ToolbarTitleStyle.Selection">
+        <item name="android:textColor">@color/secondary_button_color</item>
     </style>
 
     <style name="ToolbarSubtitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">

@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
@@ -12,7 +13,9 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -64,4 +67,10 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void clearSelectedItems();
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showSelectionMode(int count);
+
+    @StateStrategyType(SkipStrategy.class)
+    void shareCompositions(Collection<Composition> selectedCompositions);
 }

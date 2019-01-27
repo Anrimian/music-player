@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import androidx.core.content.FileProvider;
@@ -70,15 +71,29 @@ public class DialogUtils {
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.share)));
     }
 
-    public static void shareFiles(Context context, List<String> filePaths) {
-        Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-        intent.setType("audio/*");
+    public static void shareCompositions(Context context, Collection<Composition> filePaths) {
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (Composition composition : filePaths) {
+            uris.add(FileProvider.getUriForFile(context,
+                    context.getString(R.string.file_provider_authorities),
+                    new File(composition.getFilePath())));
+        }
+        shareFiles(context, uris);
+    }
+
+    public static void shareFiles(Context context, Collection<String> filePaths) {
         ArrayList<Uri> uris = new ArrayList<>();
         for (String path : filePaths) {
             uris.add(FileProvider.getUriForFile(context,
                     context.getString(R.string.file_provider_authorities),
                     new File(path)));
         }
+        shareFiles(context, uris);
+    }
+
+    public static void shareFiles(Context context, ArrayList<Uri> uris) {
+        Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        intent.setType("audio/*");
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -86,8 +101,8 @@ public class DialogUtils {
         sbTitle.append(" (");
         sbTitle.append(context.getResources().getQuantityString(
                 R.plurals.files_count,
-                filePaths.size(),
-                filePaths.size()));
+                uris.size(),
+                uris.size()));
         sbTitle.append(")");
 
         context.startActivity(Intent.createChooser(intent, sbTitle.toString()));

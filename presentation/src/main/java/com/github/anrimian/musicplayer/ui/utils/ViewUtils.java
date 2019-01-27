@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -14,14 +13,15 @@ import android.graphics.drawable.Drawable;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
 
-import android.renderscript.Sampler;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +31,9 @@ import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
 
+import static android.view.View.VISIBLE;
 import static androidx.core.view.ViewCompat.isLaidOut;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class ViewUtils {
 
@@ -45,20 +47,37 @@ public class ViewUtils {
 
     public static void animateVisibility(View view, int visibility) {
         if ((view.getAlpha() == 1f || view.getAlpha() == 0f) && view.getVisibility() != visibility) {
-            view.animate()
-                    .alpha(visibility == View.VISIBLE ? 1f : 0f)
-                    .setDuration(visibility == View.VISIBLE ? 150: 120)
-                    .setInterpolator(visibility == View.VISIBLE ? new DecelerateInterpolator(): new AccelerateInterpolator())
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            view.clearAnimation();
-                            view.setVisibility(visibility);
-                        }
-                    })
-                    .start();
+            Animator animator = getVisibilityAnimator(view, visibility);
+            animator.setDuration(visibility == VISIBLE ? 150: 120);
+            animator.setInterpolator(visibility == VISIBLE ? new DecelerateInterpolator(): new AccelerateInterpolator());
+            animator.start();
         }
+    }
+
+    public static Animator getVisibilityAnimator(View view, int visibility) {
+        float currentVisibility = view.getVisibility() == VISIBLE? 1f: 0f;
+        float targetVisibility = visibility == VISIBLE ? 1f : 0f;
+        ValueAnimator animator = ObjectAnimator.ofFloat(view, "alpha", currentVisibility, targetVisibility);
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                if (visibility == VISIBLE) {
+                    view.setAlpha(currentVisibility);
+                    view.setVisibility(VISIBLE);
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.clearAnimation();
+                if (visibility != VISIBLE) {
+                    view.setVisibility(visibility);
+                }
+            }
+        });
+        return animator;
     }
 
     public static void animateColor(@ColorInt int from,
@@ -70,6 +89,56 @@ public class ViewUtils {
                 onAnimate.call((Integer) animation.getAnimatedValue())
         );
         animator.start();
+    }
+
+    public static Animator getBackgroundAnimatorAttr(View view,
+                                                 @AttrRes int from,
+                                                 @AttrRes int to) {
+        ValueAnimator animator = getAttrColorAnimator(view.getContext(), from, to);
+        animator.addUpdateListener(animation ->
+                view.setBackgroundColor((Integer) animation.getAnimatedValue())
+        );
+        return animator;
+    }
+
+    public static Animator getBackgroundAnimator(View view,
+                                                 @ColorInt int from,
+                                                 @ColorInt int to) {
+        ValueAnimator animator = ValueAnimator.ofArgb(from, to);
+        animator.addUpdateListener(animation ->
+                view.setBackgroundColor((Integer) animation.getAnimatedValue())
+        );
+        return animator;
+    }
+
+
+    public static ValueAnimator getColorAnimator(@ColorInt int from,
+                                                 @ColorInt int to,
+                                                 Callback<Integer> onAnimate) {
+        ValueAnimator animator = ValueAnimator.ofArgb(from, to);
+        animator.addUpdateListener(animation ->
+                onAnimate.call((Integer) animation.getAnimatedValue())
+        );
+        return animator;
+    }
+
+    public static ValueAnimator getAttrColorAnimator(Context context,
+                                                     @AttrRes int from,
+                                                     @AttrRes int to,
+                                                     Callback<Integer> onAnimate) {
+        ValueAnimator animator = getAttrColorAnimator(context, from, to);
+        animator.addUpdateListener(animation ->
+                onAnimate.call((Integer) animation.getAnimatedValue())
+        );
+        return animator;
+    }
+
+    public static ValueAnimator getAttrColorAnimator(Context context,
+                                                     @AttrRes int from,
+                                                     @AttrRes int to) {
+        int fromColor = getColorFromAttr(context, from);
+        int toColor = getColorFromAttr(context, to);
+        return ValueAnimator.ofArgb(fromColor, toColor);
     }
 
     public static void showAsMultiline(Snackbar snackbar) {
