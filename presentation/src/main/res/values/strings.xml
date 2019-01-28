@@ -80,10 +80,11 @@
     <string name="now_playing_template">Now playing: %1$s. Open play queue.</string>
     <string name="play_all_in_folder">Play all in folder</string>
     <string name="delete_playlist">Delete playlist</string>
-    <string name="storage_timeout_error_message">Timeout error with loading music from system media storage.
-        This is really weird and rare error.
-        We faced that on some Xiaomi devices.
-        Try reload your phone, maybe it solve that error.</string>
+    <string name="storage_timeout_error_message">
+        Device media storage is not responding.
+         This is a really strange and rare mistake.
+         Try to reboot the device, perhaps it will solve this problem.
+    </string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

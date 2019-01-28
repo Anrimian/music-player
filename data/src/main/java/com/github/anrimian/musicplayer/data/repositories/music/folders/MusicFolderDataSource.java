@@ -5,12 +5,14 @@ import com.github.anrimian.musicplayer.data.utils.FileUtils;
 import com.github.anrimian.musicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -18,6 +20,7 @@ import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.musicplayer.data.utils.FileUtils.getParentDirPath;
+import static com.github.anrimian.musicplayer.domain.Constants.TIMEOUTS.STORAGE_LOADING_TIMEOUT_SECONDS;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static io.reactivex.Observable.fromIterable;
 
@@ -38,6 +41,8 @@ public class MusicFolderDataSource {
 
     public Single<Folder> getCompositionsInPath(@Nullable String path) {
         return getMusicFileTree()
+//                .delay(3, TimeUnit.SECONDS)//test timeout error
+                .timeout(STORAGE_LOADING_TIMEOUT_SECONDS, TimeUnit.SECONDS, Single.error(new StorageTimeoutException()))
                 .map(tree -> getFolderInPath(path));
     }
 
