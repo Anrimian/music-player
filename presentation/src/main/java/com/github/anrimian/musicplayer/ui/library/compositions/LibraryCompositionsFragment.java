@@ -31,7 +31,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -149,7 +148,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
     @Override
     public boolean onBackPressed() {
-        if (toolbar.isInSelectionMode()) {
+        if (toolbar.isInActionMode()) {
             presenter.onSelectionModeBackPressed();
             return true;
         }
@@ -250,7 +249,9 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
     @Override
     public void showSelectPlayListDialog() {
-        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
+        ChoosePlayListDialogFragment dialog = toolbar.isInActionMode()?
+                ChoosePlayListDialogFragment.newInstance(R.attr.actionModeStatusBarColor)
+                : new ChoosePlayListDialogFragment();
         dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         dialog.show(getChildFragmentManager(), null);
     }

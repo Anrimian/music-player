@@ -15,9 +15,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.c
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 
 public interface LibraryCompositionsView extends MvpView {
 
