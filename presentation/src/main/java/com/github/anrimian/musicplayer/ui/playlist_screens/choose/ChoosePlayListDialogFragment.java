@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.choose;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,10 +39,12 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -50,6 +53,7 @@ import butterknife.ButterKnife;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static androidx.core.content.ContextCompat.getColor;
+import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getContentView;
@@ -90,6 +94,14 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     private PlayListsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
     private SlideDelegate slideDelegate;
+
+    public static ChoosePlayListDialogFragment newInstance(@AttrRes int statusBarColorAttr) {
+        Bundle args = new Bundle();
+        args.putInt(STATUS_BAR_COLOR_ATTR_ARG, statusBarColorAttr);
+        ChoosePlayListDialogFragment fragment = new ChoosePlayListDialogFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @ProvidePresenter
     ChoosePlayListPresenter providePresenter() {
@@ -287,9 +299,21 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
                 .addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegate))
                 .addDelegate(new BoundValuesDelegate(0.85f, 1f,
                                 new StatusBarColorDelegate(getActivity().getWindow(),
-                                        getColorFromAttr(getContext(), android.R.attr.statusBarColor),
+                                        getColorFromAttr(getContext(), getStatusBarColorAttr()),
                                         getColor(getContext(), R.color.colorPrimaryDarkSecondary))
                         )
                 );
+    }
+
+    @AttrRes
+    private int getStatusBarColorAttr() {
+        Bundle args = getArguments();
+        if (args != null) {
+            int colorAttr = args.getInt(STATUS_BAR_COLOR_ATTR_ARG);
+            if (colorAttr != 0) {
+                return colorAttr;
+            }
+        }
+        return android.R.attr.statusBarColor;
     }
 }

@@ -15,11 +15,9 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.c
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 

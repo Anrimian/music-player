@@ -41,7 +41,7 @@ public class ToolbarMenuVisibilityDelegate implements SlideDelegate {
     }
 
     private void makeVisible(float slideOffset) {
-        if (toolbar.isInSelectionMode()) {
+        if (toolbar.isInActionMode()) {
             int startColor = getColorFromAttr(toolbar.getContext(), R.attr.colorPrimary);
             int endColor = getColorFromAttr(toolbar.getContext(), android.R.attr.windowBackground);
             ArgbEvaluator argbEvaluator = new ArgbEvaluator();

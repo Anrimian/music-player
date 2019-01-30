@@ -270,7 +270,7 @@ public class AdvancedToolbar extends FrameLayout {
         return inSearchMode;
     }
 
-    public boolean isInSelectionMode() {
+    public boolean isInActionMode() {
         return inSelectionMode;
     }
 

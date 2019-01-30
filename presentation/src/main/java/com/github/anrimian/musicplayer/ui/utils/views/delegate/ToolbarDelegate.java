@@ -35,10 +35,10 @@ public class ToolbarDelegate implements SlideDelegate {
     public void onSlide(float slideOffset) {
         if (!(navigation.getScreensCount() > 1
                 || toolbar.isInSearchMode()
-                || toolbar.isInSelectionMode())) {
+                || toolbar.isInActionMode())) {
             toolbar.setControlButtonProgress(slideOffset);
         }
-        if (toolbar.isInSelectionMode()) {
+        if (toolbar.isInActionMode()) {
             int startColor = getColorFromAttr(toolbar.getContext(), R.attr.actionModeTextColor);
             int endColor = getColorFromAttr(toolbar.getContext(), android.R.attr.textColorPrimaryInverse);
             ArgbEvaluator argbEvaluator = new ArgbEvaluator();
