@@ -12,25 +12,35 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.images.ImageCache;
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 
+import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class ImageFormatUtils {
 
+    private static final WeakHashMap<ImageView, Disposable> imageLoadingMap = new WeakHashMap<>();
+
     public static void displayImage(@NonNull ImageView imageView,
                                     @NonNull Composition composition) {
         imageView.setImageResource(R.drawable.ic_music_placeholder);
-        Single.fromCallable(() -> getCompositionImageOrThrow(composition))
+        Disposable disposable = imageLoadingMap.get(imageView);
+        if (disposable != null) {
+            disposable.dispose();
+        }
+        disposable = Single.fromCallable(() -> getCompositionImageOrThrow(composition))
                 .timeout(5, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageView::setImageBitmap,
                         t -> imageView.setImageResource(R.drawable.ic_music_placeholder));
+        imageLoadingMap.put(imageView, disposable);
     }
 
     @Nonnull
