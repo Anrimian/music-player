@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Music Player</string>
     <string name="open_drawer">Открыть боковое меню</string>
     <string name="close_drawer">Закрыть блоковое меню</string>
     <string name="useless_image">Ничего не значащая картинка</string>

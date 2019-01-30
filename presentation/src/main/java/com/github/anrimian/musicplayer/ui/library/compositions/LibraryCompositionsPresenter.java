@@ -98,6 +98,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
             interactor.play(compositions);
         } else {
             interactor.play(new ArrayList<>(selectedCompositions));
+            closeSelectionMode();
         }
     }
 
@@ -159,13 +160,17 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     void onSelectionModeBackPressed() {
-        selectedCompositions.clear();
-        getViewState().showSelectionMode(0);
-        getViewState().clearSelectedItems();
+        closeSelectionMode();
     }
 
     void onShareSelectedCompositionsClicked() {
         getViewState().shareCompositions(selectedCompositions);
+    }
+
+    private void closeSelectionMode() {
+        selectedCompositions.clear();
+        getViewState().showSelectionMode(0);
+        getViewState().clearSelectedItems();
     }
 
     private void deletePreparedCompositions() {
@@ -177,6 +182,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private void onDeleteCompositionsSuccess() {
         getViewState().showDeleteCompositionMessage(compositionsToDelete);
         compositionsToDelete.clear();
+
+        if (!selectedCompositions.isEmpty()) {
+            closeSelectionMode();
+        }
     }
 
     private void onDeleteCompositionError(Throwable throwable) {
@@ -192,6 +201,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private void onAddingToPlayListCompleted(PlayList playList) {
         getViewState().showAddingToPlayListComplete(playList, compositionsForPlayList);
         compositionsForPlayList.clear();
+
+        if (!selectedCompositions.isEmpty()) {
+            closeSelectionMode();
+        }
     }
 
     private void subscribeOnCompositions() {
