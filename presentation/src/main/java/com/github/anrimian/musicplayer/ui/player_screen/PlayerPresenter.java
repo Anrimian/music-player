@@ -23,6 +23,7 @@ import java.util.List;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static com.github.anrimian.musicplayer.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
@@ -50,6 +51,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
+
+    private int currentPosition = NO_POSITION;
 
     private boolean scrollToPositionAfterUpdate = false;
     private boolean jumpToNewItem = true;
@@ -274,9 +277,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
-                getViewState().showCurrentQueueItem(newItem, position);
-                getViewState().scrollQueueToPosition(position, !jumpToNewItem);
-                jumpToNewItem = false;
+                getViewState().showCurrentQueueItem(newItem, position, currentPosition);
+                scrollToItemPosition(position);
             }
         }
     }
@@ -316,10 +318,19 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             if (currentItem != null) {
                 Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
                 if (position != null) {
-                    getViewState().scrollQueueToPosition(position, true);
+                    scrollToItemPosition(position);
                 }
             }
         }
+    }
+
+    private void scrollToItemPosition(int position) {
+        boolean fastScroll = Math.abs(position - currentPosition) > 1;
+
+        getViewState().scrollQueueToPosition(position, !jumpToNewItem && !fastScroll);
+        jumpToNewItem = false;
+
+        currentPosition = position;
     }
 
     private void onPlayQueueReceivingError(Throwable throwable) {

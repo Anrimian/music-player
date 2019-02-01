@@ -1,7 +1,10 @@
 package com.github.anrimian.musicplayer.ui.common.format.wrappers;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -9,6 +12,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -18,6 +22,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateColor;
 
 public class CompositionItemWrapper {
 
@@ -28,13 +33,17 @@ public class CompositionItemWrapper {
     TextView tvAdditionalInfo;
 
     @BindView(R.id.clickable_item)
-    View clickableItem;
+    FrameLayout clickableItem;
 
     @Nullable
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
+    private Drawable foregroundDrawable;
+
     private Composition composition;
+
+    private boolean isPlaying;
 
     public CompositionItemWrapper(View itemView) {
         ButterKnife.bind(this, itemView);
@@ -57,11 +66,21 @@ public class CompositionItemWrapper {
         }
     }
 
-    public void showAsPlayingComposition(boolean show) {
-        int alpha = show? 20: 0;
-        int color = setAlphaComponent(getColorFromAttr(getContext(), R.attr.colorPrimary), alpha);
-        clickableItem.setBackgroundColor(color);
-        clickableItem.setClickable(!show);
+//    public void showNumber(int number) {//good idea
+//        tvAdditionalInfo.setText(String.valueOf(number) +" ● " + tvAdditionalInfo.getText());
+//    }
+
+    public void showAsPlayingComposition(boolean isPlaying) {
+        if (this.isPlaying != isPlaying) {
+            this.isPlaying = isPlaying;
+            int unselectedColor = getSelectionColor(0);
+            int selectedColor = getSelectionColor(20);
+            int startColor = isPlaying ? unselectedColor : selectedColor;
+            int endColor = isPlaying ? selectedColor : unselectedColor;
+            animateColor(startColor, endColor, color -> clickableItem.setBackgroundColor(color));
+
+            clickableItem.setClickable(!isPlaying);
+        }
     }
 
     private void showAdditionalInfo() {
@@ -69,6 +88,11 @@ public class CompositionItemWrapper {
         sb.append(" ● ");//TODO split problem • ●
         sb.append(formatMilliseconds(composition.getDuration()));
         tvAdditionalInfo.setText(sb.toString());
+    }
+
+    @ColorInt
+    private int getSelectionColor(int alpha) {
+        return setAlphaComponent(getColorFromAttr(getContext(), R.attr.colorPrimary), alpha);
     }
 
     private Context getContext() {

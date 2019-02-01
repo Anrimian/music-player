@@ -67,6 +67,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
         this.playQueueItem = item;
         this.composition = item.getComposition();
         compositionItemWrapper.bind(composition);
+//        compositionItemWrapper.showNumber(getAdapterPosition());
     }
 
     void showAsPlayingComposition(boolean show) {

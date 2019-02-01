@@ -15,6 +15,8 @@ import javax.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.github.anrimian.musicplayer.Constants.NO_POSITION;
+
 /**
  * Created on 31.10.2017.
  */
@@ -32,8 +34,6 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
 
     @Nullable
     private PlayQueueItem currentItem;
-
-    private int oldPosition = RecyclerView.NO_POSITION;
 
     public PlayQueueAdapter(List<PlayQueueItem> musicList) {
         this.musicList = musicList;
@@ -78,25 +78,12 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         return musicList.size();
     }
 
-    public void onCurrentItemChanged(PlayQueueItem currentItem, int position) {
-        int oldPosition = getOldPosition();
-
+    public void onCurrentItemChanged(PlayQueueItem currentItem, int position, int oldPosition) {
         this.currentItem = currentItem;
-        if (oldPosition != -1) {
+        if (oldPosition != NO_POSITION) {
             notifyItemChanged(oldPosition, CURRENT_COMPOSITION_CHANGED);
         }
-        this.oldPosition = position;
         notifyItemChanged(position, CURRENT_COMPOSITION_CHANGED);
-    }
-
-    private int getOldPosition() {
-        if (oldPosition != -1
-                && oldPosition < musicList.size()
-                && currentItem != null
-                && currentItem.equals(musicList.get(oldPosition))) {
-            return oldPosition;
-        }
-        return musicList.indexOf(this.currentItem);
     }
 
     public void setItems(List<PlayQueueItem> list) {

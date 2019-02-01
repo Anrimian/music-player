@@ -39,7 +39,7 @@ public interface PlayerView extends MvpView {
     void showMusicControls(boolean show);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentQueueItem(PlayQueueItem item, int position);
+    void showCurrentQueueItem(PlayQueueItem item, int position, int oldPosition);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void scrollQueueToPosition(int position, boolean smoothScroll);

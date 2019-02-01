@@ -477,7 +477,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showCurrentQueueItem(PlayQueueItem item, int position) {
+    public void showCurrentQueueItem(PlayQueueItem item, int position, int oldPosition) {
         animateVisibility(mlBottomSheet, VISIBLE);
 
         Composition composition = item.getComposition();
@@ -490,7 +490,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         ImageFormatUtils.displayImage(ivMusicIcon, composition);
 
-        playQueueAdapter.onCurrentItemChanged(item, position);
+        playQueueAdapter.onCurrentItemChanged(item, position, oldPosition);
     }
 
     @Override
@@ -500,12 +500,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             return;
         }
 
+        boolean smooth = smoothScroll
+                || position == playQueueLayoutManager.findFirstVisibleItemPosition()
+                || position == playQueueLayoutManager.findLastVisibleItemPosition();
+
         rvPlayList.post(() -> {
-            if (smoothScroll) {
+            if (smooth) {
+                //TODO many fast scroll to top, to top, to top -> wrong position
                 RecyclerViewUtils.smoothScrollToTop(position,
                         playQueueLayoutManager,
                         requireContext(),
-                        200);
+                        170);
             } else {
                 playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
             }

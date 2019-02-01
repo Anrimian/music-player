@@ -30,7 +30,8 @@ public class RecyclerViewUtils {
                                          int duration) {
         RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(context) {
 
-            @Override protected int getVerticalSnapPreference() {
+            @Override
+            protected int getVerticalSnapPreference() {
                 return LinearSmoothScroller.SNAP_TO_START;
             }
 
