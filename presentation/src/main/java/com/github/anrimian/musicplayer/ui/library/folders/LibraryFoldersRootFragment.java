@@ -44,7 +44,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment implements BackB
         navigation.setExitAnimation(R.anim.anim_slide_out_right);
         navigation.setEnterAnimation(R.anim.anim_slide_in_right);
 
-        if (savedInstanceState == null) {
+        if (navigation.hasScreens()) {
             navigation.newRootFragment(() -> LibraryFoldersFragment.newInstance(null));
         }
     }

@@ -241,6 +241,15 @@ public class FragmentNavigation {
         return fragments.size();
     }
 
+    public int getStackScreensCount() {
+        int count = fragments.size() - 1;
+        return count < 0? 0: count;
+    }
+
+    public boolean hasScreens() {
+        return !fragments.isEmpty();
+    }
+
     @Nullable
     public Fragment getFragmentOnTop() {
         return fragmentManagerProvider.getFragmentManager()
