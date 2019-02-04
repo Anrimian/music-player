@@ -256,7 +256,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
 
         navigation = FragmentNavigation.from(getChildFragmentManager());
-        navigation.initialize(fragmentContainer);
+        navigation.initialize(fragmentContainer, savedInstanceState);
         navigation.checkForEqualityOnReplace(true);
         navigation.setExitAnimation(R.anim.anim_slide_out_right);
         navigation.setEnterAnimation(R.anim.anim_slide_in_right);
@@ -346,6 +346,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        navigation.onSaveInstanceState(outState);
         outState.putInt(SELECTED_DRAWER_ITEM, selectedDrawerItemId);
         outState.putInt(BOTTOM_SHEET_STATE, bottomSheetBehavior.getState());
     }

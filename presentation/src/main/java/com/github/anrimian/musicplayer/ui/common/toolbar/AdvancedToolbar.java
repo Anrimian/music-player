@@ -383,7 +383,7 @@ public class AdvancedToolbar extends FrameLayout {
         selectionModeSubject.onNext(enabled);
 
         boolean isHamburger = !enabled;
-        if (!enabled && inSearchMode) {
+        if ((!enabled && inSearchMode) || navigation.getScreensCount() > 1) {
             isHamburger = false;
         }
 

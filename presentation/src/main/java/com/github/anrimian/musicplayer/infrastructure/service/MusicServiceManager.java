@@ -31,6 +31,7 @@ public class MusicServiceManager {
         }
     }
 
+    //TODO don't observe, just call from interactor
     public MusicServiceManager(Context context, MusicPlayerInteractor musicPlayerInteractor) {
         this.context = context;
         this.musicPlayerInteractor = musicPlayerInteractor;
