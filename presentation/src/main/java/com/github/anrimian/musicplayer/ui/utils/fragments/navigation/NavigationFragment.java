@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.fragments.navigation;
 
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 

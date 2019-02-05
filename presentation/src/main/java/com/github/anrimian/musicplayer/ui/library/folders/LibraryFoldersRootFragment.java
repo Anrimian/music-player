@@ -40,13 +40,19 @@ public class LibraryFoldersRootFragment extends LibraryFragment implements BackB
         toolbar.setSubtitle(R.string.files);
 
         navigation = FragmentNavigation.from(getChildFragmentManager());
-        navigation.initialize(gvFoldersContainer);
+        navigation.initialize(gvFoldersContainer, savedInstanceState);
         navigation.setExitAnimation(R.anim.anim_slide_out_right);
         navigation.setEnterAnimation(R.anim.anim_slide_in_right);
 
-        if (navigation.getScreensCount() == 0) {//check how it solve problem with periodically white screen
+        if (navigation.hasScreens()) {
             navigation.newRootFragment(() -> LibraryFoldersFragment.newInstance(null));
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        navigation.onSaveInstanceState(outState);
     }
 
     @Override

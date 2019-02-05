@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.utils.java;
+package com.github.anrimian.musicplayer.domain.utils;
 
 /**
  * Created on 08.03.2018.

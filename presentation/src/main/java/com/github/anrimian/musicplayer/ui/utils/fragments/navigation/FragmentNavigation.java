@@ -1,10 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils.fragments.navigation;
 
 import android.content.res.Resources;
+import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
-import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +23,6 @@ public class FragmentNavigation {
     private final LinkedList<FragmentCreator> fragments = new LinkedList<>();
     private final List<FragmentStackListener> stackListeners = new LinkedList<>();
 
-    private final JugglerViewPresenter jugglerViewPresenter = new JugglerViewPresenter();
     private JugglerView jugglerView;
 
     private boolean isNavigationEnabled = true;
@@ -51,13 +49,16 @@ public class FragmentNavigation {
         this.fragmentManagerProvider = fragmentManagerProvider;
     }
 
-    public void initialize(@NonNull JugglerView jugglerView) {
-        this.jugglerView = Objects.requireNonNull(jugglerView);
-        jugglerView.setPresenter(jugglerViewPresenter);
-        jugglerViewPresenter.initializeView(jugglerView);
+    public void initialize(@NonNull JugglerView jugglerView, @Nullable Bundle savedState) {
+        this.jugglerView = jugglerView;
+        jugglerView.initialize(savedState);
 
         hideBottomFragmentMenu();
         notifyFragmentMovedToTop(getFragmentOnTop());
+    }
+
+    public void onSaveInstanceState(Bundle state) {
+        jugglerView.saveInstanceState(state);
     }
 
     public void addNewFragment(FragmentCreator fragmentCreator) {
@@ -131,7 +132,7 @@ public class FragmentNavigation {
         Fragment oldBottomFragment = getFragmentOnBottom();
         fragments.clear();
         fragments.add(fragmentCreator);
-        int topViewId = jugglerViewPresenter.getTopViewId();
+        int topViewId = jugglerView.getTopViewId();
         FragmentTransaction transaction = fragmentManagerProvider.getFragmentManager()
                 .beginTransaction();
         if (oldBottomFragment != null) {
@@ -240,16 +241,25 @@ public class FragmentNavigation {
         return fragments.size();
     }
 
+    public int getStackScreensCount() {
+        int count = fragments.size() - 1;
+        return count < 0? 0: count;
+    }
+
+    public boolean hasScreens() {
+        return !fragments.isEmpty();
+    }
+
     @Nullable
     public Fragment getFragmentOnTop() {
         return fragmentManagerProvider.getFragmentManager()
-                .findFragmentById(jugglerViewPresenter.getTopViewId());
+                .findFragmentById(jugglerView.getTopViewId());
     }
 
     @Nullable
     public Fragment getFragmentOnBottom() {
         return fragmentManagerProvider.getFragmentManager()
-                .findFragmentById(jugglerViewPresenter.getBottomViewId());
+                .findFragmentById(jugglerView.getBottomViewId());
     }
 
     private void notifyFragmentMovedToTop(Fragment fragment) {

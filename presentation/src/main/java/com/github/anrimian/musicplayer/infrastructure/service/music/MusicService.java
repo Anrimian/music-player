@@ -160,6 +160,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayerChanges() {
+        //TODO save state and observe only one element
         serviceDisposable.add(Observable.combineLatest(
                 musicPlayerInteractor.getPlayerStateObservable(),
                 getCurrentCompositionObservable(),
