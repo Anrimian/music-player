@@ -110,6 +110,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         return trackPositionSubject;
     }
 
+    @Override
+    public long getTrackPosition() {
+        return player.getCurrentPosition();
+    }
+
     private void onCompositionPrepared(Throwable throwable, long startPosition) {
         if (throwable == null) {
             seekTo(startPosition);

@@ -27,4 +27,6 @@ public interface SettingsRepository {
     Order getFolderOrder();
 
     Order getCompositionsOrder();
+
+    int getSkipConstraintSeconds();
 }

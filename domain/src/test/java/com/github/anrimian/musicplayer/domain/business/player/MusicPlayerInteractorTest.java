@@ -79,6 +79,7 @@ public class MusicPlayerInteractorTest {
         when(playQueueRepository.getCurrentQueueItemObservable())
                 .thenReturn(currentCompositionSubject);
         when(playQueueRepository.skipToNext()).thenReturn(Single.just(1));
+        when(playQueueRepository.skipToPrevious()).thenReturn(Single.just(1));
 
         when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
 
@@ -366,5 +367,27 @@ public class MusicPlayerInteractorTest {
 
         verify(musicPlayerController).stop();
         playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
+    }
+
+    @Test
+    public void skipToPreviousTest() {
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
+        inOrder.verify(musicPlayerController).resume();
+
+        when(settingsRepository.getSkipConstraintSeconds()).thenReturn(15);
+        when(musicPlayerController.getTrackPosition()).thenReturn(10L);
+
+        musicPlayerInteractor.skipToPrevious();
+
+        inOrder.verify(playQueueRepository).skipToPrevious();
+
+        when(settingsRepository.getSkipConstraintSeconds()).thenReturn(15);
+        when(musicPlayerController.getTrackPosition()).thenReturn(30L);
+
+        musicPlayerInteractor.skipToPrevious();
+
+        inOrder.verify(musicPlayerController).seekTo(0);
     }
 }

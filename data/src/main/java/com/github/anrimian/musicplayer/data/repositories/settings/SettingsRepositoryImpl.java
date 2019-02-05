@@ -65,4 +65,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public Order getCompositionsOrder() {
         return settingsPreferences.getCompositionsOrder();
     }
+
+    @Override
+    public int getSkipConstraintSeconds() {
+        return 15;//just 15 seconds. Reserved setting for future
+    }
 }

@@ -130,8 +130,13 @@ public class MusicPlayerInteractor {
     }
 
     public void skipToPrevious() {
+        if (musicPlayerController.getTrackPosition() > settingsRepository.getSkipConstraintSeconds()) {
+            musicPlayerController.seekTo(0);
+            return;
+        }
+
         if (skipDisposable == null) {
-            playQueueRepository.skipToPrevious()
+            skipDisposable = playQueueRepository.skipToPrevious()
                     .doFinally(() -> skipDisposable = null)
                     .subscribe();
         }
@@ -139,7 +144,7 @@ public class MusicPlayerInteractor {
 
     public void skipToNext() {
         if (skipDisposable == null) {
-            playQueueRepository.skipToNext()
+            skipDisposable = playQueueRepository.skipToNext()
                     .doFinally(() -> skipDisposable = null)
                     .subscribe();
         }
@@ -147,7 +152,7 @@ public class MusicPlayerInteractor {
 
     public void skipToPosition(int position) {
         if (skipDisposable == null) {
-            playQueueRepository.skipToPosition(position)
+            skipDisposable = playQueueRepository.skipToPosition(position)
                     .doFinally(() -> skipDisposable = null)
                     .subscribe();
         }
