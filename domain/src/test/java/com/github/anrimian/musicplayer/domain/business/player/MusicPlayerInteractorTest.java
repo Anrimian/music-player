@@ -66,6 +66,7 @@ public class MusicPlayerInteractorTest {
     private BehaviorSubject<PlayQueueEvent> currentCompositionSubject = BehaviorSubject.createDefault(currentItem(0));
     private PublishSubject<AudioFocusEvent> audioFocusSubject = PublishSubject.create();
     private PublishSubject<Object> noisyAudioSubject = PublishSubject.create();
+    private PublishSubject<Integer> volumeSubject = PublishSubject.create();
 
     private TestObserver<PlayerState> playerStateSubscriber;
 
@@ -90,6 +91,7 @@ public class MusicPlayerInteractorTest {
 
         when(systemMusicController.requestAudioFocus()).thenReturn(audioFocusSubject);
         when(systemMusicController.getAudioBecomingNoisyObservable()).thenReturn(noisyAudioSubject);
+        when(systemMusicController.getVolumeObservable()).thenReturn(volumeSubject);
 
         musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
                 settingsRepository,
@@ -408,5 +410,17 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor.skipToPrevious();
 
         inOrder.verify(musicPlayerController).seekTo(0);
+    }
+
+    @Test
+    public void testVolumeSetToSilentWhilePlay() {
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
+        inOrder.verify(musicPlayerController).resume();
+
+        volumeSubject.onNext(0);
+
+        inOrder.verify(musicPlayerController).pause();
     }
 }

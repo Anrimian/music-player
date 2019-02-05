@@ -17,4 +17,6 @@ public interface SystemMusicController {
 
     Observable<Object> getAudioBecomingNoisyObservable();
 
+    Observable<Integer> getVolumeObservable();
+
 }

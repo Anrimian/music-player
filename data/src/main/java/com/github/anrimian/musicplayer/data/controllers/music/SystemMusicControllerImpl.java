@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 
 import com.github.anrimian.musicplayer.data.utils.rx.audio_focus.AudioFocusRxWrapper;
+import com.github.anrimian.musicplayer.data.utils.rx.content_observer.volume.VolumeObserver;
 import com.github.anrimian.musicplayer.data.utils.rx.receivers.RxReceivers;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
@@ -41,4 +42,8 @@ public class SystemMusicControllerImpl implements SystemMusicController {
                 .map(i -> new Object());
     }
 
+    @Override
+    public Observable<Integer> getVolumeObservable() {
+        return VolumeObserver.getVolumeObservable(context);
+    }
 }

@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import io.reactivex.Emitter;
 import io.reactivex.Observable;
 
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+
 public class RxContentObserver {
 
     public static Observable<Object> getObservable(ContentResolver contentResolver,
@@ -42,7 +44,7 @@ public class RxContentObserver {
         @Override
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
-            changeEmitter.onNext(new Object());
+            changeEmitter.onNext(TRIGGER);
         }
 
         @Override

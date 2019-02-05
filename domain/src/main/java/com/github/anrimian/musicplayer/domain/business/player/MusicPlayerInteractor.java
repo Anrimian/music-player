@@ -80,6 +80,8 @@ public class MusicPlayerInteractor {
                 .subscribe(this::onQueueItemChanged));
         playerDisposable.add(musicPlayerController.getEventsObservable()
                 .subscribe(this::onMusicPlayerEventReceived));
+        playerDisposable.add(systemMusicController.getVolumeObservable()
+                .subscribe(this::onVolumeChanged));
     }
 
     public void startPlaying(List<Composition> compositions) {
@@ -243,6 +245,12 @@ public class MusicPlayerInteractor {
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;
             handleErrorWithComposition(playerErrorParser.getErrorType(errorEvent.getThrowable()));
+        }
+    }
+
+    private void onVolumeChanged(int integer) {
+        if (playerStateSubject.getValue() == PLAY && integer == 0) {
+            pause();
         }
     }
 
