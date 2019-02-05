@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.data.utils.rx.audio_focus;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
 
@@ -21,20 +20,19 @@ import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEve
 public class AudioFocusRxWrapper {
 
     private final AudioManager audioManager;
-    private final AudioFocusObservable audioFocusChangeListener;
 
     public AudioFocusRxWrapper(Context context) {
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioFocusChangeListener = new AudioFocusObservable(audioManager);
     }
 
-    @SuppressLint("CheckResult")
     @Nullable
     public Observable<AudioFocusEvent> requestAudioFocus(int streamType, int durationHint) {
-        int audioFocusResult = audioManager.requestAudioFocus(audioFocusChangeListener, streamType,
+        AudioFocusObservable audioFocusObservable = new AudioFocusObservable();
+        int audioFocusResult = audioManager.requestAudioFocus(audioFocusObservable, streamType,
                 durationHint);
         if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            return audioFocusChangeListener.getObservable();
+            return audioFocusObservable.getObservable()
+                    .doOnDispose(() -> audioManager.abandonAudioFocus(audioFocusObservable));
         }
         return null;
     }
@@ -42,11 +40,6 @@ public class AudioFocusRxWrapper {
     private class AudioFocusObservable implements AudioManager.OnAudioFocusChangeListener {
 
         private final PublishSubject<AudioFocusEvent> subject = PublishSubject.create();
-
-        @SuppressLint("CheckResult")
-        private AudioFocusObservable(AudioManager audioManager) {
-            subject.doOnDispose(() -> audioManager.abandonAudioFocus(this));
-        }
 
         @Override
         public void onAudioFocusChange(int focusChange) {
