@@ -100,6 +100,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
+    public void setVolume(float volume) {
+        player.setVolume(volume);
+    }
+
+    @Override
     public void resume() {
         player.setPlayWhenReady(true);
         startTracingTrackPosition();

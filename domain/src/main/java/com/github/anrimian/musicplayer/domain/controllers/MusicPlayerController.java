@@ -23,6 +23,8 @@ public interface MusicPlayerController {
 
     void seekTo(long position);
 
+    void setVolume(float volume);
+
     Observable<Long> getTrackPositionObservable();
 
     long getTrackPosition();

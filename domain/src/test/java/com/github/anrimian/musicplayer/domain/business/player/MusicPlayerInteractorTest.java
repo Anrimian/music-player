@@ -28,6 +28,7 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.business.TestBusinessDataProvider.currentItem;
 import static com.github.anrimian.musicplayer.domain.business.TestBusinessDataProvider.getFakeCompositions;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_SHORTLY;
 import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.DELETED;
 import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.UNKNOWN;
 import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.GAIN;
@@ -305,6 +306,24 @@ public class MusicPlayerInteractorTest {
         inOrder.verify(musicPlayerController).resume();
 
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE, PLAY);
+    }
+
+    @Test
+    public void onAudioFocusLossShortlyAndGainTest() {
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
+        inOrder.verify(musicPlayerController).resume();
+
+        audioFocusSubject.onNext(LOSS_SHORTLY);
+
+        inOrder.verify(musicPlayerController).setVolume(0.5f);
+
+        audioFocusSubject.onNext(GAIN);
+
+        inOrder.verify(musicPlayerController).setVolume(1f);
+
+        playerStateSubscriber.assertValues(IDLE, PLAY);
     }
 
     @Test

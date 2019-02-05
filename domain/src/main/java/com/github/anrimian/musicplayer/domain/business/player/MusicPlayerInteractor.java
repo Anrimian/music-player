@@ -296,13 +296,19 @@ public class MusicPlayerInteractor {
     private void onAudioFocusChanged(AudioFocusEvent event) {
         switch (event) {
             case GAIN: {
+                musicPlayerController.setVolume(1f);
                 if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
                     musicPlayerController.resume();
                     playerStateSubject.onNext(PLAY);
                 }
                 break;
             }
-            case LOSS_SHORTLY:
+            case LOSS_SHORTLY: {
+                if (playerStateSubject.getValue() == PLAY) {
+                    musicPlayerController.setVolume(0.5f);
+                }
+                break;
+            }
             case LOSS: {
                 if (playerStateSubject.getValue() == PLAY) {
                     musicPlayerController.pause();

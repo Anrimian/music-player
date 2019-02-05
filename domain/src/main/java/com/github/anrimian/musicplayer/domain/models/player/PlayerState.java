@@ -11,7 +11,6 @@ public enum PlayerState {
     STOP,
     LOADING,
     PAUSED_EXTERNALLY {
-
         @Override
         public PlayerState toBaseState() {
             return PAUSE;
