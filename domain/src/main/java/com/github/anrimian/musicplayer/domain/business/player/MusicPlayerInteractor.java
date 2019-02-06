@@ -132,7 +132,7 @@ public class MusicPlayerInteractor {
     }
 
     public void skipToPrevious() {
-        if (musicPlayerController.getTrackPosition() > settingsRepository.getSkipConstraintSeconds()) {
+        if (musicPlayerController.getTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
             musicPlayerController.seekTo(0);
             return;
         }

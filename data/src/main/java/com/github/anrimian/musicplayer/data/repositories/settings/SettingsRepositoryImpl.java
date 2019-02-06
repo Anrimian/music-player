@@ -67,7 +67,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public int getSkipConstraintSeconds() {
-        return 15;//just 15 seconds. Reserved setting for future
+    public int getSkipConstraintMillis() {
+        return 15000;//just 15 seconds. Reserved setting for future
     }
 }

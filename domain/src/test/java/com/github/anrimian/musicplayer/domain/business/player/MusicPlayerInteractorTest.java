@@ -397,14 +397,14 @@ public class MusicPlayerInteractorTest {
         inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
         inOrder.verify(musicPlayerController).resume();
 
-        when(settingsRepository.getSkipConstraintSeconds()).thenReturn(15);
+        when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
         when(musicPlayerController.getTrackPosition()).thenReturn(10L);
 
         musicPlayerInteractor.skipToPrevious();
 
         inOrder.verify(playQueueRepository).skipToPrevious();
 
-        when(settingsRepository.getSkipConstraintSeconds()).thenReturn(15);
+        when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
         when(musicPlayerController.getTrackPosition()).thenReturn(30L);
 
         musicPlayerInteractor.skipToPrevious();
