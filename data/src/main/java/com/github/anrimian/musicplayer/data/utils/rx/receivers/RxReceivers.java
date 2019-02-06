@@ -24,8 +24,9 @@ public class RxReceivers {
     public static Observable<Intent> from(@NonNull final IntentFilter intentFilter, @NonNull final Context ctx) {
         return Observable.create(new ObservableOnSubscribe<Intent>() {
             Context appContext = ctx.getApplicationContext();
+
             @Override
-            public void subscribe(@NonNull final ObservableEmitter<Intent> emitter) throws Exception {
+            public void subscribe(@NonNull final ObservableEmitter<Intent> emitter) {
                 BroadcastReceiver receiver = new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {

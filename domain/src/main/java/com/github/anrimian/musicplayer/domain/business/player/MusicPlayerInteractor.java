@@ -248,8 +248,8 @@ public class MusicPlayerInteractor {
         }
     }
 
-    private void onVolumeChanged(int integer) {
-        if (playerStateSubject.getValue() == PLAY && integer == 0) {
+    private void onVolumeChanged(int volume) {
+        if (playerStateSubject.getValue() == PLAY && volume == 0) {
             pause();
         }
     }
