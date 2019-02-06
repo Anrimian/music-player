@@ -15,6 +15,7 @@ import io.reactivex.Observable;
 
 import static android.media.AudioManager.AUDIOFOCUS_GAIN;
 import static android.media.AudioManager.STREAM_MUSIC;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 /**
  * Created on 10.12.2017.
@@ -39,7 +40,7 @@ public class SystemMusicControllerImpl implements SystemMusicController {
     @Override
     public Observable<Object> getAudioBecomingNoisyObservable() {
         return RxReceivers.from(AudioManager.ACTION_AUDIO_BECOMING_NOISY, context)
-                .map(i -> new Object());
+                .map(i -> TRIGGER);
     }
 
     @Override

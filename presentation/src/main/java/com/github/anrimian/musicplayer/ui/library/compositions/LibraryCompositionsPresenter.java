@@ -97,8 +97,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         if (selectedCompositions.isEmpty()) {
             interactor.play(compositions);
         } else {
-            interactor.play(new ArrayList<>(selectedCompositions));
-            closeSelectionMode();
+            playSelectedCompositions();
         }
     }
 
@@ -167,10 +166,26 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         getViewState().shareCompositions(selectedCompositions);
     }
 
+    void onPlayAllSelectedClicked() {
+        playSelectedCompositions();
+    }
+
+    void onSelectAllButtonClicked() {
+        selectedCompositions.clear();
+        selectedCompositions.addAll(compositions);
+        getViewState().showSelectionMode(compositions.size());
+        getViewState().setItemsSelected(true);
+    }
+
+    private void playSelectedCompositions() {
+        interactor.play(new ArrayList<>(selectedCompositions));
+        closeSelectionMode();
+    }
+
     private void closeSelectionMode() {
         selectedCompositions.clear();
         getViewState().showSelectionMode(0);
-        getViewState().clearSelectedItems();
+        getViewState().setItemsSelected(false);
     }
 
     private void deletePreparedCompositions() {

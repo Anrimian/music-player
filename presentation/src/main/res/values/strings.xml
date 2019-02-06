@@ -85,6 +85,7 @@
          This is a really strange and rare mistake.
          Try to reboot the device, perhaps it will solve this problem.
     </string>
+    <string name="select_all">Select all</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

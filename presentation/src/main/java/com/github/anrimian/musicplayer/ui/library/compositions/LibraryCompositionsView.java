@@ -67,7 +67,7 @@ public interface LibraryCompositionsView extends MvpView {
     void onCompositionUnselected(Composition composition, int position);
 
     @StateStrategyType(SkipStrategy.class)
-    void clearSelectedItems();
+    void setItemsSelected(boolean selected);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showSelectionMode(int count);

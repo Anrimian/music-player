@@ -45,7 +45,6 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
-import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFiles;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -224,8 +223,8 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
-    public void clearSelectedItems() {
-        adapter.clearSelectedItems();
+    public void setItemsSelected(boolean selected) {
+        adapter.setItemsSelected(selected);
     }
 
     @Override
@@ -291,6 +290,14 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
 
     private boolean onActionModeItemClicked(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
+            case R.id.menu_play: {
+                presenter.onPlayAllSelectedClicked();
+                return true;
+            }
+            case R.id.menu_select_all: {
+                presenter.onSelectAllButtonClicked();
+                return true;
+            }
             case R.id.menu_add_to_playlist: {
                 presenter.onAddSelectedCompositionToPlayListClicked();
                 return true;

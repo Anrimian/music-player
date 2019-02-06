@@ -11,8 +11,9 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static java.util.Collections.singletonList;
 
 public class RxNode<K> {
@@ -142,7 +143,7 @@ public class RxNode<K> {
     }
 
     private void notifySelfRemoved() {
-        selfDeleteSubject.onNext(new Object());
+        selfDeleteSubject.onNext(TRIGGER);
     }
 
     private void notifyNodesChanged(List<NodeData> data) {

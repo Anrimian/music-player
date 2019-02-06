@@ -101,9 +101,9 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         notifyItemChanged(position, ITEM_UNSELECTED);
     }
 
-    public void clearSelectedItems() {
+    public void setItemsSelected(boolean selected) {
         for (MusicViewHolder holder: viewHolders) {
-            holder.setSelected(false);
+            holder.setSelected(selected);
         }
     }
 
