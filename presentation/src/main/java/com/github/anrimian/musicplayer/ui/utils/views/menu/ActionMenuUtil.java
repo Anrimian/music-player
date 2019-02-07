@@ -2,25 +2,44 @@ package com.github.anrimian.musicplayer.ui.utils.views.menu;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import androidx.annotation.MenuRes;
+import android.view.MenuItem;
+
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.annotation.MenuRes;
+import androidx.annotation.StyleRes;
+import androidx.appcompat.view.ActionBarPolicy;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.PublicActionMenuPresenter;
-import android.view.MenuItem;
 
 public class ActionMenuUtil {
+
+    public static void setupMenu(ActionMenuView actionMenuView,
+                                 @MenuRes int menuRes,
+                                 NavigationView.OnNavigationItemSelectedListener listener) {
+        setupMenu(actionMenuView, menuRes, listener, 0, 0);
+    }
 
     @SuppressLint("RestrictedApi")
     public static void setupMenu(ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
-                                 NavigationView.OnNavigationItemSelectedListener listener) {
+                                 NavigationView.OnNavigationItemSelectedListener listener,
+                                 int extraItemsCount,
+                                 @StyleRes int style) {
         Context context = actionMenuView.getContext();
+        if (style != 0) {
+            context = new ContextThemeWrapper(actionMenuView.getContext(), style);
+        }
         PublicActionMenuPresenter actionMenuPresenter = new PublicActionMenuPresenter(context);
-        actionMenuPresenter.setReserveOverflow(true);
-        actionMenuPresenter.setWidthLimit(context.getResources().getDisplayMetrics().widthPixels, true);
-        actionMenuPresenter.setItemLimit(Integer.MAX_VALUE);
+//        actionMenuPresenter.setReserveOverflow(false);
+//        actionMenuPresenter.setWidthLimit(context.getResources().getDisplayMetrics().widthPixels, true);
+//        actionMenuPresenter.setItemLimit(Integer.MAX_VALUE);
+
+        ActionBarPolicy abp = ActionBarPolicy.get(context);
+        actionMenuPresenter.setItemLimit(abp.getMaxActionButtons() + extraItemsCount);
 
         MenuBuilder menuBuilder = new MenuBuilder(context);
         new SupportMenuInflater(context).inflate(menuRes, menuBuilder);

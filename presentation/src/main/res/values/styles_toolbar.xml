@@ -26,6 +26,10 @@
         <item name="editTextColor">?android:attr/textColorPrimary</item>
     </style>
 
+    <style name="SelectionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">?attr/actionModeTextColor</item>
+    </style>
+
     <style name="ToolbarTitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
         <item name="android:maxLines">1</item>

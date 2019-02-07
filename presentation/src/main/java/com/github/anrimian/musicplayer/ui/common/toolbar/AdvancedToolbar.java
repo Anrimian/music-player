@@ -19,7 +19,6 @@ import android.widget.TextView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
-import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentStackListener;
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher;
@@ -46,7 +45,6 @@ import static com.github.anrimian.musicplayer.Constants.Animation.TOOLBAR_ARROW_
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setStatusBarColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getBackgroundAnimator;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getAttrColorAnimator;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getColorAnimator;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getVisibilityAnimator;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
@@ -363,7 +361,11 @@ public class AdvancedToolbar extends FrameLayout {
 
     public void setUpSelectionModeMenu(@MenuRes int menuResource,
                                        NavigationView.OnNavigationItemSelectedListener listener) {
-        setupMenu(acvSelection, menuResource, listener);
+        setupMenu(acvSelection,
+                menuResource,
+                listener,
+                1,
+                R.style.SelectionOverflowButtonStyle);
     }
 
     public void showSelectionMode(int count) {

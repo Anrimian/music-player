@@ -119,6 +119,7 @@
 
                 <androidx.appcompat.widget.ActionMenuView
                     android:id="@+id/acv_selection"
+                    style="@style/SelectionOverflowButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     app:layout_constraintTop_toTopOf="parent"
