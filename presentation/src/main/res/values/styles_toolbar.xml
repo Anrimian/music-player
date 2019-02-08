@@ -26,7 +26,7 @@
         <item name="editTextColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="SelectionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+    <style name="SelectionOverflowButtonStyle">
         <item name="android:tint">?attr/actionModeTextColor</item>
     </style>
 

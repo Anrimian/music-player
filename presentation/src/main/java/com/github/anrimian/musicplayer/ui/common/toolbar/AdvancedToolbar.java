@@ -364,8 +364,7 @@ public class AdvancedToolbar extends FrameLayout {
         setupMenu(acvSelection,
                 menuResource,
                 listener,
-                1,
-                R.style.SelectionOverflowButtonStyle);
+                1);
     }
 
     public void showSelectionMode(int count) {

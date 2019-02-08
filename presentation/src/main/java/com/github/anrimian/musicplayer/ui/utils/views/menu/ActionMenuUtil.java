@@ -7,9 +7,7 @@ import android.view.MenuItem;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.MenuRes;
-import androidx.annotation.StyleRes;
 import androidx.appcompat.view.ActionBarPolicy;
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ActionMenuView;
@@ -20,19 +18,15 @@ public class ActionMenuUtil {
     public static void setupMenu(ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  NavigationView.OnNavigationItemSelectedListener listener) {
-        setupMenu(actionMenuView, menuRes, listener, 0, 0);
+        setupMenu(actionMenuView, menuRes, listener, 0);
     }
 
     @SuppressLint("RestrictedApi")
     public static void setupMenu(ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  NavigationView.OnNavigationItemSelectedListener listener,
-                                 int extraItemsCount,
-                                 @StyleRes int style) {
+                                 int extraItemsCount) {
         Context context = actionMenuView.getContext();
-        if (style != 0) {
-            context = new ContextThemeWrapper(actionMenuView.getContext(), style);
-        }
         PublicActionMenuPresenter actionMenuPresenter = new PublicActionMenuPresenter(context);
 //        actionMenuPresenter.setReserveOverflow(false);
 //        actionMenuPresenter.setWidthLimit(context.getResources().getDisplayMetrics().widthPixels, true);

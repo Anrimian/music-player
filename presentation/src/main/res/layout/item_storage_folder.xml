@@ -50,7 +50,7 @@
         style="@style/Divider.Horizontal"
         android:layout_marginTop="@dimen/margin_normal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tv_folder_name"
         app:layout_constraintTop_toBottomOf="@id/tv_compositions_count" />
 
     <FrameLayout
