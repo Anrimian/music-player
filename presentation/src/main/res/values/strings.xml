@@ -82,10 +82,14 @@
     <string name="delete_playlist">Delete playlist</string>
     <string name="storage_timeout_error_message">
         Device media storage is not responding.
-         This is a really strange and rare mistake.
-         Try to reboot the device, perhaps it will solve this problem.
+        This is a really strange and rare mistake.
+        Try to reboot the device, perhaps it will solve this problem.
     </string>
     <string name="select_all">Select all</string>
+    <string name="file_uri_extract_error">
+        Can\'t get path for file to send.
+        Possible he is in private system folder or so.
+    </string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.widget.Toast;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -62,9 +63,16 @@ public class DialogUtils {
     public static void shareFile(Context context, String filePath) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("audio/*");
-        Uri fileUri = FileProvider.getUriForFile(context,
-                context.getString(R.string.file_provider_authorities),
-                new File(filePath));
+
+        Uri fileUri;
+        try {
+            fileUri = FileProvider.getUriForFile(context,
+                    context.getString(R.string.file_provider_authorities),
+                    new File(filePath));
+        } catch (Exception e) {
+            Toast.makeText(context, R.string.file_uri_extract_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 

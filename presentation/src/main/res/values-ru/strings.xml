@@ -80,10 +80,14 @@
     <string name="delete_playlist">Удалить плейлист</string>
     <string name="storage_timeout_error_message">
         Медиа хранилище устройства не отвечает.
-        Это действительно странная и редкая ошибка.
+        Это очень странная и редкая ошибка.
         Попробуйте перезагрузить устройство, возможно, это решит эту проблему.
     </string>
     <string name="select_all">Выделить всё</string>
+    <string name="file_uri_extract_error">
+        Не удалось получить путь к файлу для отправки.
+        Возможно, он в закрытой системной папке.
+    </string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
