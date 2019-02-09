@@ -21,6 +21,7 @@
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
     <string name="content_description_menu">Open current composition menu</string>
+    <string name="content_description_menu_template">Open composition menu %s</string>
     <string name="share">Send</string>
     <string name="content_description_repeat_mode">Repeat mode menu</string>
     <string name="content_description_shuffle">Shuffle mode</string>
@@ -90,6 +91,7 @@
         Can\'t get path for file to send.
         Possible he is in private system folder or so.
     </string>
+    <string name="loading_progress">Loading…</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

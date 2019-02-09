@@ -163,7 +163,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         searchMenuItem.call(item -> item.setVisible(false));
         orderMenuItem.call(item -> item.setVisible(false));
         fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
+        progressViewWrapper.showMessage(R.string.compositions_on_device_not_found);
     }
 
     @Override
@@ -171,7 +171,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         searchMenuItem.call(item -> item.setVisible(true));
         orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.compositions_for_search_not_found, false);
+        progressViewWrapper.showMessage(R.string.compositions_for_search_not_found);
     }
 
     @Override

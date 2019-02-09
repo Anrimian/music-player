@@ -19,6 +19,7 @@
     <string name="next_track">Следующий трек</string>
     <string name="folder">Папка</string>
     <string name="content_description_menu">Открыть меню текущей композиции</string>
+    <string name="content_description_menu_template">Открыть меню композиции: %s</string>
     <string name="share">Отправить</string>
     <string name="content_description_repeat_mode">Меню режима повтора</string>
     <string name="content_description_shuffle">Перемешать композиции</string>
@@ -88,6 +89,7 @@
         Не удалось получить путь к файлу для отправки.
         Возможно, он в закрытой системной папке.
     </string>
+    <string name="loading_progress">Загрузка…</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

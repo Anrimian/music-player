@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.github.anrimian.musicplayer.R;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
 
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
@@ -42,10 +43,15 @@ public class ProgressViewWrapper {
 
     public void hideAll() {
         progressStateContainer.setVisibility(INVISIBLE);
+        progressStateContainer.setClickable(false);//maybe it is not necessary
     }
 
     public void goneAll() {
         progressStateContainer.setVisibility(GONE);
+    }
+
+    public void showMessage(int messageId) {
+        showMessage(messageId, false);
     }
 
     public void showMessage(int messageId, boolean showTryAgainButton) {
@@ -53,7 +59,7 @@ public class ProgressViewWrapper {
     }
 
     public void showMessage(int messageId, @DrawableRes int emptyImageRes, boolean showTryAgainButton) {
-        String message = progressBar.getContext().getString(messageId);
+        String message = getString(messageId);
         showMessage(message, emptyImageRes, showTryAgainButton);
     }
 
@@ -63,9 +69,10 @@ public class ProgressViewWrapper {
 
     public void showMessage(String message, @DrawableRes int imageRes, boolean showTryAgainButton) {
         progressStateContainer.setVisibility(VISIBLE);
+        progressStateContainer.setClickable(true);
+        progressStateContainer.setContentDescription(message);
         progressBar.setVisibility(GONE);
         tvMessage.setVisibility(VISIBLE);
-        progressStateContainer.setContentDescription(message);
 
         if (message != null) {
             tvMessage.setText(message);
@@ -84,11 +91,17 @@ public class ProgressViewWrapper {
     }
 
     public void showProgress() {
-//        progressStateContainer.setContentDescription(...loading...);
+        progressStateContainer.setContentDescription(getString(R.string.loading_progress));
+        progressStateContainer.setVisibility(VISIBLE);
+        progressStateContainer.setClickable(true);
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(VISIBLE);
         tvMessage.setVisibility(GONE);
         btnTryAgain.setVisibility(GONE);
         ivEmpty.setVisibility(GONE);
+    }
+
+    private String getString(@StringRes int resId) {
+        return ivEmpty.getContext().getString(resId);
     }
 }

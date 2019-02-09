@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.format.wrappers;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -39,7 +37,8 @@ public class CompositionItemWrapper {
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
-    private Drawable foregroundDrawable;
+    @BindView(R.id.btn_actions_menu)
+    View btnActionsMenu;
 
     private Composition composition;
 
@@ -54,6 +53,8 @@ public class CompositionItemWrapper {
         String compositionName = formatCompositionName(composition);
         tvMusicName.setText(compositionName);
         clickableItem.setContentDescription(compositionName);
+        btnActionsMenu.setContentDescription(getContext().getString(
+                R.string.content_description_menu_template, compositionName));
         showAdditionalInfo();
 
         int textColorAttr = composition.isCorrupted()? android.R.attr.textColorSecondary:
