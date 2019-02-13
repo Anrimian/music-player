@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.PAUSE;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.PLAY;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
@@ -81,24 +82,34 @@ public class NotificationsDisplayer {
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(@Nonnull PlayerMetaState state,
-                                                                                     MediaSessionCompat mediaSession) {
+                                                                   MediaSessionCompat mediaSession) {
         boolean play = state.getState() == PlayerState.PLAY;
         Composition composition = state.getQueueItem().getComposition();
 
         int requestCode = play? PAUSE : PLAY;
         Intent intentPlayPause = new Intent(context, MusicService.class);
         intentPlayPause.putExtra(REQUEST_CODE, requestCode);
-        PendingIntent pIntentPlayPause = PendingIntent.getService(context, requestCode, intentPlayPause, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pIntentPlayPause = PendingIntent.getService(context,
+                requestCode,
+                intentPlayPause,
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
         Intent intentSkipToPrevious = new Intent(context, MusicService.class);
         intentSkipToPrevious.putExtra(REQUEST_CODE, SKIP_TO_PREVIOUS);
-        PendingIntent pIntentSkipToPrevious = PendingIntent.getService(context, SKIP_TO_PREVIOUS, intentSkipToPrevious, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pIntentSkipToPrevious = PendingIntent.getService(context,
+                SKIP_TO_PREVIOUS,
+                intentSkipToPrevious,
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
         Intent intentSkipToNext = new Intent(context, MusicService.class);
         intentSkipToNext.putExtra(REQUEST_CODE, SKIP_TO_NEXT);
-        PendingIntent pIntentSkipToNext = PendingIntent.getService(context, SKIP_TO_NEXT, intentSkipToNext, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pIntentSkipToNext = PendingIntent.getService(context,
+                SKIP_TO_NEXT,
+                intentSkipToNext,
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
         Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(OPEN_PLAY_QUEUE_ARG, true);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle style = new androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle();

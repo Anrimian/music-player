@@ -1,9 +1,9 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.drawer;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentStackListener;
+
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
 import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED;
@@ -45,7 +45,7 @@ public class DrawerLockStateProcessor {
         updateDrawerLockState();
     }
 
-    public void onSelectionodeChanged(boolean isInSelection) {
+    public void onSelectionModeChanged(boolean isInSelection) {
         this.isInSelectionMode = isInSelection;
         updateDrawerLockState();
     }
