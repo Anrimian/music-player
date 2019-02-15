@@ -62,7 +62,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
         requireFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-                .replace(R.id.main_activity_container, new PlayerFragment())
+                .replace(R.id.main_activity_container, PlayerFragment.newInstance())
                 .commit();
     }
 }

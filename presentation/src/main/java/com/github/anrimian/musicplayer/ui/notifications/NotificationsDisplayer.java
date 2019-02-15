@@ -11,13 +11,11 @@ import android.support.v4.media.session.MediaSessionCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
-import com.github.anrimian.musicplayer.infrastructure.service.music.models.PlayerMetaState;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 
-import javax.annotation.Nonnull;
-
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 
@@ -56,9 +54,10 @@ public class NotificationsDisplayer {
         }
     }
 
-    public Notification getForegroundNotification(@Nonnull PlayerMetaState state,
+    public Notification getForegroundNotification(boolean play,
+                                                  @Nullable PlayQueueItem composition,
                                                   MediaSessionCompat mediaSession) {
-        return getDefaultMusicNotification(state, mediaSession).build();
+        return getDefaultMusicNotification(play, composition, mediaSession).build();
     }
 
 //    public Notification getStubNotification() {
@@ -71,9 +70,10 @@ public class NotificationsDisplayer {
 //    }
 
 
-    public void updateForegroundNotification(@Nonnull PlayerMetaState state,
+    public void updateForegroundNotification(boolean play,
+                                             @Nullable PlayQueueItem composition,
                                              MediaSessionCompat mediaSession) {
-        Notification notification = getDefaultMusicNotification(state, mediaSession).build();
+        Notification notification = getDefaultMusicNotification(play, composition, mediaSession).build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
@@ -81,11 +81,9 @@ public class NotificationsDisplayer {
         notificationManager.cancel(FOREGROUND_NOTIFICATION_ID);
     }
 
-    private NotificationCompat.Builder getDefaultMusicNotification(@Nonnull PlayerMetaState state,
+    private NotificationCompat.Builder getDefaultMusicNotification(boolean play,
+                                                                   @Nullable PlayQueueItem queueItem,
                                                                    MediaSessionCompat mediaSession) {
-        boolean play = state.getState() == PlayerState.PLAY;
-        Composition composition = state.getQueueItem().getComposition();
-
         int requestCode = play? PAUSE : PLAY;
         Intent intentPlayPause = new Intent(context, MusicService.class);
         intentPlayPause.putExtra(REQUEST_CODE, requestCode);
@@ -130,11 +128,9 @@ public class NotificationsDisplayer {
 //            color = Palette.from(bitmap).generate().getDarkMutedColor(Color.WHITE);
 //        }
 
-        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
+        NotificationCompat.Builder builder =  new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .setColor(getColorFromAttr(context, android.R.attr.textColorPrimary))
 //                .setColorized(true)
-                .setContentTitle(formatCompositionName(composition))
-                .setContentText(composition.getArtist())
                 .setSmallIcon(R.drawable.ic_music_box)
                 .setContentIntent(pIntent)
                 .addAction(R.drawable.ic_skip_previous, getString(R.string.previous_track), pIntentSkipToPrevious)
@@ -145,6 +141,12 @@ public class NotificationsDisplayer {
 //                .setLargeIcon(bitmap)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        if (queueItem != null) {
+            Composition composition = queueItem.getComposition();
+            builder = builder.setContentTitle(formatCompositionName(composition))
+                             .setContentText(composition.getArtist());
+        }
+        return builder;
     }
 
     private String getString(@StringRes int resId) {

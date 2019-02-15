@@ -218,6 +218,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private FragmentNavigation navigation;
 
+    public static PlayerFragment newInstance() {
+        return newInstance(false);
+    }
+
     public static PlayerFragment newInstance(boolean openPlayQueue) {
         Bundle args = new Bundle();
         args.putBoolean(OPEN_PLAY_QUEUE_ARG, openPlayQueue);
