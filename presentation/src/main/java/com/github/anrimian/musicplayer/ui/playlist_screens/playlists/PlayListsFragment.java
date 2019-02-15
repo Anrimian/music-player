@@ -77,6 +77,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
         ButterKnife.bind(this, view);
 
         progressViewWrapper = new ProgressViewWrapper(view);
+        progressViewWrapper.hideAll();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);

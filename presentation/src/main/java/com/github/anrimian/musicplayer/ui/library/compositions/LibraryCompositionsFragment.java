@@ -97,11 +97,12 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         toolbar.setSubtitle(R.string.compositions);
         toolbar.setTextChangeListener(presenter::onSearchTextChanged);
         toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
-        toolbar.setUpSelectionModeMenu(R.menu.library_compositions_selection_menu,
+        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainLoadCompositionsClicked());
+        progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
+        progressViewWrapper.hideAll();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);

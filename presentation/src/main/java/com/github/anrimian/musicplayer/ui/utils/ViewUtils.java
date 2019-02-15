@@ -9,19 +9,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.annotation.AttrRes;
-import androidx.annotation.ColorInt;
-import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.view.menu.MenuPopupHelper;
-import androidx.appcompat.widget.PopupMenu;
-
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +19,14 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.AttrRes;
+import androidx.annotation.ColorInt;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.view.menu.MenuPopupHelper;
+import androidx.appcompat.widget.PopupMenu;
 
 import static android.view.View.VISIBLE;
 import static androidx.core.view.ViewCompat.isLaidOut;
@@ -46,11 +43,30 @@ public class ViewUtils {
     }
 
     public static void animateVisibility(View view, int visibility) {
-        if ((view.getAlpha() == 1f || view.getAlpha() == 0f) && view.getVisibility() != visibility) {
+        animateVisibility(view, visibility, null);
+    }
+
+    public static void animateVisibility(View view, int visibility, Runnable onAnimFinished) {
+        if (view.getVisibility() != visibility || view.hasTransientState()) {
             Animator animator = getVisibilityAnimator(view, visibility);
             animator.setDuration(visibility == VISIBLE ? 150: 120);
             animator.setInterpolator(visibility == VISIBLE ? new DecelerateInterpolator(): new AccelerateInterpolator());
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    view.clearAnimation();
+                    view.setVisibility(visibility);
+                    if (onAnimFinished != null) {
+                        onAnimFinished.run();
+                    }
+                }
+            });
             animator.start();
+        } else {
+            if (onAnimFinished != null) {
+                onAnimFinished.run();
+            }
         }
     }
 

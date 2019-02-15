@@ -359,7 +359,7 @@ public class AdvancedToolbar extends FrameLayout {
         drawerArrowDrawable.setColor(color);
     }
 
-    public void setUpSelectionModeMenu(@MenuRes int menuResource,
+    public void setupSelectionModeMenu(@MenuRes int menuResource,
                                        NavigationView.OnNavigationItemSelectedListener listener) {
         setupMenu(acvSelection,
                 menuResource,
