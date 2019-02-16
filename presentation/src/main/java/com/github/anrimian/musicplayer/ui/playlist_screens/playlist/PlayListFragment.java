@@ -101,6 +101,7 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
         toolbar.setTitleClickListener(null);
 
         progressViewWrapper = new ProgressViewWrapper(view);
+        progressViewWrapper.hideAll();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);

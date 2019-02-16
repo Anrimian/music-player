@@ -130,7 +130,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         toolbar = requireActivity().findViewById(R.id.toolbar);
 
         progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
+        progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
+        progressViewWrapper.hideAll();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);

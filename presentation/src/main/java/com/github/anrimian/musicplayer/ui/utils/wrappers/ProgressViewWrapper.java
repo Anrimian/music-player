@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.wrappers;
 
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -13,6 +14,7 @@ import androidx.annotation.StringRes;
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 
 /**
@@ -23,11 +25,15 @@ public class ProgressViewWrapper {
 
     private static final int NO_DRAWABLE = -1;
 
+    private static final int PROGRESS_SHOW_DELAY_MILLIS = 500;
+
     private ProgressBar progressBar;
     private TextView tvMessage;
     private View btnTryAgain;
     private ImageView ivEmpty;
     private View progressStateContainer;
+
+    private Handler handler = new Handler();
 
     public ProgressViewWrapper(View view) {
         progressBar = view.findViewById(R.id.psv_progress_bar);
@@ -37,17 +43,33 @@ public class ProgressViewWrapper {
         progressStateContainer = view.findViewById(R.id.progress_state_container);
     }
 
+    /**
+     * @deprecated use {@link #onTryAgainClick(Runnable)} instead
+     */
+    @Deprecated
     public void setTryAgainButtonOnClickListener(View.OnClickListener listener) {
         btnTryAgain.setOnClickListener(listener);
+    }
+
+    public void onTryAgainClick(Runnable listener) {
+        btnTryAgain.setOnClickListener(v -> listener.run());
+    }
+
+    public void hideAll(Runnable onHidden) {
+        animateVisibility(progressStateContainer, INVISIBLE, onHidden);
+        progressStateContainer.setClickable(false);//maybe it is not necessary
+        handler.removeCallbacksAndMessages(null);
     }
 
     public void hideAll() {
         progressStateContainer.setVisibility(INVISIBLE);
         progressStateContainer.setClickable(false);//maybe it is not necessary
+        handler.removeCallbacksAndMessages(null);
     }
 
     public void goneAll() {
         progressStateContainer.setVisibility(GONE);
+        handler.removeCallbacksAndMessages(null);
     }
 
     public void showMessage(int messageId) {
@@ -88,14 +110,20 @@ public class ProgressViewWrapper {
         } else {
             btnTryAgain.setVisibility(GONE);
         }
+
+        handler.removeCallbacksAndMessages(null);
     }
 
     public void showProgress() {
+        handler.postDelayed(this::showDelayedProgress, PROGRESS_SHOW_DELAY_MILLIS);
+    }
+
+    private void showDelayedProgress() {
         progressStateContainer.setContentDescription(getString(R.string.loading_progress));
         progressStateContainer.setVisibility(VISIBLE);
         progressStateContainer.setClickable(true);
         progressBar.setIndeterminate(true);
-        progressBar.setVisibility(VISIBLE);
+        animateVisibility(progressBar, VISIBLE);
         tvMessage.setVisibility(GONE);
         btnTryAgain.setVisibility(GONE);
         ivEmpty.setVisibility(GONE);

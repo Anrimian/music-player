@@ -95,6 +95,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         presenterDisposable.clear();
     }
 
+    void onOpenPlayQueueClicked() {
+        playerScreenInteractor.setPlayerPanelOpen(true);
+    }
+
     void onBottomPanelExpanded() {
         playerScreenInteractor.setPlayerPanelOpen(true);
         getViewState().expandBottomPanel();

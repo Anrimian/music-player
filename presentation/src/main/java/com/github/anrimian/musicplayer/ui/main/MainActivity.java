@@ -1,17 +1,21 @@
 package com.github.anrimian.musicplayer.ui.main;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
-import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
+import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +28,17 @@ public class MainActivity extends AppCompatActivity {
             goToMainScreen();
         } else {
             goToStartScreen();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (getOpenPlayQueueArg(intent)) {
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_activity_container);
+            if (fragment instanceof PlayerFragment) {
+                ((PlayerFragment) fragment).openPlayQueue();//non-smooth update, why...
+            }
         }
     }
 
@@ -52,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToMainScreen() {
-        startFragment(new PlayerFragment());
+        boolean openPlayQueue = getOpenPlayQueueArg(getIntent());
+        startFragment(PlayerFragment.newInstance(openPlayQueue));
     }
 
     private void startFragment(Fragment fragment) {
@@ -63,5 +79,11 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.main_activity_container, fragment)
                     .commit();
         }
+    }
+
+    private boolean getOpenPlayQueueArg(Intent intent) {
+        boolean openPlayQueue = intent.getBooleanExtra(OPEN_PLAY_QUEUE_ARG, false);
+        getIntent().removeExtra(OPEN_PLAY_QUEUE_ARG);
+        return openPlayQueue;
     }
 }

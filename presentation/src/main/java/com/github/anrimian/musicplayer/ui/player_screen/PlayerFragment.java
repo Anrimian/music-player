@@ -39,7 +39,6 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ExpandViewDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
@@ -48,6 +47,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveYDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ReverseDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
@@ -85,6 +85,7 @@ import butterknife.ButterKnife;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
+import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
@@ -217,6 +218,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private FragmentNavigation navigation;
 
+    public static PlayerFragment newInstance() {
+        return newInstance(false);
+    }
+
+    public static PlayerFragment newInstance(boolean openPlayQueue) {
+        Bundle args = new Bundle();
+        args.putBoolean(OPEN_PLAY_QUEUE_ARG, openPlayQueue);
+        PlayerFragment fragment = new PlayerFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @ProvidePresenter
     PlayerPresenter providePresenter() {
         return Components.getLibraryComponent().playerPresenter();
@@ -265,7 +278,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
         drawerLockStateProcessor.setupWithNavigation(navigation);
         toolbar.getSearchModeObservable().subscribe(drawerLockStateProcessor::onSearchModeChanged);
-        toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionodeChanged);
+        toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionModeChanged);
 
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
         navigationView.inflateHeaderView(R.layout.partial_drawer_header);
@@ -278,7 +291,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         setupMenu(actionMenuView, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
-        bottomSheetDelegate = getBottomSheetDelegate(drawerArrowDrawable);
+        bottomSheetDelegate = getBottomSheetDelegate();
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
         mlBottomSheet.setClickable(true);
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
@@ -305,7 +318,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked);
-        topBottomSheetPanel.setOnClickListener(v -> onTopPanelClicked());
+        topBottomSheetPanel.setOnClickListener(v -> openPlayQueue());
 
         seekBarViewWrapper = new SeekBarViewWrapper(sbTrackState);
         seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);
@@ -322,6 +335,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .findFragmentByTag(CREATE_PLAYLIST_TAG);
         if (createPlayListFragment != null) {
             createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
+        }
+
+        if (getArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
+            getArguments().remove(OPEN_PLAY_QUEUE_ARG);
+            openPlayQueue();
         }
     }
 
@@ -387,6 +405,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void onStop() {
         super.onStop();
+        //battery saving
         presenter.onStop();
     }
 
@@ -639,6 +658,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
+    public void openPlayQueue() {
+        presenter.onOpenPlayQueueClicked();
+        if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
+            bottomSheetBehavior.setState(STATE_EXPANDED);
+        }
+    }
+
     private void setButtonsSelectableBackground(@DrawableRes int resId) {
         ivPlayPause.setBackgroundResource(resId);
         ivSkipToNext.setBackgroundResource(resId);
@@ -668,12 +694,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onBottomPanelClicked() {
         if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
-        }
-    }
-
-    private void onTopPanelClicked() {
-        if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
-            bottomSheetBehavior.setState(STATE_EXPANDED);
         }
     }
 
@@ -766,7 +786,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         popup.show();
     }
 
-    private SlideDelegate getBottomSheetDelegate(DrawerArrowDrawable drawerArrowDrawable) {
+    private SlideDelegate getBottomSheetDelegate() {
         DelegateManager boundDelegateManager = new DelegateManager();
         boundDelegateManager
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))

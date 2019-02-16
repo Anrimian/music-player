@@ -9,6 +9,7 @@ public interface Constants {
         String PLAY_LIST_ID_ARG = "play_list_id_arg";
         String PATH_ARG = "path_arg";
         String STATUS_BAR_COLOR_ATTR_ARG = "status_bar_color_attr";
+        String OPEN_PLAY_QUEUE_ARG = "open_play_queue_arg";
     }
 
     interface Tags {
