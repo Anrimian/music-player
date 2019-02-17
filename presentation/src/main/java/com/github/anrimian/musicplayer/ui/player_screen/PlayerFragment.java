@@ -346,7 +346,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void setViewStartState() {
         playQueueTitleContainer.setVisibility(INVISIBLE);
         titleContainer.setVisibility(INVISIBLE);
-        mlBottomSheet.setVisibility(INVISIBLE);
+        bottomSheetTopShadow.setVisibility(INVISIBLE);
+        rvPlayList.setVisibility(INVISIBLE);
     }
 
     @Override
@@ -498,7 +499,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showCurrentQueueItem(PlayQueueItem item, int position, int oldPosition) {
-        animateVisibility(mlBottomSheet, VISIBLE);
+        animateVisibility(bottomSheetTopShadow, VISIBLE);
+        animateVisibility(rvPlayList, VISIBLE);//TODO blink on jump to item on start
 
         Composition composition = item.getComposition();
         String compositionName = formatCompositionName(composition);
@@ -662,6 +664,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         presenter.onOpenPlayQueueClicked();
         if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
             bottomSheetBehavior.setState(STATE_EXPANDED);
+            bottomSheetDelegate.onSlide(1f);
         }
     }
 
