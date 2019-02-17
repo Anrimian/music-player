@@ -70,6 +70,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private final MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private final CompositeDisposable serviceDisposable = new CompositeDisposable();
+    private final CompositeDisposable playInfoDisposable = new CompositeDisposable();
 
     private MediaSessionCompat mediaSession;
 
@@ -98,6 +99,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
+
+        serviceDisposable.add(playInfoDisposable);
 
         subscribeOnPlayerChanges();
     }
@@ -161,11 +164,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     private void subscribeOnPlayerChanges() {
         serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
-            .subscribe(this::onPlayerStateReceived));
-        serviceDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
-                .subscribe(this::onCurrentCompositionReceived));
-        serviceDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
-            .subscribe(this::onTrackPositionReceived));
+                .subscribe(this::onPlayerStateReceived));
     }
 
     private void onPlayerStateReceived(PlayerState playerState) {
@@ -179,6 +178,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                                 true,
                                 currentItem,
                                 mediaSession));
+                subscribeOnPlayInfo();
                 break;
             }
             case PAUSE: {
@@ -199,6 +199,16 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         }
     }
 
+    private void subscribeOnPlayInfo() {
+        if (playInfoDisposable.size() == 0) {
+            playInfoDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
+                    .subscribe(this::onCurrentCompositionReceived));
+            playInfoDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
+                    .subscribe(this::onTrackPositionReceived));
+        }
+    }
+
+    //little td: don't display notification in the stop state and notification isn't visible(delete intent)
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
         if (queueItem == null) {
