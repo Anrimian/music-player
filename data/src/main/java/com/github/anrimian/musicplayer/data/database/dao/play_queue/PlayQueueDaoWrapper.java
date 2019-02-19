@@ -62,6 +62,22 @@ public class PlayQueueDaoWrapper {
         playQueueDao.deleteItem(itemId);
     }
 
+    public void swapItems(PlayQueueItem firstItem,
+                          int firstPosition,
+                          PlayQueueItem secondItem,
+                          int secondPosition,
+                          boolean shuffleMode) {
+        appDatabase.runInTransaction(() -> {
+            if (shuffleMode) {
+                playQueueDao.setItemShuffledPosition(firstItem.getId(), secondPosition);
+                playQueueDao.setItemShuffledPosition(secondItem.getId(), firstPosition);
+            } else {
+                playQueueDao.setItemPosition(firstItem.getId(), secondPosition);
+                playQueueDao.setItemPosition(secondItem.getId(), firstPosition);
+            }
+        });
+    }
+
     PlayQueueLists insertNewPlayQueue(List<Composition> compositions,
                                       List<Composition> shuffledCompositions,
                                       long randomSeed) {

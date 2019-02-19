@@ -9,7 +9,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import org.junit.Before;
@@ -19,7 +18,6 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.observers.TestObserver;
@@ -34,6 +32,7 @@ import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFak
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeItems;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getReversedFakeItems;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.DELETED;
 import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.emptyList;
@@ -386,7 +385,7 @@ public class PlayQueueRepositoryImplTest {
 
     @Test
     public void testDeletedChangesWithManyItems() {
-        List<PlayQueueItem> items = ListUtils.asList(
+        List<PlayQueueItem> items = asList(
                 new PlayQueueItem(0, fakeComposition(0)),
                 new PlayQueueItem(1, fakeComposition(1)),
                 new PlayQueueItem(2, fakeComposition(1)),
@@ -411,7 +410,7 @@ public class PlayQueueRepositoryImplTest {
         TestObserver<PlayQueueEvent> compositionObserver = playQueueRepository.getCurrentQueueItemObservable()
                 .test();
 
-        List<Composition> deletedCompositions = ListUtils.asList(fakeComposition(1), fakeComposition(2));
+        List<Composition> deletedCompositions = asList(fakeComposition(1), fakeComposition(2));
 
         changeSubject.onNext(new Change<>(DELETED, deletedCompositions));
 
@@ -515,5 +514,38 @@ public class PlayQueueRepositoryImplTest {
             return true;
         });
 
+    }
+
+    @Test
+    public void swapItemsItem() {
+        playQueueRepository.setPlayQueue(asList(fakeComposition(0), fakeComposition(1))).subscribe();
+        playQueueRepository.getPlayQueueObservable()
+                .test()
+                .assertValue(list -> {
+                    assertEquals(fakeItem(0), list.get(0));
+                    assertEquals(fakeItem(1), list.get(1));
+                    return true;
+                });
+        playQueueRepository.swapItems(fakeItem(0), 0, fakeItem(1), 1)
+                .subscribe();
+
+        playQueueRepository.getPlayQueueObservable()
+                .test()
+                .assertValue(list -> {
+                    assertEquals(fakeItem(1), list.get(0));
+                    assertEquals(fakeItem(0), list.get(1));
+                    return true;
+                });
+
+        playQueueRepository.setRandomPlayingEnabled(true);
+        playQueueRepository.setRandomPlayingEnabled(false);
+
+        playQueueRepository.getPlayQueueObservable()
+                .test()
+                .assertValue(list -> {
+                    assertEquals(fakeItem(1), list.get(0));
+                    assertEquals(fakeItem(0), list.get(1));
+                    return true;
+                });
     }
 }

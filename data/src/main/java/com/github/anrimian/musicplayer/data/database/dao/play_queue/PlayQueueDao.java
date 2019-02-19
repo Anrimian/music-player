@@ -1,12 +1,12 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.Query;
-
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 
 import java.util.List;
+
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
 
 @Dao
 public interface PlayQueueDao {
@@ -34,4 +34,10 @@ public interface PlayQueueDao {
 
     @Query("UPDATE play_queue SET shuffledPosition = :shuffledPosition WHERE id = :id")
     void updateShuffledPosition(long id, int shuffledPosition);
+
+    @Query("UPDATE play_queue SET position = :position WHERE id = :itemId")
+    void setItemPosition(long itemId, int position);
+
+    @Query("UPDATE play_queue SET shuffledPosition = :position WHERE id = :itemId")
+    void setItemShuffledPosition(long itemId, int position);
 }
