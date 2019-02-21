@@ -36,8 +36,5 @@ public interface PlayQueueDao {
     void updateShuffledPosition(long id, int shuffledPosition);
 
     @Query("UPDATE play_queue SET position = :position WHERE id = :itemId")
-    void setItemPosition(long itemId, int position);
-
-    @Query("UPDATE play_queue SET shuffledPosition = :position WHERE id = :itemId")
-    void setItemShuffledPosition(long itemId, int position);
+    void updateItemPosition(long itemId, int position);
 }

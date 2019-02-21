@@ -54,6 +54,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListene
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.SimpleItemTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
@@ -77,6 +78,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -312,6 +314,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         RecyclerViewUtils.attachSwipeToDelete(rvPlayList,
                 getColorFromAttr(requireContext(), R.attr.colorAccent),
                 presenter::onItemSwipedToDelete);
+
+        SimpleItemTouchHelperCallback callback = new SimpleItemTouchHelperCallback();
+        callback.setOnMovedListener(presenter::onItemMoved);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(rvPlayList);
 
         if (savedInstanceState != null) {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
@@ -616,6 +623,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 getColorFromAttr(requireContext(), R.attr.colorControlNormal);
         ivSkipToNext.setColorFilter(color);
         ivSkipToNext.setEnabled(enabled);
+    }
+
+    @Override
+    public void notifyItemMoved(int from, int to) {
+        playQueueAdapter.notifyItemMoved(from, to);
     }
 
     @Override

@@ -211,8 +211,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     secondItem,
                     secondPosition,
                     settingsPreferences.isRandomPlayingEnabled());
-            List<PlayQueueItem> items = playQueueSubject.getValue();
-            Collections.swap(items, firstPosition, secondPosition);
         }).subscribeOn(scheduler);
     }
 

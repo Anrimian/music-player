@@ -517,8 +517,8 @@ public class PlayQueueRepositoryImplTest {
     }
 
     @Test
-    public void swapItemsItem() {
-        playQueueRepository.setPlayQueue(asList(fakeComposition(0), fakeComposition(1))).subscribe();
+    public void swapItemsTest() {
+        when(playQueueDao.getPlayQueue(any())).thenReturn(new PlayQueueLists(getFakeItems(), getReversedFakeItems()));
         playQueueRepository.getPlayQueueObservable()
                 .test()
                 .assertValue(list -> {
@@ -532,19 +532,8 @@ public class PlayQueueRepositoryImplTest {
         playQueueRepository.getPlayQueueObservable()
                 .test()
                 .assertValue(list -> {
-                    assertEquals(fakeItem(1), list.get(0));
-                    assertEquals(fakeItem(0), list.get(1));
-                    return true;
-                });
-
-        playQueueRepository.setRandomPlayingEnabled(true);
-        playQueueRepository.setRandomPlayingEnabled(false);
-
-        playQueueRepository.getPlayQueueObservable()
-                .test()
-                .assertValue(list -> {
-                    assertEquals(fakeItem(1), list.get(0));
-                    assertEquals(fakeItem(0), list.get(1));
+                    assertEquals(fakeItem(0), list.get(0));
+                    assertEquals(fakeItem(1), list.get(1));
                     return true;
                 });
     }

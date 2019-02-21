@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -88,4 +89,7 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void setSkipToNextButtonEnabled(boolean enabled);
+
+    @StateStrategyType(SkipStrategy.class)
+    void notifyItemMoved(int from, int to);
 }

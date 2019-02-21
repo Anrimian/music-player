@@ -45,4 +45,14 @@ public class PlayQueueEntity {
     public void setShuffledPosition(int shuffledPosition) {
         this.shuffledPosition = shuffledPosition;
     }
+
+    @Override
+    public String toString() {
+        return "PlayQueueEntity{" +
+                "id=" + id +
+                ", audioId=" + audioId +
+                ", position=" + position +
+                ", shuffledPosition=" + shuffledPosition +
+                '}';
+    }
 }

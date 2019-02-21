@@ -228,6 +228,16 @@ public class MusicPlayerInteractor {
         return playQueueRepository.removeQueueItem(item);
     }
 
+    public void swapItems(PlayQueueItem firstItem,
+                          int firstPosition,
+                          PlayQueueItem secondItem,
+                          int secondPosition) {
+        playQueueRepository.swapItems(firstItem, firstPosition, secondItem, secondPosition)
+                .doOnError(analytics::processNonFatalError)
+                .onErrorComplete()
+                .subscribe();
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
