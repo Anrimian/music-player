@@ -76,6 +76,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     }
 
     private void setIsDragging(RecyclerView.ViewHolder viewHolder, boolean dragging) {
+        if (viewHolder instanceof DragListener) {
+            ((DragListener) viewHolder).onDragStateChanged(dragging);
+        }
+
         if (viewHolder != null) {
             float scale = dragging ? 1.05f : 1f;
             viewHolder.itemView.animate()
