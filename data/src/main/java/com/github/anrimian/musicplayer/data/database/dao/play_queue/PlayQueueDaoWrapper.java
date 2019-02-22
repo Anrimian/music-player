@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
@@ -62,6 +64,22 @@ public class PlayQueueDaoWrapper {
         playQueueDao.deleteItem(itemId);
     }
 
+    public void swapItems(PlayQueueItem firstItem,
+                          int firstPosition,
+                          PlayQueueItem secondItem,
+                          int secondPosition,
+                          boolean shuffleMode) {
+        appDatabase.runInTransaction(() -> {
+            if (shuffleMode) {
+                playQueueDao.updateShuffledPosition(firstItem.getId(), secondPosition);
+                playQueueDao.updateShuffledPosition(secondItem.getId(), firstPosition);
+            } else {
+                playQueueDao.updateItemPosition(firstItem.getId(), secondPosition);
+                playQueueDao.updateItemPosition(secondItem.getId(), firstPosition);
+            }
+        });
+    }
+
     PlayQueueLists insertNewPlayQueue(List<Composition> compositions,
                                       List<Composition> shuffledCompositions,
                                       long randomSeed) {
@@ -80,6 +98,7 @@ public class PlayQueueDaoWrapper {
 
         Collections.sort(entities, (first, second) ->
                 Integer.compare(first.getPosition(), second.getPosition()));
+
         List<PlayQueueItem> items = toItems(entities, compositions);
 
         Collections.sort(entities, (first, second) ->

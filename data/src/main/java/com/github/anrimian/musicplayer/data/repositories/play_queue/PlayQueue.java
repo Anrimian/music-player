@@ -6,7 +6,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -152,6 +151,64 @@ public class PlayQueue {
             playQueueItem.setComposition(composition);
         }
         return true;
+    }
+
+    void swapItems(PlayQueueItem firstItem,
+                   int firstPosition,
+                   PlayQueueItem secondItem,
+                   int secondPosition) {
+        if (shuffled) {
+            swapItems(firstItem,
+                    firstPosition,
+                    secondItem,
+                    secondPosition,
+                    shuffledQueue,
+                    shuffledItemPositionMap,
+                    compositionShuffledPositionsMap);
+        } else {
+            swapItems(firstItem,
+                    firstPosition,
+                    secondItem,
+                    secondPosition,
+                    compositionQueue,
+                    itemPositionMap,
+                    compositionPositionsMap);
+        }
+    }
+
+    private void swapItems(PlayQueueItem firstItem,
+                           int firstPosition,
+                           PlayQueueItem secondItem,
+                           int secondPosition,
+                           List<PlayQueueItem> queue,
+                           Map<Long, Integer> itemPositionMap,
+                           Map<Long, List<Integer>> compositionPositionsMap) {
+        Collections.swap(queue, firstPosition, secondPosition);
+
+        itemPositionMap.put(firstItem.getId(), secondPosition);
+        itemPositionMap.put(secondItem.getId(), firstPosition);
+
+        swapCompositionPositions(firstItem.getComposition(),
+                firstPosition,
+                secondPosition,
+                compositionPositionsMap);
+        swapCompositionPositions(secondItem.getComposition(),
+                secondPosition,
+                firstPosition,
+                compositionPositionsMap);
+    }
+
+    private void swapCompositionPositions(Composition composition,
+                                          int firstPos,
+                                          int secondPos,
+                                          Map<Long, List<Integer>> compositionPositionsMap) {
+        List<Integer> positions = compositionPositionsMap.get(composition.getId());
+        for (int i = 0; i < positions.size(); i++) {
+            int compositionPosition = positions.get(i);
+            if (compositionPosition == firstPos) {
+                positions.set(i, secondPos);
+            }
+        }
     }
 
     private void replacePosition(int oldPosition,

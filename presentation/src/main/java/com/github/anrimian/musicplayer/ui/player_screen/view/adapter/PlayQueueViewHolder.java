@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 
 import javax.annotation.Nonnull;
 
@@ -19,11 +20,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+
 /**
  * Created on 31.10.2017.
  */
 
-class PlayQueueViewHolder extends RecyclerView.ViewHolder {
+class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListener {
 
     @BindView(R.id.clickable_item)
     View clickableItem;
@@ -61,6 +64,11 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder {
         this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
         this.onShareClickListener = onShareClickListener;
         this.onDeleteItemClickListener = onDeleteItemClickListener;
+    }
+
+    @Override
+    public void onDragStateChanged(boolean dragging) {
+
     }
 
     void bind(@Nonnull PlayQueueItem item) {

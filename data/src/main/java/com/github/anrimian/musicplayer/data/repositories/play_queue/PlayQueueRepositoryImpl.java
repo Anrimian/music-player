@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -195,6 +196,21 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 }
                 setCurrentItem(newItem);
             }
+        }).subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable swapItems(PlayQueueItem firstItem,
+                                 int firstPosition,
+                                 PlayQueueItem secondItem,
+                                 int secondPosition) {
+        return Completable.fromRunnable(() -> {
+            getPlayQueue().swapItems(firstItem, firstPosition, secondItem, secondPosition);
+            playQueueDao.swapItems(firstItem,
+                    firstPosition,
+                    secondItem,
+                    secondPosition,
+                    settingsPreferences.isRandomPlayingEnabled());
         }).subscribeOn(scheduler);
     }
 

@@ -38,4 +38,9 @@ public interface PlayQueueRepository {
     Completable skipToPosition(int position);
 
     Completable removeQueueItem(PlayQueueItem item);
+
+    Completable swapItems(PlayQueueItem firstItem,
+                          int firstPosition,
+                          PlayQueueItem secondItem,
+                          int secondPosition);
 }

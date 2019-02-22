@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.c
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -213,6 +214,34 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onDeleteQueueItemClicked(PlayQueueItem item) {
         deletePlayQueueItem(item);
+    }
+
+    void onItemMoved(int from, int to) {
+        if (from < to) {
+            for (int i = from; i < to; i++) {
+                swapItems(i, i + 1);
+            }
+        } else {
+            for (int i = from; i > to; i--) {
+                swapItems(i, i - 1);
+            }
+        }
+    }
+
+    private void swapItems(int from, int to) {
+        PlayQueueItem fromItem = playQueue.get(from);
+        PlayQueueItem toItem = playQueue.get(to);
+
+        Collections.swap(playQueue, from, to);
+        getViewState().notifyItemMoved(from, to);
+
+        if (fromItem.equals(currentItem)) {
+            currentPosition = to;
+        }
+        if (toItem.equals(currentItem)) {
+            currentPosition = from;
+        }
+        musicPlayerInteractor.swapItems(fromItem, from, toItem, to);
     }
 
     private void deletePlayQueueItem(PlayQueueItem item) {
