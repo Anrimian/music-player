@@ -1,7 +1,9 @@
 package com.github.anrimian.musicplayer.data.repositories.music.folders;
 
+import com.github.anrimian.musicplayer.data.models.exceptions.FolderNodeNonExistException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.utils.FileUtils;
+import com.github.anrimian.musicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.musicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
@@ -22,6 +24,7 @@ import static com.github.anrimian.musicplayer.data.utils.FileUtils.getFileName;
 import static com.github.anrimian.musicplayer.data.utils.FileUtils.getParentDirPath;
 import static com.github.anrimian.musicplayer.domain.Constants.TIMEOUTS.STORAGE_LOADING_TIMEOUT_SECONDS;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.indexOfEnd;
 import static io.reactivex.Observable.fromIterable;
 
 public class MusicFolderDataSource {
@@ -41,24 +44,56 @@ public class MusicFolderDataSource {
 
     public Single<Folder> getCompositionsInPath(@Nullable String path) {
         return getMusicFileTree()
-//                .delay(3, TimeUnit.SECONDS)//test timeout error
-                .timeout(STORAGE_LOADING_TIMEOUT_SECONDS, TimeUnit.SECONDS, Single.error(new StorageTimeoutException()))
-                .map(tree -> getFolderInPath(path));
+                .map(tree -> getFolderInPath(path, tree));
     }
 
-    private Folder getFolderInPath(@Nullable String path) {
-        RxNode<String> node = findNodeByPath(path);
+    public Single<List<String>> getAvailablePathsForPath(@Nullable String path) {
+        return getMusicFileTree()
+                .map(tree -> {
+                    List<String> paths = new ArrayList<>();
+                    paths.add(null);//root is always here
+                    if (path == null) {
+                        return paths;
+                    }
+
+                    RxNode<String> root = findRootNode(tree);
+                    FolderNode folderNode = (FolderNode) root.getData();
+                    String rootPath = folderNode.getFullPath();
+                    int lastIndexOfRootPath = indexOfEnd(path, rootPath);
+                    RxNode<String> currentNode = root;
+                    if (lastIndexOfRootPath != -1) {
+                        //+1 - remove slash at start
+                        String secondaryPaths = path.substring(lastIndexOfRootPath + 1, path.length());
+                        for (String partialPath: secondaryPaths.split("/")) {
+                            RxNode<String> child = currentNode.getChild(partialPath);
+                            if (child == null) {
+                                break;
+                            }
+                            NodeData nodeData = child.getData();
+                            if (nodeData instanceof FolderNode) {
+                                paths.add(((FolderNode) nodeData).getFullPath());
+                                currentNode = child;
+                            }
+                        }
+                    }
+
+                    return paths;
+                });
+    }
+
+
+    private Folder getFolderInPath(@Nullable String path, RxNode<String> root) {
+        RxNode<String> node = findNodeByPath(path, root);
+        if (node == null) {
+            throw new FolderNodeNonExistException();
+        }
         return folderMapper.toFolder(node);
     }
 
     @Nullable
-    private RxNode<String> findNodeByPath(@Nullable String fullPath) {
+    private RxNode<String> findNodeByPath(@Nullable String fullPath, RxNode<String> root) {
         if (fullPath == null) {
-            RxNode<String> found = root;
-            while (isEmptyFolderNode(found)) {
-                found = found.getNodes().get(0);
-            }
-            return found;
+            return findRootNode(root);
         }
         RxNode<String> target = root;
         RxNode<String> found = null;
@@ -67,6 +102,14 @@ public class MusicFolderDataSource {
             if (found != null) {
                 target = found;
             }
+        }
+        return found;
+    }
+
+    private RxNode<String> findRootNode(RxNode<String> root) {
+        RxNode<String> found = root;
+        while (isEmptyFolderNode(found)) {
+            found = found.getNodes().get(0);
         }
         return found;
     }
@@ -83,7 +126,10 @@ public class MusicFolderDataSource {
                 subscribeOnCompositionsChanging();
             }
             return root;
-        });
+        })//.delay(3, TimeUnit.SECONDS)//test timeout error
+                .timeout(STORAGE_LOADING_TIMEOUT_SECONDS,
+                        TimeUnit.SECONDS,
+                        Single.error(new StorageTimeoutException()));
     }
 
     private void subscribeOnCompositionsChanging() {
@@ -113,8 +159,10 @@ public class MusicFolderDataSource {
         for (Composition composition : compositions) {
             String path = pathIdMap.get(composition.getId());
             if (path != null && !path.equals(composition.getFilePath())) {
-                findNodeByPath(getParentDirPath(path))
-                        .removeNode(getFileName(composition.getFilePath()));
+                RxNode<String> node = findNodeByPath(getParentDirPath(path), root);
+                if (node != null) {
+                    node.removeNode(getFileName(composition.getFilePath()));
+                }
             }
             pathIdMap.put(composition.getId(), composition.getFilePath());
             getParentForPath(root, composition.getFilePath(), (node, partialPath) ->
@@ -137,7 +185,7 @@ public class MusicFolderDataSource {
     }
 
     private void removeCompositions(String path, List<String> paths) {
-        RxNode<String> node = findNodeByPath(path);
+        RxNode<String> node = findNodeByPath(path, root);
         if (node != null) {
             node.removeNodes(paths);
 

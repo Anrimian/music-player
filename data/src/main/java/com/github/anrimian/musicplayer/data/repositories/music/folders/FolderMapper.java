@@ -15,10 +15,10 @@ import javax.annotation.Nonnull;
 /**
  * Created on 13.08.2018.
  */
-public class FolderMapper {
+class FolderMapper {
 
     @Nonnull
-    public Folder toFolder(RxNode<String> node) {
+    Folder toFolder(@Nonnull RxNode<String> node) {
         return new Folder(
                 node.getChildObservable().map(this::toFileSources),
                 node.getSelfChangeObservable().map(this::toFileSource),

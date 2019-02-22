@@ -85,6 +85,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         } else {
             getViewState().showBackPathButton(path);
         }
+        //save last selected screen
         getViewState().showSearchMode(false);
 
         loadMusic();
@@ -259,7 +260,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     private void onMusicLoadingError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        ErrorCommand errorCommand = errorParser.parseError(throwable);//FolderNodeNonExistException
         getViewState().showError(errorCommand);
     }
 

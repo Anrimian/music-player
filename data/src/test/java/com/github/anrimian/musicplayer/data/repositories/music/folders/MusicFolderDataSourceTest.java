@@ -2,8 +2,8 @@ package com.github.anrimian.musicplayer.data.repositories.music.folders;
 
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
@@ -508,6 +508,34 @@ public class MusicFolderDataSourceTest {
                 .test()
                 .assertValue(list -> {
                     assertEquals(getManyCompositionsMap().size(), list.size());
+                    return true;
+                });
+    }
+
+    @Test
+    public void getAvailablePathsTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+
+        Composition compositionOne = fakeComposition(1L, "root/music/one.dd", 1L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = fakeComposition(2L, "root/music/two.dd", 2L);
+        compositions.put(2L, compositionTwo);
+
+        Composition compositionThree = fakeComposition(3L, "root/music/favorite/three.dd", 3L);
+        compositions.put(3L, compositionThree);
+
+        Composition compositionFour = fakeComposition(4L, "root/music/favorite/kiz/four.dd", 4L);
+        compositions.put(4L, compositionFour);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        musicFolderDataSource.getAvailablePathsForPath("root/music/favorite/kiz")
+                .test()
+                .assertValue(list -> {
+                    assertEquals(null, list.get(0));
+                    assertEquals("root/music/favorite", list.get(1));
+                    assertEquals("root/music/favorite/kiz", list.get(2));
                     return true;
                 });
     }

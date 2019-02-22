@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
 public class LibraryFoldersRootFragment extends LibraryFragment implements BackButtonListener {
 
     @BindView(R.id.library_folders_container)
-    JugglerView gvFoldersContainer;
+    JugglerView jvFoldersContainer;
 
     private FragmentNavigation navigation;
 
@@ -40,7 +40,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment implements BackB
         toolbar.setSubtitle(R.string.files);
 
         navigation = FragmentNavigation.from(getChildFragmentManager());
-        navigation.initialize(gvFoldersContainer, savedInstanceState);
+        navigation.initialize(jvFoldersContainer, savedInstanceState);
         navigation.setExitAnimation(R.anim.anim_slide_out_right);
         navigation.setEnterAnimation(R.anim.anim_slide_in_right);
 

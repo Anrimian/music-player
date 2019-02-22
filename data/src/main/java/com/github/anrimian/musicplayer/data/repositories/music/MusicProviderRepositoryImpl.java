@@ -76,7 +76,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Single<List<Composition>> getAllCompositionsInPath(@Nullable String path) {
-        return getCompositionsObservable(path)
+        return getCompositionsObservable(path)//FolderNodeNonExistException
                 .toList()
                 .subscribeOn(scheduler);
     }

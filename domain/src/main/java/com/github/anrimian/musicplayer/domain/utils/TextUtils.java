@@ -65,7 +65,7 @@ public class TextUtils {
         return source.substring(startIndex, source.indexOf(end, startIndex));
     }
 
-    private static int indexOfEnd(String text, String source) {
+    public static int indexOfEnd(String text, String source) {
         return text.indexOf(source) + source.length();
     }
 }
