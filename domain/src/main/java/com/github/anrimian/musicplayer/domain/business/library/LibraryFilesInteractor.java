@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.List;
 
@@ -27,15 +28,18 @@ public class LibraryFilesInteractor {
     private final MusicPlayerInteractor musicPlayerInteractor;
     private final PlayListsRepository playListsRepository;
     private final SettingsRepository settingsRepository;
+    private final UiStateRepository uiStateRepository;
 
     public LibraryFilesInteractor(MusicProviderRepository musicProviderRepository,
                                   MusicPlayerInteractor musicPlayerInteractor,
                                   PlayListsRepository playListsRepository,
-                                  SettingsRepository settingsRepository) {
+                                  SettingsRepository settingsRepository,
+                                  UiStateRepository uiStateRepository) {
         this.musicProviderRepository = musicProviderRepository;
         this.musicPlayerInteractor = musicPlayerInteractor;
         this.playListsRepository = playListsRepository;
         this.settingsRepository = settingsRepository;
+        this.uiStateRepository = uiStateRepository;
     }
 
     public Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText) {
@@ -87,5 +91,14 @@ public class LibraryFilesInteractor {
 
     public Order getFolderOrder() {
         return settingsRepository.getFolderOrder();
+    }
+
+    public void saveCurrentPath(@Nullable String path) {
+        uiStateRepository.setSelectedFolderScreen(path);
+    }
+
+    public Single<List<String>> getCurrentFolderScreens() {
+        String currentPath = uiStateRepository.getSelectedFolderScreen();
+        return musicProviderRepository.getAvailablePathsForPath(currentPath);
     }
 }

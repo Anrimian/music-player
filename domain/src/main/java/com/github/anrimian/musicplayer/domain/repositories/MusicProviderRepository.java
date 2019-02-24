@@ -4,7 +4,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -24,6 +23,8 @@ public interface MusicProviderRepository {
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
+
+    Single<List<String>> getAvailablePathsForPath(@Nullable String path);
 
     Completable writeErrorAboutComposition(ErrorType errorType, Composition composition);
 

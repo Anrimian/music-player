@@ -1,10 +1,11 @@
 package com.github.anrimian.musicplayer.ui;
 
-import androidx.annotation.MenuRes;
 import android.util.SparseIntArray;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.Screens;
+
+import androidx.annotation.MenuRes;
 
 public class ScreensMap {
 
@@ -23,7 +24,7 @@ public class ScreensMap {
         return screenMenuMap.get(menuId);
     }
 
-    public static int getMenuIdId(int screenId) {
+    public static int getMenuId(int screenId) {
         return screenMenuMapReversed.get(screenId);
     }
 }

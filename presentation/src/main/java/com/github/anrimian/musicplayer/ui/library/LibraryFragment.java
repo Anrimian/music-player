@@ -1,20 +1,21 @@
 package com.github.anrimian.musicplayer.ui.library;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
 import android.view.View;
 
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
-import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersRootFragment;
+import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 
 public class LibraryFragment extends MvpAppCompatFragment {
 
@@ -39,12 +40,12 @@ public class LibraryFragment extends MvpAppCompatFragment {
                 case R.id.menu_compositions: {
                     uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_COMPOSITIONS);
                     FragmentNavigation.from(requireFragmentManager())
-                            .newRootFragment(LibraryCompositionsFragment::new);
+                            .newRootFragment(new LibraryCompositionsFragment());
                     break;
                 }
                 case R.id.menu_files: {
                     FragmentNavigation.from(requireFragmentManager())
-                            .newRootFragment(LibraryFoldersRootFragment::new);
+                            .newRootFragment(new LibraryFoldersRootFragment());
                     uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_FOLDERS);
                     break;
                 }

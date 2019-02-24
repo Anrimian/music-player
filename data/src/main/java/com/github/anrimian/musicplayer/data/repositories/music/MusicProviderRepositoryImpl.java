@@ -82,6 +82,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
+    public Single<List<String>> getAvailablePathsForPath(@Nullable String path) {
+        return musicFolderDataSource.getAvailablePathsForPath(path)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Completable writeErrorAboutComposition(ErrorType errorType, Composition composition) {
         return Completable.complete()//TODO write error about composition
                 .subscribeOn(scheduler);

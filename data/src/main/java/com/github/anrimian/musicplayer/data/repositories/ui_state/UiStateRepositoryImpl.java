@@ -54,4 +54,14 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     public int getSelectedLibraryScreen() {
         return uiStatePreferences.getSelectedLibraryScreen();
     }
+
+    @Override
+    public void setSelectedFolderScreen(String path) {
+        uiStatePreferences.setSelectedFolderScreen(path);
+    }
+
+    @Override
+    public String getSelectedFolderScreen() {
+        return uiStatePreferences.getSelectedFolderScreen();
+    }
 }

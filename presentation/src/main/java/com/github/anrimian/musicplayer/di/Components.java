@@ -12,6 +12,8 @@ import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompos
 import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompositionsModule;
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesComponent;
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesModule;
+import com.github.anrimian.musicplayer.di.app.library.files.folder.FolderComponent;
+import com.github.anrimian.musicplayer.di.app.library.files.folder.FolderModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 
@@ -52,8 +54,13 @@ public class Components {
         return getInstance().buildLibraryComponent();
     }
 
-    public static LibraryFilesComponent getLibraryFilesComponent(@Nullable String path) {
-        return getLibraryComponent().libraryFilesComponent(new LibraryFilesModule(path));
+    public static FolderComponent getLibraryFolderComponent(@Nullable String path) {
+        return getLibraryRootFolderComponent().folderComponent(new FolderModule(path));
+    }
+
+    //save reference later if need
+    public static LibraryFilesComponent getLibraryRootFolderComponent() {
+        return getLibraryComponent().libraryFilesComponent(new LibraryFilesModule());
     }
 
     public static LibraryCompositionsComponent getLibraryCompositionsComponent() {

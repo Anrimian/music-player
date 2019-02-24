@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
@@ -89,4 +90,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showReceiveCompositionsForSendError(ErrorCommand errorCommand);
+
+    @StateStrategyType(SkipStrategy.class)
+    void goToMusicStorageScreen(String path);
 }

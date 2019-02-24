@@ -15,7 +15,7 @@ ext {
     androidCompileSdkVersion = 28
 
     //Libraries
-    androidXVersion = "1.0.2"
+    androidXVersion = "1.1.0-alpha02"
     googleMaterialVersion = "1.1.0-alpha01"
     cardViewVersion = "1.0.0"
     recyclerViewVersion = "1.0.0"

@@ -105,7 +105,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
 
     @ProvidePresenter
     LibraryFoldersPresenter providePresenter() {
-        return Components.getLibraryFilesComponent(getPath()).storageLibraryPresenter();
+        return Components.getLibraryFolderComponent(getPath()).storageLibraryPresenter();
     }
 
     @Override
@@ -168,7 +168,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
 //        menu.clear();//what fix was it?
         inflater.inflate(R.menu.library_files_menu, menu);
         orderMenuItem.setMenuItem(menu, R.id.menu_order);
@@ -176,7 +176,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_order: {
@@ -197,7 +197,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
         if (adapter == null) {
             adapter = new MusicFileSourceAdapter(musicList);
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-            adapter.setOnFolderClickListener(this::goToMusicStorageScreen);
+            adapter.setOnFolderClickListener(presenter::onFolderClicked);
             adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
             adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
             recyclerView.setAdapter(adapter);
@@ -350,6 +350,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
                 .show();
     }
 
+    @Override
+    public void goToMusicStorageScreen(String path) {
+        FragmentNavigation.from(requireFragmentManager())
+                .addNewFragment(LibraryFoldersFragment.newInstance(path));
+    }
+
     private void onCompositionMenuClicked(View view, Composition composition) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.composition_item_menu);
@@ -374,7 +380,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     }
 
     private void onFolderMenuClicked(View view, FolderFileSource folder) {
-        PopupMenu popup = new PopupMenu(getContext(), view);
+        PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.folder_item_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -394,10 +400,5 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
             return false;
         });
         popup.show();
-    }
-
-    private void goToMusicStorageScreen(String path) {
-        FragmentNavigation.from(requireFragmentManager())
-                .addNewFragment(() -> LibraryFoldersFragment.newInstance(path));
     }
 }

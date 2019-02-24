@@ -21,4 +21,8 @@ public interface UiStateRepository {
     void setSelectedLibraryScreen(int screenId);
 
     int getSelectedLibraryScreen();
+
+    void setSelectedFolderScreen(String path);
+
+    String getSelectedFolderScreen();
 }

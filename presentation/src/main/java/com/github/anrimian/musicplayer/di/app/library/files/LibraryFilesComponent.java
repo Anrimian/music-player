@@ -1,14 +1,16 @@
 package com.github.anrimian.musicplayer.di.app.library.files;
 
-import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersPresenter;
+import com.github.anrimian.musicplayer.di.app.library.files.folder.FolderComponent;
+import com.github.anrimian.musicplayer.di.app.library.files.folder.FolderModule;
+import com.github.anrimian.musicplayer.ui.library.folders.root.FolderRootPresenter;
 
 import dagger.Subcomponent;
 
-/**
- * Created on 31.10.2017.
- */
 @Subcomponent(modules = LibraryFilesModule.class)
+@LibraryFilesScope
 public interface LibraryFilesComponent {
 
-    LibraryFoldersPresenter storageLibraryPresenter();
+    FolderRootPresenter folderRootPresenter();
+
+    FolderComponent folderComponent(FolderModule module);
 }

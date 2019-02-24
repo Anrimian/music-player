@@ -189,6 +189,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
                 .subscribe(getViewState()::sendCompositions, this::onReceiveCompositionsError);
     }
 
+    void onFolderClicked(String path) {
+        interactor.saveCurrentPath(path);
+        getViewState().goToMusicStorageScreen(path);
+    }
+
     private void onReceiveCompositionsError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showReceiveCompositionsForSendError(errorCommand);
@@ -240,6 +245,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             if (lastSlashIndex != -1 && firstSlashIndex != lastSlashIndex) {
                 targetPath = path.substring(0, lastSlashIndex);//TODO root path check
             }
+//            interactor.saveCurrentPath(targetPath);//TODO not working, where save it?
             getViewState().goBackToMusicStorageScreen(targetPath);
         }
     }

@@ -52,7 +52,7 @@ public class MusicFolderDataSource {
                 .map(tree -> {
                     List<String> paths = new ArrayList<>();
                     paths.add(null);//root is always here
-                    if (path == null) {
+                    if (path == null) {//empty string?
                         return paths;
                     }
 

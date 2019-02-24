@@ -25,7 +25,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
-import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersRootFragment;
+import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
@@ -358,7 +358,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             if (drawer.getDrawerLockMode(GravityCompat.START) != LOCK_MODE_LOCKED_CLOSED) {
                 drawer.openDrawer(GravityCompat.START);
@@ -444,7 +444,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showDrawerScreen(int screenId) {
-        int itemId = ScreensMap.getMenuIdId(screenId);
+        int itemId = ScreensMap.getMenuId(screenId);
         selectedDrawerItemId = itemId;
         navigationView.setCheckedItem(itemId);
 
@@ -721,7 +721,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void startFragment(Fragment fragment) {
-        navigation.newRootFragment(() -> fragment, 0, R.anim.anim_alpha_appear);
+        navigation.newRootFragment(fragment, 0, R.anim.anim_alpha_appear);
     }
 
     private void clearFragment() {

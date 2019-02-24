@@ -6,6 +6,15 @@ import android.content.SharedPreferences;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.CURRENT_COMPOSITION_ID;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.CURRENT_PLAY_QUEUE_ID;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.IS_PLAYER_PANEL_OPEN;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.PREFERENCES_NAME;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_DRAWER_SCREEN;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_FOLDER_SCREEN;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_LIBRARY_SCREEN;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.TRACK_POSITION;
+
 /**
  * Created on 16.04.2018.
  */
@@ -13,14 +22,17 @@ public class UiStatePreferences {
 
     public static final long NO_COMPOSITION = Long.MIN_VALUE;
 
-    private static final String PREFERENCES_NAME = "ui_preferences";
+    interface Constants {
+        String PREFERENCES_NAME = "ui_preferences";
 
-    private static final String TRACK_POSITION = "track_position";
-    private static final String CURRENT_PLAY_QUEUE_ID = "current_play_queue_id";
-    private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
-    private static final String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
-    private static final String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
-    private static final String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
+        String TRACK_POSITION = "track_position";
+        String CURRENT_PLAY_QUEUE_ID = "current_play_queue_id";
+        String CURRENT_COMPOSITION_ID = "current_composition_id";
+        String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
+        String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
+        String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
+        String SELECTED_FOLDER_SCREEN = "selected_folder_screen";
+    }
 
     private final SharedPreferencesHelper preferences;
 
@@ -76,5 +88,13 @@ public class UiStatePreferences {
 
     public Long getCurrentCompositionId() {
         return preferences.getLong(CURRENT_COMPOSITION_ID, NO_COMPOSITION);
+    }
+
+    public void setSelectedFolderScreen(String path) {
+        preferences.putString(SELECTED_FOLDER_SCREEN, path);
+    }
+
+    public String getSelectedFolderScreen() {
+        return preferences.getString(SELECTED_FOLDER_SCREEN);
     }
 }
