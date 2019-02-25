@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourc
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
@@ -62,7 +63,8 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
  * Created on 23.10.2017.
  */
 
-public class LibraryFoldersFragment extends MvpAppCompatFragment implements LibraryFoldersView, BackButtonListener {
+public class LibraryFoldersFragment extends MvpAppCompatFragment
+        implements LibraryFoldersView, BackButtonListener, FragmentLayerListener {
 
     @InjectPresenter
     LibraryFoldersPresenter presenter;
@@ -168,6 +170,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     }
 
     @Override
+    public void onFragmentMovedOnTop() {
+        presenter.onFragmentDisplayed();
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
 //        menu.clear();//what fix was it?
         inflater.inflate(R.menu.library_files_menu, menu);
@@ -252,7 +259,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment implements Libr
     }
 
     @Override
-    public void goBackToMusicStorageScreen(String path) {
+    public void goBackToParentFolderScreen() {
         FragmentNavigation.from(requireFragmentManager()).goBack();
     }
 

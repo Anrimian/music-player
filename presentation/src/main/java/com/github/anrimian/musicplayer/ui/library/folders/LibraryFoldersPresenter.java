@@ -85,7 +85,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         } else {
             getViewState().showBackPathButton(path);
         }
-        //save last selected screen
         getViewState().showSearchMode(false);
 
         loadMusic();
@@ -190,8 +189,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onFolderClicked(String path) {
-        interactor.saveCurrentPath(path);
         getViewState().goToMusicStorageScreen(path);
+    }
+
+    void onFragmentDisplayed() {
+        interactor.saveCurrentPath(path);
     }
 
     private void onReceiveCompositionsError(Throwable throwable) {
@@ -239,14 +241,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private void goBackToPreviousPath() {
         if (path != null) {
-            String targetPath = null;
-            int lastSlashIndex = path.lastIndexOf('/');
-            int firstSlashIndex = path.indexOf("/");
-            if (lastSlashIndex != -1 && firstSlashIndex != lastSlashIndex) {
-                targetPath = path.substring(0, lastSlashIndex);//TODO root path check
-            }
-//            interactor.saveCurrentPath(targetPath);//TODO not working, where save it?
-            getViewState().goBackToMusicStorageScreen(targetPath);
+            getViewState().goBackToParentFolderScreen();
         }
     }
 

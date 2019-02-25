@@ -50,7 +50,7 @@ public interface LibraryFoldersView extends MvpView {
     void hideBackPathButton();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void goBackToMusicStorageScreen(String targetPath);
+    void goBackToParentFolderScreen();
 
     @StateStrategyType(AddToStartSingleStrategy.class)
     void updateList(ListUpdate<FileSource> update);
