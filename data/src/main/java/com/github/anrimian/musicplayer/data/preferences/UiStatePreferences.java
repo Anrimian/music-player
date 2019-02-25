@@ -13,6 +13,7 @@ import static com.github.anrimian.musicplayer.data.preferences.UiStatePreference
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_DRAWER_SCREEN;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_FOLDER_SCREEN;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_LIBRARY_SCREEN;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_PLAYLIST_SCREEN;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.TRACK_POSITION;
 
 /**
@@ -32,6 +33,7 @@ public class UiStatePreferences {
         String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
         String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
         String SELECTED_FOLDER_SCREEN = "selected_folder_screen";
+        String SELECTED_PLAYLIST_SCREEN = "selected_playlist_screen";
     }
 
     private final SharedPreferencesHelper preferences;
@@ -96,5 +98,13 @@ public class UiStatePreferences {
 
     public String getSelectedFolderScreen() {
         return preferences.getString(SELECTED_FOLDER_SCREEN);
+    }
+
+    public void setSelectedPlayListScreen(long playListId) {
+        preferences.putLong(SELECTED_PLAYLIST_SCREEN, playListId);
+    }
+
+    public long getSelectedPlayListScreen() {
+        return preferences.getLong(SELECTED_PLAYLIST_SCREEN);
     }
 }

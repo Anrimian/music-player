@@ -71,6 +71,10 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
                 .subscribe(this::onPlayListDeleted, this::onPlayListDeletingError);
     }
 
+    void onFragmentMovedToTop() {
+        playListsInteractor.setSelectedPlayListScreen(0);
+    }
+
     private void onPlayListDeletingError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showDeletePlayListError(errorCommand);

@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepo
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
@@ -51,8 +52,9 @@ public class PlayListsModule {
 
     @Provides
     @Nonnull
-    PlayListsInteractor playListsInteractor(PlayListsRepository playListsRepository) {
-        return new PlayListsInteractor(playListsRepository);
+    PlayListsInteractor playListsInteractor(PlayListsRepository playListsRepository,
+                                            UiStateRepository uiStateRepository) {
+        return new PlayListsInteractor(playListsRepository, uiStateRepository);
     }
 
     @Provides

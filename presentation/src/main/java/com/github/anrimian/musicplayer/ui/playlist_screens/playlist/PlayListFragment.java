@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
@@ -49,7 +50,8 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
 
-public class PlayListFragment extends MvpAppCompatFragment implements PlayListView {
+public class PlayListFragment extends MvpAppCompatFragment
+        implements PlayListView, FragmentLayerListener {
 
     @InjectPresenter
     PlayListPresenter presenter;
@@ -121,13 +123,18 @@ public class PlayListFragment extends MvpAppCompatFragment implements PlayListVi
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onFragmentMovedOnTop() {
+        presenter.onFragmentMovedToTop();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.play_list_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_delete_play_list: {

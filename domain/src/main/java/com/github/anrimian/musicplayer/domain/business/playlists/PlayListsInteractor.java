@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.List;
 
@@ -17,9 +18,12 @@ public class PlayListsInteractor {
     private final PlayListNameValidator nameValidator = new PlayListNameValidator();
 
     private final PlayListsRepository playListsRepository;
+    private final UiStateRepository uiStateRepository;
 
-    public PlayListsInteractor(PlayListsRepository playListsRepository) {
+    public PlayListsInteractor(PlayListsRepository playListsRepository,
+                               UiStateRepository uiStateRepository) {
         this.playListsRepository = playListsRepository;
+        this.uiStateRepository = uiStateRepository;
     }
 
     public Observable<List<PlayList>> getPlayListsObservable() {
@@ -49,5 +53,13 @@ public class PlayListsInteractor {
 
     public Completable deletePlayList(long playListId) {
         return playListsRepository.deletePlayList(playListId);
+    }
+
+    public void setSelectedPlayListScreen(long playListId) {
+        uiStateRepository.setSelectedPlayListScreen(playListId);
+    }
+
+    public long getSelectedPlayListScreen() {
+        return uiStateRepository.getSelectedPlayListScreen();
     }
 }

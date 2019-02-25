@@ -95,6 +95,8 @@ public class PlayListsFragment extends MvpAppCompatFragment
         toolbar.setTitle(R.string.play_lists);
         toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
+
+        presenter.onFragmentMovedToTop();
     }
 
     @Override
