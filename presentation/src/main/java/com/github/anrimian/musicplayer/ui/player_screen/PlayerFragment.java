@@ -454,7 +454,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 break;
             }
             case Screens.PLAY_LISTS: {
-                startFragment(new PlayListsFragment());
+                startFragment(new PlayListsFragment());//restore stack here
                 break;
             }
         }
