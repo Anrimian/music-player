@@ -26,7 +26,7 @@ public interface UiStateRepository {
 
     String getSelectedFolderScreen();
 
-    void setSelectedPlayListScreen(long playListId);
+    void setSelectedPlayListScreenId(long playListId);
 
-    long getSelectedPlayListScreen();
+    long getSelectedPlayListScreenId();
 }

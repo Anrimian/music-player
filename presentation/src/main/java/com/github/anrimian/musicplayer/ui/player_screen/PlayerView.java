@@ -82,7 +82,7 @@ public interface PlayerView extends MvpView {
     void showPlayQueueSubtitle(int size);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showDrawerScreen(int selectedDrawerScreen);
+    void showDrawerScreen(int selectedDrawerScreen, long selectedPlayListScreen);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showLibraryScreen(int selectedLibraryScreen);

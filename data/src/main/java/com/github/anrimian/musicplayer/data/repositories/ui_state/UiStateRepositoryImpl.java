@@ -66,12 +66,12 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     }
 
     @Override
-    public void setSelectedPlayListScreen(long playListId) {
+    public void setSelectedPlayListScreenId(long playListId) {
         uiStatePreferences.setSelectedPlayListScreen(playListId);
     }
 
     @Override
-    public long getSelectedPlayListScreen() {
+    public long getSelectedPlayListScreenId() {
         return uiStatePreferences.getSelectedPlayListScreen();
     }
 }

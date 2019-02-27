@@ -56,10 +56,10 @@ public class PlayListsInteractor {
     }
 
     public void setSelectedPlayListScreen(long playListId) {
-        uiStateRepository.setSelectedPlayListScreen(playListId);
+        uiStateRepository.setSelectedPlayListScreenId(playListId);
     }
 
     public long getSelectedPlayListScreen() {
-        return uiStateRepository.getSelectedPlayListScreen();
+        return uiStateRepository.getSelectedPlayListScreenId();
     }
 }

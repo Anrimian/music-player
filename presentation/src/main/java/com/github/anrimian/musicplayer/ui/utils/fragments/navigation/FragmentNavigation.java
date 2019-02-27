@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
@@ -33,14 +32,10 @@ public class FragmentNavigation {
 
     private boolean checkOnEqualityOnReplace = false;
 
-    @AnimRes
-    private int enterAnimation = 0;
-    @AnimRes
-    private int exitAnimation = 0;
-    @AnimRes
-    private int rootEnterAnimation = 0;
-    @AnimRes
-    private int rootExitAnimation = 0;
+    @AnimRes private int enterAnimation = 0;
+    @AnimRes private int exitAnimation = 0;
+    @AnimRes private int rootEnterAnimation = 0;
+    @AnimRes private int rootExitAnimation = 0;
 
     public static FragmentNavigation from(FragmentManager fm) {
         NavigationFragment container = (NavigationFragment) fm.findFragmentByTag(NAVIGATION_FRAGMENT_TAG);
@@ -78,8 +73,56 @@ public class FragmentNavigation {
         state.putParcelableArrayList(SCREENS, getBundleScreens());
     }
 
-    //TODO save screens stack
-    //TODO fragment changes class name on update? Same with arguments
+    public void newRootFragmentStack(List<Fragment> fragments) {
+        newRootFragmentStack(fragments, rootExitAnimation);
+    }
+
+    public void newRootFragmentStack(List<Fragment> fragments,
+                                     @AnimRes int exitAnimation) {
+        newRootFragmentStack(fragments, exitAnimation, rootEnterAnimation);
+    }
+
+    public void newRootFragmentStack(List<Fragment> fragments,
+                                     @AnimRes int exitAnimation,
+                                     @AnimRes int enterAnimation) {
+        checkForInitialization();
+        if (!isNavigationEnabled) {
+            return;
+        }
+        if (fragments.isEmpty()) {
+            return;
+        }
+        if (fragments.size() == 1) {
+            newRootFragment(fragments.get(0), exitAnimation, enterAnimation);
+            return;
+        }
+        isNavigationEnabled = false;
+        screens.clear();
+        screens.addAll(mapList(fragments, FragmentMetaData::new));
+        int id = jugglerView.getTopViewId();
+        fragmentManagerProvider.getFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(enterAnimation, exitAnimation)
+                .replace(id, fragments.get(fragments.size() - 1))
+                .runOnCommit(() -> {
+                    hideBottomFragmentMenu();
+                    notifyStackListeners();
+                    notifyFragmentMovedToTop(getFragmentOnTop());
+
+                    jugglerView.postDelayed(
+                            () -> {
+                                if (fragments.size() > 1) {
+                                    silentlyReplaceBottomFragment();
+                                }
+                                isNavigationEnabled = true;
+                            },
+                            getAnimationDuration(enterAnimation)
+                    );
+
+                })
+                .commit();
+
+    }
 
     public void addNewFragmentStack(List<Fragment> fragments) {
         addNewFragmentStack(fragments, enterAnimation);
@@ -91,6 +134,10 @@ public class FragmentNavigation {
             return;
         }
         if (fragments.isEmpty()) {
+            return;
+        }
+        if (fragments.size() == 1) {
+            addNewFragment(fragments.get(0), enterAnimation);
             return;
         }
         isNavigationEnabled = false;
@@ -187,25 +234,21 @@ public class FragmentNavigation {
         }
 
         isNavigationEnabled = false;
-        Fragment oldBottomFragment = getFragmentOnBottom();
         screens.clear();
         screens.add(new FragmentMetaData(newRootFragment));
         int topViewId = jugglerView.getTopViewId();
-        FragmentTransaction transaction = fragmentManagerProvider.getFragmentManager()
-                .beginTransaction();
-        if (oldBottomFragment != null) {
-            // I don't see it, but guess:
-            // while oldTopFragment disappears, bottom fragment can be little visible.
-            // How to check it?
-            transaction.remove(oldBottomFragment);
-        }
-        transaction.setCustomAnimations(enterAnimation, exitAnimation)
+        fragmentManagerProvider.getFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(enterAnimation, exitAnimation)
                 .replace(topViewId, newRootFragment)
                 .runOnCommit(() -> {
                     notifyStackListeners();
                     notifyFragmentMovedToTop(getFragmentOnTop());
                     jugglerView.postDelayed(
-                            () -> isNavigationEnabled = true,
+                            () -> {
+                                silentlyClearBottomFragment();
+                                isNavigationEnabled = true;
+                            },
                             getAnimationDuration(enterAnimation)
                     );
                 })
@@ -373,6 +416,17 @@ public class FragmentNavigation {
                     .beginTransaction()
                     .replace(jugglerView.getBottomViewId(), createFragment(bottomFragment))
                     .runOnCommit(this::hideBottomFragmentMenu)
+                    .commit();
+        }
+    }
+
+    private void silentlyClearBottomFragment() {
+        Fragment fragment = getFragmentOnBottom();
+        if (fragment != null) {
+            fragmentManagerProvider.getFragmentManager()
+                    .beginTransaction()
+                    .remove(fragment)
+                    .runOnCommit(() -> fragment.setMenuVisibility(false))
                     .commit();
         }
     }

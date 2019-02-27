@@ -30,6 +30,7 @@ import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAd
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
@@ -61,6 +62,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.DrawableRes;
@@ -443,7 +445,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showDrawerScreen(int screenId) {
+    public void showDrawerScreen(int screenId, long selectedPlayListScreenId) {
         int itemId = ScreensMap.getMenuId(screenId);
         selectedDrawerItemId = itemId;
         navigationView.setCheckedItem(itemId);
@@ -454,7 +456,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 break;
             }
             case Screens.PLAY_LISTS: {
-                startFragment(new PlayListsFragment());//restore stack here
+                List<Fragment> fragments = new ArrayList<>();
+                fragments.add(new PlayListsFragment());
+                if (selectedPlayListScreenId != 0) {
+                    fragments.add(PlayListFragment.newInstance(selectedPlayListScreenId));
+                }
+                navigation.newRootFragmentStack(fragments, 0, R.anim.anim_alpha_appear);
                 break;
             }
         }

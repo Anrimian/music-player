@@ -80,7 +80,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         } else {
             getViewState().collapseBottomPanel();
         }
-        getViewState().showDrawerScreen(playerScreenInteractor.getSelectedDrawerScreen());
+        getViewState().showDrawerScreen(playerScreenInteractor.getSelectedDrawerScreen(),
+                playerScreenInteractor.getSelectedPlayListScreenId());
     }
 
     void onStart() {
@@ -112,7 +113,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onDrawerScreenSelected(int screenId) {
         playerScreenInteractor.setSelectedDrawerScreen(screenId);
-        getViewState().showDrawerScreen(screenId);
+        getViewState().showDrawerScreen(screenId, 0);
     }
 
     void onLibraryScreenSelected() {

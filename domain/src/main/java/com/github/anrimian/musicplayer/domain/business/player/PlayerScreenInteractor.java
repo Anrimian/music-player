@@ -26,6 +26,10 @@ public class PlayerScreenInteractor {
         return uiStateRepository.getSelectedDrawerScreen();
     }
 
+    public long getSelectedPlayListScreenId() {
+        return uiStateRepository.getSelectedPlayListScreenId();
+    }
+
     public int getSelectedLibraryScreen() {
         return uiStateRepository.getSelectedLibraryScreen();
     }
