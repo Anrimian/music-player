@@ -107,6 +107,10 @@ public class ViewUtils {
         animator.start();
     }
 
+    public static void animateBackgroundColor(View view, @ColorInt int color) {
+        animateColor(getBackgroundColor(view), color, view::setBackgroundColor);
+    }
+
     public static Animator getBackgroundAnimatorAttr(View view,
                                                  @AttrRes int from,
                                                  @AttrRes int to) {
@@ -171,6 +175,16 @@ public class ViewUtils {
                 anchor);
         menuHelper.setForceShowIcon(true);
         menuHelper.show();
+    }
+
+    @ColorInt
+    public static int getBackgroundColor(View view) {
+        int color = Color.TRANSPARENT;
+        Drawable background = view.getBackground();
+        if (background instanceof ColorDrawable) {
+            color = ((ColorDrawable) background).getColor();
+        }
+        return color;
     }
 
     /**

@@ -9,4 +9,6 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 public interface ErrorParser<T extends ErrorCommand> {
 
     T parseError(Throwable throwable);
+
+    void logError(Throwable throwable);
 }

@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 
 import static androidx.core.graphics.ColorUtils.setAlphaComponent;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 
 /**
  * Created on 31.10.2017.
@@ -41,7 +41,9 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
 
     private Composition composition;
     private Drawable foregroundDrawable;
+
     private boolean selected = false;
+    private boolean playing = false;
 
     public MusicViewHolder(LayoutInflater inflater,
                            ViewGroup parent,
@@ -78,14 +80,36 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
     public void setSelected(boolean selected) {
         if (this.selected != selected) {
             this.selected = selected;
-            int unselectedColor = Color.TRANSPARENT;
-            int selectedColor = getSelectionColor();
-            int startColor = selected ? unselectedColor : selectedColor;
-            int endColor = selected ? selectedColor : unselectedColor;
-            animateColor(startColor, endColor, color -> clickableItem.setBackgroundColor(color));
-
+            if (!selected && playing) {
+                showAsPlaying(true);
+            } else {
+                int unselectedColor = Color.TRANSPARENT;
+                int selectedColor = getSelectionColor();
+                int endColor = selected ? selectedColor : unselectedColor;
+                animateBackgroundColor(clickableItem, endColor);
+            }
             setBackgroundClickEffectEnabled(!selected);
         }
+    }
+
+    public void setPlaying(boolean playing) {
+        if (this.playing != playing) {
+            this.playing = playing;
+            if (!selected) {
+                showAsPlaying(playing);
+            }
+        }
+    }
+
+    public Composition getComposition() {
+        return composition;
+    }
+
+    private void showAsPlaying(boolean playing) {
+        int unselectedColor = Color.TRANSPARENT;
+        int selectedColor = getPlaySelectionColor();
+        int endColor = playing ? selectedColor : unselectedColor;
+        animateBackgroundColor(clickableItem, endColor);
     }
 
     private void selectImmediate() {
@@ -109,6 +133,11 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
     @ColorInt
     private int getSelectionColor() {
         return setAlphaComponent(getColorFromAttr(getContext(), R.attr.colorAccent), 25);
+    }
+
+    @ColorInt
+    private int getPlaySelectionColor() {
+        return setAlphaComponent(getColorFromAttr(getContext(), R.attr.colorPrimary), 20);
     }
 
     private Context getContext() {

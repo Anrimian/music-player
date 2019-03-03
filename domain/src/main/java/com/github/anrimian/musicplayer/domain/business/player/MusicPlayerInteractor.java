@@ -29,6 +29,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
+import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
@@ -85,7 +86,7 @@ public class MusicPlayerInteractor {
     }
 
     public void startPlaying(List<Composition> compositions) {
-        startPlaying(compositions, 0);
+        startPlaying(compositions, NO_POSITION);
     }
 
     public void startPlaying(List<Composition> compositions, int firstPosition) {
@@ -93,6 +94,8 @@ public class MusicPlayerInteractor {
                 .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
                 .doOnError(t -> playerStateSubject.onNext(STOP))
                 .doOnComplete(this::play)
+                .doOnError(analytics::processNonFatalError)
+                .onErrorComplete()
                 .subscribe();
     }
 
@@ -106,13 +109,18 @@ public class MusicPlayerInteractor {
             playerStateSubject.onNext(PLAY);
             musicPlayerController.resume();
 
-            if (systemEventsDisposable.size() == 0) {
-                systemEventsDisposable.add(audioFocusObservable
-                        .subscribe(this::onAudioFocusChanged));
+            systemEventsDisposable.clear();
+            systemEventsDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
+            systemEventsDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
+                    .subscribe(this::onAudioBecomingNoisy));
+        }
+    }
 
-                systemEventsDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
-                        .subscribe(this::onAudioBecomingNoisy));
-            }
+    public void playOrPause() {
+        if (playerStateSubject.getValue() == PLAY) {
+            pause();
+        } else {
+            play();
         }
     }
 

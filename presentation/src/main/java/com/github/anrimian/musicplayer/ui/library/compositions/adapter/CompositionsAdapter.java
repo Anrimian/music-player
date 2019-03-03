@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
@@ -31,6 +32,9 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     private OnPositionItemClickListener<Composition> onCompositionClickListener;
     private OnViewItemClickListener<Composition> onMenuItemClickListener;
     private OnPositionItemClickListener<Composition> onLongClickListener;
+
+    @Nullable
+    private Composition currentComposition;
 
     public CompositionsAdapter(List<Composition> musicList,
                                HashSet<Composition> selectedCompositions) {
@@ -56,6 +60,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         holder.bind(composition);
         boolean selected = selectedCompositions.contains(composition);
         holder.setSelected(selected);
+        holder.setPlaying(composition.equals(currentComposition));
     }
 
     @Override
@@ -117,5 +122,12 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     public void setOnLongClickListener(OnPositionItemClickListener<Composition> onLongClickListener) {
         this.onLongClickListener = onLongClickListener;
+    }
+
+    public void showPlayingComposition(Composition composition) {
+        currentComposition = composition;
+        for (MusicViewHolder holder: viewHolders) {
+            holder.setPlaying(holder.getComposition().equals(composition));
+        }
     }
 }

@@ -3,9 +3,12 @@ package com.github.anrimian.musicplayer.ui.library.compositions;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryCompositionsInteractor;
+import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -32,10 +35,12 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     private final LibraryCompositionsInteractor interactor;
     private final PlayListsInteractor playListsInteractor;
+    private final MusicPlayerInteractor playerInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
+    private final CompositeDisposable presenterBatterySafeDisposable = new CompositeDisposable();
     private Disposable compositionsDisposable;
 
     private List<Composition> compositions = new ArrayList<>();
@@ -52,12 +57,17 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     @Nullable
     private String searchText;
 
+    @Nullable
+    private Composition currentComposition;
+
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
+                                        MusicPlayerInteractor playerInteractor,
                                         ErrorParser errorParser,
                                         Scheduler uiScheduler) {
         this.interactor = interactor;
         this.playListsInteractor = playListsInteractor;
+        this.playerInteractor = playerInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
@@ -74,13 +84,26 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         presenterDisposable.dispose();
     }
 
+    void onStart() {
+        subscribeOnCurrentComposition();
+    }
+
+    void onStop() {
+        presenterBatterySafeDisposable.clear();
+    }
+
     void onTryAgainLoadCompositionsClicked() {
         subscribeOnCompositions();
     }
 
     void onCompositionClicked(int position, Composition composition) {
         if (selectedCompositions.isEmpty()) {
-            interactor.play(compositions, position);
+            if (composition.equals(currentComposition)) {
+                playerInteractor.playOrPause();
+            } else {
+                interactor.play(compositions, position);//unexpected stop...
+                getViewState().showCurrentPlayingComposition(composition);
+            }
         } else {
             if (selectedCompositions.contains(composition)) {
                 selectedCompositions.remove(composition);
@@ -220,6 +243,22 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         if (!selectedCompositions.isEmpty()) {
             closeSelectionMode();
         }
+    }
+
+    private void subscribeOnCurrentComposition() {
+        presenterBatterySafeDisposable.add(playerInteractor.getCurrentCompositionObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onCurrentCompositionReceived, errorParser::parseError));
+    }
+
+    private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
+        PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
+        if (queueItem != null) {
+            currentComposition = queueItem.getComposition();
+        } else {
+            currentComposition = null;
+        }
+        getViewState().showCurrentPlayingComposition(currentComposition);
     }
 
     private void subscribeOnCompositions() {

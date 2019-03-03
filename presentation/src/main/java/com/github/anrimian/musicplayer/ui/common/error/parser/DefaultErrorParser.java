@@ -59,6 +59,11 @@ public class DefaultErrorParser implements ErrorParser {
         return new ErrorCommand(getString(R.string.unexpected_error));
     }
 
+    @Override
+    public void logError(Throwable throwable) {
+        logException(throwable);
+    }
+
     private void logException(Throwable throwable) {
         analytics.processNonFatalError(throwable);
     }
