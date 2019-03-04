@@ -121,9 +121,20 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.library_compositions_menu, menu);
         searchMenuItem.setMenuItem(menu, R.id.menu_search);
         orderMenuItem.setMenuItem(menu, R.id.menu_order);
@@ -131,7 +142,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_order: {
@@ -287,6 +298,11 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     @Override
     public void shareCompositions(Collection<Composition> selectedCompositions) {
         DialogUtils.shareCompositions(requireContext(), selectedCompositions);
+    }
+
+    @Override
+    public void showCurrentPlayingComposition(Composition composition) {
+        adapter.showPlayingComposition(composition);
     }
 
     private boolean onActionModeItemClicked(MenuItem menuItem) {

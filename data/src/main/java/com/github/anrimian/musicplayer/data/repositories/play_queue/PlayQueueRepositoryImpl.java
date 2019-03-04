@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -26,11 +25,10 @@ import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static io.reactivex.subjects.BehaviorSubject.create;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
-
-    private static final int NO_POSITION = -1;
 
     private final PlayQueueDaoWrapper playQueueDao;
     private final StorageMusicDataSource storageMusicDataSource;
@@ -64,7 +62,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Completable setPlayQueue(List<Composition> compositions, int firstPosition) {
+    public Completable setPlayQueue(List<Composition> compositions, int startPosition) {
         if (compositions.isEmpty()) {
             return Completable.complete();
         }
@@ -78,10 +76,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     playQueueSubject.onNext(currentQueue);
 
                     PlayQueueItem item;
-                    if (firstPosition == NO_POSITION) {
+                    if (startPosition == NO_POSITION) {
                         item = currentQueue.get(0);
                     } else {
-                        item = playQueue.getCompositionQueue().get(firstPosition);
+                        item = playQueue.getCompositionQueue().get(startPosition);
                     }
                     setCurrentItem(item);
                 })

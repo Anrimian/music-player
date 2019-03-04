@@ -74,4 +74,7 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void shareCompositions(Collection<Composition> selectedCompositions);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showCurrentPlayingComposition(Composition composition);
 }
