@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.data.repositories.music.search.Compositio
 import com.github.anrimian.musicplayer.data.repositories.music.search.FileSourceSearchFilter;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
@@ -69,7 +70,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     public Single<Folder> getCompositionsInPath(@Nullable String path,
                                                 @Nullable String searchText) {
         return musicFolderDataSource.getCompositionsInPath(path)
-                .doOnSuccess(folder -> folder.applyFileOrder(this::getFileComparator))
+                .doOnSuccess(folder -> folder.applyFileOrder(getSelectedFileComparatorObservable()))
                 .doOnSuccess(folder -> folder.applySearchFilter(searchText, new FileSourceSearchFilter()))
                 .subscribeOn(scheduler);
     }
@@ -105,14 +106,23 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                 .subscribeOn(scheduler);
     }
 
-    private Comparator<FileSource> getFileComparator() {
-        switch (settingsPreferences.getFolderOrder()) {
+    private Comparator<FileSource> getFileComparator(Order order) {
+        switch (order) {
             case ALPHABETICAL: return new AlphabeticalFileComparator();
             case ALPHABETICAL_DESC: return new AlphabeticalDescFileComparator();
             case ADD_TIME: return new CreateDateFileComparator();
             case ADD_TIME_DESC: return new CreateDateDescFileComparator();
             default: return new AlphabeticalFileComparator();
         }
+    }
+
+    private Comparator<FileSource> getSelectedFileComparator() {
+        return getFileComparator(settingsPreferences.getFolderOrder());
+    }
+
+    private Observable<Comparator<FileSource>> getSelectedFileComparatorObservable() {
+        return settingsPreferences.getFolderOrderObservable()
+                .map(this::getFileComparator);
     }
 
     private Comparator<Composition> getCompositionComparator() {
@@ -127,7 +137,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {
         return musicFolderDataSource.getCompositionsInPath(path)
-                .doOnSuccess(folder -> folder.applyFileOrder(this::getFileComparator))
+                .doOnSuccess(folder -> folder.applyFileOrder(this::getSelectedFileComparator))
                 .flatMap(folder -> folder.getFilesObservable().firstOrError())
                 .flatMapObservable(Observable::fromIterable)
                 .flatMap(fileSource -> {

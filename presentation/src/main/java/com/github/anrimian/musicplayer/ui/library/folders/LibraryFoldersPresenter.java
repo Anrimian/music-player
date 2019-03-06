@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
@@ -31,7 +32,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isDisposed;
+import static io.reactivex.internal.disposables.DisposableHelper.isDisposed;
 
 /**
  * Created on 23.10.2017.
@@ -64,7 +65,15 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final DiffCalculator<FileSource> diffCalculator = new DiffCalculator<>(
             () -> sourceList,
-            FolderHelper::areSourcesTheSame);
+            FolderHelper::areSourcesTheSame,
+            source -> {
+                if (source instanceof MusicFileSource) {
+                    MusicFileSource musicFileSource = (MusicFileSource) source;
+                    Composition composition = musicFileSource.getComposition();
+                    compositionsForPlayList.remove(composition);
+                    compositionsToDelete.remove(composition);
+                }
+            });
 
     @Nullable
     private String folderToAddToPlayList;
@@ -124,12 +133,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onCompositionClicked(int position, Composition composition) {
-        if (composition.equals(currentComposition)) {
-            playerInteractor.playOrPause();
-        } else {
-            interactor.play(path, composition);
-            getViewState().showCurrentPlayingComposition(composition);
-        }
+        interactor.playMusic(path, composition);
     }
 
     void onPlayAllButtonClicked() {
@@ -170,9 +174,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onOrderSelected(Order order) {
         interactor.setFolderOrder(order);
-        if (folder != null) {
-            subscribeOnFolderData(folder);
-        }
     }
 
     void onAddToPlayListButtonClicked(Composition composition) {

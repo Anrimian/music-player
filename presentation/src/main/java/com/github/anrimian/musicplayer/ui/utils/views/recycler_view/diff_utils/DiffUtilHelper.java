@@ -1,10 +1,11 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils;
 
 import android.os.Parcelable;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static androidx.recyclerview.widget.DiffUtil.calculateDiff;
 
@@ -24,6 +25,8 @@ public class DiffUtilHelper {
                               RecyclerView recyclerView) {
         Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
         diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
-        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+        recyclerView.post(() ->
+                recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState)
+        );
     }
 }

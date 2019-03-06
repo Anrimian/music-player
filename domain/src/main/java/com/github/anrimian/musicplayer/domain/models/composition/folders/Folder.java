@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.models.composition.folders;
 import com.github.anrimian.musicplayer.domain.utils.search.ListSearchFilter;
 import com.github.anrimian.musicplayer.domain.utils.search.SearchFilter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -40,6 +41,14 @@ public class Folder {
     @SuppressWarnings("Java8ListSort")//lets wait:)
     public void applyFileOrder(OrderProvider orderProvider) {
         filesObservable = filesObservable.doOnNext(files -> Collections.sort(files, orderProvider.getComparator()));
+    }
+
+    @SuppressWarnings("Java8ListSort")//lets wait:)
+    public void applyFileOrder(Observable<Comparator<FileSource>> orderObservable) {
+        filesObservable = Observable.combineLatest(filesObservable, orderObservable, (fileSources, fileSourceComparator) -> {
+            Collections.sort(fileSources, fileSourceComparator);
+            return new ArrayList<>(fileSources);
+        });
     }
 
     public void applySearchFilter(@Nullable String text, SearchFilter<FileSource> searchFilter) {

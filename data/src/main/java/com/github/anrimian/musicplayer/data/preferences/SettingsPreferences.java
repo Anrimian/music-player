@@ -11,9 +11,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
-import static com.github.anrimian.musicplayer.domain.models.composition.Order.ADD_TIME;
 import static com.github.anrimian.musicplayer.domain.models.composition.Order.ADD_TIME_DESC;
-import static com.github.anrimian.musicplayer.domain.models.composition.Order.valueOf;
 
 /**
  * Created on 16.04.2018.
@@ -28,6 +26,7 @@ public class SettingsPreferences {
     private static final String COMPOSITIONS_ORDER = "compositions_order";
 
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Order> folderOrderSubject = BehaviorSubject.create();
 
     private SharedPreferencesHelper preferences;
 
@@ -57,12 +56,17 @@ public class SettingsPreferences {
         return withDefaultValue(repeatModeSubject, this::getRepeatMode);
     }
 
+    public Observable<Order> getFolderOrderObservable() {
+        return withDefaultValue(folderOrderSubject, this::getFolderOrder);
+    }
+
     public Order getFolderOrder() {
         return Order.fromId(preferences.getInt(FOLDER_ORDER, ADD_TIME_DESC.getId()));
     }
 
     public void setFolderOrder(Order order) {
         preferences.putInt(FOLDER_ORDER, order.getId());
+        folderOrderSubject.onNext(order);
     }
 
     public Order getCompositionsOrder() {

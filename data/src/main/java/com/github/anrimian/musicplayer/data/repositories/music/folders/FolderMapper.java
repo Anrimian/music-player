@@ -27,11 +27,11 @@ class FolderMapper {
     }
 
     private List<FileSource> toFileSources(List<RxNode<String>> nodes) {
-        List<FileSource> changedNodes = new ArrayList<>();
+        List<FileSource> fileSources = new ArrayList<>(nodes.size());
         for (RxNode<String> changedNode : nodes) {
-            changedNodes.add(toFileSource(changedNode.getData()));
+            fileSources.add(toFileSource(changedNode.getData()));
         }
-        return changedNodes;
+        return fileSources;
     }
 
     private FileSource toFileSource(NodeData nodeData) {

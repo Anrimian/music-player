@@ -56,7 +56,7 @@ public class LibraryFilesInteractor {
         return musicProviderRepository.getAllCompositionsInPath(path);
     }
 
-    public void play(String path, Composition composition) {
+    public void playMusic(String path, Composition composition) {
         musicProviderRepository.getAllCompositionsInPath(path)
                 .doOnSuccess(compositions -> {
                         int firstPosition = compositions.indexOf(composition);

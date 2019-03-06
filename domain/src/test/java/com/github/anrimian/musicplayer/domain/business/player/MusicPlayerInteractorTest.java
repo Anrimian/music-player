@@ -28,16 +28,16 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.business.TestBusinessDataProvider.currentItem;
 import static com.github.anrimian.musicplayer.domain.business.TestBusinessDataProvider.getFakeCompositions;
-import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_SHORTLY;
-import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.DELETED;
-import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.UNKNOWN;
 import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.GAIN;
 import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_SHORTLY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
+import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.DELETED;
+import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.UNKNOWN;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -107,7 +107,7 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void startPlayingTest() {
-        musicPlayerInteractor.startPlaying(getFakeCompositions());
+        musicPlayerInteractor.startPlaying(getFakeCompositions(), 0);
 
         verify(playQueueRepository).setPlayQueue(getFakeCompositions(), 0);
         verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
