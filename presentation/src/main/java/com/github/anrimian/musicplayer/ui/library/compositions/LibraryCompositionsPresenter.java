@@ -29,6 +29,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isDisposed;
 
 @InjectViewState
 public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositionsView> {
@@ -42,6 +43,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private final CompositeDisposable presenterBatterySafeDisposable = new CompositeDisposable();
     private Disposable compositionsDisposable;
+    private Disposable currentCompositionDisposable;
 
     private List<Composition> compositions = new ArrayList<>();
     private final LinkedHashSet<Composition> selectedCompositions = new LinkedHashSet<>();
@@ -85,7 +87,9 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     void onStart() {
-        subscribeOnCurrentComposition();
+        if (!compositions.isEmpty()) {
+            subscribeOnCurrentComposition();
+        }
     }
 
     void onStop() {
@@ -101,7 +105,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
             if (composition.equals(currentComposition)) {
                 playerInteractor.playOrPause();
             } else {
-                interactor.play(compositions, position);//unexpected stop...
+                interactor.play(compositions, position);
                 getViewState().showCurrentPlayingComposition(composition);
             }
         } else {
@@ -246,9 +250,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     private void subscribeOnCurrentComposition() {
-        presenterBatterySafeDisposable.add(playerInteractor.getCurrentCompositionObservable()
+        currentCompositionDisposable = playerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onCurrentCompositionReceived, errorParser::parseError));
+                .subscribe(this::onCurrentCompositionReceived, errorParser::logError);
+        presenterBatterySafeDisposable.add(currentCompositionDisposable);
     }
 
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
@@ -289,6 +294,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
             }
         } else {
             getViewState().showList();
+
+            if (isDisposed(currentCompositionDisposable)) {
+                subscribeOnCurrentComposition();
+            }
         }
     }
 }

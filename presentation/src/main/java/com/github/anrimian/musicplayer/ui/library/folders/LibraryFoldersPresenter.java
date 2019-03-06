@@ -3,8 +3,11 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
+import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
@@ -28,6 +31,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isDisposed;
 
 /**
  * Created on 23.10.2017.
@@ -37,12 +41,16 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final LibraryFilesInteractor interactor;
+    private final MusicPlayerInteractor playerInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
+    private final CompositeDisposable presenterBatterySafeDisposable = new CompositeDisposable();
+
     private Disposable filesDisposable;
     private Disposable deleteSelfDisposable;
+    private Disposable currentCompositionDisposable;
 
     @Nullable
     private String path;
@@ -50,6 +58,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private Folder folder;
 
     private List<FileSource> sourceList = new ArrayList<>();
+
+    private final List<Composition> compositionsForPlayList = new LinkedList<>();
+    private final List<Composition> compositionsToDelete = new LinkedList<>();
 
     private final DiffCalculator<FileSource> diffCalculator = new DiffCalculator<>(
             () -> sourceList,
@@ -64,15 +75,17 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     @Nullable
     private FolderFileSource folderToDelete;
 
-    private final List<Composition> compositionsForPlayList = new LinkedList<>();
-    private final List<Composition> compositionsToDelete = new LinkedList<>();
+    @Nullable
+    private Composition currentComposition;
 
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFilesInteractor interactor,
+                                   MusicPlayerInteractor playerInteractor,
                                    ErrorParser errorParser,
                                    Scheduler uiScheduler) {
         this.path = path;
         this.interactor = interactor;
+        this.playerInteractor = playerInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
@@ -96,12 +109,27 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         presenterDisposable.dispose();
     }
 
+    void onStart() {
+        if (!sourceList.isEmpty()) {
+            subscribeOnCurrentComposition();
+        }
+    }
+
+    void onStop() {
+        presenterBatterySafeDisposable.clear();
+    }
+
     void onTryAgainButtonClicked() {
         loadMusic();
     }
 
     void onCompositionClicked(int position, Composition composition) {
-        interactor.playMusic(path, composition);
+        if (composition.equals(currentComposition)) {
+            playerInteractor.playOrPause();
+        } else {
+            interactor.play(path, composition);
+            getViewState().showCurrentPlayingComposition(composition);
+        }
     }
 
     void onPlayAllButtonClicked() {
@@ -303,6 +331,28 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             }
         } else {
             getViewState().showList();
+
+            if (isDisposed(currentCompositionDisposable)) {
+                subscribeOnCurrentComposition();
+            }
         }
+    }
+
+    private void subscribeOnCurrentComposition() {
+        currentCompositionDisposable = playerInteractor.getCurrentCompositionObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onCurrentCompositionReceived, errorParser::logError);
+        presenterBatterySafeDisposable.add(currentCompositionDisposable);
+    }
+
+    private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
+        PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
+        if (queueItem != null) {
+            currentComposition = queueItem.getComposition();
+
+        } else {
+            currentComposition = null;
+        }
+        getViewState().showCurrentPlayingComposition(currentComposition);
     }
 }

@@ -170,6 +170,18 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
+    }
+
+    @Override
     public void onFragmentMovedOnTop() {
         presenter.onFragmentDisplayed();
     }
@@ -361,6 +373,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public void goToMusicStorageScreen(String path) {
         FragmentNavigation.from(requireFragmentManager())
                 .addNewFragment(LibraryFoldersFragment.newInstance(path));
+    }
+
+    @Override
+    public void showCurrentPlayingComposition(Composition composition) {
+        adapter.showPlayingComposition(composition);
     }
 
     private void onCompositionMenuClicked(View view, Composition composition) {

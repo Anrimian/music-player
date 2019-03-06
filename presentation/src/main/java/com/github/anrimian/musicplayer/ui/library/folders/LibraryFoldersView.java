@@ -93,4 +93,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void goToMusicStorageScreen(String path);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showCurrentPlayingComposition(Composition composition);
 }
