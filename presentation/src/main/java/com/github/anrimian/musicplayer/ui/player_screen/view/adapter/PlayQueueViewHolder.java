@@ -20,8 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-
 /**
  * Created on 31.10.2017.
  */
@@ -68,7 +66,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
 
     @Override
     public void onDragStateChanged(boolean dragging) {
-
+        compositionItemWrapper.showAsDraggingItem(dragging);
     }
 
     void bind(@Nonnull PlayQueueItem item) {

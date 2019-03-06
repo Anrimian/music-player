@@ -10,17 +10,18 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static androidx.core.graphics.ColorUtils.setAlphaComponent;
+import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
+import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class CompositionItemWrapper {
 
@@ -40,9 +41,13 @@ public class CompositionItemWrapper {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
+    @BindView(R.id.divider)
+    View divider;
+
     private Composition composition;
 
     private boolean isPlaying;
+    private boolean isDragging;
 
     public CompositionItemWrapper(View itemView) {
         ButterKnife.bind(this, itemView);
@@ -71,17 +76,40 @@ public class CompositionItemWrapper {
 //        tvAdditionalInfo.setText(String.valueOf(number) +" ● " + tvAdditionalInfo.getText());
 //    }
 
+    public void showAsDraggingItem(boolean dragging) {
+        if (this.isDragging != dragging) {
+            this.isDragging = dragging;
+
+            animateVisibility(divider, dragging? View.INVISIBLE: View.VISIBLE);
+            if (!dragging && isPlaying) {
+                showAsPlaying(true);
+            } else {
+                showAsDragging(dragging);
+            }
+        }
+    }
+
     public void showAsPlayingComposition(boolean isPlaying) {
         if (this.isPlaying != isPlaying) {
             this.isPlaying = isPlaying;
-            int unselectedColor = getSelectionColor(0);
-            int selectedColor = getSelectionColor(20);
-            int startColor = isPlaying ? unselectedColor : selectedColor;
-            int endColor = isPlaying ? selectedColor : unselectedColor;
-            animateColor(startColor, endColor, color -> clickableItem.setBackgroundColor(color));
-
-            clickableItem.setClickable(!isPlaying);
+            if (!isPlaying && isDragging) {
+                showAsDragging(true);
+                return;
+            }
+            showAsPlaying(isPlaying);
         }
+    }
+
+    private void showAsDragging(boolean dragging) {
+        int endColor = getItemDragColor(getContext(), dragging? 20: 0);
+        animateBackgroundColor(clickableItem, endColor);
+    }
+
+    private void showAsPlaying(boolean isPlaying) {
+        int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
+        animateBackgroundColor(clickableItem, endColor);
+
+        clickableItem.setClickable(!isPlaying);
     }
 
     private void showAdditionalInfo() {
@@ -89,11 +117,6 @@ public class CompositionItemWrapper {
         sb.append(" ● ");//TODO split problem • ●
         sb.append(formatMilliseconds(composition.getDuration()));
         tvAdditionalInfo.setText(sb.toString());
-    }
-
-    @ColorInt
-    private int getSelectionColor(int alpha) {
-        return setAlphaComponent(getColorFromAttr(getContext(), R.attr.colorPrimary), alpha);
     }
 
     private Context getContext() {
