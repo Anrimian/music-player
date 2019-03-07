@@ -315,7 +315,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
         DragAndSwipeTouchHelperCallback callback = DragAndSwipeTouchHelperCallback.withSwipeToDelete(rvPlayList,
-                getColorFromAttr(requireContext(), R.attr.colorAccent),
+                getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
