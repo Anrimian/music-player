@@ -11,6 +11,9 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.safeSwap;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.update;
+
 public class PlayQueue {
 
     private final List<PlayQueueItem> compositionQueue;
@@ -183,10 +186,10 @@ public class PlayQueue {
                            List<PlayQueueItem> queue,
                            Map<Long, Integer> itemPositionMap,
                            Map<Long, List<Integer>> compositionPositionsMap) {
-        Collections.swap(queue, firstPosition, secondPosition);
+        safeSwap(queue, firstPosition, secondPosition);
 
-        itemPositionMap.put(firstItem.getId(), secondPosition);
-        itemPositionMap.put(secondItem.getId(), firstPosition);
+        update(itemPositionMap, firstItem.getId(), secondPosition);
+        update(itemPositionMap, secondItem.getId(), firstPosition);
 
         swapCompositionPositions(firstItem.getComposition(),
                 firstPosition,
@@ -203,6 +206,9 @@ public class PlayQueue {
                                           int secondPos,
                                           Map<Long, List<Integer>> compositionPositionsMap) {
         List<Integer> positions = compositionPositionsMap.get(composition.getId());
+        if (positions == null) {
+            return;
+        }
         for (int i = 0; i < positions.size(); i++) {
             int compositionPosition = positions.get(i);
             if (compositionPosition == firstPos) {
@@ -216,6 +222,9 @@ public class PlayQueue {
                                  Composition composition,
                                  Map<Long, List<Integer>> positionMap) {
         List<Integer> positions = positionMap.get(composition.getId());
+        if (positions == null) {
+            return;
+        }
         for (int i = 0; i < positions.size(); i++) {
             int position = positions.get(i);
             if (position == oldPosition) {
