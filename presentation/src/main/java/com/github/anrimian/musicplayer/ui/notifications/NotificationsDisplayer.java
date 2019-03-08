@@ -25,6 +25,7 @@ import static com.github.anrimian.musicplayer.infrastructure.service.music.Music
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.SKIP_TO_PREVIOUS;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
@@ -144,7 +145,7 @@ public class NotificationsDisplayer {
         if (queueItem != null) {
             Composition composition = queueItem.getComposition();
             builder = builder.setContentTitle(formatCompositionName(composition))
-                             .setContentText(composition.getArtist());
+                             .setContentText(formatCompositionAuthor(composition, context));
         }
         return builder;
     }

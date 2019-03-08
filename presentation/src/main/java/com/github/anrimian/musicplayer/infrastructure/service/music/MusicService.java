@@ -5,8 +5,13 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.ResultReceiver;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.view.KeyEvent;
 
@@ -16,6 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 
@@ -40,6 +46,12 @@ import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_T
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP;
 import static android.support.v4.media.session.PlaybackStateCompat.Builder;
+import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ALL;
+import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_GROUP;
+import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_INVALID;
+import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE;
+import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE;
+import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
@@ -283,6 +295,140 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         @Override
         public void onSkipToPrevious() {
             musicPlayerInteractor.skipToPrevious();
+        }
+
+        //next - test it
+
+        @Override
+        public void onSeekTo(long pos) {
+            musicPlayerInteractor.seekTo(pos);
+        }
+
+        @Override
+        public void onSetRepeatMode(int repeatMode) {
+            int appRepeatMode;
+            switch (repeatMode) {
+                case REPEAT_MODE_INVALID:
+                case REPEAT_MODE_NONE: {
+                    appRepeatMode = RepeatMode.NONE;
+                    break;
+                }
+                case REPEAT_MODE_GROUP:
+                case REPEAT_MODE_ALL: {
+                    appRepeatMode = RepeatMode.REPEAT_PLAY_LIST;
+                    break;
+                }
+                case REPEAT_MODE_ONE: {
+                    appRepeatMode = RepeatMode.REPEAT_COMPOSITION;
+                    break;
+                }
+                default: {
+                    appRepeatMode = RepeatMode.NONE;
+                }
+            }
+            musicPlayerInteractor.setRepeatMode(appRepeatMode);
+        }
+
+        @Override
+        public void onSetShuffleMode(int shuffleMode) {
+            musicPlayerInteractor.setRandomPlayingEnabled(shuffleMode != SHUFFLE_MODE_NONE);
+        }
+
+        //next - not implemented
+
+        @Override
+        public void onCommand(String command, Bundle extras, ResultReceiver cb) {
+            super.onCommand(command, extras, cb);
+        }
+
+        @Override
+        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            return super.onMediaButtonEvent(mediaButtonEvent);
+        }
+
+        @Override
+        public void onPrepare() {
+            super.onPrepare();
+        }
+
+        @Override
+        public void onPrepareFromMediaId(String mediaId, Bundle extras) {
+            super.onPrepareFromMediaId(mediaId, extras);
+        }
+
+        @Override
+        public void onPrepareFromSearch(String query, Bundle extras) {
+            super.onPrepareFromSearch(query, extras);
+        }
+
+        @Override
+        public void onPrepareFromUri(Uri uri, Bundle extras) {
+            super.onPrepareFromUri(uri, extras);
+        }
+
+        @Override
+        public void onPlayFromMediaId(String mediaId, Bundle extras) {
+            super.onPlayFromMediaId(mediaId, extras);
+        }
+
+        @Override
+        public void onPlayFromSearch(String query, Bundle extras) {
+            super.onPlayFromSearch(query, extras);
+        }
+
+        @Override
+        public void onPlayFromUri(Uri uri, Bundle extras) {
+            super.onPlayFromUri(uri, extras);
+        }
+
+        @Override
+        public void onSkipToQueueItem(long id) {
+            super.onSkipToQueueItem(id);
+        }
+
+        @Override
+        public void onFastForward() {
+            super.onFastForward();
+        }
+
+        @Override
+        public void onRewind() {
+            super.onRewind();
+        }
+
+        @Override
+        public void onSetRating(RatingCompat rating) {
+            super.onSetRating(rating);
+        }
+
+        @Override
+        public void onSetRating(RatingCompat rating, Bundle extras) {
+            super.onSetRating(rating, extras);
+        }
+
+        @Override
+        public void onSetCaptioningEnabled(boolean enabled) {
+            super.onSetCaptioningEnabled(enabled);
+        }
+
+        @Override
+        public void onCustomAction(String action, Bundle extras) {
+            super.onCustomAction(action, extras);
+        }
+
+        @Override
+        public void onAddQueueItem(MediaDescriptionCompat description) {
+            super.onAddQueueItem(description);
+        }
+
+        @Override
+        public void onAddQueueItem(MediaDescriptionCompat description, int index) {
+            super.onAddQueueItem(description, index);
+        }
+
+        @Override
+        public void onRemoveQueueItem(MediaDescriptionCompat description) {
+            super.onRemoveQueueItem(description);
         }
     }
 }

@@ -266,7 +266,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     .commit();
             return;
         }
-//        MusicServiceManager.initialize();
 
         toolbar.initializeViews(requireActivity().getWindow());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
@@ -344,6 +343,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
         }
 
+        //noinspection ConstantConditions
         if (getArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
             getArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();
