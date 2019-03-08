@@ -16,6 +16,7 @@
         <item name="dividerHorizontal">@color/divider_color</item>
         <item name="actionModeTextColor">@color/secondary_button_color</item>
         <item name="actionModeStatusBarColor">@color/selectionStatusBarColor</item>
+        <item name="listBackground">?attr/colorControlHighlight</item>
 
     </style>
 

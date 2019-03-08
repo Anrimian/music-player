@@ -1,9 +1,15 @@
 package com.github.anrimian.musicplayer.data.database.entities.play_queue;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "play_queue")
+@Entity(tableName = "play_queue",
+        indices = {
+                @Index(value = "position", unique = true),
+                @Index(value = "shuffledPosition", unique = true)
+        })
 public class PlayQueueEntity {
 
     @PrimaryKey(autoGenerate = true)
@@ -46,6 +52,7 @@ public class PlayQueueEntity {
         this.shuffledPosition = shuffledPosition;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "PlayQueueEntity{" +

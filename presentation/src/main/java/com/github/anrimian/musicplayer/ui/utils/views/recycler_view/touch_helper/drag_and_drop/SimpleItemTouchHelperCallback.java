@@ -1,17 +1,29 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop;
 
 
+import android.animation.ObjectAnimator;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
+    private static final float BOTTOM_Z = 0f;
+    private static final float TOP_Z = 8f;
+
     private OnMovedListener onMovedListener;
     private OnStartDragListener onStartDragListener;
     private OnEndDragListener onEndDragListener;
 
+    private boolean horizontalDrag;
+
     public SimpleItemTouchHelperCallback() {
+        this(false);
+    }
+
+    public SimpleItemTouchHelperCallback(boolean horizontalDrag) {
+        this.horizontalDrag = horizontalDrag;
     }
 
     @Override
@@ -52,10 +64,11 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public int getMovementFlags(@NonNull RecyclerView recyclerView,
                                 @NonNull RecyclerView.ViewHolder viewHolder) {
-        return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,ItemTouchHelper.DOWN
-                | ItemTouchHelper.UP
-                | ItemTouchHelper.START
-                | ItemTouchHelper.END);
+        int directions = ItemTouchHelper.DOWN | ItemTouchHelper.UP;
+        if (horizontalDrag) {
+            directions |= ItemTouchHelper.START | ItemTouchHelper.END;
+        }
+        return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, directions);
     }
 
     @Override
@@ -76,18 +89,20 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     }
 
     private void setIsDragging(RecyclerView.ViewHolder viewHolder, boolean dragging) {
+        if (viewHolder == null) {
+            return;
+        }
         if (viewHolder instanceof DragListener) {
             ((DragListener) viewHolder).onDragStateChanged(dragging);
         }
-
-        if (viewHolder != null) {
-            float scale = dragging ? 1.05f : 1f;
-            viewHolder.itemView.animate()
-                    .setDuration(150)
-                    .scaleX(scale)
-                    .scaleY(scale)
-                    .start();
-        }
+        float baseElevation = dragging? BOTTOM_Z: TOP_Z;
+        float dragElevation = dragging? TOP_Z: BOTTOM_Z;
+        ObjectAnimator elevationAnimator = ObjectAnimator.ofFloat(viewHolder.itemView,
+                "translationZ",
+                baseElevation,
+                dragElevation);
+        elevationAnimator.setDuration(DEFAULT_DRAG_ANIMATION_DURATION);
+        elevationAnimator.start();
     }
 
     public interface OnMovedListener {

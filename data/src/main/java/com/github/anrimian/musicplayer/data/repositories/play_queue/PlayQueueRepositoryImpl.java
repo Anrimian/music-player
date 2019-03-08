@@ -197,6 +197,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         }).subscribeOn(scheduler);
     }
 
+    /**
+     * update current play queue silently, doesn't send update to subscribers
+     */
     @Override
     public Completable swapItems(PlayQueueItem firstItem,
                                  int firstPosition,

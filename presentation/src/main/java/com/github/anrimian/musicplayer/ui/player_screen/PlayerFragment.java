@@ -55,7 +55,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListene
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.SimpleItemTouchHelperCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
@@ -313,11 +313,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
-        RecyclerViewUtils.attachSwipeToDelete(rvPlayList,
-                getColorFromAttr(requireContext(), R.attr.colorAccent),
-                presenter::onItemSwipedToDelete);
 
-        SimpleItemTouchHelperCallback callback = new SimpleItemTouchHelperCallback();
+        DragAndSwipeTouchHelperCallback callback = DragAndSwipeTouchHelperCallback.withSwipeToDelete(rvPlayList,
+                getColorFromAttr(requireContext(), R.attr.listBackground),
+                presenter::onItemSwipedToDelete);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvPlayList);
