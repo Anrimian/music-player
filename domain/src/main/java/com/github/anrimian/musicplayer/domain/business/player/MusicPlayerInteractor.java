@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.business.player;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
+import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -46,6 +47,7 @@ public class MusicPlayerInteractor {
 
     private final MusicPlayerController musicPlayerController;
     private final SystemMusicController systemMusicController;
+    private final SystemServiceController systemServiceController;
     private final SettingsRepository settingsRepository;
     private final PlayQueueRepository playQueueRepository;
     private final MusicProviderRepository musicProviderRepository;
@@ -65,6 +67,7 @@ public class MusicPlayerInteractor {
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  SettingsRepository settingsRepository,
                                  SystemMusicController systemMusicController,
+                                 SystemServiceController systemServiceController,
                                  PlayQueueRepository playQueueRepository,
                                  MusicProviderRepository musicProviderRepository,
                                  Analytics analytics,
@@ -72,6 +75,7 @@ public class MusicPlayerInteractor {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
+        this.systemServiceController = systemServiceController;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
         this.analytics = analytics;
@@ -108,6 +112,7 @@ public class MusicPlayerInteractor {
         if (audioFocusObservable != null) {
             playerStateSubject.onNext(PLAY);
             musicPlayerController.resume();
+            systemServiceController.startMusicService();
 
             systemEventsDisposable.clear();
             systemEventsDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));

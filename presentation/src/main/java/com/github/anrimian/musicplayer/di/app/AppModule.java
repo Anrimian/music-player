@@ -1,17 +1,17 @@
 package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 
-import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.infrastructure.service.MusicServiceManager;
+import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
+import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
+import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 
+import androidx.annotation.NonNull;
 import dagger.Module;
 import dagger.Provides;
 
@@ -44,9 +44,8 @@ public class AppModule {
     @Provides
     @Nonnull
     @Singleton
-    MusicServiceManager serviceManager(Context context,
-                                       MusicPlayerInteractor musicPlayerInteractor) {
-        return new MusicServiceManager(context, musicPlayerInteractor);
+    SystemServiceController systemServiceController(Context context) {
+        return new SystemServiceControllerImpl(context);
     }
 
     @Provides

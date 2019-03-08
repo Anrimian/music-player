@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase;
 
 @Database(entities = {
         PlayQueueEntity.class
-}, version = 2)
+}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract PlayQueueDao playQueueDao();
 }

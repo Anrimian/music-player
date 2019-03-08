@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.infrastructure.service.music;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -21,6 +23,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.media.session.MediaButtonReceiver;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -85,6 +88,11 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            stopSelf();//maybe also show notification
+            return;
+        }
         Components.getAppComponent().inject(this);
 
         mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());

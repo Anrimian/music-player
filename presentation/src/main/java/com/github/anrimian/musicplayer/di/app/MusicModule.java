@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.di.app;
 
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
@@ -18,6 +17,7 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
+import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import androidx.annotation.NonNull;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.Scheduler;
@@ -45,6 +46,7 @@ class MusicModule {
     MusicPlayerInteractor musicPlayerInteractor(MusicPlayerController musicPlayerController,
                                                 SettingsRepository settingsRepository,
                                                 SystemMusicController systemMusicController,
+                                                SystemServiceController systemServiceController,
                                                 PlayQueueRepository playQueueRepository,
                                                 MusicProviderRepository musicProviderRepository,
                                                 Analytics analytics,
@@ -52,6 +54,7 @@ class MusicModule {
         return new MusicPlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
+                systemServiceController,
                 playQueueRepository,
                 musicProviderRepository,
                 analytics,

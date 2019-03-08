@@ -18,7 +18,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.infrastructure.service.MusicServiceManager;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -267,7 +266,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     .commit();
             return;
         }
-        MusicServiceManager.initialize();
+//        MusicServiceManager.initialize();
 
         toolbar.initializeViews(requireActivity().getWindow());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
