@@ -29,7 +29,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isDisposed;
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
 
 @InjectViewState
 public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositionsView> {
@@ -295,7 +295,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         } else {
             getViewState().showList();
 
-            if (isDisposed(currentCompositionDisposable)) {
+            if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
             }
         }

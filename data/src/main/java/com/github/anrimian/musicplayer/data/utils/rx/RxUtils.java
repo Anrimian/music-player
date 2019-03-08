@@ -19,7 +19,7 @@ public class RxUtils {
         return completable.toObservable().share().flatMapCompletable(o -> Completable.complete());
     }
 
-    public static boolean isDisposed(@Nullable Disposable disposable) {
+    public static boolean isInactive(@Nullable Disposable disposable) {
         return disposable == null || disposable.isDisposed();
     }
 

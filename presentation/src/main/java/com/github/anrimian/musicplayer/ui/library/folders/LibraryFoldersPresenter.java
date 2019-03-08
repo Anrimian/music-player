@@ -32,7 +32,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
-import static io.reactivex.internal.disposables.DisposableHelper.isDisposed;
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
 
 /**
  * Created on 23.10.2017.
@@ -133,7 +133,12 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onCompositionClicked(int position, Composition composition) {
-        interactor.playMusic(path, composition);
+        if (composition.equals(currentComposition)) {
+            playerInteractor.playOrPause();
+        } else {
+            interactor.play(path, composition);
+            getViewState().showCurrentPlayingComposition(composition);
+        }
     }
 
     void onPlayAllButtonClicked() {
@@ -333,7 +338,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         } else {
             getViewState().showList();
 
-            if (isDisposed(currentCompositionDisposable)) {
+            if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
             }
         }
@@ -350,7 +355,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
         if (queueItem != null) {
             currentComposition = queueItem.getComposition();
-
         } else {
             currentComposition = null;
         }
