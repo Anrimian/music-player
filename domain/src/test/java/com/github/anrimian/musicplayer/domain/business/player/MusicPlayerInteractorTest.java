@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.business.player;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
+import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
@@ -57,6 +58,7 @@ public class MusicPlayerInteractorTest {
     private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
     private MusicProviderRepository musicProviderRepository = mock(MusicProviderRepository.class);
     private SystemMusicController systemMusicController = mock(SystemMusicController.class);
+    private SystemServiceController systemServiceController = mock(SystemServiceController.class);
     private Analytics analytics = mock(Analytics.class);
     private PlayerErrorParser playerErrorParser = mock(PlayerErrorParser.class);
 
@@ -96,6 +98,7 @@ public class MusicPlayerInteractorTest {
         musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
+                systemServiceController,
                 playQueueRepository,
                 musicProviderRepository,
                 analytics,

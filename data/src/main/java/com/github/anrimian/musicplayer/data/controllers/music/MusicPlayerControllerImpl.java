@@ -28,7 +28,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -45,15 +47,20 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
 
     private final SimpleExoPlayer player;
+
     private final UiStatePreferences uiStatePreferences;
+    private final Scheduler scheduler;
 
     @Nullable
     private Disposable trackPositionDisposable;
 
-    public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences, Context context) {
+    public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences,
+                                     Context context,
+                                     Scheduler scheduler) {
         this.uiStatePreferences = uiStatePreferences;
+        this.scheduler = scheduler;
         player = ExoPlayerFactory.newSimpleInstance(
-//                context,
+                context,
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
@@ -74,40 +81,52 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                 .ignoreElement()
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
+                .subscribeOn(scheduler)
                 .subscribe();
     }
 
     @Override
     public void stop() {
-        seekTo(0);
-        player.stop();
-        stopTracingTrackPosition();
-        uiStatePreferences.setTrackPosition(0);
+        Completable.fromRunnable(() -> {
+            seekTo(0);
+            player.stop();
+            stopTracingTrackPosition();
+            uiStatePreferences.setTrackPosition(0);
+        }).subscribeOn(scheduler).subscribe();
+
     }
 
     @Override
     public void pause() {
-        player.setPlayWhenReady(false);
-        stopTracingTrackPosition();
-        uiStatePreferences.setTrackPosition(player.getCurrentPosition());
+        Completable.fromRunnable(() -> {
+            player.setPlayWhenReady(false);
+            stopTracingTrackPosition();
+            uiStatePreferences.setTrackPosition(player.getCurrentPosition());
+        }).subscribeOn(scheduler).subscribe();
     }
 
     @Override
     public void seekTo(long position) {
-        player.seekTo(position);
-        trackPositionSubject.onNext(position);
-        uiStatePreferences.setTrackPosition(player.getCurrentPosition());
+        Completable.fromRunnable(() -> {
+            player.seekTo(position);
+            trackPositionSubject.onNext(position);
+            uiStatePreferences.setTrackPosition(player.getCurrentPosition());
+        }).subscribeOn(scheduler).subscribe();
     }
 
     @Override
     public void setVolume(float volume) {
-        player.setVolume(volume);
+        Completable.fromRunnable(() -> player.setVolume(volume))
+                .subscribeOn(scheduler)
+                .subscribe();
     }
 
     @Override
     public void resume() {
-        player.setPlayWhenReady(true);
-        startTracingTrackPosition();
+        Completable.fromRunnable(() -> {
+            player.setPlayWhenReady(true);
+            startTracingTrackPosition();
+        }).subscribeOn(scheduler).subscribe();
     }
 
     @Override
@@ -134,6 +153,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private void startTracingTrackPosition() {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
+                .observeOn(scheduler)
                 .map(o -> player.getCurrentPosition())
                 .subscribe(trackPositionSubject::onNext);
     }
@@ -151,7 +171,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
             if (!file.exists()) {
                 throw new FileNotFoundException(composition.getFilePath() + " not found");
             }
-           return composition;
+            return composition;
         });
     }
 
@@ -163,11 +183,9 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
             fileDataSource.open(dataSpec);
 
             DataSource.Factory factory = () -> fileDataSource;
-            MediaSource mediaSource = new ExtractorMediaSource(fileDataSource.getUri(),
-                    factory,
-                    new DefaultExtractorsFactory(),
-                    null,
-                    null);
+            MediaSource mediaSource = new ExtractorMediaSource.Factory(factory)
+                    .setExtractorsFactory(new DefaultExtractorsFactory())
+                    .createMediaSource(uri);
             player.prepare(mediaSource);
             emitter.onSuccess(mediaSource);
         });

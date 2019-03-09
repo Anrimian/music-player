@@ -32,6 +32,7 @@ import io.reactivex.Scheduler;
 
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 02.11.2017.
@@ -87,8 +88,9 @@ class MusicModule {
     @NonNull
     @Singleton
     MusicPlayerController provideMusicPlayerController(UiStatePreferences uiStatePreferences,
-                                                       Context context) {
-        return new MusicPlayerControllerImpl(uiStatePreferences, context);
+                                                       Context context,
+                                                       @Named(UI_SCHEDULER) Scheduler scheduler) {
+        return new MusicPlayerControllerImpl(uiStatePreferences, context, scheduler);
     }
 
     @Provides
