@@ -43,4 +43,8 @@ public interface PlayQueueRepository {
                           int firstPosition,
                           PlayQueueItem secondItem,
                           int secondPosition);
+
+    Completable addCompositionsToPlayNext(List<Composition> compositions);
+
+    Completable addCompositionsToEnd(List<Composition> compositions);
 }
