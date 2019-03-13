@@ -75,7 +75,7 @@ public class PlayQueueDaoWrapperTest {
         List<Long> shuffledIds = new ArrayList<>(ids);
         Collections.shuffle(shuffledIds, new Random(randomSeed));
 
-        when(playQueueDao.insertPlayQueue(any())).thenReturn(ids);
+        when(playQueueDao.insertItems(any())).thenReturn(ids);
 
         PlayQueueLists queueLists = daoWrapper.insertNewPlayQueue(list, shuffledList, randomSeed);
 

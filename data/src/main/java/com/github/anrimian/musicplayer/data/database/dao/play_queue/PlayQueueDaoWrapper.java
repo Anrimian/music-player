@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
-import android.util.Log;
-
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
@@ -80,11 +78,24 @@ public class PlayQueueDaoWrapper {
         });
     }
 
+    public List<PlayQueueItem> addCompositionsToQueue(List<Composition> compositions,
+                                                      int afterPosition,
+                                                      int afterShuffledPositions) {
+        return appDatabase.runInTransaction(() -> {
+            List<PlayQueueEntity> entities = toEntityList(compositions, afterPosition, afterShuffledPositions);
+            List<Long> ids = playQueueDao.insertItems(entities);
+            int increaseBy = entities.size();
+            playQueueDao.increasePositions(increaseBy, afterPosition);
+            playQueueDao.increaseShuffledPositions(increaseBy, afterShuffledPositions);
+            return toPlayQueueItems(compositions, ids);
+        });
+    }
+
     PlayQueueLists insertNewPlayQueue(List<Composition> compositions,
                                       List<Composition> shuffledCompositions,
                                       long randomSeed) {
         playQueueDao.deletePlayQueue();
-        List<Long> ids = playQueueDao.insertPlayQueue(toEntityList(compositions, randomSeed));
+        List<Long> ids = playQueueDao.insertItems(toShuffledEntityList(compositions, randomSeed));
         List<PlayQueueItem> items = toPlayQueueItems(compositions, ids);
         List<Long> shuffledIds = new ArrayList<>(ids);
         Collections.shuffle(shuffledIds, new Random(randomSeed));
@@ -132,8 +143,8 @@ public class PlayQueueDaoWrapper {
         }
     }
 
-    private List<PlayQueueEntity> toEntityList(List<Composition> compositions,
-                                               long randomSeed) {
+    private List<PlayQueueEntity> toShuffledEntityList(List<Composition> compositions,
+                                                       long randomSeed) {
         List<PlayQueueEntity> entityList = new ArrayList<>(compositions.size());
         List<Integer> shuffledPositionList = new ArrayList<>(compositions.size());
         for (int i = 0; i < compositions.size(); i++) {
@@ -149,6 +160,27 @@ public class PlayQueueDaoWrapper {
             playQueueEntity.setShuffledPosition(shuffledPositionList.get(i));
 
             entityList.add(playQueueEntity);
+        }
+        return entityList;
+    }
+
+    private List<PlayQueueEntity> toEntityList(List<Composition> compositions,
+                                               int after,
+                                               int afterShuffledPositions) {
+        List<PlayQueueEntity> entityList = new ArrayList<>(compositions.size());
+
+        int position = ++after;
+        int shuffledPosition = ++afterShuffledPositions;
+        for (Composition composition: compositions) {
+            PlayQueueEntity playQueueEntity = new PlayQueueEntity();
+            playQueueEntity.setAudioId(composition.getId());
+            playQueueEntity.setPosition(position);
+            playQueueEntity.setShuffledPosition(shuffledPosition);
+
+            entityList.add(playQueueEntity);
+
+            position++;
+            shuffledPosition++;
         }
         return entityList;
     }

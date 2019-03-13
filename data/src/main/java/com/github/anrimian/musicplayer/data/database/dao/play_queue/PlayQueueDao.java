@@ -15,7 +15,7 @@ public interface PlayQueueDao {
     List<PlayQueueEntity> getPlayQueue();
 
     @Insert
-    List<Long> insertPlayQueue(List<PlayQueueEntity> playQueueEntityList);
+    List<Long> insertItems(List<PlayQueueEntity> playQueueEntityList);
 
     @Query("DELETE FROM play_queue")
     void deletePlayQueue();
@@ -37,4 +37,12 @@ public interface PlayQueueDao {
 
     @Query("UPDATE play_queue SET position = :position WHERE id = :itemId")
     void updateItemPosition(long itemId, int position);
+
+    @Query("UPDATE play_queue SET position = position + :increaseBy WHERE position > :after")
+    void increasePositions(int increaseBy, int after);
+
+    @Query("UPDATE play_queue " +
+            "SET shuffledPosition = shuffledPosition + :increaseBy " +
+            "WHERE shuffledPosition > :after")
+    void increaseShuffledPositions(int increaseBy, int after);
 }

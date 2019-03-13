@@ -37,8 +37,10 @@ import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.DE
 import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -536,5 +538,37 @@ public class PlayQueueRepositoryImplTest {
                     assertEquals(fakeItem(1), list.get(1));
                     return true;
                 });
+    }
+
+    @Test//not clear data(doesn't have unique ids)
+    public void addCompositionsToNextTest() {
+        playQueueRepository.setPlayQueue(getFakeCompositions()).subscribe();
+
+        TestObserver<PlayQueueEvent> itemObserver = playQueueRepository.getCurrentQueueItemObservable()
+                .test();
+
+        itemObserver.assertValueAt(0, item -> {
+            assertEquals(fakeItem(0), item.getPlayQueueItem());
+            return true;
+        });
+
+        when(playQueueDao.addCompositionsToQueue(any(), anyInt(), anyInt()))
+                .thenReturn(asList(
+                        fakeItem(2),
+                        fakeItem(3)
+                        )
+                );
+
+        playQueueRepository.addCompositionsToPlayNext(asList(fakeComposition(2), fakeComposition(3))).subscribe();
+        playQueueRepository.skipToNext().subscribe();
+
+        itemObserver.assertValueAt(1, item -> {
+            assertEquals(fakeComposition(2), requireNonNull(item.getPlayQueueItem()).getComposition());
+            return true;
+        });
+    }
+
+    @Test
+    public void addCompositionsToEndTest() {
     }
 }

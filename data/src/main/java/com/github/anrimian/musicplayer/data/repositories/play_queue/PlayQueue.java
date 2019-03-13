@@ -18,8 +18,10 @@ public class PlayQueue {
 
     private final List<PlayQueueItem> compositionQueue;
     private final List<PlayQueueItem> shuffledQueue;
+
     private final Map<Long, Integer> itemPositionMap = new HashMap<>();
     private final Map<Long, Integer> shuffledItemPositionMap = new HashMap<>();
+
     private final Map<Long, List<Integer>> compositionPositionsMap = new HashMap<>();
     private final Map<Long, List<Integer>> compositionShuffledPositionsMap = new HashMap<>();
 
@@ -35,12 +37,28 @@ public class PlayQueue {
     }
 
     @Nullable
-    Integer getPosition(@Nullable PlayQueueItem item) {
+    Integer getCurrentPosition(@Nullable PlayQueueItem item) {
         if (item == null) {
             return null;
         }
         Map<Long, Integer> positionMap = shuffled? shuffledItemPositionMap : itemPositionMap;
         return positionMap.get(item.getId());
+    }
+
+    @Nullable
+    Integer getPosition(@Nullable PlayQueueItem item) {
+        if (item == null) {
+            return null;
+        }
+        return itemPositionMap.get(item.getId());
+    }
+
+    @Nullable
+    Integer getShuffledPosition(@Nullable PlayQueueItem item) {
+        if (item == null) {
+            return null;
+        }
+        return shuffledItemPositionMap.get(item.getId());
     }
 
     List<PlayQueueItem> getCurrentPlayQueue() {
@@ -109,14 +127,15 @@ public class PlayQueue {
 
         for (Composition composition: compositions) {
             List<Integer> positions = compositionPositionsMap.get(composition.getId());
-            if (positions == null) {
+            List<Integer> shuffledPositions = compositionShuffledPositionsMap.get(composition.getId());
+            if (positions == null || shuffledPositions == null) {
                 continue;
             }
             updated = true;
             for (int position: positions) {
                 normalList[position] = null;
             }
-            for (int position: compositionShuffledPositionsMap.get(composition.getId())) {
+            for (int position: shuffledPositions) {
                 shuffledList[position] = null;
             }
         }
@@ -142,14 +161,16 @@ public class PlayQueue {
 
     boolean updateComposition(Composition composition) {
         List<Integer> positions = compositionPositionsMap.get(composition.getId());
-        if (positions == null) {
+        List<Integer> shuffledPositions = compositionShuffledPositionsMap.get(composition.getId());
+        if (positions == null || shuffledPositions == null) {
             return false;
         }
         for (int position: positions) {
             PlayQueueItem playQueueItem = compositionQueue.get(position);
             playQueueItem.setComposition(composition);
         }
-        for (int position: compositionShuffledPositionsMap.get(composition.getId())) {
+
+        for (int position: shuffledPositions) {
             PlayQueueItem playQueueItem = shuffledQueue.get(position);
             playQueueItem.setComposition(composition);
         }
@@ -177,6 +198,12 @@ public class PlayQueue {
                     itemPositionMap,
                     compositionPositionsMap);
         }
+    }
+
+    void addItems(List<PlayQueueItem> items, int position, int shuffledPosition) {
+        compositionQueue.addAll(++position, items);
+        shuffledQueue.addAll(++shuffledPosition, items);
+        fillPositionMap();//can be optimized
     }
 
     private void swapItems(PlayQueueItem firstItem,

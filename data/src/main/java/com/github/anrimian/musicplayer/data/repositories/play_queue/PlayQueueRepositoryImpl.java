@@ -90,7 +90,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Nullable
     @Override
     public Integer getCompositionPosition(@Nonnull PlayQueueItem playQueueItem) {
-        return getPlayQueue().getPosition(playQueueItem);
+        return getPlayQueue().getCurrentPosition(playQueueItem);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Single.fromCallable(this::getPlayQueue)
                 .map(playQueue -> {
                     List<PlayQueueItem> items = playQueue.getCurrentPlayQueue();
-                    Integer position = playQueue.getPosition(getCurrentItem());
+                    Integer position = playQueue.getCurrentPosition(getCurrentItem());
                     if (position == null) {
                         return 0;
                     }
@@ -146,7 +146,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Single.fromCallable(this::getPlayQueue)
                 .map(playQueue -> {
                     List<PlayQueueItem> compositions = playQueue.getCurrentPlayQueue();
-                    Integer position = playQueue.getPosition(getCurrentItem());
+                    Integer position = playQueue.getCurrentPosition(getCurrentItem());
                     if (position == null) {
                         return 0;
                     }
@@ -176,7 +176,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             PlayQueueItem currentItem = getCurrentItem();
             PlayQueue playQueue = getPlayQueue();
             if (item.equals(currentItem)) {
-                currentPosition = playQueue.getPosition(currentItem);
+                currentPosition = playQueue.getCurrentPosition(currentItem);
             }
 
             playQueue.removeQueueItem(item);
@@ -213,6 +213,32 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     secondPosition,
                     settingsPreferences.isRandomPlayingEnabled());
         }).subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable addCompositionsToPlayNext(List<Composition> compositions) {
+        return Completable.fromRunnable(() -> {
+            PlayQueue playQueue = getPlayQueue();
+            if (playQueue.isEmpty()) {
+                return;
+            }
+            Integer position = playQueue.getPosition(getCurrentItem());
+            if (position == null) {
+                return;
+            }
+            Integer shuffledPositions = playQueue.getShuffledPosition(getCurrentItem());
+            if (shuffledPositions == null) {
+                return;
+            }
+            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions, position, shuffledPositions);
+            playQueue.addItems(newItems, position, shuffledPositions);
+            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
+        });
+    }
+
+    @Override
+    public Completable addCompositionsToEnd(List<Composition> compositions) {
+        return null;//implement
     }
 
     private PlayQueue getPlayQueue() {
@@ -260,7 +286,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
                 List<PlayQueueItem> items = getPlayQueue().getCurrentPlayQueue();
                 int nextCurrentPosition;
-                Integer currentPosition = getPlayQueue().getPosition(currentItem);
+                Integer currentPosition = getPlayQueue().getCurrentPosition(currentItem);
                 if (currentPosition == null || currentPosition >= items.size() - 1) {
                     nextCurrentPosition = 0;
                 } else {
