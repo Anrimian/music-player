@@ -25,15 +25,28 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
     private final Callback<Integer> swipeCallback;
 
+    private final int swipeFlags;
+    private final int dragFlags;
+
     private OnMovedListener onMovedListener;
     private OnStartDragListener onStartDragListener;
     private OnEndDragListener onEndDragListener;
 
-    private boolean horizontalDrag;
+    private boolean dragging;
 
     public static DragAndSwipeTouchHelperCallback withSwipeToDelete(RecyclerView recyclerView,
                                                                     @ColorInt int backgroundColor,
                                                                     Callback<Integer> swipeCallback) {
+        return withSwipeToDelete(recyclerView,
+                backgroundColor,
+                swipeCallback,
+                ItemTouchHelper.START | ItemTouchHelper.END);
+    }
+
+    public static DragAndSwipeTouchHelperCallback withSwipeToDelete(RecyclerView recyclerView,
+                                                                    @ColorInt int backgroundColor,
+                                                                    Callback<Integer> swipeCallback,
+                                                                    int swipeFlags) {
         CompositeCallback<Integer> compositeCallback = new CompositeCallback<>();
         compositeCallback.add(swipeCallback);
         compositeCallback.add(i -> {
@@ -51,13 +64,21 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     }
 
     public DragAndSwipeTouchHelperCallback(@ColorInt int color, Callback<Integer> swipeCallback) {
-        this(color, swipeCallback, false);
+        this(color, swipeCallback, ItemTouchHelper.START | ItemTouchHelper.END);
     }
 
     public DragAndSwipeTouchHelperCallback(@ColorInt int color,
                                            Callback<Integer> swipeCallback,
-                                           boolean horizontalDrag) {
-        this.horizontalDrag = horizontalDrag;
+                                           int swipeFlags) {
+        this(color, swipeCallback, swipeFlags, ItemTouchHelper.DOWN | ItemTouchHelper.UP);
+    }
+
+    public DragAndSwipeTouchHelperCallback(@ColorInt int color,
+                                           Callback<Integer> swipeCallback,
+                                           int swipeFlags,
+                                           int dragFlags) {
+        this.swipeFlags = swipeFlags;
+        this.dragFlags = dragFlags;
         this.swipeCallback = swipeCallback;
         paint.setColor(color);
     }
@@ -65,9 +86,10 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            dragging = true;
             setIsDragging(viewHolder, true);
             if (onStartDragListener != null) {
-                onStartDragListener.onStartDrag();
+                onStartDragListener.onStartDrag(viewHolder.getAdapterPosition());
             }
         }
         super.onSelectedChanged(viewHolder, actionState);
@@ -76,10 +98,13 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public void clearView(@NonNull RecyclerView recyclerView,
                           @NonNull RecyclerView.ViewHolder viewHolder) {
-        if (onEndDragListener != null) {
-            onEndDragListener.onEndDrag();
+        if (dragging) {
+            dragging = false;
+            if (onEndDragListener != null) {
+                onEndDragListener.onEndDrag(viewHolder.getAdapterPosition());
+            }
+            setIsDragging(viewHolder, false);
         }
-        setIsDragging(viewHolder, false);
         super.clearView(recyclerView, viewHolder);
     }
 
@@ -112,12 +137,8 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public int getMovementFlags(@NonNull RecyclerView recyclerView,
                                 @NonNull RecyclerView.ViewHolder viewHolder) {
-        int directions = ItemTouchHelper.DOWN | ItemTouchHelper.UP;
-        if (horizontalDrag) {
-            directions |= ItemTouchHelper.START | ItemTouchHelper.END;
-        }
-        return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.START | ItemTouchHelper.END)
-                | makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, directions);
+        return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, swipeFlags)
+                | makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, dragFlags);
     }
 
     @Override
@@ -182,11 +203,11 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     }
 
     public interface OnStartDragListener {
-        void onStartDrag();
+        void onStartDrag(int position);
     }
 
     public interface OnEndDragListener {
-        void onEndDrag();
+        void onEndDrag(int position);
     }
 
 }

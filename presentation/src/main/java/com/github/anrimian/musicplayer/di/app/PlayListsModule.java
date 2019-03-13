@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
+import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -53,8 +54,9 @@ public class PlayListsModule {
     @Provides
     @Nonnull
     PlayListsInteractor playListsInteractor(PlayListsRepository playListsRepository,
-                                            UiStateRepository uiStateRepository) {
-        return new PlayListsInteractor(playListsRepository, uiStateRepository);
+                                            UiStateRepository uiStateRepository,
+                                            Analytics analytics) {
+        return new PlayListsInteractor(playListsRepository, uiStateRepository, analytics);
     }
 
     @Provides

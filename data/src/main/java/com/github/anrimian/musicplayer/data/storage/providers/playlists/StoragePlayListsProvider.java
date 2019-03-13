@@ -39,6 +39,7 @@ import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
 import static android.provider.MediaStore.MediaColumns.DATE_MODIFIED;
 import static android.provider.MediaStore.MediaColumns.DISPLAY_NAME;
 import static android.provider.MediaStore.MediaColumns.TITLE;
+import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 import static java.util.Collections.emptyList;
 
@@ -85,7 +86,7 @@ public class StoragePlayListsProvider {
         contentValues.put(Playlists.NAME, name);
         contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
         Uri uri = contentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, contentValues);
-        if (uri == null) {
+        if (uri == null || isEmpty(uri.getLastPathSegment())) {
             throw new PlayListNotCreatedException();
         }
         long id = Long.valueOf(uri.getLastPathSegment());
@@ -197,8 +198,8 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public void moveItemInPlayList(long playListId, int fromId, int toId) {
-        boolean moved = Playlists.Members.moveItem(contentResolver, playListId, fromId, toId);
+    public void moveItemInPlayList(long playListId, int from, int to) {
+        boolean moved = Playlists.Members.moveItem(contentResolver, playListId, from, to);
         if (!moved) {
             throw new CompositionNotMovedException();
         }

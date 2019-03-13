@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -68,4 +69,7 @@ public interface PlayListView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showDeletePlayListError(ErrorCommand errorCommand);
+
+    @StateStrategyType(SkipStrategy.class)
+    void notifyItemMoved(int from, int to);
 }
