@@ -80,6 +80,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         } else {
             getViewState().collapseBottomPanel();
         }
+        getViewState().showDrawerScreen(playerScreenInteractor.getSelectedDrawerScreen(),
+                playerScreenInteractor.getSelectedPlayListScreenId());
     }
 
     void onStart() {
@@ -93,11 +95,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     void onStop() {
         jumpToNewItem = true;
         presenterDisposable.clear();
-    }
-
-    void onCurrentScreenRequested() {//maybe it helps
-        getViewState().showDrawerScreen(playerScreenInteractor.getSelectedDrawerScreen(),
-                playerScreenInteractor.getSelectedPlayListScreenId());
     }
 
     void onOpenPlayQueueClicked() {
