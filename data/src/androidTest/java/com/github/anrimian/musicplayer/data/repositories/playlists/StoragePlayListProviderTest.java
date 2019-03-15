@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 import android.Manifest;
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
 import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
@@ -16,6 +15,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 import io.reactivex.observers.TestObserver;
 
@@ -116,9 +116,9 @@ public class StoragePlayListProviderTest {
             storagePlayListsProvider.moveItemInPlayList(playList.getId(), 2, 0);
 
             List<PlayListItem> movedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
+            assertEquals(compositionThree, movedItems.get(0).getComposition());
             assertEquals(compositionOne, movedItems.get(1).getComposition());
             assertEquals(compositionTwo, movedItems.get(2).getComposition());
-            assertEquals(compositionThree, movedItems.get(0).getComposition());
         } finally {
             storagePlayListsProvider.deletePlayList(playList.getId());
         }

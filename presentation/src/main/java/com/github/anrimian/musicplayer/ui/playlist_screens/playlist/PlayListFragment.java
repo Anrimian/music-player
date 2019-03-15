@@ -26,6 +26,7 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -38,6 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -49,6 +51,8 @@ import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback.withSwipeToDelete;
 
 public class PlayListFragment extends MvpAppCompatFragment
         implements PlayListView, FragmentLayerListener {
@@ -104,6 +108,16 @@ public class PlayListFragment extends MvpAppCompatFragment
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.hideAll();
+
+        DragAndSwipeTouchHelperCallback callback = withSwipeToDelete(recyclerView,
+                getColorFromAttr(requireContext(), R.attr.listBackground),
+                presenter::onItemSwipedToDelete,
+                ItemTouchHelper.END);
+        callback.setOnMovedListener(presenter::onItemMoved);
+        callback.setOnStartDragListener(presenter::onDragStarted);
+        callback.setOnEndDragListener(presenter::onDragEnded);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -270,6 +284,11 @@ public class PlayListFragment extends MvpAppCompatFragment
                 getString(R.string.play_list_delete_error, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
+    }
+
+    @Override
+    public void notifyItemMoved(int from, int to) {
+        adapter.notifyItemMoved(from, to);
     }
 
     private void onCompositionMenuClicked(View view, PlayListItem playListItem) {

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.business.playlists;
 
+import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.playlists.validators.PlayListNameValidator;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -19,11 +20,14 @@ public class PlayListsInteractor {
 
     private final PlayListsRepository playListsRepository;
     private final UiStateRepository uiStateRepository;
+    private final Analytics analytics;
 
     public PlayListsInteractor(PlayListsRepository playListsRepository,
-                               UiStateRepository uiStateRepository) {
+                               UiStateRepository uiStateRepository,
+                               Analytics analytics) {
         this.playListsRepository = playListsRepository;
         this.uiStateRepository = uiStateRepository;
+        this.analytics = analytics;
     }
 
     public Observable<List<PlayList>> getPlayListsObservable() {
@@ -53,6 +57,13 @@ public class PlayListsInteractor {
 
     public Completable deletePlayList(long playListId) {
         return playListsRepository.deletePlayList(playListId);
+    }
+
+    public void moveItemInPlayList(long playListId, int from, int to) {
+        playListsRepository.moveItemInPlayList(playListId, from, to)
+                .doOnError(analytics::processNonFatalError)
+                .onErrorComplete()
+                .subscribe();
     }
 
     public void setSelectedPlayListScreen(long playListId) {

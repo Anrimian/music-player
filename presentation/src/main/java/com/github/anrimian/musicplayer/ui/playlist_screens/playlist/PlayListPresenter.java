@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.c
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,6 +50,8 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
+
+    private int startDragPosition;
 
     public PlayListPresenter(long playListId,
                              MusicPlayerInteractor musicPlayerInteractor,
@@ -104,9 +107,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     void onDeleteFromPlayListButtonClicked(PlayListItem playListItem) {
-        playListsInteractor.deleteItemFromPlayList(playListItem.getItemId(), playListId)
-                .observeOn(uiScheduler)
-                .subscribe(() -> onDeleteItemCompleted(playListItem), this::onDeleteItemError);
+        deleteItem(playListItem);
     }
 
     void onDeletePlayListButtonClicked() {
@@ -121,6 +122,41 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     void onFragmentMovedToTop() {
         playListsInteractor.setSelectedPlayListScreen(playListId);
+    }
+
+    void onItemSwipedToDelete(int position) {
+        deleteItem(items.get(position));
+    }
+
+    void onItemMoved(int from, int to) {
+        if (from < to) {
+            for (int i = from; i < to; i++) {
+                swapItems(i, i + 1);
+            }
+        } else {
+            for (int i = from; i > to; i--) {
+                swapItems(i, i - 1);
+            }
+        }
+    }
+
+    void onDragStarted(int position) {
+        startDragPosition = position;
+    }
+
+    void onDragEnded(int position) {
+        playListsInteractor.moveItemInPlayList(playListId, startDragPosition, position);//lock update and subscribe on complete?
+    }
+
+    private void deleteItem(PlayListItem playListItem) {
+        playListsInteractor.deleteItemFromPlayList(playListItem.getItemId(), playListId)
+                .observeOn(uiScheduler)
+                .subscribe(() -> onDeleteItemCompleted(playListItem), this::onDeleteItemError);
+    }
+
+    private void swapItems(int from, int to) {
+        Collections.swap(items, from, to);
+        getViewState().notifyItemMoved(from, to);
     }
 
     private void onPlayListDeletingError(Throwable throwable) {

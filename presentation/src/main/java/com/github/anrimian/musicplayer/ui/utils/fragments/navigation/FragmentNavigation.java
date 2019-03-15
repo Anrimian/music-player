@@ -416,7 +416,7 @@ public class FragmentNavigation {
                     .beginTransaction()
                     .replace(jugglerView.getBottomViewId(), createFragment(bottomFragment))
                     .runOnCommit(this::hideBottomFragmentMenu)
-                    .commit();
+                    .commit();//repeat java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
         }
     }
 
