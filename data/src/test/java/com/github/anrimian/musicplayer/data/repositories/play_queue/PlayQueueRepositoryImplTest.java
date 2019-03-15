@@ -570,5 +570,29 @@ public class PlayQueueRepositoryImplTest {
 
     @Test
     public void addCompositionsToEndTest() {
+        playQueueRepository.setPlayQueue(getFakeCompositions()).subscribe();
+
+        TestObserver<PlayQueueEvent> itemObserver = playQueueRepository.getCurrentQueueItemObservable()
+                .test();
+
+        itemObserver.assertValueAt(0, item -> {
+            assertEquals(fakeItem(0), item.getPlayQueueItem());
+            return true;
+        });
+
+        when(playQueueDao.addCompositionsToQueue(any()))
+                .thenReturn(asList(
+                        fakeItem(2),
+                        fakeItem(3)
+                        )
+                );
+
+        playQueueRepository.addCompositionsToEnd(asList(fakeComposition(2), fakeComposition(3))).subscribe();
+        playQueueRepository.skipToPrevious().subscribe();
+
+        itemObserver.assertValueAt(1, item -> {
+            assertEquals(fakeComposition(3), requireNonNull(item.getPlayQueueItem()).getComposition());
+            return true;
+        });
     }
 }

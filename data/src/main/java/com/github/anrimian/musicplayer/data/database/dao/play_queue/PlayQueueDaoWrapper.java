@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
+
 /**
  * Created on 02.07.2018.
  */
@@ -78,15 +80,21 @@ public class PlayQueueDaoWrapper {
         });
     }
 
+    public List<PlayQueueItem> addCompositionsToQueue(List<Composition> compositions) {
+        return addCompositionsToQueue(compositions, NO_POSITION, NO_POSITION);
+    }
+
     public List<PlayQueueItem> addCompositionsToQueue(List<Composition> compositions,
                                                       int afterPosition,
                                                       int afterShuffledPositions) {
         return appDatabase.runInTransaction(() -> {
             List<PlayQueueEntity> entities = toEntityList(compositions, afterPosition, afterShuffledPositions);
             List<Long> ids = playQueueDao.insertItems(entities);
-            int increaseBy = entities.size();
-            playQueueDao.increasePositions(increaseBy, afterPosition);
-            playQueueDao.increaseShuffledPositions(increaseBy, afterShuffledPositions);
+            if (afterPosition != NO_POSITION) {
+                int increaseBy = entities.size();
+                playQueueDao.increasePositions(increaseBy, afterPosition);
+                playQueueDao.increaseShuffledPositions(increaseBy, afterShuffledPositions);
+            }
             return toPlayQueueItems(compositions, ids);
         });
     }
@@ -124,7 +132,9 @@ public class PlayQueueDaoWrapper {
         List<PlayQueueItem> items = new ArrayList<>();
         for (PlayQueueEntity entity: entities) {
             Composition composition = compositionMap.get(entity.getAudioId());
-            items.add(new PlayQueueItem(entity.getId(), composition));
+            if (composition != null) {
+                items.add(new PlayQueueItem(entity.getId(), composition));
+            }
         }
         return items;
     }

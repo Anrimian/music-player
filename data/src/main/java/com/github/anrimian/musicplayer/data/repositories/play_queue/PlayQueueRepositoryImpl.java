@@ -233,12 +233,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions, position, shuffledPositions);
             playQueue.addItems(newItems, position, shuffledPositions);
             playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
-        });
+        }).subscribeOn(scheduler);
     }
 
     @Override
     public Completable addCompositionsToEnd(List<Composition> compositions) {
-        return null;//implement
+        return Completable.fromRunnable(() -> {
+            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions);
+            PlayQueue playQueue = getPlayQueue();
+            playQueue.addItems(newItems);
+            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
+        }).subscribeOn(scheduler);
     }
 
     private PlayQueue getPlayQueue() {

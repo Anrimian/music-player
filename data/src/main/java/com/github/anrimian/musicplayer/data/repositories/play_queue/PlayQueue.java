@@ -86,7 +86,10 @@ public class PlayQueue {
             throw new IllegalStateException("move item to top without shuffle mode");
         }
 
-        int previousPosition = shuffledItemPositionMap.get(item.getId());
+        Integer previousPosition = shuffledItemPositionMap.get(item.getId());
+        if (previousPosition == null) {
+            return;
+        }
         PlayQueueItem firstItem = shuffledQueue.set(0, item);
         shuffledQueue.set(previousPosition, firstItem);
 
@@ -110,9 +113,9 @@ public class PlayQueue {
     private void removeItem(PlayQueueItem playQueueItem,
                             List<PlayQueueItem> list,
                             Map<Long, Integer> itemPositionMap) {
-        int position = itemPositionMap.get(playQueueItem.getId());
-        if (position != -1) {
-            list.remove(position);
+        Integer position = itemPositionMap.get(playQueueItem.getId());
+        if (position != null) {
+            list.remove(position.intValue());
         }
     }
 
@@ -198,6 +201,12 @@ public class PlayQueue {
                     itemPositionMap,
                     compositionPositionsMap);
         }
+    }
+
+    void addItems(List<PlayQueueItem> items) {
+        compositionQueue.addAll(items);
+        shuffledQueue.addAll(items);
+        fillPositionMap();//can be optimized
     }
 
     void addItems(List<PlayQueueItem> items, int position, int shuffledPosition) {
