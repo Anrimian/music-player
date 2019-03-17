@@ -63,7 +63,7 @@
 
     <TextView
         android:id="@+id/tv_current_composition"
-        style="@style/Content.Text.Small"
+        style="@style/Content.Text.Medium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
@@ -75,7 +75,7 @@
         app:layout_constraintBottom_toTopOf="@+id/tv_current_composition_author"
         app:layout_constraintEnd_toEndOf="@+id/tv_current_composition_author"
         app:layout_constraintStart_toStartOf="@+id/tv_current_composition_author"
-        tools:text="testtesttststststtst" />
+        tools:text="testtggppptresttststststtst" />
 
     <ImageView
         android:id="@+id/btn_random_play"
@@ -99,7 +99,7 @@
 
     <TextView
         android:id="@+id/tv_played_time"
-        style="@style/Content.Text"
+        style="@style/Content.Text.Time"
         android:gravity="center_vertical|start"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
 
     <TextView
         android:id="@+id/tv_total_time"
-        style="@style/Content.Text"
+        style="@style/Content.Text.Time"
         android:gravity="center_vertical|end"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

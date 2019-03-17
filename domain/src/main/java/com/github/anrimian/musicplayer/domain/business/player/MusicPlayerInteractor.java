@@ -26,7 +26,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
@@ -59,8 +58,6 @@ public class MusicPlayerInteractor {
 
     private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
-
-    private Disposable skipDisposable;
 
     private PlayQueueItem currentItem;
 
@@ -149,28 +146,15 @@ public class MusicPlayerInteractor {
             musicPlayerController.seekTo(0);
             return;
         }
-
-        if (skipDisposable == null) {
-            skipDisposable = playQueueRepository.skipToPrevious()
-                    .doFinally(() -> skipDisposable = null)
-                    .subscribe();
-        }
+        playQueueRepository.skipToPrevious().subscribe();
     }
 
     public void skipToNext() {
-        if (skipDisposable == null) {
-            skipDisposable = playQueueRepository.skipToNext()
-                    .doFinally(() -> skipDisposable = null)
-                    .subscribe();
-        }
+        playQueueRepository.skipToNext().subscribe();
     }
 
     public void skipToPosition(int position) {
-        if (skipDisposable == null) {
-            skipDisposable = playQueueRepository.skipToPosition(position)
-                    .doFinally(() -> skipDisposable = null)
-                    .subscribe();
-        }
+        playQueueRepository.skipToPosition(position).subscribe();
     }
 
     public Observable<Integer> getRepeatModeObservable() {
@@ -312,15 +296,14 @@ public class MusicPlayerInteractor {
             musicPlayerController.seekTo(0);
             return;
         }
+        playQueueRepository.skipToNext()
+                .doOnSuccess(this::onAutoSkipNextFinished)
+                .subscribe();
+    }
 
-        if (skipDisposable == null) {
-            skipDisposable = playQueueRepository.skipToNext()
-                    .doFinally(() -> skipDisposable = null)
-                    .subscribe(currentPosition -> {
-                        if (currentPosition == 0 && !(settingsRepository.getRepeatMode() == RepeatMode.REPEAT_PLAY_LIST)) {
-                            pause();
-                        }
-                    });
+    private void onAutoSkipNextFinished(int currentPosition) {
+        if (currentPosition == 0 && !(settingsRepository.getRepeatMode() == RepeatMode.REPEAT_PLAY_LIST)) {
+            pause();
         }
     }
 

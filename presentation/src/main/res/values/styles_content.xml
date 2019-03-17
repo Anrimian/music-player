@@ -38,7 +38,7 @@
     </style>
 
     <style name="Content.Text.Time">
-
+        <item name="android:textSize">13sp</item>
     </style>
 
     <style name="Content.Text.Subtitle" parent="Content.Text">
@@ -52,6 +52,10 @@
 
     <style name="Content.Text.Small">
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="Content.Text.Medium">
+        <item name="android:textSize">15sp</item>
     </style>
 
     <style name="Content.Button.Main.Expanded">

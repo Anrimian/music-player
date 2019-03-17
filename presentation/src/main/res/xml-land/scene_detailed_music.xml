@@ -30,7 +30,7 @@
 
         <Constraint
             android:id="@+id/tv_current_composition"
-            style="@style/Content.Text.Small"
+            style="@style/Content.Text.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
