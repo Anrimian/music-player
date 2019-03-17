@@ -679,6 +679,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     public void openPlayQueue() {
         presenter.onOpenPlayQueueClicked();
+        setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
         if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
             bottomSheetBehavior.setState(STATE_EXPANDED);
             bottomSheetDelegate.onSlide(1f);

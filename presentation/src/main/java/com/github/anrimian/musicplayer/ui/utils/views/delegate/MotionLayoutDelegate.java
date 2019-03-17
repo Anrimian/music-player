@@ -23,6 +23,9 @@ public class MotionLayoutDelegate implements SlideDelegate {
     @Override
     public void onSlide(float slideOffset) {
         if (isLaidOut(motionLayout)) {
+            if (motionLayout.getVisibility() != VISIBLE) {
+                motionLayout.setVisibility(VISIBLE);
+            }
             moveView(slideOffset);
         } else {
             motionLayout.post(() -> {

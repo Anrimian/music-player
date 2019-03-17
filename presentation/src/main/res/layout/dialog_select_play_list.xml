@@ -87,8 +87,6 @@
 
         </FrameLayout>
 
-
-
     </LinearLayout>
 
     <include layout="@layout/partial_progress_state"

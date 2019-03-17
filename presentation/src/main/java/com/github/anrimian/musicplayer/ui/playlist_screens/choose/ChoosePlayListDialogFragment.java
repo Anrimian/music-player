@@ -109,7 +109,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(Dialog dialog, int style) {
+    public void setupDialog(@NonNull Dialog dialog, int style) {
         super.setupDialog(dialog, style);
         View view = View.inflate(getContext(), R.layout.dialog_select_play_list, null);
         dialog.setContentView(view);
@@ -168,7 +168,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
         slideDelegate.onSlide(0f);
     }
@@ -181,7 +181,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
                 return;
             }
             float usableSlideOffset = slideOffset;
-            int activityHeight = contentView.getHeight() - getStatusBarHeight(getContext());
+            int activityHeight = contentView.getHeight() - getStatusBarHeight(requireContext());
             int viewHeight = clListContainer.getHeight();
             if (activityHeight > viewHeight) {
                 usableSlideOffset = 0;
@@ -298,9 +298,9 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         return new DelegateManager()
                 .addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegate))
                 .addDelegate(new BoundValuesDelegate(0.85f, 1f,
-                                new StatusBarColorDelegate(getActivity().getWindow(),
+                                new StatusBarColorDelegate(requireActivity().getWindow(),
                                         getColorFromAttr(getContext(), getStatusBarColorAttr()),
-                                        getColor(getContext(), R.color.colorPrimaryDarkSecondary))
+                                        getColor(requireContext(), R.color.colorPrimaryDarkSecondary))
                         )
                 );
     }
