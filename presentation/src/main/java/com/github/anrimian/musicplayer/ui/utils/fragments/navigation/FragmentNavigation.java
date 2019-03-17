@@ -62,9 +62,11 @@ public class FragmentNavigation {
             return;
         }
         if (savedState != null) {
-            ArrayList<Bundle> bundleFragments = new ArrayList<>();
-            screens.addAll(mapList(bundleFragments, FragmentMetaData::new));
-            restoreFragmentStack();
+            ArrayList<Bundle> bundleFragments = savedState.getParcelableArrayList(SCREENS);
+            if (bundleFragments != null) {
+                screens.addAll(mapList(bundleFragments, FragmentMetaData::new));
+                restoreFragmentStack();
+            }
         }
     }
 
@@ -96,6 +98,7 @@ public class FragmentNavigation {
             newRootFragment(fragments.get(0), exitAnimation, enterAnimation);
             return;
         }
+
         isNavigationEnabled = false;
         screens.clear();
         screens.addAll(mapList(fragments, FragmentMetaData::new));

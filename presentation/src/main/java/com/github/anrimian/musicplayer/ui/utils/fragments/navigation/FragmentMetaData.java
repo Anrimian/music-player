@@ -45,4 +45,12 @@ class FragmentMetaData {
         bundle.putBundle(ARGUMENTS, arguments);
         return bundle;
     }
+
+    @Override
+    public String toString() {
+        return "FragmentMetaData{" +
+                "fragmentClassName='" + fragmentClassName + '\'' +
+                ", arguments=" + arguments +
+                '}';
+    }
 }
