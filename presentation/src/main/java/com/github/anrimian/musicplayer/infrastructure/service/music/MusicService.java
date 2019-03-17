@@ -13,6 +13,7 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import com.github.anrimian.musicplayer.di.Components;
@@ -60,6 +61,7 @@ import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisp
  * Created on 03.11.2017.
  */
 
+//TODO observe empty notification fixes and remove logs
 public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     public static final String REQUEST_CODE = "request_code";
@@ -100,6 +102,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("KEK", "onCreate");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             stopSelf();//maybe also show notification
@@ -128,10 +131,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
+        Log.d("KEK", "onStartCommand, req code:" + requestCode);
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
         } else {
             KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession, intent);
+            Log.d("KEK", "onStartCommand, keyEvent action: " + keyEvent);
             if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
                 handleMediaButtonAction(keyEvent);
             }
@@ -153,8 +158,10 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
+        Log.d("KEK", "handleMediaButtonAction, key code: " + keyEvent.getKeyCode());
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.KEYCODE_MEDIA_PLAY: {
+                Log.d("KEK", "handleMediaButtonAction: play");
                 musicPlayerInteractor.play();
                 break;
             }
@@ -183,16 +190,25 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayerChanges() {
+        Log.d("KEK", "subscribeOnPlayerChanges");
         serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
                 .subscribe(this::onPlayerStateReceived));
     }
 
     private void onPlayerStateReceived(PlayerState playerState) {
-        this.playerState = playerState;
+        Log.d("KEK", "onPlayerStateReceived: " + playerState);
         updateMediaSessionState(playerState, trackPosition);
+
+        //ignore first not play state
+        if (this.playerState == null && playerState != PlayerState.PLAY) {
+            return;
+        }
+
+        this.playerState = playerState;
         switch (playerState) {
             case PLAY: {
                 mediaSession.setActive(true);
+                Log.d("KEK", "startForeground, currentItem: " + currentItem);
                 startForeground(FOREGROUND_NOTIFICATION_ID,
                         notificationsDisplayer.getForegroundNotification(
                                 true,
@@ -220,7 +236,9 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayInfo() {
+        Log.d("KEK", "subscribeOnPlayInfo");
         if (playInfoDisposable.size() == 0) {
+            Log.d("KEK", "really subscribeOnPlayInfo: ");
             playInfoDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
                     .subscribe(this::onCurrentCompositionReceived));
             playInfoDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
@@ -231,12 +249,14 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     //little td: don't display notification in the stop state and notification isn't visible(delete intent)
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
+        Log.d("KEK", "onCurrentCompositionReceived: " + queueItem);
         if (queueItem == null) {
             mediaSession.setActive(false);
             stopSelf();
             return;
         }
         if (!queueItem.equals(currentItem)) {
+            Log.d("KEK", "onCurrentCompositionReceived: set current");
             currentItem = queueItem;
             updateMediaSessionMetadata(currentItem.getComposition());
             notificationsDisplayer.updateForegroundNotification(
@@ -274,12 +294,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         @Override
         public void onPlay() {
-            musicPlayerInteractor.play();
+            musicPlayerInteractor.playOrPause();
         }
 
         @Override
         public void onPause() {
-            musicPlayerInteractor.pause();
+            musicPlayerInteractor.playOrPause();
         }
 
         @Override
