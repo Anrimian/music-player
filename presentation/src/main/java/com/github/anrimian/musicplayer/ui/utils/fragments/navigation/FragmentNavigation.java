@@ -65,7 +65,7 @@ public class FragmentNavigation {
             ArrayList<Bundle> bundleFragments = savedState.getParcelableArrayList(SCREENS);
             if (bundleFragments != null) {
                 screens.addAll(mapList(bundleFragments, FragmentMetaData::new));
-                restoreFragmentStack();
+                notifyFragmentMovedToTop(getFragmentOnTop());
             }
         }
     }
@@ -386,30 +386,6 @@ public class FragmentNavigation {
         for (FragmentStackListener listener: stackListeners) {
             listener.onStackChanged(getScreensCount());
         }
-    }
-
-    private void restoreFragmentStack() {
-        checkForInitialization();
-        if (!isNavigationEnabled) {
-            return;
-        }
-        if (screens.isEmpty()) {
-            return;
-        }
-        isNavigationEnabled = false;
-        FragmentMetaData topFragment = screens.getLast();
-
-        fragmentManagerProvider.getFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(rootEnterAnimation, 0)
-                .replace(jugglerView.getTopViewId(), createFragment(topFragment))
-                .runOnCommit(() -> {
-                    isNavigationEnabled = true;
-                    notifyStackListeners();
-                    notifyFragmentMovedToTop(getFragmentOnTop());
-                    silentlyReplaceBottomFragment();
-                })
-                .commit();
     }
 
     private void silentlyReplaceBottomFragment() {

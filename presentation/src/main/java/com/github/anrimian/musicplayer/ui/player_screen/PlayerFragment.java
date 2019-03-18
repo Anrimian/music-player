@@ -320,6 +320,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         if (savedInstanceState != null) {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
+        } else {
+            presenter.onCurrentScreenRequested();
         }
 
         btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked);
