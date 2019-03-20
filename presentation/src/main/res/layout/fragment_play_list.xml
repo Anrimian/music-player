@@ -10,11 +10,12 @@
         android:id="@+id/list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?android:attr/colorBackground">
+        android:background="?android:attr/colorBackground"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
-            android:importantForAccessibility="no"
             android:background="?attr/listBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
