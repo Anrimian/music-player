@@ -29,7 +29,7 @@ public class AlphabeticalFileComparatorTest {
                 new FolderFileSource("aby", 1, new Date(0), new Date(0))
         );
 
-        Collections.sort(fileSources, new AlphabeticalFileComparator());
+        Collections.sort(fileSources, new FolderComparator(new AlphabeticalFileComparator()));
 
         assertEquals("aby", ((FolderFileSource) fileSources.get(0)).getFullPath());
         assertEquals("basic", ((FolderFileSource) fileSources.get(1)).getFullPath());

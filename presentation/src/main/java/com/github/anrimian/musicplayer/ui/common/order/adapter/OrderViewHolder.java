@@ -1,40 +1,47 @@
 package com.github.anrimian.musicplayer.ui.common.order.adapter;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getOrderTitle;
 
-public class OrderViewHolder extends RecyclerView.ViewHolder {
+class OrderViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.rb_order)
     RadioButton rbOrder;
 
-    private Order order;
+    private OrderType order;
 
     OrderViewHolder(LayoutInflater inflater,
                     ViewGroup parent,
-                    OnItemClickListener<Order> onItemClickListener) {
+                    OnItemClickListener<OrderType> onItemClickListener) {
         super(inflater.inflate(R.layout.item_order, parent, false));
         ButterKnife.bind(this, itemView);
 
         if (onItemClickListener != null) {
-            itemView.setOnClickListener(v -> onItemClickListener.onItemClick(order));
+            rbOrder.setOnClickListener(v -> onItemClickListener.onItemClick(order));
         }
     }
 
-    void bindView(Order order, boolean selected) {
+    void bindView(OrderType order) {
         this.order = order;
         rbOrder.setText(getOrderTitle(order));
+    }
+
+    void setSelected(boolean selected) {
         rbOrder.setChecked(selected);
+    }
+
+    OrderType getOrder() {
+        return order;
     }
 }

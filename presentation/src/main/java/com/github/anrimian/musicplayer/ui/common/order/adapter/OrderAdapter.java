@@ -1,28 +1,29 @@
 package com.github.anrimian.musicplayer.ui.common.order.adapter;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static java.util.Arrays.asList;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderViewHolder> {
 
-    private List<Order> orderList = asList(Order.values());
+    private final Set<OrderViewHolder> viewHolders = new HashSet<>();
 
-    private OnItemClickListener<Order> onItemClickListener;
+    private List<OrderType> orderList = asList(OrderType.values());
 
-    private Order selectedOrder;
+    private OnItemClickListener<OrderType> onItemClickListener;
 
-    public OrderAdapter(Order selectedOrder) {
-        this.selectedOrder = selectedOrder;
-    }
+    private OrderType selectedOrder;
 
     @NonNull
     @Override
@@ -33,8 +34,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        Order order = orderList.get(position);
-        holder.bindView(order, selectedOrder == order);
+        viewHolders.add(holder);
+
+        OrderType order = orderList.get(position);
+        holder.bindView(order);
+        holder.setSelected(order == selectedOrder);
     }
 
     @Override
@@ -42,7 +46,20 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderViewHolder> {
         return orderList.size();
     }
 
-    public void setOnItemClickListener(OnItemClickListener<Order> onItemClickListener) {
+    @Override
+    public void onViewRecycled(@NonNull OrderViewHolder holder) {
+        super.onViewRecycled(holder);
+        viewHolders.remove(holder);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener<OrderType> onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    public void setCheckedItem(OrderType selectedOrder) {
+        this.selectedOrder = selectedOrder;
+        for (OrderViewHolder holder: viewHolders) {
+            holder.setSelected(holder.getOrder() == selectedOrder);
+        }
     }
 }

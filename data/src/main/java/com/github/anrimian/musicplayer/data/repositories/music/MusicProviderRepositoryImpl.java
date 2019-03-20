@@ -1,24 +1,22 @@
 package com.github.anrimian.musicplayer.data.repositories.music;
 
 import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
+import com.github.anrimian.musicplayer.data.repositories.music.comparators.DescComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.AlphabeticalCompositionComparator;
-import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.AlphabeticalDescCompositionComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.CreateDateCompositionComparator;
-import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.CreateDateDescCompositionComparator;
-import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.AlphabeticalDescFileComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.AlphabeticalFileComparator;
-import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.CreateDateDescFileComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.CreateDateFileComparator;
+import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.FolderComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.music.search.CompositionSearchFilter;
 import com.github.anrimian.musicplayer.data.repositories.music.search.FileSourceSearchFilter;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 
@@ -107,13 +105,22 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     private Comparator<FileSource> getFileComparator(Order order) {
-        switch (order) {
-            case ALPHABETICAL: return new AlphabeticalFileComparator();
-            case ALPHABETICAL_DESC: return new AlphabeticalDescFileComparator();
-            case ADD_TIME: return new CreateDateFileComparator();
-            case ADD_TIME_DESC: return new CreateDateDescFileComparator();
+        Comparator<FileSource> comparator;
+        switch (order.getOrderType()) {
+            case ALPHABETICAL: {
+                comparator = new AlphabeticalFileComparator();
+                break;
+            }
+            case ADD_TIME: {
+                comparator = new CreateDateFileComparator();
+                break;
+            }
             default: return new AlphabeticalFileComparator();
         }
+        if (order.isReversed()) {
+            comparator = new DescComparator<>(comparator);
+        }
+        return new FolderComparator(comparator);
     }
 
     private Comparator<FileSource> getSelectedFileComparator() {
@@ -126,13 +133,23 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     private Comparator<Composition> getCompositionComparator() {
-        switch (settingsPreferences.getCompositionsOrder()) {
-            case ALPHABETICAL: return new AlphabeticalCompositionComparator();
-            case ALPHABETICAL_DESC: return new AlphabeticalDescCompositionComparator();
-            case ADD_TIME: return new CreateDateCompositionComparator();
-            case ADD_TIME_DESC: return new CreateDateDescCompositionComparator();
+        Order order = settingsPreferences.getCompositionsOrder();
+        Comparator<Composition> comparator;
+        switch (order.getOrderType()) {
+            case ALPHABETICAL: {
+                comparator = new AlphabeticalCompositionComparator();
+                break;
+            }
+            case ADD_TIME: {
+                comparator = new CreateDateCompositionComparator();
+                break;
+            }
             default: return new AlphabeticalCompositionComparator();
         }
+        if (order.isReversed()) {
+            comparator = new DescComparator<>(comparator);
+        }
+        return comparator;
     }
 
     private Observable<Composition> getCompositionsObservable(@Nullable String path) {

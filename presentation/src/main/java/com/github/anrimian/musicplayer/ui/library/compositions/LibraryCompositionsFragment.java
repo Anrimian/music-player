@@ -13,7 +13,7 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -268,8 +268,8 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
     }
 
     @Override
-    public void showSelectOrderScreen(Order folderOrder) {
-        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder);
+    public void showSelectOrderScreen(Order order) {
+        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order);
         fragment.setOnCompleteListener(presenter::onOrderSelected);
         fragment.show(getChildFragmentManager(), ORDER_TAG);
     }

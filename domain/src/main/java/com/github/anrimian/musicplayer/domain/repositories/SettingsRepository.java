@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
 import io.reactivex.Observable;
 

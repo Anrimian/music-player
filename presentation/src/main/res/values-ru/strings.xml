@@ -27,9 +27,7 @@
     <string name="delete">Удалить</string>
     <string name="delete_folder">Удалить папку</string>
     <string name="alphabetical_order">По алфавиту</string>
-    <string name="alphabetical_desc_order">По алфавиту в обратном направлении</string>
     <string name="add_date_order">По дате добавления</string>
-    <string name="add_date_desc_order">По дате добавления в обратном направлении</string>
     <string name="order">Сортировка</string>
     <string name="files">Файлы</string>
     <string name="compositions">Композиции</string>
@@ -90,6 +88,8 @@
         Возможно, он в закрытой системной папке.
     </string>
     <string name="loading_progress">Загрузка…</string>
+    <string name="alphabetical_order_desc_title">Я - А</string>
+    <string name="add_date_order_desc_title">Сначала поздние</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

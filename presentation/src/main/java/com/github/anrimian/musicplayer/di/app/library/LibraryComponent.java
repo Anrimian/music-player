@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompos
 import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompositionsModule;
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesComponent;
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesModule;
+import com.github.anrimian.musicplayer.ui.common.order.SelectOrderPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerPresenter;
 
 import dagger.Subcomponent;
@@ -20,4 +21,5 @@ public interface LibraryComponent {
     LibraryCompositionsComponent libraryCompositionsComponent(LibraryCompositionsModule module);
 
     PlayerPresenter playerPresenter();
+    SelectOrderPresenter selectOrderPresenter();
 }

@@ -11,23 +11,16 @@ public class CreateDateFileComparator implements Comparator<FileSource> {
 
     @Override
     public int compare(FileSource first, FileSource second) {
-        if (first.getClass().equals(second.getClass())) {
-            if (first instanceof FolderFileSource) {
-                Date secondDate = ((FolderFileSource) second).getLatestCreateDate();
-                if (secondDate == null) {
-                    return -1;
-                }
-                Date firstDate = ((FolderFileSource) first).getLatestCreateDate();
-                if (firstDate == null) {
-                    return 1;
-                }
-                return firstDate.compareTo(secondDate);
-            } else if (first instanceof MusicFileSource) {
-                return ((MusicFileSource) first).getComposition().getDateAdded()
-                        .compareTo(((MusicFileSource) second).getComposition().getDateAdded());
+        if (first instanceof FolderFileSource) {
+            Date secondDate = ((FolderFileSource) second).getLatestCreateDate();
+            Date firstDate = ((FolderFileSource) first).getLatestCreateDate();
+            if (firstDate == null || secondDate == null) {
+                return 1;
             }
-        } else {
-            return first instanceof FolderFileSource? -1 : 1;
+            return firstDate.compareTo(secondDate);
+        } else if (first instanceof MusicFileSource) {
+            return ((MusicFileSource) first).getComposition().getDateAdded()
+                    .compareTo(((MusicFileSource) second).getComposition().getDateAdded());
         }
         return 0;
     }

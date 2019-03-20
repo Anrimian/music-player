@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music.comparators.folder;
 
+import com.github.anrimian.musicplayer.data.repositories.music.comparators.DescComparator;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
@@ -29,7 +30,13 @@ public class AlphabeticalDescFileComparatorTest {
                 new FolderFileSource("aby", 1, new Date(0), new Date(0))
         );
 
-        Collections.sort(fileSources, new AlphabeticalDescFileComparator());
+        Collections.sort(fileSources, new FolderComparator(
+                        new DescComparator<>(
+                                new AlphabeticalFileComparator()
+                        )
+                )
+        );
+
 
         assertEquals("basic", ((FolderFileSource) fileSources.get(0)).getFullPath());
         assertEquals("aby", ((FolderFileSource) fileSources.get(1)).getFullPath());

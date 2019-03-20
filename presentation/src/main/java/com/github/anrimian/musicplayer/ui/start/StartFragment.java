@@ -37,7 +37,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.setTryAgainButtonOnClickListener(v -> presenter.onTryAgainButtonClicked());
+        progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
     }
 
     @Override

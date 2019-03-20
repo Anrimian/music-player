@@ -11,21 +11,17 @@ public class AlphabeticalFileComparator implements Comparator<FileSource> {
 
     @Override
     public int compare(FileSource first, FileSource second) {
-        if (first.getClass().equals(second.getClass())) {
-            Collator collator = Collator.getInstance();
-            if (first instanceof FolderFileSource) {
-                return collator.compare(
-                        ((FolderFileSource) first).getFullPath(),
-                        ((FolderFileSource) second).getFullPath()
-                );
-            } else if (first instanceof MusicFileSource) {
-                return collator.compare(
-                        ((MusicFileSource) first).getComposition().getFilePath(),
-                        ((MusicFileSource) second).getComposition().getFilePath()
-                );
-            }
-        } else {
-            return first instanceof FolderFileSource? -1 : 1;
+        Collator collator = Collator.getInstance();
+        if (first instanceof FolderFileSource) {
+            return collator.compare(
+                    ((FolderFileSource) first).getFullPath(),
+                    ((FolderFileSource) second).getFullPath()
+            );
+        } else if (first instanceof MusicFileSource) {
+            return collator.compare(
+                    ((MusicFileSource) first).getComposition().getFilePath(),
+                    ((MusicFileSource) second).getComposition().getFilePath()
+            );
         }
         return 0;
     }

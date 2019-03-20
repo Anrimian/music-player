@@ -4,10 +4,8 @@ import android.content.Context;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.Order;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 
-import java.util.List;
 import java.util.Locale;
 
 import static android.text.TextUtils.isEmpty;
@@ -66,13 +64,19 @@ public class FormatUtils {
         return sb.toString();
     }
 
-    public static int getOrderTitle(Order order) {
-        switch (order) {
+    public static int getOrderTitle(OrderType orderType) {
+        switch (orderType) {
             case ALPHABETICAL: return R.string.alphabetical_order;
-            case ALPHABETICAL_DESC: return R.string.alphabetical_desc_order;
             case ADD_TIME: return R.string.add_date_order;
-            case ADD_TIME_DESC: return R.string.add_date_desc_order;
-            default: throw new IllegalStateException("can not find title for order: " + order);
+            default: throw new IllegalStateException("can not find title for order: " + orderType);
+        }
+    }
+
+    public static int getReversedOrderText(OrderType orderType) {
+        switch (orderType) {
+            case ALPHABETICAL: return R.string.alphabetical_order_desc_title;
+            case ADD_TIME: return R.string.add_date_order_desc_title;
+            default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }
 }

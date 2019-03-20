@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music.comparators.composition;
 
+import com.github.anrimian.musicplayer.data.repositories.music.comparators.DescComparator;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class CreateDateDescCompositionComparatorTest {
 
         List<Composition> compositions = asList(compositionOne, compositionTwo, compositionThree);
 
-        Collections.sort(compositions, new CreateDateDescCompositionComparator());
+        Collections.sort(compositions, new DescComparator<>(new CreateDateCompositionComparator()));
 
         assertEquals(compositionThree, compositions.get(0));
         assertEquals(compositionTwo, compositions.get(1));

@@ -4,9 +4,10 @@ import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 
 import org.junit.Before;
@@ -39,7 +40,7 @@ public class MusicProviderRepositoryImplTest {
 
     @Before
     public void setUp() {
-        when(settingsPreferences.getFolderOrder()).thenReturn(Order.ALPHABETICAL);
+        when(settingsPreferences.getFolderOrder()).thenReturn(new Order(OrderType.ALPHABETICAL, false));
     }
 
     @Test

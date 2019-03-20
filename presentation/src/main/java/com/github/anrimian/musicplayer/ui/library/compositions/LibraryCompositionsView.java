@@ -6,7 +6,7 @@ import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
@@ -40,7 +40,7 @@ public interface LibraryCompositionsView extends MvpView {
     void updateList(ListUpdate<Composition> update, HashSet<Composition> selectedCompositionsMap);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showSelectOrderScreen(Order folderOrder);
+    void showSelectOrderScreen(Order order);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectPlayListDialog();

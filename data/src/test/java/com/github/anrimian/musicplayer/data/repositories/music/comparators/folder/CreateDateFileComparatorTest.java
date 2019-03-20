@@ -30,7 +30,7 @@ public class CreateDateFileComparatorTest {
                 new FolderFileSource("nullabla", 1, null, null)
         );
 
-        Collections.sort(fileSources, new CreateDateFileComparator());
+        Collections.sort(fileSources, new FolderComparator(new CreateDateFileComparator()));
 
         assertEquals("basic", ((FolderFileSource) fileSources.get(0)).getFullPath());
         assertEquals("aby", ((FolderFileSource) fileSources.get(1)).getFullPath());

@@ -29,9 +29,7 @@
     <string name="delete">Delete</string>
     <string name="delete_folder">Delete folder</string>
     <string name="alphabetical_order">Alphabetically</string>
-    <string name="alphabetical_desc_order">Alphabetical in the opposite direction</string>
     <string name="add_date_order">By date of addition</string>
-    <string name="add_date_desc_order">By date of addition in the opposite direction</string>
     <string name="order">Sorting</string>
     <string name="files">Files</string>
     <string name="compositions">Songs</string>
@@ -92,6 +90,8 @@
         Possible he is in private system folder or so.
     </string>
     <string name="loading_progress">Loading…</string>
+    <string name="alphabetical_order_desc_title">Z - A</string>
+    <string name="add_date_order_desc_title">Later first</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
