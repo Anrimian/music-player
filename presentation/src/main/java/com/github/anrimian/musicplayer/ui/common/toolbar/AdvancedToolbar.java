@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.ui.common.toolbar;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -311,8 +311,7 @@ public class AdvancedToolbar extends FrameLayout {
     private void setCommandButtonMode(boolean isBase, boolean animate) {
         float end = isBase? 0f : 1f;
         if (animate) {
-            float start = drawerArrowDrawable.getProgress();
-            ObjectAnimator objectAnimator = ofFloat(drawerArrowDrawable, "progress", start, end);
+            ValueAnimator objectAnimator = getControlButtonAnimator(isBase);
             objectAnimator.setDuration(TOOLBAR_ARROW_ANIMATION_TIME);
             objectAnimator.start();
         } else {
@@ -320,10 +319,14 @@ public class AdvancedToolbar extends FrameLayout {
         }
     }
 
-    private ObjectAnimator getControlButtonAnimator(boolean isArrow) {
+    private ValueAnimator getControlButtonAnimator(boolean isArrow) {
         float start = drawerArrowDrawable.getProgress();
         float end = isArrow? 0f : 1f;
-        return ofFloat(drawerArrowDrawable, "progress", start, end);
+        ValueAnimator objectAnimator = ofFloat(start, end);
+        objectAnimator.addUpdateListener(animation ->
+                drawerArrowDrawable.setProgress((float) animation.getAnimatedValue())
+        );
+        return objectAnimator;
     }
 
     @Nullable
@@ -417,7 +420,7 @@ public class AdvancedToolbar extends FrameLayout {
 
             List<Animator> baseAnimators = new ArrayList<>();
             if (inSearchMode) {
-                baseAnimators.add(getVisibilityAnimator(etSearch, anotherElementsVisibility));//visibility animator not working?
+                baseAnimators.add(getVisibilityAnimator(etSearch, anotherElementsVisibility));
             } else {
                 baseAnimators.add(getVisibilityAnimator(clTitleContainer, anotherElementsVisibility));
                 baseAnimators.add(getVisibilityAnimator(getActionMenuView(), anotherElementsVisibility));
