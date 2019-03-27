@@ -14,6 +14,7 @@ public class ListUtils {
         return list;
     }
 
+    @SafeVarargs
     public static <T> List<T> asList(T... objects) {
         return new ArrayList<>(Arrays.asList(objects));
     }
