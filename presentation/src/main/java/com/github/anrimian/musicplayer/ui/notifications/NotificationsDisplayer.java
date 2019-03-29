@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
+import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -27,7 +28,6 @@ import static com.github.anrimian.musicplayer.infrastructure.service.music.Music
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 
 /**
@@ -38,13 +38,16 @@ public class NotificationsDisplayer {
 
     public static final int FOREGROUND_NOTIFICATION_ID = 1;
 
-    private static final String FOREGROUND_CHANNEL_ID = "0";
+    public static final String FOREGROUND_CHANNEL_ID = "0";
 
-    private NotificationManager notificationManager;
-    private Context context;
+    private final Context context;
+    private final NotificationManager notificationManager;
+    private final AppNotificationBuilder notificationBuilder;
 
-    public NotificationsDisplayer(Context context) {
+    public NotificationsDisplayer(Context context, AppNotificationBuilder notificationBuilder) {
         this.context = context;
+        this.notificationBuilder = notificationBuilder;
+
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -111,41 +114,42 @@ public class NotificationsDisplayer {
         intent.putExtra(OPEN_PLAY_QUEUE_ARG, true);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle style = new androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle();
-        style.setShowActionsInCompactView(0, 1, 2);
-//        style.setMediaSession(mediaSession.getSessionToken());
-
         NotificationCompat.Action playPauseAction = new NotificationCompat.Action(
                 play? R.drawable.ic_pause: R.drawable.ic_play,
                 getString(play? R.string.pause: R.string.play),
                 pIntentPlayPause);
 
-//        Bitmap bitmap = getCompositionImage(composition);
-//        int color;
-//        if (bitmap == null) {
-//            color = Color.WHITE;/*getColorFromAttr(context, android.R.attr.textColorPrimary);*/
-//            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_music_box);
-//        } else {
-//            color = Palette.from(bitmap).generate().getDarkMutedColor(Color.WHITE);
-//        }
+        androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle();
+        style.setShowActionsInCompactView(0, 1, 2);
 
-        NotificationCompat.Builder builder =  new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
-                .setColor(getColorFromAttr(context, android.R.attr.textColorPrimary))
+        NotificationCompat.Builder builder =  notificationBuilder.buildMusicNotification(context, queueItem)
 //                .setColorized(true)
                 .setSmallIcon(R.drawable.ic_music_box)
                 .setContentIntent(pIntent)
                 .addAction(R.drawable.ic_skip_previous, getString(R.string.previous_track), pIntentSkipToPrevious)
                 .addAction(playPauseAction)
                 .addAction(R.drawable.ic_skip_next, getString(R.string.next_track), pIntentSkipToNext)
-                .setStyle(style)
                 .setShowWhen(false)
-//                .setLargeIcon(bitmap)
+                .setStyle(style)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         if (queueItem != null) {
             Composition composition = queueItem.getComposition();
+
+//            Bitmap bitmap = getCompositionImage(composition);
+//
+//            int color;
+//            if (bitmap == null) {
+//                color = Color.WHITE;/*getColorFromAttr(context, android.R.attr.textColorPrimary);*/
+//                bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);//default icon
+//            } else {
+//                color = Palette.from(bitmap).generate().getDarkMutedColor(Color.WHITE);
+//
+//            }
+
             builder = builder.setContentTitle(formatCompositionName(composition))
-                             .setContentText(formatCompositionAuthor(composition, context));
+                    .setContentText(formatCompositionAuthor(composition, context));
+//                    .setLargeIcon(bitmap);
         }
         return builder;
     }
