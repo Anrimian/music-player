@@ -292,7 +292,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         setupMenu(actionMenuView, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
-        bottomSheetDelegate = getBottomSheetDelegate();
+        bottomSheetDelegate = createBottomSheetDelegate();
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
         mlBottomSheet.setClickable(true);
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
@@ -421,6 +421,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void expandBottomPanel() {
         setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
+        toolbar.setControlButtonProgress(1f);
 
         drawerLockStateProcessor.onBottomSheetOpened(true);
         bottomSheetDelegate.onSlide(1f);
@@ -808,7 +809,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         popup.show();
     }
 
-    private SlideDelegate getBottomSheetDelegate() {
+    private SlideDelegate createBottomSheetDelegate() {
         DelegateManager boundDelegateManager = new DelegateManager();
         boundDelegateManager
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
@@ -824,7 +825,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRepeatMode)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
-                .addDelegate(new ToolbarDelegate(navigation, toolbar, requireActivity().getWindow()))
+                .addDelegate(new ToolbarDelegate(toolbar, requireActivity().getWindow()))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
         DelegateManager delegateManager = new DelegateManager();

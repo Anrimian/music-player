@@ -5,7 +5,6 @@ import android.view.Window;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -16,14 +15,11 @@ public class ToolbarDelegate implements SlideDelegate {
     private final int startStatusBarColor;
     private final int endStatusBarColor;
 
-    private final FragmentNavigation navigation;
     private final AdvancedToolbar toolbar;
     private final Window window;
 
-    public ToolbarDelegate(FragmentNavigation navigation,
-                           AdvancedToolbar toolbar,
+    public ToolbarDelegate(AdvancedToolbar toolbar,
                            Window window) {
-        this.navigation = navigation;
         this.toolbar = toolbar;
         this.window = window;
 
@@ -33,11 +29,8 @@ public class ToolbarDelegate implements SlideDelegate {
 
     @Override
     public void onSlide(float slideOffset) {
-        if (!(navigation.getScreensCount() > 1
-                || toolbar.isInSearchMode()
-                || toolbar.isInActionMode())) {
-            toolbar.setControlButtonProgress(slideOffset);
-        }
+        toolbar.setControlButtonProgress(slideOffset);
+
         if (toolbar.isInActionMode()) {
             int startColor = getColorFromAttr(toolbar.getContext(), R.attr.actionModeTextColor);
             int endColor = getColorFromAttr(toolbar.getContext(), android.R.attr.textColorPrimaryInverse);

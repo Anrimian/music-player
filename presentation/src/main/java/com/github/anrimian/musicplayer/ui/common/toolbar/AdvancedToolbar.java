@@ -355,7 +355,9 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     public void setControlButtonProgress(float slideOffset) {
-        drawerArrowDrawable.setProgress(slideOffset);
+        if (!(navigation.getScreensCount() > 1 || inSearchMode || inSelectionMode)) {
+            drawerArrowDrawable.setProgress(slideOffset);
+        }
     }
 
     public void setControlButtonColor(@ColorInt int color) {
