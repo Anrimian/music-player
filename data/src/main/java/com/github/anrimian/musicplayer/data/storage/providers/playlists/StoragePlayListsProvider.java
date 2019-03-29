@@ -205,6 +205,17 @@ public class StoragePlayListsProvider {
         }
     }
 
+    public void updatePlayListName(long playListId, String name) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Playlists.NAME, name);
+        //update time or not?
+//        contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
+        contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
+                contentValues,
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(playListId) });
+    }
+
     private void updateModifyTime(long playListId) {
         ContentValues playListValues = new ContentValues();
         playListValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);

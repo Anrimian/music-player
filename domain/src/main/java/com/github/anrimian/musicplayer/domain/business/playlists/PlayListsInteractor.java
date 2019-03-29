@@ -66,6 +66,10 @@ public class PlayListsInteractor {
                 .subscribe();
     }
 
+    public Completable updatePlayListName(long playListId, String name) {
+        return playListsRepository.updatePlayListName(playListId, name);
+    }
+
     public void setSelectedPlayListScreen(long playListId) {
         uiStateRepository.setSelectedPlayListScreenId(playListId);
     }

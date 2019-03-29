@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils;
 
+import java.util.List;
+
 public interface PayloadFunction<T> {
 
-    Object getChangePayload(T oldItem, T newItem);
+    List<Object> getChangePayload(T oldItem, T newItem);
 }

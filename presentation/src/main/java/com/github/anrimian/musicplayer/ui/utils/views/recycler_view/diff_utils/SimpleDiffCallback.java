@@ -1,9 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils;
 
+import java.util.List;
+
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
-
-import java.util.List;
 
 /**
  * Created on 17.02.2018.
@@ -106,7 +106,7 @@ public class SimpleDiffCallback<T> extends DiffUtil.Callback {
     public static class PayloadDefaultFunction<T> implements PayloadFunction<T> {
 
         @Override
-        public Object getChangePayload(T oldItem, T newItem) {
+        public List<Object> getChangePayload(T oldItem, T newItem) {
             return null;
         }
     }

@@ -27,4 +27,6 @@ public interface PlayListsRepository {
     Completable deletePlayList(long playListId);
 
     Completable moveItemInPlayList(long playListId, int from, int to);
+
+    Completable updatePlayListName(long playListId, String name);
 }

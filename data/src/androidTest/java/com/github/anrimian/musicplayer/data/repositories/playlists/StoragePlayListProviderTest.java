@@ -124,6 +124,21 @@ public class StoragePlayListProviderTest {
         }
     }
 
+    @Test
+    public void updatePlayListNameTest() {
+        String oldName = "test playlist name";
+        String newName = "test playlist name(new name)";
+        storagePlayListsProvider.createPlayList(oldName);
+
+        StoragePlayList playList = getPlayList(oldName);
+        try {
+            storagePlayListsProvider.updatePlayListName(playList.getId(), newName);
+            assertEquals(newName, getPlayList(newName).getName());
+        } finally {
+            storagePlayListsProvider.deletePlayList(playList.getId());
+        }
+    }
+
     private StoragePlayList getPlayList(String name) {
         for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
             if (playList.getName().equals(name)) {
