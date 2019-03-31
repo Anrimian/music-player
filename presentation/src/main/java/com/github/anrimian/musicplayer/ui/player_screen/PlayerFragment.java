@@ -46,6 +46,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveXDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveYDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ReverseDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
@@ -100,6 +101,7 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFrom
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getResourceIdFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
@@ -815,7 +817,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
                 .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
-//                .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
+                .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
                 .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.icon_size, ivMusicIcon)))
@@ -844,6 +846,15 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
         }
         delegateManager.addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegateManager));
+        //ellipsize TextView workaround. Find better later
+        delegateManager.addDelegate(slideOffset -> {
+            if (slideOffset == 1f) {
+                run(tvCurrentComposition, () -> {
+                    tvCurrentComposition.requestLayout();
+                    tvCurrentComposition.invalidate();
+                });
+            }
+        });
         return delegateManager;
     }
 

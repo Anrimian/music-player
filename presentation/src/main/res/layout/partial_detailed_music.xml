@@ -75,7 +75,7 @@
         app:layout_constraintBottom_toTopOf="@+id/tv_current_composition_author"
         app:layout_constraintEnd_toEndOf="@+id/tv_current_composition_author"
         app:layout_constraintStart_toStartOf="@+id/tv_current_composition_author"
-        tools:text="testtggppptresttststststtst" />
+        tools:text="testtggpptesttggppptresttststststtsttesttggppptresttststststtstptresttststststtst" />
 
     <ImageView
         android:id="@+id/btn_random_play"
