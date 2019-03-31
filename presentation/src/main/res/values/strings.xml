@@ -52,9 +52,12 @@
     <string name="save_as_play_list">Save as playlist</string>
     <string name="cancel">Cancel</string>
     <string name="deleting">Deleting</string>
-    <string name="delete_composition_template">Delete song %1$s?</string>
-    <string name="delete_folder_template">Delete %2$s from folder %1$s? If there are no more files in the folder, it will also be deleted.</string>
-    <string name="delete_template">Delete %1$s?</string>
+    <string name="delete_composition_template">Delete song %1$s? This action cannot be undone.</string>
+    <string name="delete_folder_template">Delete %2$s from folder %1$s?
+        If there are no more files in the folder, it will also be deleted.
+        This action cannot be undone.
+    </string>
+    <string name="delete_template">Delete %1$s? This action cannot be undone.</string>
     <string name="delete_composition_success">Song %1$s deleted</string>
     <string name="delete_compositions_success">%1$d songs deleted</string>
     <string name="search">Search</string>
