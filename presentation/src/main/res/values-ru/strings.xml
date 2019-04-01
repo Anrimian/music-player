@@ -29,7 +29,7 @@
     <string name="alphabetical_order">По алфавиту</string>
     <string name="add_date_order">По дате добавления</string>
     <string name="order">Сортировка</string>
-    <string name="files">Файлы</string>
+    <string name="folders">Папки</string>
     <string name="compositions">Композиции</string>
     <string name="play_lists">Плейлисты</string>
     <string name="play_lists_on_device_not_found">Плейлистов на устройстве не найдено</string>

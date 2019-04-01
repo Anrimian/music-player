@@ -3,5 +3,5 @@
     <item android:id="@+id/menu_compositions"
         android:title="@string/compositions"/>
     <item android:id="@+id/menu_files"
-        android:title="@string/files"/>
+        android:title="@string/folders"/>
 </menu>

@@ -59,7 +59,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment
         ButterKnife.bind(this, view);
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle(R.string.files);
+        toolbar.setSubtitle(R.string.folders);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onEmptyFolderStackArrived);

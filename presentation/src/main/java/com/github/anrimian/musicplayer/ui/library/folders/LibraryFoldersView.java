@@ -96,4 +96,10 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showCurrentPlayingComposition(Composition composition);
+
+    @StateStrategyType(SkipStrategy.class)
+    void showCompositionActionDialog(Composition composition);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showErrorMessage(ErrorCommand errorCommand);
 }

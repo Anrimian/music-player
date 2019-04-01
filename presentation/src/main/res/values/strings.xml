@@ -31,7 +31,7 @@
     <string name="alphabetical_order">Alphabetically</string>
     <string name="add_date_order">By date of addition</string>
     <string name="order">Sorting</string>
-    <string name="files">Files</string>
+    <string name="folders">Folders</string>
     <string name="compositions">Songs</string>
     <string name="play_lists">Playlists</string>
     <string name="play_lists_on_device_not_found">No playlists found on device</string>

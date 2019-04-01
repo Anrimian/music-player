@@ -118,11 +118,13 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
         if (fragment != null) {
             fragment.setOnCompleteListener(presenter::onOrderSelected);
         }
+
         ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (playListDialog != null) {
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
+
         MenuDialogFragment compositionDialog = (MenuDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(COMPOSITION_ACTION_TAG);
         if (compositionDialog != null) {

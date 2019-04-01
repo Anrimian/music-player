@@ -33,6 +33,7 @@ import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 /**
  * Created on 23.10.2017.
@@ -87,6 +88,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     @Nullable
     private Composition currentComposition;
 
+    private Composition compositionInAction;
+
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFilesInteractor interactor,
                                    MusicPlayerInteractor playerInteractor,
@@ -133,12 +136,48 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onCompositionClicked(int position, Composition composition) {
+        if (currentComposition != null) {
+            compositionInAction = composition;
+            getViewState().showCompositionActionDialog(composition);
+        } else {
+            interactor.play(path, composition);
+            getViewState().showCurrentPlayingComposition(composition);
+        }
+    }
+
+    void onCompositionIconClicked(int position, Composition composition) {
         if (composition.equals(currentComposition)) {
             playerInteractor.playOrPause();
         } else {
             interactor.play(path, composition);
             getViewState().showCurrentPlayingComposition(composition);
         }
+    }
+
+    void onPlayActionSelected() {
+        interactor.play(path, compositionInAction);
+    }
+
+    void onPlayNextFolderClicked(FolderFileSource folder) {
+        interactor.getAllCompositionsInPath(folder.getFullPath())
+                .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
+    void onAddToQueueFolderClicked(FolderFileSource folder) {
+        interactor.getAllCompositionsInPath(folder.getFullPath())
+                .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
+    void onPlayNextActionSelected() {
+        addCompositionsToPlayNext(asList(compositionInAction));
+    }
+
+    void onAddToQueueActionSelected() {
+        addCompositionsToEnd(asList(compositionInAction));
     }
 
     void onPlayAllButtonClicked() {
@@ -228,6 +267,23 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onFragmentDisplayed() {
         interactor.saveCurrentPath(path);
+    }
+
+    private void addCompositionsToPlayNext(List<Composition> compositions) {
+        playerInteractor.addCompositionsToPlayNext(compositions)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
+    private void addCompositionsToEnd(List<Composition> compositions) {
+        playerInteractor.addCompositionsToEnd(compositions)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
+    private void onDefaultError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showErrorMessage(errorCommand);
     }
 
     private void onReceiveCompositionsError(Throwable throwable) {

@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -51,11 +52,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFiles;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -159,6 +162,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 .findFragmentByTag(SELECT_PLAYLIST_FOR_FOLDER_TAG);
         if (folderPlayListDialog != null) {
             folderPlayListDialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
+        }
+
+        MenuDialogFragment compositionDialog = (MenuDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(COMPOSITION_ACTION_TAG);
+        if (compositionDialog != null) {
+            compositionDialog.setOnCompleteListener(this::onCompositionActionSelected);
         }
 
         if (getPath() != null) {//TODO root path -> not root path change case
@@ -380,6 +389,38 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         adapter.showPlayingComposition(composition);
     }
 
+    @Override
+    public void showCompositionActionDialog(Composition composition) {
+        MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance(
+                R.menu.composition_actions_menu,
+                formatCompositionName(composition)
+        );
+        menuDialogFragment.setOnCompleteListener(this::onCompositionActionSelected);
+        menuDialogFragment.show(getChildFragmentManager(), COMPOSITION_ACTION_TAG);
+    }
+
+    @Override
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onCompositionActionSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_play: {
+                presenter.onPlayActionSelected();
+                break;
+            }
+            case R.id.menu_play_next: {
+                presenter.onPlayNextActionSelected();
+                break;
+            }
+            case R.id.menu_add_to_queue: {
+                presenter.onAddToQueueActionSelected();
+                break;
+            }
+        }
+    }
+
     private void onCompositionMenuClicked(View view, Composition composition) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.composition_item_menu);
@@ -408,6 +449,14 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         popup.inflate(R.menu.folder_item_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
+                case R.id.menu_play_next: {
+                    presenter.onPlayNextFolderClicked(folder);
+                    return true;
+                }
+                case R.id.menu_add_to_queue: {
+                    presenter.onAddToQueueFolderClicked(folder);
+                    return true;
+                }
                 case R.id.menu_add_to_playlist: {
                     presenter.onAddFolderToPlayListButtonClicked(folder.getFullPath());
                     return true;
