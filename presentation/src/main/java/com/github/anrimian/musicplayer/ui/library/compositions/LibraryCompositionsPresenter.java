@@ -30,6 +30,7 @@ import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 @InjectViewState
 public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositionsView> {
@@ -61,6 +62,9 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     @Nullable
     private Composition currentComposition;
+
+    private Composition compositionInAction;
+    private int compositionPositionInAction;
 
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
@@ -102,8 +106,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     void onCompositionClicked(int position, Composition composition) {
         if (selectedCompositions.isEmpty()) {
-            if (composition.equals(currentComposition)) {
-                playerInteractor.playOrPause();
+            if (currentComposition != null) {
+                compositionInAction = composition;
+                compositionPositionInAction = position;
+                getViewState().showCompositionActionDialog(composition);
             } else {
                 interactor.play(compositions, position);
                 getViewState().showCurrentPlayingComposition(composition);
@@ -117,6 +123,15 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
                 getViewState().onCompositionSelected(composition, position);
             }
             getViewState().showSelectionMode(selectedCompositions.size());
+        }
+    }
+
+    void onCompositionIconClicked(int position, Composition composition) {
+        if (composition.equals(currentComposition)) {
+            playerInteractor.playOrPause();
+        } else {
+            interactor.play(compositions, position);
+            getViewState().showCurrentPlayingComposition(composition);
         }
     }
 
@@ -204,6 +219,40 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         getViewState().setItemsSelected(true);
     }
 
+    void onPlayNextSelectedCompositionsClicked() {
+        addCompositionsToPlayNext(new ArrayList<>(selectedCompositions));
+        closeSelectionMode();
+    }
+
+    void onAddToQueueSelectedCompositionsClicked() {
+        addCompositionsToEnd(new ArrayList<>(selectedCompositions));
+        closeSelectionMode();
+    }
+
+    void onPlayActionSelected() {
+        interactor.play(compositions, compositionPositionInAction);
+    }
+
+    void onPlayNextActionSelected() {
+        addCompositionsToPlayNext(asList(compositionInAction));
+    }
+
+    void onAddToQueueActionSelected() {
+        addCompositionsToEnd(asList(compositionInAction));
+    }
+
+    private void addCompositionsToPlayNext(List<Composition> compositions) {
+        playerInteractor.addCompositionsToPlayNext(compositions)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
+    private void addCompositionsToEnd(List<Composition> compositions) {
+        playerInteractor.addCompositionsToEnd(compositions)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
     private void playSelectedCompositions() {
         interactor.play(new ArrayList<>(selectedCompositions));
         closeSelectionMode();
@@ -228,6 +277,11 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         if (!selectedCompositions.isEmpty()) {
             closeSelectionMode();
         }
+    }
+
+    private void onDefaultError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showErrorMessage(errorCommand);
     }
 
     private void onDeleteCompositionError(Throwable throwable) {

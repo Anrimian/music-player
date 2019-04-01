@@ -18,6 +18,7 @@ public interface Constants {
         String SELECT_PLAYLIST_FOR_FOLDER_TAG = "select_playlist_for_folder_tag";
         String CREATE_PLAYLIST_TAG = "create_playlist_tag";
         String PLAY_LIST_MENU = "play_list_menu";
+        String COMPOSITION_ACTION_TAG = "composition_action_tag";
     }
 
     interface Animation {

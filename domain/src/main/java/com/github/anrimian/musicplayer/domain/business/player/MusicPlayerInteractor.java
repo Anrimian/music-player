@@ -235,6 +235,14 @@ public class MusicPlayerInteractor {
                 .subscribe();
     }
 
+    public Completable addCompositionsToPlayNext(List<Composition> compositions) {
+        return playQueueRepository.addCompositionsToPlayNext(compositions);
+    }
+
+    public Completable addCompositionsToEnd(List<Composition> compositions) {
+        return playQueueRepository.addCompositionsToEnd(compositions);
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {

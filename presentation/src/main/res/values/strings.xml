@@ -95,6 +95,9 @@
     <string name="loading_progress">Loading…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
     <string name="add_date_order_desc_title">Later first</string>
+    <string name="play_action">Play</string>
+    <string name="play_next">Play next</string>
+    <string name="add_to_play_queue">Add to play queue</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

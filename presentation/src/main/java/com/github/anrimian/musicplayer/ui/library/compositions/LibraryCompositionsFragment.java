@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
@@ -42,13 +43,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
-public class LibraryCompositionsFragment extends LibraryFragment implements LibraryCompositionsView, BackButtonListener {
+public class LibraryCompositionsFragment extends LibraryFragment implements
+        LibraryCompositionsView, BackButtonListener {
 
     @InjectPresenter
     LibraryCompositionsPresenter presenter;
@@ -118,6 +122,11 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (playListDialog != null) {
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
+        }
+        MenuDialogFragment compositionDialog = (MenuDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(COMPOSITION_ACTION_TAG);
+        if (compositionDialog != null) {
+            compositionDialog.setOnCompleteListener(this::onCompositionActionSelected);
         }
     }
 
@@ -305,6 +314,38 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
         adapter.showPlayingComposition(composition);
     }
 
+    @Override
+    public void showCompositionActionDialog(Composition composition) {
+        MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance(
+                R.menu.composition_actions_menu,
+                formatCompositionName(composition)
+        );
+        menuDialogFragment.setOnCompleteListener(this::onCompositionActionSelected);
+        menuDialogFragment.show(getChildFragmentManager(), COMPOSITION_ACTION_TAG);
+    }
+
+    @Override
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onCompositionActionSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_play: {
+                presenter.onPlayActionSelected();
+                break;
+            }
+            case R.id.menu_play_next: {
+                presenter.onPlayNextActionSelected();
+                break;
+            }
+            case R.id.menu_add_to_queue: {
+                presenter.onAddToQueueActionSelected();
+                break;
+            }
+        }
+    }
+
     private boolean onActionModeItemClicked(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_play: {
@@ -313,6 +354,14 @@ public class LibraryCompositionsFragment extends LibraryFragment implements Libr
             }
             case R.id.menu_select_all: {
                 presenter.onSelectAllButtonClicked();
+                return true;
+            }
+            case R.id.menu_play_next: {
+                presenter.onPlayNextSelectedCompositionsClicked();
+                return true;
+            }
+            case R.id.menu_add_to_queue: {
+                presenter.onAddToQueueSelectedCompositionsClicked();
                 return true;
             }
             case R.id.menu_add_to_playlist: {
