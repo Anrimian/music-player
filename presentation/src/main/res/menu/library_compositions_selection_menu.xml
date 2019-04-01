@@ -16,6 +16,16 @@
         android:title="@string/add_to_playlist"
         app:iconTint="@color/secondary_button_color"
         app:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_play_next"
+        android:icon="@drawable/ic_play_next"
+        android:title="@string/play_next"
+        app:iconTint="@color/secondary_button_color"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_add_to_queue"
+        android:icon="@drawable/ic_add_to_queue"
+        android:title="@string/add_to_queue"
+        app:iconTint="@color/secondary_button_color"
+        app:showAsAction="ifRoom"/>
     <item android:id="@+id/menu_share"
         android:icon="@drawable/ic_share_variant"
         android:title="@string/share"
