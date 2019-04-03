@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
@@ -46,8 +47,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
@@ -289,6 +292,38 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void notifyItemMoved(int from, int to) {
         adapter.notifyItemMoved(from, to);
+    }
+
+    @Override
+    public void showCompositionActionDialog(Composition composition) {
+        MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance(
+                R.menu.composition_actions_menu,
+                formatCompositionName(composition)
+        );
+        menuDialogFragment.setOnCompleteListener(this::onCompositionActionSelected);
+        menuDialogFragment.show(getChildFragmentManager(), COMPOSITION_ACTION_TAG);
+    }
+
+    @Override
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        Snackbar.make(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onCompositionActionSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_play: {
+                presenter.onPlayActionSelected();
+                break;
+            }
+            case R.id.menu_play_next: {
+                presenter.onPlayNextActionSelected();
+                break;
+            }
+            case R.id.menu_add_to_queue: {
+                presenter.onAddToQueueActionSelected();
+                break;
+            }
+        }
     }
 
     private void onCompositionMenuClicked(View view, PlayListItem playListItem) {

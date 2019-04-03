@@ -72,4 +72,10 @@ public interface PlayListView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void notifyItemMoved(int from, int to);
+
+    @StateStrategyType(SkipStrategy.class)
+    void showCompositionActionDialog(Composition composition);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showErrorMessage(ErrorCommand errorCommand);
 }

@@ -5,6 +5,8 @@ import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper;
@@ -22,7 +24,9 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static java.util.Objects.requireNonNull;
@@ -30,12 +34,14 @@ import static java.util.Objects.requireNonNull;
 @InjectViewState
 public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
-    private final MusicPlayerInteractor musicPlayerInteractor;
+    private final MusicPlayerInteractor playerInteractor;
     private final PlayListsInteractor playListsInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
+    private final CompositeDisposable presenterBatterySafeDisposable = new CompositeDisposable();
+    private Disposable currentItemDisposable;
 
     private final long playListId;
 
@@ -53,13 +59,18 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private int startDragPosition;
 
+    private PlayQueueItem currentItem;
+
+    private Composition compositionInAction;
+    private int compositionPositionInAction;
+
     public PlayListPresenter(long playListId,
-                             MusicPlayerInteractor musicPlayerInteractor,
+                             MusicPlayerInteractor playerInteractor,
                              PlayListsInteractor playListsInteractor,
                              ErrorParser errorParser,
                              Scheduler uiScheduler) {
         this.playListId = playListId;
-        this.musicPlayerInteractor = musicPlayerInteractor;
+        this.playerInteractor = playerInteractor;
         this.playListsInteractor = playListsInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
@@ -78,12 +89,31 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         presenterDisposable.dispose();
     }
 
+    void onStart() {
+        if (!items.isEmpty()) {
+            subscribeOnCurrentComposition();
+        }
+    }
+
+    void onStop() {
+        presenterBatterySafeDisposable.clear();
+    }
+
     void onCompositionClicked(int position) {
-        musicPlayerInteractor.startPlaying(mapList(items, PlayListItem::getComposition), position);
+        if (currentItem == null) {
+            playerInteractor.startPlaying(
+                    mapList(items, PlayListItem::getComposition),
+                    position
+            );
+        } else {
+            compositionInAction = items.get(position).getComposition();
+            compositionPositionInAction = position;
+            getViewState().showCompositionActionDialog(compositionInAction);
+        }
     }
 
     void onPlayAllButtonClicked() {
-        musicPlayerInteractor.startPlaying(mapList(items, PlayListItem::getComposition));
+        playerInteractor.startPlaying(mapList(items, PlayListItem::getComposition));
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
@@ -148,6 +178,38 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         playListsInteractor.moveItemInPlayList(playListId, startDragPosition, position);//lock update and subscribe on complete?
     }
 
+    void onPlayActionSelected() {
+        playerInteractor.startPlaying(
+                mapList(items, PlayListItem::getComposition),
+                compositionPositionInAction
+        );
+    }
+
+    void onPlayNextActionSelected() {
+        addCompositionsToPlayNext(asList(compositionInAction));
+    }
+
+    void onAddToQueueActionSelected() {
+        addCompositionsToEnd(asList(compositionInAction));
+    }
+
+    private void addCompositionsToPlayNext(List<Composition> compositions) {
+        playerInteractor.addCompositionsToPlayNext(compositions)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
+    private void addCompositionsToEnd(List<Composition> compositions) {
+        playerInteractor.addCompositionsToEnd(compositions)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
+    private void onDefaultError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showErrorMessage(errorCommand);
+    }
+
     private void deleteItem(PlayListItem playListItem) {
         playListsInteractor.deleteItemFromPlayList(playListItem.getItemId(), playListId)
                 .observeOn(uiScheduler)
@@ -197,7 +259,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     private void deletePreparedCompositions() {
-        musicPlayerInteractor.deleteCompositions(compositionsToDelete)
+        playerInteractor.deleteCompositions(compositionsToDelete)
                 .observeOn(uiScheduler)
                 .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionsError);
     }
@@ -242,6 +304,21 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
             getViewState().showEmptyList();
         } else {
             getViewState().showList();
+
+            if (isInactive(currentItemDisposable)) {
+                subscribeOnCurrentComposition();
+            }
         }
+    }
+
+    private void subscribeOnCurrentComposition() {
+        currentItemDisposable = playerInteractor.getCurrentCompositionObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onCurrentCompositionReceived, errorParser::logError);
+        presenterBatterySafeDisposable.add(currentItemDisposable);
+    }
+
+    private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
+        currentItem = playQueueEvent.getPlayQueueItem();
     }
 }
