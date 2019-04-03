@@ -83,4 +83,7 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showQueueActions(boolean show);
 }

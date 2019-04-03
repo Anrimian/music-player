@@ -99,7 +99,7 @@
     <string name="add_date_order_desc_title">Сначала поздние</string>
     <string name="play_action">Проиграть</string>
     <string name="play_next">Проиграть следующим</string>
-    <string name="add_to_play_queue">Добавить в очередь воспроизведения</string>
+    <string name="add_to_play_queue">Добавить в очередь</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

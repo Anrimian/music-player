@@ -94,6 +94,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
 
+    private boolean showQueueActions;
+
     public static LibraryFoldersFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
         args.putString(PATH_ARG, path);
@@ -404,6 +406,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         Snackbar.make(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void showQueueActions(boolean show) {
+        showQueueActions = show;
+    }
+
     private void onCompositionActionSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_play: {
@@ -447,6 +454,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private void onFolderMenuClicked(View view, FolderFileSource folder) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.folder_item_menu);
+        Menu menu = popup.getMenu();
+
+        menu.findItem(R.id.menu_play_next).setVisible(showQueueActions);
+        menu.findItem(R.id.menu_add_to_queue).setVisible(showQueueActions);
+
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_play_next: {

@@ -102,4 +102,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showQueueActions(boolean show);
 }

@@ -331,6 +331,14 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
         Snackbar.make(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void showQueueActions(boolean show) {
+        toolbar.editActionMenu(menu -> {
+           menu.findItem(R.id.menu_play_next).setVisible(show);
+           menu.findItem(R.id.menu_add_to_queue).setVisible(show);
+        });
+    }
+
     private void onCompositionActionSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_play: {

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
@@ -370,6 +371,10 @@ public class AdvancedToolbar extends FrameLayout {
                 menuResource,
                 listener,
                 1);
+    }
+
+    public void editActionMenu(Callback<Menu> callback) {
+        callback.call(acvSelection.getMenu());
     }
 
     public void showSelectionMode(int count) {

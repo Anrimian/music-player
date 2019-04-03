@@ -110,6 +110,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         } else {
             getViewState().showBackPathButton(path);
         }
+        getViewState().showQueueActions(false);
         getViewState().showSearchMode(false);
 
         loadMusic();
@@ -414,6 +415,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         } else {
             currentComposition = null;
         }
+        getViewState().showQueueActions(currentComposition != null);
         getViewState().showCurrentPlayingComposition(currentComposition);
     }
 }

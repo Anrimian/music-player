@@ -81,6 +81,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
+        getViewState().showQueueActions(false);
         subscribeOnCompositions();
     }
 
@@ -317,6 +318,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         } else {
             currentComposition = null;
         }
+        getViewState().showQueueActions(currentComposition != null);
         getViewState().showCurrentPlayingComposition(currentComposition);
     }
 

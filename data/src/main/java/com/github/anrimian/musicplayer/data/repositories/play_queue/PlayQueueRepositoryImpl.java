@@ -239,8 +239,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable addCompositionsToEnd(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
-            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions);
             PlayQueue playQueue = getPlayQueue();
+            if (playQueue.isEmpty()) {
+                return;
+            }
+            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions);
             playQueue.addItems(newItems);
             playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
         }).subscribeOn(scheduler);
