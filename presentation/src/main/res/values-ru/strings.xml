@@ -52,7 +52,7 @@
     <string name="deleting">Удаление</string>
     <string name="delete_composition_template">
         Удалить композицию %1$s?
-        Это действие нельзя будет отменить
+        Это действие нельзя будет отменить.
     </string>
     <string name="delete_folder_template">
         Удалить %2$s из папки %1$s?
