@@ -215,6 +215,10 @@ public class PlayQueue {
         fillPositionMap();//can be optimized
     }
 
+    int size() {
+        return compositionQueue.size();
+    }
+
     private void swapItems(PlayQueueItem firstItem,
                            int firstPosition,
                            PlayQueueItem secondItem,

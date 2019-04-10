@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
-
 /**
  * Created on 02.07.2018.
  */
@@ -80,21 +78,30 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public List<PlayQueueItem> addCompositionsToQueue(List<Composition> compositions) {
-        return addCompositionsToQueue(compositions, NO_POSITION, NO_POSITION);
+    public List<PlayQueueItem> addCompositionsToEndQueue(List<Composition> compositions) {
+        return appDatabase.runInTransaction(() -> {
+            int positionToInsert = playQueueDao.getLastPosition();
+            List<PlayQueueEntity> entities = toEntityList(compositions, positionToInsert, positionToInsert);
+            List<Long> ids = playQueueDao.insertItems(entities);
+            return toPlayQueueItems(compositions, ids);
+        });
     }
 
     public List<PlayQueueItem> addCompositionsToQueue(List<Composition> compositions,
-                                                      int afterPosition,
-                                                      int afterShuffledPositions) {
+                                                      PlayQueueItem currentItem) {
         return appDatabase.runInTransaction(() -> {
-            List<PlayQueueEntity> entities = toEntityList(compositions, afterPosition, afterShuffledPositions);
+            int position = playQueueDao.getPosition(currentItem.getId());
+            int shuffledPosition = playQueueDao.getShuffledPosition(currentItem.getId());
+
+            List<PlayQueueEntity> entities = toEntityList(compositions, position, shuffledPosition);
             List<Long> ids = playQueueDao.insertItems(entities);
-            if (afterPosition != NO_POSITION) {
-                int increaseBy = entities.size();
-                playQueueDao.increasePositions(increaseBy, afterPosition);
-                playQueueDao.increaseShuffledPositions(increaseBy, afterShuffledPositions);
-            }
+
+            int increaseBy = entities.size();
+            int afterPosition = position + increaseBy;
+            int afterShuffledPosition = shuffledPosition + increaseBy;
+            playQueueDao.increasePositions(increaseBy, afterPosition);
+            playQueueDao.increaseShuffledPositions(increaseBy, afterShuffledPosition);
+
             return toPlayQueueItems(compositions, ids);
         });
     }
@@ -175,12 +182,10 @@ public class PlayQueueDaoWrapper {
     }
 
     private List<PlayQueueEntity> toEntityList(List<Composition> compositions,
-                                               int after,
-                                               int afterShuffledPositions) {
+                                               int position,
+                                               int shuffledPosition) {
         List<PlayQueueEntity> entityList = new ArrayList<>(compositions.size());
 
-        int position = ++after;
-        int shuffledPosition = ++afterShuffledPositions;
         for (Composition composition: compositions) {
             PlayQueueEntity playQueueEntity = new PlayQueueEntity();
             playQueueEntity.setAudioId(composition.getId());

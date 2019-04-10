@@ -40,7 +40,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -552,7 +551,7 @@ public class PlayQueueRepositoryImplTest {
             return true;
         });
 
-        when(playQueueDao.addCompositionsToQueue(any(), anyInt(), anyInt()))
+        when(playQueueDao.addCompositionsToQueue(any(), any()))
                 .thenReturn(asList(
                         fakeItem(2),
                         fakeItem(3)
@@ -580,7 +579,7 @@ public class PlayQueueRepositoryImplTest {
             return true;
         });
 
-        when(playQueueDao.addCompositionsToQueue(any()))
+        when(playQueueDao.addCompositionsToEndQueue(any()))
                 .thenReturn(asList(
                         fakeItem(2),
                         fakeItem(3)

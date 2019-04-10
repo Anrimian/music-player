@@ -222,16 +222,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             if (playQueue.isEmpty()) {
                 return;
             }
-            Integer position = playQueue.getPosition(getCurrentItem());
+            PlayQueueItem currentItem = getCurrentItem();
+            Integer position = playQueue.getPosition(currentItem);
             if (position == null) {
                 return;
             }
-            Integer shuffledPositions = playQueue.getShuffledPosition(getCurrentItem());
-            if (shuffledPositions == null) {
+            Integer shuffledPosition = playQueue.getShuffledPosition(currentItem);
+            if (shuffledPosition == null) {
                 return;
             }
-            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions, position, shuffledPositions);
-            playQueue.addItems(newItems, position, shuffledPositions);
+            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions, currentItem);
+            playQueue.addItems(newItems, position, shuffledPosition);
             playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
         }).subscribeOn(scheduler);
     }
@@ -243,7 +244,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             if (playQueue.isEmpty()) {
                 return;
             }
-            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions);
+            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToEndQueue(compositions);
             playQueue.addItems(newItems);
             playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
         }).subscribeOn(scheduler);

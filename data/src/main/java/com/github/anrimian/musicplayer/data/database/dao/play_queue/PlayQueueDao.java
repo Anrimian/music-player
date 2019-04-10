@@ -26,6 +26,9 @@ public interface PlayQueueDao {
     @Query("DELETE FROM play_queue WHERE audioId = :id")
     void deleteComposition(long id);
 
+    @Query("SELECT position FROM play_queue WHERE id = :id")
+    int getPosition(long id);
+
     @Query("SELECT shuffledPosition FROM play_queue WHERE id = :id")
     int getShuffledPosition(long id);
 
@@ -45,4 +48,7 @@ public interface PlayQueueDao {
             "SET shuffledPosition = shuffledPosition + :increaseBy " +
             "WHERE shuffledPosition > :after")
     void increaseShuffledPositions(int increaseBy, int after);
+
+    @Query("SELECT MAX(position) FROM play_queue")
+    int getLastPosition();
 }
