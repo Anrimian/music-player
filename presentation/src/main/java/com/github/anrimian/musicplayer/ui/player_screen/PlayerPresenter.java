@@ -314,7 +314,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
-                getViewState().showCurrentQueueItem(newItem, position, currentPosition);
+                getViewState().showCurrentQueueItem(newItem);
                 scrollToItemPosition(position);
             }
         }

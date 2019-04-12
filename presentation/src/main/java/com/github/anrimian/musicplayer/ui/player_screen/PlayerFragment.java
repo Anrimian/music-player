@@ -514,7 +514,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showCurrentQueueItem(PlayQueueItem item, int position, int oldPosition) {
+    public void showCurrentQueueItem(PlayQueueItem item) {
         animateVisibility(bottomSheetTopShadow, VISIBLE);
         animateVisibility(rvPlayList, VISIBLE);//TODO blink on jump to item on start
 
@@ -528,7 +528,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         ImageFormatUtils.displayImage(ivMusicIcon, composition);
 
-        playQueueAdapter.onCurrentItemChanged(item, position, oldPosition);
+        playQueueAdapter.onCurrentItemChanged(item);
     }
 
     @Override

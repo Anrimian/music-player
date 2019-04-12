@@ -8,14 +8,14 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import static com.github.anrimian.musicplayer.Constants.NO_POSITION;
 
 /**
  * Created on 31.10.2017.
@@ -23,7 +23,7 @@ import static com.github.anrimian.musicplayer.Constants.NO_POSITION;
 
 public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> {
 
-    private static final String CURRENT_COMPOSITION_CHANGED = "current_composition_changed";
+    private final Set<PlayQueueViewHolder> viewHolders = new HashSet<>();
 
     private List<PlayQueueItem> musicList;
     private OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener;
@@ -53,6 +53,8 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull PlayQueueViewHolder holder, int position) {
+        viewHolders.add(holder);
+
         PlayQueueItem composition = musicList.get(position);
         holder.bind(composition);
         holder.showAsPlayingComposition(composition.equals(currentItem));
@@ -65,12 +67,6 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position);
         }
-        for (Object payload: payloads) {
-            if (payload == CURRENT_COMPOSITION_CHANGED) {
-                PlayQueueItem item = musicList.get(position);
-                holder.showAsPlayingComposition(item.equals(currentItem));
-            }
-        }
     }
 
     @Override
@@ -78,12 +74,17 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         return musicList.size();
     }
 
-    public void onCurrentItemChanged(PlayQueueItem currentItem, int position, int oldPosition) {
+    @Override
+    public void onViewRecycled(@NonNull PlayQueueViewHolder holder) {
+        super.onViewRecycled(holder);
+        viewHolders.remove(holder);
+    }
+
+    public void onCurrentItemChanged(PlayQueueItem currentItem) {
         this.currentItem = currentItem;
-        if (oldPosition != NO_POSITION) {
-            notifyItemChanged(oldPosition, CURRENT_COMPOSITION_CHANGED);
+        for (PlayQueueViewHolder holder: viewHolders) {
+            holder.showAsPlayingComposition(holder.getPlayQueueItem().equals(currentItem));
         }
-        notifyItemChanged(position, CURRENT_COMPOSITION_CHANGED);
     }
 
     public void setItems(List<PlayQueueItem> list) {

@@ -80,6 +80,10 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
         compositionItemWrapper.showAsPlayingComposition(show);
     }
 
+    PlayQueueItem getPlayQueueItem() {
+        return playQueueItem;
+    }
+
     private void onActionsMenuButtonClicked(View view) {
         PopupMenu popup = new PopupMenu(getContext(), view);
         popup.inflate(R.menu.play_queue_item_menu);
