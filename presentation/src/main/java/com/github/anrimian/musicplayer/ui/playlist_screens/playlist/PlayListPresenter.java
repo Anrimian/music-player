@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper;
+import com.github.anrimian.musicplayer.domain.utils.model.Item;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
@@ -63,6 +64,8 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private Composition compositionInAction;
     private int compositionPositionInAction;
+
+    private Item<PlayListItem> deletedItem;
 
     public PlayListPresenter(long playListId,
                              MusicPlayerInteractor playerInteractor,
@@ -136,8 +139,8 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         addPreparedCompositionsToPlayList(playList);
     }
 
-    void onDeleteFromPlayListButtonClicked(PlayListItem playListItem) {
-        deleteItem(playListItem);
+    void onDeleteFromPlayListButtonClicked(PlayListItem playListItem, int position) {
+        deleteItem(playListItem, position);
     }
 
     void onDeletePlayListButtonClicked() {
@@ -155,7 +158,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     void onItemSwipedToDelete(int position) {
-        deleteItem(items.get(position));
+        deleteItem(items.get(position), position);
     }
 
     void onItemMoved(int from, int to) {
@@ -193,6 +196,15 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         addCompositionsToEnd(asList(compositionInAction));
     }
 
+    void onRestoreRemovedItemClicked() {
+        Composition removedComposition = deletedItem.getData().getComposition();
+        playListsInteractor.addCompositionsToPlayList(asList(removedComposition),
+                playList,
+                deletedItem.getPosition())
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
     private void addCompositionsToPlayNext(List<Composition> compositions) {
         playerInteractor.addCompositionsToPlayNext(compositions)
                 .observeOn(uiScheduler)
@@ -210,10 +222,10 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         getViewState().showErrorMessage(errorCommand);
     }
 
-    private void deleteItem(PlayListItem playListItem) {
+    private void deleteItem(PlayListItem playListItem, int position) {
         playListsInteractor.deleteItemFromPlayList(playListItem.getItemId(), playListId)
                 .observeOn(uiScheduler)
-                .subscribe(() -> onDeleteItemCompleted(playListItem), this::onDeleteItemError);
+                .subscribe(() -> onDeleteItemCompleted(playListItem, position), this::onDeleteItemError);
     }
 
     private void swapItems(int from, int to) {
@@ -230,8 +242,10 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         getViewState().showPlayListDeleteSuccess(playList);
     }
 
-    private void onDeleteItemCompleted(PlayListItem item) {
+    private void onDeleteItemCompleted(PlayListItem item, int position) {
         if (playList != null) {
+            deletedItem = new Item<>(item, position);
+//            getViewState().notifyItemRemoved(position);
             getViewState().showDeleteItemCompleted(playList, asList(item));
         }
     }
@@ -265,8 +279,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     private void onDeleteCompositionsSuccess() {
-        getViewState().showDeleteCompositionMessage(compositionsToDelete);
-        compositionsToDelete.clear();
+        getViewState().showDeletedCompositionMessage(compositionsToDelete);
     }
 
     private void onDeleteCompositionsError(Throwable throwable) {

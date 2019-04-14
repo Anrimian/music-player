@@ -233,7 +233,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
+    public void showDeletedCompositionMessage(List<Composition> compositionsToDelete) {
         String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
         Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
     }
@@ -263,7 +263,9 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items) {
         String text = getDeletePlayListItemCompleteMessage(requireActivity(), playList, items);
-        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(clListContainer, text, Snackbar.LENGTH_LONG)
+                .setAction(R.string.cancel, v -> presenter.onRestoreRemovedItemClicked())
+                .show();
     }
 
     @Override
@@ -292,6 +294,11 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void notifyItemMoved(int from, int to) {
         adapter.notifyItemMoved(from, to);
+    }
+
+    @Override
+    public void notifyItemRemoved(int position) {
+        adapter.notifyItemRemoved(position);
     }
 
     @Override
@@ -326,7 +333,7 @@ public class PlayListFragment extends MvpAppCompatFragment
         }
     }
 
-    private void onCompositionMenuClicked(View view, PlayListItem playListItem) {
+    private void onCompositionMenuClicked(View view, PlayListItem playListItem, int position) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.play_list_item_menu);
         popup.setOnMenuItemClickListener(item -> {
@@ -340,7 +347,7 @@ public class PlayListFragment extends MvpAppCompatFragment
                     return true;
                 }
                 case R.id.menu_delete_from_play_list: {
-                    presenter.onDeleteFromPlayListButtonClicked(playListItem);
+                    presenter.onDeleteFromPlayListButtonClicked(playListItem, position);
                     return true;
                 }
                 case R.id.menu_delete: {

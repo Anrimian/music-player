@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -113,6 +114,7 @@ public class StoragePlayListsProvider {
 
     public Observable<List<PlayListItem>> getPlayListChangeObservable(long playListId) {
         return RxContentObserver.getObservable(contentResolver, getContentUri("external", playListId))
+                .debounce(new FastDebounceFilter<>())
                 .map(o -> getPlayListItems(playListId));
     }
 

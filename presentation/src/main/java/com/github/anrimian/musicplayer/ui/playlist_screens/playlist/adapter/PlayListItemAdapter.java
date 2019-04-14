@@ -1,15 +1,16 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewPositionItemClickListener;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created on 31.10.2017.
@@ -19,7 +20,7 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
 
     private List<PlayListItem> musicList;
     private OnItemClickListener<Integer> onCompositionClickListener;
-    private OnViewItemClickListener<PlayListItem> onMenuItemClickListener;
+    private OnViewPositionItemClickListener<PlayListItem> onMenuItemClickListener;
 
     public PlayListItemAdapter(List<PlayListItem> musicList) {
         this.musicList = musicList;
@@ -53,7 +54,7 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
-    public void setOnMenuItemClickListener(OnViewItemClickListener<PlayListItem> onMenuItemClickListener) {
+    public void setOnMenuItemClickListener(OnViewPositionItemClickListener<PlayListItem> onMenuItemClickListener) {
         this.onMenuItemClickListener = onMenuItemClickListener;
     }
 }

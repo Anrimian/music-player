@@ -10,7 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewPositionItemClickListener;
 
 import javax.annotation.Nonnull;
 
@@ -38,7 +38,7 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder {
     PlayListItemViewHolder(LayoutInflater inflater,
                            ViewGroup parent,
                            OnItemClickListener<Integer> onCompositionClickListener,
-                           OnViewItemClickListener<PlayListItem> onMenuClickListener) {
+                           OnViewPositionItemClickListener<PlayListItem> onMenuClickListener) {
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
         ButterKnife.bind(this, itemView);
         compositionItemWrapper = new CompositionItemWrapper(itemView);
@@ -48,7 +48,9 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder {
                     onCompositionClickListener.onItemClick(getAdapterPosition())
             );
         }
-        btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, item));
+        btnActionsMenu.setOnClickListener(v ->
+                onMenuClickListener.onItemClick(v, item, getAdapterPosition())
+        );
     }
 
     public void bind(@Nonnull PlayListItem item) {

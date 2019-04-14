@@ -47,6 +47,12 @@ public class PlayListsInteractor {
                 .flatMap(playListsRepository::createPlayList);
     }
 
+    public Completable addCompositionsToPlayList(List<Composition> compositions,
+                                                 PlayList playList,
+                                                 int position) {
+        return playListsRepository.addCompositionsToPlayList(compositions, playList, position);
+    }
+
     public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
         return playListsRepository.addCompositionsToPlayList(compositions, playList);
     }

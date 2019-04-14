@@ -85,6 +85,17 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
+    public Completable addCompositionsToPlayList(List<Composition> compositions,
+                                                PlayList playList,
+                                                int position) {
+        return Completable.fromAction(() -> storagePlayListsProvider.addCompositionsToPlayList(
+                compositions,
+                playList.getId(),
+                position)
+        ).subscribeOn(scheduler);
+    }
+
+    @Override
     public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
         return Completable.fromAction(() -> storagePlayListsProvider.addCompositionsToPlayList(
                 compositions,

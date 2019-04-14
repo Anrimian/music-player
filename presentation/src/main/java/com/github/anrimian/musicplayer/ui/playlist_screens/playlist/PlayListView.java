@@ -44,7 +44,7 @@ public interface PlayListView extends MvpView {
     void showDeleteCompositionError(ErrorCommand errorCommand);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
+    void showDeletedCompositionMessage(List<Composition> compositionsToDelete);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectPlayListDialog();
@@ -78,4 +78,7 @@ public interface PlayListView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void notifyItemRemoved(int position);
 }
