@@ -205,6 +205,12 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
                 .subscribe(() -> {}, this::onDefaultError);
     }
 
+    void onChangePlayListNameButtonClicked() {
+        if (playList != null) {
+            getViewState().showEditPlayListNameDialog(playList);
+        }
+    }
+
     private void addCompositionsToPlayNext(List<Composition> compositions) {
         playerInteractor.addCompositionsToPlayNext(compositions)
                 .observeOn(uiScheduler)

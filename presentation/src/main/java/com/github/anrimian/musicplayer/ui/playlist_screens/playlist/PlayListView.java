@@ -81,4 +81,7 @@ public interface PlayListView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void notifyItemRemoved(int position);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showEditPlayListNameDialog(PlayList playListInMenu);
 }

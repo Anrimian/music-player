@@ -79,6 +79,10 @@ public class ChoosePlayListPresenter extends MvpPresenter<ChoosePlayListView> {
                 .subscribe(this::onPlayListDeleted, this::onPlayListDeletingError);
     }
 
+    void onChangePlayListNameButtonClicked() {
+        getViewState().showEditPlayListNameDialog(playListInMenu);
+    }
+
     private void onPlayListDeletingError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showDeletePlayListError(errorCommand);

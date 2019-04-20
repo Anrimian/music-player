@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
@@ -185,6 +186,15 @@ public class ViewUtils {
             color = ((ColorDrawable) background).getColor();
         }
         return color;
+    }
+
+    public static void setEditableText(EditText editText, String text) {
+        editText.setText(text);
+        if (text != null) {
+            if (editText.getSelectionEnd() == 0) {
+                editText.setSelection(text.length());
+            }
+        }
     }
 
     /**

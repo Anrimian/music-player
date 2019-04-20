@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.playlist_screens.create;
+package com.github.anrimian.musicplayer.ui.playlist_screens.rename;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -16,21 +16,23 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatDialogFragment;
 
+import java.util.Objects;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
-        implements CreatePlayListView {
+import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setEditableText;
+
+public class RenamePlayListDialogFragment extends MvpAppCompatDialogFragment
+        implements RenamePlayListView {
 
     @InjectPresenter
-    CreatePlayListPresenter presenter;
+    RenamePlayListPresenter presenter;
 
     @BindView(R.id.et_playlist_name)
     EditText etPlayListName;
@@ -44,14 +46,19 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
 
-    private Button btnCreate;
+    private Button btnChange;
 
-    @Nullable
-    private OnCompleteListener<PlayList> onCompleteListener;
+    public static RenamePlayListDialogFragment newInstance(long playListId) {
+        Bundle args = new Bundle();
+        args.putLong(PLAY_LIST_ID_ARG, playListId);
+        RenamePlayListDialogFragment fragment = new RenamePlayListDialogFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @ProvidePresenter
-    CreatePlayListPresenter providePresenter() {
-        return Components.getAppComponent().createPlayListsPresenter();
+    RenamePlayListPresenter providePresenter() {
+        return Components.getPlayListComponent(getPlayListId()).changePlayListPresenter();
     }
 
     @NonNull
@@ -62,8 +69,8 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
         ButterKnife.bind(this, view);
 
         AlertDialog dialog = new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.create_playlist)
-                .setPositiveButton(R.string.create, null)
+                .setTitle(R.string.edit_name)
+                .setPositiveButton(R.string.change, null)
                 .setNegativeButton(R.string.cancel, (dialog1, which) -> {})
                 .setView(view)
                 .create();
@@ -77,15 +84,15 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
             return true;
         });
 
-        btnCreate = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        btnCreate.setOnClickListener(v -> onCompleteButtonClicked());
+        btnChange = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        btnChange.setOnClickListener(v -> onCompleteButtonClicked());
 
         return dialog;
     }
 
     @Override
     public void showProgress() {
-        btnCreate.setEnabled(false);
+        btnChange.setEnabled(false);
         etPlayListName.setEnabled(false);
         tvError.setVisibility(View.GONE);
         tvProgress.setVisibility(View.VISIBLE);
@@ -94,7 +101,7 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
 
     @Override
     public void showInputState() {
-        btnCreate.setEnabled(true);
+        btnChange.setEnabled(true);
         etPlayListName.setEnabled(true);
         tvError.setVisibility(View.GONE);
         tvProgress.setVisibility(View.GONE);
@@ -103,27 +110,31 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
 
     @Override
     public void showError(ErrorCommand errorCommand) {
-        btnCreate.setEnabled(true);
+        btnChange.setEnabled(true);
         etPlayListName.setEnabled(true);
         tvProgress.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         tvError.setVisibility(View.VISIBLE);
-        tvError.setText(getString(R.string.create_playlist_error_template, errorCommand.getMessage()));
+        tvError.setText(getString(R.string.chage_playlist_name_error_template, errorCommand.getMessage()));
     }
 
     @Override
-    public void onPlayListCreated(PlayList playList) {
-        if (onCompleteListener != null) {
-            onCompleteListener.onComplete(playList);
+    public void showPlayListName(String initialName) {
+        if (etPlayListName.length() == 0) {
+            setEditableText(etPlayListName, initialName);
         }
-        dismiss();
     }
 
-    public void setOnCompleteListener(@Nullable OnCompleteListener<PlayList> onCompleteListener) {
-        this.onCompleteListener = onCompleteListener;
+    @Override
+    public void closeScreen() {
+        dismiss();
     }
 
     private void onCompleteButtonClicked() {
         presenter.onCompleteInputButtonClicked(etPlayListName.getText().toString());
+    }
+
+    private long getPlayListId() {
+        return Objects.requireNonNull(getArguments()).getLong(PLAY_LIST_ID_ARG);
     }
 }

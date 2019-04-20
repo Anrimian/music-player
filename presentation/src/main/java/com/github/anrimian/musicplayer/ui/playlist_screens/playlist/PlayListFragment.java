@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
+import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -89,11 +90,6 @@ public class PlayListFragment extends MvpAppCompatFragment
         return Components.getPlayListComponent(getPlayListId()).playListPresenter();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -154,6 +150,10 @@ public class PlayListFragment extends MvpAppCompatFragment
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.menu_change_play_list_name: {
+                presenter.onChangePlayListNameButtonClicked();
+                return true;
+            }
             case R.id.menu_delete_play_list: {
                 presenter.onDeletePlayListButtonClicked();
                 return true;
@@ -309,6 +309,13 @@ public class PlayListFragment extends MvpAppCompatFragment
         );
         menuDialogFragment.setOnCompleteListener(this::onCompositionActionSelected);
         menuDialogFragment.show(getChildFragmentManager(), COMPOSITION_ACTION_TAG);
+    }
+
+    @Override
+    public void showEditPlayListNameDialog(PlayList playList) {
+        RenamePlayListDialogFragment fragment =
+                RenamePlayListDialogFragment.newInstance(playList.getId());
+        fragment.show(getChildFragmentManager(), null);
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
+import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpBottomSheetDialogFragment;
@@ -235,6 +236,13 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     }
 
     @Override
+    public void showEditPlayListNameDialog(PlayList playList) {
+        RenamePlayListDialogFragment fragment =
+                RenamePlayListDialogFragment.newInstance(playList.getId());
+        fragment.show(getChildFragmentManager(), null);
+    }
+
+    @Override
     public void showPlayListDeleteSuccess(PlayList playList) {
         Snackbar.make(clListContainer,
                 getString(R.string.play_list_deleted, playList.getName()),
@@ -252,6 +260,10 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     private void onPlayListMenuItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
+            case R.id.menu_change_play_list_name: {
+                presenter.onChangePlayListNameButtonClicked();
+                break;
+            }
             case R.id.menu_delete_play_list: {
                 presenter.onDeletePlayListButtonClicked();
                 break;

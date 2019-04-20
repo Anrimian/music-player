@@ -75,6 +75,10 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
         playListsInteractor.setSelectedPlayListScreen(0);
     }
 
+    void onChangePlayListNameButtonClicked() {
+        getViewState().showEditPlayListNameDialog(playListInMenu);
+    }
+
     private void onPlayListDeletingError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showDeletePlayListError(errorCommand);

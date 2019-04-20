@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListPresenter;
+import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -34,5 +35,16 @@ public class PlayListModule {
                 playListsInteractor,
                 errorParser,
                 uiSchedule);
+    }
+
+    @Provides
+    @Nonnull
+    RenamePlayListPresenter changePlayListPresenter(PlayListsInteractor playListsInteractor,
+                                                    @Named(UI_SCHEDULER) Scheduler uiSchedule,
+                                                    ErrorParser errorParser) {
+        return new RenamePlayListPresenter(playListId,
+                playListsInteractor,
+                uiSchedule,
+                errorParser);
     }
 }

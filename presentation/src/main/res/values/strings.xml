@@ -39,6 +39,7 @@
     <string name="create">Create</string>
     <string name="create_playlist">Create playlist</string>
     <string name="create_playlist_error_template">Can not create playlist: %1$s</string>
+    <string name="chage_playlist_name_error_template">Can not change playlist name: %1$s</string>
     <string name="name_can_not_be_empty">name can not be empty</string>
     <string name="create_progress">Creating…</string>
     <string name="play_list_with_this_name_already_exists">playlist with this name already exists</string>
@@ -98,6 +99,8 @@
     <string name="play_action">Play</string>
     <string name="play_next">Play next</string>
     <string name="add_to_play_queue">Add to queue</string>
+    <string name="edit_name">Rename</string>
+    <string name="change">Change</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

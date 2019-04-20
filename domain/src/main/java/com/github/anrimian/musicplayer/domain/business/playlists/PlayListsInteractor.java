@@ -73,7 +73,8 @@ public class PlayListsInteractor {
     }
 
     public Completable updatePlayListName(long playListId, String name) {
-        return playListsRepository.updatePlayListName(playListId, name);
+        return nameValidator.validate(name)
+                .flatMapCompletable(o -> playListsRepository.updatePlayListName(playListId, name));
     }
 
     public void setSelectedPlayListScreen(long playListId) {

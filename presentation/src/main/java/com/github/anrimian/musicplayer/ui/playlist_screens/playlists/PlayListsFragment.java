@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
+import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -159,8 +160,19 @@ public class PlayListsFragment extends MvpAppCompatFragment
                 .show();
     }
 
+    @Override
+    public void showEditPlayListNameDialog(PlayList playList) {
+        RenamePlayListDialogFragment fragment =
+                RenamePlayListDialogFragment.newInstance(playList.getId());
+        fragment.show(getChildFragmentManager(), null);
+    }
+
     private void onPlayListMenuItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
+            case R.id.menu_change_play_list_name: {
+                presenter.onChangePlayListNameButtonClicked();
+                break;
+            }
             case R.id.menu_delete_play_list: {
                 presenter.onDeletePlayListButtonClicked();
                 break;
