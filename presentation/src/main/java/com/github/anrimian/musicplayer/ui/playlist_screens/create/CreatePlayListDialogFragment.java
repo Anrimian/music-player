@@ -76,6 +76,7 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
             onCompleteButtonClicked();
             return true;
         });
+        etPlayListName.requestFocus();
 
         btnCreate = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         btnCreate.setOnClickListener(v -> onCompleteButtonClicked());

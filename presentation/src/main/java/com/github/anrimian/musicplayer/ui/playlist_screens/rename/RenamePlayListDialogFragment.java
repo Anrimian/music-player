@@ -83,6 +83,7 @@ public class RenamePlayListDialogFragment extends MvpAppCompatDialogFragment
             onCompleteButtonClicked();
             return true;
         });
+        etPlayListName.requestFocus();
 
         btnChange = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         btnChange.setOnClickListener(v -> onCompleteButtonClicked());
