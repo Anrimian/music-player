@@ -28,10 +28,12 @@ import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.media.session.MediaButtonReceiver;
+import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM;
@@ -53,6 +55,7 @@ import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_I
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE;
 import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
@@ -75,6 +78,10 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     @Inject
     MusicPlayerInteractor musicPlayerInteractor;
+
+    @Named(UI_SCHEDULER)
+    @Inject
+    Scheduler uiScheduler;
 
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
     public Builder stateBuilder = new Builder()
@@ -192,6 +199,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private void subscribeOnPlayerChanges() {
         Log.d("KEK", "subscribeOnPlayerChanges");
         serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+                .observeOn(uiScheduler)
                 .subscribe(this::onPlayerStateReceived));
     }
 
@@ -240,8 +248,10 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         if (playInfoDisposable.size() == 0) {
             Log.d("KEK", "really subscribeOnPlayInfo: ");
             playInfoDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
+                    .observeOn(uiScheduler)
                     .subscribe(this::onCurrentCompositionReceived));
             playInfoDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
+                    .observeOn(uiScheduler)
                     .subscribe(this::onTrackPositionReceived));
         }
     }
