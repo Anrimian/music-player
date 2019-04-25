@@ -27,6 +27,8 @@ import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositio
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
+import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarDelegate;
+import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
@@ -47,8 +49,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveYDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.ReverseDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.ToolbarMenuVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
@@ -815,7 +815,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         DelegateManager boundDelegateManager = new DelegateManager();
         boundDelegateManager
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
-                .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarMenuVisibilityDelegate(toolbar))))
+                .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarVisibilityDelegate(toolbar))))
                 .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))

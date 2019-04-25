@@ -1,10 +1,11 @@
-package com.github.anrimian.musicplayer.ui.utils.views.delegate;
+package com.github.anrimian.musicplayer.ui.player_screen.view.slide;
 
 import android.animation.ArgbEvaluator;
 import android.view.Window;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
