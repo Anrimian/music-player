@@ -544,7 +544,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         rvPlayList.post(() -> {
             if (smooth) {
-                //TODO many fast scroll to top, to top, to top -> wrong position
                 RecyclerViewUtils.smoothScrollToTop(position,
                         playQueueLayoutManager,
                         requireContext(),

@@ -2,13 +2,13 @@ package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
-import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private final PlayQueueDaoWrapper playQueueDao;
     private final StorageMusicDataSource storageMusicDataSource;
-    private final SettingsPreferences settingsPreferences;
+    private final SettingsRepository settingsPreferences;
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler scheduler;
 
@@ -46,7 +46,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
                                    StorageMusicDataSource storageMusicDataSource,
-                                   SettingsPreferences settingsPreferences,
+                                   SettingsRepository settingsPreferences,
                                    UiStatePreferences uiStatePreferences,
                                    Scheduler scheduler) {
         this.playQueueDao = playQueueDao;

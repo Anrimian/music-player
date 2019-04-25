@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.music;
 
-import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.DescComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.AlphabeticalCompositionComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.CreateDateCompositionComparator;
@@ -19,6 +18,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFi
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,12 +43,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     private final StorageMusicDataSource storageMusicDataSource;
     private final MusicFolderDataSource musicFolderDataSource;
-    private final SettingsPreferences settingsPreferences;
+    private final SettingsRepository settingsPreferences;
     private final Scheduler scheduler;
 
     public MusicProviderRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
                                        MusicFolderDataSource musicFolderDataSource,
-                                       SettingsPreferences settingsPreferences,
+                                       SettingsRepository settingsPreferences,
                                        Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
         this.musicFolderDataSource = musicFolderDataSource;

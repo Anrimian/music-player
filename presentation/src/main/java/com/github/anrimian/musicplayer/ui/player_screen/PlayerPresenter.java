@@ -80,6 +80,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         } else {
             getViewState().collapseBottomPanel();
         }
+        subscribeOnUiSettings();
     }
 
     void onStart() {
@@ -386,5 +387,15 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             long duration = currentItem.getComposition().getDuration();
             getViewState().showTrackState(currentPosition, duration);
         }
+    }
+
+    private void subscribeOnUiSettings() {
+        presenterDisposable.add(playerScreenInteractor.getCoversEnabledObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onUiSettingsReceived, errorParser::logError));
+    }
+
+    private void onUiSettingsReceived(boolean isCoversEnabled) {
+        //hmmm
     }
 }

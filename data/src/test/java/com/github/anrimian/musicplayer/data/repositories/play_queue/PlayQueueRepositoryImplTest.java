@@ -2,8 +2,8 @@ package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
-import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
+import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
@@ -52,7 +52,7 @@ public class PlayQueueRepositoryImplTest {
 
     private final PlayQueueDaoWrapper playQueueDao = mock(PlayQueueDaoWrapper.class);
     private final StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
-    private final SettingsPreferences settingsPreferences = mock(SettingsPreferences.class);
+    private final SettingsRepositoryImpl settingsPreferences = mock(SettingsRepositoryImpl.class);
     private final UiStatePreferences uiStatePreferences = mock(UiStatePreferences.class);
 
     private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();

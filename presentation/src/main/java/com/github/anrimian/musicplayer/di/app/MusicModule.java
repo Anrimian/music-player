@@ -6,7 +6,6 @@ import android.content.Context;
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
@@ -67,7 +66,7 @@ class MusicModule {
     @Singleton
     PlayQueueRepository playQueueRepositoryNew(PlayQueueDaoWrapper playQueueDao,
                                                StorageMusicDataSource storageMusicDataSource,
-                                               SettingsPreferences settingsPreferences,
+                                               SettingsRepository settingsPreferences,
                                                UiStatePreferences uiStatePreferences,
                                                @Named(DB_SCHEDULER) Scheduler dbScheduler) {
         return new PlayQueueRepositoryImpl(playQueueDao,
@@ -98,7 +97,7 @@ class MusicModule {
     @Singleton
     MusicProviderRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
                                                     MusicFolderDataSource musicFolderDataSource,
-                                                    SettingsPreferences settingsPreferences,
+                                                    SettingsRepository settingsPreferences,
                                                     @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MusicProviderRepositoryImpl(storageMusicDataSource,
                 musicFolderDataSource,

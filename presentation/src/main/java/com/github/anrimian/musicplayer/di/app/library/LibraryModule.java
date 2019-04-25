@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.di.app.library;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.order.SelectOrderPresenter;
@@ -40,8 +41,9 @@ public class LibraryModule {
 
     @Provides
     @NonNull
-    PlayerScreenInteractor playerScreenInteractor(UiStateRepository uiStateRepository) {
-        return new PlayerScreenInteractor(uiStateRepository);
+    PlayerScreenInteractor playerScreenInteractor(UiStateRepository uiStateRepository,
+                                                  SettingsRepository settingsRepository) {
+        return new PlayerScreenInteractor(uiStateRepository, settingsRepository);
     }
 
     @Provides
