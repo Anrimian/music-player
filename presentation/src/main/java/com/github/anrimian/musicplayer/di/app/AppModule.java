@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
-import android.os.Build;
 
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
@@ -9,7 +8,6 @@ import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
-import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilderV21;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
@@ -49,10 +47,7 @@ public class AppModule {
     @Nonnull
     @Singleton
     AppNotificationBuilder appNotificationBuilder() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return new AppNotificationBuilder();
-        }
-        return new AppNotificationBuilderV21();
+        return new AppNotificationBuilder();
     }
 
     @Provides
