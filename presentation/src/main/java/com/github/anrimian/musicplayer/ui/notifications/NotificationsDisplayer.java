@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 
+import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.PAUSE;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.PLAY;
@@ -124,6 +125,7 @@ public class NotificationsDisplayer {
 
         NotificationCompat.Builder builder =  notificationBuilder.buildMusicNotification(context, queueItem)
 //                .setColorized(true)
+                .setColor(getColor(context, R.color.default_notification_color))
                 .setSmallIcon(R.drawable.ic_music_box)
                 .setContentIntent(pIntent)
                 .addAction(R.drawable.ic_skip_previous, getString(R.string.previous_track), pIntentSkipToPrevious)
@@ -137,7 +139,7 @@ public class NotificationsDisplayer {
             Composition composition = queueItem.getComposition();
 
 //            Bitmap bitmap = getCompositionImage(composition);
-//
+
 //            int color;
 //            if (bitmap == null) {
 //                color = Color.WHITE;/*getColorFromAttr(context, android.R.attr.textColorPrimary);*/
@@ -146,9 +148,10 @@ public class NotificationsDisplayer {
 //                color = Palette.from(bitmap).generate().getDarkMutedColor(Color.WHITE);
 //
 //            }
-
+//
             builder = builder.setContentTitle(formatCompositionName(composition))
                     .setContentText(formatCompositionAuthor(composition, context));
+//                    .setColor(color)
 //                    .setLargeIcon(bitmap);
         }
         return builder;
