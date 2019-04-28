@@ -1,28 +1,29 @@
-package com.github.anrimian.musicplayer.ui.utils.views.delegate;
+package com.github.anrimian.musicplayer.ui.player_screen.view.slide;
 
 import android.animation.ArgbEvaluator;
 
-import androidx.appcompat.widget.ActionMenuView;
-
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 
-import static androidx.core.view.ViewCompat.isLaidOut;
+import androidx.appcompat.widget.ActionMenuView;
+
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static androidx.core.view.ViewCompat.isLaidOut;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 /**
  * Created on 21.01.2018.
  */
 
-public class ToolbarMenuVisibilityDelegate implements SlideDelegate {
+public class ToolbarVisibilityDelegate implements SlideDelegate {
 
     private final AdvancedToolbar toolbar;
 
     private ActionMenuView actionMenuView;
 
-    public ToolbarMenuVisibilityDelegate(AdvancedToolbar toolbar) {
+    public ToolbarVisibilityDelegate(AdvancedToolbar toolbar) {
         this.toolbar = toolbar;
     }
 
@@ -48,8 +49,11 @@ public class ToolbarMenuVisibilityDelegate implements SlideDelegate {
             int color = (int) argbEvaluator.evaluate(slideOffset, startColor, endColor);
             toolbar.setBackgroundColor(color);
         } else if (!toolbar.isInSearchMode()) {
-            actionMenuView.setVisibility(slideOffset == 0 ? INVISIBLE : VISIBLE);
+            int contentVisibility = slideOffset == 0 ? INVISIBLE : VISIBLE;
+            actionMenuView.setVisibility(contentVisibility);
             actionMenuView.setAlpha(slideOffset);
+            toolbar.setContentVisibility(contentVisibility);
+            toolbar.setContentAlpha(slideOffset);
         }
     }
 }

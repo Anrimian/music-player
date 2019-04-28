@@ -16,7 +16,70 @@
         app:titleTextColor="?android:attr/textColorPrimaryInverse"
         app:subtitleTextColor="?android:attr/textColorSecondaryInverse"
         tools:navigationIcon="@drawable/ic_menu"
-        tools:menu="@menu/library_compositions_menu"/>
+        tools:menu="@menu/library_compositions_menu">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/title_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="48dp">
+
+            <TextView
+                android:id="@+id/tv_title"
+                style="@style/ToolbarTitleStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/tv_subtitle"
+                tools:text="fflafdsdssff"/>
+
+            <TextView
+                android:id="@+id/tv_subtitle"
+                style="@style/ToolbarSubtitleStyle"
+                android:textColor="?android:attr/textColorSecondaryInverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
+                app:layout_constraintTop_toBottomOf="@id/tv_title"
+                app:layout_constraintStart_toStartOf="@id/tv_title"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="dd"/>
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/titles_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="right"
+                app:constraint_referenced_ids="tv_title, tv_subtitle"/>
+
+            <View
+                android:id="@+id/action_icon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/ic_triangle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/titles_barrier"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.6" />
+
+            <FrameLayout
+                android:id="@+id/fl_title_area"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/action_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.appcompat.widget.Toolbar>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -27,65 +90,6 @@
             android:id="@+id/toolbar_content_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/title_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:minHeight="48dp">
-
-                <TextView
-                    android:id="@+id/tv_title"
-                    style="@style/ToolbarTitleStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/tv_subtitle"
-                    tools:text="fflafff"/>
-
-                <TextView
-                    android:id="@+id/tv_subtitle"
-                    style="@style/ToolbarSubtitleStyle"
-                    android:textColor="?android:attr/textColorSecondaryInverse"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintTop_toBottomOf="@id/tv_title"
-                    app:layout_constraintLeft_toLeftOf="@id/tv_title"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    tools:text="dd"/>
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/titles_barrier"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="right"
-                    app:constraint_referenced_ids="tv_title, tv_subtitle"/>
-
-                <View
-                    android:id="@+id/action_icon"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/ic_triangle"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="@id/titles_barrier"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.6" />
-
-                <FrameLayout
-                    android:id="@+id/fl_title_area"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/action_icon"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <EditText
                 android:id="@+id/et_search"

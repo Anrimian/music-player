@@ -389,6 +389,14 @@ public class AdvancedToolbar extends FrameLayout {
         }
     }
 
+    public void setContentVisibility(int visibility) {
+        clTitleContainer.setVisibility(visibility);
+    }
+
+    public void setContentAlpha(float alpha) {
+        clTitleContainer.setAlpha(alpha);
+    }
+
     private void setSelectionModeEnabled(boolean enabled, boolean animate) {
         inSelectionMode = enabled;
         selectionModeSubject.onNext(enabled);
