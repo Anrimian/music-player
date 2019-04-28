@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/toolbar"
+                layout="@layout/partial_toolbar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.5" />
+
+            <com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView
+                android:id="@+id/drawer_fragment_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:layout_constraintStart_toStartOf="@id/toolbar"
+                app:layout_constraintEnd_toEndOf="@id/toolbar"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <include
+                android:id="@+id/toolbar_play_queue"
+                layout="@layout/partial_toolbar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/toolbar"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:id="@+id/cl_play_queue_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/toolbar_play_queue"
+                app:layout_constraintStart_toStartOf="@id/toolbar_play_queue"
+                app:layout_constraintEnd_toEndOf="@id/toolbar_play_queue"
+                app:layout_constraintBottom_toTopOf="@id/ml_bottom_sheet">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_playlist"
+                    android:importantForAccessibility="no"
+                    android:background="?attr/listBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+            <View
+                android:id="@+id/bottom_sheet_top_shadow"
+                android:layout_width="0dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_shadow_top"
+                app:layout_constraintBottom_toTopOf="@id/ml_bottom_sheet"
+                app:layout_constraintStart_toStartOf="@id/ml_bottom_sheet"
+                app:layout_constraintEnd_toEndOf="@id/ml_bottom_sheet" />
+
+            <include layout="@layout/partial_detailed_music"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/bottom_sheet_portrait_expand_height"
+                app:behavior_hideable="false"
+                app:behavior_peekHeight="@dimen/bottom_sheet_height"
+                app:layout_behavior="@string/bottom_sheet_behavior"
+                app:layout_constraintStart_toStartOf="@id/toolbar_play_queue"
+                app:layout_constraintEnd_toEndOf="@id/toolbar_play_queue"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_shadow_left"
+                app:layout_constraintTop_toBottomOf="@id/toolbar_play_queue"
+                app:layout_constraintStart_toStartOf="@id/toolbar_play_queue"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_shadow_bottom"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation_view"
+            android:layout_width="280dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:menu="@menu/drawer_menu"/>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

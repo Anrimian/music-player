@@ -189,6 +189,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     CoordinatorLayout clPlayQueueContainer;
 
     @BindView(R.id.ml_bottom_sheet)
+    @Nullable
     MotionLayout mlBottomSheet;
 
     @BindView(R.id.toolbar)
@@ -206,10 +207,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.tv_queue_subtitle)
     TextView tvQueueSubtitle;
 
+    @Nullable
     private BottomSheetBehavior<View> bottomSheetBehavior;
 
     private PlayQueueAdapter playQueueAdapter;
 
+    @Nullable
     private SlideDelegate bottomSheetDelegate;
 
     private int selectedDrawerItemId = NO_ITEM;
@@ -294,17 +297,21 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         setupMenu(actionMenuView, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
-        bottomSheetDelegate = createBottomSheetDelegate();
-        bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
-        mlBottomSheet.setClickable(true);
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
-                this::onBottomSheetStateChanged,
-                bottomSheetDelegate::onSlide
-        ));
+        if (mlBottomSheet != null) {
+            bottomSheetDelegate = createBottomSheetDelegate();
+            bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
+            mlBottomSheet.setClickable(true);
+            assert bottomSheetDelegate != null;
+            assert bottomSheetBehavior != null;
+            bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
+                    this::onBottomSheetStateChanged,
+                    bottomSheetDelegate::onSlide
+            ));
+        }
 
         toolbar.setupWithNavigation(navigation,
                 drawerArrowDrawable,
-                () -> bottomSheetBehavior.getState() == STATE_EXPANDED);
+                () -> bottomSheetBehavior == null || bottomSheetBehavior.getState() == STATE_EXPANDED);
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
@@ -377,7 +384,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onSaveInstanceState(outState);
         navigation.onSaveInstanceState(outState);
         outState.putInt(SELECTED_DRAWER_ITEM, selectedDrawerItemId);
-        outState.putInt(BOTTOM_SHEET_STATE, bottomSheetBehavior.getState());
+        if (bottomSheetBehavior != null) {
+            outState.putInt(BOTTOM_SHEET_STATE, bottomSheetBehavior.getState());
+        }
     }
 
     @Override
@@ -389,7 +398,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public boolean onBackPressed() {
-        if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
+        if (bottomSheetBehavior != null && bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
             return true;
         }
@@ -422,27 +431,32 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void expandBottomPanel() {
-        setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
-        toolbar.setControlButtonProgress(1f);
+        if (bottomSheetDelegate != null) {
+            setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
+            toolbar.setControlButtonProgress(1f);
 
-        drawerLockStateProcessor.onBottomSheetOpened(true);
-        bottomSheetDelegate.onSlide(1f);
-        if (bottomSheetBehavior.getState() != STATE_EXPANDED) {
-            bottomSheetBehavior.setState(STATE_EXPANDED);
+            drawerLockStateProcessor.onBottomSheetOpened(true);
+            bottomSheetDelegate.onSlide(1f);
+            assert bottomSheetBehavior != null;
+            if (bottomSheetBehavior.getState() != STATE_EXPANDED) {
+                bottomSheetBehavior.setState(STATE_EXPANDED);
+            }
         }
     }
 
     @Override
     public void collapseBottomPanel() {
-        setButtonsSelectableBackground(
-                getResourceIdFromAttr(requireContext(),
-                        R.attr.selectableItemBackgroundBorderless)
-        );
+        if (bottomSheetDelegate != null) {
+            setButtonsSelectableBackground(
+                    getResourceIdFromAttr(requireContext(),
+                            R.attr.selectableItemBackgroundBorderless)
+            );
 
-        drawerLockStateProcessor.onBottomSheetOpened(false);
-        bottomSheetDelegate.onSlide(0f);
-        if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
-            bottomSheetBehavior.setState(STATE_COLLAPSED);
+            drawerLockStateProcessor.onBottomSheetOpened(false);
+            bottomSheetDelegate.onSlide(0f);
+            if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
+                bottomSheetBehavior.setState(STATE_COLLAPSED);
+            }
         }
     }
 
@@ -504,12 +518,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showMusicControls(boolean show) {
-        setContentBottomHeight(show ?
-                getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height) : 0);
-        bottomSheetTopShadow.setVisibility(show? View.VISIBLE: View.GONE);
+        if (bottomSheetBehavior != null) {
+            setContentBottomHeight(show ?
+                    getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height) : 0);
+            bottomSheetTopShadow.setVisibility(show ? View.VISIBLE : View.GONE);
 
-        if (!show && bottomSheetBehavior.getState() == STATE_EXPANDED) {
-            bottomSheetBehavior.setState(STATE_COLLAPSED);
+            if (!show && bottomSheetBehavior.getState() == STATE_EXPANDED) {
+                bottomSheetBehavior.setState(STATE_COLLAPSED);
+            }
         }
     }
 
@@ -682,11 +698,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     public void openPlayQueue() {
-        presenter.onOpenPlayQueueClicked();
-        setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
-        if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
-            bottomSheetBehavior.setState(STATE_EXPANDED);
-            bottomSheetDelegate.onSlide(1f);
+        if (bottomSheetDelegate != null) {
+            presenter.onOpenPlayQueueClicked();
+            setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
+            assert bottomSheetBehavior != null;
+            if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
+                bottomSheetBehavior.setState(STATE_EXPANDED);
+                bottomSheetDelegate.onSlide(1f);
+            }
         }
     }
 
@@ -716,6 +735,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void onBottomPanelClicked() {
         if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
@@ -723,11 +743,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void setContentBottomHeight(int heightInPixels) {
-        bottomSheetBehavior.setPeekHeight(heightInPixels);
+        if (bottomSheetBehavior != null) {
+            bottomSheetBehavior.setPeekHeight(heightInPixels);
 
-        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fragmentContainer.getLayoutParams();
-        layoutParams.bottomMargin = heightInPixels;
-        fragmentContainer.setLayoutParams(layoutParams);
+            CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fragmentContainer.getLayoutParams();
+            layoutParams.bottomMargin = heightInPixels;
+            fragmentContainer.setLayoutParams(layoutParams);
+        }
     }
 
     private void startFragment(Fragment fragment) {
