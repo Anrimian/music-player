@@ -29,6 +29,9 @@ import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAd
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarDelegate;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarVisibilityDelegate;
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.PlayerViewWrapper;
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.PlayerViewWrapperImpl;
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.TabletPlayerViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
@@ -85,7 +88,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
@@ -201,7 +203,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.acv_play_queue)
     ActionMenuView actionMenuView;
 
-    @BindView(R.id.play_queue_title_container)
+    @BindView(R.id.toolbar_play_queue)
     View playQueueTitleContainer;
 
     @BindView(R.id.tv_queue_subtitle)
@@ -224,6 +226,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private DrawerLockStateProcessor drawerLockStateProcessor;
 
     private FragmentNavigation navigation;
+
+    private PlayerViewWrapper playerViewWrapper;
 
     public static PlayerFragment newInstance() {
         return newInstance(false);
@@ -260,7 +264,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        setViewStartState();
+        if (mlBottomSheet == null) {
+            playerViewWrapper = new TabletPlayerViewWrapper(view);
+        } else {
+            playerViewWrapper = new PlayerViewWrapperImpl(view);
+        }
+
+        playerViewWrapper.setViewStartState();
+//        setViewStartState();
 
         RxPermissions rxPermissions = new RxPermissions(requireActivity());
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -358,13 +369,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             getArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();
         }
-    }
-
-    private void setViewStartState() {
-        playQueueTitleContainer.setVisibility(INVISIBLE);
-        titleContainer.setVisibility(INVISIBLE);
-        bottomSheetTopShadow.setVisibility(INVISIBLE);
-        rvPlayList.setVisibility(INVISIBLE);
     }
 
     @Override

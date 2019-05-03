@@ -62,4 +62,6 @@
     <dimen name="sheet_dialog_title_collapsed_size">14sp</dimen>
     <dimen name="sheet_dialog_title_expanded_size">19sp</dimen>
 
+    <dimen name="toolbar_content_start">72dp</dimen>
+
 </resources>
