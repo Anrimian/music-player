@@ -396,6 +396,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onUiSettingsReceived(boolean isCoversEnabled) {
-        //hmmm
+        getViewState().showCoversEnabled(isCoversEnabled);
     }
 }

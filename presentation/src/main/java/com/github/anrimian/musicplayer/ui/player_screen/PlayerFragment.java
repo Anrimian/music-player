@@ -56,6 +56,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.D
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
+import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -209,6 +210,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private BottomSheetBehavior<View> bottomSheetBehavior;
 
     private PlayQueueAdapter playQueueAdapter;
+    private DefferedObject<PlayQueueAdapter> playQueueAdapterWrapper = new DefferedObject<>();
 
     private SlideDelegate bottomSheetDelegate;
 
@@ -559,6 +561,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         List<PlayQueueItem> list = update.getNewList();
         if (playQueueAdapter == null) {
             playQueueAdapter = new PlayQueueAdapter(list);
+            playQueueAdapterWrapper.setObject(playQueueAdapter);
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
             playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
             playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
@@ -636,6 +639,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void notifyItemMoved(int from, int to) {
         playQueueAdapter.notifyItemMoved(from, to);
+    }
+
+    @Override
+    public void showCoversEnabled(boolean isCoversEnabled) {
+        playQueueAdapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
+        //current composition
     }
 
     @Override

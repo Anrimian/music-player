@@ -35,6 +35,8 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
     @Nullable
     private PlayQueueItem currentItem;
 
+    private boolean isCoversEnabled;
+
     public PlayQueueAdapter(List<PlayQueueItem> musicList) {
         this.musicList = musicList;
     }
@@ -56,7 +58,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         viewHolders.add(holder);
 
         PlayQueueItem composition = musicList.get(position);
-        holder.bind(composition);
+        holder.bind(composition, isCoversEnabled);
         holder.showAsPlayingComposition(composition.equals(currentItem));
     }
 
@@ -84,6 +86,13 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         this.currentItem = currentItem;
         for (PlayQueueViewHolder holder: viewHolders) {
             holder.showAsPlayingComposition(holder.getPlayQueueItem().equals(currentItem));
+        }
+    }
+
+    public void setCoversEnabled(boolean isCoversEnabled) {
+        this.isCoversEnabled = isCoversEnabled;
+        for (PlayQueueViewHolder holder: viewHolders) {
+            holder.setCoversVisible(isCoversEnabled);
         }
     }
 

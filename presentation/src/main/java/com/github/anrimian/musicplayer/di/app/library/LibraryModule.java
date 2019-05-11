@@ -41,9 +41,10 @@ public class LibraryModule {
 
     @Provides
     @NonNull
-    PlayerScreenInteractor playerScreenInteractor(UiStateRepository uiStateRepository,
+    PlayerScreenInteractor playerScreenInteractor(MusicPlayerInteractor musicPlayerInteractor,
+                                                  UiStateRepository uiStateRepository,
                                                   SettingsRepository settingsRepository) {
-        return new PlayerScreenInteractor(uiStateRepository, settingsRepository);
+        return new PlayerScreenInteractor(musicPlayerInteractor, uiStateRepository, settingsRepository);
     }
 
     @Provides

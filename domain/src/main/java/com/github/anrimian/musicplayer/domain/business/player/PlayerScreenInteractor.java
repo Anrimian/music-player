@@ -7,11 +7,15 @@ import io.reactivex.Observable;
 
 public class PlayerScreenInteractor {
 
+    private final MusicPlayerInteractor musicPlayerInteractor;
+
     private final UiStateRepository uiStateRepository;
     private final SettingsRepository settingsRepository;
 
-    public PlayerScreenInteractor(UiStateRepository uiStateRepository,
+    public PlayerScreenInteractor(MusicPlayerInteractor musicPlayerInteractor,
+                                  UiStateRepository uiStateRepository,
                                   SettingsRepository settingsRepository) {
+        this.musicPlayerInteractor = musicPlayerInteractor;
         this.uiStateRepository = uiStateRepository;
         this.settingsRepository = settingsRepository;
     }

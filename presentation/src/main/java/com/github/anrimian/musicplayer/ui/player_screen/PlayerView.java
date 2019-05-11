@@ -92,4 +92,7 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void notifyItemMoved(int from, int to);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showCoversEnabled(boolean isCoversEnabled);
 }
