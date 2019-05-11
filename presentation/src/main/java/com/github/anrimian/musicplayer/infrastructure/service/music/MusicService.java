@@ -18,11 +18,13 @@ import android.view.KeyEvent;
 
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.business.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
+import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 
@@ -58,6 +60,7 @@ import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils.getCompositionImage;
 import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
@@ -78,6 +81,9 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     @Inject
     MusicPlayerInteractor musicPlayerInteractor;
+
+    @Inject
+    MusicServiceInteractor musicServiceInteractor;
 
     @Named(UI_SCHEDULER)
     @Inject
@@ -103,6 +109,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     @Nullable
     private PlayQueueItem currentItem;
+
+    private MusicNotificationSetting notificationSetting;
 
     private long trackPosition;
 
@@ -132,6 +140,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         serviceDisposable.add(playInfoDisposable);
 
+        subscribeOnNotificationSettings();
         subscribeOnPlayerChanges();
     }
 
@@ -221,7 +230,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                         notificationsDisplayer.getForegroundNotification(
                                 true,
                                 currentItem,
-                                mediaSession));
+                                mediaSession,
+                                notificationSetting));
                 subscribeOnPlayInfo();
                 break;
             }
@@ -230,7 +240,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 notificationsDisplayer.updateForegroundNotification(
                         false,
                         currentItem,
-                        mediaSession);
+                        mediaSession,
+                        notificationSetting);
                 stopForeground(false);
                 break;
             }
@@ -272,7 +283,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             notificationsDisplayer.updateForegroundNotification(
                     playerState == PlayerState.PLAY,
                     currentItem,
-                    mediaSession);
+                    mediaSession,
+                    notificationSetting);
         }
     }
 
@@ -281,15 +293,33 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         updateMediaSessionState(playerState, trackPosition);
     }
 
+    private void subscribeOnNotificationSettings() {
+        musicServiceInteractor.getNotificationSettingObservable()
+                .subscribe(this::onNotificationSettingReceived);
+    }
+
+    private void onNotificationSettingReceived(MusicNotificationSetting setting) {
+        boolean updateNotification = notificationSetting == null;
+        notificationSetting = setting;
+        if (updateNotification) {
+            notificationsDisplayer.updateForegroundNotification(
+                    playerState == PlayerState.PLAY,
+                    currentItem,
+                    mediaSession,
+                    notificationSetting);
+        }
+    }
+
     private void updateMediaSessionMetadata(Composition composition) {
-        MediaMetadataCompat metadata = metadataBuilder
-//                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, getCompositionImage(composition))
+        MediaMetadataCompat.Builder builder = metadataBuilder
                 .putString(METADATA_KEY_TITLE, composition.getTitle())
                 .putString(METADATA_KEY_ALBUM, composition.getAlbum())
                 .putString(METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
-                .putLong(METADATA_KEY_DURATION, composition.getDuration())
-                .build();
-        mediaSession.setMetadata(metadata);
+                .putLong(METADATA_KEY_DURATION, composition.getDuration());
+        if (notificationSetting.isCoversOnLockScreen()) {
+            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, getCompositionImage(composition));
+        }
+        mediaSession.setMetadata(builder.build());
     }
 
     private void updateMediaSessionState(PlayerState playerState, long trackPosition) {

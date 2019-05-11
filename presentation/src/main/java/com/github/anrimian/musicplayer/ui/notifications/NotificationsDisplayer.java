@@ -6,12 +6,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
@@ -29,6 +32,7 @@ import static com.github.anrimian.musicplayer.infrastructure.service.music.Music
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils.getCompositionImage;
 
 
 /**
@@ -61,8 +65,10 @@ public class NotificationsDisplayer {
 
     public Notification getForegroundNotification(boolean play,
                                                   @Nullable PlayQueueItem composition,
-                                                  MediaSessionCompat mediaSession) {
-        return getDefaultMusicNotification(play, composition, mediaSession).build();
+                                                  MediaSessionCompat mediaSession,
+                                                  MusicNotificationSetting notificationSetting) {
+        return getDefaultMusicNotification(play, composition, mediaSession, notificationSetting)
+                .build();
     }
 
 //    public Notification getStubNotification() {
@@ -77,8 +83,13 @@ public class NotificationsDisplayer {
 
     public void updateForegroundNotification(boolean play,
                                              @Nullable PlayQueueItem composition,
-                                             MediaSessionCompat mediaSession) {
-        Notification notification = getDefaultMusicNotification(play, composition, mediaSession).build();
+                                             MediaSessionCompat mediaSession,
+                                             MusicNotificationSetting notificationSetting) {
+        Notification notification = getDefaultMusicNotification(play,
+                composition,
+                mediaSession,
+                notificationSetting)
+                .build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
@@ -88,7 +99,8 @@ public class NotificationsDisplayer {
 
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,
                                                                    @Nullable PlayQueueItem queueItem,
-                                                                   MediaSessionCompat mediaSession) {
+                                                                   MediaSessionCompat mediaSession,
+                                                                   MusicNotificationSetting notificationSetting) {
         int requestCode = play? PAUSE : PLAY;
         Intent intentPlayPause = new Intent(context, MusicService.class);
         intentPlayPause.putExtra(REQUEST_CODE, requestCode);
@@ -123,6 +135,10 @@ public class NotificationsDisplayer {
         androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle();
         style.setShowActionsInCompactView(0, 1, 2);
 
+//        if (notificationSetting.isCoversOnLockScreen()) {
+            style.setMediaSession(mediaSession.getSessionToken());
+//        }
+
         NotificationCompat.Builder builder =  notificationBuilder.buildMusicNotification(context, queueItem)
 //                .setColorized(true)
                 .setColor(getColor(context, R.color.default_notification_color))
@@ -135,20 +151,28 @@ public class NotificationsDisplayer {
                 .setStyle(style)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        if (notificationSetting.isColoredNotification()) {
+            builder.setColorized(true);
+        }
+
         if (queueItem != null) {
             Composition composition = queueItem.getComposition();
 
-//            Bitmap bitmap = getCompositionImage(composition);
+            if (notificationSetting.isShowCovers()) {
+                Bitmap bitmap = getCompositionImage(composition);
 
-//            int color;
-//            if (bitmap == null) {
-//                color = Color.WHITE;/*getColorFromAttr(context, android.R.attr.textColorPrimary);*/
-//                bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);//default icon
-//            } else {
-//                color = Palette.from(bitmap).generate().getDarkMutedColor(Color.WHITE);
-//
-//            }
-//
+//                int color;
+                if (bitmap == null) {
+//                    color = Color.WHITE;/*getColorFromAttr(context, android.R.attr.textColorPrimary);*/
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);//default icon
+                } else {
+//                    color = Palette.from(bitmap).generate().getDarkMutedColor(Color.WHITE);
+
+                }
+                builder.setLargeIcon(bitmap);
+            }
+
             builder = builder.setContentTitle(formatCompositionName(composition))
                     .setContentText(formatCompositionAuthor(composition, context));
 //                    .setColor(color)

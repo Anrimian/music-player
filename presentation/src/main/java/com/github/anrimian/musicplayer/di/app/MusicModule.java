@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRep
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.business.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
@@ -21,6 +22,7 @@ import com.github.anrimian.musicplayer.domain.repositories.MusicProviderReposito
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
+import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -103,5 +105,12 @@ class MusicModule {
                 musicFolderDataSource,
                 settingsPreferences,
                 scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    MusicServiceInteractor musicServiceInteractor(SettingsRepository settingsRepository) {
+        return new MusicServiceInteractor(settingsRepository);
     }
 }
