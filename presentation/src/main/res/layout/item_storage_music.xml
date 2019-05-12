@@ -20,12 +20,12 @@
 
     <TextView
         android:id="@+id/tv_composition_name"
-        style="@style/Base.TextAppearance.AppCompat.Body1"
+        style="@style/Content.Text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_spacing_margin"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
-        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/content_internal_margin"
+        android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
         app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,10 +34,10 @@
 
     <TextView
         android:id="@+id/tv_additional_info"
-        style="@style/Base.TextAppearance.AppCompat.Caption"
+        style="@style/Content.SecondaryText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginTop="@dimen/content_spacing_margin"
         android:lineSpacingExtra="2dp"
         app:layout_constraintEnd_toEndOf="@+id/tv_composition_name"
         app:layout_constraintStart_toStartOf="@+id/tv_composition_name"
@@ -47,7 +47,7 @@
     <View
         android:id="@+id/divider"
         style="@style/Divider.Horizontal"
-        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tv_composition_name"
         app:layout_constraintTop_toBottomOf="@id/tv_additional_info" />
