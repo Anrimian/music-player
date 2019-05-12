@@ -27,8 +27,6 @@ import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositio
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
-import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarDelegate;
-import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarVisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.PlayerViewWrapper;
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.PlayerViewWrapperImpl;
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.TabletPlayerViewWrapper;
@@ -41,25 +39,12 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
-import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.ExpandViewDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.LeftBottomShadowDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveXDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.MoveYDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.ReverseDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -100,13 +85,9 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getResourceIdFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 
 /**
  * Created on 19.10.2017.
@@ -116,7 +97,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private static final int NO_ITEM = -1;
     private static final String SELECTED_DRAWER_ITEM = "selected_drawer_item";
-    private static final String BOTTOM_SHEET_STATE = "bottom_sheet_state";
 
     @InjectPresenter
     PlayerPresenter presenter;
@@ -209,13 +189,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.tv_queue_subtitle)
     TextView tvQueueSubtitle;
 
-    @Nullable
-    private BottomSheetBehavior<View> bottomSheetBehavior;
-
     private PlayQueueAdapter playQueueAdapter;
-
-    @Nullable
-    private SlideDelegate bottomSheetDelegate;
 
     private int selectedDrawerItemId = NO_ITEM;
     private int itemIdToStart = NO_ITEM;
@@ -264,14 +238,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        if (mlBottomSheet == null) {
-            playerViewWrapper = new TabletPlayerViewWrapper(view);
-        } else {
-            playerViewWrapper = new PlayerViewWrapperImpl(view);
-        }
-
-        playerViewWrapper.setViewStartState();
-//        setViewStartState();
 
         RxPermissions rxPermissions = new RxPermissions(requireActivity());
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -297,6 +263,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         toolbar.getSearchModeObservable().subscribe(drawerLockStateProcessor::onSearchModeChanged);
         toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionModeChanged);
 
+        if (mlBottomSheet == null) {
+            playerViewWrapper = new TabletPlayerViewWrapper(view,
+                    drawerLockStateProcessor::onBottomSheetOpened);
+        } else {
+            playerViewWrapper = new PlayerViewWrapperImpl(view,
+                    requireActivity(),
+                    presenter::onBottomPanelCollapsed,
+                    presenter::onBottomPanelExpanded,
+                    drawerLockStateProcessor::onBottomSheetOpened);
+        }
+
+
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
         navigationView.inflateHeaderView(R.layout.partial_drawer_header);
 
@@ -308,21 +286,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         setupMenu(actionMenuView, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
-        if (mlBottomSheet != null) {
-            bottomSheetDelegate = createBottomSheetDelegate();
-            bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
-            mlBottomSheet.setClickable(true);
-            assert bottomSheetDelegate != null;
-            assert bottomSheetBehavior != null;
-            bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
-                    this::onBottomSheetStateChanged,
-                    bottomSheetDelegate::onSlide
-            ));
-        }
-
         toolbar.setupWithNavigation(navigation,
                 drawerArrowDrawable,
-                () -> bottomSheetBehavior == null || bottomSheetBehavior.getState() == STATE_EXPANDED);
+                () -> playerViewWrapper.isBottomPanelExpanded());
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
@@ -388,9 +354,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onSaveInstanceState(outState);
         navigation.onSaveInstanceState(outState);
         outState.putInt(SELECTED_DRAWER_ITEM, selectedDrawerItemId);
-        if (bottomSheetBehavior != null) {
-            outState.putInt(BOTTOM_SHEET_STATE, bottomSheetBehavior.getState());
-        }
     }
 
     @Override
@@ -402,8 +365,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public boolean onBackPressed() {
-        if (bottomSheetBehavior != null && bottomSheetBehavior.getState() == STATE_EXPANDED) {
-            bottomSheetBehavior.setState(STATE_COLLAPSED);
+        if (playerViewWrapper.isBottomPanelExpanded()) {
+            playerViewWrapper.collapseBottomPanel();
             return true;
         }
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -435,33 +398,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void expandBottomPanel() {
-        if (bottomSheetDelegate != null) {
-            setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
-            toolbar.setControlButtonProgress(1f);
-
-            drawerLockStateProcessor.onBottomSheetOpened(true);
-            bottomSheetDelegate.onSlide(1f);
-            assert bottomSheetBehavior != null;
-            if (bottomSheetBehavior.getState() != STATE_EXPANDED) {
-                bottomSheetBehavior.setState(STATE_EXPANDED);
-            }
-        }
+        playerViewWrapper.expandBottomPanel();
     }
 
     @Override
     public void collapseBottomPanel() {
-        if (bottomSheetDelegate != null) {
-            setButtonsSelectableBackground(
-                    getResourceIdFromAttr(requireContext(),
-                            R.attr.selectableItemBackgroundBorderless)
-            );
-
-            drawerLockStateProcessor.onBottomSheetOpened(false);
-            bottomSheetDelegate.onSlide(0f);
-            if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
-                bottomSheetBehavior.setState(STATE_COLLAPSED);
-            }
-        }
+        playerViewWrapper.collapseBottomPanel();
     }
 
     @Override
@@ -522,15 +464,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showMusicControls(boolean show) {
-        if (bottomSheetBehavior != null) {
-            setContentBottomHeight(show ?
-                    getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height) : 0);
-            bottomSheetTopShadow.setVisibility(show ? View.VISIBLE : View.GONE);
-
-            if (!show && bottomSheetBehavior.getState() == STATE_EXPANDED) {
-                bottomSheetBehavior.setState(STATE_COLLAPSED);
-            }
-        }
+        playerViewWrapper.showMusicControls(show);
     }
 
     @Override
@@ -702,21 +636,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     public void openPlayQueue() {
-        if (bottomSheetDelegate != null) {
-            presenter.onOpenPlayQueueClicked();
-            setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
-            assert bottomSheetBehavior != null;
-            if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
-                bottomSheetBehavior.setState(STATE_EXPANDED);
-                bottomSheetDelegate.onSlide(1f);
-            }
-        }
-    }
-
-    private void setButtonsSelectableBackground(@DrawableRes int resId) {
-        ivPlayPause.setBackgroundResource(resId);
-        ivSkipToNext.setBackgroundResource(resId);
-        ivSkipToPrevious.setBackgroundResource(resId);
+        presenter.onOpenPlayQueueClicked();
+        playerViewWrapper.openPlayQueue();
     }
 
     private boolean onPlayQueueMenuItemClicked(MenuItem menuItem) {
@@ -736,23 +657,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             drawer.openDrawer(GravityCompat.START);
         } else {
             onBackPressed();
-        }
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    private void onBottomPanelClicked() {
-        if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
-            bottomSheetBehavior.setState(STATE_COLLAPSED);
-        }
-    }
-
-    private void setContentBottomHeight(int heightInPixels) {
-        if (bottomSheetBehavior != null) {
-            bottomSheetBehavior.setPeekHeight(heightInPixels);
-
-            CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fragmentContainer.getLayoutParams();
-            layoutParams.bottomMargin = heightInPixels;
-            fragmentContainer.setLayoutParams(layoutParams);
         }
     }
 
@@ -835,65 +739,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         });
         insertMenuItemIcons(requireContext(), popup);
         popup.show();
-    }
-
-    private SlideDelegate createBottomSheetDelegate() {
-        DelegateManager boundDelegateManager = new DelegateManager();
-        boundDelegateManager
-                .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
-                .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarVisibilityDelegate(toolbar))))
-                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
-                .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
-                .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
-                .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
-                .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.icon_size, ivMusicIcon)))
-                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))
-                .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
-                .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(sbTrackState)))
-                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRepeatMode)))
-                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
-                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
-                .addDelegate(new ToolbarDelegate(toolbar, requireActivity().getWindow()))
-                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
-
-        DelegateManager delegateManager = new DelegateManager();
-        if (bottomSheetCoordinator != null) {//landscape
-            boundDelegateManager.addDelegate(new MoveXDelegate(
-                    0.5f,
-                    bottomSheetCoordinator));
-            boundDelegateManager.addDelegate(new LeftBottomShadowDelegate(
-                    bottomSheetLeftShadow,
-                    bottomSheetTopLeftShadow,
-                    mlBottomSheet,
-                    bottomSheetCoordinator));
-            delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.85f));
-        } else {
-            boundDelegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)));
-            delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
-        }
-        delegateManager.addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegateManager));
-        //ellipsize TextView workaround. Find better later
-        delegateManager.addDelegate(slideOffset -> {
-            if (slideOffset == 1f) {
-                run(tvCurrentComposition, () -> {
-                    tvCurrentComposition.requestLayout();
-                    tvCurrentComposition.invalidate();
-                });
-            }
-        });
-        return delegateManager;
-    }
-
-    private void onBottomSheetStateChanged(Integer newState) {
-        switch (newState) {
-            case STATE_COLLAPSED: {
-                presenter.onBottomPanelCollapsed();
-                return;
-            }
-            case STATE_EXPANDED: {
-                presenter.onBottomPanelExpanded();
-            }
-        }
     }
 
     private void onShareCompositionClicked(Composition composition) {

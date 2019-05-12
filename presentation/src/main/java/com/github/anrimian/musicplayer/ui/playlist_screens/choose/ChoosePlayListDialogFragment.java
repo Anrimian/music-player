@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -52,6 +53,7 @@ import butterknife.ButterKnife;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
@@ -167,6 +169,21 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
             fragment.setOnCompleteListener(this::onPlayListMenuItemSelected);
         }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //set max width in large width cases
+        int width = requireContext().getResources().getDimensionPixelSize(R.dimen.bottom_sheet_width);
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setLayout(width > 0 ? width : MATCH_PARENT, MATCH_PARENT);
+            }
+        }
+    }
+
 
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {

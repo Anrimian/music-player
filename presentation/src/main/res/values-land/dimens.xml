@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--modal bottom sheet-->
     <dimen name="sheet_dialog_title_expanded_size">18sp</dimen>
+
+    <item name="choose_playlist_dialog_height" type="dimen" format="float">0.7</item>
 
 </resources>

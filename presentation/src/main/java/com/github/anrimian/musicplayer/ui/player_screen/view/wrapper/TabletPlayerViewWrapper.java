@@ -5,31 +5,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.AppCompatSeekBar;
-import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class TabletPlayerViewWrapper implements PlayerViewWrapper {
-
-    @Nullable
-    @BindView(R.id.coordinator_bottom_sheet)
-    CoordinatorLayout bottomSheetCoordinator;
-
-    @Nullable
-    @BindView(R.id.bottom_sheet_left_shadow)
-    View bottomSheetLeftShadow;
-
-    @Nullable
-    @BindView(R.id.bottom_sheet_top_left_shadow)
-    View bottomSheetTopLeftShadow;
 
     @BindView(R.id.rv_playlist)
     RecyclerView rvPlayList;
@@ -82,10 +69,6 @@ public class TabletPlayerViewWrapper implements PlayerViewWrapper {
     @BindView(R.id.cl_play_queue_container)
     CoordinatorLayout clPlayQueueContainer;
 
-    @BindView(R.id.ml_bottom_sheet)
-    @Nullable
-    MotionLayout mlBottomSheet;
-
     @BindView(R.id.toolbar)
     AdvancedToolbar toolbar;
 
@@ -101,13 +84,33 @@ public class TabletPlayerViewWrapper implements PlayerViewWrapper {
     @BindView(R.id.tv_queue_subtitle)
     TextView tvQueueSubtitle;
 
-    public TabletPlayerViewWrapper(View view) {
+    public TabletPlayerViewWrapper(View view, Callback<Boolean> bottomSheetStateListener) {
         ButterKnife.bind(this, view);
+        bottomSheetStateListener.call(false);
     }
 
     @Override
-    public void setViewStartState() {
-//        playQueueTitleContainer.setVisibility(INVISIBLE);
-//        titleContainer.setVisibility(INVISIBLE);
+    public boolean isBottomPanelExpanded() {
+        return false;
+    }
+
+    @Override
+    public void collapseBottomPanel() {
+
+    }
+
+    @Override
+    public void expandBottomPanel() {
+
+    }
+
+    @Override
+    public void openPlayQueue() {
+
+    }
+
+    @Override
+    public void showMusicControls(boolean show) {
+
     }
 }
