@@ -56,8 +56,9 @@ public class FragmentNavigation {
         this.jugglerView = jugglerView;
         jugglerView.initialize(savedState);
 
+        hideBottomFragmentMenu();
+
         if (!screens.isEmpty()) {//just orientation change
-            hideBottomFragmentMenu();
             notifyFragmentMovedToTop(getFragmentOnTop());
             return;
         }

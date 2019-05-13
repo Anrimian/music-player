@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
+import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
@@ -38,6 +39,8 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     JugglerView jvFoldersContainer;
 
     private FragmentNavigation navigation;
+    private final DefferedObject<FragmentNavigation> navigationWrapper = new DefferedObject<>();
+
     private ProgressViewWrapper progressViewWrapper;
 
     @ProvidePresenter
@@ -58,9 +61,6 @@ public class LibraryFoldersRootFragment extends LibraryFragment
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle(R.string.folders);
-
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onEmptyFolderStackArrived);
 
@@ -68,10 +68,18 @@ public class LibraryFoldersRootFragment extends LibraryFragment
         navigation.initialize(jvFoldersContainer, savedInstanceState);
         navigation.setExitAnimation(R.anim.anim_slide_out_right);
         navigation.setEnterAnimation(R.anim.anim_slide_in_right);
+        navigationWrapper.setObject(navigation);
 
         if (!navigation.hasScreens()) {
             presenter.onEmptyFolderStackArrived();
         }
+    }
+
+    @Override
+    public void onFragmentMovedOnTop() {
+        super.onFragmentMovedOnTop();
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setSubtitle(R.string.folders);
     }
 
     @Override
@@ -85,6 +93,17 @@ public class LibraryFoldersRootFragment extends LibraryFragment
         Fragment fragment = navigation.getFragmentOnTop();
         return fragment instanceof BackButtonListener
                 && ((BackButtonListener) fragment).onBackPressed();
+    }
+
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        navigationWrapper.call(navigation -> {
+            Fragment fragment = navigation.getFragmentOnTop();
+            if (fragment != null) {
+                fragment.setMenuVisibility(menuVisible);
+            }
+        });
     }
 
     @Override

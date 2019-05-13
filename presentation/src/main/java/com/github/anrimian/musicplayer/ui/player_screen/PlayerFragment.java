@@ -33,6 +33,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
+import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -777,19 +778,24 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private boolean onNavigationItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (selectedDrawerItemId != itemId) {
+        boolean selected = false;
+        if (itemId == R.id.menu_settings) {
+            navigation.addNewFragment(new SettingsFragment());
+        } else if (selectedDrawerItemId != itemId) {
             selectedDrawerItemId = itemId;
             itemIdToStart = itemId;
             clearFragment();
+            selected = true;
         }
         drawer.closeDrawer(GravityCompat.START);
-        return true;
+        return selected;
     }
 
     private void onDrawerClosed() {
         if (itemIdToStart != NO_ITEM) {
             int screenId = ScreensMap.getScreenId(itemIdToStart);
             presenter.onDrawerScreenSelected(screenId);
+            itemIdToStart = NO_ITEM;
         }
     }
 

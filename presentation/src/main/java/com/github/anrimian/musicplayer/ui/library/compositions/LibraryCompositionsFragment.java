@@ -139,6 +139,13 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
     }
 
     @Override
+    public void onFragmentMovedOnTop() {
+        super.onFragmentMovedOnTop();
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setSubtitle(R.string.compositions);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         presenter.onStop();
