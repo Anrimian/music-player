@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--player bottom sheet-->
+    <dimen name="bottom_sheet_expand_height">210dp</dimen>
+
+    <!--modal bottom sheet-->
     <dimen name="bottom_sheet_width">480dp</dimen>
 
     <!--content margins-->

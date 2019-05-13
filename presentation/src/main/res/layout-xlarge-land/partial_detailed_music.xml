@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="@dimen/bottom_sheet_expand_height"
     android:background="?android:attr/windowBackground">
 
     <!--uses to catch unnecessary clicks-->
@@ -28,8 +28,8 @@
     <ImageView
         android:id="@+id/iv_skip_to_previous"
         style="@style/Content.Button.Main"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="@dimen/content_spacing_margin"
+        android:layout_marginStart="@dimen/content_spacing_margin"
         android:contentDescription="@string/previous_track"
         app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -50,8 +50,8 @@
     <ImageView
         android:id="@+id/iv_skip_to_next"
         style="@style/Content.Button.Main"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="@dimen/content_spacing_margin"
+        android:layout_marginStart="@dimen/content_spacing_margin"
         android:contentDescription="@string/next_track"
         app:layout_constraintEnd_toStartOf="@+id/btn_infinite_play"
         app:layout_constraintStart_toEndOf="@+id/iv_play_pause"
@@ -66,7 +66,7 @@
         android:ellipsize="end"
         android:gravity="center_vertical"
         android:singleLine="true"
-        android:layout_marginBottom="6dp"
+        android:layout_marginBottom="@dimen/content_spacing_margin"
         app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintTop_toTopOf="@+id/iv_music_icon"
         app:layout_constraintBottom_toTopOf="@+id/tv_current_composition_author"
@@ -78,8 +78,8 @@
         android:id="@+id/btn_random_play"
         style="@style/Content.Button"
         android:contentDescription="@string/content_description_shuffle"
-        android:layout_marginBottom="@dimen/content_horizontal_margin"
-        android:layout_marginStart="@dimen/bottom_sheet_content_margin"
+        android:layout_marginBottom="@dimen/content_vertical_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_shuffle"/>
@@ -88,8 +88,8 @@
         android:id="@+id/btn_infinite_play"
         style="@style/Content.Button"
         android:contentDescription="@string/content_description_repeat_mode"
-        android:layout_marginBottom="@dimen/content_horizontal_margin"
-        android:layout_marginEnd="@dimen/bottom_sheet_content_margin"
+        android:layout_marginBottom="@dimen/content_vertical_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_repeat" />
@@ -123,7 +123,7 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="@dimen/content_spacing_margin"
         android:layout_marginLeft="1.5dp"
         android:layout_marginRight="1.5dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -137,11 +137,12 @@
         android:contentDescription="@string/folder"
         android:layout_gravity="center|start"
         android:scaleType="centerCrop"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="@dimen/content_vertical_margin"
+        android:layout_marginBottom="@dimen/content_internal_margin"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/sb_track_state"
         app:layout_constraintLeft_toLeftOf="@id/tv_played_time"
         tools:srcCompat="@drawable/ic_music_placeholder" />
-
 
     <ImageView
         android:id="@+id/btn_actions_menu"
@@ -159,8 +160,8 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:ellipsize="end"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="@dimen/content_internal_margin"
+        android:layout_marginEnd="@dimen/content_internal_margin"
         app:layout_constraintTop_toBottomOf="@+id/tv_current_composition"
         app:layout_constraintBottom_toBottomOf="@+id/iv_music_icon"
         app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
