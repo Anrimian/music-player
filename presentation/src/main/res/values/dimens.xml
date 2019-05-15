@@ -3,7 +3,6 @@
 
     <!--specific sizes-->
     <dimen name="play_actions_panel_height">120dp</dimen>
-    <dimen name="bottom_sheet_height">60dp</dimen>
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
 
     <dimen name="music_control_button_padding_collapsed">12dp</dimen>
@@ -53,7 +52,9 @@
     <dimen name="bottom_sheet_top_left_shadow_height">6dp</dimen>
     <dimen name="bottom_sheet_shadow_height">8dp</dimen>
     <dimen name="bottom_sheet_shadow_internal_margin">4dp</dimen>
+    <dimen name="bottom_sheet_height">60dp</dimen>
     <dimen name="bottom_sheet_expand_height">200dp</dimen>
+    <dimen name="control_button_width">52dp</dimen>
 
     <dimen name="bottom_sheet_content_margin">16dp</dimen>
     <dimen name="play_button_expand_margin">8dp</dimen>

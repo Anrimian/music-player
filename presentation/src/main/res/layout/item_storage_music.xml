@@ -24,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_spacing_margin"
-        android:layout_marginStart="@dimen/content_internal_margin"
+        android:layout_marginStart="@dimen/content_margin"
         android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
         app:layout_constraintStart_toEndOf="@+id/iv_music_icon"

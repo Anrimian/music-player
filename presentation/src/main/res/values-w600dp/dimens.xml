@@ -2,6 +2,8 @@
 <resources>
     <!--player bottom sheet-->
     <dimen name="bottom_sheet_expand_height">210dp</dimen>
+    <dimen name="bottom_sheet_height">76dp</dimen>
+    <dimen name="control_button_width">64dp</dimen>
 
     <!--modal bottom sheet-->
     <dimen name="bottom_sheet_width">480dp</dimen>
@@ -10,4 +12,7 @@
     <dimen name="content_internal_margin">16dp</dimen>
     <dimen name="content_horizontal_margin">24dp</dimen>
     <dimen name="content_vertical_margin">24dp</dimen>
+
+    <!--toolbar-->
+    <dimen name="toolbar_content_start">80dp</dimen>
 </resources>
