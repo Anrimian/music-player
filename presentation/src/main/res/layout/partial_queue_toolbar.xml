@@ -35,6 +35,7 @@
         android:id="@+id/acv_play_queue"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/toolbar_control_offset"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

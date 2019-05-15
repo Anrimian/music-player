@@ -15,4 +15,6 @@
 
     <!--toolbar-->
     <dimen name="toolbar_content_start">80dp</dimen>
+    <dimen name="toolbar_control_offset">8dp</dimen>
+
 </resources>

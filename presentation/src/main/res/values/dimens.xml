@@ -69,5 +69,6 @@
 
     <!--toolbar-->
     <dimen name="toolbar_content_start">72dp</dimen>
+    <dimen name="toolbar_control_offset">0dp</dimen>
 
 </resources>

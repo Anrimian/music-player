@@ -16,6 +16,8 @@
             android:id="@+id/motion_layout"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
+            android:layout_marginStart="@dimen/toolbar_control_offset"
+            android:layout_marginEnd="@dimen/toolbar_control_offset"
             app:layoutDescription="@xml/scene_select_play_list">
 
             <FrameLayout
@@ -62,7 +64,7 @@
                 android:contentDescription="@string/create_playlist"
                 android:tint="@color/icon_color"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_plus" />
 
@@ -72,18 +74,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <FrameLayout
-                android:id="@+id/title_shadow"
-                android:layout_width="match_parent"
-                android:layout_height="6dp"
-                android:background="@drawable/bg_shadow_bottom"/>
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:importantForAccessibility="no"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="?attr/listBackground"
                 tools:listitem="@layout/item_play_list" />
+
+            <FrameLayout
+                android:id="@+id/title_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_shadow_bottom"/>
 
         </FrameLayout>
 
