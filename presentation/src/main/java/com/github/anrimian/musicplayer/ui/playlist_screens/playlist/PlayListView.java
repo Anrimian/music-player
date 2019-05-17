@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
@@ -28,7 +28,7 @@ public interface PlayListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();
 
-    @StateStrategyType(AddToStartSingleStrategy.class)
+    @StateStrategyType(ListStateStrategyStrategy.class)
     void updateItemsList(ListUpdate<PlayListItem> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)

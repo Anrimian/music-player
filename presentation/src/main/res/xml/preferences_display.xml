@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="show_covers"
+        android:title="@string/show_covers"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
+        android:key="show_covers_in_notification"
+        android:title="@string/show_covers_in_notification"
+        android:defaultValue="true"
+        android:dependency="show_covers"/>
+
+    <CheckBoxPreference
+        android:key="colored_notification"
+        android:title="@string/colored_notification"
+        android:defaultValue="false"
+        android:dependency="show_covers_in_notification"/>
+
+    <CheckBoxPreference
+        android:key="show_covers_on_lock_screen"
+        android:title="@string/show_covers_on_lock_screen"
+        android:defaultValue="false"
+        android:dependency="show_covers_in_notification"/>
+</PreferenceScreen>

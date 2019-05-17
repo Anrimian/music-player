@@ -101,6 +101,11 @@
     <string name="add_to_play_queue">Add to queue</string>
     <string name="edit_name">Rename</string>
     <string name="change">Change</string>
+    <string name="show_covers">Show covers</string>
+    <string name="show_covers_in_notification">Show covers in notification</string>
+    <string name="colored_notification">Color notification in cover colors</string>
+    <string name="show_covers_on_lock_screen">Show covers on lock screen</string>
+    <string name="display">Display</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

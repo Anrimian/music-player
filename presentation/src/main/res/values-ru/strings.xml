@@ -103,6 +103,11 @@
     <string name="add_to_play_queue">Добавить в очередь</string>
     <string name="edit_name">Переименовать</string>
     <string name="change">Изменить</string>
+    <string name="show_covers">Показывать обложки</string>
+    <string name="show_covers_in_notification">Показывать обложку в уведомлении</string>
+    <string name="colored_notification">Окрашивать уведомление в цвета обложки</string>
+    <string name="show_covers_on_lock_screen">Показывать обложку на экране блокировки</string>
+    <string name="display">Отображение</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

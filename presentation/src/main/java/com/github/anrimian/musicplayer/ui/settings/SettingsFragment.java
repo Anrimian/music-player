@@ -42,12 +42,17 @@ public class SettingsFragment extends Fragment {
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.settings);
-        toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
         SlidrPanel.replace(flContainer, slidrConfig, () ->
                         FragmentNavigation.from(requireFragmentManager()).goBack(0),
                 toolbar::onStackFragmentSlided);
+
+//        if (savedInstanceState == null) {
+//            getChildFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, new DisplaySettingsFragment())
+//                    .commit();
+//        }
     }
 }

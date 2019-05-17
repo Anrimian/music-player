@@ -47,4 +47,12 @@ public interface SettingsRepository {
     Order getCompositionsOrder();
 
     int getSkipConstraintMillis();
+
+    boolean isCoversEnabled();
+
+    boolean isCoversInNotificationEnabled();
+
+    boolean isColoredNotificationEnabled();
+
+    boolean isCoversOnLockScreenEnabled();
 }

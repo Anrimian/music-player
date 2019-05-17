@@ -20,12 +20,13 @@ import static com.github.anrimian.musicplayer.domain.models.composition.order.Or
  */
 public class SettingsRepositoryImpl implements SettingsRepository {
 
-    private static final String PREFERENCES_NAME = "settings_preferences";
+    public static final String PREFERENCES_NAME = "settings_preferences";
 
     private static final String RANDOM_PLAYING_ENABLED = "random_playing_enabled";
     private static final String REPEAT_MODE = "repeat_mode";
     private static final String FOLDER_ORDER = "folder_order";
     private static final String COMPOSITIONS_ORDER = "compositions_order";
+
     private static final String SHOW_COVERS = "show_covers";
     private static final String SHOW_COVERS_IN_NOTIFICATION = "show_covers_in_notification";
     private static final String COLORED_NOTIFICATION = "colored_notification";
@@ -148,6 +149,26 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         return 15000;//just 15 seconds. Reserved setting for future
     }
 
+    @Override
+    public boolean isCoversEnabled() {
+        return preferences.getBoolean(SHOW_COVERS, true);
+    }
+
+    @Override
+    public boolean isCoversInNotificationEnabled() {
+        return preferences.getBoolean(SHOW_COVERS_IN_NOTIFICATION, true);
+    }
+
+    @Override
+    public boolean isColoredNotificationEnabled() {
+        return preferences.getBoolean(COLORED_NOTIFICATION, true);
+    }
+
+    @Override
+    public boolean isCoversOnLockScreenEnabled() {
+        return preferences.getBoolean(SHOW_COVERS_ON_LOCK_SCREEN, false);
+    }
+
     private Order orderFromInt(int order) {
         boolean reversed = false;
         if (order % 2 == 0) {
@@ -163,21 +184,5 @@ public class SettingsRepositoryImpl implements SettingsRepository {
             id++;
         }
         return id;
-    }
-
-    private boolean isCoversEnabled() {
-        return preferences.getBoolean(SHOW_COVERS, true);
-    }
-
-    private boolean isCoversInNotificationEnabled() {
-        return preferences.getBoolean(SHOW_COVERS_IN_NOTIFICATION, true);
-    }
-
-    private boolean isColoredNotificationEnabled() {
-        return preferences.getBoolean(COLORED_NOTIFICATION, true);
-    }
-
-    private boolean isCoversOnLockScreenEnabled() {
-        return preferences.getBoolean(SHOW_COVERS_ON_LOCK_SCREEN, false);
     }
 }
