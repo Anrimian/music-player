@@ -191,17 +191,6 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
     }
 
     @Override
-    public void showMusicControls(boolean show) {
-        setContentBottomHeight(show ?
-                activity.getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height) : 0);
-        bottomSheetTopShadow.setVisibility(show ? View.VISIBLE : View.GONE);
-
-        if (!show && bottomSheetBehavior.getState() == STATE_EXPANDED) {
-            bottomSheetBehavior.setState(STATE_COLLAPSED);
-        }
-    }
-
-    @Override
     public void openPlayQueue() {
         setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
         if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
@@ -286,8 +275,8 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
     private void setViewStartState() {
         playQueueTitleContainer.setVisibility(INVISIBLE);
         titleContainer.setVisibility(INVISIBLE);
-        bottomSheetTopShadow.setVisibility(INVISIBLE);
-        rvPlayList.setVisibility(INVISIBLE);
+//        bottomSheetTopShadow.setVisibility(INVISIBLE);
+//        rvPlayList.setVisibility(INVISIBLE);
         toolbarTitleContainer.setVisibility(INVISIBLE);
     }
 }

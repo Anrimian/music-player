@@ -108,9 +108,4 @@ public class TabletPlayerViewWrapper implements PlayerViewWrapper {
     public void openPlayQueue() {
 
     }
-
-    @Override
-    public void showMusicControls(boolean show) {
-
-    }
 }

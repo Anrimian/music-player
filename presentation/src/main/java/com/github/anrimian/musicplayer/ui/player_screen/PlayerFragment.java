@@ -63,7 +63,6 @@ import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -107,17 +106,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.navigation_view)
     NavigationView navigationView;
 
-    @Nullable
-    @BindView(R.id.coordinator_bottom_sheet)
-    CoordinatorLayout bottomSheetCoordinator;
+//    @Nullable
+//    @BindView(R.id.coordinator_bottom_sheet)
+//    CoordinatorLayout bottomSheetCoordinator;
 
-    @Nullable
-    @BindView(R.id.bottom_sheet_left_shadow)
-    View bottomSheetLeftShadow;
+//    @Nullable
+//    @BindView(R.id.bottom_sheet_left_shadow)
+//    View bottomSheetLeftShadow;
 
-    @Nullable
-    @BindView(R.id.bottom_sheet_top_left_shadow)
-    View bottomSheetTopLeftShadow;
+//    @Nullable
+//    @BindView(R.id.bottom_sheet_top_left_shadow)
+//    View bottomSheetTopLeftShadow;
 
     @BindView(R.id.rv_playlist)
     RecyclerView rvPlayList;
@@ -177,14 +176,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.toolbar)
     AdvancedToolbar toolbar;
 
-    @BindView(R.id.toolbar_content_container)
-    View titleContainer;
+//    @BindView(R.id.toolbar_content_container)
+//    View titleContainer;
 
     @BindView(R.id.acv_play_queue)
-    ActionMenuView actionMenuView;
+    ActionMenuView acvPlayQueueMenu;
 
-    @BindView(R.id.toolbar_play_queue)
-    View playQueueTitleContainer;
+//    @BindView(R.id.toolbar_play_queue)
+//    View playQueueTitleContainer;
 
     @BindView(R.id.tv_queue_subtitle)
     TextView tvQueueSubtitle;
@@ -284,7 +283,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawer.addDrawerListener(new SimpleDrawerListener(this::onDrawerClosed));
 
-        setupMenu(actionMenuView, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
+        setupMenu(acvPlayQueueMenu, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
         toolbar.setupWithNavigation(navigation,
                 drawerArrowDrawable,
@@ -463,26 +462,48 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showMusicControls(boolean show) {
-        playerViewWrapper.showMusicControls(show);
+    public void setMusicControlsEnabled(boolean show) {
+        ivSkipToNext.setEnabled(show);
+        ivSkipToPrevious.setEnabled(show);
+        ivPlayPause.setEnabled(show);
+        btnRepeatMode.setEnabled(show);
+        btnRandomPlay.setEnabled(show);
+        sbTrackState.setEnabled(show);
+        acvPlayQueueMenu.getMenu().findItem(R.id.menu_save_as_playlist).setEnabled(show);
     }
 
     @Override
-    public void showCurrentQueueItem(PlayQueueItem item) {
+    public void showCurrentQueueItem(@Nullable PlayQueueItem item) {
         animateVisibility(bottomSheetTopShadow, VISIBLE);
         animateVisibility(rvPlayList, VISIBLE);//TODO blink on jump to item on start
 
-        Composition composition = item.getComposition();
-        String compositionName = formatCompositionName(composition);
-        tvCurrentComposition.setText(compositionName);
-        tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
-        tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
-        seekBarViewWrapper.setMax(composition.getDuration());
-        topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, compositionName));
+        btnActionsMenu.setEnabled(item != null);
+        if (item == null) {
+            tvPlayedTime.setText(formatMilliseconds(0));
+            tvTotalTime.setText(formatMilliseconds(0));
+            sbTrackState.setProgress(0);
 
-        ImageFormatUtils.displayImage(ivMusicIcon, composition);
+            tvCurrentComposition.setText(R.string.no_current_composition);
+            tvCurrentCompositionAuthor.setText(R.string.unknown_author);
+            ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
+            topBottomSheetPanel.setContentDescription(getString(
+                            R.string.now_playing_template,
+                            getString(R.string.no_current_composition)
+                    )
+            );
+        } else {
+            Composition composition = item.getComposition();
+            String compositionName = formatCompositionName(composition);
+            tvCurrentComposition.setText(compositionName);
+            tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
+            tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
+            seekBarViewWrapper.setMax(composition.getDuration());
+            topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, compositionName));
 
-        playQueueAdapter.onCurrentItemChanged(item);
+            ImageFormatUtils.displayImage(ivMusicIcon, composition);
+
+            playQueueAdapter.onCurrentItemChanged(item);
+        }
     }
 
     @Override
@@ -552,12 +573,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showRandomPlayingButton(boolean active) {
+        btnRandomPlay.setSelected(active);
         if (active) {
-            int selectedColor = getColorFromAttr(requireContext(), R.attr.colorAccent);
-            btnRandomPlay.setColorFilter(selectedColor);
+//            int selectedColor = getColorFromAttr(requireContext(), R.attr.colorAccent);
+//            btnRandomPlay.setColorFilter(selectedColor);
             btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(false));
         } else {
-            btnRandomPlay.clearColorFilter();
+//            btnRandomPlay.clearColorFilter();
             btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(true));
         }
     }
@@ -582,9 +604,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void setSkipToNextButtonEnabled(boolean enabled) {
-        int color = enabled? ContextCompat.getColor(requireContext(), R.color.icon_color) :
-                getColorFromAttr(requireContext(), R.attr.colorControlNormal);
-        ivSkipToNext.setColorFilter(color);
+//        int color = enabled? ContextCompat.getColor(requireContext(), R.color.icon_color) :
+//                getColorFromAttr(requireContext(), R.attr.colorControlNormal);
+//        ivSkipToNext.setColorFilter(color);
         ivSkipToNext.setEnabled(enabled);
     }
 

@@ -8,7 +8,5 @@ public interface PlayerViewWrapper {
 
     void expandBottomPanel();
 
-    void showMusicControls(boolean show);
-
     void openPlayQueue();
 }

@@ -101,6 +101,7 @@
     <string name="add_to_play_queue">Add to queue</string>
     <string name="edit_name">Rename</string>
     <string name="change">Change</string>
+    <string name="no_current_composition">No current composition</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

@@ -103,6 +103,7 @@
     <string name="add_to_play_queue">Добавить в очередь</string>
     <string name="edit_name">Переименовать</string>
     <string name="change">Изменить</string>
+    <string name="no_current_composition">Нет текущей композиции</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
