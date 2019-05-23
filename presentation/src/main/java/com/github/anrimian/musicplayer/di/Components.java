@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.di.app.library.files.folder.FolderCompone
 import com.github.anrimian.musicplayer.di.app.library.files.folder.FolderModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
+import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 
 import javax.annotation.Nullable;
 
@@ -69,6 +70,10 @@ public class Components {
 
     public static PlayListComponent getPlayListComponent(long playListId) {
         return getAppComponent().playListComponent(new PlayListModule(playListId));
+    }
+
+    public static SettingsComponent getSettingsComponent() {
+        return getAppComponent().settingsComponent();
     }
 
     private LibraryComponent buildLibraryComponent() {

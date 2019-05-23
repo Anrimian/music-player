@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -42,17 +43,19 @@ public class SettingsFragment extends Fragment {
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.settings);
+        toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(flContainer, slidrConfig, () ->
-                        FragmentNavigation.from(requireFragmentManager()).goBack(0),
+        SlidrPanel.replace(flContainer,
+                slidrConfig,
+                () -> FragmentNavigation.from(requireFragmentManager()).goBack(0),
                 toolbar::onStackFragmentSlided);
 
-//        if (savedInstanceState == null) {
-//            getChildFragmentManager().beginTransaction()
-//                    .replace(R.id.fragment_container, new DisplaySettingsFragment())
-//                    .commit();
-//        }
+        if (savedInstanceState == null) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new DisplaySettingsFragment())
+                    .commit();
+        }
     }
 }

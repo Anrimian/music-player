@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
+import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
@@ -34,6 +35,7 @@ public interface AppComponent {
 
     LibraryComponent libraryComponent(LibraryModule libraryModule);
     PlayListComponent playListComponent(PlayListModule module);
+    SettingsComponent settingsComponent();
 
     PlayListsPresenter playListsPresenter();
     CreatePlayListPresenter createPlayListsPresenter();

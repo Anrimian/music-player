@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -40,6 +41,17 @@ public class ViewUtils {
             runnable.run();
         } else {
             view.post(runnable);
+        }
+    }
+
+    public static void onCheckChanged(CheckBox checkBox, Callback<Boolean> listener) {
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> listener.call(isChecked));
+    }
+
+    public static void setChecked(CheckBox checkBox, boolean checked) {
+        if (checkBox.isChecked() != checked) {
+            checkBox.setChecked(checked);
+            checkBox.jumpDrawablesToCurrentState();
         }
     }
 
