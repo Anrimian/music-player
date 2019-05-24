@@ -140,7 +140,7 @@ public class NotificationsDisplayer {
 //        }
 
         NotificationCompat.Builder builder =  notificationBuilder.buildMusicNotification(context, queueItem)
-//                .setColorized(true)
+                .setColorized(notificationSetting.isColoredNotification())
                 .setColor(getColor(context, R.color.default_notification_color))
                 .setSmallIcon(R.drawable.ic_music_box)
                 .setContentIntent(pIntent)
@@ -151,10 +151,6 @@ public class NotificationsDisplayer {
                 .setStyle(style)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-
-        if (notificationSetting.isColoredNotification()) {
-            builder.setColorized(true);
-        }
 
         if (queueItem != null) {
             Composition composition = queueItem.getComposition();

@@ -14,19 +14,35 @@ public class MusicServiceInteractor {
     }
 
     public Observable<MusicNotificationSetting> getNotificationSettingObservable() {
-        return Observable.combineLatest(settingsRepository.getCoversEnabledObservable(),
-                settingsRepository.getCoversInNotificationEnabledObservable(),
-                settingsRepository.getColoredNotificationEnabledObservable(),
-                settingsRepository.getCoversOnLockScreenEnabledObservable(),
+        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
+                getColoredNotificationEnabledObservable(),
+                getCoversOnLockScreenEnabledObservable(),
                 this::mapToSettingModel);
     }
 
-    private MusicNotificationSetting mapToSettingModel(boolean coversEnabled,
-                                                       boolean notificationCovers,
+    private Observable<Boolean> getCoversInNotificationEnabledObservable() {
+        return Observable.combineLatest(settingsRepository.getCoversEnabledObservable(),
+                settingsRepository.getCoversInNotificationEnabledObservable(),
+                (coversEnabled, coversInNotification) -> coversEnabled && coversInNotification);
+    }
+
+    private Observable<Boolean> getColoredNotificationEnabledObservable() {
+        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
+                settingsRepository.getColoredNotificationEnabledObservable(),
+                (coversInNotification, coloredNotification) -> coversInNotification && coloredNotification);
+    }
+
+    private Observable<Boolean> getCoversOnLockScreenEnabledObservable() {
+        return Observable.combineLatest(settingsRepository.getCoversInNotificationEnabledObservable(),
+                settingsRepository.getCoversOnLockScreenEnabledObservable(),
+                (coversInNotification, coversOnLockScreen) -> coversInNotification && coversOnLockScreen);
+    }
+
+    private MusicNotificationSetting mapToSettingModel(boolean notificationCovers,
                                                        boolean coloredNotification,
                                                        boolean coversOnLockScreen) {
-        return new MusicNotificationSetting(coversEnabled && notificationCovers,
+        return new MusicNotificationSetting(notificationCovers,
                 coloredNotification,
-                coversEnabled && coversOnLockScreen);
+                coversOnLockScreen);
     }
 }

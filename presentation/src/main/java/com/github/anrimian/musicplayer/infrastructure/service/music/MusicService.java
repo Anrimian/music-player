@@ -299,7 +299,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void onNotificationSettingReceived(MusicNotificationSetting setting) {
-        boolean updateNotification = notificationSetting == null;
+        boolean updateNotification = notificationSetting != null;
         notificationSetting = setting;
         if (updateNotification) {
             notificationsDisplayer.updateForegroundNotification(

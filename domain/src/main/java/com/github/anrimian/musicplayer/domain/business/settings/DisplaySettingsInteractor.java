@@ -20,24 +20,6 @@ public class DisplaySettingsInteractor {
         return settingsRepository.getCoversInNotificationEnabledObservable();
     }
 
-//    public Observable<Boolean> getCoversInNotificationEnabledObservable() {
-//        return Observable.combineLatest(settingsRepository.getCoversEnabledObservable(),
-//                settingsRepository.getCoversInNotificationEnabledObservable(),
-//                (coversEnabled, coversInNotification) -> coversEnabled && coversInNotification);
-//    }
-//
-//    public Observable<Boolean> getColoredNotificationEnabledObservable() {
-//        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
-//                settingsRepository.getColoredNotificationEnabledObservable(),
-//                (coversInNotification, coloredNotification) -> coversInNotification && coloredNotification);
-//    }
-//
-//    public Observable<Boolean> getCoversOnLockScreenEnabledObservable() {
-//        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
-//                settingsRepository.getCoversOnLockScreenEnabledObservable(),
-//                (coversInNotification, coversOnLockScreen) -> coversInNotification && coversOnLockScreen);
-//    }
-
     public boolean isCoversEnabled() {
         return settingsRepository.isCoversEnabled();
     }
