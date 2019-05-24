@@ -27,11 +27,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -54,9 +52,6 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
     @Nullable
     @BindView(R.id.bottom_sheet_top_left_shadow)
     View bottomSheetTopLeftShadow;
-
-    @BindView(R.id.rv_playlist)
-    RecyclerView rvPlayList;
 
     @BindView(R.id.iv_play_pause)
     ImageView ivPlayPause;
@@ -88,12 +83,6 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
     @BindView(R.id.sb_track_state)
     AppCompatSeekBar sbTrackState;
 
-    @BindView(R.id.bottom_sheet_top_shadow)
-    View bottomSheetTopShadow;
-
-    @BindView(R.id.top_panel)
-    View topBottomSheetPanel;
-
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
@@ -115,14 +104,8 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
     @BindView(R.id.toolbar_content_container)
     View titleContainer;
 
-    @BindView(R.id.acv_play_queue)
-    ActionMenuView actionMenuView;
-
     @BindView(R.id.toolbar_play_queue)
     View playQueueTitleContainer;
-
-    @BindView(R.id.tv_queue_subtitle)
-    TextView tvQueueSubtitle;
 
     @BindView(R.id.title_container)
     View toolbarTitleContainer;
@@ -254,7 +237,10 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
                     bottomSheetTopLeftShadow,
                     mlBottomSheet,
                     bottomSheetCoordinator));
-            delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.85f));
+            delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer,
+                    0.85f,
+                    activity.getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height)
+            ));
         } else {
             boundDelegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)));
             delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
@@ -275,8 +261,6 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
     private void setViewStartState() {
         playQueueTitleContainer.setVisibility(INVISIBLE);
         titleContainer.setVisibility(INVISIBLE);
-//        bottomSheetTopShadow.setVisibility(INVISIBLE);
-//        rvPlayList.setVisibility(INVISIBLE);
         toolbarTitleContainer.setVisibility(INVISIBLE);
     }
 }

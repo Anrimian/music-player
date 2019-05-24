@@ -2,7 +2,6 @@
 <resources>
 
     <!--specific sizes-->
-    <dimen name="play_actions_panel_height">120dp</dimen>
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
 
     <dimen name="music_control_button_padding_collapsed">12dp</dimen>

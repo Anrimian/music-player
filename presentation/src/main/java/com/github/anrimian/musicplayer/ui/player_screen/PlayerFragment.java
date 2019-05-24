@@ -106,18 +106,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.navigation_view)
     NavigationView navigationView;
 
-//    @Nullable
-//    @BindView(R.id.coordinator_bottom_sheet)
-//    CoordinatorLayout bottomSheetCoordinator;
-
-//    @Nullable
-//    @BindView(R.id.bottom_sheet_left_shadow)
-//    View bottomSheetLeftShadow;
-
-//    @Nullable
-//    @BindView(R.id.bottom_sheet_top_left_shadow)
-//    View bottomSheetTopLeftShadow;
-
     @BindView(R.id.rv_playlist)
     RecyclerView rvPlayList;
 
@@ -176,14 +164,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @BindView(R.id.toolbar)
     AdvancedToolbar toolbar;
 
-//    @BindView(R.id.toolbar_content_container)
-//    View titleContainer;
-
     @BindView(R.id.acv_play_queue)
     ActionMenuView acvPlayQueueMenu;
-
-//    @BindView(R.id.toolbar_play_queue)
-//    View playQueueTitleContainer;
 
     @BindView(R.id.tv_queue_subtitle)
     TextView tvQueueSubtitle;
