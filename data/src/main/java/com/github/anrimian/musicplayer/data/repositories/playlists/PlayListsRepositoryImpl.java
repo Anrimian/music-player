@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.MapChangeProcessor;
+import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     public Observable<List<PlayList>> getPlayListsObservable() {
         return withDefaultValue(playListsSubject, this::getPlayListsMap)
                 .map(this::toSortedPlayLists)
+                .debounce(new FastDebounceFilter<>())//issues with often updates
                 .subscribeOn(scheduler);
     }
 

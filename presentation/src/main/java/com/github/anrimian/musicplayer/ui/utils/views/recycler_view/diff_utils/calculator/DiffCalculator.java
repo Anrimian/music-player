@@ -81,6 +81,7 @@ public class DiffCalculator<T> {
         return calculateChange(newList, detectMoves);
     }
 
+    //unsafe of often calls, think about it
     public ListUpdate<T> calculateChange(List<T> newList, boolean detectMoves) {
         List<T> oldList = currentListFunction.call();
         DiffUtil.DiffResult diffResult = calculateDiff(new SimpleDiffCallback<>(
