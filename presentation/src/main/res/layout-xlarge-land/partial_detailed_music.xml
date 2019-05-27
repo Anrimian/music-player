@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.motion.widget.MotionLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/bottom_sheet_expand_height"
-    android:background="?android:attr/windowBackground"
-    app:layoutDescription="@xml/scene_detailed_music"
-    tools:showPaths="true"
-    tools:progress="1">
+    android:background="?android:attr/windowBackground">
 
     <!--uses to catch unnecessary clicks-->
     <View
@@ -71,7 +68,7 @@
         android:singleLine="true"
         android:layout_marginBottom="@dimen/content_spacing_margin"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintTop_toTopOf="@+id/music_icon_wrapper"
+        app:layout_constraintTop_toTopOf="@+id/iv_music_icon"
         app:layout_constraintBottom_toTopOf="@+id/tv_current_composition_author"
         app:layout_constraintEnd_toEndOf="@+id/tv_current_composition_author"
         app:layout_constraintStart_toStartOf="@+id/tv_current_composition_author"
@@ -81,8 +78,8 @@
         android:id="@+id/btn_random_play"
         style="@style/Content.Button"
         android:contentDescription="@string/content_description_shuffle"
-        android:layout_marginBottom="@dimen/content_horizontal_margin"
-        android:layout_marginStart="@dimen/content_vertical_margin"
+        android:layout_marginBottom="@dimen/content_vertical_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_shuffle"/>
@@ -133,26 +130,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/tv_played_time"/>
 
-    <FrameLayout
-        android:id="@+id/music_icon_wrapper"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_music_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="@dimen/content_internal_margin"
+        android:contentDescription="@string/folder"
+        android:layout_gravity="center|start"
+        android:scaleType="centerCrop"
         android:layout_marginTop="@dimen/content_vertical_margin"
+        android:layout_marginBottom="@dimen/content_internal_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/sb_track_state"
-        app:layout_constraintLeft_toLeftOf="@id/tv_played_time">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/iv_music_icon"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:contentDescription="@string/folder"
-            android:layout_gravity="center|start"
-            android:scaleType="centerCrop"
-            tools:srcCompat="@drawable/ic_music_placeholder" />
-
-    </FrameLayout>
+        app:layout_constraintLeft_toLeftOf="@id/tv_played_time"
+        tools:srcCompat="@drawable/ic_music_placeholder" />
 
     <ImageView
         android:id="@+id/btn_actions_menu"
@@ -173,10 +163,10 @@
         android:layout_marginStart="@dimen/content_internal_margin"
         android:layout_marginEnd="@dimen/content_internal_margin"
         app:layout_constraintTop_toBottomOf="@+id/tv_current_composition"
-        app:layout_constraintBottom_toBottomOf="@+id/music_icon_wrapper"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_music_icon"
         app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
-        app:layout_constraintStart_toEndOf="@+id/music_icon_wrapper"
+        app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
         tools:text="ddddddddddddddddddddd"/>
 
-</androidx.constraintlayout.motion.widget.MotionLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 

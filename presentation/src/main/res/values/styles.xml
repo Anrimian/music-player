@@ -17,7 +17,7 @@
         <item name="actionModeTextColor">@color/secondary_button_color</item>
         <item name="actionModeStatusBarColor">@color/selectionStatusBarColor</item>
         <item name="listBackground">@color/light_light_gray</item>
-
+        <item name="listItemBackground">@android:color/white</item>
     </style>
 
     <style name="AppTheme.Drawer" parent="AppTheme">

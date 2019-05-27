@@ -101,6 +101,7 @@
     <string name="add_to_play_queue">Add to queue</string>
     <string name="edit_name">Rename</string>
     <string name="change">Change</string>
+    <string name="no_current_composition">No current composition</string>
     <string name="show_covers">Show covers</string>
     <string name="show_covers_in_notification">Show covers in notification</string>
     <string name="colored_notification">Color notification in cover colors</string>

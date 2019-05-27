@@ -2,8 +2,6 @@
 <resources>
 
     <!--specific sizes-->
-    <dimen name="play_actions_panel_height">120dp</dimen>
-    <dimen name="bottom_sheet_height">60dp</dimen>
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
 
     <dimen name="music_control_button_padding_collapsed">12dp</dimen>
@@ -29,7 +27,9 @@
 
     <dimen name="top_control_button_size">48dp</dimen>
 
+    <!--content margins-->
     <dimen name="content_spacing_margin">8dp</dimen>
+    <dimen name="content_internal_margin">8dp</dimen>
     <dimen name="content_horizontal_margin">16dp</dimen>
     <dimen name="content_vertical_margin">16dp</dimen>
     <dimen name="content_margin">16dp</dimen>
@@ -46,12 +46,14 @@
     <dimen name="dialog_margin_content_horizontal">8dp</dimen>
     <dimen name="radio_button_text_margin_start">8dp</dimen>
 
-    <!--bottom sheet-->
+    <!--player bottom sheet-->
     <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>
     <dimen name="bottom_sheet_top_left_shadow_height">6dp</dimen>
     <dimen name="bottom_sheet_shadow_height">8dp</dimen>
     <dimen name="bottom_sheet_shadow_internal_margin">4dp</dimen>
-    <dimen name="bottom_sheet_portrait_expand_height">200dp</dimen>
+    <dimen name="bottom_sheet_height">60dp</dimen>
+    <dimen name="bottom_sheet_expand_height">200dp</dimen>
+    <dimen name="control_button_width">52dp</dimen>
 
     <dimen name="bottom_sheet_content_margin">16dp</dimen>
     <dimen name="play_button_expand_margin">8dp</dimen>
@@ -59,7 +61,13 @@
     <dimen name="button_expand_size">48dp</dimen>
     <dimen name="popup_menu_item_icon_size">20dp</dimen>
 
+    <!--modal bottom sheet-->
     <dimen name="sheet_dialog_title_collapsed_size">14sp</dimen>
     <dimen name="sheet_dialog_title_expanded_size">19sp</dimen>
+    <dimen name="bottom_sheet_width">0dp</dimen>
+
+    <!--toolbar-->
+    <dimen name="toolbar_content_start">72dp</dimen>
+    <dimen name="toolbar_control_offset">0dp</dimen>
 
 </resources>

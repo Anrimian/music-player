@@ -74,7 +74,8 @@ public class MusicPlayerInteractorTest {
 
     private InOrder inOrder = Mockito.inOrder(playQueueRepository,
             musicPlayerController,
-            musicProviderRepository);
+            musicProviderRepository,
+            systemServiceController);
 
     @Before
     public void setUp() {
@@ -309,6 +310,7 @@ public class MusicPlayerInteractorTest {
         audioFocusSubject.onNext(GAIN);
 
         inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(systemServiceController).startMusicService();
 
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE, PLAY);
     }

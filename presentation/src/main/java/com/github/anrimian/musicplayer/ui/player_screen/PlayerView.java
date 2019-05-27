@@ -15,6 +15,8 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.c
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /**
  * Created on 02.11.2017.
  */
@@ -37,10 +39,10 @@ public interface PlayerView extends MvpView {
     void collapseBottomPanel();
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showMusicControls(boolean show);
+    void setMusicControlsEnabled(boolean show);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentQueueItem(PlayQueueItem item);
+    void showCurrentQueueItem(@Nullable PlayQueueItem item);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void scrollQueueToPosition(int position, boolean smoothScroll);

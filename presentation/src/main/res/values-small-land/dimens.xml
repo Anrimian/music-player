@@ -5,4 +5,8 @@
     <dimen name="play_button_expand_size">36dp</dimen>
     <dimen name="button_expand_size">26dp</dimen>
 
+    <!--content margins-->
+    <dimen name="content_horizontal_margin">8dp</dimen>
+    <dimen name="content_vertical_margin">8dp</dimen>
+
 </resources>

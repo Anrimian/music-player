@@ -5,19 +5,19 @@
         <item name="android:layout_height">@dimen/button_expand_size</item>
         <item name="android:scaleType">centerInside</item>
         <item name="android:background">?actionBarItemBackground</item>
-        <item name="android:tint">@color/primary_button_color</item>
+        <item name="android:tint">@color/color_button</item>
     </style>
 
     <style name="Content.Button.Main">
-        <item name="android:layout_width">52dp</item>
+        <item name="android:layout_width">@dimen/control_button_width</item>
         <item name="android:layout_height">@dimen/bottom_sheet_height</item>
-        <item name="android:background">?selectableItemBackgroundBorderless</item>
+        <item name="android:background">@drawable/bg_selectable_round_shape</item>
     </style>
 
     <style name="Content.Button.Menu">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="android:tint">@color/secondary_button_color</item>
+        <item name="android:tint">@color/color_button_secondary</item>
     </style>
 
     <style name="Content.Text" parent="@style/Base.TextAppearance.AppCompat.Body1">
@@ -27,7 +27,6 @@
     <style name="Content.Dialog.Text" parent="@style/Content.Text">
         <item name="android:textSize">16sp</item>
     </style>
-
 
     <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">
 

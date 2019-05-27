@@ -320,8 +320,9 @@ public class MusicPlayerInteractor {
             case GAIN: {
                 musicPlayerController.setVolume(1f);
                 if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
-                    musicPlayerController.resume();
                     playerStateSubject.onNext(PLAY);
+                    musicPlayerController.resume();
+                    systemServiceController.startMusicService();
                 }
                 break;
             }

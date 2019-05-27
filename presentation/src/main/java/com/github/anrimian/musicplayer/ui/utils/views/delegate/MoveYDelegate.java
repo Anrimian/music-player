@@ -8,10 +8,16 @@ public class MoveYDelegate implements SlideDelegate {
 
     private final View view;
     private final float movePercent;
+    private final int minCollapseHeight;
 
     public MoveYDelegate(View view, float movePercent) {
+        this(view, movePercent, 0);
+    }
+
+    public MoveYDelegate(View view, float movePercent, int minCollapseHeight) {
         this.view = view;
         this.movePercent = movePercent;
+        this.minCollapseHeight = minCollapseHeight;
     }
 
     @Override
@@ -24,14 +30,12 @@ public class MoveYDelegate implements SlideDelegate {
     }
 
     private void moveView(float slideOffset) {
-        float childY = view.getMeasuredHeight() * movePercent * (1 - slideOffset);
+        int viewHeight = view.getMeasuredHeight();
+        float usedViewHeight = viewHeight * movePercent;
+        if (minCollapseHeight != 0 && viewHeight - usedViewHeight > minCollapseHeight) {
+            usedViewHeight = viewHeight - minCollapseHeight;
+        }
+        float childY = usedViewHeight * (1 - slideOffset);
         view.setTranslationY(childY);
-//        if (startY == UNDEFINED) {
-//            startY = view.getY();
-//        }
-//        int height = view.getMeasuredHeight();
-//        float deltaY = startY - (height * slideOffset);
-//        view.setY(deltaY);
-//        view.setAlpha(1 - slideOffset);
     }
 }

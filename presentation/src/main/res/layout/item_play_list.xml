@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/windowBackground">
+    android:background="?attr/listItemBackground">
 
     <TextView
         android:id="@+id/tv_play_list_name"
@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         android:layout_marginStart="@dimen/content_horizontal_margin"
-        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -26,7 +26,7 @@
         style="@style/Base.TextAppearance.AppCompat.Caption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginTop="@dimen/content_spacing_margin"
         android:lineSpacingExtra="2dp"
         app:layout_constraintEnd_toEndOf="@+id/tv_play_list_name"
         app:layout_constraintStart_toStartOf="@+id/tv_play_list_name"
@@ -36,7 +36,7 @@
     <View
         android:id="@+id/divider"
         style="@style/Divider.Horizontal"
-        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_additional_info" />

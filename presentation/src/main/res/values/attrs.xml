@@ -3,4 +3,5 @@
     <attr name="actionModeTextColor" format="color"/>
     <attr name="actionModeStatusBarColor" format="color"/>
     <attr name="listBackground" format="color"/>
+    <attr name="listItemBackground" format="color"/>
 </resources>

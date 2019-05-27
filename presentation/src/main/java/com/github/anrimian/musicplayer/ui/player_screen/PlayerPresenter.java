@@ -310,12 +310,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
         this.currentItem = newItem;
-        getViewState().showMusicControls(currentItem != null);
+        getViewState().showCurrentQueueItem(newItem);
         if (newItem != null) {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
             if (position != null) {
-                getViewState().showCurrentQueueItem(newItem);
                 scrollToItemPosition(position);
             }
         }
@@ -349,6 +348,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void onPlayQueueChanged(ListUpdate<PlayQueueItem> update) {
         playQueue = update.getNewList();
         getViewState().showPlayQueueSubtitle(playQueue.size());
+        getViewState().setMusicControlsEnabled(!playQueue.isEmpty());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
         getViewState().updatePlayQueue(update, !scrollToPositionAfterUpdate);
         if (scrollToPositionAfterUpdate) {
@@ -373,7 +373,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onPlayQueueReceivingError(Throwable throwable) {
         errorParser.parseError(throwable);
-        getViewState().showMusicControls(false);
+        getViewState().setMusicControlsEnabled(false);
     }
 
     private void subscribeOnTrackPositionChanging() {

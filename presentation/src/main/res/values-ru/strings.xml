@@ -103,6 +103,7 @@
     <string name="add_to_play_queue">Добавить в очередь</string>
     <string name="edit_name">Переименовать</string>
     <string name="change">Изменить</string>
+    <string name="no_current_composition">Нет текущей композиции</string>
     <string name="show_covers">Показывать обложки</string>
     <string name="show_covers_in_notification">Показывать обложку в уведомлении</string>
     <string name="colored_notification">Окрашивать уведомление в цвета обложки</string>
