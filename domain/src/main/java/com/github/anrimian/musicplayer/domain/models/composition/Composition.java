@@ -15,6 +15,7 @@ public class Composition {
     private String title;
     private String album;
     private String filePath;
+    @Nullable
     private String displayName;
 
     private long duration;
@@ -67,11 +68,12 @@ public class Composition {
         this.filePath = filePath;
     }
 
+    @Nullable
     public String getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
+    public void setDisplayName(@Nullable String displayName) {
         this.displayName = displayName;
     }
 

@@ -18,8 +18,8 @@ import java.util.List;
 
 import androidx.core.content.FileProvider;
 
+import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
 
 public class DialogUtils {
 

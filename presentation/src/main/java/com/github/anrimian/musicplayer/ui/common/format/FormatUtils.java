@@ -20,15 +20,6 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class FormatUtils {
 
-    public static String formatCompositionName(Composition composition) {
-        String name = composition.getDisplayName();
-        int cropIndex = name.lastIndexOf('.');
-        if (cropIndex != -1) {
-            return name.substring(0, cropIndex);
-        }
-        return name;
-    }
-
     public static StringBuilder formatCompositionAuthor(Composition composition, Context context) {
         String author = composition.getArtist();
 

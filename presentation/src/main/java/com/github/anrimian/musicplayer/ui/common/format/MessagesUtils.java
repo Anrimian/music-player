@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 
 public class MessagesUtils {
 
