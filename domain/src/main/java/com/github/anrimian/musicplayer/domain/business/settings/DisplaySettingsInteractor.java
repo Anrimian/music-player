@@ -33,7 +33,7 @@ public class DisplaySettingsInteractor {
     }
 
     public boolean isCoversOnLockScreenEnabled() {
-        return settingsRepository.isColoredNotificationEnabled();
+        return settingsRepository.isCoversOnLockScreenEnabled();
     }
 
     public void setCoversEnabled(boolean enabled) {

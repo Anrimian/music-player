@@ -161,7 +161,7 @@ public class NotificationsDisplayer {
 //                int color;
                 if (bitmap == null) {
 //                    color = Color.WHITE;/*getColorFromAttr(context, android.R.attr.textColorPrimary);*/
-                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);//default icon
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_notification_large_icon);//default icon
                 } else {
 //                    color = Palette.from(bitmap).generate().getDarkMutedColor(Color.WHITE);
 
