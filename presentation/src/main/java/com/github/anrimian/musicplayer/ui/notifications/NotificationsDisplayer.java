@@ -158,21 +158,14 @@ public class NotificationsDisplayer {
             if (notificationSetting.isShowCovers()) {
                 Bitmap bitmap = getCompositionImage(composition);
 
-//                int color;
                 if (bitmap == null) {
-//                    color = Color.WHITE;/*getColorFromAttr(context, android.R.attr.textColorPrimary);*/
                     bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_notification_large_icon);//default icon
-                } else {
-//                    color = Palette.from(bitmap).generate().getDarkMutedColor(Color.WHITE);
-
                 }
                 builder.setLargeIcon(bitmap);
             }
 
             builder = builder.setContentTitle(formatCompositionName(composition))
                     .setContentText(formatCompositionAuthor(composition, context));
-//                    .setColor(color)
-//                    .setLargeIcon(bitmap);
         }
         return builder;
     }

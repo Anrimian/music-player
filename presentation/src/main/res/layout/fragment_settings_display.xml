@@ -1,59 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:overScrollMode="ifContentScrolls">
 
-    <CheckBox
-        style="@style/CheckboxStyle"
-        android:id="@+id/cb_covers"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/show_covers"
-        android:layout_marginTop="@dimen/content_vertical_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <CheckBox
-        style="@style/CheckboxStyle"
-        android:id="@+id/cb_covers_in_notification"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/show_covers_in_notification"
-        android:layout_marginTop="@dimen/content_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cb_covers" />
+        <CheckBox
+            style="@style/CheckboxStyle"
+            android:id="@+id/cb_covers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/show_covers"
+            android:layout_marginTop="@dimen/content_spacing_margin"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <CheckBox
-        style="@style/CheckboxStyle"
-        android:id="@+id/cb_colored_notification"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/colored_notification"
-        android:layout_marginTop="@dimen/content_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cb_covers_in_notification" />
+        <CheckBox
+            style="@style/CheckboxStyle"
+            android:id="@+id/cb_covers_in_notification"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/show_covers_in_notification"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cb_covers" />
 
-    <CheckBox
-        style="@style/CheckboxStyle"
-        android:id="@+id/cb_notification_on_lock_screen"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/show_covers_on_lock_screen"
-        android:layout_marginTop="@dimen/content_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cb_colored_notification" />
+        <CheckBox
+            style="@style/CheckboxStyle"
+            android:id="@+id/cb_colored_notification"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/colored_notification"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cb_covers_in_notification" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <CheckBox
+            style="@style/CheckboxStyle"
+            android:id="@+id/cb_notification_on_lock_screen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/show_covers_on_lock_screen"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cb_colored_notification" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
+
