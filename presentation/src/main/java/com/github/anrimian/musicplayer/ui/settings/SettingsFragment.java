@@ -53,7 +53,7 @@ public class SettingsFragment extends Fragment {
                 toolbar::onStackFragmentSlided);
 
         if (savedInstanceState == null) {
-            getChildFragmentManager().beginTransaction()
+            requireFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new DisplaySettingsFragment())
                     .commit();
         }
