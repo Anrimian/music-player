@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -16,6 +18,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicServiceInteractor;
@@ -279,7 +282,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         if (!queueItem.equals(currentItem)) {
             Log.d("KEK", "onCurrentCompositionReceived: set current");
             currentItem = queueItem;
-            updateMediaSessionMetadata(currentItem.getComposition());
+            updateMediaSessionMetadata(currentItem.getComposition(), notificationSetting);
             notificationsDisplayer.updateForegroundNotification(
                     playerState == PlayerState.PLAY,
                     currentItem,
@@ -307,18 +310,26 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                     currentItem,
                     mediaSession,
                     notificationSetting);
+            if (currentItem != null) {
+                updateMediaSessionMetadata(currentItem.getComposition(), notificationSetting);
+            }
         }
     }
 
-    private void updateMediaSessionMetadata(Composition composition) {
+    private void updateMediaSessionMetadata(Composition composition, MusicNotificationSetting setting) {
         MediaMetadataCompat.Builder builder = metadataBuilder
                 .putString(METADATA_KEY_TITLE, composition.getTitle())
                 .putString(METADATA_KEY_ALBUM, composition.getAlbum())
                 .putString(METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
                 .putLong(METADATA_KEY_DURATION, composition.getDuration());
-        if (notificationSetting.isCoversOnLockScreen()) {
-            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, getCompositionImage(composition));
+        Bitmap bitmap = null;
+        if (setting.isCoversOnLockScreen()) {
+            bitmap = getCompositionImage(composition);
+            if (bitmap == null) {
+                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification_large_icon);//default icon
+            }
         }
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
         mediaSession.setMetadata(builder.build());
     }
 
