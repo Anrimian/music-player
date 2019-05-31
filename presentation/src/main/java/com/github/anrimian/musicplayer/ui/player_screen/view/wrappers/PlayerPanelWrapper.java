@@ -1,6 +1,6 @@
-package com.github.anrimian.musicplayer.ui.player_screen.view.wrapper;
+package com.github.anrimian.musicplayer.ui.player_screen.view.wrappers;
 
-public interface PlayerViewWrapper {
+public interface PlayerPanelWrapper {
 
     boolean isBottomPanelExpanded();
 

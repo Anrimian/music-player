@@ -10,10 +10,16 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrPosition;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -24,6 +30,9 @@ public class DisplaySettingsFragment extends MvpAppCompatFragment implements Dis
 
     @InjectPresenter
     DisplaySettingsPresenter presenter;
+
+    @BindView(R.id.nsv_container)
+    NestedScrollView nsvContainer;
 
     @BindView(R.id.cb_covers)
     CheckBox cbCovers;
@@ -54,6 +63,17 @@ public class DisplaySettingsFragment extends MvpAppCompatFragment implements Dis
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.settings);
+        toolbar.setSubtitle(R.string.display);
+        toolbar.setTitleClickListener(null);
+
+        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
+        SlidrPanel.replace(nsvContainer,
+                slidrConfig,
+                () -> FragmentNavigation.from(requireFragmentManager()).goBack(0),
+                toolbar::onStackFragmentSlided);
 
         onCheckChanged(cbCovers, presenter::onCoversChecked);
         onCheckChanged(cbCoversInNotification, presenter::onCoversInNotificationChecked);

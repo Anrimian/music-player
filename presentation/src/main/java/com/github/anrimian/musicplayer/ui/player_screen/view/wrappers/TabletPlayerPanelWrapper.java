@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.player_screen.view.wrapper;
+package com.github.anrimian.musicplayer.ui.player_screen.view.wrappers;
 
 import android.view.View;
 
@@ -6,9 +6,9 @@ import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 
 import butterknife.ButterKnife;
 
-public class TabletPlayerViewWrapper implements PlayerViewWrapper {
+public class TabletPlayerPanelWrapper implements PlayerPanelWrapper {
 
-    public TabletPlayerViewWrapper(View view, Callback<Boolean> bottomSheetStateListener) {
+    public TabletPlayerPanelWrapper(View view, Callback<Boolean> bottomSheetStateListener) {
         ButterKnife.bind(this, view);
         bottomSheetStateListener.call(false);
     }

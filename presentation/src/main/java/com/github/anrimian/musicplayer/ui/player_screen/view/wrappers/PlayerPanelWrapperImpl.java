@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.player_screen.view.wrapper;
+package com.github.anrimian.musicplayer.ui.player_screen.view.wrappers;
 
 import android.app.Activity;
 import android.view.View;
@@ -39,7 +39,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 
-public class PlayerViewWrapperImpl implements PlayerViewWrapper {
+public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
 
     @Nullable
     @BindView(R.id.coordinator_bottom_sheet)
@@ -118,11 +118,11 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
     private BottomSheetBehavior<View> bottomSheetBehavior;
     private SlideDelegate bottomSheetDelegate;
 
-    public PlayerViewWrapperImpl(View view,
-                                 Activity activity,
-                                 Runnable onBottomSheetDragCollapsed,
-                                 Runnable onBottomSheetDragExpanded,
-                                 Callback<Boolean> bottomSheetStateListener) {
+    public PlayerPanelWrapperImpl(View view,
+                                  Activity activity,
+                                  Runnable onBottomSheetDragCollapsed,
+                                  Runnable onBottomSheetDragExpanded,
+                                  Callback<Boolean> bottomSheetStateListener) {
         this.activity = activity;
         this.onBottomSheetDragCollapsed = onBottomSheetDragCollapsed;
         this.onBottomSheetDragExpanded = onBottomSheetDragExpanded;

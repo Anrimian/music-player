@@ -42,7 +42,7 @@ public interface PlayerView extends MvpView {
     void setMusicControlsEnabled(boolean show);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentQueueItem(@Nullable PlayQueueItem item);
+    void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void scrollQueueToPosition(int position, boolean smoothScroll);
@@ -96,5 +96,5 @@ public interface PlayerView extends MvpView {
     void notifyItemMoved(int from, int to);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCoversEnabled(boolean isCoversEnabled);
+    void setPlayQueueCoversEnabled(boolean isCoversEnabled);
 }
