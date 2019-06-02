@@ -9,6 +9,24 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
+import androidx.appcompat.widget.ActionMenuView;
+import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
@@ -52,23 +70,6 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
-import androidx.appcompat.widget.ActionMenuView;
-import androidx.appcompat.widget.AppCompatSeekBar;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -468,11 +469,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             tvCurrentComposition.setText(R.string.no_current_composition);
             tvCurrentCompositionAuthor.setText(R.string.unknown_author);
             ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
-            topBottomSheetPanel.setContentDescription(getString(
-                            R.string.now_playing_template,
-                            getString(R.string.no_current_composition)
-                    )
-            );
+            String noCompositionMessage = getString(R.string.no_current_composition);
+            topBottomSheetPanel.setContentDescription(noCompositionMessage);
+            rvPlayList.setContentDescription(noCompositionMessage);
         } else {
             Composition composition = item.getComposition();
             String compositionName = formatCompositionName(composition);
@@ -501,7 +500,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         rvPlayList.post(() -> {
             if (smooth) {
-                //TODO many fast scroll to top, to top, to top -> wrong position
                 RecyclerViewUtils.smoothScrollToTop(position,
                         playQueueLayoutManager,
                         requireContext(),
