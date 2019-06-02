@@ -70,4 +70,9 @@
     <dimen name="toolbar_content_start">72dp</dimen>
     <dimen name="toolbar_control_offset">0dp</dimen>
 
+    <!--widgets-->
+    <dimen name="widget_content_margin_vertical">4dp</dimen>
+    <dimen name="widget_content_margin_horizontal">8dp</dimen>
+    <dimen name="widget_content_spacing_margin">2dp</dimen>
+
 </resources>

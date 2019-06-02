@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_appwidget"
+    android:paddingBottom="8dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/iv_cover"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_music_placeholder"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"/>
+
+    <TextView
+        android:id="@+id/tv_composition"
+        style="@style/Content.Text.Medium"
+        android:lines="1"
+        android:ellipsize="end"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="16dp"
+        android:layout_alignTop="@id/iv_cover"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/iv_cover"
+        android:text="composition_name"
+        tools:text="fdfdfdf" />
+
+    <TextView
+        android:id="@+id/tv_composition_author"
+        style="@style/Content.Text.Medium"
+        android:lines="1"
+        android:ellipsize="end"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/tv_composition"
+        android:layout_below="@id/tv_composition"
+        android:layout_alignEnd="@+id/tv_composition"
+        android:text="composition_author"
+        tools:text="fdfdfdf" />
+
+    <ImageView
+        android:id="@+id/iv_skip_to_previous"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="center"
+        android:layout_marginEnd="8dp"
+        android:layout_alignTop="@id/iv_play_pause"
+        android:layout_toStartOf="@+id/iv_play_pause"
+        android:src="@drawable/ic_skip_previous" />
+
+    <ImageView
+        android:id="@+id/iv_play_pause"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="center"
+        android:layout_marginTop="8dp"
+        android:layout_below="@+id/tv_composition_author"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_play" />
+
+    <ImageView
+        android:id="@+id/ic_skip_to_next"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="center"
+        android:layout_marginStart="8dp"
+        android:layout_alignTop="@id/iv_play_pause"
+        android:layout_toEndOf="@+id/iv_play_pause"
+        android:src="@drawable/ic_skip_next" />
+
+</RelativeLayout>

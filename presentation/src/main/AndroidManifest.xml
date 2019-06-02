@@ -54,6 +54,36 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
+        <receiver
+            android:name=".ui.widgets.WidgetProviderSmall"
+            android:icon="@mipmap/ic_launcher_round"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action
+                    android:name="android.appwidget.action.APPWIDGET_UPDATE">
+                </action>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_small_metadata">
+            </meta-data>
+        </receiver>
+
+        <!--<receiver-->
+            <!--android:name=".ui.widgets.WidgetProvider"-->
+            <!--android:icon="@mipmap/ic_launcher_round"-->
+            <!--android:label="medium_widget">-->
+            <!--<intent-filter>-->
+                <!--<action-->
+                    <!--android:name="android.appwidget.action.APPWIDGET_UPDATE">-->
+                <!--</action>-->
+            <!--</intent-filter>-->
+            <!--<meta-data-->
+                <!--android:name="android.appwidget.provider"-->
+                <!--android:resource="@xml/widget_medium_metadata">-->
+            <!--</meta-data>-->
+        <!--</receiver>-->
+
     </application>
 
 </manifest>

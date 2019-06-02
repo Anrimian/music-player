@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_appwidget"
+    tools:layout_width="300dp"
+    tools:layout_height="140dp">
+
+    <TextView
+        android:id="@+id/tv_composition"
+        style="@style/AppWidget.Text.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/widget_content_margin_horizontal"
+        android:layout_marginEnd="@dimen/widget_content_margin_horizontal"
+        android:layout_marginTop="@dimen/widget_content_margin_vertical"
+        android:layout_alignTop="@id/iv_cover"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="composition_name composition_name composition_name composition_name"
+        tools:text="fdfdfdf" />
+
+    <TextView
+        android:id="@+id/tv_composition_author"
+        style="@style/AppWidget.Text.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_content_spacing_margin"
+        android:layout_alignStart="@id/tv_composition"
+        android:layout_below="@id/tv_composition"
+        android:layout_alignEnd="@+id/tv_composition"
+        android:text="composition_author composition_author composition_author composition_author composition_author"
+        tools:text="fdfdfdf" />
+
+    <ImageView
+        android:id="@+id/iv_skip_to_previous"
+        style="@style/AppWidget_ImageButton"
+        android:layout_marginEnd="@dimen/widget_content_spacing_margin"
+        android:layout_alignTop="@id/iv_play_pause"
+        android:layout_alignBottom="@+id/iv_skip_to_next"
+        android:layout_toStartOf="@+id/iv_play_pause"
+        android:src="@drawable/ic_skip_previous"
+        android:contentDescription="@string/previous_track"/>
+
+    <ImageView
+        android:id="@+id/iv_play_pause"
+        style="@style/AppWidget_ImageButton"
+        android:layout_toStartOf="@id/iv_skip_to_next"
+        android:layout_alignTop="@+id/iv_skip_to_next"
+        android:layout_alignBottom="@+id/iv_skip_to_next"
+        android:src="@drawable/ic_play"
+        android:contentDescription="@string/play"/>
+
+    <ImageView
+        android:id="@+id/iv_skip_to_next"
+        style="@style/AppWidget_ImageButton"
+        android:layout_marginTop="@dimen/widget_content_spacing_margin"
+        android:layout_marginStart="@dimen/widget_content_spacing_margin"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="@dimen/widget_content_margin_horizontal"
+        android:layout_marginBottom="@dimen/widget_content_spacing_margin"
+        android:src="@drawable/ic_skip_next"
+        android:contentDescription="@string/next_track"/>
+
+</RelativeLayout>
