@@ -30,7 +30,7 @@ ext {
     rxPermissionsVersion = "0.9.4@aar"
     acraVersion = "4.9.0"
     moxyVersion = "1.5.3"
-    butterKnifeVersion = "9.0.0-rc2"
+    butterKnifeVersion = "10.1.0"
     daggerVersion = "2.18"
     exoPlayerVersion = "2.9.6"
     roomVersion = "2.1.0-alpha02"

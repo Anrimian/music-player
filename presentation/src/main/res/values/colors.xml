@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#512DA8</color>
     <color name="colorAccent">#009688</color>
     <color name="light_primary_color">#D1C4E9</color>
+    <color name="disabled_color">#757575</color>
 
     <color name="default_notification_color">#00796b</color>
 

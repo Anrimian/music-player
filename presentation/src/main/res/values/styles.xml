@@ -11,11 +11,17 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="disabledColor">@color/disabled_color</item>
+
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
+
         <item name="dividerHorizontal">@color/divider_color</item>
+
         <item name="actionModeTextColor">@color/secondary_button_color</item>
         <item name="actionModeStatusBarColor">@color/selectionStatusBarColor</item>
+
         <item name="listBackground">@color/light_light_gray</item>
         <item name="listItemBackground">@android:color/white</item>
     </style>
