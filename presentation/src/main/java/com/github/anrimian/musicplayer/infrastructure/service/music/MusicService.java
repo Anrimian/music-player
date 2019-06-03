@@ -16,6 +16,10 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.media.session.MediaButtonReceiver;
+
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -30,9 +34,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.media.session.MediaButtonReceiver;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -55,6 +56,10 @@ import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_I
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE;
 import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE;
+import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
+import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
+import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
+import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
@@ -68,10 +73,6 @@ import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisp
 public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     public static final String REQUEST_CODE = "request_code";
-    public static final int PLAY = 1;
-    public static final int PAUSE = 2;
-    public static final int SKIP_TO_NEXT = 3;
-    public static final int SKIP_TO_PREVIOUS = 4;
 
     @Inject
     NotificationsDisplayer notificationsDisplayer;

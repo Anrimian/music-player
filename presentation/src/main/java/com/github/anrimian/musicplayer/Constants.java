@@ -4,6 +4,13 @@ public interface Constants {
 
     int NO_POSITION = -1;
 
+    interface Actions {
+        int PLAY = 1;
+        int PAUSE = 2;
+        int SKIP_TO_NEXT = 3;
+        int SKIP_TO_PREVIOUS = 4;
+    }
+
     interface Arguments {
         String ORDER_ARG = "order_arg";
         String PLAY_LIST_ID_ARG = "play_list_id_arg";

@@ -54,6 +54,10 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
+        <receiver android:name=".ui.widgets.WidgetActionsReceiver">
+
+        </receiver>
+
         <receiver
             android:name=".ui.widgets.WidgetProviderSmall"
             android:icon="@mipmap/ic_launcher_round"
