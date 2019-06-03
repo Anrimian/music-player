@@ -96,6 +96,8 @@ public class MusicPlayerInteractorTest {
         when(systemMusicController.getAudioBecomingNoisyObservable()).thenReturn(noisyAudioSubject);
         when(systemMusicController.getVolumeObservable()).thenReturn(volumeSubject);
 
+        when(settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled()).thenReturn(true);
+
         musicPlayerInteractor = new MusicPlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
@@ -325,6 +327,26 @@ public class MusicPlayerInteractorTest {
         audioFocusSubject.onNext(LOSS_SHORTLY);
 
         inOrder.verify(musicPlayerController).setVolume(0.5f);
+
+        audioFocusSubject.onNext(GAIN);
+
+        inOrder.verify(musicPlayerController).setVolume(1f);
+
+        playerStateSubscriber.assertValues(IDLE, PLAY);
+    }
+
+    @Test
+    public void onAudioFocusLossShortlyAndGainWithoutDecreaseVolumeTest() {
+        when(settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled()).thenReturn(false);
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
+        inOrder.verify(musicPlayerController).resume();
+
+        audioFocusSubject.onNext(LOSS_SHORTLY);
+
+        inOrder.verify(musicPlayerController, never()).setVolume(0.5f);
 
         audioFocusSubject.onNext(GAIN);
 

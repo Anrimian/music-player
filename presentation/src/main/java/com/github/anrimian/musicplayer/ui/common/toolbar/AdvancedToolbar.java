@@ -260,7 +260,7 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     public void onStackFragmentSlided(float offset) {
-        if (navigation.getScreensCount() >= 2) {
+        if (navigation.getScreensCount() <= 2) {
             drawerArrowDrawable.setProgress(offset);
         }
     }

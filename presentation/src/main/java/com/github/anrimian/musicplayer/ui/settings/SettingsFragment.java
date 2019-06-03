@@ -4,10 +4,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsFragment;
+import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -23,10 +26,18 @@ import butterknife.ButterKnife;
  * Created on 19.10.2017.
  */
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment implements FragmentLayerListener {
 
     @BindView(R.id.fl_container)
     View flContainer;
+
+    @BindView(R.id.tv_display)
+    TextView tvDisplay;
+
+    @BindView(R.id.tv_player)
+    TextView tvPlayer;
+
+    private FragmentNavigation navigation;
 
     @Nullable
     @Override
@@ -42,20 +53,24 @@ public class SettingsFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.settings);
-        toolbar.setSubtitle(null);
-        toolbar.setTitleClickListener(null);
+
+        navigation = FragmentNavigation.from(requireFragmentManager());
+
+        tvDisplay.setOnClickListener(v -> navigation.addNewFragment(new DisplaySettingsFragment()));
+        tvPlayer.setOnClickListener(v -> navigation.addNewFragment(new PlayerSettingsFragment()));
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
         SlidrPanel.replace(flContainer,
                 slidrConfig,
-                () -> FragmentNavigation.from(requireFragmentManager()).goBack(0),
+                () -> navigation.goBack(0),
                 toolbar::onStackFragmentSlided);
+    }
 
-        if (savedInstanceState == null) {
-            requireFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new DisplaySettingsFragment())
-                    .commit();
-        }
+    @Override
+    public void onFragmentMovedOnTop() {
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.settings);
+        toolbar.setSubtitle(null);
+        toolbar.setTitleClickListener(null);
     }
 }

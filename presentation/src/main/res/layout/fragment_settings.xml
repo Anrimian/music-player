@@ -3,16 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/fl_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:background="?android:attr/colorBackground">
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
+        <TextView
+            android:id="@+id/tv_display"
+            style="@style/Content.Text.Button"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"
+            android:text="@string/display"/>
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/tv_player"
+            style="@style/Content.Text.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/playing"/>
+
+    </LinearLayout>
 </FrameLayout>

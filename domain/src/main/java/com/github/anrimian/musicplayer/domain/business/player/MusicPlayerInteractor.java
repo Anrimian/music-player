@@ -327,7 +327,8 @@ public class MusicPlayerInteractor {
                 break;
             }
             case LOSS_SHORTLY: {
-                if (playerStateSubject.getValue() == PLAY) {
+                if (playerStateSubject.getValue() == PLAY
+                        && settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled()) {
                     musicPlayerController.setVolume(0.5f);
                 }
                 break;

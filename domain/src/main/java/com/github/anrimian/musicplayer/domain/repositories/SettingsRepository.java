@@ -55,4 +55,8 @@ public interface SettingsRepository {
     boolean isColoredNotificationEnabled();
 
     boolean isCoversOnLockScreenEnabled();
+
+    boolean isDecreaseVolumeOnAudioFocusLossEnabled();
+
+    void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled);
 }

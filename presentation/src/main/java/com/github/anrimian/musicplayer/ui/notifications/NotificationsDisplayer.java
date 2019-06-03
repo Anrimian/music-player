@@ -134,12 +134,9 @@ public class NotificationsDisplayer {
 
         androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle();
         style.setShowActionsInCompactView(0, 1, 2);
+        style.setMediaSession(mediaSession.getSessionToken());
 
-//        if (notificationSetting.isCoversOnLockScreen()) {
-            style.setMediaSession(mediaSession.getSessionToken());
-//        }
-
-        NotificationCompat.Builder builder =  notificationBuilder.buildMusicNotification(context, queueItem)
+        NotificationCompat.Builder builder = notificationBuilder.buildMusicNotification(context)
                 .setColorized(notificationSetting.isColoredNotification())
                 .setColor(getColor(context, R.color.default_notification_color))
                 .setSmallIcon(R.drawable.ic_music_box)

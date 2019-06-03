@@ -20,7 +20,7 @@ import static com.github.anrimian.musicplayer.domain.models.composition.order.Or
  */
 public class SettingsRepositoryImpl implements SettingsRepository {
 
-    public static final String PREFERENCES_NAME = "settings_preferences";
+    private static final String PREFERENCES_NAME = "settings_preferences";
 
     private static final String RANDOM_PLAYING_ENABLED = "random_playing_enabled";
     private static final String REPEAT_MODE = "repeat_mode";
@@ -31,6 +31,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String SHOW_COVERS_IN_NOTIFICATION = "show_covers_in_notification";
     private static final String COLORED_NOTIFICATION = "colored_notification";
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
+
+    private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
 
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Order> folderOrderSubject = BehaviorSubject.create();
@@ -167,6 +169,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public boolean isCoversOnLockScreenEnabled() {
         return preferences.getBoolean(SHOW_COVERS_ON_LOCK_SCREEN, false);
+    }
+
+    @Override
+    public boolean isDecreaseVolumeOnAudioFocusLossEnabled() {
+        return preferences.getBoolean(DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS, true);
+    }
+
+    @Override
+    public void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled) {
+        preferences.putBoolean(DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS, enabled);
     }
 
     private Order orderFromInt(int order) {

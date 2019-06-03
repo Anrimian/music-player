@@ -109,6 +109,8 @@
     <string name="colored_notification">Окрашивать уведомление в цвета обложки</string>
     <string name="show_covers_on_lock_screen">Показывать обложку на экране блокировки</string>
     <string name="display">Отображение</string>
+    <string name="decrease_volume_on_notification">Уменьшать громкость при получении уведомления</string>
+    <string name="playing">Проигрывание</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
