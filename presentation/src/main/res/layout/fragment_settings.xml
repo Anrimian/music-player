@@ -17,6 +17,10 @@
             android:layout_height="wrap_content"
             android:text="@string/display"/>
 
+        <View
+            style="@style/Divider.Horizontal"
+            android:layout_marginStart="@dimen/toolbar_content_start"/>
+
         <TextView
             android:id="@+id/tv_player"
             style="@style/Content.Text.Button"

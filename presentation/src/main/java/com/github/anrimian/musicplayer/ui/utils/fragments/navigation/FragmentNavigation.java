@@ -37,6 +37,8 @@ public class FragmentNavigation {
     @AnimRes private int rootEnterAnimation = 0;
     @AnimRes private int rootExitAnimation = 0;
 
+    private boolean isVisible = true;
+
     public static FragmentNavigation from(FragmentManager fm) {
         NavigationFragment container = (NavigationFragment) fm.findFragmentByTag(NAVIGATION_FRAGMENT_TAG);
         if (container == null) {
@@ -104,10 +106,13 @@ public class FragmentNavigation {
         screens.clear();
         screens.addAll(mapList(fragments, FragmentMetaData::new));
         int id = jugglerView.getTopViewId();
+
+        Fragment fragment = fragments.get(fragments.size() - 1);
+        fragment.setMenuVisibility(isVisible);
         fragmentManagerProvider.getFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(enterAnimation, exitAnimation)
-                .replace(id, fragments.get(fragments.size() - 1))
+                .replace(id, fragment)
                 .runOnCommit(() -> {
                     hideBottomFragmentMenu();
                     notifyStackListeners();
@@ -147,10 +152,13 @@ public class FragmentNavigation {
         isNavigationEnabled = false;
         screens.addAll(mapList(fragments, FragmentMetaData::new));
         int id = jugglerView.prepareTopView();
+
+        Fragment fragment = fragments.get(fragments.size() - 1);
+        fragment.setMenuVisibility(isVisible);
         fragmentManagerProvider.getFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(enterAnimation, 0)
-                .replace(id, fragments.get(fragments.size() - 1))
+                .replace(id, fragment)
                 .runOnCommit(() -> {
                     hideBottomFragmentMenu();
                     notifyStackListeners();
@@ -184,6 +192,7 @@ public class FragmentNavigation {
         isNavigationEnabled = false;
         screens.add(new FragmentMetaData(fragment));
         int id = jugglerView.prepareTopView();
+        fragment.setMenuVisibility(isVisible);
         fragmentManagerProvider.getFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(enterAnimation, 0)
@@ -241,6 +250,7 @@ public class FragmentNavigation {
         screens.clear();
         screens.add(new FragmentMetaData(newRootFragment));
         int topViewId = jugglerView.getTopViewId();
+        newRootFragment.setMenuVisibility(isVisible);
         fragmentManagerProvider.getFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(enterAnimation, exitAnimation)
@@ -377,6 +387,18 @@ public class FragmentNavigation {
                 .findFragmentById(jugglerView.getBottomViewId());
     }
 
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+        Fragment fragment = getFragmentOnTop();
+        if (fragment != null) {
+            fragment.setMenuVisibility(visible);
+        }
+    }
+
     private void notifyFragmentMovedToTop(Fragment fragment) {
         if (fragment instanceof FragmentLayerListener) {
             ((FragmentLayerListener) fragment).onFragmentMovedOnTop();
@@ -392,8 +414,12 @@ public class FragmentNavigation {
     private void silentlyReplaceBottomFragment() {
         if (screens.size() > 1) {
             FragmentMetaData bottomFragment = screens.get(screens.size() - 2);
-            fragmentManagerProvider.getFragmentManager()
-                    .beginTransaction()
+            FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+            if (fm == null) {
+                //can be null if in very fast create-close case
+                return;
+            }
+            fm.beginTransaction()
                     .replace(jugglerView.getBottomViewId(), createFragment(bottomFragment))
                     .runOnCommit(this::hideBottomFragmentMenu)
                     .commitAllowingStateLoss();

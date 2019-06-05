@@ -98,12 +98,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
-        navigationWrapper.call(navigation -> {
-            Fragment fragment = navigation.getFragmentOnTop();
-            if (fragment != null) {
-                fragment.setMenuVisibility(menuVisible);
-            }
-        });
+        navigationWrapper.call(navigation -> navigation.setVisible(menuVisible));
     }
 
     @Override
