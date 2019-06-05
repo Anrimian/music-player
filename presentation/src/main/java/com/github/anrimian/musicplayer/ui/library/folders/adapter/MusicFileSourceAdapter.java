@@ -38,6 +38,7 @@ public class MusicFileSourceAdapter extends RecyclerView.Adapter {
 
     @Nullable
     private Composition currentComposition;
+    private boolean isCoversEnabled;
 
     public MusicFileSourceAdapter(List<FileSource> musicList) {
         this.musicList = musicList;
@@ -75,7 +76,7 @@ public class MusicFileSourceAdapter extends RecyclerView.Adapter {
                 MusicViewHolder musicViewHolder = (MusicViewHolder) holder;
                 MusicFileSource musicFileSource = (MusicFileSource) fileSource;
                 Composition composition = musicFileSource.getComposition();
-                musicViewHolder.bind(composition);
+                musicViewHolder.bind(composition, isCoversEnabled);
                 musicViewHolder.setPlaying(composition.equals(currentComposition));
                 break;
             }
@@ -136,6 +137,16 @@ public class MusicFileSourceAdapter extends RecyclerView.Adapter {
             if (holder instanceof MusicViewHolder) {
                 MusicViewHolder musicViewHolder = (MusicViewHolder) holder;
                 musicViewHolder.setPlaying(musicViewHolder.getComposition().equals(composition));
+            }
+        }
+    }
+
+    public void setCoversEnabled(boolean isCoversEnabled) {
+        this.isCoversEnabled = isCoversEnabled;
+        for (RecyclerView.ViewHolder holder: viewHolders) {
+            if (holder instanceof MusicViewHolder) {
+                MusicViewHolder musicViewHolder = (MusicViewHolder) holder;
+                musicViewHolder.setCoversVisible(isCoversEnabled);
             }
         }
     }

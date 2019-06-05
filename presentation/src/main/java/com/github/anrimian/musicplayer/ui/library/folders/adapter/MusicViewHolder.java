@@ -72,9 +72,13 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
         btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, composition));
     }
 
-    public void bind(@Nonnull Composition composition) {
+    public void bind(@Nonnull Composition composition, boolean isCoversEnabled) {
         this.composition = composition;
-        compositionItemWrapper.bind(composition);
+        compositionItemWrapper.bind(composition, isCoversEnabled);
+    }
+
+    public void setCoversVisible(boolean isCoversEnabled) {
+        compositionItemWrapper.showCompositionImage(isCoversEnabled);
     }
 
     public void setSelected(boolean selected) {

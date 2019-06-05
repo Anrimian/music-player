@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLay
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
+import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -69,6 +70,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
 
     private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
+    private final DefferedObject<CompositionsAdapter> adapterWrapper = new DefferedObject<>();
     private ProgressViewWrapper progressViewWrapper;
 
     private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
@@ -235,6 +237,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
             adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
             adapter.setOnLongClickListener(presenter::onCompositionLongClick);
+            adapterWrapper.setObject(adapter);
             recyclerView.setAdapter(adapter);
         } else {
             adapter.setItems(list);
@@ -321,6 +324,11 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
     @Override
     public void showCurrentPlayingComposition(Composition composition) {
         adapter.showPlayingComposition(composition);
+    }
+
+    @Override
+    public void setDisplayCoversEnabled(boolean isCoversEnabled) {
+        adapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
     }
 
     @Override

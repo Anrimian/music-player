@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app.library.files.folder;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersPresenter;
 
@@ -34,11 +35,13 @@ public class FolderModule {
     @Nonnull
     LibraryFoldersPresenter libraryFoldersPresenter(LibraryFilesInteractor interactor,
                                                     MusicPlayerInteractor playerInteractor,
+                                                    DisplaySettingsInteractor displaySettingsInteractor,
                                                     @Named(STORAGE_ERROR_PARSER) ErrorParser errorParser,
                                                     @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new LibraryFoldersPresenter(path,
                 interactor,
                 playerInteractor,
+                displaySettingsInteractor,
                 errorParser,
                 uiScheduler);
     }

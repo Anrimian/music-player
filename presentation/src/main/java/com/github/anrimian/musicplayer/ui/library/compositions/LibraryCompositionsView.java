@@ -86,4 +86,7 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showQueueActions(boolean show);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void setDisplayCoversEnabled(boolean isCoversEnabled);
 }
