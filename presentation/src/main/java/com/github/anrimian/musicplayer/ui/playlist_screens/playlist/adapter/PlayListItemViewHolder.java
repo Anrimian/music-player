@@ -53,10 +53,10 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder {
         );
     }
 
-    public void bind(@Nonnull PlayListItem item) {
+    public void bind(@Nonnull PlayListItem item, boolean coversEnabled) {
         this.item = item;
         Composition composition = item.getComposition();
-        compositionItemWrapper.bind(composition);
+        compositionItemWrapper.bind(composition, coversEnabled);
     }
 
     private String getString(@StringRes int resId) {

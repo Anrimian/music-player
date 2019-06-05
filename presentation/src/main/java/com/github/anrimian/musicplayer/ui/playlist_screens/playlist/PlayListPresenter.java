@@ -4,6 +4,7 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -37,6 +38,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private final MusicPlayerInteractor playerInteractor;
     private final PlayListsInteractor playListsInteractor;
+    private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
@@ -70,11 +72,13 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     public PlayListPresenter(long playListId,
                              MusicPlayerInteractor playerInteractor,
                              PlayListsInteractor playListsInteractor,
+                             DisplaySettingsInteractor displaySettingsInteractor,
                              ErrorParser errorParser,
                              Scheduler uiScheduler) {
         this.playListId = playListId;
         this.playerInteractor = playerInteractor;
         this.playListsInteractor = playListsInteractor;
+        this.displaySettingsInteractor = displaySettingsInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
@@ -318,7 +322,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private void onPlayListsReceived(ListUpdate<PlayListItem> listUpdate) {
         items = listUpdate.getNewList();
-        getViewState().updateItemsList(listUpdate);
+        getViewState().updateItemsList(listUpdate, displaySettingsInteractor.isCoversEnabled());
         if (items.isEmpty()) {
             getViewState().showEmptyList();
         } else {

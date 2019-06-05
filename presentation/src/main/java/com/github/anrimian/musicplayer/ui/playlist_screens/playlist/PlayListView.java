@@ -29,7 +29,7 @@ public interface PlayListView extends MvpView {
     void showLoading();
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updateItemsList(ListUpdate<PlayListItem> update);
+    void updateItemsList(ListUpdate<PlayListItem> update, boolean coversEnabled);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);

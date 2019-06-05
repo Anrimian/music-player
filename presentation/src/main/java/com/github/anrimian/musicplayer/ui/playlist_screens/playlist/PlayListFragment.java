@@ -181,10 +181,10 @@ public class PlayListFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void updateItemsList(ListUpdate<PlayListItem> update) {
+    public void updateItemsList(ListUpdate<PlayListItem> update, boolean coversEnabled) {
         List<PlayListItem> list = update.getNewList();
         if (adapter == null) {
-            adapter = new PlayListItemAdapter(list);
+            adapter = new PlayListItemAdapter(list, coversEnabled);
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
             adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
             recyclerView.setAdapter(adapter);
