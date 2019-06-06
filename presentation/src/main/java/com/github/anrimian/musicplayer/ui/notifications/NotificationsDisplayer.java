@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat;
 
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
+import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.PAUSE;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.PLAY;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;

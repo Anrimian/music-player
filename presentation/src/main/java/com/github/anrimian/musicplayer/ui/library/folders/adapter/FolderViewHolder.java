@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.getLastPathPart;
+
 /**
  * Created on 31.10.2017.
  */
@@ -53,11 +55,7 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
     void bind(@Nonnull FolderFileSource folderFileSource) {
         this.folder = folderFileSource;
         this.path = folderFileSource.getFullPath();
-        String displayPath = path;
-        int lastSlashIndex = path.lastIndexOf('/');
-        if (lastSlashIndex != -1) {
-            displayPath = path.substring(++lastSlashIndex, path.length());
-        }
+        String displayPath = getLastPathPart(path);
         tvFolderName.setText(displayPath);
 
         int filesCount = folderFileSource.getFilesCount();
