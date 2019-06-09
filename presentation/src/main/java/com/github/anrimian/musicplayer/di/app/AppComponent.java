@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
+import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
 
 import javax.inject.Singleton;
 
@@ -43,6 +44,8 @@ public interface AppComponent {
     ChoosePlayListPresenter choosePlayListPresenter();
 
     UiStatePreferences uiStatePreferences();
+
+    WidgetUpdater widgetUpdater();
 
     void inject(MusicService musicService);
 }

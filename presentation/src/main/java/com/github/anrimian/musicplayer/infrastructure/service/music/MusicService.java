@@ -29,6 +29,7 @@ import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
+import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -84,6 +85,9 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Inject
     Scheduler uiScheduler;
 
+    @Inject
+    WidgetUpdater widgetUpdater;
+
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
     public Builder stateBuilder = new Builder()
             .setActions(ACTION_PLAY
@@ -117,6 +121,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             return;
         }
         Components.getAppComponent().inject(this);
+        widgetUpdater.start();
 
         mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
         mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS | FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -209,9 +214,9 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         updateMediaSessionState(playerState, trackPosition);
 
         //ignore first not play state
-        if (this.playerState == null && playerState != PlayerState.PLAY) {
-            return;
-        }
+//        if (this.playerState == null && playerState != PlayerState.PLAY) {
+//            return;
+//        }
 
         this.playerState = playerState;
         switch (playerState) {

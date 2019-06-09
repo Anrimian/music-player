@@ -17,6 +17,9 @@ public interface Constants {
         String PATH_ARG = "path_arg";
         String STATUS_BAR_COLOR_ATTR_ARG = "status_bar_color_attr";
         String OPEN_PLAY_QUEUE_ARG = "open_play_queue_arg";
+        String COMPOSITION_NAME_ARG = "composition_name_arg";
+        String COMPOSITION_AUTHOR_ARG = "composition_author_arg";
+        String PLAY_ARG = "play_arg";
     }
 
     interface Tags {
