@@ -11,6 +11,14 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.AttrRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
@@ -41,18 +49,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import androidx.annotation.AttrRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
@@ -61,7 +61,7 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFrom
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getContentView;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getFloat;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getStatusBarHeight;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
+import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils.attachDynamicShadow;
 
 public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         implements ChoosePlayListView {
@@ -136,20 +136,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        titleShadow.setVisibility(
-                recyclerView.computeVerticalScrollOffset() > 0? VISIBLE: INVISIBLE
-        );
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                animateVisibility(
-                        titleShadow,
-                        recyclerView.computeVerticalScrollOffset() > 0? VISIBLE: INVISIBLE
-                );
-            }
-        });
+        attachDynamicShadow(recyclerView, titleShadow);
 
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {

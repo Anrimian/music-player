@@ -1,16 +1,22 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view;
 
 import android.content.Context;
+import android.view.View;
+
 import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import android.view.View;
 
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.java.CompositeCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteItemDecorator;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteTouchHelperCallback;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class RecyclerViewUtils {
 
@@ -63,5 +69,22 @@ public class RecyclerViewUtils {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteTouchHelperCallback(
                 backgroundColor, compositeCallback));
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    public static void attachDynamicShadow(RecyclerView recyclerView, View shadow) {
+        shadow.setVisibility(
+                recyclerView.computeVerticalScrollOffset() > 0? VISIBLE: View.GONE
+        );
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                animateVisibility(
+                        shadow,
+                        recyclerView.computeVerticalScrollOffset() > 0? VISIBLE: GONE
+                );
+            }
+        });
     }
 }
