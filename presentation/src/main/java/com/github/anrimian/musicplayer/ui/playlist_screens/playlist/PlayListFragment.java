@@ -8,6 +8,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
@@ -37,13 +45,6 @@ import com.r0adkll.slidr.model.SlidrPosition;
 import java.util.List;
 import java.util.Objects;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -111,7 +112,7 @@ public class PlayListFragment extends MvpAppCompatFragment
         DragAndSwipeTouchHelperCallback callback = withSwipeToDelete(recyclerView,
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
-                ItemTouchHelper.END);
+                ItemTouchHelper.START);
         callback.setOnMovedListener(presenter::onItemMoved);
         callback.setOnStartDragListener(presenter::onDragStarted);
         callback.setOnEndDragListener(presenter::onDragEnded);
