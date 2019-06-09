@@ -19,6 +19,11 @@ public class TabletPlayerPanelWrapper implements PlayerPanelWrapper {
     }
 
     @Override
+    public void collapseBottomPanelSmoothly() {
+
+    }
+
+    @Override
     public void collapseBottomPanel() {
 
     }

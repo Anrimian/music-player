@@ -4,7 +4,7 @@
 
     <translate
         android:fromXDelta="0%"
-        android:toXDelta="18%"/>
+        android:toXDelta="15%"/>
 
     <alpha
         android:fromAlpha="1.0"

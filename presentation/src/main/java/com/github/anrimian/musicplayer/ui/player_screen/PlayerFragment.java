@@ -352,7 +352,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public boolean onBackPressed() {
         if (playerPanelWrapper.isBottomPanelExpanded()) {
-            playerPanelWrapper.collapseBottomPanel();
+            playerPanelWrapper.collapseBottomPanelSmoothly();
             return true;
         }
         if (drawer.isDrawerOpen(GravityCompat.START)) {

@@ -5,6 +5,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -25,11 +31,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import androidx.annotation.DrawableRes;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatSeekBar;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -155,6 +156,15 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         );
 
         bottomSheetDelegate.onSlide(0f);
+        if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
+            bottomSheetBehavior.setState(STATE_COLLAPSED);
+        }
+    }
+
+    @Override
+    public void collapseBottomPanelSmoothly() {
+        bottomSheetStateListener.call(false);
+
         if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
         }

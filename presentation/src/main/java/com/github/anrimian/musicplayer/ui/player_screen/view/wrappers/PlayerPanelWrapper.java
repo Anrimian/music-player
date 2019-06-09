@@ -6,6 +6,8 @@ public interface PlayerPanelWrapper {
 
     void collapseBottomPanel();
 
+    void collapseBottomPanelSmoothly();
+
     void expandBottomPanel();
 
     void openPlayQueue();
