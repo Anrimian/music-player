@@ -4,6 +4,7 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -44,6 +45,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final LibraryFilesInteractor interactor;
     private final MusicPlayerInteractor playerInteractor;
+    private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
@@ -93,11 +95,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFilesInteractor interactor,
                                    MusicPlayerInteractor playerInteractor,
+                                   DisplaySettingsInteractor displaySettingsInteractor,
                                    ErrorParser errorParser,
                                    Scheduler uiScheduler) {
         this.path = path;
         this.interactor = interactor;
         this.playerInteractor = playerInteractor;
+        this.displaySettingsInteractor = displaySettingsInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
@@ -114,6 +118,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         getViewState().showSearchMode(false);
 
         loadMusic();
+        subscribeOnUiSettings();
     }
 
     @Override
@@ -417,5 +422,15 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         }
         getViewState().showQueueActions(currentComposition != null);
         getViewState().showCurrentPlayingComposition(currentComposition);
+    }
+
+    private void subscribeOnUiSettings() {
+        presenterDisposable.add(displaySettingsInteractor.getCoversEnabledObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onUiSettingsReceived, errorParser::logError));
+    }
+
+    private void onUiSettingsReceived(boolean isCoversEnabled) {
+        getViewState().setDisplayCoversEnabled(isCoversEnabled);
     }
 }

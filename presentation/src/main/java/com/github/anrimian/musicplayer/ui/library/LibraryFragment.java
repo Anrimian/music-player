@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 
@@ -17,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 
-public class LibraryFragment extends MvpAppCompatFragment {
+public class LibraryFragment extends MvpAppCompatFragment implements FragmentLayerListener {
 
     private UiStatePreferences uiStatePreferences;
 
@@ -25,11 +26,14 @@ public class LibraryFragment extends MvpAppCompatFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        uiStatePreferences = Components.getAppComponent().uiStatePreferences();
+    }
+
+    @Override
+    public void onFragmentMovedOnTop() {
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.library);
         toolbar.setTitleClickListener(this::onLibraryTitleClicked);
-
-        uiStatePreferences = Components.getAppComponent().uiStatePreferences();
     }
 
     private void onLibraryTitleClicked(View view) {

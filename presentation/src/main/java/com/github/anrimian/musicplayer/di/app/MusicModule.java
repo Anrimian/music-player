@@ -6,7 +6,6 @@ import android.content.Context;
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
@@ -14,6 +13,7 @@ import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRep
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.business.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.domain.repositories.MusicProviderReposito
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
+import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -67,7 +68,7 @@ class MusicModule {
     @Singleton
     PlayQueueRepository playQueueRepositoryNew(PlayQueueDaoWrapper playQueueDao,
                                                StorageMusicDataSource storageMusicDataSource,
-                                               SettingsPreferences settingsPreferences,
+                                               SettingsRepository settingsPreferences,
                                                UiStatePreferences uiStatePreferences,
                                                @Named(DB_SCHEDULER) Scheduler dbScheduler) {
         return new PlayQueueRepositoryImpl(playQueueDao,
@@ -98,11 +99,18 @@ class MusicModule {
     @Singleton
     MusicProviderRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
                                                     MusicFolderDataSource musicFolderDataSource,
-                                                    SettingsPreferences settingsPreferences,
+                                                    SettingsRepository settingsPreferences,
                                                     @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MusicProviderRepositoryImpl(storageMusicDataSource,
                 musicFolderDataSource,
                 settingsPreferences,
                 scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    MusicServiceInteractor musicServiceInteractor(SettingsRepository settingsRepository) {
+        return new MusicServiceInteractor(settingsRepository);
     }
 }

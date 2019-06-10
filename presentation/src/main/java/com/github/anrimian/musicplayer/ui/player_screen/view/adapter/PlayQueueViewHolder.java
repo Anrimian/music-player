@@ -69,11 +69,15 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
         compositionItemWrapper.showAsDraggingItem(dragging);
     }
 
-    void bind(@Nonnull PlayQueueItem item) {
+    void bind(@Nonnull PlayQueueItem item, boolean showCovers) {
         this.playQueueItem = item;
         this.composition = item.getComposition();
-        compositionItemWrapper.bind(composition);
+        compositionItemWrapper.bind(composition, showCovers);
 //        compositionItemWrapper.showNumber(getAdapterPosition());
+    }
+
+    void setCoversVisible(boolean visible) {
+        compositionItemWrapper.showCompositionImage(visible);
     }
 
     void showAsPlayingComposition(boolean show) {

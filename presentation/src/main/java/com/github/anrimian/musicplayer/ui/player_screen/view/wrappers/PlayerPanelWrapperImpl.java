@@ -1,9 +1,15 @@
-package com.github.anrimian.musicplayer.ui.player_screen.view.wrapper;
+package com.github.anrimian.musicplayer.ui.player_screen.view.wrappers;
 
 import android.app.Activity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
@@ -25,11 +31,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import androidx.annotation.DrawableRes;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatSeekBar;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -39,7 +40,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 
-public class PlayerViewWrapperImpl implements PlayerViewWrapper {
+public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
 
     @Nullable
     @BindView(R.id.coordinator_bottom_sheet)
@@ -118,11 +119,11 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
     private BottomSheetBehavior<View> bottomSheetBehavior;
     private SlideDelegate bottomSheetDelegate;
 
-    public PlayerViewWrapperImpl(View view,
-                                 Activity activity,
-                                 Runnable onBottomSheetDragCollapsed,
-                                 Runnable onBottomSheetDragExpanded,
-                                 Callback<Boolean> bottomSheetStateListener) {
+    public PlayerPanelWrapperImpl(View view,
+                                  Activity activity,
+                                  Runnable onBottomSheetDragCollapsed,
+                                  Runnable onBottomSheetDragExpanded,
+                                  Callback<Boolean> bottomSheetStateListener) {
         this.activity = activity;
         this.onBottomSheetDragCollapsed = onBottomSheetDragCollapsed;
         this.onBottomSheetDragExpanded = onBottomSheetDragExpanded;
@@ -155,6 +156,15 @@ public class PlayerViewWrapperImpl implements PlayerViewWrapper {
         );
 
         bottomSheetDelegate.onSlide(0f);
+        if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
+            bottomSheetBehavior.setState(STATE_COLLAPSED);
+        }
+    }
+
+    @Override
+    public void collapseBottomPanelSmoothly() {
+        bottomSheetStateListener.call(false);
+
         if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
         }

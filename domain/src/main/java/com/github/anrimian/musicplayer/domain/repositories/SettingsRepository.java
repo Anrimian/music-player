@@ -24,9 +24,39 @@ public interface SettingsRepository {
 
     void setCompositionsOrder(Order order);
 
+    Observable<Order> getFolderOrderObservable();
+
+    Observable<Boolean> getCoversEnabledObservable();
+
+    Observable<Boolean> getCoversInNotificationEnabledObservable();
+
+    Observable<Boolean> getColoredNotificationEnabledObservable();
+
+    Observable<Boolean> getCoversOnLockScreenEnabledObservable();
+
+    void setCoversEnabled(boolean enabled);
+
+    void setCoversInNotificationEnabled(boolean enabled);
+
+    void setColoredNotificationEnabled(boolean enabled);
+
+    void setCoversOnLockScreenEnabled(boolean enabled);
+
     Order getFolderOrder();
 
     Order getCompositionsOrder();
 
     int getSkipConstraintMillis();
+
+    boolean isCoversEnabled();
+
+    boolean isCoversInNotificationEnabled();
+
+    boolean isColoredNotificationEnabled();
+
+    boolean isCoversOnLockScreenEnabled();
+
+    boolean isDecreaseVolumeOnAudioFocusLossEnabled();
+
+    void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled);
 }

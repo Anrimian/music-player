@@ -35,6 +35,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     @Nullable
     private Composition currentComposition;
+    private boolean isCoversEnabled;
 
     public CompositionsAdapter(List<Composition> musicList,
                                HashSet<Composition> selectedCompositions) {
@@ -57,7 +58,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         viewHolders.add(holder);
 
         Composition composition = musicList.get(position);
-        holder.bind(composition);
+        holder.bind(composition, isCoversEnabled);
         boolean selected = selectedCompositions.contains(composition);
         holder.setSelected(selected);
         holder.setPlaying(composition.equals(currentComposition));
@@ -128,6 +129,13 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         currentComposition = composition;
         for (MusicViewHolder holder: viewHolders) {
             holder.setPlaying(holder.getComposition().equals(composition));
+        }
+    }
+
+    public void setCoversEnabled(boolean isCoversEnabled) {
+        this.isCoversEnabled = isCoversEnabled;
+        for (MusicViewHolder holder: viewHolders) {
+            holder.setCoversVisible(isCoversEnabled);
         }
     }
 }

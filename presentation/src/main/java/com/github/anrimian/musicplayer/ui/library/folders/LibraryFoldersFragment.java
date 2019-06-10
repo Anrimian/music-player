@@ -33,6 +33,7 @@ import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
+import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -90,6 +91,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private AdvancedToolbar toolbar;
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
+    private final DefferedObject<MusicFileSourceAdapter> adapterWrapper = new DefferedObject<>();
+
     private HeaderViewWrapper headerViewWrapper;
 
     private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
@@ -230,6 +233,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             adapter.setOnFolderClickListener(presenter::onFolderClicked);
             adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
             adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
+            adapterWrapper.setObject(adapter);
             recyclerView.setAdapter(adapter);
         } else {
             adapter.setItems(musicList);
@@ -409,6 +413,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showQueueActions(boolean show) {
         showQueueActions = show;
+    }
+
+    @Override
+    public void setDisplayCoversEnabled(boolean isCoversEnabled) {
+        adapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
     }
 
     private void onCompositionActionSelected(MenuItem menuItem) {

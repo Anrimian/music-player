@@ -53,7 +53,12 @@ public class CompositionItemWrapper {
         ButterKnife.bind(this, itemView);
     }
 
+    @Deprecated
     public void bind(Composition composition) {
+        bind(composition, true);
+    }
+
+    public void bind(Composition composition, boolean showCovers) {
         this.composition = composition;
         String compositionName = formatCompositionName(composition);
         tvMusicName.setText(compositionName);
@@ -66,9 +71,16 @@ public class CompositionItemWrapper {
                 android.R.attr.textColorPrimary;
 
         tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
+        showCompositionImage(showCovers);
+    }
 
+    public void showCompositionImage(boolean showCovers) {
         if (ivMusicIcon != null) {
-            ImageFormatUtils.displayImage(ivMusicIcon, composition);
+            if (showCovers) {
+                ImageFormatUtils.displayImage(ivMusicIcon, composition);
+            } else {
+                ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
+            }
         }
     }
 

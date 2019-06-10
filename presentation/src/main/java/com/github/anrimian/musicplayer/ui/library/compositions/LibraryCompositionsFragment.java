@@ -24,9 +24,11 @@ import com.github.anrimian.musicplayer.ui.library.compositions.adapter.Compositi
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
+import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -52,7 +54,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
 public class LibraryCompositionsFragment extends LibraryFragment implements
-        LibraryCompositionsView, BackButtonListener {
+        LibraryCompositionsView, BackButtonListener, FragmentLayerListener {
 
     @InjectPresenter
     LibraryCompositionsPresenter presenter;
@@ -68,6 +70,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
 
     private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
+    private final DefferedObject<CompositionsAdapter> adapterWrapper = new DefferedObject<>();
     private ProgressViewWrapper progressViewWrapper;
 
     private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
@@ -98,7 +101,6 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle(R.string.compositions);
         toolbar.setTextChangeListener(presenter::onSearchTextChanged);
         toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
@@ -136,6 +138,13 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
     public void onStart() {
         super.onStart();
         presenter.onStart();
+    }
+
+    @Override
+    public void onFragmentMovedOnTop() {
+        super.onFragmentMovedOnTop();
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setSubtitle(R.string.compositions);
     }
 
     @Override
@@ -228,6 +237,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
             adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
             adapter.setOnLongClickListener(presenter::onCompositionLongClick);
+            adapterWrapper.setObject(adapter);
             recyclerView.setAdapter(adapter);
         } else {
             adapter.setItems(list);
@@ -314,6 +324,11 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
     @Override
     public void showCurrentPlayingComposition(Composition composition) {
         adapter.showPlayingComposition(composition);
+    }
+
+    @Override
+    public void setDisplayCoversEnabled(boolean isCoversEnabled) {
+        adapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
     }
 
     @Override

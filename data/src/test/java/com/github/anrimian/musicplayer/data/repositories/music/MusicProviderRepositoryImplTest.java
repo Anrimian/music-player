@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.music;
 
-import com.github.anrimian.musicplayer.data.preferences.SettingsPreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
+import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
@@ -28,7 +28,7 @@ public class MusicProviderRepositoryImplTest {
 
     private StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
     private MusicFolderDataSource musicFolderDataSource = mock(MusicFolderDataSource.class);
-    private SettingsPreferences settingsPreferences = mock(SettingsPreferences.class);
+    private SettingsRepositoryImpl settingsPreferences = mock(SettingsRepositoryImpl.class);
     private Scheduler scheduler = Schedulers.trampoline();
 
     private MusicProviderRepository musicProviderRepository = new MusicProviderRepositoryImpl(

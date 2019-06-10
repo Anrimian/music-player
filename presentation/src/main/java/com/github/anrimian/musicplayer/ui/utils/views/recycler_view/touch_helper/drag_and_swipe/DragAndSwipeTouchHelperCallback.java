@@ -6,15 +6,18 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.View;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.java.CompositeCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteItemDecorator;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.RecyclerView;
+import static androidx.recyclerview.widget.ItemTouchHelper.DOWN;
+import static androidx.recyclerview.widget.ItemTouchHelper.UP;
 
 public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
@@ -60,7 +63,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
             }
         });
 
-        return new DragAndSwipeTouchHelperCallback(backgroundColor, compositeCallback);
+        return new DragAndSwipeTouchHelperCallback(backgroundColor, compositeCallback, swipeFlags);
     }
 
     public DragAndSwipeTouchHelperCallback(@ColorInt int color, Callback<Integer> swipeCallback) {
@@ -70,7 +73,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     public DragAndSwipeTouchHelperCallback(@ColorInt int color,
                                            Callback<Integer> swipeCallback,
                                            int swipeFlags) {
-        this(color, swipeCallback, swipeFlags, ItemTouchHelper.DOWN | ItemTouchHelper.UP);
+        this(color, swipeCallback, swipeFlags, UP | DOWN);
     }
 
     public DragAndSwipeTouchHelperCallback(@ColorInt int color,
@@ -137,8 +140,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public int getMovementFlags(@NonNull RecyclerView recyclerView,
                                 @NonNull RecyclerView.ViewHolder viewHolder) {
-        return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, swipeFlags)
-                | makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, dragFlags);
+        return makeMovementFlags(dragFlags, swipeFlags);
     }
 
     @Override

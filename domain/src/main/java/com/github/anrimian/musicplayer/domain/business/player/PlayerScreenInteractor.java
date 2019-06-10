@@ -1,13 +1,23 @@
 package com.github.anrimian.musicplayer.domain.business.player;
 
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+
+import io.reactivex.Observable;
 
 public class PlayerScreenInteractor {
 
-    private final UiStateRepository uiStateRepository;
+    private final MusicPlayerInteractor musicPlayerInteractor;
 
-    public PlayerScreenInteractor(UiStateRepository uiStateRepository) {
+    private final UiStateRepository uiStateRepository;
+    private final SettingsRepository settingsRepository;
+
+    public PlayerScreenInteractor(MusicPlayerInteractor musicPlayerInteractor,
+                                  UiStateRepository uiStateRepository,
+                                  SettingsRepository settingsRepository) {
+        this.musicPlayerInteractor = musicPlayerInteractor;
         this.uiStateRepository = uiStateRepository;
+        this.settingsRepository = settingsRepository;
     }
 
     public void setPlayerPanelOpen(boolean open) {
@@ -32,5 +42,9 @@ public class PlayerScreenInteractor {
 
     public int getSelectedLibraryScreen() {
         return uiStateRepository.getSelectedLibraryScreen();
+    }
+
+    public Observable<Boolean> getCoversEnabledObservable() {
+        return settingsRepository.getCoversEnabledObservable();
     }
 }

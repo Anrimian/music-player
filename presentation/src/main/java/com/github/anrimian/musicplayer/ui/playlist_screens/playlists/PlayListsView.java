@@ -5,7 +5,7 @@ import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
@@ -22,7 +22,7 @@ public interface PlayListsView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();
 
-    @StateStrategyType(AddToStartSingleStrategy.class)
+    @StateStrategyType(ListStateStrategyStrategy.class)
     void updateList(ListUpdate<PlayList> listUpdate);
 
     @StateStrategyType(OneExecutionStateStrategy.class)

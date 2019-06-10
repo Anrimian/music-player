@@ -93,15 +93,12 @@ public class PlayQueueDaoWrapper {
             int position = playQueueDao.getPosition(currentItem.getId());
             int shuffledPosition = playQueueDao.getShuffledPosition(currentItem.getId());
 
+            int increaseBy = compositions.size();
+            playQueueDao.increasePositions(increaseBy, position);
+            playQueueDao.increaseShuffledPositions(increaseBy, shuffledPosition);
+
             List<PlayQueueEntity> entities = toEntityList(compositions, position, shuffledPosition);
             List<Long> ids = playQueueDao.insertItems(entities);
-
-            int increaseBy = entities.size();
-            int afterPosition = position + increaseBy;
-            int afterShuffledPosition = shuffledPosition + increaseBy;
-            playQueueDao.increasePositions(increaseBy, afterPosition);
-            playQueueDao.increaseShuffledPositions(increaseBy, afterShuffledPosition);
-
             return toPlayQueueItems(compositions, ids);
         });
     }
@@ -189,13 +186,13 @@ public class PlayQueueDaoWrapper {
         for (Composition composition: compositions) {
             PlayQueueEntity playQueueEntity = new PlayQueueEntity();
             playQueueEntity.setAudioId(composition.getId());
-            playQueueEntity.setPosition(position);
-            playQueueEntity.setShuffledPosition(shuffledPosition);
+            playQueueEntity.setPosition(++position);
+            playQueueEntity.setShuffledPosition(++shuffledPosition);
 
             entityList.add(playQueueEntity);
 
-            position++;
-            shuffledPosition++;
+//            position++;
+//            shuffledPosition++;
         }
         return entityList;
     }

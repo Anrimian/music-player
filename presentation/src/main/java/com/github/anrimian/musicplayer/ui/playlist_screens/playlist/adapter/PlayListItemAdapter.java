@@ -18,12 +18,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHolder> {
 
+    private final boolean coversEnabled;
+
     private List<PlayListItem> musicList;
     private OnItemClickListener<Integer> onCompositionClickListener;
     private OnViewPositionItemClickListener<PlayListItem> onMenuItemClickListener;
 
-    public PlayListItemAdapter(List<PlayListItem> musicList) {
+    public PlayListItemAdapter(List<PlayListItem> musicList, boolean coversEnabled) {
         this.musicList = musicList;
+        this.coversEnabled = coversEnabled;
     }
 
     @NonNull
@@ -38,7 +41,7 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
     @Override
     public void onBindViewHolder(@NonNull PlayListItemViewHolder holder, int position) {
         PlayListItem composition = musicList.get(position);
-        holder.bind(composition);
+        holder.bind(composition, coversEnabled);
     }
 
     @Override

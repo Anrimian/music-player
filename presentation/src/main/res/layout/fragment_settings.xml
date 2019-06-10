@@ -1,7 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#ff0000">
+    android:layout_height="match_parent">
 
+    <LinearLayout
+        android:id="@+id/fl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="?android:attr/colorBackground">
+
+        <TextView
+            android:id="@+id/tv_display"
+            style="@style/Content.Text.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/display"/>
+
+        <View
+            style="@style/Divider.Horizontal"
+            android:layout_marginStart="@dimen/toolbar_content_start"/>
+
+        <TextView
+            android:id="@+id/tv_player"
+            style="@style/Content.Text.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/playing"/>
+
+    </LinearLayout>
 </FrameLayout>

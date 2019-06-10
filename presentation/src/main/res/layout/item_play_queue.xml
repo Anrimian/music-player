@@ -46,7 +46,7 @@
 
     <View
         android:id="@+id/divider"
-        style="@style/Divider.Horizontal"
+        style="@style/Divider.Horizontal.Constraint"
         android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tv_composition_name"

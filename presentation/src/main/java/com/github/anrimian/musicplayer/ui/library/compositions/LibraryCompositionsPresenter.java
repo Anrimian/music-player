@@ -5,6 +5,7 @@ import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -38,6 +39,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private final LibraryCompositionsInteractor interactor;
     private final PlayListsInteractor playListsInteractor;
     private final MusicPlayerInteractor playerInteractor;
+    private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
@@ -69,11 +71,13 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
                                         MusicPlayerInteractor playerInteractor,
+                                        DisplaySettingsInteractor displaySettingsInteractor,
                                         ErrorParser errorParser,
                                         Scheduler uiScheduler) {
         this.interactor = interactor;
         this.playListsInteractor = playListsInteractor;
         this.playerInteractor = playerInteractor;
+        this.displaySettingsInteractor = displaySettingsInteractor;
         this.errorParser = errorParser;
         this.uiScheduler = uiScheduler;
     }
@@ -83,6 +87,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         super.onFirstViewAttach();
         getViewState().showQueueActions(false);
         subscribeOnCompositions();
+        subscribeOnUiSettings();
     }
 
     @Override
@@ -355,5 +360,15 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
                 subscribeOnCurrentComposition();
             }
         }
+    }
+
+    private void subscribeOnUiSettings() {
+        presenterDisposable.add(displaySettingsInteractor.getCoversEnabledObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onUiSettingsReceived, errorParser::logError));
+    }
+
+    private void onUiSettingsReceived(boolean isCoversEnabled) {
+        getViewState().setDisplayCoversEnabled(isCoversEnabled);
     }
 }

@@ -45,13 +45,14 @@ import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositio
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
-import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.PlayerViewWrapper;
-import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.PlayerViewWrapperImpl;
-import com.github.anrimian.musicplayer.ui.player_screen.view.wrapper.TabletPlayerViewWrapper;
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapper;
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapperImpl;
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.TabletPlayerPanelWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
+import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -63,6 +64,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.D
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
+import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -172,6 +174,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     TextView tvQueueSubtitle;
 
     private PlayQueueAdapter playQueueAdapter;
+    private DefferedObject<PlayQueueAdapter> playQueueAdapterWrapper = new DefferedObject<>();
 
     private int selectedDrawerItemId = NO_ITEM;
     private int itemIdToStart = NO_ITEM;
@@ -183,7 +186,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private FragmentNavigation navigation;
 
-    private PlayerViewWrapper playerViewWrapper;
+    private PlayerPanelWrapper playerPanelWrapper;
 
     public static PlayerFragment newInstance() {
         return newInstance(false);
@@ -247,10 +250,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionModeChanged);
 
         if (mlBottomSheet == null) {
-            playerViewWrapper = new TabletPlayerViewWrapper(view,
+            playerPanelWrapper = new TabletPlayerPanelWrapper(view,
                     drawerLockStateProcessor::onBottomSheetOpened);
         } else {
-            playerViewWrapper = new PlayerViewWrapperImpl(view,
+            playerPanelWrapper = new PlayerPanelWrapperImpl(view,
                     requireActivity(),
                     presenter::onBottomPanelCollapsed,
                     presenter::onBottomPanelExpanded,
@@ -271,7 +274,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         toolbar.setupWithNavigation(navigation,
                 drawerArrowDrawable,
-                () -> playerViewWrapper.isBottomPanelExpanded());
+                () -> playerPanelWrapper.isBottomPanelExpanded());
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
@@ -282,7 +285,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         DragAndSwipeTouchHelperCallback callback = DragAndSwipeTouchHelperCallback.withSwipeToDelete(rvPlayList,
                 getColorFromAttr(requireContext(), R.attr.listBackground),
-                presenter::onItemSwipedToDelete);
+                presenter::onItemSwipedToDelete,
+                ItemTouchHelper.START);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvPlayList);
@@ -348,8 +352,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public boolean onBackPressed() {
-        if (playerViewWrapper.isBottomPanelExpanded()) {
-            playerViewWrapper.collapseBottomPanel();
+        if (playerPanelWrapper.isBottomPanelExpanded()) {
+            playerPanelWrapper.collapseBottomPanelSmoothly();
             return true;
         }
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -381,12 +385,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void expandBottomPanel() {
-        playerViewWrapper.expandBottomPanel();
+        playerPanelWrapper.expandBottomPanel();
     }
 
     @Override
     public void collapseBottomPanel() {
-        playerViewWrapper.collapseBottomPanel();
+        playerPanelWrapper.collapseBottomPanel();
     }
 
     @Override
@@ -457,7 +461,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showCurrentQueueItem(@Nullable PlayQueueItem item) {
+    public void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover) {
         animateVisibility(bottomSheetTopShadow, VISIBLE);
         animateVisibility(rvPlayList, VISIBLE);//TODO blink on jump to item on start
 
@@ -482,7 +486,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             seekBarViewWrapper.setMax(composition.getDuration());
             topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, compositionName));
 
-            ImageFormatUtils.displayImage(ivMusicIcon, composition);
+            if (showCover) {
+                ImageFormatUtils.displayImage(ivMusicIcon, composition);
+            } else {
+                ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
+            }
 
             playQueueAdapter.onCurrentItemChanged(item);
         }
@@ -516,6 +524,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         List<PlayQueueItem> list = update.getNewList();
         if (playQueueAdapter == null) {
             playQueueAdapter = new PlayQueueAdapter(list);
+            playQueueAdapterWrapper.setObject(playQueueAdapter);
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
             playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
             playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
@@ -556,11 +565,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showRandomPlayingButton(boolean active) {
         btnRandomPlay.setSelected(active);
         if (active) {
-//            int selectedColor = getColorFromAttr(requireContext(), R.attr.colorAccent);
-//            btnRandomPlay.setColorFilter(selectedColor);
             btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(false));
         } else {
-//            btnRandomPlay.clearColorFilter();
             btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(true));
         }
     }
@@ -585,15 +591,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void setSkipToNextButtonEnabled(boolean enabled) {
-//        int color = enabled? ContextCompat.getColor(requireContext(), R.color.icon_color) :
-//                getColorFromAttr(requireContext(), R.attr.colorControlNormal);
-//        ivSkipToNext.setColorFilter(color);
         ivSkipToNext.setEnabled(enabled);
     }
 
     @Override
     public void notifyItemMoved(int from, int to) {
         playQueueAdapter.notifyItemMoved(from, to);
+    }
+
+    @Override
+    public void setPlayQueueCoversEnabled(boolean isCoversEnabled) {
+        playQueueAdapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
     }
 
     @Override
@@ -640,7 +648,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     public void openPlayQueue() {
         presenter.onOpenPlayQueueClicked();
-        playerViewWrapper.openPlayQueue();
+        playerPanelWrapper.openPlayQueue();
     }
 
     private boolean onPlayQueueMenuItemClicked(MenuItem menuItem) {
@@ -702,19 +710,24 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private boolean onNavigationItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (selectedDrawerItemId != itemId) {
+        boolean selected = false;
+        if (itemId == R.id.menu_settings) {
+            navigation.addNewFragment(new SettingsFragment());
+        } else if (selectedDrawerItemId != itemId) {
             selectedDrawerItemId = itemId;
             itemIdToStart = itemId;
             clearFragment();
+            selected = true;
         }
         drawer.closeDrawer(GravityCompat.START);
-        return true;
+        return selected;
     }
 
     private void onDrawerClosed() {
         if (itemIdToStart != NO_ITEM) {
             int screenId = ScreensMap.getScreenId(itemIdToStart);
             presenter.onDrawerScreenSelected(screenId);
+            itemIdToStart = NO_ITEM;
         }
     }
 

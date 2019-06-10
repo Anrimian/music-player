@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
@@ -42,12 +42,12 @@ public interface PlayerView extends MvpView {
     void setMusicControlsEnabled(boolean show);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentQueueItem(@Nullable PlayQueueItem item);
+    void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void scrollQueueToPosition(int position, boolean smoothScroll);
 
-    @StateStrategyType(AddToStartSingleStrategy.class)
+    @StateStrategyType(ListStateStrategyStrategy.class)
     void updatePlayQueue(ListUpdate<PlayQueueItem> update, boolean keepPosition);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
@@ -94,4 +94,7 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void notifyItemMoved(int from, int to);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void setPlayQueueCoversEnabled(boolean isCoversEnabled);
 }

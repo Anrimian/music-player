@@ -11,7 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderF
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.AddToStartSingleStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
@@ -52,7 +52,7 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goBackToParentFolderScreen();
 
-    @StateStrategyType(AddToStartSingleStrategy.class)
+    @StateStrategyType(ListStateStrategyStrategy.class)
     void updateList(ListUpdate<FileSource> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
@@ -105,4 +105,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showQueueActions(boolean show);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void setDisplayCoversEnabled(boolean isCoversEnabled);
 }

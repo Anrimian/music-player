@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.di.app.library.compositions;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -30,11 +31,13 @@ public class LibraryCompositionsModule {
     LibraryCompositionsPresenter libraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                                               PlayListsInteractor playListsInteractor,
                                                               MusicPlayerInteractor playerInteractor,
+                                                              DisplaySettingsInteractor displaySettingsInteractor,
                                                               @Named(STORAGE_ERROR_PARSER) ErrorParser errorParser,
                                                               @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new LibraryCompositionsPresenter(interactor,
                 playListsInteractor,
                 playerInteractor,
+                displaySettingsInteractor,
                 errorParser,
                 uiScheduler);
     }

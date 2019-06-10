@@ -41,6 +41,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
+    private final CompositeDisposable batterySafeDisposable = new CompositeDisposable();
 
     private List<PlayQueueItem> playQueue = new ArrayList<>();
 
@@ -49,6 +50,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             PlayQueueItemHelper::areSourcesTheSame);
 
     private PlayQueueItem currentItem;
+    private boolean isCoversEnabled = false;
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
@@ -80,6 +82,13 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         } else {
             getViewState().collapseBottomPanel();
         }
+        subscribeOnUiSettings();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenterDisposable.dispose();
     }
 
     void onStart() {
@@ -92,7 +101,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onStop() {
         jumpToNewItem = true;
-        presenterDisposable.clear();
+        batterySafeDisposable.clear();
     }
 
     void onCurrentScreenRequested() {
@@ -295,7 +304,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnCurrentCompositionChanging() {
-        presenterDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
+        batterySafeDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayQueueEventReceived));
     }
@@ -309,7 +318,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
         this.currentItem = newItem;
-        getViewState().showCurrentQueueItem(newItem);
+        getViewState().showCurrentQueueItem(newItem, isCoversEnabled);
         if (newItem != null) {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
             Integer position = musicPlayerInteractor.getQueuePosition(newItem);
@@ -320,7 +329,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnPlayerStateChanges() {
-        presenterDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+        batterySafeDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayerStateChanged));
     }
@@ -338,7 +347,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnPlayQueue() {
-        presenterDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
+        batterySafeDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
                 .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError));
@@ -376,7 +385,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnTrackPositionChanging() {
-        presenterDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
+        batterySafeDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onTrackPositionChanged));
     }
@@ -385,6 +394,20 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (currentItem != null) {
             long duration = currentItem.getComposition().getDuration();
             getViewState().showTrackState(currentPosition, duration);
+        }
+    }
+
+    private void subscribeOnUiSettings() {
+        presenterDisposable.add(playerScreenInteractor.getCoversEnabledObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onUiSettingsReceived, errorParser::logError));
+    }
+
+    private void onUiSettingsReceived(boolean isCoversEnabled) {
+        this.isCoversEnabled = isCoversEnabled;
+        getViewState().setPlayQueueCoversEnabled(isCoversEnabled);
+        if (currentItem != null) {
+            getViewState().showCurrentQueueItem(currentItem, isCoversEnabled);
         }
     }
 }
