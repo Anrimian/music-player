@@ -1,0 +1,63 @@
+package com.github.anrimian.musicplayer.ui.about;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.github.anrimian.musicplayer.BuildConfig;
+import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrPosition;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class AboutAppFragment extends Fragment implements FragmentLayerListener {
+
+    @BindView(R.id.fl_container)
+    View flContainer;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_about, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
+
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+
+        FragmentNavigation navigation = FragmentNavigation.from(requireFragmentManager());
+
+//        tvDisplay.setOnClickListener(v -> navigation.addNewFragment(new DisplaySettingsFragment()));
+//        tvPlayer.setOnClickListener(v -> navigation.addNewFragment(new PlayerSettingsFragment()));
+
+        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
+        SlidrPanel.replace(flContainer,
+                slidrConfig,
+                () -> navigation.goBack(0),
+                toolbar::onStackFragmentSlided);
+    }
+
+    @Override
+    public void onFragmentMovedOnTop() {
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.app_name);
+        toolbar.setSubtitle(getString(R.string.version_template, BuildConfig.VERSION_NAME));
+        toolbar.setTitleClickListener(null);
+    }
+}

@@ -37,6 +37,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
+import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
@@ -712,6 +713,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         boolean selected = false;
         if (itemId == R.id.menu_settings) {
             navigation.addNewFragment(new SettingsFragment());
+        } else if (itemId == R.id.menu_about) {
+            navigation.addNewFragment(new AboutAppFragment());
         } else if (selectedDrawerItemId != itemId) {
             selectedDrawerItemId = itemId;
             itemIdToStart = itemId;

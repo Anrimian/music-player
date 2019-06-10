@@ -15,6 +15,10 @@
             android:icon="@drawable/ic_settings"
             android:title="@string/settings"/>
 
+        <item android:id="@+id/menu_about"
+            android:icon="@drawable/ic_info"
+            android:title="@string/about_app"/>
+
     </group>
 
 </menu>

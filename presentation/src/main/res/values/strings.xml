@@ -109,6 +109,8 @@
     <string name="display">Display</string>
     <string name="decrease_volume_on_notification">Decrease volume when notification received</string>
     <string name="playing">Player</string>
+    <string name="about_app">About</string>
+    <string name="version_template">Version %s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
