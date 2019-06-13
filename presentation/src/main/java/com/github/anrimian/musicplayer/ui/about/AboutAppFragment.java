@@ -2,6 +2,9 @@ package com.github.anrimian.musicplayer.ui.about;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,10 +24,14 @@ import com.r0adkll.slidr.model.SlidrPosition;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.sendEmail;
+
 public class AboutAppFragment extends Fragment implements FragmentLayerListener {
 
     @BindView(R.id.fl_container)
     View flContainer;
+
+
 
     @Nullable
     @Override
@@ -38,6 +45,8 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+
+        setHasOptionsMenu(true);
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
 
@@ -59,5 +68,23 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
         toolbar.setTitle(R.string.app_name);
         toolbar.setSubtitle(getString(R.string.version_template, BuildConfig.VERSION_NAME));
         toolbar.setTitleClickListener(null);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.about_app_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_email: {
+                sendEmail(requireContext(), getString(R.string.feedback_email));
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 }

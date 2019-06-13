@@ -10,12 +10,15 @@
         android:orientation="vertical"
         android:background="?android:attr/colorBackground">
 
-        <!--<TextView-->
-            <!--android:id="@+id/tv_display"-->
-            <!--style="@style/Content.Text.Button"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/display"/>-->
+        <TextView
+            android:id="@+id/tv_about"
+            style="@style/Content.Text.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginTop="@dimen/content_vertical_margin"
+            android:text="@string/about_app_text"/>
 
         <!--<View-->
             <!--style="@style/Divider.Horizontal"-->

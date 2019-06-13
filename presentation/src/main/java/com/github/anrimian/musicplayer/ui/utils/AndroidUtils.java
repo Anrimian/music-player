@@ -1,28 +1,31 @@
 package com.github.anrimian.musicplayer.ui.utils;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DimenRes;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import static android.text.TextUtils.isEmpty;
+
 /**
  * Created on 16.02.2017.
  */
 
-@SuppressWarnings("WeakerAccess")
 public class AndroidUtils {
 
     public static int dpToPx(int dp, Context ctx) {
@@ -92,9 +95,7 @@ public class AndroidUtils {
             Window window = activity.getWindow();
             if (window != null) {
                 View decorView = window.getDecorView();
-                if (decorView != null) {
-                    return decorView.findViewById(android.R.id.content);
-                }
+                return decorView.findViewById(android.R.id.content);
             }
         }
         return null;
@@ -103,6 +104,19 @@ public class AndroidUtils {
     public static void setStatusBarColor(Window window, @ColorInt int color) {
         if (Build.VERSION.SDK_INT >= 21) {
             window.setStatusBarColor(color);
+        }
+    }
+
+    public static void sendEmail(Context ctx, String email) {
+        if (isEmpty(email)) {
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email, null));
+        try {
+            ctx.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            //very low possibility, don't translate yet
+            Toast.makeText(ctx, "Mail app  not found", Toast.LENGTH_SHORT).show();
         }
     }
 }

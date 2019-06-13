@@ -113,7 +113,12 @@
     <string name="playing">Проигрывание</string>
     <string name="about_app">О приложении</string>
     <string name="version_template">Версия %s</string>
-
+    <string name="about_app_text">Нашли ошибку?
+        Экран отображается некорректо или медленно?
+        Недостаёт какой-либо функциональности?
+        Напишите мне об этом, буду благодарен обратной связи.
+    </string>
+    <string name="send_email">Отправить email</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

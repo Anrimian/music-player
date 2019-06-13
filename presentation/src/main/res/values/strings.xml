@@ -1,5 +1,6 @@
 <resources>
     <string name="file_provider_authorities" translatable="false">share_file_provider</string>
+    <string name="feedback_email" translatable="false">anrimian.developer@gmail.com</string>
 
     <string name="app_name" translatable="false">Music Player</string>
     <string name="open_drawer">Open drawer</string>
@@ -111,6 +112,12 @@
     <string name="playing">Player</string>
     <string name="about_app">About</string>
     <string name="version_template">Version %s</string>
+    <string name="about_app_text">Found a issue?
+         Is the screen displayed incorrectly or slowly?
+         Lacking any features?
+         Write me about it, I will be appreciated for feedback.
+    </string>
+    <string name="send_email">Send email</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
