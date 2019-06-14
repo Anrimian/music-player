@@ -2,17 +2,19 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
+import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 
-import androidx.annotation.NonNull;
 import dagger.Module;
 import dagger.Provides;
 
@@ -62,5 +64,12 @@ public class AppModule {
     @Singleton
     Analytics analytics() {
         return new AnalyticsImpl();
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    ThemeController themeController(Context context) {
+        return new ThemeController(context);
     }
 }
