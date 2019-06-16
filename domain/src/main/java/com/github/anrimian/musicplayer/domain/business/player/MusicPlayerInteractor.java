@@ -200,6 +200,10 @@ public class MusicPlayerInteractor {
                 .distinctUntilChanged();
     }
 
+    public PlayerState getPlayerState() {
+        return playerStateSubject.getValue();
+    }
+
     public Observable<PlayQueueEvent> getCurrentCompositionObservable() {
         return playQueueRepository.getCurrentQueueItemObservable();
     }

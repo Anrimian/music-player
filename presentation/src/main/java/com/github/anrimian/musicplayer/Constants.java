@@ -20,6 +20,7 @@ public interface Constants {
         String COMPOSITION_NAME_ARG = "composition_name_arg";
         String COMPOSITION_AUTHOR_ARG = "composition_author_arg";
         String PLAY_ARG = "play_arg";
+        String QUEUE_SIZE_ARG = "queue_size_arg";
     }
 
     interface Tags {
