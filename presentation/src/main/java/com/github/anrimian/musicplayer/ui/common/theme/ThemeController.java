@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.common.theme;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 
@@ -22,7 +23,14 @@ public class ThemeController {
     public void applyCurrentTheme(Activity activity) {
         AppTheme appTheme = AppTheme.getTheme(preferences.getInt(THEME_ID, 0));
 
-        activity.getTheme().applyStyle(appTheme.getThemeResId(), false);
+        activity.getTheme().applyStyle(appTheme.getThemeResId(), true);
+    }
+
+    //optimize
+    public void applyCurrentTheme(Resources.Theme theme) {
+        AppTheme appTheme = AppTheme.getTheme(preferences.getInt(THEME_ID, 0));
+
+        theme.applyStyle(appTheme.getThemeResId(), true);
     }
 
     public void setTheme(Activity activity, AppTheme appTheme) {

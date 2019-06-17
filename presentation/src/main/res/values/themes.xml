@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="PrimaryLightTheme">
+    <style name="PrimaryLightTheme" parent="AppTheme.Drawer">
         <!--<item name="colorPrimary">@color/colorPrimary</item>-->
         <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
         <!--<item name="colorAccent">@color/colorAccent</item>-->
@@ -15,8 +15,8 @@
         <item name="colorPrimaryDark">@color/secondColorPrimaryDark</item>
         <item name="colorAccent">@color/secondColorAccent</item>
 
-        <item name="listBackground">@color/back_two</item>
-        <item name="listItemBackground">@color/back_three</item>
+        <!--<item name="listBackground">@color/back_two</item>-->
+        <!--<item name="listItemBackground">@color/back_three</item>-->
     </style>
 
 </resources>
