@@ -6,15 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 /**
  * Created on 19.10.2017.
@@ -27,6 +28,8 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
     private ProgressViewWrapper progressViewWrapper;
 
+    private RxPermissions rxPermissions;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -36,14 +39,16 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        rxPermissions = new RxPermissions(requireActivity());
+
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
     }
 
     @Override
     public void requestFilesPermissions() {
-        new RxPermissions(requireActivity())
-                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .subscribe(presenter::onFilesPermissionResult);
     }
 
@@ -55,6 +60,11 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     @Override
     public void showStub() {
         progressViewWrapper.hideAll();
+    }
+
+    @Override
+    public void startSystemUi() {
+        Components.getAppComponent().widgetUpdater().start();
     }
 
     @Override

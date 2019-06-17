@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
+import com.github.anrimian.musicplayer.utils.Permissions;
 
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
@@ -24,11 +25,9 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEU
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
 import static com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater.ACTION_UPDATE_COMPOSITION;
-import static com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater.ACTION_UPDATE_PLAY_STATE;
 import static com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater.ACTION_UPDATE_QUEUE;
 
 
-//FIXME permission handle
 public class WidgetProviderSmall extends AppWidgetProvider {
 
     @Override
@@ -54,12 +53,10 @@ public class WidgetProviderSmall extends AppWidgetProvider {
             queueSize = WidgetDataHolder.getCurrentQueueSize(context);
         }
 
-        boolean play = Components.getAppComponent().musicPlayerInteractor().getPlayerState() == PlayerState.PLAY;
-        if (ACTION_UPDATE_PLAY_STATE.equals(intent.getAction())) {
-            //FIXME get actual data in different way?
-            play = Components.getAppComponent().musicPlayerInteractor().getPlayerState() == PlayerState.PLAY;//intent.getBooleanExtra(PLAY_ARG, false);
+        boolean play = false;
+        if (Permissions.hasFilePermission(context)) {
+            play = Components.getAppComponent().musicPlayerInteractor().getPlayerState() == PlayerState.PLAY;
         }
-
 
         int[] ids = appWidgetManager.getAppWidgetIds(thisAppWidget);
         for (int widgetId : ids) {

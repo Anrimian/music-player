@@ -1,10 +1,8 @@
 package com.github.anrimian.musicplayer.infrastructure.service.music;
 
-import android.Manifest;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,7 +17,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.media.session.MediaButtonReceiver;
 
 import com.github.anrimian.musicplayer.R;
@@ -34,7 +31,7 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
-import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
+import com.github.anrimian.musicplayer.utils.Permissions;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -94,9 +91,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Inject
     Scheduler uiScheduler;
 
-    @Inject
-    WidgetUpdater widgetUpdater;
-
     public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
     public Builder stateBuilder = new Builder()
             .setActions(ACTION_PLAY
@@ -126,17 +120,16 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     public void onCreate() {
         super.onCreate();
         Log.d("KEK", "onCreate");
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+
+        mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
+
+        if (!Permissions.hasFilePermission(this)) {
             stopSelf();//maybe also show notification
             return;
         }
         Components.getAppComponent().inject(this);
-        widgetUpdater.start();
 
-        mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
         mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS | FLAG_HANDLES_TRANSPORT_CONTROLS);
-
         mediaSession.setCallback(mediaSessionCallback);
 
         Intent activityIntent = new Intent(this, MainActivity.class);

@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.utils.Permissions;
 
 import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
@@ -18,13 +19,17 @@ public class WidgetActionsReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        MusicPlayerInteractor interactor = Components.getAppComponent().musicPlayerInteractor();
+        if (!Permissions.hasFilePermission(context)) {
+            return;//TODO show notif
+        }
 
         int action = intent.getIntExtra(REQUEST_CODE, 0);
 
         if (action == 0) {
             return;
         }
+
+        MusicPlayerInteractor interactor = Components.getAppComponent().musicPlayerInteractor();
         switch (action) {
             case SKIP_TO_PREVIOUS: {
                 interactor.skipToPrevious();

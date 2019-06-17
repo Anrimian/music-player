@@ -232,7 +232,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     .commit();
             return;
         }
-        Components.getAppComponent().widgetUpdater().start();
 
         toolbar.initializeViews(requireActivity().getWindow());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
