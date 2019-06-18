@@ -118,6 +118,7 @@
          Write me about it, I will be appreciated for feedback.
     </string>
     <string name="send_email">Send email</string>
+    <string name="theme">Theme</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

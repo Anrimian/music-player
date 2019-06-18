@@ -6,19 +6,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsFragment;
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsFragment;
+import com.github.anrimian.musicplayer.ui.settings.themes.ThemeSettingsFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -36,6 +38,9 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
 
     @BindView(R.id.tv_player)
     TextView tvPlayer;
+
+    @BindView(R.id.tv_theme_name)
+    TextView tvTheme;
 
     private FragmentNavigation navigation;
 
@@ -58,6 +63,7 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
 
         tvDisplay.setOnClickListener(v -> navigation.addNewFragment(new DisplaySettingsFragment()));
         tvPlayer.setOnClickListener(v -> navigation.addNewFragment(new PlayerSettingsFragment()));
+        tvTheme.setOnClickListener(v -> navigation.addNewFragment(new ThemeSettingsFragment()));
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
         SlidrPanel.replace(flContainer,
