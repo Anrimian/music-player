@@ -255,6 +255,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         } else {
             playerPanelWrapper = new PlayerPanelWrapperImpl(view,
                     requireActivity(),
+                    savedInstanceState,
                     presenter::onBottomPanelCollapsed,
                     presenter::onBottomPanelExpanded,
                     drawerLockStateProcessor::onBottomSheetOpened);

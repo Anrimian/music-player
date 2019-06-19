@@ -30,7 +30,6 @@ public class ThemeController {
 
         activity.getTheme().applyStyle(appTheme.getThemeResId(), true);
 
-        //TODO animation
         activity.recreate();
     }
 }
