@@ -42,8 +42,10 @@ import static com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils.
 public class NotificationsDisplayer {
 
     public static final int FOREGROUND_NOTIFICATION_ID = 1;
+    public static final int ERROR_NOTIFICATION_ID = 2;
 
     public static final String FOREGROUND_CHANNEL_ID = "0";
+    public static final String ERROR_CHANNEL_ID = "1";
 
     private final Context context;
     private final NotificationManager notificationManager;
@@ -57,10 +59,43 @@ public class NotificationsDisplayer {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
-                    getString(R.string.foreground_channel_id),
+                    getString(R.string.foreground_channel_description),
                     NotificationManager.IMPORTANCE_LOW);
             notificationManager.createNotificationChannel(channel);
+
+            NotificationChannel errorChannel = new NotificationChannel(ERROR_CHANNEL_ID,
+                    getString(R.string.error_channel_description),
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(errorChannel);
         }
+    }
+
+    public void showErrorNotification(@StringRes int errorMessageId) {
+        Intent intent = new Intent(context, MainActivity.class);
+        PendingIntent pIntent = PendingIntent.getActivity(context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        Notification notification = new NotificationCompat.Builder(context, ERROR_CHANNEL_ID)
+                .setContentTitle(context.getString(R.string.playing_error))
+                .setContentText(context.getString(errorMessageId))
+                .setColor(getColor(context, R.color.default_notification_color))
+                .setSmallIcon(R.drawable.ic_music_box)
+                .setVibrate(new long[]{100L, 100L})
+                .setContentIntent(pIntent)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .build();
+
+        notificationManager.notify(ERROR_NOTIFICATION_ID, notification);
+
+    }
+
+    public void removeErrorNotification() {
+        notificationManager.cancel(ERROR_NOTIFICATION_ID);
     }
 
     public Notification getForegroundNotification(boolean play,
@@ -70,16 +105,6 @@ public class NotificationsDisplayer {
         return getDefaultMusicNotification(play, composition, mediaSession, notificationSetting)
                 .build();
     }
-
-//    public Notification getStubNotification() {
-//        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
-//                .setContentTitle(getString(R.string.preparing_for_launch))
-//                .setSmallIcon(R.drawable.ic_music_box)
-//                .setPriority(NotificationCompat.PRIORITY_HIGH)
-//                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-//                .build();
-//    }
-
 
     public void updateForegroundNotification(boolean play,
                                              @Nullable PlayQueueItem composition,

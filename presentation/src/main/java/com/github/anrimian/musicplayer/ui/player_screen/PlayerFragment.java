@@ -224,6 +224,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        //FIXME: possible here: start playing, hide app, revoke permission, open
         RxPermissions rxPermissions = new RxPermissions(requireActivity());
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             requireFragmentManager()

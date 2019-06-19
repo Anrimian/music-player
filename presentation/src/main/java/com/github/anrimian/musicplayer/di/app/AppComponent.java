@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
+import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
@@ -48,6 +49,7 @@ public interface AppComponent {
     UiStatePreferences uiStatePreferences();
 
     WidgetUpdater widgetUpdater();
+    NotificationsDisplayer notificationDisplayer();
 
     void inject(MusicService musicService);
 }

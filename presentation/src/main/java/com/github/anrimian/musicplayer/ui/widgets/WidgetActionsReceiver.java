@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
@@ -19,8 +21,10 @@ public class WidgetActionsReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        AppComponent appComponent = Components.getAppComponent();
         if (!Permissions.hasFilePermission(context)) {
-            return;//TODO show notif
+            appComponent.notificationDisplayer().showErrorNotification(R.string.no_file_permission);
+            return;
         }
 
         int action = intent.getIntExtra(REQUEST_CODE, 0);
@@ -29,7 +33,7 @@ public class WidgetActionsReceiver extends BroadcastReceiver {
             return;
         }
 
-        MusicPlayerInteractor interactor = Components.getAppComponent().musicPlayerInteractor();
+        MusicPlayerInteractor interactor = appComponent.musicPlayerInteractor();
         switch (action) {
             case SKIP_TO_PREVIOUS: {
                 interactor.skipToPrevious();

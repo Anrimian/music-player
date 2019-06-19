@@ -21,6 +21,7 @@ import androidx.media.session.MediaButtonReceiver;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -78,8 +79,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     public static final String REQUEST_CODE = "request_code";
 
-    @Inject
-    NotificationsDisplayer notificationsDisplayer;
+    private NotificationsDisplayer notificationsDisplayer;
 
     @Inject
     MusicPlayerInteractor musicPlayerInteractor;
@@ -123,11 +123,15 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
 
+        AppComponent appComponent = Components.getAppComponent();
+        notificationsDisplayer = appComponent.notificationDisplayer();
+
         if (!Permissions.hasFilePermission(this)) {
-            stopSelf();//maybe also show notification
+            notificationsDisplayer.showErrorNotification(R.string.no_file_permission);//test it
+            stopSelf();
             return;
         }
-        Components.getAppComponent().inject(this);
+        appComponent.inject(this);
 
         mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS | FLAG_HANDLES_TRANSPORT_CONTROLS);
         mediaSession.setCallback(mediaSessionCallback);
