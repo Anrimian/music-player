@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.widgets;
+package com.github.anrimian.musicplayer.ui.widgets.providers;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -12,6 +12,8 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
+import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
+import com.github.anrimian.musicplayer.ui.widgets.WidgetDataHolder;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
 import static android.text.TextUtils.isEmpty;
@@ -68,7 +70,6 @@ public class WidgetProviderSmall extends AppWidgetProvider {
                     compositionAuthor,
                     queueSize);
         }
-
     }
 
     private void updateWidget(Context context,

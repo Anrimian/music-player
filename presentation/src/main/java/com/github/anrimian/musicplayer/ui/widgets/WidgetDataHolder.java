@@ -13,17 +13,17 @@ public class WidgetDataHolder {
     private static final String CURRENT_COMPOSITION_AUTHOR = "current_composition_author";
     private static final String CURRENT_QUEUE_SIZE = "current_queue_size";
 
-    public static void setCompositionName(Context context, String compositionName) {
+    static void setCompositionName(Context context, String compositionName) {
         SharedPreferencesHelper preferences = getPreferences(context);
         preferences.putString(CURRENT_COMPOSITION, compositionName);
     }
 
-    public static void setCompositionAuthor(Context context, String author) {
+    static void setCompositionAuthor(Context context, String author) {
         SharedPreferencesHelper preferences = getPreferences(context);
         preferences.putString(CURRENT_COMPOSITION_AUTHOR, author);
     }
 
-    public static void setCurrentQueueSize(Context context, int size) {
+    static void setCurrentQueueSize(Context context, int size) {
         SharedPreferencesHelper preferences = getPreferences(context);
         preferences.putInt(CURRENT_QUEUE_SIZE, size);
     }

@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.musicplayer.ui.widgets.providers.WidgetProviderSmall;
 
 import java.util.List;
 
@@ -23,15 +24,12 @@ public class WidgetUpdater {
 
     public static final String ACTION_UPDATE_COMPOSITION = "action_update_composition";
     public static final String ACTION_UPDATE_QUEUE = "action_update_queue";
-    public static final String ACTION_UPDATE_PLAY_STATE = "action_update_play_state";
 
     private final Context context;
     private final MusicPlayerInteractor musicPlayerInteractor;
 
     private final CompositeDisposable updateDisposable = new CompositeDisposable();
 
-
-    //FIXME update when no service or activity started
     public WidgetUpdater(Context context, MusicPlayerInteractor musicPlayerInteractor) {
         this.context = context;
         this.musicPlayerInteractor = musicPlayerInteractor;
@@ -86,7 +84,6 @@ public class WidgetUpdater {
 
     private void onPlayStateReceived(PlayerState playerState) {
         Intent intent = new Intent(context, WidgetProviderSmall.class);
-        intent.setAction(ACTION_UPDATE_PLAY_STATE);
         intent.putExtra(PLAY_ARG, playerState == PlayerState.PLAY);
         context.sendBroadcast(intent);
     }
