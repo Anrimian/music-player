@@ -7,6 +7,20 @@
     </style>
 
     <style name="PrimaryDarkTheme" parent="PrimaryLightTheme">
+        <!--background-->
+        <item name="android:windowBackground">@color/primary_background_dark</item>
+        <item name="android:colorBackground">@color/primary_background_dark</item>
+        <item name="listBackground">@color/secondary_background_dark</item>
+        <item name="listItemBackground">@color/primary_background_dark</item>
+
+        <!--text-->
+        <item name="android:textColorPrimary">@color/text_color_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_color_secondary_dark</item>
+
+        <!--controls-->
+        <item name="buttonColor">@color/primary_button_color_dark</item>
+        <item name="secondaryButtonColor">@color/secondary_button_color_dark</item>
+        <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
 
     </style>
 

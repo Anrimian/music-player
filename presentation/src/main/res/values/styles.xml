@@ -7,23 +7,30 @@
     </style>
 
     <style name="AppTheme" parent="AppBaseTheme">
+        <!--primary colors-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
+        <!--control colors-->
         <item name="disabledColor">@color/disabled_color</item>
+        <item name="buttonColor">@color/primary_button_color</item>
+        <item name="secondaryButtonColor">@color/secondary_button_color</item>
 
+        <!--text colors-->
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
 
-        <item name="dividerHorizontal">@color/divider_color</item>
-
+        <!--action mode-->
         <item name="actionModeTextColor">@color/secondary_button_color</item>
         <item name="actionModeStatusBarColor">@color/selectionStatusBarColor</item>
 
+        <!--background-->
         <item name="listBackground">@color/light_light_gray</item>
         <item name="listItemBackground">@android:color/white</item>
 
+        <!--other-->
+        <item name="android:dividerHorizontal">@color/divider_color</item>
     </style>
 
     <style name="AppTheme.Drawer" parent="AppTheme">

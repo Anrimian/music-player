@@ -2,7 +2,12 @@
 <resources>
     <attr name="actionModeTextColor" format="color"/>
     <attr name="actionModeStatusBarColor" format="color"/>
+
     <attr name="listBackground" format="color"/>
     <attr name="listItemBackground" format="color"/>
+
     <attr name="disabledColor" format="color"/>
+
+    <attr name="buttonColor" format="color"/>
+    <attr name="secondaryButtonColor" format="color"/>
 </resources>
