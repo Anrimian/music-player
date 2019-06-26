@@ -477,6 +477,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             String noCompositionMessage = getString(R.string.no_current_composition);
             topBottomSheetPanel.setContentDescription(noCompositionMessage);
             rvPlayList.setContentDescription(noCompositionMessage);
+            sbTrackState.setContentDescription(noCompositionMessage);
         } else {
             Composition composition = item.getComposition();
             String compositionName = formatCompositionName(composition);
@@ -485,6 +486,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
             seekBarViewWrapper.setMax(composition.getDuration());
             topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, compositionName));
+            sbTrackState.setContentDescription(null);
 
             if (showCover) {
                 ImageFormatUtils.displayImage(ivMusicIcon, composition);
