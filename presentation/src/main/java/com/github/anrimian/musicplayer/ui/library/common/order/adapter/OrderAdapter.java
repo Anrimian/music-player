@@ -1,7 +1,10 @@
-package com.github.anrimian.musicplayer.ui.common.order.adapter;
+package com.github.anrimian.musicplayer.ui.library.common.order.adapter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
@@ -9,9 +12,6 @@ import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import static java.util.Arrays.asList;
 
