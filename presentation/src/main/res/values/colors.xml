@@ -31,7 +31,10 @@
     <color name="secondColorAccent">#FF5722</color>
 
     <!--dark theme-->
-    <color name="primary_background_dark">#1f1f1f</color>
+    <color name="darkColorPrimary">#1f1f1f</color>
+    <color name="darkColorPrimaryDark">#2D2D2D</color>
+
+    <color name="primary_background_dark">#1d1d1d</color>
     <color name="secondary_background_dark">#121212</color>
 
     <color name="text_color_primary_dark">#F3F3F3</color>
@@ -41,5 +44,7 @@
     <color name="secondary_button_color_dark">#B1B1B1</color>
     <color name="color_control_highlight_dark">#4DFFFFFF</color>
 
-
+    <!--other-->
+    <color name="startShadowColor">#00000000</color>
+    <color name="endShadowColor">#33000000</color>
 </resources>

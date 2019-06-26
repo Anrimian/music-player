@@ -21,7 +21,9 @@
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
 
-        <!--action mode-->
+        <!--toolbar-->
+        <item name="toolbarColor">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="actionModeTextColor">@color/secondary_button_color</item>
         <item name="actionModeStatusBarColor">@color/selectionStatusBarColor</item>
 

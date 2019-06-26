@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="toolbarColor" format="color"/>
     <attr name="actionModeTextColor" format="color"/>
     <attr name="actionModeStatusBarColor" format="color"/>
 

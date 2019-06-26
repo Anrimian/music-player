@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="CheckboxStyle" parent="AppTheme">
+    <style name="CheckboxStyle">
         <item name="android:gravity">center_vertical</item>
         <item name="android:paddingTop">16dp</item>
         <item name="android:paddingBottom">16dp</item>
         <item name="android:paddingStart">24dp</item>
         <item name="android:textSize">@dimen/text_size_small_2</item>
+        <item name="android:textColor">@color/color_text_primary</item>
     </style>
 </resources>
