@@ -30,6 +30,7 @@
         <!--background-->
         <item name="listBackground">@color/light_light_gray</item>
         <item name="listItemBackground">@android:color/white</item>
+        <item name="playerPanelBackground">?attr/listItemBackground</item>
 
         <!--other-->
         <item name="android:dividerHorizontal">@color/divider_color</item>

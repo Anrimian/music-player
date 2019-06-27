@@ -31,11 +31,11 @@
     <color name="secondColorAccent">#FF5722</color>
 
     <!--dark theme-->
-    <color name="darkColorPrimary">#1f1f1f</color>
-    <color name="darkColorPrimaryDark">#2D2D2D</color>
+    <color name="darkColorPrimary">#2E2E2E</color>
+    <color name="darkColorPrimaryDark">#3D3D3D</color>
 
-    <color name="primary_background_dark">#1d1d1d</color>
-    <color name="secondary_background_dark">#121212</color>
+    <color name="dark_background_level_1">#1d1d1d</color>
+    <color name="dark_background_level_0">#121212</color>
 
     <color name="text_color_primary_dark">#F3F3F3</color>
     <color name="text_color_secondary_dark">#B1B1B1</color>
@@ -43,6 +43,8 @@
     <color name="primary_button_color_dark">#F1ECEC</color>
     <color name="secondary_button_color_dark">#B1B1B1</color>
     <color name="color_control_highlight_dark">#4DFFFFFF</color>
+
+    <color name="popup_menu_background">#3D3D3D</color>
 
     <!--other-->
     <color name="startShadowColor">#00000000</color>

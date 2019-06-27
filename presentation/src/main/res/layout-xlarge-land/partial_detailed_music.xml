@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/bottom_sheet_expand_height"
-    android:background="?android:attr/windowBackground">
+    android:background="?attr/playerPanelBackground">
 
     <!--uses to catch unnecessary clicks-->
     <View
