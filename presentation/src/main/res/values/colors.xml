@@ -44,7 +44,7 @@
     <color name="secondary_button_color_dark">#B1B1B1</color>
     <color name="color_control_highlight_dark">#4DFFFFFF</color>
 
-    <color name="popup_menu_background">#3D3D3D</color>
+    <color name="menu_item_background_color_dark">#3D3D3D</color>
 
     <!--other-->
     <color name="startShadowColor">#00000000</color>

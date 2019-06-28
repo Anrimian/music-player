@@ -7,6 +7,7 @@
     <attr name="listBackground" format="color"/>
     <attr name="listItemBackground" format="color"/>
     <attr name="playerPanelBackground" format="color"/>
+    <attr name="menuItemBackground" format="color"/>
 
     <attr name="disabledColor" format="color"/>
 

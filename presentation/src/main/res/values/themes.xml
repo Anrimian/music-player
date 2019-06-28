@@ -16,7 +16,7 @@
         <item name="android:colorBackground">@color/dark_background_level_1</item>
         <item name="listBackground">@color/dark_background_level_0</item>
         <item name="listItemBackground">@color/dark_background_level_1</item>
-        <item name="android:itemBackground">@color/popup_menu_background</item>
+        <item name="menuItemBackground">@color/menu_item_background_color_dark</item>
         <item name="playerPanelBackground">?attr/colorPrimary</item>
 
         <!--text-->
