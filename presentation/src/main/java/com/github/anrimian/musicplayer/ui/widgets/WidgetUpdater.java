@@ -7,7 +7,7 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.musicplayer.ui.widgets.providers.WidgetProviderSmall;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 
 public class WidgetUpdater {
 
+    public static final String WIDGET_ACTION = "widget_action";
     public static final String ACTION_UPDATE_COMPOSITION = "action_update_composition";
     public static final String ACTION_UPDATE_QUEUE = "action_update_queue";
 
@@ -53,13 +54,12 @@ public class WidgetUpdater {
     }
 
     private void onPlayQueueReceived(List<PlayQueueItem> playQueueItems) {
-        Intent intent = new Intent(context, WidgetProviderSmall.class);
-        intent.setAction(ACTION_UPDATE_QUEUE);
-        intent.putExtra(QUEUE_SIZE_ARG, playQueueItems.size());
-
         WidgetDataHolder.setCurrentQueueSize(context, playQueueItems.size());
 
-        context.sendBroadcast(intent);
+        updateWidgets(intent -> {
+            intent.putExtra(WIDGET_ACTION, ACTION_UPDATE_QUEUE);
+            intent.putExtra(QUEUE_SIZE_ARG, playQueueItems.size());
+        });
     }
 
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
@@ -70,21 +70,28 @@ public class WidgetUpdater {
             compositionName = formatCompositionName(item.getComposition());
             compositionAuthor = formatCompositionAuthor(item.getComposition(), context).toString();
         }
+        updateComposition(compositionName, compositionAuthor);
+    }
 
-        Intent intent = new Intent(context, WidgetProviderSmall.class);
-        intent.setAction(ACTION_UPDATE_COMPOSITION);
-        intent.putExtra(COMPOSITION_NAME_ARG, compositionName);
-        intent.putExtra(COMPOSITION_AUTHOR_ARG, compositionAuthor);
-
+    private void updateComposition(String compositionName, String compositionAuthor) {
         WidgetDataHolder.setCompositionName(context, compositionName);
         WidgetDataHolder.setCompositionAuthor(context, compositionAuthor);
 
-        context.sendBroadcast(intent);
+        updateWidgets(intent -> {
+            intent.putExtra(WIDGET_ACTION, ACTION_UPDATE_COMPOSITION);
+            intent.putExtra(COMPOSITION_NAME_ARG, compositionName);
+            intent.putExtra(COMPOSITION_AUTHOR_ARG, compositionAuthor);
+        });
     }
 
     private void onPlayStateReceived(PlayerState playerState) {
-        Intent intent = new Intent(context, WidgetProviderSmall.class);
-        intent.putExtra(PLAY_ARG, playerState == PlayerState.PLAY);
+        updateWidgets(intent -> intent.putExtra(PLAY_ARG, playerState == PlayerState.PLAY));
+    }
+
+    private void updateWidgets(Callback<Intent> intentCallback) {
+        Intent intent = new Intent("android.appwidget.action.APPWIDGET_UPDATE");
+        intent.setPackage(context.getPackageName());
+        intentCallback.call(intent);
         context.sendBroadcast(intent);
     }
 }
