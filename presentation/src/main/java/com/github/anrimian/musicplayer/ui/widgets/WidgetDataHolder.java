@@ -12,6 +12,9 @@ public class WidgetDataHolder {
     private static final String CURRENT_COMPOSITION = "current_composition";
     private static final String CURRENT_COMPOSITION_AUTHOR = "current_composition_author";
     private static final String CURRENT_QUEUE_SIZE = "current_queue_size";
+    private static final String CURRENT_COMPOSITION_FILE = "current_composition_file";
+    private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
+
 
     static void setCompositionName(Context context, String compositionName) {
         SharedPreferencesHelper preferences = getPreferences(context);
@@ -21,6 +24,16 @@ public class WidgetDataHolder {
     static void setCompositionAuthor(Context context, String author) {
         SharedPreferencesHelper preferences = getPreferences(context);
         preferences.putString(CURRENT_COMPOSITION_AUTHOR, author);
+    }
+
+    static void setCompositionId(Context context, long compositionId) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        preferences.putLong(CURRENT_COMPOSITION_ID, compositionId);
+    }
+
+    static void setCompositionFile(Context context, String filePath) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        preferences.putString(CURRENT_COMPOSITION_FILE, filePath);
     }
 
     static void setCurrentQueueSize(Context context, int size) {
@@ -38,9 +51,19 @@ public class WidgetDataHolder {
         return preferences.getString(CURRENT_COMPOSITION_AUTHOR);
     }
 
+    public static String getCompositionFile(Context context) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        return preferences.getString(CURRENT_COMPOSITION_FILE);
+    }
+
     public static int getCurrentQueueSize(Context context) {
         SharedPreferencesHelper preferences = getPreferences(context);
         return preferences.getInt(CURRENT_QUEUE_SIZE);
+    }
+
+    public static long getCompositionId(Context context) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        return preferences.getLong(CURRENT_COMPOSITION_ID);
     }
 
     private static SharedPreferencesHelper getPreferences(Context context) {

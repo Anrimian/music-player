@@ -19,4 +19,7 @@
     <dimen name="widget_content_margin_horizontal">16dp</dimen>
     <dimen name="widget_content_spacing_margin">8dp</dimen>
 
+    <dimen name="widget_medium_content_margin_vertical">16dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">16dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin">4dp</dimen>
 </resources>

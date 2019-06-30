@@ -3,16 +3,18 @@ package com.github.anrimian.musicplayer.ui.common.format;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.widget.ImageView;
+import android.widget.RemoteViews;
+
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.widget.ImageView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.images.ImageCache;
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 
-import java.util.HashMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -25,27 +27,45 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ImageFormatUtils {
 
-    private static final WeakHashMap<ImageView, Disposable> imageLoadingMap = new WeakHashMap<>();
+    private static final WeakHashMap<Integer, Disposable> imageLoadingMap = new WeakHashMap<>();
 
     public static void displayImage(@NonNull ImageView imageView,
                                     @NonNull Composition composition) {
         imageView.setImageResource(R.drawable.ic_music_placeholder);
-        Disposable disposable = imageLoadingMap.get(imageView);
+        int viewId = imageView.getId();
+        Disposable disposable = imageLoadingMap.get(viewId);
         if (disposable != null) {
             disposable.dispose();
         }
-        disposable = Single.fromCallable(() -> getCompositionImageOrThrow(composition))
+        disposable = Single.fromCallable(() -> getCompositionImageOrThrow(composition.getFilePath(), composition.getId()))
                 .timeout(5, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageView::setImageBitmap,
                         t -> imageView.setImageResource(R.drawable.ic_music_placeholder));
-        imageLoadingMap.put(imageView, disposable);
+        imageLoadingMap.put(viewId, disposable);
     }
 
+    public static void displayImage(@NonNull RemoteViews widgetView,
+                                    @IdRes int viewId,
+                                    @NonNull String compositionFile,
+                                    long compositionId) {
+        widgetView.setImageViewResource(viewId, R.drawable.ic_music_placeholder);
+        Disposable disposable = imageLoadingMap.get(viewId);
+        if (disposable != null) {
+            disposable.dispose();
+        }
+        disposable = Single.fromCallable(() -> getCompositionImageOrThrow(compositionFile, compositionId))
+                .timeout(5, TimeUnit.SECONDS)
+                .map(ImageUtils::toCircleBitmap)
+                .subscribe(bitmap -> widgetView.setImageViewBitmap(viewId, bitmap),
+                        t -> widgetView.setImageViewResource(viewId, R.drawable.ic_music_placeholder));
+        imageLoadingMap.put(viewId, disposable);
+    }
+    
     @Nonnull
-    private static Bitmap getCompositionImageOrThrow(Composition composition) {
-        Bitmap bitmap = getCompositionImage(composition);
+    private static Bitmap getCompositionImageOrThrow(String compositionFile, long compositionId) {
+        Bitmap bitmap = getCompositionImage(compositionFile, compositionId);
         if (bitmap == null) {
             throw new RuntimeException("composition image not found");
         }
@@ -54,15 +74,20 @@ public class ImageFormatUtils {
 
     @Nullable
     public static Bitmap getCompositionImage(Composition composition) {
+        return getCompositionImage(composition.getFilePath(), composition.getId());
+    }
+
+    @Nullable
+    public static Bitmap getCompositionImage(String compositionFile, long compositionId) {
         ImageCache imageCache = ImageCache.getInstance();
-        Bitmap bitmap = imageCache.getBitmap(composition.getId());
+        Bitmap bitmap = imageCache.getBitmap(compositionId);
         if (bitmap == null) {
             synchronized (ImageCache.class) {
-                bitmap = imageCache.getBitmap(composition.getId());
+                bitmap = imageCache.getBitmap(compositionId);
                 if (bitmap == null) {
-                    bitmap = extractImageComposition(composition);
+                    bitmap = extractImageComposition(compositionFile);
                     if (bitmap != null) {
-                        imageCache.putBitmap(composition.getId(), bitmap);
+                        imageCache.putBitmap(compositionId, bitmap);
                     }
                 }
             }
@@ -71,11 +96,11 @@ public class ImageFormatUtils {
     }
 
     @Nullable
-    private static Bitmap extractImageComposition(Composition composition) {
+    private static Bitmap extractImageComposition(String filePath) {
         MediaMetadataRetriever mmr = null;
         try {
             mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(composition.getFilePath());
+            mmr.setDataSource(filePath);
             byte[] imageBytes = mmr.getEmbeddedPicture();
             mmr.release();
             if (imageBytes == null) {

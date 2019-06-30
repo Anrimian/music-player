@@ -24,6 +24,8 @@ import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_FILE_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
@@ -43,12 +45,18 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
 
         String compositionName;
         String compositionAuthor;
+        String compositionFile;
+        long compositionId;
         if (ACTION_UPDATE_COMPOSITION.equals(intent.getStringExtra(WIDGET_ACTION))) {
             compositionName = intent.getStringExtra(COMPOSITION_NAME_ARG);
             compositionAuthor = intent.getStringExtra(COMPOSITION_AUTHOR_ARG);
+            compositionFile = intent.getStringExtra(COMPOSITION_FILE_ARG);
+            compositionId = intent.getLongExtra(COMPOSITION_ID_ARG, 0);
         } else {
             compositionName = WidgetDataHolder.getCompositionName(context);
             compositionAuthor = WidgetDataHolder.getCompositionAuthor(context);
+            compositionFile = WidgetDataHolder.getCompositionFile(context);
+            compositionId = WidgetDataHolder.getCompositionId(context);
         }
 
         int queueSize;
@@ -71,6 +79,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                     play,
                     compositionName,
                     compositionAuthor,
+                    compositionFile,
+                    compositionId,
                     queueSize);
         }
     }
@@ -80,6 +90,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                                   boolean play,
                                   String compositionName,
                                   String compositionAuthor,
+                                  String compositionFile,
+                                  long compositionId,
                                   int queueSize) {
         boolean enabled = true;
         if (isEmpty(compositionName)) {
@@ -135,6 +147,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                               boolean play,
                               String compositionName,
                               String compositionAuthor,
+                              String compositionFile,
+                              long compositionId,
                               int queueSize) {
         RemoteViews widgetView = new RemoteViews(context.getPackageName(), getRemoveViewId());
 
@@ -143,6 +157,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 play,
                 compositionName,
                 compositionAuthor,
+                compositionFile,
+                compositionId,
                 queueSize);
 
         appWidgetManager.updateAppWidget(widgetId, widgetView);

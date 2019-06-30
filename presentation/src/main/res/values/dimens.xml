@@ -78,4 +78,8 @@
     <dimen name="widget_content_margin_horizontal">8dp</dimen>
     <dimen name="widget_content_spacing_margin">2dp</dimen>
 
+    <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">8dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin">2dp</dimen>
+
 </resources>
