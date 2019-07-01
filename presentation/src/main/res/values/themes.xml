@@ -28,6 +28,9 @@
         <item name="secondaryButtonColor">@color/secondary_button_color_dark</item>
         <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
 
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">?android:attr/textColorPrimary</item>
+
         <!--toolbar-->
         <!--<item name="toolbarColor">?attr/colorPrimary</item>-->
         <!--<item name="android:statusBarColor">?attr/colorPrimaryDark</item>-->

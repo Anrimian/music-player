@@ -9,6 +9,8 @@
     <attr name="playerPanelBackground" format="color"/>
     <attr name="menuItemBackground" format="color"/>
 
+    <attr name="navigationViewPrimaryColor" format="color"/>
+
     <attr name="disabledColor" format="color"/>
 
     <attr name="buttonColor" format="color"/>
