@@ -36,10 +36,15 @@
 
         <!--other-->
         <item name="android:dividerHorizontal">@color/divider_color</item>
+        <item name="android:alertDialogTheme">@style/DialogStyle</item>
     </style>
 
     <style name="AppTheme.Drawer" parent="AppTheme">
 
+    </style>
+
+    <style name="DialogStyle" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:background">?attr/menuItemBackground</item>
     </style>
 
     <style name="Divider" parent="AppTheme">
