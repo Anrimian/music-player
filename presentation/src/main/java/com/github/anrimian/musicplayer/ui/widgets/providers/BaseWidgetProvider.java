@@ -71,6 +71,13 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
             play = Components.getAppComponent().musicPlayerInteractor().getPlayerState() == PlayerState.PLAY;
         }
 
+        boolean enabled = true;
+        if (isEmpty(compositionName)) {
+            compositionName = context.getString(R.string.no_current_composition);
+            compositionAuthor = null;
+            enabled = false;
+        }
+
         int[] ids = appWidgetManager.getAppWidgetIds(thisAppWidget);
         for (int widgetId : ids) {
             updateWidget(context,
@@ -81,7 +88,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                     compositionAuthor,
                     compositionFile,
                     compositionId,
-                    queueSize);
+                    queueSize,
+                    enabled);
         }
     }
 
@@ -92,13 +100,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                                   String compositionAuthor,
                                   String compositionFile,
                                   long compositionId,
-                                  int queueSize) {
-        boolean enabled = true;
-        if (isEmpty(compositionName)) {
-            compositionName = context.getString(R.string.no_current_composition);
-            compositionAuthor = null;
-            enabled = false;
-        }
+                                  int queueSize,
+                                  boolean enabled) {
         widgetView.setBoolean(R.id.iv_skip_to_previous, "setEnabled", enabled);
         widgetView.setBoolean(R.id.iv_play_pause, "setEnabled", enabled);
         widgetView.setBoolean(R.id.iv_skip_to_next, "setEnabled", enabled && queueSize > 1);
@@ -133,7 +136,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         widgetView.setOnClickPendingIntent(R.id.iv_skip_to_next, pIntentSkipToNext);
 
         Intent intent = new Intent(context, MainActivity.class);
-        intent.putExtra(OPEN_PLAY_QUEUE_ARG, true);
+        intent.putExtra(OPEN_PLAY_QUEUE_ARG, enabled);
         PendingIntent pIntent = PendingIntent.getActivity(context,
                 0,
                 intent,
@@ -149,8 +152,9 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                               String compositionAuthor,
                               String compositionFile,
                               long compositionId,
-                              int queueSize) {
-        RemoteViews widgetView = new RemoteViews(context.getPackageName(), getRemoveViewId());
+                              int queueSize,
+                              boolean enabled) {
+        RemoteViews widgetView = new RemoteViews(context.getPackageName(), getRemoteViewId());
 
         applyViewLogic(widgetView,
                 context,
@@ -159,11 +163,12 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 compositionAuthor,
                 compositionFile,
                 compositionId,
-                queueSize);
+                queueSize,
+                enabled);
 
         appWidgetManager.updateAppWidget(widgetId, widgetView);
     }
 
     @LayoutRes
-    protected abstract int getRemoveViewId();
+    protected abstract int getRemoteViewId();
 }

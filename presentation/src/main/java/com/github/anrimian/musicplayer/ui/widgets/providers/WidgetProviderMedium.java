@@ -17,7 +17,8 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                                   String compositionAuthor,
                                   String compositionFile,
                                   long compositionId,
-                                  int queueSize) {
+                                  int queueSize,
+                                  boolean enabled) {
         super.applyViewLogic(widgetView,
                 context,
                 play,
@@ -25,15 +26,17 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                 compositionAuthor,
                 compositionFile,
                 compositionId,
-                queueSize);
+                queueSize,
+                enabled);
+        widgetView.setBoolean(R.id.iv_shuffle_mode, "setEnabled", enabled);
+        widgetView.setBoolean(R.id.iv_repeat_mode, "setEnabled", enabled);
 
         //TODO cover setting
-        //TODO image loading issue(loaded here but not in activity)
         ImageFormatUtils.displayImage(widgetView, R.id.iv_cover, compositionFile, compositionId);
     }
 
     @Override
-    protected int getRemoveViewId() {
+    protected int getRemoteViewId() {
         return R.layout.widget_medium;
     }
 }

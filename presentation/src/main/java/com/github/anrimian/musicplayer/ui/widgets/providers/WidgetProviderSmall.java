@@ -6,7 +6,7 @@ import com.github.anrimian.musicplayer.R;
 public class WidgetProviderSmall extends BaseWidgetProvider {
 
     @Override
-    protected int getRemoveViewId() {
+    protected int getRemoteViewId() {
         return R.layout.widget_small;
     }
 }

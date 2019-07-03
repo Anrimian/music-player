@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.ui.common.format;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
@@ -27,13 +29,12 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ImageFormatUtils {
 
-    private static final WeakHashMap<Integer, Disposable> imageLoadingMap = new WeakHashMap<>();
+    private static final WeakHashMap<ImageView, Disposable> imageLoadingMap = new WeakHashMap<>();
 
     public static void displayImage(@NonNull ImageView imageView,
                                     @NonNull Composition composition) {
         imageView.setImageResource(R.drawable.ic_music_placeholder);
-        int viewId = imageView.getId();
-        Disposable disposable = imageLoadingMap.get(viewId);
+        Disposable disposable = imageLoadingMap.get(imageView);
         if (disposable != null) {
             disposable.dispose();
         }
@@ -42,25 +43,25 @@ public class ImageFormatUtils {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageView::setImageBitmap,
-                        t -> imageView.setImageResource(R.drawable.ic_music_placeholder));
-        imageLoadingMap.put(viewId, disposable);
+                        t -> {
+                    imageView.setImageResource(R.drawable.ic_music_placeholder);
+                            Log.d("KEK", "displayImage error: " + t.getMessage());
+                        });
+        imageLoadingMap.put(imageView, disposable);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
     public static void displayImage(@NonNull RemoteViews widgetView,
                                     @IdRes int viewId,
                                     @NonNull String compositionFile,
                                     long compositionId) {
         widgetView.setImageViewResource(viewId, R.drawable.ic_music_placeholder);
-        Disposable disposable = imageLoadingMap.get(viewId);
-        if (disposable != null) {
-            disposable.dispose();
-        }
-        disposable = Single.fromCallable(() -> getCompositionImageOrThrow(compositionFile, compositionId))
+        Single.fromCallable(() -> getCompositionImageOrThrow(compositionFile, compositionId))
                 .timeout(5, TimeUnit.SECONDS)
                 .map(ImageUtils::toCircleBitmap)
                 .subscribe(bitmap -> widgetView.setImageViewBitmap(viewId, bitmap),
                         t -> widgetView.setImageViewResource(viewId, R.drawable.ic_music_placeholder));
-        imageLoadingMap.put(viewId, disposable);
     }
     
     @Nonnull
