@@ -18,7 +18,8 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                                   String compositionFile,
                                   long compositionId,
                                   int queueSize,
-                                  boolean enabled) {
+                                  boolean enabled,
+                                  boolean showCovers) {
         super.applyViewLogic(widgetView,
                 context,
                 play,
@@ -27,12 +28,16 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                 compositionFile,
                 compositionId,
                 queueSize,
-                enabled);
+                enabled,
+                showCovers);
         widgetView.setBoolean(R.id.iv_shuffle_mode, "setEnabled", enabled);
         widgetView.setBoolean(R.id.iv_repeat_mode, "setEnabled", enabled);
 
-        //TODO cover setting
-        ImageFormatUtils.displayImage(widgetView, R.id.iv_cover, compositionFile, compositionId);
+        if (showCovers) {
+            ImageFormatUtils.displayImage(widgetView, R.id.iv_cover, compositionFile, compositionId);
+        } else {
+            widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);
+        }
     }
 
     @Override

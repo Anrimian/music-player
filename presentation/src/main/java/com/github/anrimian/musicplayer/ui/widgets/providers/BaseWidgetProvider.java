@@ -12,6 +12,7 @@ import androidx.annotation.LayoutRes;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
@@ -66,10 +67,13 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
             queueSize = WidgetDataHolder.getCurrentQueueSize(context);
         }
 
+        AppComponent appComponent = Components.getAppComponent();
         boolean play = false;
         if (Permissions.hasFilePermission(context)) {
-            play = Components.getAppComponent().musicPlayerInteractor().getPlayerState() == PlayerState.PLAY;
+            play = appComponent.musicPlayerInteractor().getPlayerState() == PlayerState.PLAY;
         }
+
+        boolean showCovers = appComponent.displaySettingsInteractor().isCoversEnabled();
 
         boolean enabled = true;
         if (isEmpty(compositionName)) {
@@ -89,7 +93,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                     compositionFile,
                     compositionId,
                     queueSize,
-                    enabled);
+                    enabled,
+                    showCovers);
         }
     }
 
@@ -101,7 +106,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                                   String compositionFile,
                                   long compositionId,
                                   int queueSize,
-                                  boolean enabled) {
+                                  boolean enabled,
+                                  boolean showCovers) {
         widgetView.setBoolean(R.id.iv_skip_to_previous, "setEnabled", enabled);
         widgetView.setBoolean(R.id.iv_play_pause, "setEnabled", enabled);
         widgetView.setBoolean(R.id.iv_skip_to_next, "setEnabled", enabled && queueSize > 1);
@@ -153,7 +159,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                               String compositionFile,
                               long compositionId,
                               int queueSize,
-                              boolean enabled) {
+                              boolean enabled,
+                              boolean showCovers) {
         RemoteViews widgetView = new RemoteViews(context.getPackageName(), getRemoteViewId());
 
         applyViewLogic(widgetView,
@@ -164,7 +171,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 compositionFile,
                 compositionId,
                 queueSize,
-                enabled);
+                enabled,
+                showCovers);
 
         appWidgetManager.updateAppWidget(widgetId, widgetView);
     }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
@@ -30,12 +31,16 @@ public class WidgetUpdater {
 
     private final Context context;
     private final MusicPlayerInteractor musicPlayerInteractor;
+    private final DisplaySettingsInteractor displaySettingsInteractor;
 
     private final CompositeDisposable updateDisposable = new CompositeDisposable();
 
-    public WidgetUpdater(Context context, MusicPlayerInteractor musicPlayerInteractor) {
+    public WidgetUpdater(Context context,
+                         MusicPlayerInteractor musicPlayerInteractor,
+                         DisplaySettingsInteractor displaySettingsInteractor) {
         this.context = context;
         this.musicPlayerInteractor = musicPlayerInteractor;
+        this.displaySettingsInteractor = displaySettingsInteractor;
     }
 
     public void start() {
@@ -53,6 +58,14 @@ public class WidgetUpdater {
         updateDisposable.add(musicPlayerInteractor
                 .getPlayerStateObservable()
                 .subscribe(this::onPlayStateReceived));
+
+        updateDisposable.add(displaySettingsInteractor
+            .getCoversEnabledObservable()
+            .subscribe(this::onDisplaySettingsChanged));
+    }
+
+    private void onDisplaySettingsChanged(boolean isCoversEnabled) {
+        updateWidgets(intent -> {});
     }
 
     private void onPlayQueueReceived(List<PlayQueueItem> playQueueItems) {
