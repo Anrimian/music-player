@@ -37,7 +37,7 @@
     </style>
 
     <style name="ToolbarTitleStyle.Selection">
-        <item name="android:textColor">@color/secondary_button_color</item>
+        <item name="android:textColor">?attr/actionModeTextColor</item>
     </style>
 
     <style name="ToolbarSubtitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">

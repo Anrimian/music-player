@@ -10,7 +10,9 @@
         <!--primary colors-->
         <item name="colorPrimary">@color/darkColorPrimary</item>
         <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccentDark</item>
         <item name="colorPrimaryDarkSecondary">@color/darkColorPrimaryDark</item>
+        <item name="actionModeTextColor">@color/primary_button_color_dark</item>
 
         <!--background-->
         <item name="android:windowBackground">@color/dark_background_level_1</item>
@@ -35,8 +37,8 @@
         <item name="navigationViewPrimaryColor">?android:attr/textColorPrimary</item>
 
         <!--toolbar-->
-        <!--<item name="toolbarColor">?attr/colorPrimary</item>-->
-        <!--<item name="android:statusBarColor">?attr/colorPrimaryDark</item>-->
+        <item name="actionModeStatusBarColor">@color/actionModeStatusBarColorDark</item>
+        <item name="actionModeBackgroundColor">@color/actionModeBackgroundColorDark</item>
 
         <!--other-->
         <item name="android:alertDialogTheme">@style/DarkDialogStyle</item>

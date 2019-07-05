@@ -2,8 +2,11 @@
 <resources>
     <attr name="toolbarColor" format="color"/>
     <attr name="actionModeTextColor" format="color"/>
-    <attr name="actionModeStatusBarColor" format="color"/>
     <attr name="colorPrimaryDarkSecondary" format="color"/>
+
+    <!--action mode-->
+    <attr name="actionModeBackgroundColor" format="color"/>
+    <attr name="actionModeStatusBarColor" format="color"/>
 
     <!--background-->
     <attr name="listBackground" format="color"/>
