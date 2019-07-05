@@ -3,6 +3,7 @@
     <attr name="toolbarColor" format="color"/>
     <attr name="actionModeTextColor" format="color"/>
     <attr name="actionModeStatusBarColor" format="color"/>
+    <attr name="colorPrimaryDarkSecondary" format="color"/>
 
     <!--background-->
     <attr name="listBackground" format="color"/>
@@ -18,6 +19,7 @@
     <attr name="buttonColor" format="color"/>
     <attr name="secondaryButtonColor" format="color"/>
     <attr name="brightButtonColor" format="color"/>
+    <attr name="buttonColorInverse" format="color"/>
 
     <!--text-->
     <attr name="dialogTitleColor" format="color"/>

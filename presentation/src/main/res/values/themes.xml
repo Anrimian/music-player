@@ -10,6 +10,7 @@
         <!--primary colors-->
         <item name="colorPrimary">@color/darkColorPrimary</item>
         <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <item name="colorPrimaryDarkSecondary">@color/darkColorPrimaryDark</item>
 
         <!--background-->
         <item name="android:windowBackground">@color/dark_background_level_1</item>
@@ -28,6 +29,7 @@
         <item name="buttonColor">@color/primary_button_color_dark</item>
         <item name="secondaryButtonColor">@color/secondary_button_color_dark</item>
         <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
+        <item name="buttonColorInverse">@color/primary_button_color_dark</item>
 
         <!--navigation view-->
         <item name="navigationViewPrimaryColor">?android:attr/textColorPrimary</item>

@@ -54,7 +54,6 @@ import butterknife.ButterKnife;
 
 import static android.view.View.INVISIBLE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -316,7 +315,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
                 .addDelegate(new BoundValuesDelegate(0.85f, 1f,
                                 new StatusBarColorDelegate(requireActivity().getWindow(),
                                         getColorFromAttr(getContext(), getStatusBarColorAttr()),
-                                        getColor(requireContext(), R.color.colorPrimaryDarkSecondary))
+                                        getColorFromAttr(requireContext(), R.attr.colorPrimaryDarkSecondary))
                         )
                 );
     }
