@@ -16,10 +16,12 @@
         <item name="disabledColor">@color/disabled_color</item>
         <item name="buttonColor">@color/primary_button_color</item>
         <item name="secondaryButtonColor">@color/secondary_button_color</item>
+        <item name="brightButtonColor">@color/colorAccent</item>
 
         <!--text colors-->
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
+        <item name="dialogTitleColor">@color/text_color_primary</item>
 
         <!--toolbar-->
         <item name="toolbarColor">?attr/colorPrimary</item>
@@ -44,10 +46,6 @@
 
     <style name="AppTheme.Drawer" parent="AppTheme">
 
-    </style>
-
-    <style name="DialogStyle" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:background">?attr/menuItemBackground</item>
     </style>
 
     <style name="NavigationViewStyle">

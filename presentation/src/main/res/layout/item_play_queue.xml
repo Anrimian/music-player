@@ -20,7 +20,7 @@
 
     <TextView
         android:id="@+id/tv_composition_name"
-        style="@style/Content.Text"
+        style="@style/TextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_internal_margin"
@@ -64,7 +64,7 @@
 
     <ImageView
         android:id="@+id/btn_actions_menu"
-        style="@style/Content.Button.Menu"
+        style="@style/ButtonStyle.Menu"
         android:layout_marginTop="2dp"
         android:contentDescription="@string/content_description_menu"
         app:layout_constraintEnd_toEndOf="parent"

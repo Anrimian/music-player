@@ -10,26 +10,26 @@
 
         <Constraint
             android:id="@+id/iv_skip_to_previous"
-            style="@style/Content.Button.Main"
+            style="@style/ButtonStyle.Main"
             app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
             app:layout_constraintTop_toTopOf="@+id/iv_play_pause" />
 
         <Constraint
             android:id="@+id/iv_play_pause"
-            style="@style/Content.Button.Main"
+            style="@style/ButtonStyle.Main"
             app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
             app:layout_constraintTop_toTopOf="@+id/iv_skip_to_next"/>
 
         <Constraint
             android:id="@+id/iv_skip_to_next"
-            style="@style/Content.Button.Main"
+            style="@style/ButtonStyle.Main"
             android:layout_marginEnd="@dimen/content_spacing_margin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <Constraint
             android:id="@+id/tv_current_composition"
-            style="@style/Content.Text.Medium"
+            style="@style/TextStyle.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/content_internal_margin"
@@ -59,7 +59,7 @@
 
         <Constraint
             android:id="@+id/tv_current_composition_author"
-            style="@style/Content.Text.Subtitle"
+            style="@style/TextStyle.Subtitle"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintTop_toBottomOf="@+id/tv_current_composition"

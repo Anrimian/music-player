@@ -41,7 +41,7 @@
 
     <ImageView
         android:id="@+id/iv_skip_to_previous"
-        style="@style/Content.Button.Main.Expanded"
+        style="@style/ButtonStyle.Main.Expanded"
         android:layout_marginStart="@dimen/content_spacing_margin"
         app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -52,7 +52,7 @@
 
     <ImageView
         android:id="@+id/iv_play_pause"
-        style="@style/Content.Button.Main.Expanded"
+        style="@style/ButtonStyle.Main.Expanded"
         app:layout_constraintBottom_toBottomOf="@id/btn_random_play"
         app:layout_constraintTop_toTopOf="@id/btn_random_play"
         app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
@@ -62,7 +62,7 @@
 
     <ImageView
         android:id="@+id/iv_skip_to_next"
-        style="@style/Content.Button.Main.Expanded"
+        style="@style/ButtonStyle.Main.Expanded"
         android:contentDescription="@string/next_track"
         android:layout_marginEnd="@dimen/content_spacing_margin"
         app:layout_constraintEnd_toStartOf="@id/btn_infinite_play"
@@ -72,7 +72,7 @@
 
     <TextView
         android:id="@+id/tv_current_composition"
-        style="@style/Content.Text.Medium"
+        style="@style/TextStyle.Medium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
@@ -88,7 +88,7 @@
 
     <ImageView
         android:id="@+id/btn_random_play"
-        style="@style/Content.Button"
+        style="@style/ButtonStyle"
         android:contentDescription="@string/content_description_shuffle"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         app:layout_constraintTop_toBottomOf="@id/group_time"
@@ -98,7 +98,7 @@
 
     <ImageView
         android:id="@+id/btn_infinite_play"
-        style="@style/Content.Button"
+        style="@style/ButtonStyle"
         android:contentDescription="@string/content_description_repeat_mode"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         app:layout_constraintBottom_toBottomOf="@id/btn_random_play"
@@ -107,7 +107,7 @@
 
     <TextView
         android:id="@+id/tv_played_time"
-        style="@style/Content.Text.Time"
+        style="@style/TextStyle.Time"
         android:gravity="center_vertical|start"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
 
     <TextView
         android:id="@+id/tv_total_time"
-        style="@style/Content.Text.Time"
+        style="@style/TextStyle.Time"
         android:gravity="center_vertical|end"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -170,7 +170,7 @@
 
     <ImageView
         android:id="@+id/btn_actions_menu"
-        style="@style/Content.Button.Menu"
+        style="@style/ButtonStyle.Menu"
         android:contentDescription="@string/content_description_menu"
         android:layout_marginBottom="6dp"
         app:layout_constraintEnd_toEndOf="@id/guideline_left"
@@ -179,7 +179,7 @@
 
     <TextView
         android:id="@+id/tv_current_composition_author"
-        style="@style/Content.Text.Subtitle"
+        style="@style/TextStyle.Subtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:singleLine="true"

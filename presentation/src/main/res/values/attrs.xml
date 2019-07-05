@@ -4,6 +4,7 @@
     <attr name="actionModeTextColor" format="color"/>
     <attr name="actionModeStatusBarColor" format="color"/>
 
+    <!--background-->
     <attr name="listBackground" format="color"/>
     <attr name="listItemBackground" format="color"/>
     <attr name="playerPanelBackground" format="color"/>
@@ -13,6 +14,11 @@
 
     <attr name="disabledColor" format="color"/>
 
+    <!--buttons-->
     <attr name="buttonColor" format="color"/>
     <attr name="secondaryButtonColor" format="color"/>
+    <attr name="brightButtonColor" format="color"/>
+
+    <!--text-->
+    <attr name="dialogTitleColor" format="color"/>
 </resources>

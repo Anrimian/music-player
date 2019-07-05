@@ -22,6 +22,7 @@
         <!--text-->
         <item name="android:textColorPrimary">@color/text_color_primary_dark</item>
         <item name="android:textColorSecondary">@color/text_color_secondary_dark</item>
+        <item name="dialogTitleColor">@color/text_color_primary_dark</item>
 
         <!--controls-->
         <item name="buttonColor">@color/primary_button_color_dark</item>
@@ -34,6 +35,9 @@
         <!--toolbar-->
         <!--<item name="toolbarColor">?attr/colorPrimary</item>-->
         <!--<item name="android:statusBarColor">?attr/colorPrimaryDark</item>-->
+
+        <!--other-->
+        <item name="android:alertDialogTheme">@style/DarkDialogStyle</item>
 
     </style>
 
