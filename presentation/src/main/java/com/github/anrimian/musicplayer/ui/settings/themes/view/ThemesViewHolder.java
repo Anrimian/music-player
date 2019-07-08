@@ -32,6 +32,6 @@ class ThemesViewHolder extends RecyclerView.ViewHolder {
     void bind(AppTheme appTheme) {
         this.appTheme = appTheme;
 
-        tvTheme.setText(appTheme.name());
+        tvTheme.setText(appTheme.getDescriptionId());
     }
 }

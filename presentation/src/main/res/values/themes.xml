@@ -21,6 +21,7 @@
         <item name="listItemBackground">@color/dark_background_level_1</item>
         <item name="menuItemBackground">@color/menu_item_background_color_dark</item>
         <item name="playerPanelBackground">?attr/colorPrimary</item>
+        <item name="subToolbarBackground">@color/dark_background_level_1</item>
 
         <!--text-->
         <item name="android:textColorPrimary">@color/text_color_primary_dark</item>

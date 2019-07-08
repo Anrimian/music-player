@@ -38,6 +38,7 @@
         <item name="playerPanelBackground">?attr/listItemBackground</item>
         <item name="android:itemBackground">@drawable/bg_menu_item</item>
         <item name="menuItemBackground">@android:color/white</item>
+        <item name="subToolbarBackground">?attr/listItemBackground</item>
 
         <!--navigation view-->
         <item name="navigationViewPrimaryColor">@color/colorPrimary</item>
@@ -53,9 +54,6 @@
 
     <style name="NavigationViewStyle">
         <item name="colorPrimary">?attr/navigationViewPrimaryColor</item>
-        <!--<item name="colorPrimary">@android:color/holo_red_dark</item>-->
-        <!--<item name="colorPrimaryDark">@android:color/holo_red_dark</item>-->
-        <!--<item name="colorAccent">@android:color/holo_red_dark</item>-->
     </style>
 
     <style name="Divider" parent="AppTheme">

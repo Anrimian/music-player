@@ -13,6 +13,7 @@
     <attr name="listItemBackground" format="color"/>
     <attr name="playerPanelBackground" format="color"/>
     <attr name="menuItemBackground" format="color"/>
+    <attr name="subToolbarBackground" format="color"/>
 
     <attr name="navigationViewPrimaryColor" format="color"/>
 
