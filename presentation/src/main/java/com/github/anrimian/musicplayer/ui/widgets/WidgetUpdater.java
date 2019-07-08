@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
@@ -20,6 +21,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
@@ -60,12 +62,17 @@ public class WidgetUpdater {
                 .subscribe(this::onPlayStateReceived));
 
         updateDisposable.add(displaySettingsInteractor
-            .getCoversEnabledObservable()
-            .subscribe(this::onDisplaySettingsChanged));
+                .getCoversEnabledObservable()
+                .subscribe(this::onDisplaySettingsChanged));
+
+        updateDisposable.add(Observable.combineLatest(musicPlayerInteractor.getRepeatModeObservable(),
+                musicPlayerInteractor.getRandomPlayingObservable(),
+                (o1, o2) -> TRIGGER)
+                .subscribe(o -> updateWidgets()));
     }
 
     private void onDisplaySettingsChanged(boolean isCoversEnabled) {
-        updateWidgets(intent -> {});
+        updateWidgets();
     }
 
     private void onPlayQueueReceived(List<PlayQueueItem> playQueueItems) {
@@ -114,10 +121,16 @@ public class WidgetUpdater {
         updateWidgets(intent -> intent.putExtra(PLAY_ARG, playerState == PlayerState.PLAY));
     }
 
+    private void updateWidgets() {
+        updateWidgets(null);
+    }
+
     private void updateWidgets(Callback<Intent> intentCallback) {
         Intent intent = new Intent("android.appwidget.action.APPWIDGET_UPDATE");
         intent.setPackage(context.getPackageName());
-        intentCallback.call(intent);
+        if (intentCallback != null) {
+            intentCallback.call(intent);
+        }
         context.sendBroadcast(intent);
     }
 }

@@ -9,6 +9,8 @@ public interface Constants {
         int PAUSE = 2;
         int SKIP_TO_NEXT = 3;
         int SKIP_TO_PREVIOUS = 4;
+        int CHANGE_SHUFFLE_NODE = 5;
+        int CHANGE_REPEAT_MODE = 6;
     }
 
     interface Arguments {

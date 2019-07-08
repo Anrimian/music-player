@@ -13,7 +13,9 @@ import androidx.annotation.LayoutRes;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
+import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetDataHolder;
@@ -69,8 +71,13 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
 
         AppComponent appComponent = Components.getAppComponent();
         boolean play = false;
+        boolean randomPlayModeEnabled = false;
+        int repeatMode = RepeatMode.NONE;
         if (Permissions.hasFilePermission(context)) {
-            play = appComponent.musicPlayerInteractor().getPlayerState() == PlayerState.PLAY;
+            MusicPlayerInteractor musicPlayerInteractor = appComponent.musicPlayerInteractor();
+            play = musicPlayerInteractor.getPlayerState() == PlayerState.PLAY;
+            randomPlayModeEnabled = musicPlayerInteractor.isRandomPlayingEnabled();
+            repeatMode = musicPlayerInteractor.getRepeatMode();
         }
 
         boolean showCovers = appComponent.displaySettingsInteractor().isCoversEnabled();
@@ -94,7 +101,9 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                     compositionId,
                     queueSize,
                     enabled,
-                    showCovers);
+                    showCovers,
+                    randomPlayModeEnabled,
+                    repeatMode);
         }
     }
 
@@ -107,7 +116,9 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                                   long compositionId,
                                   int queueSize,
                                   boolean enabled,
-                                  boolean showCovers) {
+                                  boolean showCovers,
+                                  boolean randomPlayModeEnabled,
+                                  int repeatMode) {
         widgetView.setBoolean(R.id.iv_skip_to_previous, "setEnabled", enabled);
         widgetView.setBoolean(R.id.iv_play_pause, "setEnabled", enabled);
         widgetView.setBoolean(R.id.iv_skip_to_next, "setEnabled", enabled && queueSize > 1);
@@ -160,7 +171,9 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                               long compositionId,
                               int queueSize,
                               boolean enabled,
-                              boolean showCovers) {
+                              boolean showCovers,
+                              boolean randomPlayModeEnabled,
+                              int repeatMode) {
         RemoteViews widgetView = new RemoteViews(context.getPackageName(), getRemoteViewId());
 
         applyViewLogic(widgetView,
@@ -172,7 +185,9 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 compositionId,
                 queueSize,
                 enabled,
-                showCovers);
+                showCovers,
+                randomPlayModeEnabled,
+                repeatMode);
 
         appWidgetManager.updateAppWidget(widgetId, widgetView);
     }

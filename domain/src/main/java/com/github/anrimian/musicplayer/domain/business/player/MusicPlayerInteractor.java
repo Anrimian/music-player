@@ -161,8 +161,16 @@ public class MusicPlayerInteractor {
         return settingsRepository.getRepeatModeObservable();
     }
 
+    public int getRepeatMode() {
+        return settingsRepository.getRepeatMode();
+    }
+
     public boolean isRandomPlayingEnabled() {
         return settingsRepository.isRandomPlayingEnabled();
+    }
+
+    public Observable<Boolean> getRandomPlayingObservable() {
+        return settingsRepository.getRandomPlayingObservable();
     }
 
     public void setRandomPlayingEnabled(boolean enabled) {
@@ -188,6 +196,23 @@ public class MusicPlayerInteractor {
 
     public void setRepeatMode(int mode) {
         settingsRepository.setRepeatMode(mode);
+    }
+
+    public void changeRepeatMode() {
+        switch (settingsRepository.getRepeatMode()) {
+            case RepeatMode.NONE: {
+                settingsRepository.setRepeatMode(RepeatMode.REPEAT_PLAY_LIST);
+                break;
+            }
+            case RepeatMode.REPEAT_PLAY_LIST: {
+                settingsRepository.setRepeatMode(RepeatMode.REPEAT_COMPOSITION);
+                break;
+            }
+            case RepeatMode.REPEAT_COMPOSITION: {
+                settingsRepository.setRepeatMode(RepeatMode.NONE);
+                break;
+            }
+        }
     }
 
     public Observable<Long> getTrackPositionObservable() {

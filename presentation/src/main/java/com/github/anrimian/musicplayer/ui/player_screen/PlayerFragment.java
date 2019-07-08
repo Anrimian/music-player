@@ -84,6 +84,7 @@ import static com.github.anrimian.musicplayer.domain.models.composition.Composit
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -545,21 +546,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showRepeatMode(int mode) {
-        @DrawableRes int iconRes = R.drawable.ic_repeat_off;
-        switch (mode) {
-            case RepeatMode.NONE: {
-                iconRes = R.drawable.ic_repeat_off;
-                break;
-            }
-            case RepeatMode.REPEAT_COMPOSITION: {
-                iconRes = R.drawable.ic_repeat_once;
-                break;
-            }
-            case RepeatMode.REPEAT_PLAY_LIST: {
-                iconRes = R.drawable.ic_repeat;
-                break;
-            }
-        }
+        @DrawableRes int iconRes = getRepeatModeIcon(mode);
         btnRepeatMode.setImageResource(iconRes);
     }
 
