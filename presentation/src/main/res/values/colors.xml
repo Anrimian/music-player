@@ -47,8 +47,8 @@
 
     <color name="menu_item_background_color_dark">#3D3D3D</color>
 
-    <color name="actionModeStatusBarColorDark">#283593</color>
-    <color name="actionModeBackgroundColorDark">#1A237E</color>
+    <color name="actionModeStatusBarColorDark">#5C5B5B</color>
+    <color name="actionModeBackgroundColorDark">#3D3D3D</color>
 
 
     <!--other-->
