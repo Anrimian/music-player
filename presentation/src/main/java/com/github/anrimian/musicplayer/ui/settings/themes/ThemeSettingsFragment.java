@@ -14,10 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
+import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.themes.view.ThemesAdapter;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.decorators.DividerItemDecoration;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
@@ -28,6 +30,8 @@ public class ThemeSettingsFragment extends Fragment {
 
     @BindView(R.id.rv_themes)
     RecyclerView rvThemes;
+
+    private ThemeController themeController;
 
     @Nullable
     @Override
@@ -42,6 +46,8 @@ public class ThemeSettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        themeController = Components.getAppComponent().themeController();
+
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.settings);
         toolbar.setSubtitle(R.string.theme);
@@ -54,12 +60,19 @@ public class ThemeSettingsFragment extends Fragment {
                 toolbar::onStackFragmentSlided);
 
         rvThemes.setLayoutManager(new LinearLayoutManager(requireContext()));
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(requireContext(),
+                DividerItemDecoration.VERTICAL,
+                getResources().getDimensionPixelSize(R.dimen.toolbar_content_start),
+                false);
+        rvThemes.addItemDecoration(itemDecorator);
 
-        ThemesAdapter adapter = new ThemesAdapter(AppTheme.values(), this::onThemeClicked);
+        ThemesAdapter adapter = new ThemesAdapter(AppTheme.values(),
+                themeController.getCurrentTheme(),
+                this::onThemeClicked);
         rvThemes.setAdapter(adapter);
     }
 
     private void onThemeClicked(AppTheme appTheme) {
-        Components.getAppComponent().themeController().setTheme(requireActivity(), appTheme);
+        themeController.setTheme(requireActivity(), appTheme);
     }
 }

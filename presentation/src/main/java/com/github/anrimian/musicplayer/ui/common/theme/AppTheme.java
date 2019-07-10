@@ -15,7 +15,6 @@ public enum AppTheme {
             R.string.dark_theme,
             R.color.darkColorPrimary,
             R.color.dark_background_level_0);
-//    TEST(2, R.style.PrimaryTestTheme, descriptionId, primaryColorId, backgroundColorId);
 
     private final int id;
     private final int themeResId;

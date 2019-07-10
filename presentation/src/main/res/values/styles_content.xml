@@ -33,6 +33,14 @@
         <item name="android:textSize">17sp</item>
     </style>
 
+    <style name="Content.Text.Button.Single" parent="@style/Base.TextAppearance.AppCompat.Body1">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:paddingTop">@dimen/content_vertical_margin</item>
+        <item name="android:paddingBottom">@dimen/content_vertical_margin</item>
+        <item name="android:paddingEnd">@dimen/content_horizontal_margin</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
     <style name="Content.Dialog.Text" parent="@style/TextStyle">
         <item name="android:textSize">16sp</item>
     </style>

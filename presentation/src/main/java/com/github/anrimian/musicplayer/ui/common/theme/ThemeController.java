@@ -24,19 +24,25 @@ public class ThemeController {
     }
 
     public void applyCurrentTheme(Activity activity) {
-        AppTheme appTheme = AppTheme.getTheme(preferences.getInt(THEME_ID, 0));
-
+        AppTheme appTheme = getCurrentTheme();
         activity.getTheme().applyStyle(appTheme.getThemeResId(), true);
         updateTaskManager(activity);
     }
 
     public void setTheme(Activity activity, AppTheme appTheme) {
+        if (appTheme == getCurrentTheme()) {
+            return;
+        }
         preferences.putInt(THEME_ID, appTheme.getId());
 
         activity.getTheme().applyStyle(appTheme.getThemeResId(), true);
         updateTaskManager(activity);
 
         activity.recreate();
+    }
+
+    public AppTheme getCurrentTheme() {
+        return AppTheme.getTheme(preferences.getInt(THEME_ID, 0));
     }
 
     private void updateTaskManager(Activity activity) {

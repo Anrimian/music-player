@@ -12,10 +12,14 @@ import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 public class ThemesAdapter extends RecyclerView.Adapter<ThemesViewHolder> {
 
     private final AppTheme[] themes;
+    private final AppTheme currentTheme;
     private final Callback<AppTheme> themeClickListener;
 
-    public ThemesAdapter(AppTheme[] themes, Callback<AppTheme> themeClickListener) {
+    public ThemesAdapter(AppTheme[] themes,
+                         AppTheme currentTheme,
+                         Callback<AppTheme> themeClickListener) {
         this.themes = themes;
+        this.currentTheme = currentTheme;
         this.themeClickListener = themeClickListener;
     }
 
@@ -28,7 +32,8 @@ public class ThemesAdapter extends RecyclerView.Adapter<ThemesViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ThemesViewHolder holder, int position) {
-        holder.bind(themes[position]);
+        AppTheme theme = themes[position];
+        holder.bind(theme, theme.equals(currentTheme));
     }
 
     @Override

@@ -46,6 +46,7 @@
         <!--other-->
         <item name="android:dividerHorizontal">@color/divider_color</item>
         <item name="android:alertDialogTheme">@style/DialogStyle</item>
+        <item name="android:listDivider">@drawable/divider</item>
     </style>
 
     <style name="AppTheme.Drawer" parent="AppTheme">
