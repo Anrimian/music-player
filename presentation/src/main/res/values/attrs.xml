@@ -27,4 +27,5 @@
 
     <!--text-->
     <attr name="dialogTitleColor" format="color"/>
+    <attr name="colorError" format="color"/>
 </resources>

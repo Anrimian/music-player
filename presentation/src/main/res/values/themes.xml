@@ -28,6 +28,7 @@
         <item name="android:textColorSecondary">@color/text_color_secondary_dark</item>
         <item name="dialogTitleColor">@color/text_color_primary_dark</item>
         <item name="brightButtonColor">@color/colorAccentDark</item>
+        <item name="colorError">@color/color_error_dark</item>
 
         <!--controls-->
         <item name="buttonColor">@color/primary_button_color_dark</item>
@@ -44,7 +45,6 @@
 
         <!--other-->
         <item name="android:alertDialogTheme">@style/DarkDialogStyle</item>
-
     </style>
 
     <style name="PrimaryTestTheme" parent="PrimaryLightTheme">

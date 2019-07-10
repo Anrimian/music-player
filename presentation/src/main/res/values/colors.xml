@@ -50,6 +50,8 @@
     <color name="actionModeStatusBarColorDark">#5C5B5B</color>
     <color name="actionModeBackgroundColorDark">#3D3D3D</color>
 
+    <color name="color_error_dark">#CF6679</color>
+
 
     <!--other-->
     <color name="startShadowColor">#00000000</color>

@@ -90,7 +90,7 @@
     </style>
 
     <style name="TextStyle.Error">
-        <item name="android:textColor">@color/colorError</item>
+        <item name="android:textColor">?attr/colorError</item>
         <item name="android:textSize">13sp</item>
     </style>
 

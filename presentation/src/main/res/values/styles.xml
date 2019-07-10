@@ -24,6 +24,7 @@
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
         <item name="dialogTitleColor">@color/text_color_primary</item>
+        <item name="colorError">@color/colorError</item>
 
         <!--toolbar-->
         <item name="toolbarColor">?attr/colorPrimary</item>
