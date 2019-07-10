@@ -123,7 +123,9 @@
             android:layout_width="280dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            app:menu="@menu/drawer_menu"/>
+            android:clickable="true"
+            android:focusable="true"
+            app:menu="@menu/drawer_menu" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
 
