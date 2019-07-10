@@ -34,6 +34,7 @@ ext {
     daggerVersion = "2.18"
     exoPlayerVersion = "2.9.6"
     roomVersion = "2.1.0-rc01"
+    mp3MagicVersion = "0.9.1"
 
     //Testing
     jUnitVersion = '4.12'

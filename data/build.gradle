@@ -45,6 +45,8 @@ dependencies {
     implementation dataDependencies.roomRx
     annotationProcessor dataDependencies.roomCompiler
 
+    implementation group: 'com.mpatric', name: 'mp3agic', version: mp3MagicVersion
+
     testImplementation testDependencies.junit
     testImplementation testDependencies.mockito
     androidTestImplementation testDependencies.junit
