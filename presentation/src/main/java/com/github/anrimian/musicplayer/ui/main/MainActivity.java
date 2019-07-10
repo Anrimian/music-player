@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.main;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,6 +15,8 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import com.github.anrimian.musicplayer.utils.Permissions;
+
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (hasFilePermissions()) {
+        if (Permissions.hasFilePermission(this)) {
             goToMainScreen();
         } else {
             goToStartScreen();
@@ -57,11 +58,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         AndroidUtils.hideKeyboard(getWindow().getDecorView());
-    }
-
-    private boolean hasFilePermissions() {
-        RxPermissions rxPermissions = new RxPermissions(this);
-        return rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     private void goToStartScreen() {

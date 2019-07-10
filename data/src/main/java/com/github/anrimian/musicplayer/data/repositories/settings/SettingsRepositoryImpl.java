@@ -35,6 +35,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
 
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Order> folderOrderSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversNotificationSubject = BehaviorSubject.create();
@@ -51,11 +52,17 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setRandomPlayingEnabled(boolean enabled) {
         preferences.putBoolean(RANDOM_PLAYING_ENABLED, enabled);
+        randomModeSubject.onNext(enabled);
     }
 
     @Override
     public boolean isRandomPlayingEnabled() {
         return preferences.getBoolean(RANDOM_PLAYING_ENABLED);
+    }
+
+    @Override
+    public Observable<Boolean> getRandomPlayingObservable() {
+        return withDefaultValue(randomModeSubject, this::isRandomPlayingEnabled);
     }
 
     @Override

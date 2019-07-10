@@ -2,15 +2,17 @@ package com.github.anrimian.musicplayer;
 
 import android.app.Application;
 
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer;
+import com.github.anrimian.musicplayer.utils.Permissions;
 import com.github.anrimian.musicplayer.utils.acra.AcraReportDialog;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.config.ConfigurationBuilder;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import io.reactivex.plugins.RxJavaPlugins;
 
 /**
@@ -24,10 +26,15 @@ public class App extends Application {
         super.onCreate();
         RxJavaPlugins.setErrorHandler(new RxJavaErrorConsumer());
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+
         Components.init(getApplicationContext());
 
         if (BuildConfig.DEBUG) {
             initAcra();
+        }
+
+        if (Permissions.hasFilePermission(this)) {
+            Components.getAppComponent().widgetUpdater().start();
         }
     }
 

@@ -2,9 +2,12 @@ package com.github.anrimian.musicplayer.ui.common.format;
 
 import android.content.Context;
 
+import androidx.annotation.DrawableRes;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 
 import java.util.Locale;
 
@@ -68,6 +71,22 @@ public class FormatUtils {
             case ALPHABETICAL: return R.string.alphabetical_order_desc_title;
             case ADD_TIME: return R.string.add_date_order_desc_title;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
+        }
+    }
+
+    @DrawableRes
+    public static int getRepeatModeIcon(int repeatMode) {
+        switch (repeatMode) {
+            case RepeatMode.NONE: {
+                return R.drawable.ic_repeat_off;
+            }
+            case RepeatMode.REPEAT_COMPOSITION: {
+                return R.drawable.ic_repeat_once;
+            }
+            case RepeatMode.REPEAT_PLAY_LIST: {
+                return R.drawable.ic_repeat;
+            }
+            default: return R.drawable.ic_repeat_off;
         }
     }
 }

@@ -4,12 +4,27 @@ public interface Constants {
 
     int NO_POSITION = -1;
 
+    interface Actions {
+        int PLAY = 1;
+        int PAUSE = 2;
+        int SKIP_TO_NEXT = 3;
+        int SKIP_TO_PREVIOUS = 4;
+        int CHANGE_SHUFFLE_NODE = 5;
+        int CHANGE_REPEAT_MODE = 6;
+    }
+
     interface Arguments {
         String ORDER_ARG = "order_arg";
         String PLAY_LIST_ID_ARG = "play_list_id_arg";
         String PATH_ARG = "path_arg";
         String STATUS_BAR_COLOR_ATTR_ARG = "status_bar_color_attr";
         String OPEN_PLAY_QUEUE_ARG = "open_play_queue_arg";
+        String COMPOSITION_NAME_ARG = "composition_name_arg";
+        String COMPOSITION_AUTHOR_ARG = "composition_author_arg";
+        String COMPOSITION_FILE_ARG = "composition_file_arg";
+        String COMPOSITION_ID_ARG = "composition_id_arg";
+        String PLAY_ARG = "play_arg";
+        String QUEUE_SIZE_ARG = "queue_size_arg";
     }
 
     interface Tags {

@@ -8,6 +8,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
@@ -19,8 +26,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
@@ -43,12 +50,6 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

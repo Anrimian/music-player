@@ -18,6 +18,7 @@ public class StartPresenter extends MvpPresenter<StartView> {
 
     void onFilesPermissionResult(boolean granted) {
         if (granted) {
+            getViewState().startSystemUi();
             getViewState().goToMainScreen();
         } else {
             getViewState().showDeniedPermissionMessage();

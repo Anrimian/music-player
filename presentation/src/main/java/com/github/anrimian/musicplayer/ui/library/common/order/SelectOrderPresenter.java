@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.common.order;
+package com.github.anrimian.musicplayer.ui.library.common.order;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;

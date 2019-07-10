@@ -17,7 +17,7 @@
     <string name="compositions_on_device_not_found">No songs found on device</string>
     <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
     <string name="compositions_for_search_not_found">No matching search results found</string>
-    <string name="foreground_channel_id">Music play notifications</string>
+    <string name="foreground_channel_description">Music play notifications</string>
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
@@ -110,6 +110,9 @@
     <string name="display">Display</string>
     <string name="decrease_volume_on_notification">Decrease volume when notification received</string>
     <string name="playing">Player</string>
+    <string name="error_channel_description">Playing error notifications</string>
+    <string name="playing_error">Play error</string>
+    <string name="no_file_permission">No file permission</string>
     <string name="about_app">About</string>
     <string name="version_template">Version %s</string>
     <string name="about_app_text">Found a issue? Is the screen displayed incorrectly or slowly? Lacking any features? Write me about it, I will be appreciated for feedback.</string>
