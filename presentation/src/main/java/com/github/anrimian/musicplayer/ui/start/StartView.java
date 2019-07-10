@@ -24,4 +24,7 @@ interface StartView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = SCREEN_STATE)
     void showStub();
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void startSystemUi();
 }

@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.common.order;
+package com.github.anrimian.musicplayer.ui.library.common.order;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;

@@ -85,6 +85,7 @@ import static com.github.anrimian.musicplayer.domain.models.composition.Composit
 import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -225,6 +226,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        //FIXME: possible here: start playing, hide app, revoke permission, open
         RxPermissions rxPermissions = new RxPermissions(requireActivity());
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             requireFragmentManager()
@@ -477,6 +479,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             String noCompositionMessage = getString(R.string.no_current_composition);
             topBottomSheetPanel.setContentDescription(noCompositionMessage);
             rvPlayList.setContentDescription(noCompositionMessage);
+            sbTrackState.setContentDescription(noCompositionMessage);
         } else {
             Composition composition = item.getComposition();
             String compositionName = formatCompositionName(composition);
@@ -485,6 +488,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
             seekBarViewWrapper.setMax(composition.getDuration());
             topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, compositionName));
+            sbTrackState.setContentDescription(null);
 
             if (showCover) {
                 ImageFormatUtils.displayImage(ivMusicIcon, composition);
@@ -543,21 +547,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showRepeatMode(int mode) {
-        @DrawableRes int iconRes = R.drawable.ic_repeat_off;
-        switch (mode) {
-            case RepeatMode.NONE: {
-                iconRes = R.drawable.ic_repeat_off;
-                break;
-            }
-            case RepeatMode.REPEAT_COMPOSITION: {
-                iconRes = R.drawable.ic_repeat_once;
-                break;
-            }
-            case RepeatMode.REPEAT_PLAY_LIST: {
-                iconRes = R.drawable.ic_repeat;
-                break;
-            }
-        }
+        @DrawableRes int iconRes = getRepeatModeIcon(mode);
         btnRepeatMode.setImageResource(iconRes);
     }
 

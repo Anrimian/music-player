@@ -14,7 +14,7 @@
     <string name="compositions_on_device_not_found">Композиций на устройстве не найдено</string>
     <string name="compositions_and_folders_for_search_not_found">Композиций и папок, подходящих под результаты поиска, не найдено</string>
     <string name="compositions_for_search_not_found">Композиций, подходящих под результаты поиска, не найдено</string>
-    <string name="foreground_channel_id">Уведомление о проигрывании музыки</string>
+    <string name="foreground_channel_description">Уведомление о проигрывании музыки</string>
     <string name="previous_track">Предыдущий трек</string>
     <string name="next_track">Следующий трек</string>
     <string name="folder">Папка</string>
@@ -111,6 +111,9 @@
     <string name="display">Отображение</string>
     <string name="decrease_volume_on_notification">Уменьшать громкость при получении уведомления</string>
     <string name="playing">Проигрывание</string>
+    <string name="error_channel_description">Уведомления об ошибках</string>
+    <string name="playing_error">Ошибка воспроизведения</string>
+    <string name="no_file_permission">Нет разрешения на доступ к файлам</string>
     <string name="about_app">О приложении</string>
     <string name="version_template">Версия %s</string>
     <string name="about_app_text">Нашли ошибку?

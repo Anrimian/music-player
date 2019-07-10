@@ -1,14 +1,15 @@
-package com.github.anrimian.musicplayer.ui.common.order.adapter;
+package com.github.anrimian.musicplayer.ui.library.common.order.adapter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

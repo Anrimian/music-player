@@ -44,7 +44,10 @@
 
     <dimen name="dialog_margin_content_vertical">12dp</dimen>
     <dimen name="dialog_margin_content_horizontal">8dp</dimen>
-    <dimen name="radio_button_text_margin_start">8dp</dimen>
+
+    <!--controls-->
+    <dimen name="radio_button_text_margin_start">16dp</dimen>
+    <dimen name="radio_button_text_vertical_padding">8dp</dimen>
 
     <!--player bottom sheet-->
     <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>
@@ -69,5 +72,15 @@
     <!--toolbar-->
     <dimen name="toolbar_content_start">72dp</dimen>
     <dimen name="toolbar_control_offset">0dp</dimen>
+
+    <!--widgets-->
+    <dimen name="widget_content_margin_vertical">4dp</dimen>
+    <dimen name="widget_content_margin_horizontal">8dp</dimen>
+    <dimen name="widget_content_spacing_margin">2dp</dimen>
+
+    <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">8dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_vertical">4dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_horizontal">2dp</dimen>
 
 </resources>

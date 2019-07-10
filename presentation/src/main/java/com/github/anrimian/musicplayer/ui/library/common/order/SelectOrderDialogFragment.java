@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.common.order;
+package com.github.anrimian.musicplayer.ui.library.common.order;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -7,20 +7,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
-import com.github.anrimian.musicplayer.ui.common.order.adapter.OrderAdapter;
+import com.github.anrimian.musicplayer.ui.library.common.order.adapter.OrderAdapter;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatDialogFragment;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

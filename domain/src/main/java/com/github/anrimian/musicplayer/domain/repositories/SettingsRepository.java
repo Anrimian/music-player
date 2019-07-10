@@ -14,6 +14,8 @@ public interface SettingsRepository {
 
     boolean isRandomPlayingEnabled();
 
+    Observable<Boolean> getRandomPlayingObservable();
+
     void setRepeatMode(int mode);
 
     int getRepeatMode();
