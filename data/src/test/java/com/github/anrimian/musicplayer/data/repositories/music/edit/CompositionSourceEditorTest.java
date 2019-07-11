@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
+
 public class CompositionSourceEditorTest {
 
     @Rule
@@ -16,7 +18,20 @@ public class CompositionSourceEditorTest {
 
     @Test
     public void testEditor() throws IOException {
-        System.out.println("title: " + sourceEditor.getCompositionAuthor(res.getFile().getPath()).blockingGet());
-        System.out.println("author: " + sourceEditor.getCompositionAuthor(res.getFile().getPath()).blockingGet());
+        String filePath = res.getFile().getPath();
+        System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
+        System.out.println("author: " + sourceEditor.getCompositionAuthor(filePath).blockingGet());
+    }
+
+    @Test
+    public void changeTitleTest() throws IOException {
+        String filePath = res.getFile().getPath();
+        System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
+
+        String testTitle = "Test title";
+        sourceEditor.setCompositionTitle(filePath, testTitle).subscribe();
+        String newTitle = sourceEditor.getCompositionTitle(filePath).blockingGet();
+        System.out.println("new title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
+        assertEquals(testTitle, newTitle);
     }
 }
