@@ -26,6 +26,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
@@ -247,7 +248,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showPlayListDeleteSuccess(PlayList playList) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.play_list_deleted, playList.getName()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -255,7 +256,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showDeletePlayListError(ErrorCommand errorCommand) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.play_list_delete_error, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();

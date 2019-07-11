@@ -1,11 +1,15 @@
 package com.github.anrimian.musicplayer.ui.common.format;
 
 import android.content.Context;
+import android.view.View;
+
+import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -48,5 +52,29 @@ public class MessagesUtils {
         } else {
             return context.getString(R.string.delete_compositions_success, compositions.size());
         }
+    }
+
+    public static Snackbar makeSnackbar(@NonNull View view,
+                                @NonNull CharSequence text,
+                                @Snackbar.Duration int duration) {
+        Context context = view.getContext();
+        Snackbar snackbar = Snackbar.make(view, text, duration);
+//        snackbar.setActionTextColor(getColorFromAttr(context, R.attr.colorAccent));
+
+//        TextView tvText = view.findViewById(com.google.android.material.R.id.snackbar_text);
+//        ViewGroup snackbarView = (ViewGroup) snackbar.getView();
+
+//        for (int i = 0; i < snackbarView.getChildCount(); i++) {
+//            View v = snackbarView.getChildAt(i);
+//            if (v instanceof TextView) {
+//                TextView t = (TextView) v;
+//                t.setTextColor(Color.BLACK);
+//            }
+//        }
+//        tvText.setTextColor(Color.BLACK);
+
+//        snackbarView.setBackgroundColor(getColorFromAttr(context, R.attr.menuItemBackground));
+
+        return snackbar;
     }
 }
