@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="PrimaryLightTheme" parent="AppTheme.Drawer">
-        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
-        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
-        <!--<item name="colorAccent">@color/colorAccent</item>-->
-    </style>
+    <style name="PrimaryLightTheme" parent="AppTheme.Drawer"/>
 
     <style name="PrimaryDarkTheme" parent="PrimaryLightTheme">
         <!--primary colors-->
@@ -22,10 +18,13 @@
         <item name="menuItemBackground">@color/menu_item_background_color_dark</item>
         <item name="playerPanelBackground">?attr/colorPrimary</item>
         <item name="subToolbarBackground">@color/dark_background_level_1</item>
+        <item name="snackbarBackground">@color/snackbar_color_dark</item>
 
         <!--text-->
         <item name="android:textColorPrimary">@color/text_color_primary_dark</item>
         <item name="android:textColorSecondary">@color/text_color_secondary_dark</item>
+        <item name="android:textColorPrimaryInverse">@color/text_color_primary</item>
+        <item name="android:textColorSecondaryInverse">@color/text_color_secondary_dark</item>
         <item name="dialogTitleColor">@color/text_color_primary_dark</item>
         <item name="brightButtonColor">@color/colorAccentDark</item>
         <item name="colorError">@color/color_error_dark</item>
@@ -51,9 +50,6 @@
         <item name="colorPrimary">@color/secondColorPrimary</item>
         <item name="colorPrimaryDark">@color/secondColorPrimaryDark</item>
         <item name="colorAccent">@color/secondColorAccent</item>
-
-        <!--<item name="listBackground">@color/back_two</item>-->
-        <!--<item name="listItemBackground">@color/back_three</item>-->
     </style>
 
 </resources>

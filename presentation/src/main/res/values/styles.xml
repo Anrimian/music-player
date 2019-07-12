@@ -23,6 +23,8 @@
         <!--text colors-->
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
+        <item name="toolbarTextColorPrimary">@color/text_color_primary_dark</item>
+        <item name="toolbarTextColorSecondary">@color/text_color_secondary_dark</item>
         <item name="dialogTitleColor">@color/text_color_primary</item>
         <item name="colorError">@color/colorError</item>
 
@@ -40,6 +42,7 @@
         <item name="android:itemBackground">@drawable/bg_menu_item</item>
         <item name="menuItemBackground">@android:color/white</item>
         <item name="subToolbarBackground">?attr/listItemBackground</item>
+        <item name="snackbarBackground">@color/snackbar_color</item>
 
         <!--navigation view-->
         <item name="navigationViewPrimaryColor">@color/colorPrimary</item>

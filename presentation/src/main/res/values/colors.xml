@@ -7,6 +7,8 @@
 
     <color name="disabled_color">#757575</color>
 
+    <color name="snackbar_color">#323232</color>
+
     <color name="default_notification_color">#00796b</color>
 
     <color name="text_color_primary">#212121</color>
@@ -51,6 +53,8 @@
     <color name="actionModeBackgroundColorDark">#3D3D3D</color>
 
     <color name="color_error_dark">#CF6679</color>
+
+    <color name="snackbar_color_dark">#ffff</color>
 
 
     <!--other-->

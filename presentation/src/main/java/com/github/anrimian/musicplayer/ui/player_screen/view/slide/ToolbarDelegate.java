@@ -34,7 +34,7 @@ public class ToolbarDelegate implements SlideDelegate {
 
         if (toolbar.isInActionMode()) {
             int startColor = getColorFromAttr(toolbar.getContext(), R.attr.actionModeTextColor);
-            int endColor = getColorFromAttr(toolbar.getContext(), android.R.attr.textColorPrimaryInverse);
+            int endColor = getColorFromAttr(toolbar.getContext(), R.attr.toolbarTextColorPrimary);
             ArgbEvaluator argbEvaluator = new ArgbEvaluator();
             int color = (int) argbEvaluator.evaluate(slideOffset, startColor, endColor);
             toolbar.setControlButtonColor(color);

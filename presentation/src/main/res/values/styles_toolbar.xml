@@ -15,9 +15,9 @@
     </style>
 
     <style name="ToolbarStyle">
-        <item name="colorControlNormal">?android:attr/textColorPrimaryInverse</item>
-        <item name="android:editTextColor">?android:attr/textColorPrimaryInverse</item>
-        <item name="editTextColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="colorControlNormal">?attr/toolbarTextColorPrimary</item>
+        <item name="android:editTextColor">?attr/toolbarTextColorPrimary</item>
+        <item name="editTextColor">?attr/toolbarTextColorPrimary</item>
     </style>
 
     <style name="ToolbarStyle.Selection">
@@ -31,7 +31,7 @@
     </style>
 
     <style name="ToolbarTitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:textColor">?attr/toolbarTextColorPrimary</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>

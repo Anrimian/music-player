@@ -131,7 +131,7 @@ public class AdvancedToolbar extends FrameLayout {
         actionIcon.setVisibility(GONE);
         selectionModeContainer.setVisibility(INVISIBLE);
 
-        controlButtonColor = getColorFromAttr(getContext(), android.R.attr.textColorPrimaryInverse);
+        controlButtonColor = getColorFromAttr(getContext(), R.attr.toolbarTextColorPrimary);
         controlButtonActionModeColor = getColorFromAttr(getContext(), R.attr.actionModeTextColor);
 
         backgroundColor = getColorFromAttr(getContext(), R.attr.colorPrimary);

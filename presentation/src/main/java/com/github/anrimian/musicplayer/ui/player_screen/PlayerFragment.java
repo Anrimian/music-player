@@ -696,7 +696,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private DrawerArrowDrawable createDrawerArrowDrawable() {
         DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(requireActivity());
-        drawerArrowDrawable.setColor(getColorFromAttr(requireActivity(), android.R.attr.textColorPrimaryInverse));
+        drawerArrowDrawable.setColor(getColorFromAttr(requireActivity(), R.attr.toolbarTextColorPrimary));
         return drawerArrowDrawable;
     }
 
