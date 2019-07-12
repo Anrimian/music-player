@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:theme="@style/ToolbarStyle"
+        app:titleTextColor="?android:attr/textColorPrimaryInverse"
+        app:subtitleTextColor="?android:attr/textColorSecondaryInverse"/>
+
+    <TextView
+        android:id="@+id/tv_test"
+        style="@style/AppWidget.Text.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/content_vertical_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
+</LinearLayout>

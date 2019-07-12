@@ -9,6 +9,9 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
 @InjectViewState
 public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorView> {
@@ -19,6 +22,7 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     private final ErrorParser errorParser;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
+    private Disposable changeDisposable;
 
     private Composition composition;
 
@@ -44,10 +48,29 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         presenterDisposable.dispose();
     }
 
+    void onNewAuthorEntered(String author) {
+        if (composition == null) {
+            return;
+        }
+
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.editCompositionAuthor(composition, author)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
+
+    private void onDefaultError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showErrorMessage(errorCommand);
+    }
+
     private void loadComposition() {
         presenterDisposable.add(editorInteractor.getCompositionObservable(compositionId)
                 .observeOn(uiScheduler)
-                .subscribe(this::onCompositionReceived, this::onCompositionLoadingError, getViewState()::closeScreen));
+                .subscribe(this::onCompositionReceived,
+                        this::onCompositionLoadingError,
+                        getViewState()::closeScreen));
     }
 
     private void onCompositionReceived(Composition composition) {

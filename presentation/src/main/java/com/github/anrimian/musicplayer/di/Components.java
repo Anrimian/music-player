@@ -6,6 +6,8 @@ import android.content.Context;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.di.app.AppModule;
 import com.github.anrimian.musicplayer.di.app.DaggerAppComponent;
+import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompositionsComponent;
@@ -70,6 +72,12 @@ public class Components {
 
     public static PlayListComponent getPlayListComponent(long playListId) {
         return getAppComponent().playListComponent(new PlayListModule(playListId));
+    }
+
+    public static CompositionEditorComponent getCompositionEditorComponent(long compositionId) {
+        return getAppComponent().compositionEditorComponent(
+                new CompositionEditorModule(compositionId)
+        );
     }
 
     public static SettingsComponent getSettingsComponent() {

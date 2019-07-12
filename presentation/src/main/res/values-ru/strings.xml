@@ -122,6 +122,7 @@
         Напишите мне об этом, буду благодарен обратной связи.
     </string>
     <string name="send_email">Отправить email</string>
+    <string name="edit">Редактировать</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

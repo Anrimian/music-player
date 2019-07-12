@@ -42,6 +42,7 @@ import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
@@ -595,6 +596,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
+    public void startEditCompositionScreen(long id) {
+        startActivity(CompositionEditorActivity.newIntent(requireContext(), id));
+    }
+
+    @Override
     public void showAddingToPlayListError(ErrorCommand errorCommand) {
         Snackbar.make(clPlayQueueContainer,
                 getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
@@ -684,6 +690,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 }
                 case R.id.menu_delete: {
                     presenter.onDeleteCurrentCompositionButtonClicked();
+                    return true;
+                }
+                case R.id.menu_edit: {
+                    presenter.onEditCompositionButtonClicked();
                     return true;
                 }
             }

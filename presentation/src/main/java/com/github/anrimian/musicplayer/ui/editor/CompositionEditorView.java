@@ -19,4 +19,7 @@ public interface CompositionEditorView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = DISPLAY_COMPOSITION_STATE)
     void showComposition(Composition composition);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showErrorMessage(ErrorCommand errorCommand);
 }

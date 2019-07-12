@@ -97,4 +97,7 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void setPlayQueueCoversEnabled(boolean isCoversEnabled);
+
+    @StateStrategyType(SkipStrategy.class)
+    void startEditCompositionScreen(long id);
 }

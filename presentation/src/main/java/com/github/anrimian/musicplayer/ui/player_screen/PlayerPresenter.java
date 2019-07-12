@@ -241,6 +241,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         }
     }
 
+    void onEditCompositionButtonClicked() {
+        getViewState().startEditCompositionScreen(currentItem.getComposition().getId());
+    }
+
     private void swapItems(int from, int to) {
         PlayQueueItem fromItem = playQueue.get(from);
         PlayQueueItem toItem = playQueue.get(to);
