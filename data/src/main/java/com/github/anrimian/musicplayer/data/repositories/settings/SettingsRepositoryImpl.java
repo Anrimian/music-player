@@ -108,7 +108,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setCoversEnabled(boolean enabled) {
-        if (enabled != showCoversSubject.getValue()) {
+        if (enabled != isCoversEnabled()) {
             preferences.putBoolean(SHOW_COVERS, enabled);
             showCoversSubject.onNext(enabled);
         }
@@ -116,7 +116,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setCoversInNotificationEnabled(boolean enabled) {
-        if (enabled != showCoversNotificationSubject.getValue()) {
+        if (enabled != isCoversInNotificationEnabled()) {
             preferences.putBoolean(SHOW_COVERS_IN_NOTIFICATION, enabled);
             showCoversNotificationSubject.onNext(enabled);
         }
@@ -124,7 +124,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setColoredNotificationEnabled(boolean enabled) {
-        if (enabled != coloredNotificationSubject.getValue()) {
+        if (enabled != isColoredNotificationEnabled()) {
             preferences.putBoolean(COLORED_NOTIFICATION, enabled);
             coloredNotificationSubject.onNext(enabled);
         }
@@ -132,7 +132,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setCoversOnLockScreenEnabled(boolean enabled) {
-        if (enabled != showCoversOnLockScreenSubject.getValue()) {
+        if (enabled != isCoversOnLockScreenEnabled()) {
             preferences.putBoolean(SHOW_COVERS_ON_LOCK_SCREEN, enabled);
             showCoversOnLockScreenSubject.onNext(enabled);
         }
