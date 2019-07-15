@@ -12,6 +12,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimaryDarkSecondary">@color/colorPrimaryDarkSecondary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimary</item>
 
         <!--control colors-->
         <item name="disabledColor">@color/disabled_color</item>
