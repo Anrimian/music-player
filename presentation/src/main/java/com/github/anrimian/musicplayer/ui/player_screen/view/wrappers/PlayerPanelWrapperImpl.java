@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.wrappers;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -121,6 +122,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
 
     public PlayerPanelWrapperImpl(View view,
                                   Activity activity,
+                                  Bundle savedInstanceState,
                                   Runnable onBottomSheetDragCollapsed,
                                   Runnable onBottomSheetDragExpanded,
                                   Callback<Boolean> bottomSheetStateListener) {
@@ -132,6 +134,9 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         ButterKnife.bind(this, view);
 
         setViewStartState();
+        if (savedInstanceState == null) {
+            mlBottomSheet.setVisibility(INVISIBLE);
+        }
 
         bottomSheetDelegate = createBottomSheetDelegate();
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
@@ -139,6 +144,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
                 this::onBottomSheetStateChanged,
                 bottomSheetDelegate::onSlide
+
         ));
     }
 
@@ -238,7 +244,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
 
         DelegateManager delegateManager = new DelegateManager();
-        if (bottomSheetCoordinator != null) {//landscape
+        if (isInLandscapeOrientation()) {//landscape
             boundDelegateManager.addDelegate(new MoveXDelegate(
                     0.5f,
                     bottomSheetCoordinator));
@@ -251,6 +257,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
                     0.85f,
                     activity.getResources().getDimensionPixelSize(R.dimen.bottom_sheet_height)
             ));
+            boundDelegateManager.addDelegate(new BoundValuesDelegate(0f, 0.1f, new VisibilityDelegate(clPlayQueueContainer)));
         } else {
             boundDelegateManager.addDelegate(new BoundValuesDelegate(0.90f, 1f, new VisibilityDelegate(clPlayQueueContainer)));
             delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
@@ -269,8 +276,13 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     }
 
     private void setViewStartState() {
+        clPlayQueueContainer.setVisibility(INVISIBLE);
         playQueueTitleContainer.setVisibility(INVISIBLE);
         titleContainer.setVisibility(INVISIBLE);
         toolbarTitleContainer.setVisibility(INVISIBLE);
+    }
+
+    private boolean isInLandscapeOrientation() {
+        return bottomSheetCoordinator != null;
     }
 }

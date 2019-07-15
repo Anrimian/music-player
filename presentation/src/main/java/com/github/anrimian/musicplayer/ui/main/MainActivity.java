@@ -8,10 +8,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import com.github.anrimian.musicplayer.utils.Permissions;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
@@ -20,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Components.getAppComponent().themeController().applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

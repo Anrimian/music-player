@@ -1,8 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="toolbarColor" format="color"/>
     <attr name="actionModeTextColor" format="color"/>
+    <attr name="colorPrimaryDarkSecondary" format="color"/>
+
+    <!--action mode-->
+    <attr name="actionModeBackgroundColor" format="color"/>
     <attr name="actionModeStatusBarColor" format="color"/>
+
+    <!--background-->
     <attr name="listBackground" format="color"/>
     <attr name="listItemBackground" format="color"/>
+    <attr name="playerPanelBackground" format="color"/>
+    <attr name="menuItemBackground" format="color"/>
+    <attr name="subToolbarBackground" format="color"/>
+
+    <attr name="navigationViewPrimaryColor" format="color"/>
+
     <attr name="disabledColor" format="color"/>
+
+    <!--buttons-->
+    <attr name="buttonColor" format="color"/>
+    <attr name="secondaryButtonColor" format="color"/>
+    <attr name="brightButtonColor" format="color"/>
+    <attr name="buttonColorInverse" format="color"/>
+
+    <!--text-->
+    <attr name="dialogTitleColor" format="color"/>
+    <attr name="colorError" format="color"/>
+    <attr name="toolbarTextColorPrimary" format="color"/>
+    <attr name="toolbarTextColorSecondary" format="color"/>
+
+    <!--snackbar-->
+    <attr name="snackbarBackground" format="color"/>
 </resources>

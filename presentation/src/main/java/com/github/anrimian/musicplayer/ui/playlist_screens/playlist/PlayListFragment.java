@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
@@ -227,7 +228,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -236,12 +237,12 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void showDeletedCompositionMessage(List<Composition> compositionsToDelete) {
         String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
-        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+        MessagesUtils.makeSnackbar(clListContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void showAddingToPlayListError(ErrorCommand errorCommand) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -250,12 +251,12 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions) {
         String text = getAddToPlayListCompleteMessage(requireActivity(), playList, compositions);
-        Snackbar.make(clListContainer, text, Snackbar.LENGTH_SHORT).show();
+        MessagesUtils.makeSnackbar(clListContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void showDeleteItemError(ErrorCommand errorCommand) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.add_item_to_playlist_error_template, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -264,7 +265,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items) {
         String text = getDeletePlayListItemCompleteMessage(requireActivity(), playList, items);
-        Snackbar.make(clListContainer, text, Snackbar.LENGTH_LONG)
+        MessagesUtils.makeSnackbar(clListContainer, text, Snackbar.LENGTH_LONG)
                 .setAction(R.string.cancel, v -> presenter.onRestoreRemovedItemClicked())
                 .show();
     }
@@ -278,7 +279,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void showPlayListDeleteSuccess(PlayList playList) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.play_list_deleted, playList.getName()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -286,7 +287,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void showDeletePlayListError(ErrorCommand errorCommand) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.play_list_delete_error, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -321,7 +322,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        Snackbar.make(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+        MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
     private void onCompositionActionSelected(MenuItem menuItem) {

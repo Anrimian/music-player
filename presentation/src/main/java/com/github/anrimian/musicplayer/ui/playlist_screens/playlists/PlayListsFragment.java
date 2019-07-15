@@ -6,6 +6,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
@@ -13,6 +19,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
@@ -28,11 +35,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -146,7 +148,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     @Override
     public void showPlayListDeleteSuccess(PlayList playList) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.play_list_deleted, playList.getName()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -154,7 +156,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     @Override
     public void showDeletePlayListError(ErrorCommand errorCommand) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.play_list_delete_error, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();

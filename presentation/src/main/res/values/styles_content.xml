@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Content.Button" parent="AppTheme">
+    <style name="ButtonStyle">
         <item name="android:layout_width">@dimen/button_expand_size</item>
         <item name="android:layout_height">@dimen/button_expand_size</item>
         <item name="android:scaleType">centerInside</item>
@@ -8,19 +8,19 @@
         <item name="android:tint">@color/color_button</item>
     </style>
 
-    <style name="Content.Button.Main">
+    <style name="ButtonStyle.Main">
         <item name="android:layout_width">@dimen/control_button_width</item>
         <item name="android:layout_height">@dimen/bottom_sheet_height</item>
         <item name="android:background">@drawable/bg_selectable_round_shape</item>
     </style>
 
-    <style name="Content.Button.Menu">
+    <style name="ButtonStyle.Menu">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:tint">@color/color_button_secondary</item>
     </style>
 
-    <style name="Content.Text" parent="@style/Base.TextAppearance.AppCompat.Body1">
+    <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
 
     </style>
 
@@ -33,7 +33,15 @@
         <item name="android:textSize">17sp</item>
     </style>
 
-    <style name="Content.Dialog.Text" parent="@style/Content.Text">
+    <style name="Content.Text.Button.Single" parent="@style/Base.TextAppearance.AppCompat.Body1">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:paddingTop">@dimen/content_vertical_margin</item>
+        <item name="android:paddingBottom">@dimen/content_vertical_margin</item>
+        <item name="android:paddingEnd">@dimen/content_horizontal_margin</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="Content.Dialog.Text" parent="@style/TextStyle">
         <item name="android:textSize">16sp</item>
     </style>
 
@@ -45,28 +53,28 @@
         <item name="android:textSize">11sp</item>
     </style>
 
-    <style name="Content.Text.Time">
+    <style name="TextStyle.Time">
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="Content.Text.Subtitle" parent="Content.Text">
+    <style name="TextStyle.Subtitle">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Content.Text.Subtitle.Small">
+    <style name="TextStyle.Subtitle.Small">
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="Content.Text.Small">
+    <style name="TextStyle.Small">
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="Content.Text.Medium">
+    <style name="TextStyle.Medium">
         <item name="android:textSize">15sp</item>
     </style>
 
-    <style name="Content.Button.Main.Expanded">
+    <style name="ButtonStyle.Main.Expanded">
         <item name="android:layout_width">@dimen/play_button_expand_size</item>
         <item name="android:layout_height">@dimen/play_button_expand_size</item>
     </style>
@@ -81,13 +89,20 @@
         <item name="android:layout_height">24dp</item>
     </style>
 
-    <style name="Content.Text.Error">
-        <item name="android:textColor">@color/colorError</item>
+    <style name="TextStyle.Error">
+        <item name="android:textColor">?attr/colorError</item>
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="Content.Text.Progress">
+    <style name="TextStyle.Progress">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:textSize">13sp</item>
     </style>
+
+    <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textColorHint">?android:attr/textColorSecondary</item>
+    </style>
+
 </resources>

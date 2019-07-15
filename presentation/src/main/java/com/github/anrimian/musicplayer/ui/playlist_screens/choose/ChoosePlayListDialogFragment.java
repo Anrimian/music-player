@@ -26,6 +26,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
@@ -54,7 +55,6 @@ import butterknife.ButterKnife;
 
 import static android.view.View.INVISIBLE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -248,7 +248,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showPlayListDeleteSuccess(PlayList playList) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.play_list_deleted, playList.getName()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -256,7 +256,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showDeletePlayListError(ErrorCommand errorCommand) {
-        Snackbar.make(clListContainer,
+        MessagesUtils.makeSnackbar(clListContainer,
                 getString(R.string.play_list_delete_error, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -316,7 +316,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
                 .addDelegate(new BoundValuesDelegate(0.85f, 1f,
                                 new StatusBarColorDelegate(requireActivity().getWindow(),
                                         getColorFromAttr(getContext(), getStatusBarColorAttr()),
-                                        getColor(requireContext(), R.color.colorPrimaryDarkSecondary))
+                                        getColorFromAttr(requireContext(), R.attr.colorPrimaryDarkSecondary))
                         )
                 );
     }

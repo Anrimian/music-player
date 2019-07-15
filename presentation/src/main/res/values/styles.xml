@@ -7,27 +7,58 @@
     </style>
 
     <style name="AppTheme" parent="AppBaseTheme">
-        <!-- Customize your theme here. -->
+        <!--primary colors-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryDarkSecondary">@color/colorPrimaryDarkSecondary</item>
 
+        <!--control colors-->
         <item name="disabledColor">@color/disabled_color</item>
+        <item name="buttonColor">@color/primary_button_color</item>
+        <item name="secondaryButtonColor">@color/secondary_button_color</item>
+        <item name="brightButtonColor">@color/colorAccent</item>
+        <item name="buttonColorInverse">@color/icon_color</item>
 
+        <!--text colors-->
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
+        <item name="toolbarTextColorPrimary">@color/text_color_primary_dark</item>
+        <item name="toolbarTextColorSecondary">@color/text_color_secondary_dark</item>
+        <item name="dialogTitleColor">@color/text_color_primary</item>
+        <item name="colorError">@color/colorError</item>
 
-        <item name="dividerHorizontal">@color/divider_color</item>
-
+        <!--toolbar-->
+        <item name="toolbarColor">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="actionModeTextColor">@color/secondary_button_color</item>
         <item name="actionModeStatusBarColor">@color/selectionStatusBarColor</item>
+        <item name="actionModeBackgroundColor">@android:color/white</item>
 
+        <!--background-->
         <item name="listBackground">@color/light_light_gray</item>
         <item name="listItemBackground">@android:color/white</item>
+        <item name="playerPanelBackground">?attr/listItemBackground</item>
+        <item name="android:itemBackground">@drawable/bg_menu_item</item>
+        <item name="menuItemBackground">@android:color/white</item>
+        <item name="subToolbarBackground">?attr/listItemBackground</item>
+        <item name="snackbarBackground">@color/snackbar_color</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@color/colorPrimary</item>
+
+        <!--other-->
+        <item name="android:dividerHorizontal">@color/divider_color</item>
+        <item name="android:alertDialogTheme">@style/DialogStyle</item>
+        <item name="android:listDivider">@drawable/divider</item>
     </style>
 
     <style name="AppTheme.Drawer" parent="AppTheme">
 
+    </style>
+
+    <style name="NavigationViewStyle">
+        <item name="colorPrimary">?attr/navigationViewPrimaryColor</item>
     </style>
 
     <style name="SlidrActivityTheme" parent="AppTheme">

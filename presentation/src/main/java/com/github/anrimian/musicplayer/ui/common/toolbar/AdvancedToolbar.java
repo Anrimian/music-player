@@ -17,6 +17,16 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.MenuRes;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
+import androidx.appcompat.widget.ActionMenuView;
+import androidx.appcompat.widget.Toolbar;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
@@ -28,15 +38,6 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.MenuRes;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
-import androidx.appcompat.widget.ActionMenuView;
-import androidx.appcompat.widget.Toolbar;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
@@ -130,11 +131,11 @@ public class AdvancedToolbar extends FrameLayout {
         actionIcon.setVisibility(GONE);
         selectionModeContainer.setVisibility(INVISIBLE);
 
-        controlButtonColor = getColorFromAttr(getContext(), android.R.attr.textColorPrimaryInverse);
+        controlButtonColor = getColorFromAttr(getContext(), R.attr.toolbarTextColorPrimary);
         controlButtonActionModeColor = getColorFromAttr(getContext(), R.attr.actionModeTextColor);
 
         backgroundColor = getColorFromAttr(getContext(), R.attr.colorPrimary);
-        backgroundActionModeColor = getColorFromAttr(getContext(), android.R.attr.windowBackground);
+        backgroundActionModeColor = getColorFromAttr(getContext(), R.attr.actionModeBackgroundColor);
 
         statusBarColor = getColorFromAttr(window.getContext(), android.R.attr.statusBarColor);
         statusBarActionModeColor = getColorFromAttr(window.getContext(), R.attr.actionModeStatusBarColor);

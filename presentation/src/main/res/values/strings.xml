@@ -115,12 +115,11 @@
     <string name="no_file_permission">No file permission</string>
     <string name="about_app">About</string>
     <string name="version_template">Version %s</string>
-    <string name="about_app_text">Found a issue?
-         Is the screen displayed incorrectly or slowly?
-         Lacking any features?
-         Write me about it, I will be appreciated for feedback.
-    </string>
+    <string name="about_app_text">Found a issue? Is the screen displayed incorrectly or slowly? Lacking any features? Write me about it, I will be appreciated for feedback.</string>
     <string name="send_email">Send email</string>
+    <string name="theme">Theme</string>
+    <string name="white_theme">White</string>
+    <string name="dark_theme">Dark</string>
     <string name="edit">Edit</string>
 
     <plurals name="compositions_count">
