@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.ui.utils;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -17,7 +19,9 @@ import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DimenRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
 import static android.text.TextUtils.isEmpty;
@@ -117,6 +121,27 @@ public class AndroidUtils {
         } catch (ActivityNotFoundException e) {
             //very low possibility, don't translate yet
             Toast.makeText(ctx, "Mail app  not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static void updateTaskManager(Activity activity,
+                                         @StringRes int titleResId,
+                                         @DrawableRes int iconResId,
+                                         @ColorInt int titleColor) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ActivityManager.TaskDescription taskDescription;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                taskDescription = new ActivityManager.TaskDescription(
+                        activity.getString(titleResId),
+                        iconResId,
+                        titleColor);
+            } else {
+                taskDescription = new ActivityManager.TaskDescription(
+                        activity.getString(titleResId),
+                        BitmapFactory.decodeResource(activity.getResources(), iconResId),
+                        titleColor);
+            }
+            activity.setTaskDescription(taskDescription);
         }
     }
 }

@@ -41,6 +41,7 @@ import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
 import com.github.anrimian.musicplayer.ui.common.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
@@ -257,6 +258,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         } else {
             playerPanelWrapper = new PlayerPanelWrapperImpl(view,
                     requireActivity(),
+                    savedInstanceState,
                     presenter::onBottomPanelCollapsed,
                     presenter::onBottomPanelExpanded,
                     drawerLockStateProcessor::onBottomSheetOpened);
@@ -596,7 +598,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showAddingToPlayListError(ErrorCommand errorCommand) {
-        Snackbar.make(clPlayQueueContainer,
+        MessagesUtils.makeSnackbar(clPlayQueueContainer,
                 getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -605,7 +607,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions) {
         String text = getAddToPlayListCompleteMessage(requireActivity(), playList, compositions);
-        Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
+        MessagesUtils.makeSnackbar(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -624,7 +626,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        Snackbar.make(clPlayQueueContainer,
+        MessagesUtils.makeSnackbar(clPlayQueueContainer,
                 getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -633,7 +635,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
         String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
-        Snackbar.make(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
+        MessagesUtils.makeSnackbar(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
     public void openPlayQueue() {
@@ -694,7 +696,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private DrawerArrowDrawable createDrawerArrowDrawable() {
         DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(requireActivity());
-        drawerArrowDrawable.setColor(getColorFromAttr(requireActivity(), android.R.attr.textColorPrimaryInverse));
+        drawerArrowDrawable.setColor(getColorFromAttr(requireActivity(), R.attr.toolbarTextColorPrimary));
         return drawerArrowDrawable;
     }
 

@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:minHeight="?attr/actionBarSize"
-        app:titleTextColor="?android:attr/textColorPrimaryInverse"
-        app:subtitleTextColor="?android:attr/textColorSecondaryInverse"
+        app:titleTextColor="?attr/toolbarTextColorPrimary"
+        app:subtitleTextColor="?attr/toolbarTextColorSecondary"
         tools:navigationIcon="@drawable/ic_menu"
         tools:menu="@menu/library_compositions_menu">
 

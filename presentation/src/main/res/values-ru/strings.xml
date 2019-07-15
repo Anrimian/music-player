@@ -85,16 +85,9 @@
     <string name="now_playing_template">Сейчас проигрывает: %1$s. Открыть очередь воспроизведения.</string>
     <string name="play_all_in_folder">Проиграть всё в папке</string>
     <string name="delete_playlist">Удалить плейлист</string>
-    <string name="storage_timeout_error_message">
-        Медиа хранилище устройства не отвечает.
-        Это очень странная и редкая ошибка.
-        Попробуйте перезагрузить устройство, возможно, это решит эту проблему.
-    </string>
+    <string name="storage_timeout_error_message">Медиа хранилище устройства не отвечает. Это очень странная и редкая ошибка. Попробуйте перезагрузить устройство, возможно, это решит эту проблему.</string>
     <string name="select_all">Выделить всё</string>
-    <string name="file_uri_extract_error">
-        Не удалось получить путь к файлу для отправки.
-        Возможно, он в закрытой системной папке.
-    </string>
+    <string name="file_uri_extract_error">Не удалось получить путь к файлу для отправки. Возможно, он в закрытой системной папке.</string>
     <string name="loading_progress">Загрузка…</string>
     <string name="alphabetical_order_desc_title">Я - А</string>
     <string name="add_date_order_desc_title">Сначала поздние</string>
@@ -116,12 +109,11 @@
     <string name="no_file_permission">Нет разрешения на доступ к файлам</string>
     <string name="about_app">О приложении</string>
     <string name="version_template">Версия %s</string>
-    <string name="about_app_text">Нашли ошибку?
-        Экран отображается некорректо или медленно?
-        Недостаёт какой-либо функциональности?
-        Напишите мне об этом, буду благодарен обратной связи.
-    </string>
+    <string name="about_app_text">Нашли ошибку? Экран отображается некорректо или медленно? Недостаёт какой-либо функциональности? Напишите мне об этом, буду благодарен обратной связи.</string>
     <string name="send_email">Отправить email</string>
+    <string name="theme">Тема оформления</string>
+    <string name="white_theme">Светлая</string>
+    <string name="dark_theme">Тёмная</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

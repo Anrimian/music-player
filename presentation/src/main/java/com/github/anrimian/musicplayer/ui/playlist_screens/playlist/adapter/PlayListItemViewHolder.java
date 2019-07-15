@@ -5,17 +5,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.StringRes;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewPositionItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 
 import javax.annotation.Nonnull;
 
-import androidx.annotation.StringRes;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -23,7 +25,7 @@ import butterknife.ButterKnife;
  * Created on 31.10.2017.
  */
 
-public class PlayListItemViewHolder extends RecyclerView.ViewHolder {
+public class PlayListItemViewHolder extends RecyclerView.ViewHolder implements DragListener {
 
     @BindView(R.id.clickable_item)
     View clickableItem;
@@ -57,6 +59,11 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder {
         this.item = item;
         Composition composition = item.getComposition();
         compositionItemWrapper.bind(composition, coversEnabled);
+    }
+
+    @Override
+    public void onDragStateChanged(boolean dragging) {
+        compositionItemWrapper.showAsDraggingItem(dragging);
     }
 
     private String getString(@StringRes int resId) {

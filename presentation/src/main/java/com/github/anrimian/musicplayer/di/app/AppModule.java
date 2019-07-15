@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsI
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
+import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
@@ -75,5 +76,12 @@ public class AppModule {
                                 MusicPlayerInteractor playerInteractor,
                                 DisplaySettingsInteractor displaySettingsInteractor) {
         return new WidgetUpdater(context, playerInteractor, displaySettingsInteractor);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    ThemeController themeController(Context context) {
+        return new ThemeController(context);
     }
 }
