@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app.editor;
 
 import com.github.anrimian.musicplayer.data.repositories.music.edit.CompositionEditorRepositoryImpl;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.business.editor.CompositionEditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.CompositionEditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
@@ -28,8 +29,9 @@ public class CompositionEditorModule {
 
     @Provides
     @Nonnull
-    CompositionEditorRepository compositionEditorRepository(@Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new CompositionEditorRepositoryImpl(scheduler);
+    CompositionEditorRepository compositionEditorRepository(StorageMusicDataSource storageMusicDataSource,
+                                                            @Named(DB_SCHEDULER) Scheduler scheduler) {
+        return new CompositionEditorRepositoryImpl(storageMusicDataSource, scheduler);
     }
 
     @Provides

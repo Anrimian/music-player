@@ -3,8 +3,6 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 import com.github.anrimian.musicplayer.domain.utils.changes.ChangeType;
 
@@ -14,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -106,6 +102,11 @@ public class StorageMusicDataSource {
                     changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
                 })
                 .ignoreElement()
+                .subscribeOn(scheduler);
+    }
+
+    public Completable updateCompositionAuthor(Composition composition, String author) {
+        return Completable.fromAction(() -> musicProvider.updateCompositionAuthor(composition, author))
                 .subscribeOn(scheduler);
     }
 

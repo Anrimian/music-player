@@ -1,10 +1,12 @@
-package com.github.anrimian.musicplayer.ui.common;
+package com.github.anrimian.musicplayer.ui.common.dialogs;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -15,8 +17,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import androidx.core.content.FileProvider;
 
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;

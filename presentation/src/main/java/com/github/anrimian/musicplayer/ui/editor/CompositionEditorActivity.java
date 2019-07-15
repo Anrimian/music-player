@@ -14,6 +14,7 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatActivity;
 import com.r0adkll.slidr.Slidr;
@@ -22,6 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 public class CompositionEditorActivity extends MvpAppCompatActivity
@@ -62,7 +64,15 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
             actionBar.setTitle(R.string.edit);
         }
 
+        tvTest.setOnClickListener(v -> presenter.onChangeAuthorClicked());
+
         Slidr.attach(this);
+
+        InputTextDialogFragment fragment = (InputTextDialogFragment)
+                getSupportFragmentManager().findFragmentByTag(AUTHOR_TAG);
+        if (fragment != null) {
+            fragment.setOnCompleteListener(presenter::onNewAuthorEntered);
+        }
     }
 
     @Override
@@ -84,6 +94,17 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @Override
     public void showComposition(Composition composition) {
         tvTest.setText(formatCompositionAuthor(composition, this));
+    }
+
+    @Override
+    public void showEnterAuthorDialog(Composition composition) {
+        InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.change_author_name,
+                R.string.change,
+                R.string.cancel,
+                R.string.enter_author_name,
+                composition.getArtist());
+        fragment.setOnCompleteListener(presenter::onNewAuthorEntered);
+        fragment.show(getSupportFragmentManager(), AUTHOR_TAG);
     }
 
     @Override

@@ -115,6 +115,8 @@
     <string name="white_theme">Светлая</string>
     <string name="dark_theme">Тёмная</string>
     <string name="edit">Редактировать</string>
+    <string name="change_author_name">Изменить имя автора</string>
+    <string name="enter_author_name">Введите имя автора</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

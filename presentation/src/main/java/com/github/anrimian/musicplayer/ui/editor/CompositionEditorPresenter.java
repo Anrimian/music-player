@@ -48,6 +48,13 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         presenterDisposable.dispose();
     }
 
+    void onChangeAuthorClicked() {
+        if (composition == null) {
+            return;
+        }
+        getViewState().showEnterAuthorDialog(composition);
+    }
+
     void onNewAuthorEntered(String author) {
         if (composition == null) {
             return;

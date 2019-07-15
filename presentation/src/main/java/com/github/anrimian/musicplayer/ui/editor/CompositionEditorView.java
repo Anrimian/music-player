@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.editor;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -22,4 +23,7 @@ public interface CompositionEditorView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);
+
+    @StateStrategyType(SkipStrategy.class)
+    void showEnterAuthorDialog(Composition composition);
 }

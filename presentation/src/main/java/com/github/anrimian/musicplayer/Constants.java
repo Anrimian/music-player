@@ -25,6 +25,11 @@ public interface Constants {
         String COMPOSITION_ID_ARG = "composition_id_arg";
         String PLAY_ARG = "play_arg";
         String QUEUE_SIZE_ARG = "queue_size_arg";
+        String TITLE_ARG = "title_arg";
+        String POSITIVE_BUTTON_ARG = "positive_button_arg";
+        String NEGATIVE_BUTTON_ARG = "negative_button_arg";
+        String EDIT_TEXT_HINT = "edit_text_hint";
+        String EDIT_TEXT_VALUE = "edit_text_value";
     }
 
     interface Tags {
@@ -34,6 +39,7 @@ public interface Constants {
         String CREATE_PLAYLIST_TAG = "create_playlist_tag";
         String PLAY_LIST_MENU = "play_list_menu";
         String COMPOSITION_ACTION_TAG = "composition_action_tag";
+        String AUTHOR_TAG = "author_tag";
     }
 
     interface Animation {
