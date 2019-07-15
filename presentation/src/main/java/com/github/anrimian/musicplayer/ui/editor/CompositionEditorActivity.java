@@ -22,6 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 public class CompositionEditorActivity extends MvpAppCompatActivity
         implements CompositionEditorView {
@@ -49,6 +50,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Components.getAppComponent().themeController().applyCurrentSlidrTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_composition_edit);
         ButterKnife.bind(this);
@@ -81,7 +83,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showComposition(Composition composition) {
-        tvTest.setText(composition.getArtist());
+        tvTest.setText(formatCompositionAuthor(composition, this));
     }
 
     @Override

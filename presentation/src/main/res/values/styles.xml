@@ -61,7 +61,7 @@
         <item name="colorPrimary">?attr/navigationViewPrimaryColor</item>
     </style>
 
-    <style name="SlidrActivityTheme" parent="AppTheme">
+    <style name="SlidrActivityTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
 
