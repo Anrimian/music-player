@@ -82,12 +82,20 @@ public class StorageMusicProvider {
     }
 
     public void updateCompositionAuthor(Composition composition, String author) {
+        updateComposition(composition.getId(), ARTIST, author);
+    }
+
+    public void updateCompositionTitle(Composition composition, String title) {
+        updateComposition(composition.getId(), TITLE, title);
+    }
+
+    private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
-        cv.put(ARTIST, author);
+        cv.put(key, value);
         contentResolver.update(EXTERNAL_CONTENT_URI,
                 cv,
                 MediaStore.Audio.Playlists._ID + " = ?",
-                new String[] { String.valueOf(composition.getId()) });
+                new String[] { String.valueOf(id) });
     }
 
     private Map<Long, Composition> getCompositions(Uri uri) {

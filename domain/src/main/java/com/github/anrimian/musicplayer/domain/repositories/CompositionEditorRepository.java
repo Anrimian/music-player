@@ -7,4 +7,6 @@ import io.reactivex.Completable;
 public interface CompositionEditorRepository {
 
     Completable editCompositionAuthor(Composition composition, String newAuthor);
+
+    Completable editCompositionTitle(Composition composition, String title);
 }

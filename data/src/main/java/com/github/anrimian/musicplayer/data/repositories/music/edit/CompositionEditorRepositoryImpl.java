@@ -26,4 +26,11 @@ public class CompositionEditorRepositoryImpl implements CompositionEditorReposit
                 .andThen(storageMusicDataSource.updateCompositionAuthor(composition, newAuthor))
                 .subscribeOn(scheduler);
     }
+
+    @Override
+    public Completable editCompositionTitle(Composition composition, String title) {
+        return sourceEditor.setCompositionTitle(composition.getFilePath(), title)
+                .andThen(storageMusicDataSource.updateCompositionTitle(composition, title))
+                .subscribeOn(scheduler);
+    }
 }

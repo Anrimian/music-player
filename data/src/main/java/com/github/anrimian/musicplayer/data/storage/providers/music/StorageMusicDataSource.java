@@ -110,6 +110,11 @@ public class StorageMusicDataSource {
                 .subscribeOn(scheduler);
     }
 
+    public Completable updateCompositionTitle(Composition composition, String title) {
+        return Completable.fromAction(() -> musicProvider.updateCompositionTitle(composition, title))
+                .subscribeOn(scheduler);
+    }
+
     private void deleteCompositionInternal(Map<Long, Composition> compositions,
                                            Composition composition) {
         String filePath = composition.getFilePath();

@@ -24,6 +24,7 @@ import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 public class CompositionEditorActivity extends MvpAppCompatActivity
@@ -32,8 +33,11 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @InjectPresenter
     CompositionEditorPresenter presenter;
 
-    @BindView(R.id.tv_test)
-    TextView tvTest;
+    @BindView(R.id.tv_author)
+    TextView tvAuthor;
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -64,7 +68,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
             actionBar.setTitle(R.string.edit);
         }
 
-        tvTest.setOnClickListener(v -> presenter.onChangeAuthorClicked());
+        tvAuthor.setOnClickListener(v -> presenter.onChangeAuthorClicked());
+        tvTitle.setOnClickListener(v -> presenter.onChangeTitleClicked());
 
         Slidr.attach(this);
 
@@ -72,6 +77,12 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 getSupportFragmentManager().findFragmentByTag(AUTHOR_TAG);
         if (fragment != null) {
             fragment.setOnCompleteListener(presenter::onNewAuthorEntered);
+        }
+
+        InputTextDialogFragment titleFragment = (InputTextDialogFragment)
+                getSupportFragmentManager().findFragmentByTag(TITLE_TAG);
+        if (titleFragment != null) {
+            titleFragment.setOnCompleteListener(presenter::onNewTitleEntered);
         }
     }
 
@@ -88,12 +99,13 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showCompositionLoadingError(ErrorCommand errorCommand) {
-        tvTest.setText(errorCommand.getMessage());
+        tvAuthor.setText(errorCommand.getMessage());
     }
 
     @Override
     public void showComposition(Composition composition) {
-        tvTest.setText(formatCompositionAuthor(composition, this));
+        tvTitle.setText(composition.getTitle());
+        tvAuthor.setText(formatCompositionAuthor(composition, this));
     }
 
     @Override
@@ -105,6 +117,17 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 composition.getArtist());
         fragment.setOnCompleteListener(presenter::onNewAuthorEntered);
         fragment.show(getSupportFragmentManager(), AUTHOR_TAG);
+    }
+
+    @Override
+    public void showEnterTitleDialog(Composition composition) {
+        InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.change_title,
+                R.string.change,
+                R.string.cancel,
+                R.string.enter_title,
+                composition.getTitle());
+        fragment.setOnCompleteListener(presenter::onNewTitleEntered);
+        fragment.show(getSupportFragmentManager(), TITLE_TAG);
     }
 
     @Override

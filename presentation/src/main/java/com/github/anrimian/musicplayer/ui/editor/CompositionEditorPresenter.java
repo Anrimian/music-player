@@ -55,6 +55,13 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         getViewState().showEnterAuthorDialog(composition);
     }
 
+    void onChangeTitleClicked() {
+        if (composition == null) {
+            return;
+        }
+        getViewState().showEnterTitleDialog(composition);
+    }
+
     void onNewAuthorEntered(String author) {
         if (composition == null) {
             return;
@@ -62,6 +69,18 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
 
         dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.editCompositionAuthor(composition, author)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
+
+    void onNewTitleEntered(String title) {
+        if (composition == null) {
+            return;
+        }
+
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.editCompositionTitle(composition, title)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);

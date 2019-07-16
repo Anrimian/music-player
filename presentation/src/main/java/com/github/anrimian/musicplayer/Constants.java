@@ -40,6 +40,7 @@ public interface Constants {
         String PLAY_LIST_MENU = "play_list_menu";
         String COMPOSITION_ACTION_TAG = "composition_action_tag";
         String AUTHOR_TAG = "author_tag";
+        String TITLE_TAG = "title_tag";
     }
 
     interface Animation {
