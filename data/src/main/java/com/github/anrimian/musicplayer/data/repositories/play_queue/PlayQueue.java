@@ -170,12 +170,12 @@ public class PlayQueue {
         }
         for (int position: positions) {
             PlayQueueItem playQueueItem = compositionQueue.get(position);
-            playQueueItem.setComposition(composition);
+            compositionQueue.set(position, new PlayQueueItem(playQueueItem.getId(), composition));
         }
 
         for (int position: shuffledPositions) {
             PlayQueueItem playQueueItem = shuffledQueue.get(position);
-            playQueueItem.setComposition(composition);
+            shuffledQueue.set(position, new PlayQueueItem(playQueueItem.getId(), composition));
         }
         return true;
     }

@@ -25,6 +25,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.github.anrimian.musicplayer.Constants.NO_POSITION;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
@@ -315,7 +316,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem newItem = playQueueEvent.getPlayQueueItem();
-        if (currentItem == null || !currentItem.equals(newItem)) {
+        if (currentItem == null || !currentItem.equals(newItem)
+                || !areSourcesTheSame(newItem.getComposition(), currentItem.getComposition())) {
             onCurrentCompositionChanged(newItem, playQueueEvent.getTrackPosition());
         }
     }

@@ -5,15 +5,15 @@ import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import androidx.annotation.AnimRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
@@ -446,7 +446,7 @@ public class FragmentNavigation {
             int id = jugglerView.prepareBottomView();
             if (screens.size() > 1) {
                 FragmentMetaData metaData = screens.get(screens.size() - 2);
-                Fragment bottomFragment = createFragment(metaData);
+                Fragment bottomFragment = createFragment(metaData);//can be null here
                 bottomFragment.setMenuVisibility(false);
                 fragmentManagerProvider.getFragmentManager()
                         .beginTransaction()
@@ -493,7 +493,7 @@ public class FragmentNavigation {
     }
 
     private Fragment createFragment(FragmentMetaData metaData) {
-        return fragmentManagerProvider.getFragmentManager()
+        return fragmentManagerProvider.getFragmentManager()//can be null?
                 .getFragmentFactory()
                 .instantiate(jugglerView.getContext().getClassLoader(),
                         metaData.getFragmentClassName(),
