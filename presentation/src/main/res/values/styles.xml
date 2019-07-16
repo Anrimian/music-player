@@ -4,6 +4,7 @@
     <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
     </style>
 
     <style name="AppTheme" parent="AppBaseTheme">
@@ -64,22 +65,13 @@
     <style name="SlidrActivityTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-
-        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
     </style>
 
     <style name="WindowAnimationTransition" parent="@android:style/Animation.Activity">
-        <!--hmmm-->
-        <!--<item name="android:windowEnterAnimation">@anim/anim_slide_in_right</item>-->
-        <item name="android:windowExitAnimation">@anim/anim_slide_out_right</item>
-
-
         <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in_right</item>
-        <!--<item name="android:activityOpenExitAnimation">@anim/anim_slide_out_right</item>-->
-        <!--<item name="android:activityCloseEnterAnimation">@anim/anim_slide_in_right</item>-->
-        <!--<item name="android:activityCloseExitAnimation">@anim/anim_slide_out_right</item>-->
-
-
+        <item name="android:activityOpenExitAnimation">@anim/anim_slide_out_right</item>
+        <item name="android:activityCloseEnterAnimation">@anim/anim_slide_in_right</item>
+        <item name="android:activityCloseExitAnimation">@anim/anim_slide_out_right</item>
     </style>
 
     <style name="Divider" parent="AppTheme">
