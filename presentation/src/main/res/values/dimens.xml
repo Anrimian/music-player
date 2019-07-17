@@ -47,7 +47,7 @@
 
     <!--controls-->
     <dimen name="radio_button_text_margin_start">16dp</dimen>
-    <dimen name="radio_button_text_vertical_padding">8dp</dimen>
+    <dimen name="radio_button_text_vertical_padding">12dp</dimen>
 
     <!--player bottom sheet-->
     <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>
