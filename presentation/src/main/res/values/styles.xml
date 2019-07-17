@@ -42,6 +42,7 @@
         <item name="playerPanelBackground">?attr/listItemBackground</item>
         <item name="android:itemBackground">@drawable/bg_menu_item</item>
         <item name="menuItemBackground">@android:color/white</item>
+        <item name="dialogBackground">@android:color/white</item>
         <item name="subToolbarBackground">?attr/listItemBackground</item>
         <item name="snackbarBackground">@color/snackbar_color</item>
 

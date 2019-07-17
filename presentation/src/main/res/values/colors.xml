@@ -35,6 +35,7 @@
     <!--dark theme-->
     <color name="darkColorPrimary">#2E2E2E</color>
     <color name="darkColorPrimaryDark">#3D3D3D</color>
+    <color name="darkColorPrimaryDarkSecondary">#6B6B6B</color>
     <color name="colorAccentDark">#03A9F4</color>
     <color name="darkColorPrimaryVariant">#F57C00</color>
 
