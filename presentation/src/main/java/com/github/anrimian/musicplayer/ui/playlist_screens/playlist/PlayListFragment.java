@@ -27,6 +27,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
@@ -343,16 +344,22 @@ public class PlayListFragment extends MvpAppCompatFragment
     }
 
     private void onCompositionMenuClicked(View view, PlayListItem playListItem, int position) {
+        Composition composition = playListItem.getComposition();
+
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.play_list_item_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {
-                    presenter.onAddToPlayListButtonClicked(playListItem.getComposition());
+                    presenter.onAddToPlayListButtonClicked(composition);
+                    return true;
+                }
+                case R.id.menu_edit: {
+                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
                     return true;
                 }
                 case R.id.menu_share: {
-                    shareFile(requireContext(), playListItem.getComposition().getFilePath());
+                    shareFile(requireContext(), composition.getFilePath());
                     return true;
                 }
                 case R.id.menu_delete_from_play_list: {
@@ -360,7 +367,7 @@ public class PlayListFragment extends MvpAppCompatFragment
                     return true;
                 }
                 case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(playListItem.getComposition());
+                    presenter.onDeleteCompositionButtonClicked(composition);
                     return true;
                 }
             }

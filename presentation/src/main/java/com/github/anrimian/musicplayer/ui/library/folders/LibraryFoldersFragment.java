@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
@@ -446,6 +447,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {
                     presenter.onAddToPlayListButtonClicked(composition);
+                    return true;
+                }
+                case R.id.menu_edit: {
+                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
                     return true;
                 }
                 case R.id.menu_share: {

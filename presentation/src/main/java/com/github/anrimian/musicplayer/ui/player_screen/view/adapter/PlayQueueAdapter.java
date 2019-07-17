@@ -3,19 +3,18 @@ package com.github.anrimian.musicplayer.ui.player_screen.view.adapter;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
-import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created on 31.10.2017.
@@ -27,10 +26,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
 
     private List<PlayQueueItem> musicList;
     private OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener;
-    private OnItemClickListener<Composition> onDeleteCompositionClickListener;
-    private OnItemClickListener<Composition> onAddToPlaylistClickListener;
-    private OnItemClickListener<Composition> onShareClickListener;
-    private OnItemClickListener<PlayQueueItem> onDeleteItemClickListener;
+    private OnViewItemClickListener<PlayQueueItem> menuClickListener;
 
     @Nullable
     private PlayQueueItem currentItem;
@@ -47,10 +43,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         return new PlayQueueViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
                 onCompositionClickListener,
-                onDeleteCompositionClickListener,
-                onAddToPlaylistClickListener,
-                onShareClickListener,
-                onDeleteItemClickListener);
+                menuClickListener);
     }
 
     @Override
@@ -104,19 +97,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
-    public void setOnDeleteCompositionClickListener(OnItemClickListener<Composition> onDeleteCompositionClickListener) {
-        this.onDeleteCompositionClickListener = onDeleteCompositionClickListener;
-    }
-
-    public void setOnAddToPlaylistClickListener(OnItemClickListener<Composition> onAddToPlaylistClickListener) {
-        this.onAddToPlaylistClickListener = onAddToPlaylistClickListener;
-    }
-
-    public void setOnShareClickListener(OnItemClickListener<Composition> onShareClickListener) {
-        this.onShareClickListener = onShareClickListener;
-    }
-
-    public void setOnDeleteItemClickListener(OnItemClickListener<PlayQueueItem> onDeleteItemClickListener) {
-        this.onDeleteItemClickListener = onDeleteItemClickListener;
+    public void setMenuClickListener(OnViewItemClickListener<PlayQueueItem> menuClickListener) {
+        this.menuClickListener = menuClickListener;
     }
 }

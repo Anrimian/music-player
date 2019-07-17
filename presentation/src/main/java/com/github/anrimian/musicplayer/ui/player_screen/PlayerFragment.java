@@ -533,10 +533,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             playQueueAdapter = new PlayQueueAdapter(list);
             playQueueAdapterWrapper.setObject(playQueueAdapter);
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
-            playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
-            playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
-            playQueueAdapter.setOnShareClickListener(this::onShareCompositionClicked);
-            playQueueAdapter.setOnDeleteItemClickListener(presenter::onDeleteQueueItemClicked);
+            playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
             rvPlayList.setAdapter(playQueueAdapter);
         } else {
             playQueueAdapter.setItems(list);
@@ -733,6 +730,39 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             presenter.onDrawerScreenSelected(screenId);
             itemIdToStart = NO_ITEM;
         }
+    }
+
+    private void onPlayItemMenuClicked(View view, PlayQueueItem playQueueItem) {
+        Composition composition = playQueueItem.getComposition();
+
+        PopupMenu popup = new PopupMenu(requireContext(), view);
+        popup.inflate(R.menu.play_queue_item_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_add_to_playlist: {
+                    presenter.onAddQueueItemToPlayListButtonClicked(composition);
+                    return true;
+                }
+                case R.id.menu_edit: {
+                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                    return true;
+                }
+                case R.id.menu_share: {
+                    onShareCompositionClicked(composition);
+                    return true;
+                }
+                case R.id.menu_delete_from_queue: {
+                    presenter.onDeleteQueueItemClicked(playQueueItem);
+                    return true;
+                }
+                case R.id.menu_delete: {
+                    presenter.onDeleteCompositionButtonClicked(composition);
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
     }
 
     private void onRepeatModeButtonClicked(View view) {
