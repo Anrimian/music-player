@@ -19,12 +19,12 @@ import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
-import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -43,6 +43,7 @@ import static android.provider.MediaStore.MediaColumns.TITLE;
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 public class StoragePlayListsProvider {
 
@@ -52,12 +53,12 @@ public class StoragePlayListsProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<List<StoragePlayList>> getChangeObservable() {
+    public Observable<Map<Long, StoragePlayList>> getChangeObservable() {
         return RxContentObserver.getObservable(contentResolver, Playlists.EXTERNAL_CONTENT_URI)
                 .map(o -> getPlayLists());
     }
 
-    public List<StoragePlayList> getPlayLists() {
+    public Map<Long, StoragePlayList> getPlayLists() {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -67,16 +68,17 @@ public class StoragePlayListsProvider {
                     null,
                     null);
             if (cursor == null) {
-                return emptyList();
+                return emptyMap();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
 
-            List<StoragePlayList> playLists = new ArrayList<>();
+            Map<Long, StoragePlayList> map = new HashMap<>();
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
-                playLists.add(getPlayListFromCursor(cursorWrapper));
+                StoragePlayList playList = getPlayListFromCursor(cursorWrapper);
+                map.put(playList.getId(), playList);
             }
-            return playLists;
+            return map;
         } finally {
             IOUtils.closeSilently(cursor);
         }
@@ -112,13 +114,13 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public Observable<List<PlayListItem>> getPlayListChangeObservable(long playListId) {
+    public Observable<List<StoragePlayListItem>> getPlayListChangeObservable(long playListId) {
         return RxContentObserver.getObservable(contentResolver, getContentUri("external", playListId))
-                .debounce(new FastDebounceFilter<>())
+//                .debounce(new FastDebounceFilter<>())
                 .map(o -> getPlayListItems(playListId));
     }
 
-    public List<PlayListItem> getPlayListItems(long playListId) {
+    public List<StoragePlayListItem> getPlayListItems(long playListId) {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -142,11 +144,13 @@ public class StoragePlayListsProvider {
                 return emptyList();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            List<PlayListItem> compositions = new ArrayList<>(cursor.getCount());
+            List<StoragePlayListItem> compositions = new ArrayList<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
-                PlayListItem item = getPlayListItemFromCursor(cursorWrapper);
+                StoragePlayListItem item = getPlayListItemFromCursor(cursorWrapper);
+//                long itemId = cursorWrapper.getLong(Playlists.Members._ID);
+
                 compositions.add(item);
             }
             return compositions;
@@ -247,7 +251,7 @@ public class StoragePlayListsProvider {
         }
     }
 
-    private PlayListItem getPlayListItemFromCursor(CursorWrapper cursorWrapper) {
+    private StoragePlayListItem getPlayListItemFromCursor(CursorWrapper cursorWrapper) {
         String artist = cursorWrapper.getString(Playlists.Members.ARTIST);
         String title = cursorWrapper.getString(Playlists.Members.TITLE);
         String album = cursorWrapper.getString(Playlists.Members.ALBUM);
@@ -304,7 +308,7 @@ public class StoragePlayListsProvider {
 
         checkCorruptedComposition(composition);
 
-        return new PlayListItem(itemId, composition);
+        return new StoragePlayListItem(itemId, audioId);
     }
 
     private void checkCorruptedComposition(Composition composition) {

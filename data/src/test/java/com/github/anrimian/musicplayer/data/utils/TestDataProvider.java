@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.utils;
 
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.models.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -36,6 +37,20 @@ public class TestDataProvider {
             compositions.add(composition);
         }
         return compositions;
+    }
+
+    public static List<StoragePlayListItem> getFakeStoragePlayListItems() {
+        List<StoragePlayListItem> items = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+            Composition composition = new Composition();
+
+            composition.setFilePath("music-" + i);
+            composition.setId(i);
+
+            StoragePlayListItem item = new StoragePlayListItem(i, i);
+            items.add(item);
+        }
+        return items;
     }
 
     public static List<PlayListItem> getFakePlayListItems() {
@@ -76,9 +91,14 @@ public class TestDataProvider {
         return getFakeCompositions().get(index);
     }
 
+    public static StoragePlayListItem fakeStoragePlayListItem(int index) {
+        return getFakeStoragePlayListItems().get(index);
+    }
+
     public static PlayListItem fakePlayListItem(int index) {
         return getFakePlayListItems().get(index);
     }
+
 
     public static PlayQueueItem fakeItem(int index) {
         return getFakeItems().get(index);
