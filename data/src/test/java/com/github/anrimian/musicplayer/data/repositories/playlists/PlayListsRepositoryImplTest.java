@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
-import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;

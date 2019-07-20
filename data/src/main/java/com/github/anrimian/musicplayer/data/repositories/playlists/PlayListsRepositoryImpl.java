@@ -1,11 +1,9 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
-import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotFoundException;
 import com.github.anrimian.musicplayer.data.repositories.playlists.comparators.PlayListModifyDateComparator;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.PlayListDataSource;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -13,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.MapChangeProcessor;
+import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +55,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         return withDefaultValue(playListsSubject, this::getPlayListsMap)
                 .flatMapSingle(this::toPlayLists)
                 .map(this::toSortedPlayLists)
-//                .debounce(new FastDebounceFilter<>())//issues with often updates
+                .debounce(new FastDebounceFilter<>())//issues with often updates
                 .subscribeOn(scheduler);
     }
 
@@ -140,7 +139,6 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         ).subscribeOn(scheduler);
     }
 
-    //TODO catch concurrent modification exception
     private List<PlayList> toSortedPlayLists(List<PlayList> list) {
         Collections.sort(list, new PlayListModifyDateComparator());
         return list;
@@ -206,9 +204,6 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         Map<Long, PlayListDataSource> playListMap = new ConcurrentHashMap<>();
         for (StoragePlayList storagePlayList: storagePlayLists.values()) {
             long id = storagePlayList.getId();
-//            List<StoragePlayListItem> storageItems = storagePlayListsProvider.getPlayListItems(id);
-//            List<PlayListItem> items = createPlayList(storageItems, storageMusicDataSource.getCompositionsMap());
-//            PlayList playList = toPlayList(storagePlayList, items);
 
             PlayListDataSource playListDataSource = new PlayListDataSource(storagePlayList,
                     storagePlayListsProvider,
@@ -225,17 +220,5 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                 storagePlayList.getDateModified(),
                 items.size(),
                 getTotalDuration(items));
-    }
-
-    private List<PlayListItem> createPlayList(List<StoragePlayListItem> items, Map<Long, Composition> compositionMap) {
-        List<PlayListItem> playListItems = new ArrayList<>(items.size());
-        for (StoragePlayListItem item: items) {
-            Composition composition = compositionMap.get(item.getCompositionId());
-            if (composition == null) {
-                continue;
-            }
-            playListItems.add(new PlayListItem(item.getItemId(), composition));
-        }
-        return playListItems;
     }
 }

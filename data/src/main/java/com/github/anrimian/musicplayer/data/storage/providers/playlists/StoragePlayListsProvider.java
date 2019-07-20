@@ -5,10 +5,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Playlists;
 
-import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotMovedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
@@ -19,6 +17,7 @@ import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,15 +30,8 @@ import javax.annotation.Nullable;
 import io.reactivex.Observable;
 
 import static android.provider.BaseColumns._ID;
-import static android.provider.MediaStore.Audio.AudioColumns.ALBUM;
-import static android.provider.MediaStore.Audio.AudioColumns.ARTIST;
-import static android.provider.MediaStore.Audio.AudioColumns.DURATION;
 import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
-import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
-import static android.provider.MediaStore.MediaColumns.DATE_MODIFIED;
-import static android.provider.MediaStore.MediaColumns.DISPLAY_NAME;
-import static android.provider.MediaStore.MediaColumns.TITLE;
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 import static java.util.Collections.emptyList;
@@ -116,7 +108,7 @@ public class StoragePlayListsProvider {
 
     public Observable<List<StoragePlayListItem>> getPlayListChangeObservable(long playListId) {
         return RxContentObserver.getObservable(contentResolver, getContentUri("external", playListId))
-//                .debounce(new FastDebounceFilter<>())
+                .debounce(new FastDebounceFilter<>())
                 .map(o -> getPlayListItems(playListId));
     }
 
@@ -125,18 +117,7 @@ public class StoragePlayListsProvider {
         try {
             cursor = contentResolver.query(
                     getContentUri("external", playListId),
-                    new String[] {
-                            ARTIST,
-                            TITLE,
-                            ALBUM,
-                            MediaStore.Images.Media.DATA,
-                            DISPLAY_NAME,
-                            DURATION,
-                            MediaStore.Images.Media.SIZE,
-                            AUDIO_ID,
-                            _ID,
-                            DATE_ADDED,
-                            DATE_MODIFIED},
+                    new String[] {AUDIO_ID, _ID},
                     null,
                     null,
                     Playlists.Members.PLAY_ORDER);
@@ -144,16 +125,14 @@ public class StoragePlayListsProvider {
                 return emptyList();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            List<StoragePlayListItem> compositions = new ArrayList<>(cursor.getCount());
+            List<StoragePlayListItem> items = new ArrayList<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
                 StoragePlayListItem item = getPlayListItemFromCursor(cursorWrapper);
-//                long itemId = cursorWrapper.getLong(Playlists.Members._ID);
-
-                compositions.add(item);
+                items.add(item);
             }
-            return compositions;
+            return items;
         } finally {
             IOUtils.closeSilently(cursor);
         }
@@ -252,69 +231,9 @@ public class StoragePlayListsProvider {
     }
 
     private StoragePlayListItem getPlayListItemFromCursor(CursorWrapper cursorWrapper) {
-        String artist = cursorWrapper.getString(Playlists.Members.ARTIST);
-        String title = cursorWrapper.getString(Playlists.Members.TITLE);
-        String album = cursorWrapper.getString(Playlists.Members.ALBUM);
-        String filePath = cursorWrapper.getString(Playlists.Members.DATA);
-//        String albumKey = cursorWrapper.getString(Playlists.Members.ALBUM_KEY);
-//        String composer = cursorWrapper.getString(Playlists.Members.COMPOSER);
-        String displayName = cursorWrapper.getString(Playlists.Members.DISPLAY_NAME);
-//        String mimeType = cursorWrapper.getString(Playlists.Members.MIME_TYPE);
-
         long itemId = cursorWrapper.getLong(Playlists.Members._ID);
-        long duration = cursorWrapper.getLong(Playlists.Members.DURATION);
-        long size = cursorWrapper.getLong(Playlists.Members.SIZE);
         long audioId = cursorWrapper.getLong(Playlists.Members.AUDIO_ID);
-//        long artistId = cursorWrapper.getLong(Playlists.Members.ARTIST_ID);
-//        long bookmark = cursorWrapper.getLong(Playlists.Members.BOOKMARK);
-//        long albumId = cursorWrapper.getLong(Playlists.Members.ALBUM_ID);
-        long dateAdded = cursorWrapper.getLong(Playlists.Members.DATE_ADDED);
-        long dateModified = cursorWrapper.getLong(Playlists.Members.DATE_MODIFIED);
-
-//        boolean isAlarm = cursorWrapper.getBoolean(Playlists.Members.IS_ALARM);
-//        boolean isMusic = cursorWrapper.getBoolean(Playlists.Members.IS_MUSIC);
-//        boolean isNotification = cursorWrapper.getBoolean(Playlists.Members.IS_NOTIFICATION);
-//        boolean isPodcast = cursorWrapper.getBoolean(Playlists.Members.IS_PODCAST);
-//        boolean isRingtone = cursorWrapper.getBoolean(Playlists.Members.IS_RINGTONE);
-
-//        @Nullable Integer year = cursorWrapper.getInt(Playlists.Members.YEAR);
-
-        if (artist.equals("<unknown>")) {
-            artist = null;
-        }
-
-        Composition composition = new Composition();
-        //composition
-        composition.setArtist(artist);
-        composition.setTitle(title);
-        composition.setAlbum(album);
-        composition.setFilePath(filePath);
-//        composition.setComposer(composer);
-        composition.setDisplayName(displayName);
-
-        composition.setDuration(duration);
-        composition.setSize(size);
-        composition.setId(audioId);
-        composition.setDateAdded(new Date(dateAdded * 1000L));
-        composition.setDateModified(new Date(dateModified * 1000L));
-
-//        composition.setAlarm(isAlarm);
-//        composition.setMusic(isMusic);
-//        composition.setNotification(isNotification);
-//        composition.setPodcast(isPodcast);
-//        composition.setRingtone(isRingtone);
-
-//        composition.setYear(year);
-
-        checkCorruptedComposition(composition);
-
         return new StoragePlayListItem(itemId, audioId);
-    }
-
-    private void checkCorruptedComposition(Composition composition) {
-        if (composition.getDuration() == 0) {
-            composition.setCorrupted(true);
-        }
     }
 
     private StoragePlayList getPlayListFromCursor(CursorWrapper cursorWrapper) {

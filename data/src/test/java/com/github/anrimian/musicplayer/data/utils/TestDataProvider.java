@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.data.utils;
 
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
-import com.github.anrimian.musicplayer.data.models.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;

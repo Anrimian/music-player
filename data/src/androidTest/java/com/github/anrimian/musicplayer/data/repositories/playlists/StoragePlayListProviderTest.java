@@ -4,19 +4,20 @@ import android.Manifest;
 import android.content.Context;
 import android.util.Log;
 
-import com.github.anrimian.musicplayer.data.models.StoragePlayList;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
+
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.GrantPermissionRule;
 import io.reactivex.observers.TestObserver;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -38,19 +39,19 @@ public class StoragePlayListProviderTest {
 
     @Test
     public void getPlayLists() {
-        List<StoragePlayList> playLists = storagePlayListsProvider.getPlayLists();
+        Map<Long, StoragePlayList> playLists = storagePlayListsProvider.getPlayLists();
         assertNotNull(playLists);
     }
 
     @Test
     public void createAndDeletePlayListTest() {
-        TestObserver<List<StoragePlayList>> playListsObserver = storagePlayListsProvider.getChangeObservable()
+        TestObserver<Map<Long, StoragePlayList>> playListsObserver = storagePlayListsProvider.getChangeObservable()
                 .test();
 
         StoragePlayList createdPlayList = storagePlayListsProvider.createPlayList("test playlist10");
         assertEquals("test playlist10", createdPlayList.getName());
 
-        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
+        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists().values()) {
             if (playList.getName().equals("test playlist10")) {
                 storagePlayListsProvider.deletePlayList(playList.getId());
             }
@@ -61,24 +62,24 @@ public class StoragePlayListProviderTest {
 
     @Test
     public void addCompositionToPlayListTest() {
-        Composition composition = findComposition(0);
-        Log.d("KEK", "composition: " + composition);
+        StoragePlayListItem item = findComposition(0);
+        Log.d("KEK", "item: " + item);
 
         storagePlayListsProvider.createPlayList("test playlist6");
 
         StoragePlayList playList = getPlayList("test playlist6");
         try {
-            storagePlayListsProvider.addCompositionToPlayList(composition.getId(),
+            storagePlayListsProvider.addCompositionToPlayList(item.getCompositionId(),
                     playList.getId(),
                     0);
 
-            List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
+            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
             assertEquals(1, items.size());
-            assertEquals(composition, items.get(0).getComposition());
+            assertEquals(item.getCompositionId(), items.get(0).getCompositionId());
 
             storagePlayListsProvider.deleteItemFromPlayList(items.get(0).getItemId(), playList.getId());
 
-            List<PlayListItem> deletedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
+            List<StoragePlayListItem> deletedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
             assertEquals(0, deletedItems.size());
         } finally {
             storagePlayListsProvider.deletePlayList(playList.getId());
@@ -87,38 +88,38 @@ public class StoragePlayListProviderTest {
 
     @Test
     public void moveItemInPlayListTest() {
-        Composition compositionOne = findComposition(0);
-        Composition compositionTwo = findComposition(1);
-        Composition compositionThree = findComposition(2);
+        StoragePlayListItem compositionOne = findComposition(0);
+        StoragePlayListItem compositionTwo = findComposition(1);
+        StoragePlayListItem compositionThree = findComposition(2);
 
         storagePlayListsProvider.createPlayList("test playlist7");
 
         StoragePlayList playList = getPlayList("test playlist7");
 
         try {
-            storagePlayListsProvider.addCompositionToPlayList(compositionOne.getId(),
+            storagePlayListsProvider.addCompositionToPlayList(compositionOne.getCompositionId(),
                     playList.getId(),
                     0);
 
-            storagePlayListsProvider.addCompositionToPlayList(compositionTwo.getId(),
+            storagePlayListsProvider.addCompositionToPlayList(compositionTwo.getCompositionId(),
                     playList.getId(),
                     1);
 
-            storagePlayListsProvider.addCompositionToPlayList(compositionThree.getId(),
+            storagePlayListsProvider.addCompositionToPlayList(compositionThree.getCompositionId(),
                     playList.getId(),
                     2);
 
-            List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
-            assertEquals(compositionOne, items.get(0).getComposition());
-            assertEquals(compositionTwo, items.get(1).getComposition());
-            assertEquals(compositionThree, items.get(2).getComposition());
+            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
+            assertEquals(compositionOne.getCompositionId(), items.get(0).getCompositionId());
+            assertEquals(compositionTwo.getCompositionId(), items.get(1).getCompositionId());
+            assertEquals(compositionThree.getCompositionId(), items.get(2).getCompositionId());
 
             storagePlayListsProvider.moveItemInPlayList(playList.getId(), 2, 0);
 
-            List<PlayListItem> movedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
-            assertEquals(compositionThree, movedItems.get(0).getComposition());
-            assertEquals(compositionOne, movedItems.get(1).getComposition());
-            assertEquals(compositionTwo, movedItems.get(2).getComposition());
+            List<StoragePlayListItem> movedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
+            assertEquals(compositionThree.getCompositionId(), movedItems.get(0).getCompositionId());
+            assertEquals(compositionOne.getCompositionId(), movedItems.get(1).getCompositionId());
+            assertEquals(compositionTwo.getCompositionId(), movedItems.get(2).getCompositionId());
         } finally {
             storagePlayListsProvider.deletePlayList(playList.getId());
         }
@@ -140,7 +141,7 @@ public class StoragePlayListProviderTest {
     }
 
     private StoragePlayList getPlayList(String name) {
-        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
+        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists().values()) {
             if (playList.getName().equals(name)) {
                 return playList;
             }
@@ -148,12 +149,12 @@ public class StoragePlayListProviderTest {
         throw new IllegalStateException("play list not found, name: " + name);
     }
 
-    private Composition findComposition(int index) {
-        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists()) {
-            List<PlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
+    private StoragePlayListItem findComposition(int index) {
+        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists().values()) {
+            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
 
             if (index < items.size()) {
-                return items.get(index).getComposition();
+                return items.get(index);
             }
         }
         throw new IllegalStateException("composition not found");

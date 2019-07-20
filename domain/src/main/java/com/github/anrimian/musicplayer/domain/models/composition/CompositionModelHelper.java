@@ -7,7 +7,11 @@ public class CompositionModelHelper {
     public static String formatCompositionName(Composition composition) {
         String title = composition.getTitle();
         if (isEmpty(title)) {
-            String filePath = getLastPathPart(composition.getFilePath());
+            String filePath = composition.getFilePath();
+            if (isEmpty(filePath)) {
+                return "";
+            }
+            filePath = getLastPathPart(composition.getFilePath());
             int cropIndex = filePath.lastIndexOf('.');
             if (cropIndex != -1) {
                 return filePath.substring(0, cropIndex);
@@ -21,7 +25,7 @@ public class CompositionModelHelper {
         String displayPath = path;
         int lastSlashIndex = path.lastIndexOf('/');
         if (lastSlashIndex != -1) {
-            displayPath = path.substring(++lastSlashIndex, path.length());
+            displayPath = path.substring(++lastSlashIndex);
         }
         return displayPath;
     }

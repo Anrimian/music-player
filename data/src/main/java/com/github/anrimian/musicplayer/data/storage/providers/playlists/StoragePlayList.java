@@ -1,4 +1,6 @@
-package com.github.anrimian.musicplayer.data.models;
+package com.github.anrimian.musicplayer.data.storage.providers.playlists;
+
+import androidx.annotation.NonNull;
 
 import java.util.Date;
 
@@ -61,6 +63,7 @@ public class StoragePlayList {
         return (int) (id ^ (id >>> 32));
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "PlayList{" +

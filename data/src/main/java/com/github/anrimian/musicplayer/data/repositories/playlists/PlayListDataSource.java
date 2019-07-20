@@ -1,7 +1,9 @@
-package com.github.anrimian.musicplayer.data.storage.providers.playlists;
+package com.github.anrimian.musicplayer.data.repositories.playlists;
 
-import com.github.anrimian.musicplayer.data.models.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
@@ -18,9 +20,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper.getTotalDuration;
 
-public class PlayListDataSource {
-
-    private Disposable disposable;
+class PlayListDataSource {
 
     private final StoragePlayList rawPlayList;
     private final StoragePlayListsProvider storagePlayListsProvider;
@@ -28,47 +28,34 @@ public class PlayListDataSource {
 
     private BehaviorSubject<List<PlayListItem>> itemsSubject = BehaviorSubject.create();
     private BehaviorSubject<PlayList> playListSubject = BehaviorSubject.create();
-//    private BehaviorSubject<PlayList> playListSubject = BehaviorSubject.create();
 
-//    private final Observable<List<StoragePlayListItem>> playListItemObservable;
-//    private final Observable<List<StoragePlayListItem>> playListItemObservable;
+    private Disposable disposable;
 
-    public PlayListDataSource(StoragePlayList rawPlayList,
+    PlayListDataSource(StoragePlayList rawPlayList,
                        StoragePlayListsProvider storagePlayListsProvider,
                        StorageMusicDataSource storageMusicDataSource) {
         this.rawPlayList = rawPlayList;
-//        this.rawPlayList = rawPlayList;
-//        itemsSubject = BehaviorSubject.createDefault(items);
-//        playListSubject = BehaviorSubject.createDefault(rawPlayList);
-//
-//        disposable = Observable.combineLatest(Observable.just(storageItems).mergeWith(storagePlayListsProvider.getPlayListChangeObservable(rawPlayList.getId())),
-//                storageMusicDataSource.getCompositionObservable(),
-//                this::createPlayList)
-//                .subscribe(this::onPlayListItemsChanged);
         this.storagePlayListsProvider = storagePlayListsProvider;
         this.storageMusicDataSource = storageMusicDataSource;
     }
 
-//    PlayListDataSource(PlayList rawPlayList) {
-//        this.rawPlayList = rawPlayList;
-//        itemsSubject = BehaviorSubject.create();
-//        playListSubject = BehaviorSubject.create();
-//    }
-
-    public Observable<List<PlayListItem>> getPlayListItemsObservable() {
+    Observable<List<PlayListItem>> getPlayListItemsObservable() {
         return withDefaultValue(itemsSubject, this::loadPlayListItems);
     }
 
-    public Observable<PlayList> getPlayListObservable() {
+    Observable<PlayList> getPlayListObservable() {
         return withDefaultValue(playListSubject, this::loadPlayList);
     }
 
-//    PlayList getRawPlayList() {
-//        return rawPlayList;
-//    }
+    Single<PlayList> getPlayList() {
+        return Single.fromCallable(this::loadPlayList);
+    }
 
-    public void updatePlayList(StoragePlayList newPlayList) {
+    void updatePlayList(StoragePlayList newPlayList) {
         PlayList playList = playListSubject.getValue();
+        if (playList == null) {
+            return;
+        }
         PlayList updatedPlayList = new PlayList(rawPlayList.getId(),
                 newPlayList.getName(),
                 newPlayList.getDateAdded(),
@@ -78,7 +65,7 @@ public class PlayListDataSource {
         playListSubject.onNext(updatedPlayList);
     }
 
-    public void dispose() {
+    void dispose() {
         if (disposable != null) {
             disposable.dispose();
         }
@@ -86,9 +73,6 @@ public class PlayListDataSource {
         playListSubject.onComplete();
     }
 
-    public Single<PlayList> getPlayList() {
-        return Single.fromCallable(this::loadPlayList);
-    }
 
     private List<PlayListItem> loadPlayListItems() {
         List<PlayListItem> playListItems = itemsSubject.getValue();
@@ -96,7 +80,7 @@ public class PlayListDataSource {
             synchronized (this) {
                 List<StoragePlayListItem> storageItems = storagePlayListsProvider.getPlayListItems(rawPlayList.getId());
                 Map<Long, Composition> compositionMap = storageMusicDataSource.getCompositionsMap();
-                playListItems = createPlayList(storageItems, compositionMap);
+                playListItems = mergeItems(storageItems, compositionMap);
                 subscribeOnPlayListItemsChanges(storageItems, compositionMap);
             }
         }
@@ -105,7 +89,6 @@ public class PlayListDataSource {
 
     private PlayList loadPlayList() {
         PlayList playList = playListSubject.getValue();
-//        List<PlayListItem> playListItems = loadPlayListItems();
         if (playList == null) {
             synchronized (this) {
                 playList = createPlayList(rawPlayList, loadPlayListItems());
@@ -124,31 +107,15 @@ public class PlayListDataSource {
     }
 
     private void subscribeOnPlayListItemsChanges(List<StoragePlayListItem> items, Map<Long, Composition> compositionMap) {
-        disposable = Observable.combineLatest(storagePlayListsProvider.getPlayListChangeObservable(rawPlayList.getId()).defaultIfEmpty(items),
-                storageMusicDataSource.getCompositionObservable().defaultIfEmpty(compositionMap),//error with no value//TODO optimize
-                this::createPlayList)
+        disposable = Observable.combineLatest(
+                Observable.just(items).mergeWith(storagePlayListsProvider.getPlayListChangeObservable(rawPlayList.getId())),
+                Observable.just(compositionMap).mergeWith(storageMusicDataSource.getCompositionObservable()),//can be optimized
+                this::mergeItems)
+                .skip(1)
                 .subscribe(this::onPlayListItemsChanged);
     }
 
-    private void onPlayListItemsChanged(List<PlayListItem> items) {
-        PlayList playList = playListSubject.getValue();
-        PlayList updatedPlayList = new PlayList(playList.getId(),
-                playList.getName(),
-                playList.getDateAdded(),
-                playList.getDateModified(),
-                items.size(),
-                getTotalDuration(items));
-        playListSubject.onNext(updatedPlayList);
-        itemsSubject.onNext(items);
-    }
-
-//    private List<PlayListItem> getPlayListItems() {
-//        return createPlayList(storagePlayListsProvider.getPlayListItems(rawPlayList.getId()),
-//                storageMusicDataSource.getCompositionsMap()
-//        );
-//    }
-
-    private List<PlayListItem> createPlayList(List<StoragePlayListItem> items, Map<Long, Composition> compositionMap) {
+    private List<PlayListItem> mergeItems(List<StoragePlayListItem> items, Map<Long, Composition> compositionMap) {
         List<PlayListItem> playListItems = new ArrayList<>(items.size());
         for (StoragePlayListItem item: items) {
             Composition composition = compositionMap.get(item.getCompositionId());
@@ -158,5 +125,21 @@ public class PlayListDataSource {
             playListItems.add(new PlayListItem(item.getItemId(), composition));
         }
         return playListItems;
+    }
+
+    private void onPlayListItemsChanged(List<PlayListItem> items) {
+        itemsSubject.onNext(items);
+
+        PlayList playList = playListSubject.getValue();
+        if (playList == null) {
+            return;
+        }
+        PlayList updatedPlayList = new PlayList(playList.getId(),
+                playList.getName(),
+                playList.getDateAdded(),
+                playList.getDateModified(),
+                items.size(),
+                getTotalDuration(items));
+        playListSubject.onNext(updatedPlayList);
     }
 }
