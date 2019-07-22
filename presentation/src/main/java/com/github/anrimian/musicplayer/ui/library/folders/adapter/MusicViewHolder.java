@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.annotation.ColorInt;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
@@ -16,12 +19,11 @@ import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import javax.annotation.Nonnull;
 
-import androidx.annotation.ColorInt;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static androidx.core.graphics.ColorUtils.setAlphaComponent;
+import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 
@@ -141,7 +143,7 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
 
     @ColorInt
     private int getPlaySelectionColor() {
-        return setAlphaComponent(getColorFromAttr(getContext(), R.attr.colorPrimary), 20);
+        return getPlayingCompositionColor(getContext(), 20);
     }
 
     private Context getContext() {

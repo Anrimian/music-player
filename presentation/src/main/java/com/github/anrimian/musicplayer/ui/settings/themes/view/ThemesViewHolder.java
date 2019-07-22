@@ -6,16 +6,15 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-class ThemesViewHolder extends RecyclerView.ViewHolder {
+class ThemesViewHolder extends BaseViewHolder {
 
     @BindView(R.id.tv_theme_name)
     TextView tvTheme;
@@ -40,9 +39,11 @@ class ThemesViewHolder extends RecyclerView.ViewHolder {
     void bind(AppTheme appTheme, boolean isSelected) {
         this.appTheme = appTheme;
 
-        tvTheme.setText(appTheme.getDescriptionId());
+        String description = getContext().getString(appTheme.getDescriptionId());
+        tvTheme.setText(description);
         rbTheme.setChecked(isSelected);
 
+        flClickableArea.setContentDescription(description);
         flClickableArea.setClickable(!isSelected);
     }
 }

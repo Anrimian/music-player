@@ -2,13 +2,13 @@
 <resources>
 
     <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:background">?attr/menuItemBackground</item>
+        <item name="android:windowBackground">?attr/dialogBackground</item>
         <item name="android:windowTitleStyle">@style/DialogTitleStyle</item>
         <item name="android:buttonBarButtonStyle">@style/DialogButtonStyle</item>
     </style>
 
     <style name="DarkDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:background">?attr/menuItemBackground</item>
+        <item name="android:windowBackground">?attr/dialogBackground</item>
         <item name="android:windowTitleStyle">@style/DialogTitleStyle</item>
         <item name="android:buttonBarButtonStyle">@style/DialogButtonStyle</item>
     </style>

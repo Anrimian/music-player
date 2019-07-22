@@ -8,8 +8,9 @@
         <item name="colorPrimary">@color/darkColorPrimary</item>
         <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccentDark</item>
-        <item name="colorPrimaryDarkSecondary">@color/darkColorPrimaryDark</item>
+        <item name="colorPrimaryDarkSecondary">@color/darkColorPrimaryDarkSecondary</item>
         <item name="actionModeTextColor">@color/primary_button_color_dark</item>
+        <item name="colorPrimaryVariant">@color/darkColorPrimaryVariant</item>
 
         <!--background-->
         <!--<item name="android:windowBackground">@color/dark_background_level_1</item>-->
@@ -17,6 +18,7 @@
         <item name="listBackground">@color/dark_background_level_0</item>
         <item name="listItemBackground">@color/dark_background_level_1</item>
         <item name="menuItemBackground">@color/menu_item_background_color_dark</item>
+        <item name="dialogBackground">@color/menu_item_background_color_dark</item>
         <item name="playerPanelBackground">?attr/colorPrimary</item>
         <item name="subToolbarBackground">@color/dark_background_level_1</item>
         <item name="snackbarBackground">@color/snackbar_color_dark</item>
