@@ -1,16 +1,16 @@
 apply plugin: 'com.android.library'
 
 android {
-    def globalConfiguration = rootProject.extensions.getByName("ext")
+    def config = rootProject.ext
 
-    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
-    buildToolsVersion globalConfiguration["androidBuildToolsVersion"]
+    compileSdkVersion config.androidCompileSdkVersion
+    buildToolsVersion config.androidBuildToolsVersion
 
     defaultConfig {
-        minSdkVersion globalConfiguration["androidMinSdkVersion"]
-        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
-        versionCode globalConfiguration["androidVersionCode"]
-        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+        minSdkVersion config.androidMinSdkVersion
+        targetSdkVersion config.androidTargetSdkVersion
+        versionCode config.androidVersionCode
+        testInstrumentationRunner config.testInstrumentationRunner
 
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8

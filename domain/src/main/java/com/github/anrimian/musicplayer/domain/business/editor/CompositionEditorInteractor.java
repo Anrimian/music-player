@@ -26,6 +26,10 @@ public class CompositionEditorInteractor {
         return editorRepository.editCompositionTitle(composition, newTitle);
     }
 
+    public Completable editCompositionFileName(Composition composition, String newFileName) {
+        return Completable.error(new Exception("NOT IMPLEMENTED"));
+    }
+
     public Observable<Composition> getCompositionObservable(long id) {
         return musicProviderRepository.getCompositionObservable(id);
     }

@@ -62,6 +62,13 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         getViewState().showEnterTitleDialog(composition);
     }
 
+    void onChangeFileNameClicked() {
+        if (composition == null) {
+            return;
+        }
+        getViewState().showEnterFileNameDialog(composition);
+    }
+
     void onNewAuthorEntered(String author) {
         if (composition == null) {
             return;
@@ -81,6 +88,18 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
 
         dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.editCompositionTitle(composition, title)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
+
+    void onNewFileNameEntered(String fileName) {
+        if (composition == null) {
+            return;
+        }
+
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.editCompositionFileName(composition, fileName)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);

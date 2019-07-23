@@ -7,18 +7,27 @@ public class CompositionModelHelper {
     public static String formatCompositionName(Composition composition) {
         String title = composition.getTitle();
         if (isEmpty(title)) {
-            String filePath = composition.getFilePath();
-            if (isEmpty(filePath)) {
-                return "";
-            }
-            filePath = getLastPathPart(composition.getFilePath());
-            int cropIndex = filePath.lastIndexOf('.');
-            if (cropIndex != -1) {
-                return filePath.substring(0, cropIndex);
-            }
-            return filePath;
+            return formatFileName(composition.getFilePath());
         }
         return title;
+    }
+
+    public static String formatFileName(String filePath) {
+        return formatFileName(filePath, false);
+    }
+
+    public static String formatFileName(String filePath, boolean showExtension) {
+        if (isEmpty(filePath)) {
+            return "";
+        }
+        String fileName = getLastPathPart(filePath);
+        if (!showExtension) {
+            int cropIndex = fileName.lastIndexOf('.');
+            if (cropIndex != -1) {
+                return fileName.substring(0, cropIndex);
+            }
+        }
+        return fileName;
     }
 
     public static String getLastPathPart(String path) {
