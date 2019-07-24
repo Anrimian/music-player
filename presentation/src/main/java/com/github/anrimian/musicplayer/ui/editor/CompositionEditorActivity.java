@@ -163,7 +163,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 R.string.change,
                 R.string.cancel,
                 R.string.filename,
-                formatFileName(composition.getFilePath()));//TODO can not be empty
+                formatFileName(composition.getFilePath()),
+                false);
         fragment.setOnCompleteListener(presenter::onNewFileNameEntered);
         fragment.show(getSupportFragmentManager(), FILE_NAME_TAG);
     }

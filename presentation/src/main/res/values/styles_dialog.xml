@@ -22,7 +22,7 @@
     </style>
 
     <style name="DialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">?attr/brightButtonColor</item>
+        <item name="android:textColor">@color/color_text_button</item>
     </style>
 
 </resources>

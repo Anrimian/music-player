@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,12 +20,16 @@ import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.Constants.Arguments.CAN_BE_EMPTY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_HINT;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_VALUE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.NEGATIVE_BUTTON_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITIVE_BUTTON_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.TITLE_ARG;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setSoftInputVisible;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setEditableText;
+import static com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher.onTextChanged;
 
 public class InputTextDialogFragment extends DialogFragment {
 
@@ -41,12 +44,27 @@ public class InputTextDialogFragment extends DialogFragment {
                                                       @StringRes int negativeButtonText,
                                                       @StringRes int editTextHint,
                                                       String editTextValue) {
+        return newInstance(title,
+                positiveButtonText,
+                negativeButtonText,
+                editTextHint,
+                editTextValue,
+                true);
+    }
+
+    public static InputTextDialogFragment newInstance(@StringRes int title,
+                                                      @StringRes int positiveButtonText,
+                                                      @StringRes int negativeButtonText,
+                                                      @StringRes int editTextHint,
+                                                      String editTextValue,
+                                                      boolean canBeEmpty) {
         Bundle args = new Bundle();
         args.putInt(TITLE_ARG, title);
         args.putInt(POSITIVE_BUTTON_ARG, positiveButtonText);
         args.putInt(NEGATIVE_BUTTON_ARG, negativeButtonText);
         args.putInt(EDIT_TEXT_HINT, editTextHint);
         args.putString(EDIT_TEXT_VALUE, editTextValue);
+        args.putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty);
         InputTextDialogFragment fragment = new InputTextDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -67,7 +85,7 @@ public class InputTextDialogFragment extends DialogFragment {
                 .setNegativeButton(args.getInt(NEGATIVE_BUTTON_ARG), (dialog1, which) -> {})
                 .setView(view)
                 .create();
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        setSoftInputVisible(dialog.getWindow());
         dialog.show();
 
         editText.setHint(args.getInt(EDIT_TEXT_HINT));
@@ -78,10 +96,15 @@ public class InputTextDialogFragment extends DialogFragment {
             return true;
         });
         setEditableText(editText, args.getString(EDIT_TEXT_VALUE));
+
         editText.requestFocus();
 
         Button btnCreate = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         btnCreate.setOnClickListener(v -> onCompleteButtonClicked());
+
+        if (!args.getBoolean(CAN_BE_EMPTY_ARG)) {
+            onTextChanged(editText, text -> btnCreate.setEnabled(!isEmpty(text)));
+        }
 
         return dialog;
     }

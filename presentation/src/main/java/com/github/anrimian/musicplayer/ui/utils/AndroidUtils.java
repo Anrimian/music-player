@@ -14,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -143,5 +144,12 @@ public class AndroidUtils {
             }
             activity.setTaskDescription(taskDescription);
         }
+    }
+
+    public static void setSoftInputVisible(Window window) {
+        if (window != null) {
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        }
+
     }
 }
