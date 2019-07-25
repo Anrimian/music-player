@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -57,6 +58,12 @@ public class MessagesUtils {
         } else {
             return context.getString(R.string.delete_compositions_success, compositions.size());
         }
+    }
+
+    public static Snackbar makeSnackbar(@NonNull View view,
+                                        @StringRes int text,
+                                        @Snackbar.Duration int duration) {
+        return makeSnackbar(view, view.getContext().getString(text), duration);
     }
 
     @SuppressLint("RestrictedApi")

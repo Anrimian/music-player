@@ -121,6 +121,7 @@
     <string name="filename">Имя файла</string>
     <string name="artist">Исполнитель</string>
     <string name="change_file_name">Изменить имя файла</string>
+    <string name="copied_message">Текст скопирован</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

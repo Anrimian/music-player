@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
@@ -16,6 +17,8 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.Slidr;
@@ -30,6 +33,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class CompositionEditorActivity extends MvpAppCompatActivity
         implements CompositionEditorView {
@@ -49,6 +53,15 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.tv_filename)
     TextView tvFileName;
 
+    @BindView(R.id.tv_author_hint)
+    TextView tvAuthorHint;
+
+    @BindView(R.id.tv_title_hint)
+    TextView tvTitleHint;
+
+    @BindView(R.id.tv_filename_hint)
+    TextView tvFileNameHint;
+
     @BindView(R.id.change_author_clickable_area)
     View changeAuthorClickableArea;
 
@@ -60,6 +73,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    private DialogFragmentRunner<InputTextDialogFragment> authorDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> titleDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
 
     public static Intent newIntent(Context context, long compositionId) {
         Intent intent = new Intent(context, CompositionEditorActivity.class);
@@ -90,26 +107,27 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         changeAuthorClickableArea.setOnClickListener(v -> presenter.onChangeAuthorClicked());
         changeTitleClickableArea.setOnClickListener(v -> presenter.onChangeTitleClicked());
         changeFilenameClickableArea.setOnClickListener(v -> presenter.onChangeFileNameClicked());
+        onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
+        onLongClick(changeTitleClickableArea, () -> copyText(tvTitle, tvTitleHint));
+        onLongClick(changeFilenameClickableArea, () -> copyText(tvFileName, tvFileNameHint));
 
         Slidr.attach(this);
 
-        InputTextDialogFragment fragment = (InputTextDialogFragment)
-                getSupportFragmentManager().findFragmentByTag(AUTHOR_TAG);
-        if (fragment != null) {
-            fragment.setOnCompleteListener(presenter::onNewAuthorEntered);
-        }
+        FragmentManager fm = getSupportFragmentManager();
+        authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                AUTHOR_TAG,
+                fragment -> fragment.setOnCompleteListener(presenter::onNewAuthorEntered));
 
-        InputTextDialogFragment titleFragment = (InputTextDialogFragment)
-                getSupportFragmentManager().findFragmentByTag(TITLE_TAG);
-        if (titleFragment != null) {
-            titleFragment.setOnCompleteListener(presenter::onNewTitleEntered);
-        }
+        titleDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                TITLE_TAG,
+                fragment -> fragment.setOnCompleteListener(presenter::onNewTitleEntered));
 
-        InputTextDialogFragment fileNameFragment = (InputTextDialogFragment)
-                getSupportFragmentManager().findFragmentByTag(FILE_NAME_TAG);
-        if (fileNameFragment != null) {
-            fileNameFragment.setOnCompleteListener(presenter::onNewFileNameEntered);
-        }
+        filenameDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                FILE_NAME_TAG,
+                fragment -> fragment.setOnCompleteListener(presenter::onNewFileNameEntered));
+
+        //TODO change file name
+        //TODO affect current composition issue(unwanted play from start)
     }
 
     @Override
@@ -142,8 +160,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 R.string.cancel,
                 R.string.artist,
                 composition.getArtist());
-        fragment.setOnCompleteListener(presenter::onNewAuthorEntered);
-        fragment.show(getSupportFragmentManager(), AUTHOR_TAG);
+        authorDialogFragmentRunner.show(fragment);
     }
 
     @Override
@@ -153,8 +170,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 R.string.cancel,
                 R.string.title,
                 composition.getTitle());
-        fragment.setOnCompleteListener(presenter::onNewTitleEntered);
-        fragment.show(getSupportFragmentManager(), TITLE_TAG);
+        titleDialogFragmentRunner.show(fragment);
     }
 
     @Override
@@ -165,12 +181,22 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 R.string.filename,
                 formatFileName(composition.getFilePath()),
                 false);
-        fragment.setOnCompleteListener(presenter::onNewFileNameEntered);
-        fragment.show(getSupportFragmentManager(), FILE_NAME_TAG);
+        filenameDialogFragmentRunner.show(fragment);
     }
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
         makeSnackbar(container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
+    }
+
+    private void copyText(TextView textView, TextView tvLabel) {
+        AndroidUtils.copyText(this,
+                textView.getText().toString(),
+                tvLabel.getText().toString());
+        onTextCopied();
+    }
+
+    private void onTextCopied() {
+        makeSnackbar(container, R.string.copied_message, Snackbar.LENGTH_SHORT).show();
     }
 }

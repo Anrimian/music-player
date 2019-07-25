@@ -20,21 +20,28 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
 
+import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.google.android.material.snackbar.Snackbar;
+
 import static android.view.View.VISIBLE;
 import static androidx.core.view.ViewCompat.isLaidOut;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class ViewUtils {
+
+    public static void onLongClick(View view, Runnable onClick) {
+        view.setOnLongClickListener(v -> {
+            onClick.run();
+            return true;
+        });
+    }
 
     public static void run(View view, Runnable runnable) {
         if (isLaidOut(view)) {
