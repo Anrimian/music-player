@@ -108,6 +108,8 @@ public class ImageFormatUtils {
                 return null;
             }
             return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        } catch (Exception ignored) {
+            return null;
         } finally {
             if (mmr != null) {
                 mmr.release();

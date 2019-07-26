@@ -339,7 +339,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
         }
         if (updatedCurrentComposition) {
-            currentCompositionSubject.onNext(new PlayQueueEvent(currentItem));
+            currentCompositionSubject.onNext(new PlayQueueEvent(currentItem, true));
         }
     }
 

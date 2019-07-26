@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -115,7 +116,11 @@ public class InputTextDialogFragment extends DialogFragment {
 
     private void onCompleteButtonClicked() {
         if (onCompleteListener != null) {
-            onCompleteListener.call(editText.getText().toString());
+            String text = editText.getText().toString();
+            //noinspection ConstantConditions
+            if (!TextUtils.equals(text, getArguments().getString(EDIT_TEXT_VALUE))) {
+                onCompleteListener.call(editText.getText().toString());
+            }
         }
         dismiss();
     }

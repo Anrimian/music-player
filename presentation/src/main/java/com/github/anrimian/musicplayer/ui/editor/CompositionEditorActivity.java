@@ -125,8 +125,6 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         filenameDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 FILE_NAME_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewFileNameEntered));
-
-        //TODO affect current composition issue(unwanted play from start)
     }
 
     @Override
