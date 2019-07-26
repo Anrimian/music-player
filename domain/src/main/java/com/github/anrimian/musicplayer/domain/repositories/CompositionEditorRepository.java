@@ -9,4 +9,6 @@ public interface CompositionEditorRepository {
     Completable editCompositionAuthor(Composition composition, String newAuthor);
 
     Completable editCompositionTitle(Composition composition, String title);
+
+    Completable editCompositionFileName(Composition composition, String fileName);
 }

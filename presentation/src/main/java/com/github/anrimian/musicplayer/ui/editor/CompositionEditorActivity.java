@@ -30,7 +30,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatFileName;
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
@@ -101,7 +101,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(R.string.edit);
+            actionBar.setTitle(R.string.edit_tags);
         }
 
         changeAuthorClickableArea.setOnClickListener(v -> presenter.onChangeAuthorClicked());
@@ -126,7 +126,6 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 FILE_NAME_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewFileNameEntered));
 
-        //TODO change file name
         //TODO affect current composition issue(unwanted play from start)
     }
 

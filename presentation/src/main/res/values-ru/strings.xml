@@ -115,6 +115,7 @@
     <string name="white_theme">Светлая</string>
     <string name="dark_theme">Тёмная</string>
     <string name="edit">Редактировать</string>
+    <string name="edit_tags">Редактировать теги</string>
     <string name="change_author_name">Изменить имя исполнителя</string>
     <string name="change_title">Изменить название</string>
     <string name="title">Название</string>

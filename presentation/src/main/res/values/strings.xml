@@ -121,6 +121,7 @@
     <string name="white_theme">White</string>
     <string name="dark_theme">Dark</string>
     <string name="edit">Edit</string>
+    <string name="edit_tags">Edit tags</string>
     <string name="change_author_name">Change artist</string>
     <string name="change_title">Change title</string>
     <string name="title">Title</string>

@@ -2,12 +2,12 @@ package com.github.anrimian.musicplayer.data.repositories.music.folders;
 
 import com.github.anrimian.musicplayer.data.models.exceptions.FolderNodeNonExistException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
-import com.github.anrimian.musicplayer.data.utils.FileUtils;
 import com.github.anrimian.musicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.musicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
+import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.data.utils.FileUtils.getFileName;
-import static com.github.anrimian.musicplayer.data.utils.FileUtils.getParentDirPath;
 import static com.github.anrimian.musicplayer.domain.Constants.TIMEOUTS.STORAGE_LOADING_TIMEOUT_SECONDS;
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getParentDirPath;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.indexOfEnd;
 import static io.reactivex.Observable.fromIterable;
