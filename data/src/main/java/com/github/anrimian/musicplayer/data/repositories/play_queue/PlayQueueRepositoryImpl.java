@@ -320,6 +320,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private void processModifyChange(List<Composition> changedCompositions) {
+        PlayQueueItem currentItem = getCurrentItem();
         boolean updatedCurrentComposition = false;
         boolean updated = false;
 
@@ -329,9 +330,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 updated = updatedItem;
             }
 
-            PlayQueueItem currentItem = getCurrentItem();
             if (currentItem != null && currentItem.getComposition().equals(modifiedComposition)) {
-                currentItem.setComposition(modifiedComposition);
+                currentItem = new PlayQueueItem(currentItem.getId(), modifiedComposition);
                 updatedCurrentComposition = true;
             }
         }
@@ -339,7 +339,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
         }
         if (updatedCurrentComposition) {
-            currentCompositionSubject.onNext(new PlayQueueEvent(getCurrentItem()));
+            currentCompositionSubject.onNext(new PlayQueueEvent(currentItem));
         }
     }
 

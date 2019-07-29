@@ -3,6 +3,8 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
@@ -26,7 +28,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import androidx.annotation.NonNull;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.Scheduler;
@@ -66,7 +67,7 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    PlayQueueRepository playQueueRepositoryNew(PlayQueueDaoWrapper playQueueDao,
+    PlayQueueRepository playQueueRepository(PlayQueueDaoWrapper playQueueDao,
                                                StorageMusicDataSource storageMusicDataSource,
                                                SettingsRepository settingsPreferences,
                                                UiStatePreferences uiStatePreferences,

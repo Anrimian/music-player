@@ -4,10 +4,10 @@ import javax.annotation.Nonnull;
 
 public class PlayQueueItem {
 
-    private long id;
+    private final long id;
 
     @Nonnull
-    private Composition composition;
+    private final Composition composition;
 
     public PlayQueueItem(long id, @Nonnull Composition composition) {
         this.id = id;
@@ -18,17 +18,9 @@ public class PlayQueueItem {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     @Nonnull
     public Composition getComposition() {
         return composition;
-    }
-
-    public void setComposition(@Nonnull Composition composition) {
-        this.composition = composition;
     }
 
     @Override

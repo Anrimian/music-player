@@ -20,6 +20,8 @@ public interface MusicProviderRepository {
 
     Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText);
 
+    Observable<Composition> getCompositionObservable(long id);
+
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);

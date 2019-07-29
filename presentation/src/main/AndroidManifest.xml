@@ -39,6 +39,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.editor.CompositionEditorActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/SlidrActivityTheme"/>
+
         <service android:name=".infrastructure.service.music.MusicService"
             android:exported="false">
             <intent-filter>

@@ -38,11 +38,12 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
-import com.github.anrimian.musicplayer.ui.common.DialogUtils;
+import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
@@ -83,7 +84,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEU
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.DialogUtils.shareFile;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
@@ -532,10 +533,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             playQueueAdapter = new PlayQueueAdapter(list);
             playQueueAdapterWrapper.setObject(playQueueAdapter);
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
-            playQueueAdapter.setOnDeleteCompositionClickListener(presenter::onDeleteCompositionButtonClicked);
-            playQueueAdapter.setOnAddToPlaylistClickListener(presenter::onAddQueueItemToPlayListButtonClicked);
-            playQueueAdapter.setOnShareClickListener(this::onShareCompositionClicked);
-            playQueueAdapter.setOnDeleteItemClickListener(presenter::onDeleteQueueItemClicked);
+            playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
             rvPlayList.setAdapter(playQueueAdapter);
         } else {
             playQueueAdapter.setItems(list);
@@ -594,6 +592,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void setPlayQueueCoversEnabled(boolean isCoversEnabled) {
         playQueueAdapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
+    }
+
+    @Override
+    public void startEditCompositionScreen(long id) {
+        startActivity(CompositionEditorActivity.newIntent(requireContext(), id));
     }
 
     @Override
@@ -688,6 +691,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     presenter.onDeleteCurrentCompositionButtonClicked();
                     return true;
                 }
+                case R.id.menu_edit: {
+                    presenter.onEditCompositionButtonClicked();
+                    return true;
+                }
             }
             return false;
         });
@@ -723,6 +730,39 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             presenter.onDrawerScreenSelected(screenId);
             itemIdToStart = NO_ITEM;
         }
+    }
+
+    private void onPlayItemMenuClicked(View view, PlayQueueItem playQueueItem) {
+        Composition composition = playQueueItem.getComposition();
+
+        PopupMenu popup = new PopupMenu(requireContext(), view);
+        popup.inflate(R.menu.play_queue_item_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_add_to_playlist: {
+                    presenter.onAddQueueItemToPlayListButtonClicked(composition);
+                    return true;
+                }
+                case R.id.menu_edit: {
+                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                    return true;
+                }
+                case R.id.menu_share: {
+                    onShareCompositionClicked(composition);
+                    return true;
+                }
+                case R.id.menu_delete_from_queue: {
+                    presenter.onDeleteQueueItemClicked(playQueueItem);
+                    return true;
+                }
+                case R.id.menu_delete: {
+                    presenter.onDeleteCompositionButtonClicked(composition);
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
     }
 
     private void onRepeatModeButtonClicked(View view) {

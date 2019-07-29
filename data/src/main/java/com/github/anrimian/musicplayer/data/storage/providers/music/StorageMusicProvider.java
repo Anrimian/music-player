@@ -1,20 +1,18 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import com.github.anrimian.musicplayer.data.models.exceptions.DeleteFileException;
 import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
-import java.io.File;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,8 +20,16 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
 
-import static android.provider.MediaStore.Audio.Media.*;
-import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
+import static android.provider.MediaStore.Audio.Media.ALBUM;
+import static android.provider.MediaStore.Audio.Media.ARTIST;
+import static android.provider.MediaStore.Audio.Media.DATE_ADDED;
+import static android.provider.MediaStore.Audio.Media.DATE_MODIFIED;
+import static android.provider.MediaStore.Audio.Media.DISPLAY_NAME;
+import static android.provider.MediaStore.Audio.Media.DURATION;
+import static android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+import static android.provider.MediaStore.Audio.Media.IS_MUSIC;
+import static android.provider.MediaStore.Audio.Media.TITLE;
+import static android.provider.MediaStore.Audio.Media._ID;
 import static java.util.Collections.emptyMap;
 
 public class StorageMusicProvider {
@@ -45,6 +51,51 @@ public class StorageMusicProvider {
 
     public Map<Long, Composition> getCompositions() {
         return getCompositions(EXTERNAL_CONTENT_URI);
+    }
+
+    public void deleteComposition(String path) {//TODO not become update
+        contentResolver.delete(EXTERNAL_CONTENT_URI,
+                MediaStore.Images.Media.DATA + " = ?",
+                new String[] { path });
+    }
+
+    @Nullable
+    public Composition getComposition(long id) {
+        Cursor cursor = null;
+        try {
+            cursor = contentResolver.query(
+                    EXTERNAL_CONTENT_URI,
+                    null,
+                    MediaStore.Images.Media._ID + " = ?",
+                    new String[] { String.valueOf(id) },
+                    null);
+            if (cursor == null || cursor.getCount() == 0) {
+                return null;
+            }
+
+            cursor.moveToPosition(0);
+            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+            return getCompositionFromCursor(cursorWrapper);
+        } finally {
+            IOUtils.closeSilently(cursor);
+        }
+    }
+
+    public void updateCompositionAuthor(Composition composition, String author) {
+        updateComposition(composition.getId(), ARTIST, author);
+    }
+
+    public void updateCompositionTitle(Composition composition, String title) {
+        updateComposition(composition.getId(), TITLE, title);
+    }
+
+    private void updateComposition(long id, String key, String value) {
+        ContentValues cv = new ContentValues();
+        cv.put(key, value);
+        contentResolver.update(EXTERNAL_CONTENT_URI,
+                cv,
+                MediaStore.Audio.Playlists._ID + " = ?",
+                new String[] { String.valueOf(id) });
     }
 
     private Map<Long, Composition> getCompositions(Uri uri) {
@@ -79,34 +130,6 @@ public class StorageMusicProvider {
                 compositions.put(composition.getId(), composition);
             }
             return compositions;
-        } finally {
-            IOUtils.closeSilently(cursor);
-        }
-    }
-
-    public void deleteComposition(String path) {//TODO not become update
-        contentResolver.delete(EXTERNAL_CONTENT_URI,
-                MediaStore.Images.Media.DATA + " = ?",
-                new String[] { path });
-    }
-
-    @Nullable
-    public Composition getComposition(long id) {
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(
-                    EXTERNAL_CONTENT_URI,
-                    null,
-                    MediaStore.Images.Media._ID + " = ?",
-                    new String[] { String.valueOf(id) },
-                    null);
-            if (cursor == null || cursor.getCount() == 0) {
-                return null;
-            }
-
-            cursor.moveToPosition(0);
-            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            return getCompositionFromCursor(cursorWrapper);
         } finally {
             IOUtils.closeSilently(cursor);
         }

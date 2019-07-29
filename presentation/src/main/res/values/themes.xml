@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="PrimaryLightTheme" parent="AppTheme.Drawer"/>
+    <style name="PrimaryLightTheme" parent="AppTheme">
+    </style>
 
-    <style name="PrimaryDarkTheme" parent="PrimaryLightTheme">
+    <style name="PrimaryDarkTheme" parent="AppTheme">
         <!--primary colors-->
         <item name="colorPrimary">@color/darkColorPrimary</item>
         <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
@@ -12,7 +13,7 @@
         <item name="colorPrimaryVariant">@color/darkColorPrimaryVariant</item>
 
         <!--background-->
-        <item name="android:windowBackground">@color/dark_background_level_1</item>
+        <!--<item name="android:windowBackground">@color/dark_background_level_1</item>-->
         <item name="android:colorBackground">@color/dark_background_level_1</item>
         <item name="listBackground">@color/dark_background_level_0</item>
         <item name="listItemBackground">@color/dark_background_level_1</item>

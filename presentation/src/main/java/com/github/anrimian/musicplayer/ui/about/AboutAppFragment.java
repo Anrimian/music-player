@@ -31,8 +31,6 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
     @BindView(R.id.fl_container)
     View flContainer;
 
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -51,9 +49,6 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
 
         FragmentNavigation navigation = FragmentNavigation.from(requireFragmentManager());
-
-//        tvDisplay.setOnClickListener(v -> navigation.addNewFragment(new DisplaySettingsFragment()));
-//        tvPlayer.setOnClickListener(v -> navigation.addNewFragment(new PlayerSettingsFragment()));
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
         SlidrPanel.replace(flContainer,

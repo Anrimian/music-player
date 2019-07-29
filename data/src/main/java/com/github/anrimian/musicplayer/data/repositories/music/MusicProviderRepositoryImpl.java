@@ -65,6 +65,13 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
+    public Observable<Composition> getCompositionObservable(long id) {
+        return storageMusicDataSource.getCompositionObservable()
+                .flatMap(compositions -> findComposition(compositions, id))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Single<Folder> getCompositionsInPath(@Nullable String path,
                                                 @Nullable String searchText) {
         return musicFolderDataSource.getCompositionsInPath(path)
@@ -171,5 +178,16 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         List<Composition> list = new ArrayList<>(compositionMap.values());
         Collections.sort(list, getCompositionComparator());
         return list;
+    }
+
+    private Observable<Composition> findComposition(Map<Long, Composition> compositions, long id) {
+        return Observable.create(emitter -> {
+            Composition composition = compositions.get(id);
+            if (composition == null) {
+                emitter.onComplete();
+            } else {
+                emitter.onNext(composition);
+            }
+        });
     }
 }

@@ -29,6 +29,11 @@ public class ThemeController {
         updateTaskManager(activity);
     }
 
+    public void applyCurrentSlidrTheme(Activity activity) {
+        applyCurrentTheme(activity);
+        activity.getTheme().applyStyle(R.style.SlidrActivityTheme, true);
+    }
+
     public void setTheme(Activity activity, AppTheme appTheme) {
         if (appTheme == getCurrentTheme()) {
             return;
