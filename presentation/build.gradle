@@ -11,18 +11,19 @@ android {
         }
     }
 
-    def globalConfiguration = rootProject.extensions.getByName("ext")
-    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
-    buildToolsVersion globalConfiguration["androidBuildToolsVersion"]
-    defaultConfig {
-        minSdkVersion globalConfiguration["androidMinSdkVersion"]
-        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+    def config = rootProject.ext
 
-        applicationId globalConfiguration["androidApplicationId"]
-        versionCode globalConfiguration["androidVersionCode"]
-        versionName globalConfiguration["androidVersionName"]
-        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
-        testApplicationId globalConfiguration["testApplicationId"]
+    compileSdkVersion config.androidCompileSdkVersion
+    buildToolsVersion config.androidBuildToolsVersion
+    defaultConfig {
+        minSdkVersion config.androidMinSdkVersion
+        targetSdkVersion config.androidTargetSdkVersion
+
+        applicationId config.androidApplicationId
+        versionCode config.androidVersionCode
+        versionName config.androidVersionName
+        testInstrumentationRunner config.testInstrumentationRunner
+        testApplicationId config.testApplicationId
         archivesBaseName = "$applicationId-v$versionCode($versionName)"
         vectorDrawables.useSupportLibrary = true
     }

@@ -3,9 +3,13 @@ package com.github.anrimian.musicplayer.data.repositories.music.edit;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.repositories.CompositionEditorRepository;
+import com.github.anrimian.musicplayer.domain.utils.FileUtils;
+
+import java.io.File;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 
 public class CompositionEditorRepositoryImpl implements CompositionEditorRepository {
 
@@ -33,4 +37,28 @@ public class CompositionEditorRepositoryImpl implements CompositionEditorReposit
                 .andThen(storageMusicDataSource.updateCompositionTitle(composition, title))
                 .subscribeOn(scheduler);
     }
+
+    @Override
+    public Completable editCompositionFileName(Composition composition, String fileName) {
+        return Single.fromCallable(() -> FileUtils.getChangedFilePath(composition.getFilePath(), fileName))
+                .flatMap(newPath -> renameFile(composition.getFilePath(), newPath))
+                .flatMapCompletable(newPath -> storageMusicDataSource.updateCompositionFilePath(composition, newPath))
+                .subscribeOn(scheduler);
+    }
+
+    private Single<String> renameFile(String oldPath, String newPath) {
+        return Single.create(emitter -> {
+
+            File oldFile = new File(oldPath);
+            File newFile = new File(newPath);
+            if (oldFile.renameTo(newFile)) {
+                emitter.onSuccess(newPath);
+            } else {
+                emitter.onError(new Exception("file not renamed"));
+            }
+        });
+    }
+
+
+
 }

@@ -115,10 +115,14 @@
     <string name="white_theme">Светлая</string>
     <string name="dark_theme">Тёмная</string>
     <string name="edit">Редактировать</string>
-    <string name="change_author_name">Изменить имя автора</string>
-    <string name="enter_author_name">Введите имя автора</string>
-    <string name="change_title">Изменить заголовок</string>
-    <string name="enter_title">Введите заголовок</string>
+    <string name="edit_tags">Редактировать теги</string>
+    <string name="change_author_name">Изменить имя исполнителя</string>
+    <string name="change_title">Изменить название</string>
+    <string name="title">Название</string>
+    <string name="filename">Имя файла</string>
+    <string name="artist">Исполнитель</string>
+    <string name="change_file_name">Изменить имя файла</string>
+    <string name="copied_message">Текст скопирован</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

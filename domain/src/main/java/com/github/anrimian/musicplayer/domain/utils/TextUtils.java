@@ -59,7 +59,6 @@ public class TextUtils {
         return s == null || s.length() == 0;
     }
 
-    //oauth2://mrmobile/v1/authorization#access_token=aab6118993c009530a1bb4d9f728a51b53c0d508&expires_in=3600&token_type=Bearer&scope=phone&state=state
     public static String between(String source, String start, String end) {
         int startIndex = indexOfEnd(source, start);
         return source.substring(startIndex, source.indexOf(end, startIndex));

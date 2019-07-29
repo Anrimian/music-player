@@ -277,7 +277,11 @@ public class MusicPlayerInteractor {
         if (currentItem == null) {
             stop();
         } else {
-            musicPlayerController.prepareToPlay(currentItem.getComposition(), compositionEvent.getTrackPosition());
+            long trackPosition = compositionEvent.getTrackPosition();
+            if (compositionEvent.takePositionFromCurrent()) {
+                trackPosition = musicPlayerController.getTrackPosition();
+            }
+            musicPlayerController.prepareToPlay(currentItem.getComposition(), trackPosition);
         }
     }
 

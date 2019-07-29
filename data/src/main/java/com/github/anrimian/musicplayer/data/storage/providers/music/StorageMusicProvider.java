@@ -89,6 +89,10 @@ public class StorageMusicProvider {
         updateComposition(composition.getId(), TITLE, title);
     }
 
+    public void updateCompositionFilePath(Composition composition, String filePath) {
+        updateComposition(composition.getId(), MediaStore.Images.Media.DATA, filePath);
+    }
+
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
         cv.put(key, value);

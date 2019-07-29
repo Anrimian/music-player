@@ -26,6 +26,10 @@ public class CompositionEditorInteractor {
         return editorRepository.editCompositionTitle(composition, newTitle);
     }
 
+    public Completable editCompositionFileName(Composition composition, String newFileName) {
+        return editorRepository.editCompositionFileName(composition, newFileName);
+    }
+
     public Observable<Composition> getCompositionObservable(long id) {
         return musicProviderRepository.getCompositionObservable(id);
     }

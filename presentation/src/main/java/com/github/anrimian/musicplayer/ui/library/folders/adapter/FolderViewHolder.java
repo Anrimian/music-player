@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
@@ -13,11 +15,11 @@ import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import javax.annotation.Nonnull;
 
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.getLastPathPart;
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
+
 
 /**
  * Created on 31.10.2017.
@@ -55,7 +57,7 @@ class FolderViewHolder extends RecyclerView.ViewHolder {
     void bind(@Nonnull FolderFileSource folderFileSource) {
         this.folder = folderFileSource;
         this.path = folderFileSource.getFullPath();
-        String displayPath = getLastPathPart(path);
+        String displayPath = getFileName(path);
         tvFolderName.setText(displayPath);
 
         int filesCount = folderFileSource.getFilesCount();

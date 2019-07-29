@@ -5,12 +5,14 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
@@ -21,10 +23,10 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatDialogFragment;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setSoftInputVisible;
 
 public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
         implements CreatePlayListView {
@@ -67,7 +69,7 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
                 .setNegativeButton(R.string.cancel, (dialog1, which) -> {})
                 .setView(view)
                 .create();
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        setSoftInputVisible(dialog.getWindow());
         dialog.show();
 
         etPlayListName.setImeOptions(EditorInfo.IME_ACTION_DONE);
