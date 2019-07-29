@@ -108,4 +108,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void setDisplayCoversEnabled(boolean isCoversEnabled);
+
+    @StateStrategyType(SkipStrategy.class)
+    void showInputFolderNameDialog(String path);
 }

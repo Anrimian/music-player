@@ -61,6 +61,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private Disposable deleteActionDisposable;
     private Disposable playlistActionDisposable;
     private Disposable shareActionDisposable;
+    private Disposable renameActionDisposable;
 
     @Nullable
     private String path;
@@ -289,6 +290,18 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onFragmentDisplayed() {
         interactor.saveCurrentPath(path);
+    }
+
+    void onRenameFolderClicked(String folderPath) {
+        getViewState().showInputFolderNameDialog(folderPath);
+    }
+
+    void onNewFolderNameInputed(String path, String name) {
+        dispose(renameActionDisposable, presenterDisposable);
+        renameActionDisposable = interactor.renameFolder(path, name)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(renameActionDisposable);
     }
 
     private void addCompositionsToPlayNext(List<Composition> compositions) {

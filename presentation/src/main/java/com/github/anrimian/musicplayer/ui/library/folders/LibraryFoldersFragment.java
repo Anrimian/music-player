@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +26,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderF
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -35,6 +37,7 @@ import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWra
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
@@ -57,10 +60,12 @@ import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFiles;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
@@ -101,6 +106,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
 
     private boolean showQueueActions;
+
+    private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
 
     public static LibraryFoldersFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
@@ -154,29 +161,37 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
-        SelectOrderDialogFragment fragment = (SelectOrderDialogFragment) getChildFragmentManager()
+        FragmentManager fm = getChildFragmentManager();
+
+        SelectOrderDialogFragment orderFragment = (SelectOrderDialogFragment) fm
                 .findFragmentByTag(ORDER_TAG);
-        if (fragment != null) {
-            fragment.setOnCompleteListener(presenter::onOrderSelected);
+        if (orderFragment != null) {
+            orderFragment.setOnCompleteListener(presenter::onOrderSelected);
         }
 
-        ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
+        ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) fm
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (playListDialog != null) {
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
 
-        ChoosePlayListDialogFragment folderPlayListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
+        ChoosePlayListDialogFragment folderPlayListDialog = (ChoosePlayListDialogFragment) fm
                 .findFragmentByTag(SELECT_PLAYLIST_FOR_FOLDER_TAG);
         if (folderPlayListDialog != null) {
             folderPlayListDialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
         }
 
-        MenuDialogFragment compositionDialog = (MenuDialogFragment) getChildFragmentManager()
+        MenuDialogFragment compositionDialog = (MenuDialogFragment) fm
                 .findFragmentByTag(COMPOSITION_ACTION_TAG);
         if (compositionDialog != null) {
             compositionDialog.setOnCompleteListener(this::onCompositionActionSelected);
         }
+
+        filenameDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                FILE_NAME_TAG,
+                fragment -> fragment.setComplexCompleteListener((path, extra) -> {
+                    presenter.onNewFolderNameInputed(extra.getString(PATH_ARG), path);
+                }));
 
         if (getPath() != null) {//TODO root path -> not root path change case
             SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
@@ -423,6 +438,20 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         adapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
     }
 
+    @Override
+    public void showInputFolderNameDialog(String path) {
+        Bundle extra = new Bundle();
+        extra.putString(PATH_ARG, path);
+        InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.rename_folder,
+                R.string.change,
+                R.string.cancel,
+                R.string.folder_name,
+                formatFileName(path),
+                false,
+                extra);
+        filenameDialogFragmentRunner.show(fragment);
+    }
+
     private void onCompositionActionSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_play: {
@@ -487,6 +516,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 }
                 case R.id.menu_add_to_playlist: {
                     presenter.onAddFolderToPlayListButtonClicked(folder.getFullPath());
+                    return true;
+                }
+                case R.id.menu_rename_folder: {
+                    presenter.onRenameFolderClicked(folder.getFullPath());
                     return true;
                 }
                 case R.id.menu_share: {

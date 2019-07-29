@@ -123,6 +123,8 @@
     <string name="artist">Исполнитель</string>
     <string name="change_file_name">Изменить имя файла</string>
     <string name="copied_message">Текст скопирован</string>
+    <string name="folder_name">Имя папки</string>
+    <string name="rename_folder">Переименовать папку</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

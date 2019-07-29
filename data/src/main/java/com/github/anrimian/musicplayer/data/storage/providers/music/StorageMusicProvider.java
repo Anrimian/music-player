@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentO
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -91,6 +92,15 @@ public class StorageMusicProvider {
 
     public void updateCompositionFilePath(Composition composition, String filePath) {
         updateComposition(composition.getId(), MediaStore.Images.Media.DATA, filePath);
+    }
+
+    public void updateCompositionsFilePath(List<Composition> compositions,
+                                           String oldFilePath,
+                                           String newFilePath) {
+        for (Composition composition: compositions) {
+            String resultPath = composition.getFilePath().replace(oldFilePath, newFilePath);
+            updateComposition(composition.getId(), MediaStore.Images.Media.DATA, resultPath);
+        }
     }
 
     private void updateComposition(long id, String key, String value) {

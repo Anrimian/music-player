@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app.library.files;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -36,11 +37,13 @@ public class LibraryFilesModule {
     @Nonnull
     @LibraryFilesScope
     LibraryFilesInteractor libraryFilesInteractor(MusicProviderRepository musicProviderRepository,
+                                                  EditorRepository editorRepository,
                                                   MusicPlayerInteractor musicPlayerInteractor,
                                                   PlayListsRepository playListsRepository,
                                                   SettingsRepository settingsRepository,
                                                   UiStateRepository uiStateRepository) {
         return new LibraryFilesInteractor(musicProviderRepository,
+                editorRepository,
                 musicPlayerInteractor,
                 playListsRepository,
                 settingsRepository,

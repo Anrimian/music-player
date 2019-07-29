@@ -63,7 +63,7 @@ public class MusicFolderDataSource {
                     RxNode<String> currentNode = root;
                     if (lastIndexOfRootPath != -1) {
                         //+1 - remove slash at start
-                        String secondaryPaths = path.substring(lastIndexOfRootPath + 1, path.length());
+                        String secondaryPaths = path.substring(lastIndexOfRootPath + 1);
                         for (String partialPath: secondaryPaths.split("/")) {
                             RxNode<String> child = currentNode.getChild(partialPath);
                             if (child == null) {
@@ -156,6 +156,7 @@ public class MusicFolderDataSource {
     }
 
     private void processModifyChange(List<Composition> compositions) {
+        //TODO possible error here with renaming
         for (Composition composition : compositions) {
             String path = pathIdMap.get(composition.getId());
             if (path != null && !path.equals(composition.getFilePath())) {

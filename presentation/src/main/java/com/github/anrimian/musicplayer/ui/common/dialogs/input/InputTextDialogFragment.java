@@ -17,6 +17,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.java.PairCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,6 +26,7 @@ import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.Constants.Arguments.CAN_BE_EMPTY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_HINT;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_VALUE;
+import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.NEGATIVE_BUTTON_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITIVE_BUTTON_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.TITLE_ARG;
@@ -39,6 +41,9 @@ public class InputTextDialogFragment extends DialogFragment {
 
     @Nullable
     private Callback<String> onCompleteListener;
+
+    @Nullable
+    private PairCallback<String, Bundle> complexCompleteListener;
 
     public static InputTextDialogFragment newInstance(@StringRes int title,
                                                       @StringRes int positiveButtonText,
@@ -59,6 +64,22 @@ public class InputTextDialogFragment extends DialogFragment {
                                                       @StringRes int editTextHint,
                                                       String editTextValue,
                                                       boolean canBeEmpty) {
+        return newInstance(title,
+                positiveButtonText,
+                negativeButtonText,
+                editTextHint,
+                editTextValue,
+                canBeEmpty,
+                null);
+    }
+
+    public static InputTextDialogFragment newInstance(@StringRes int title,
+                                                      @StringRes int positiveButtonText,
+                                                      @StringRes int negativeButtonText,
+                                                      @StringRes int editTextHint,
+                                                      String editTextValue,
+                                                      boolean canBeEmpty,
+                                                      Bundle extra) {
         Bundle args = new Bundle();
         args.putInt(TITLE_ARG, title);
         args.putInt(POSITIVE_BUTTON_ARG, positiveButtonText);
@@ -66,6 +87,7 @@ public class InputTextDialogFragment extends DialogFragment {
         args.putInt(EDIT_TEXT_HINT, editTextHint);
         args.putString(EDIT_TEXT_VALUE, editTextValue);
         args.putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty);
+        args.putBundle(EXTRA_DATA_ARG, extra);
         InputTextDialogFragment fragment = new InputTextDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -114,14 +136,21 @@ public class InputTextDialogFragment extends DialogFragment {
         this.onCompleteListener = onCompleteListener;
     }
 
+    public void setComplexCompleteListener(@Nullable PairCallback<String, Bundle> complexCompleteListener) {
+        this.complexCompleteListener = complexCompleteListener;
+    }
+
     private void onCompleteButtonClicked() {
-        if (onCompleteListener != null) {
-            String text = editText.getText().toString();
-            //noinspection ConstantConditions
-            if (!TextUtils.equals(text, getArguments().getString(EDIT_TEXT_VALUE))) {
-                onCompleteListener.call(editText.getText().toString());
+        String text = editText.getText().toString();
+        if (!TextUtils.equals(text, getArguments().getString(EDIT_TEXT_VALUE))) {
+            if (onCompleteListener != null) {
+                onCompleteListener.call(text);
+            }
+            if (complexCompleteListener != null) {
+                complexCompleteListener.call(text, getArguments().getBundle(EXTRA_DATA_ARG));
             }
         }
         dismiss();
     }
+
 }

@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -25,17 +26,20 @@ import io.reactivex.Single;
 public class LibraryFilesInteractor {
 
     private final MusicProviderRepository musicProviderRepository;
+    private final EditorRepository editorRepository;
     private final MusicPlayerInteractor musicPlayerInteractor;
     private final PlayListsRepository playListsRepository;
     private final SettingsRepository settingsRepository;
     private final UiStateRepository uiStateRepository;
 
     public LibraryFilesInteractor(MusicProviderRepository musicProviderRepository,
+                                  EditorRepository editorRepository,
                                   MusicPlayerInteractor musicPlayerInteractor,
                                   PlayListsRepository playListsRepository,
                                   SettingsRepository settingsRepository,
                                   UiStateRepository uiStateRepository) {
         this.musicProviderRepository = musicProviderRepository;
+        this.editorRepository = editorRepository;
         this.musicPlayerInteractor = musicPlayerInteractor;
         this.playListsRepository = playListsRepository;
         this.settingsRepository = settingsRepository;
@@ -102,5 +106,14 @@ public class LibraryFilesInteractor {
         return musicProviderRepository.getAvailablePathsForPath(currentPath);
     }
 
-
+    public Completable renameFolder(String folderPath, String newName) {
+        return editorRepository.changeFolderName(folderPath, newName)
+                .flatMapCompletable(newPath ->
+                        musicProviderRepository.getAllCompositionsInPath(folderPath)
+                        .flatMapCompletable(compositions ->
+                                editorRepository.changeCompositionsFilePath(compositions,
+                                        folderPath,
+                                        newPath))
+                );
+    }
 }
