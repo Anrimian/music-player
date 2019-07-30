@@ -56,7 +56,7 @@
         <item name="android:listDivider">@drawable/divider</item>
     </style>
 
-    <style name="AppTheme.Drawer" parent="AppTheme">
+    <style name="AppTheme.VersionSpecific" parent="AppTheme">
 
     </style>
 
