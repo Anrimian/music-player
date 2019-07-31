@@ -61,7 +61,7 @@ public class DefaultErrorParser implements ErrorParser {
             return new ErrorCommand(getString(R.string.storage_timeout_error_message));
         }
         logException(throwable);
-        return new ErrorCommand(getString(R.string.unexpected_error));
+        return new ErrorCommand(getString(R.string.unexpected_error, throwable.getMessage()));
     }
 
     @Override
@@ -75,5 +75,9 @@ public class DefaultErrorParser implements ErrorParser {
 
     private String getString(@StringRes int resId) {
         return context.getString(resId);
+    }
+
+    private String getString(@StringRes int resId, Object... formatArgs) {
+        return context.getString(resId, formatArgs);
     }
 }
