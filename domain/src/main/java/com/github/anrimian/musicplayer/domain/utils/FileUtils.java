@@ -44,10 +44,10 @@ public class FileUtils {
     public static String getChangedFilePath(String fullPath, String newFileName) {
         String fileName = FileUtils.formatFileName(fullPath);
         String newPath = fullPath.replace(fileName, newFileName);
-        return getUniqueFileName(newPath, newFileName);
+        return getUniqueFilePath(newPath, newFileName);
     }
 
-    private static String getUniqueFileName(String filePath, String fileName) {
+    private static String getUniqueFilePath(String filePath, String fileName) {
         File file = new File(filePath);
         int filesCount = 0;
         String newFileName;
