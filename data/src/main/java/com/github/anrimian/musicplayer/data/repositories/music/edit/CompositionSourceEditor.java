@@ -9,6 +9,7 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.id3.ID3v24Tag;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +46,10 @@ public class CompositionSourceEditor {
             CannotWriteException {
         AudioFile f = AudioFileIO.read(new File(filePath));
         Tag tag = f.getTag();
+        if (tag == null) {
+            tag = new ID3v24Tag();
+            f.setTag(tag);
+        }
         tag.addField(genericKey, value);
         AudioFileIO.write(f);
     }

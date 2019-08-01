@@ -32,7 +32,7 @@
         <activity android:name=".ui.main.MainActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/AppTheme.Drawer">
+            android:theme="@style/AppTheme.VersionSpecific">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

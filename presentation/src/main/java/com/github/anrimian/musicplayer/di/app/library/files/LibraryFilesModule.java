@@ -17,7 +17,6 @@ import dagger.Module;
 import dagger.Provides;
 import io.reactivex.Scheduler;
 
-import static com.github.anrimian.musicplayer.di.app.ErrorModule.STORAGE_ERROR_PARSER;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 @Module
@@ -26,7 +25,7 @@ public class LibraryFilesModule {
     @Provides
     @Nonnull
     FolderRootPresenter folderRootPresenter(LibraryFilesInteractor interactor,
-                                            @Named(STORAGE_ERROR_PARSER) ErrorParser errorParser,
+                                            ErrorParser errorParser,
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new FolderRootPresenter(interactor,
                 errorParser,

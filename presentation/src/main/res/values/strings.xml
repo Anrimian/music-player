@@ -12,7 +12,7 @@
     <string name="library">Library</string>
     <string name="settings">Settings</string>
     <string name="internal_app_error">Internal app error</string>
-    <string name="unexpected_error">Unexpected error</string>
+    <string name="unexpected_error">Error: %s</string>
     <string name="file_not_found">File not found</string>
     <string name="compositions_on_device_not_found">No songs found on device</string>
     <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>

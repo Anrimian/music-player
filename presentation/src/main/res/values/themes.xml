@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="PrimaryLightTheme" parent="AppTheme">
+    <style name="PrimaryLightTheme" parent="AppTheme.VersionSpecific">
     </style>
 
-    <style name="PrimaryDarkTheme" parent="AppTheme">
+    <style name="PrimaryDarkTheme" parent="AppTheme.VersionSpecific">
         <!--primary colors-->
         <item name="colorPrimary">@color/darkColorPrimary</item>
         <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
