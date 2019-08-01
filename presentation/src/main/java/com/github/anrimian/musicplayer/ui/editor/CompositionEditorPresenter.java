@@ -105,6 +105,13 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         presenterDisposable.add(changeDisposable);
     }
 
+    void onCopyFileNameClicked() {
+        if (composition == null) {
+            return;
+        }
+        getViewState().copyFileNameText(composition.getFilePath());
+    }
+
     private void onDefaultError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showErrorMessage(errorCommand);

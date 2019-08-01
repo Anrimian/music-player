@@ -109,7 +109,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         changeFilenameClickableArea.setOnClickListener(v -> presenter.onChangeFileNameClicked());
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeTitleClickableArea, () -> copyText(tvTitle, tvTitleHint));
-        onLongClick(changeFilenameClickableArea, () -> copyText(tvFileName, tvFileNameHint));
+        onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
 
         Slidr.attach(this);
 
@@ -184,6 +184,14 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
         makeSnackbar(container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void copyFileNameText(String filePath) {
+        AndroidUtils.copyText(this,
+                formatFileName(filePath),
+                getString(R.string.filename));
+        onTextCopied();
     }
 
     private void copyText(TextView textView, TextView tvLabel) {
