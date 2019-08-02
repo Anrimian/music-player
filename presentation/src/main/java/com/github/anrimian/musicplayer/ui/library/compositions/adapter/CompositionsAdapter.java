@@ -1,7 +1,10 @@
 package com.github.anrimian.musicplayer.ui.library.compositions.adapter;
 
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicViewHolder;
@@ -11,10 +14,6 @@ import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created on 31.10.2017.
@@ -46,8 +45,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     @NonNull
     @Override
     public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new MusicViewHolder(LayoutInflater.from(parent.getContext()),
-                parent,
+        return new MusicViewHolder(parent,
                 onCompositionClickListener,
                 onMenuItemClickListener,
                 onLongClickListener);

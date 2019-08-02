@@ -1,9 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils;
 
-import java.util.List;
-
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
+
+import java.util.List;
 
 /**
  * Created on 17.02.2018.

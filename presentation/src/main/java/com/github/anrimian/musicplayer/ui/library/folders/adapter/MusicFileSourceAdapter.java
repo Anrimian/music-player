@@ -1,7 +1,10 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
@@ -14,10 +17,6 @@ import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created on 31.10.2017.
@@ -47,18 +46,15 @@ public class MusicFileSourceAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (type) {
             case TYPE_MUSIC: {
-                return new MusicViewHolder(inflater,
-                        parent,
+                return new MusicViewHolder(parent,
                         onCompositionClickListener,
                         onCompositionMenuItemClicked,
                         null);
             }
             case TYPE_FILE: {
-                return new FolderViewHolder(inflater,
-                        parent,
+                return new FolderViewHolder(parent,
                         onFolderClickListener,
                         onFolderMenuClickListener);
             }

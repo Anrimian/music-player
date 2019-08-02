@@ -1,21 +1,19 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import javax.annotation.Nonnull;
 
@@ -31,7 +29,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgrou
  * Created on 31.10.2017.
  */
 
-public class MusicViewHolder extends RecyclerView.ViewHolder {
+public class MusicViewHolder extends BaseViewHolder {
 
     @BindView(R.id.clickable_item)
     FrameLayout clickableItem;
@@ -47,12 +45,11 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
     private boolean selected = false;
     private boolean playing = false;
 
-    public MusicViewHolder(LayoutInflater inflater,
-                           ViewGroup parent,
+    public MusicViewHolder(ViewGroup parent,
                            OnPositionItemClickListener<Composition> onCompositionClickListener,
                            OnViewItemClickListener<Composition> onMenuClickListener,
                            OnPositionItemClickListener<Composition> onLongClickListener) {
-        super(inflater.inflate(R.layout.item_storage_music, parent, false));
+        super(parent, R.layout.item_storage_music);
         ButterKnife.bind(this, itemView);
         compositionItemWrapper = new CompositionItemWrapper(itemView);
 
@@ -144,9 +141,5 @@ public class MusicViewHolder extends RecyclerView.ViewHolder {
     @ColorInt
     private int getPlaySelectionColor() {
         return getPlayingCompositionColor(getContext(), 20);
-    }
-
-    private Context getContext() {
-        return itemView.getContext();
     }
 }

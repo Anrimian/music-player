@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.settings.themes.view;
 
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
@@ -27,10 +26,9 @@ class ThemesViewHolder extends BaseViewHolder {
 
     private AppTheme appTheme;
 
-    ThemesViewHolder(LayoutInflater inflater,
-                     ViewGroup parent,
+    ThemesViewHolder(ViewGroup parent,
                      Callback<AppTheme> onThemeClickListener) {
-        super(inflater.inflate(R.layout.item_theme, parent, false));
+        super(parent, R.layout.item_theme);
         ButterKnife.bind(this, itemView);
 
         flClickableArea.setOnClickListener(v -> onThemeClickListener.call(appTheme));

@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.settings.themes.view;
 
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -26,8 +25,7 @@ public class ThemesAdapter extends RecyclerView.Adapter<ThemesViewHolder> {
     @NonNull
     @Override
     public ThemesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new ThemesViewHolder(inflater, parent, themeClickListener);
+        return new ThemesViewHolder(parent, themeClickListener);
     }
 
     @Override
