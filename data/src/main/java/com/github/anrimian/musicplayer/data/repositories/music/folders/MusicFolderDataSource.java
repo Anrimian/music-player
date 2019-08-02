@@ -81,7 +81,6 @@ public class MusicFolderDataSource {
                 });
     }
 
-
     private Folder getFolderInPath(@Nullable String path, RxNode<String> root) {
         RxNode<String> node = findNodeByPath(path, root);
         if (node == null) {
@@ -156,17 +155,17 @@ public class MusicFolderDataSource {
     }
 
     private void processModifyChange(List<Composition> compositions) {
-        //TODO possible error here with renaming
         for (Composition composition : compositions) {
             String path = pathIdMap.get(composition.getId());
-            if (path != null && !path.equals(composition.getFilePath())) {
+            String compositionPath = composition.getFilePath();
+            if (path != null && !path.equals(compositionPath)) {
                 RxNode<String> node = findNodeByPath(getParentDirPath(path), root);
                 if (node != null) {
-                    node.removeNode(getFileName(composition.getFilePath()));
+                    node.removeNode(getFileName(path));
                 }
             }
-            pathIdMap.put(composition.getId(), composition.getFilePath());
-            getParentForPath(root, composition.getFilePath(), (node, partialPath) ->
+            pathIdMap.put(composition.getId(), compositionPath);
+            getParentForPath(root, compositionPath, (node, partialPath) ->
                     node.updateNode(partialPath, new CompositionNode(composition))
             );
         }
@@ -189,18 +188,6 @@ public class MusicFolderDataSource {
         RxNode<String> node = findNodeByPath(path, root);
         if (node != null) {
             node.removeNodes(paths);
-
-            clearEmptyNode(node);
-        }
-    }
-
-    private void clearEmptyNode(RxNode<String> node) {
-        if (node.getNodes().isEmpty()) {
-            RxNode<String> parent = node.getParent();
-            if (parent != null) {
-                parent.removeNode(node.getKey());
-                clearEmptyNode(parent);
-            }
         }
     }
 

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.utils.folders;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,7 +26,7 @@ public class RxNode<K> {
 
     private final LinkedHashMap<K, RxNode<K>> nodes = new LinkedHashMap<>();
 
-    private K key;
+    private final K key;
     private NodeData data;
 
     @Nullable
@@ -113,6 +115,8 @@ public class RxNode<K> {
 
             notifyNodesRemoved(mapList(removedNodes, RxNode::getData));
             notifyChildrenChanged();
+
+            clearEmptyNodeIfNeed(this);
         }
     }
 
@@ -122,6 +126,8 @@ public class RxNode<K> {
             removedNode.notifySelfRemoved();
             notifyChildrenChanged();
             notifyNodesRemoved(singletonList(removedNode.getData()));
+
+            clearEmptyNodeIfNeed(this);
         }
     }
 
@@ -139,6 +145,16 @@ public class RxNode<K> {
             notifyChildrenChanged();
         } else {
             addNode(new RxNode<>(key, nodeData));
+        }
+    }
+
+    private void clearEmptyNodeIfNeed(RxNode<K> node) {
+        if (node.getNodes().isEmpty()) {
+            RxNode<K> parent = node.getParent();
+            if (parent != null) {
+                parent.removeNode(node.getKey());
+                clearEmptyNodeIfNeed(parent);
+            }
         }
     }
 
@@ -195,6 +211,7 @@ public class RxNode<K> {
         childSubject.onNext(getNodes());
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "RxNode{" +
