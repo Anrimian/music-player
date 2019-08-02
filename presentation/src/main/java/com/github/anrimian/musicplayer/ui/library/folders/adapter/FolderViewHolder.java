@@ -10,6 +10,8 @@ import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import butterknife.BindView;
@@ -53,11 +55,38 @@ class FolderViewHolder extends BaseViewHolder {
     void bind(@Nonnull FolderFileSource folderFileSource) {
         this.folder = folderFileSource;
         this.path = folderFileSource.getFullPath();
+        showFolderName();
+        showFilesCount();
+    }
+
+    public void update(FolderFileSource folderFileSource, List<Object> payloads) {
+        this.folder = folderFileSource;
+        this.path = folderFileSource.getFullPath();
+        bind(folderFileSource);
+//        for (Object payload: payloads) {
+//            if (payload instanceof List) {
+//                //noinspection SingleStatementInBlock,unchecked
+//                update(folderFileSource, (List) payload);
+//            }
+//            if (payload == PATH) {
+//                showFolderName();
+//            }
+//            if (payload == FILES_COUNT) {
+//                showFilesCount();
+//            }
+//        }
+    }
+
+    private void showFilesCount() {
+        int filesCount = folder.getFilesCount();
+        String text = getContext().getResources().getQuantityString(R.plurals.compositions_count,
+                filesCount,
+                filesCount);
+        tvCompositionsCount.setText(text);
+    }
+
+    private void showFolderName() {
         String displayPath = getFileName(path);
         tvFolderName.setText(displayPath);
-
-        int filesCount = folderFileSource.getFilesCount();
-        String text = getContext().getResources().getQuantityString(R.plurals.compositions_count, filesCount, filesCount);
-        tvCompositionsCount.setText(text);
     }
 }

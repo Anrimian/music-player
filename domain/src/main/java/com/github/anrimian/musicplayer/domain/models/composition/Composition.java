@@ -16,6 +16,7 @@ public class Composition {
     private String album;
     private String filePath;
     @Nullable
+    @Deprecated
     private String displayName;
 
     private long duration;
@@ -69,10 +70,12 @@ public class Composition {
     }
 
     @Nullable
+    @Deprecated
     public String getDisplayName() {
         return displayName;
     }
 
+    @Deprecated
     public void setDisplayName(@Nullable String displayName) {
         this.displayName = displayName;
     }

@@ -20,10 +20,10 @@ public class SimpleDiffItemCallback<T> extends DiffUtil.ItemCallback<T> {
     }
 
     /**
-     * if you use this constructor, payload function must return null only if no changes has detected
+     * if you use this constructor, payload function must return null or empty only if no changes has detected
      */
     public SimpleDiffItemCallback(PayloadFunction<T> payloadFunction) {
-        this(new PayloadContentCheckFunction<>(payloadFunction), new PayloadDefaultFunction<>());
+        this(new PayloadContentCheckFunction<>(payloadFunction), payloadFunction);
     }
 
     public SimpleDiffItemCallback(ContentCheckFunction<T> contentCheckFunction,
@@ -66,7 +66,8 @@ public class SimpleDiffItemCallback<T> extends DiffUtil.ItemCallback<T> {
 
         @Override
         public boolean areContentsTheSame(T oldItem, T newItem) {
-            return payloadFunction.getChangePayload(oldItem, newItem) != null;
+            List<Object> payloads = payloadFunction.getChangePayload(oldItem, newItem);
+            return payloads != null && !payloads.isEmpty();
         }
     }
 

@@ -43,9 +43,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNav
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -99,7 +96,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private AdvancedToolbar toolbar;
     private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
-    private final DefferedObject<MusicFileSourceAdapter> adapterWrapper = new DefferedObject<>();
 
     private HeaderViewWrapper headerViewWrapper;
 
@@ -155,6 +151,13 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        adapter = new MusicFileSourceAdapter();
+        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
+        adapter.setOnFolderClickListener(presenter::onFolderClicked);
+        adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
+        adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
+        recyclerView.setAdapter(adapter);
 
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
@@ -243,20 +246,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void updateList(ListUpdate<FileSource> update) {
-        List<FileSource> musicList = update.getNewList();
-        if (adapter == null) {
-            adapter = new MusicFileSourceAdapter(musicList);
-            adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-            adapter.setOnFolderClickListener(presenter::onFolderClicked);
-            adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
-            adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
-            adapterWrapper.setObject(adapter);
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.setItems(musicList);
-            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
-        }
+    public void updateList(List<FileSource> list) {
+        adapter.submitList(list);
     }
 
     @Override
@@ -435,7 +426,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void setDisplayCoversEnabled(boolean isCoversEnabled) {
-        adapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
+        adapter.setCoversEnabled(isCoversEnabled);
     }
 
     @Override

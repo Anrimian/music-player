@@ -4,15 +4,18 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
+import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,14 +25,13 @@ import java.util.Set;
  * Created on 31.10.2017.
  */
 
-public class MusicFileSourceAdapter extends RecyclerView.Adapter {
+public class MusicFileSourceAdapter extends ListAdapter<FileSource, RecyclerView.ViewHolder> {
 
     private static final int TYPE_MUSIC = 1;
     private static final int TYPE_FILE = 2;
 
     private final Set<RecyclerView.ViewHolder> viewHolders = new HashSet<>();
 
-    private List<FileSource> musicList;
     private OnPositionItemClickListener<Composition> onCompositionClickListener;
     private OnItemClickListener<String> onFolderClickListener;
     private OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener;
@@ -39,8 +41,8 @@ public class MusicFileSourceAdapter extends RecyclerView.Adapter {
     private Composition currentComposition;
     private boolean isCoversEnabled;
 
-    public MusicFileSourceAdapter(List<FileSource> musicList) {
-        this.musicList = musicList;
+    public MusicFileSourceAdapter() {
+        super(new SimpleDiffItemCallback<>(FolderHelper::areSourcesTheSame));
     }
 
     @NonNull
@@ -66,7 +68,7 @@ public class MusicFileSourceAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         viewHolders.add(holder);
 
-        FileSource fileSource = musicList.get(position);
+        FileSource fileSource = getItem(position);
         switch (holder.getItemViewType()) {
             case TYPE_MUSIC: {
                 MusicViewHolder musicViewHolder = (MusicViewHolder) holder;
@@ -86,29 +88,45 @@ public class MusicFileSourceAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public int getItemCount() {
-        return musicList.size();
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder,
+                                 int position,
+                                 @NonNull List<Object> payloads) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position);
+            return;
+        }
+        FileSource fileSource = getItem(position);
+        switch (holder.getItemViewType()) {
+            case TYPE_MUSIC: {
+                MusicViewHolder musicViewHolder = (MusicViewHolder) holder;
+                MusicFileSource musicFileSource = (MusicFileSource) fileSource;
+                Composition composition = musicFileSource.getComposition();
+                musicViewHolder.update(composition, payloads);
+                break;
+            }
+            case TYPE_FILE: {
+                FolderViewHolder folderViewHolder = (FolderViewHolder) holder;
+                FolderFileSource folderFileSource = (FolderFileSource) fileSource;
+                folderViewHolder.update(folderFileSource, payloads);
+                break;
+            }
+        }
     }
 
     @Override
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
-        //noinspection unchecked
         super.onViewRecycled(holder);
         viewHolders.remove(holder);
     }
 
     @Override
     public int getItemViewType(int position) {
-        FileSource source = musicList.get(position);
+        FileSource source = getItem(position);
         if (source instanceof FolderFileSource) {
             return TYPE_FILE;
         } else {
             return TYPE_MUSIC;
         }
-    }
-
-    public void setItems(List<FileSource> musicList) {
-        this.musicList = musicList;
     }
 
     public void setOnCompositionClickListener(OnPositionItemClickListener<Composition> onCompositionClickListener) {

@@ -11,16 +11,12 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -72,18 +68,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
-
-    private final DiffCalculator<FileSource> diffCalculator = new DiffCalculator<>(
-            () -> sourceList,
-            FolderHelper::areSourcesTheSame,
-            source -> {
-                if (source instanceof MusicFileSource) {
-                    MusicFileSource musicFileSource = (MusicFileSource) source;
-                    Composition composition = musicFileSource.getComposition();
-                    compositionsForPlayList.remove(composition);
-                    compositionsToDelete.remove(composition);
-                }
-            });
 
     @Nullable
     private String folderToAddToPlayList;
@@ -421,15 +405,14 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private void subscribeOnFolderData(Folder folder) {
         dispose(filesDisposable, presenterDisposable);
         filesDisposable = folder.getFilesObservable()
-                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onMusicOnFoldersReceived);
         presenterDisposable.add(filesDisposable);
     }
 
-    private void onMusicOnFoldersReceived(ListUpdate<FileSource> listUpdate) {
-        sourceList = listUpdate.getNewList();
-        getViewState().updateList(listUpdate);
+    private void onMusicOnFoldersReceived(List<FileSource> sourceList) {
+        this.sourceList = sourceList;
+        getViewState().updateList(sourceList);
         if (sourceList.isEmpty()) {
             if (TextUtils.isEmpty(searchText)) {
                 getViewState().showEmptyList();

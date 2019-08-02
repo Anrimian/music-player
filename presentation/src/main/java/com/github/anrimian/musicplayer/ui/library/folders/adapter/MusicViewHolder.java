@@ -15,6 +15,8 @@ import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import butterknife.BindView;
@@ -74,6 +76,11 @@ public class MusicViewHolder extends BaseViewHolder {
     public void bind(@Nonnull Composition composition, boolean isCoversEnabled) {
         this.composition = composition;
         compositionItemWrapper.bind(composition, isCoversEnabled);
+    }
+
+    public void update(Composition composition, List<Object> payloads) {
+        this.composition = composition;
+        compositionItemWrapper.update(composition, payloads);
     }
 
     public void setCoversVisible(boolean isCoversEnabled) {
