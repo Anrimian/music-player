@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
+import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
 
 import java.util.List;
 
@@ -271,17 +272,13 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         }
     }
 
-    private void processCompositionChange(Change<List<Composition>> change) {
-        List<Composition> changedCompositions = change.getData();
-        switch (change.getChangeType()) {
-            case DELETED: {
-                processDeleteChange(changedCompositions);
-                break;
-            }
-            case MODIFY: {
-                processModifyChange(changedCompositions);
-                break;
-            }
+    private void processCompositionChange(Change<Composition> change) {
+        if (change instanceof Change.DeleteChange) {
+            processDeleteChange(((Change.DeleteChange<Composition>) change).getData());
+            return;
+        }
+        if (change instanceof Change.ModifyChange) {
+            processModifyChange(((Change.ModifyChange<Composition>) change).getData());
         }
     }
 
@@ -319,12 +316,13 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         }
     }
 
-    private void processModifyChange(List<Composition> changedCompositions) {
+    private void processModifyChange(List<ModifiedData<Composition>> changedCompositions) {
         PlayQueueItem currentItem = getCurrentItem();
         boolean updatedCurrentComposition = false;
         boolean updated = false;
 
-        for (Composition modifiedComposition : changedCompositions) {
+        for (ModifiedData<Composition> modifiedData : changedCompositions) {
+            Composition modifiedComposition = modifiedData.getNewData();
             boolean updatedItem = getPlayQueue().updateComposition(modifiedComposition);
             if (!updated) {
                 updated = updatedItem;

@@ -3,12 +3,10 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
-import com.github.anrimian.musicplayer.domain.utils.changes.ChangeType;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.Map;
 
 import io.reactivex.observers.TestObserver;
@@ -17,6 +15,7 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -43,7 +42,7 @@ public class StorageMusicDataSourceTest {
 
     @Test
     public void removeChangeTest() {
-        TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
         storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
@@ -55,28 +54,28 @@ public class StorageMusicDataSourceTest {
         changeSubject.onNext(changedCompositions);
 
         changeTestObserver.assertValue(change -> {
-            assertEquals(ChangeType.DELETED, change.getChangeType());
-            assertEquals(getFakeCompositionsMap().get(0L), change.getData().get(0));
-            assertEquals(getFakeCompositionsMap().get(1L), change.getData().get(1));
-            assertEquals(getFakeCompositionsMap().get(3L), change.getData().get(2));
-            assertEquals(getFakeCompositionsMap().get(getFakeCompositionsMap().size() - 1L), change.getData().get(3));
+            Change.DeleteChange deleteChange = (Change.DeleteChange) change;
+            assertEquals(getFakeCompositionsMap().get(0L), deleteChange.getData().get(0));
+            assertEquals(getFakeCompositionsMap().get(1L), deleteChange.getData().get(1));
+            assertEquals(getFakeCompositionsMap().get(3L), deleteChange.getData().get(2));
+            assertEquals(getFakeCompositionsMap().get(getFakeCompositionsMap().size() - 1L), deleteChange.getData().get(3));
             return true;
         });
 
         storageMusicDataSource.getCompositions()
                 .test()
                 .assertValue(compositions -> {
-                    assertEquals(null, compositions.get(0L));
-                    assertEquals(null, compositions.get(1L));
-                    assertEquals(null, compositions.get(3L));
-                    assertEquals(null, compositions.get(getFakeCompositionsMap().size() - 1L));
+                    assertNull(compositions.get(0L));
+                    assertNull(compositions.get(1L));
+                    assertNull(compositions.get(3L));
+                    assertNull(compositions.get(getFakeCompositionsMap().size() - 1L));
                     return true;
                 });
     }
 
     @Test
     public void addChangeTest() {
-        TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
         storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
@@ -87,8 +86,8 @@ public class StorageMusicDataSourceTest {
         changeSubject.onNext(changedCompositions);
 
         changeTestObserver.assertValue(change -> {
-            assertEquals(ChangeType.ADDED, change.getChangeType());
-            assertEquals(addedComposition, change.getData().get(0));
+            Change.AddChange addChange = (Change.AddChange) change;
+            assertEquals(addedComposition, addChange.getData().get(0));
             return true;
         });
 
@@ -103,7 +102,7 @@ public class StorageMusicDataSourceTest {
 
     @Test
     public void modifyChangeTest() {
-        TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
         storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
@@ -113,8 +112,8 @@ public class StorageMusicDataSourceTest {
         changeSubject.onNext(changedCompositions);
 
         changeTestObserver.assertValue(change -> {
-            assertEquals(ChangeType.MODIFY, change.getChangeType());
-            assertEquals(changedComposition, change.getData().get(0));
+            Change.ModifyChange<Composition> modifyChange = (Change.ModifyChange) change;
+            assertEquals(changedComposition, modifyChange.getData().get(0).getNewData());
             return true;
         });
 
@@ -129,23 +128,23 @@ public class StorageMusicDataSourceTest {
 
     @Test
     public void deleteCompositionTest() {
-        TestObserver<Change<List<Composition>>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
+        TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
         TestObserver<Map<Long, Composition>> compositionObserver = storageMusicDataSource.getCompositions().test();
 
         storageMusicDataSource.deleteComposition(getFakeCompositionsMap().get(0L))
-            .test()
-            .assertComplete();
+                .test()
+                .assertComplete();
 
         changeTestObserver.assertValue(change -> {
-            assertEquals(ChangeType.DELETED, change.getChangeType());
-            assertEquals(getFakeCompositionsMap().get(0L), change.getData().get(0));
+            Change.DeleteChange deleteChange = (Change.DeleteChange) change;
+            assertEquals(getFakeCompositionsMap().get(0L), deleteChange.getData().get(0));
             return true;
         });
 
         compositionObserver.assertValue(compositions -> {
-                    assertEquals(null, compositions.get(0L));
-                    return true;
-                });
+            assertNull(compositions.get(0L));
+            return true;
+        });
     }
 
     @Test

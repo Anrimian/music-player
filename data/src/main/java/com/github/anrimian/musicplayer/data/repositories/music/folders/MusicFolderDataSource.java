@@ -9,11 +9,10 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
+import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -32,8 +31,6 @@ public class MusicFolderDataSource {
     private final FolderMapper folderMapper = new FolderMapper();
 
     private final StorageMusicDataSource storageMusicDataSource;
-
-    private Map<Long, String> pathIdMap = new HashMap<>();
 
     @Nullable
     private RxNode<String> root;
@@ -137,43 +134,41 @@ public class MusicFolderDataSource {
                 .subscribe();
     }
 
-    private void onCompositionsChanged(Change<List<Composition>> change) {
-        switch (change.getChangeType()) {
-            case ADDED: {
-                processAddChange(change.getData());
-                break;
-            }
-            case DELETED: {
-                processDeleteChange(change.getData());
-                break;
-            }
-            case MODIFY: {
-                processModifyChange(change.getData());
-                break;
-            }
+    private void onCompositionsChanged(Change<Composition> change) {
+        if (change instanceof Change.AddChange) {
+            processAddChange(((Change.AddChange<Composition>) change).getData());
+            return;
+        }
+        if (change instanceof Change.DeleteChange) {
+            processDeleteChange(((Change.DeleteChange<Composition>) change).getData());
+            return;
+        }
+        if (change instanceof Change.ModifyChange) {
+            processModifyChange(((Change.ModifyChange<Composition>) change).getData());
         }
     }
 
-    private void processModifyChange(List<Composition> compositions) {
-        for (Composition composition : compositions) {
-            String path = pathIdMap.get(composition.getId());
-            String compositionPath = composition.getFilePath();
+    private void processModifyChange(List<ModifiedData<Composition>> compositions) {
+        for (ModifiedData<Composition> modifiedData : compositions) {
+            Composition oldComposition = modifiedData.getOldData();
+            Composition newComposition = modifiedData.getNewData();
+
+            String path = oldComposition.getFilePath();
+            String compositionPath = newComposition.getFilePath();
             if (path != null && !path.equals(compositionPath)) {
                 RxNode<String> node = findNodeByPath(getParentDirPath(path), root);
                 if (node != null) {
                     node.removeNode(getFileName(path));
                 }
             }
-            pathIdMap.put(composition.getId(), compositionPath);
             getParentForPath(root, compositionPath, (node, partialPath) ->
-                    node.updateNode(partialPath, new CompositionNode(composition))
+                    node.updateNode(partialPath, new CompositionNode(newComposition))
             );
         }
     }
 
     private void processDeleteChange(List<Composition> compositions) {
         fromIterable(compositions)
-                .doOnNext(composition -> pathIdMap.remove(composition.getId()))
                 .groupBy(composition -> getParentDirPath(composition.getFilePath()))
                 .doOnNext(group -> group.map(Composition::getFilePath)
                         .map(FileUtils::getFileName)
@@ -193,7 +188,6 @@ public class MusicFolderDataSource {
 
     private void processAddChange(List<Composition> compositions) {
         fromIterable(compositions)
-                .doOnNext(composition -> pathIdMap.put(composition.getId(), composition.getFilePath()))
                 .groupBy(composition -> getParentDirPath(composition.getFilePath()))
                 .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
                         .doOnSuccess(pathCompositions ->
@@ -217,7 +211,6 @@ public class MusicFolderDataSource {
     private RxNode<String> createMusicFileTree() {
         RxNode<String> root = new RxNode<>(null, null);
         fromIterable(storageMusicDataSource.getCompositionsMap().values())
-                .doOnNext(composition -> pathIdMap.put(composition.getId(), composition.getFilePath()))
                 .groupBy(composition -> getParentDirPath(composition.getFilePath()))
                 .doOnNext(group -> group.collect(ArrayList<Composition>::new, List::add)
                         .doOnSuccess(pathCompositions ->

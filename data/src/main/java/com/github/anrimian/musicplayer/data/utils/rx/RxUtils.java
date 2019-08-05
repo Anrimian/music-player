@@ -30,6 +30,12 @@ public class RxUtils {
         }
     }
 
+    public static void dispose(@io.reactivex.annotations.Nullable Disposable disposable) {
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
+    }
+
     public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Creator<T> creator) {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
