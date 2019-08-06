@@ -109,11 +109,8 @@ public class LibraryFilesInteractor {
     public Completable renameFolder(String folderPath, String newName) {
         return editorRepository.changeFolderName(folderPath, newName)
                 .flatMapCompletable(newPath ->
-                        musicProviderRepository.getAllCompositionsInPath(folderPath)
-                        .flatMapCompletable(compositions ->
-                                editorRepository.changeCompositionsFilePath(compositions,
-                                        folderPath,
-                                        newPath))
+                        musicProviderRepository.changeFolderName(folderPath, newName, newPath)
+                        .flatMapCompletable(editorRepository::changeCompositionsFilePath)
                 );
     }
 }

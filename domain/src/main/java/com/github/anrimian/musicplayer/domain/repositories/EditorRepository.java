@@ -15,9 +15,7 @@ public interface EditorRepository {
 
     Completable changeCompositionFileName(Composition composition, String fileName);
 
-    Completable changeCompositionsFilePath(List<Composition> compositions,
-                                           String oldFilePath,
-                                           String newFilePath);
+    Completable changeCompositionsFilePath(List<Composition> compositions);
 
     Single<String> changeFolderName(String filePath, String folderName);
 }

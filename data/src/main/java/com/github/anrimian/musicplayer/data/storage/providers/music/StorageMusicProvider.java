@@ -94,12 +94,9 @@ public class StorageMusicProvider {
         updateComposition(composition.getId(), MediaStore.Images.Media.DATA, filePath);
     }
 
-    public void updateCompositionsFilePath(List<Composition> compositions,
-                                           String oldFilePath,
-                                           String newFilePath) {
+    public void updateCompositionsFilePath(List<Composition> compositions) {
         for (Composition composition: compositions) {
-            String resultPath = composition.getFilePath().replace(oldFilePath, newFilePath);
-            updateComposition(composition.getId(), MediaStore.Images.Media.DATA, resultPath);
+            updateComposition(composition.getId(), MediaStore.Images.Media.DATA, composition.getFilePath());
         }
     }
 

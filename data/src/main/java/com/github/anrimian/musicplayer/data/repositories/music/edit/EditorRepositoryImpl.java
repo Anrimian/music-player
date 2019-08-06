@@ -48,10 +48,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
-    public Completable changeCompositionsFilePath(List<Composition> compositions,
-                                                  String oldFilePath,
-                                                  String newFilePath) {
-        return storageMusicDataSource.updateCompositionsFilePath(compositions, oldFilePath, newFilePath)
+    public Completable changeCompositionsFilePath(List<Composition> compositions) {
+        return storageMusicDataSource.updateCompositionsFilePath(compositions)
                 .subscribeOn(scheduler);
     }
 

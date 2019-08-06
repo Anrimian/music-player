@@ -26,7 +26,7 @@ public class RxNode<K> {
 
     private final LinkedHashMap<K, RxNode<K>> nodes = new LinkedHashMap<>();
 
-    private final K key;
+    private K key;
     private NodeData data;
 
     @Nullable
@@ -146,6 +146,27 @@ public class RxNode<K> {
         } else {
             addNode(new RxNode<>(key, nodeData));
         }
+    }
+
+    public void updateKey(K key) {
+        if (parent != null) {
+            parent.updateChildKey(this, key);
+        }
+        this.key = key;
+    }
+
+    public void updateData(NodeData nodeData) {
+        this.data = nodeData;
+        selfChangeSubject.onNext(data);
+        if (parent != null) {
+            parent.notifyNodesChanged(singletonList(nodeData));
+            parent.notifyChildrenChanged();
+        }
+    }
+
+    private void updateChildKey(RxNode<K> node, K newKey) {
+        nodes.remove(node.getKey());
+        nodes.put(newKey, node);
     }
 
     private void clearEmptyNodeIfNeed(RxNode<K> node) {

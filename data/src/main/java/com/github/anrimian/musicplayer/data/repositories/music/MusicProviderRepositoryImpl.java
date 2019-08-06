@@ -111,6 +111,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                 .subscribeOn(scheduler);
     }
 
+    @Override
+    public Single<List<Composition>> changeFolderName(String folderPath, String newName, String newPath) {
+        return musicFolderDataSource.changeFolderName(folderPath, newName, newPath);
+    }
+
     private Comparator<FileSource> getFileComparator(Order order) {
         Comparator<FileSource> comparator;
         switch (order.getOrderType()) {

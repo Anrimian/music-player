@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -76,6 +77,64 @@ public class MusicFolderDataSource {
 
                     return paths;
                 });
+    }
+
+    public Single<List<Composition>> changeFolderName(String folderPath, String newName, String newPath) {
+        return getMusicFileTree()
+                .map(tree -> {
+                    List<Composition> affectedCompositions = new LinkedList<>();
+
+                    RxNode<String> node = findNodeByPath(folderPath, tree);
+                    if (node != null) {
+                        node.updateKey(newName);
+                        NodeData nodeData = node.getData();
+                        if (nodeData instanceof FolderNode) {
+                            FolderNode folderNode = (FolderNode) nodeData;
+                            nodeData = new FolderNode(newPath,
+                                    folderNode.getCompositionsCount(),
+                                    folderNode.getLatestCreateDate(),
+                                    folderNode.getEarliestCreateDate());
+                            node.updateData(nodeData);
+                        }
+                        updateNodesPath(node, folderPath, newPath, affectedCompositions);
+                    }
+                    return affectedCompositions;
+                });
+    }
+
+    private void updateNodesPath(RxNode<String> parentNode,
+                                 String folderPath,
+                                 String newPath,
+                                 List<Composition> outAffectedCompositions) {
+        for (RxNode<String> node: parentNode.getNodes()) {
+            Composition affectedComposition = updateNodePathData(node, folderPath, newPath);
+            if (affectedComposition != null) {
+                outAffectedCompositions.add(affectedComposition);
+            }
+            updateNodesPath(node, folderPath, newPath, outAffectedCompositions);
+        }
+    }
+
+    @Nullable
+    private Composition updateNodePathData(RxNode<String> node, String folderPath, String newPath) {
+        NodeData nodeData = node.getData();
+        if (nodeData instanceof FolderNode) {
+            FolderNode folderNode = (FolderNode) nodeData;
+            nodeData = new FolderNode(folderNode.getFullPath().replace(folderPath, newPath),
+                    folderNode.getCompositionsCount(),
+                    folderNode.getLatestCreateDate(),
+                    folderNode.getEarliestCreateDate());
+            node.updateData(nodeData);
+            return null;
+        }
+        if (nodeData instanceof CompositionNode) {
+            CompositionNode compositionNode = (CompositionNode) nodeData;
+            Composition composition = compositionNode.getComposition();
+            composition = composition.copy(composition.getFilePath().replace(folderPath, newPath));
+            node.updateData(new CompositionNode(composition));
+            return composition;
+        }
+        return null;
     }
 
     private Folder getFolderInPath(@Nullable String path, RxNode<String> root) {

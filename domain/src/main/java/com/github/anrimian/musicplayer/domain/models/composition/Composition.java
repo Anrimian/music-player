@@ -28,6 +28,48 @@ public class Composition {
 
     private boolean isCorrupted;
 
+    public Composition(@Nullable String artist,
+                       String title,
+                       String album,
+                       String filePath,
+                       @Nullable String displayName,
+                       long duration,
+                       long size,
+                       long id,
+                       Date dateAdded,
+                       Date dateModified,
+                       boolean isCorrupted) {
+        this.artist = artist;
+        this.title = title;
+        this.album = album;
+        this.filePath = filePath;
+        this.displayName = displayName;
+        this.duration = duration;
+        this.size = size;
+        this.id = id;
+        this.dateAdded = dateAdded;
+        this.dateModified = dateModified;
+        this.isCorrupted = isCorrupted;
+    }
+
+    @Deprecated
+    public Composition() {
+    }
+
+    public Composition copy(String newPath) {
+        return new Composition(artist,
+                title,
+                album,
+                newPath,
+                displayName,
+                duration,
+                size,
+                id,
+                dateAdded,
+                dateModified,
+                isCorrupted);
+    }
+
     public boolean isCorrupted() {
         return isCorrupted;
     }

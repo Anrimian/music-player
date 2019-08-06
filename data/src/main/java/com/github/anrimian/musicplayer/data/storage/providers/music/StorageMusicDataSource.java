@@ -120,12 +120,8 @@ public class StorageMusicDataSource {
                 .subscribeOn(scheduler);
     }
 
-    public Completable updateCompositionsFilePath(List<Composition> compositions,
-                                                  String oldFilePath,
-                                                  String newFilePath) {
-        return Completable.fromAction(() -> musicProvider.updateCompositionsFilePath(compositions,
-                oldFilePath,
-                newFilePath))
+    public Completable updateCompositionsFilePath(List<Composition> compositions) {
+        return Completable.fromAction(() -> musicProvider.updateCompositionsFilePath(compositions))
                 .subscribeOn(scheduler);
     }
 
