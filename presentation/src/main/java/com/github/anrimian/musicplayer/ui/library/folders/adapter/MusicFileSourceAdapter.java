@@ -42,7 +42,7 @@ public class MusicFileSourceAdapter extends ListAdapter<FileSource, RecyclerView
     private boolean isCoversEnabled;
 
     public MusicFileSourceAdapter() {
-        super(new SimpleDiffItemCallback<>(FolderHelper::areSourcesTheSame));
+        super(new SimpleDiffItemCallback<>(FolderHelper::getChangePayload));
     }
 
     @NonNull
