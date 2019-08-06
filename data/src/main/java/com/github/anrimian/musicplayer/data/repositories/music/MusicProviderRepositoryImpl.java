@@ -112,8 +112,8 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Single<List<Composition>> changeFolderName(String folderPath, String newName, String newPath) {
-        return musicFolderDataSource.changeFolderName(folderPath, newName, newPath);
+    public Single<List<Composition>> changeFolderName(String folderPath, String newPath) {
+        return musicFolderDataSource.changeFolderName(folderPath, newPath);
     }
 
     private Comparator<FileSource> getFileComparator(Order order) {

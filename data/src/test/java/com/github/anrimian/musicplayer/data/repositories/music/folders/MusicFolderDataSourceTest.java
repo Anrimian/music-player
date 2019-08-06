@@ -615,7 +615,7 @@ public class MusicFolderDataSourceTest {
         TestObserver<FileSource> changedFolderObserver = changedFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> changedFolderChildrenObserver = changedFolder.getFilesObservable().test();
 
-        musicFolderDataSource.changeFolderName("root/music/ww", "zzz", "root/music/zzz")
+        musicFolderDataSource.changeFolderName("root/music/ww", "root/music/zzz")
                 .test()
                 .assertValue(affectedCompositions -> {
                     assertEquals("root/music/zzz/etc/four.dd", affectedCompositions.get(0).getFilePath());

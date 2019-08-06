@@ -24,6 +24,7 @@ import static com.github.anrimian.musicplayer.domain.Constants.TIMEOUTS.STORAGE_
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getParentDirPath;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.indexOfEnd;
 import static io.reactivex.Observable.fromIterable;
 
@@ -79,13 +80,14 @@ public class MusicFolderDataSource {
                 });
     }
 
-    public Single<List<Composition>> changeFolderName(String folderPath, String newName, String newPath) {
+    public Single<List<Composition>> changeFolderName(String folderPath, String newPath) {
         return getMusicFileTree()
                 .map(tree -> {
                     List<Composition> affectedCompositions = new LinkedList<>();
 
                     RxNode<String> node = findNodeByPath(folderPath, tree);
                     if (node != null) {
+                        String newName = getLastPathSegment(newPath);
                         node.updateKey(newName);
                         NodeData nodeData = node.getData();
                         if (nodeData instanceof FolderNode) {
