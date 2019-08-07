@@ -145,8 +145,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setupSelectionModeMenu(R.menu.library_folders_selection_menu,
-                this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
@@ -226,6 +224,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void onFragmentMovedOnTop() {
         presenter.onFragmentDisplayed();
+
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setupSelectionModeMenu(R.menu.library_folders_selection_menu,
+                this::onActionModeItemClicked);
     }
 
     @Override
@@ -526,10 +528,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter.onPlayAllSelectedClicked();
                 return true;
             }
-//            case R.id.menu_select_all: {
-//                presenter.onSelectAllButtonClicked();
-//                return true;
-//            }
+            case R.id.menu_select_all: {
+                presenter.onSelectAllButtonClicked();
+                return true;
+            }
 //            case R.id.menu_play_next: {
 //                presenter.onPlayNextSelectedCompositionsClicked();
 //                return true;

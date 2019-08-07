@@ -315,6 +315,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         playSelectedCompositions();
     }
 
+    void onSelectAllButtonClicked() {
+        selectedFiles.clear();//reselect previous feature
+        selectedFiles.addAll(sourceList);
+        getViewState().showSelectionMode(selectedFiles.size());
+        getViewState().setItemsSelected(true);
+    }
+
     private void playSelectedCompositions() {
         interactor.play(new ArrayList<>(selectedFiles));
         closeSelectionMode();
@@ -327,6 +334,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private void processMultiSelectClick(int position, FileSource folder, Runnable onClick) {
         if (selectedFiles.isEmpty()) {
             onClick.run();
+            closeSelectionMode();
         } else {
             if (selectedFiles.contains(folder)) {
                 selectedFiles.remove(folder);

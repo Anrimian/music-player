@@ -6,11 +6,11 @@
         android:title="@string/play_all"
         app:iconTint="?attr/actionModeTextColor"
         app:showAsAction="always"/>
-    <!--<item android:id="@+id/menu_select_all"-->
-        <!--android:icon="@drawable/ic_select_all"-->
-        <!--android:title="@string/select_all"-->
-        <!--app:iconTint="?attr/actionModeTextColor"-->
-        <!--app:showAsAction="ifRoom"/>-->
+    <item android:id="@+id/menu_select_all"
+        android:icon="@drawable/ic_select_all"
+        android:title="@string/select_all"
+        app:iconTint="?attr/actionModeTextColor"
+        app:showAsAction="ifRoom"/>
     <!--<item android:id="@+id/menu_play_next"-->
         <!--android:icon="@drawable/ic_play_next"-->
         <!--android:title="@string/play_next"-->

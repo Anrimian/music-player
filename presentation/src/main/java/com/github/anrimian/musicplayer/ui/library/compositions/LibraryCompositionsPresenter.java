@@ -219,7 +219,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     }
 
     void onSelectAllButtonClicked() {
-        selectedCompositions.clear();
+        selectedCompositions.clear();//reselect previous feature
         selectedCompositions.addAll(compositions);
         getViewState().showSelectionMode(compositions.size());
         getViewState().setItemsSelected(true);
