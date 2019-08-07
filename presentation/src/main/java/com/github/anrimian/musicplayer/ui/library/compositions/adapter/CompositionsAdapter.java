@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicViewHolder;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
@@ -15,14 +14,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
+
 /**
  * Created on 31.10.2017.
  */
 
 public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
-
-    private static final Object ITEM_SELECTED = new Object();
-    private static final Object ITEM_UNSELECTED = new Object();
 
     private final Set<MusicViewHolder> viewHolders = new HashSet<>();
 

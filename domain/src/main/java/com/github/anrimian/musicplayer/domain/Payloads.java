@@ -12,4 +12,6 @@ public interface Payloads {
     Object SIZE = new Object();
     Object TITLE = new Object();
     Object CORRUPTED = new Object();
+    Object ITEM_SELECTED = new Object();
+    Object ITEM_UNSELECTED = new Object();
 }

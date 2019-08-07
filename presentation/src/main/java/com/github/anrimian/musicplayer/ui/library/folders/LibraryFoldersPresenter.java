@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
@@ -19,6 +20,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,6 +70,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
+    private final LinkedHashSet<FileSource> selectedFiles = new LinkedHashSet<>();
 
     @Nullable
     private String folderToAddToPlayList;
@@ -132,14 +135,17 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         loadMusic();
     }
 
-    void onCompositionClicked(int position, Composition composition) {
-        if (currentComposition != null) {
-            compositionInAction = composition;
-            getViewState().showCompositionActionDialog(composition);
-        } else {
-            interactor.play(path, composition);
-            getViewState().showCurrentPlayingComposition(composition);
-        }
+    void onCompositionClicked(int position, MusicFileSource musicFileSource) {
+        processMultiSelectClick(position, musicFileSource, () -> {
+           Composition composition = musicFileSource.getComposition();
+            if (currentComposition != null) {
+                compositionInAction = composition;
+                getViewState().showCompositionActionDialog(composition);
+            } else {
+                interactor.play(path, composition);
+                getViewState().showCurrentPlayingComposition(composition);
+            }
+        });
     }
 
     void onCompositionIconClicked(int position, Composition composition) {
@@ -189,6 +195,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         if (path == null) {
             throw new IllegalStateException("can not go back in root screen");
         }
+        closeSelectionMode();
         goBackToPreviousPath();
     }
 
@@ -268,8 +275,16 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         presenterDisposable.add(shareActionDisposable);
     }
 
-    void onFolderClicked(String path) {
-        getViewState().goToMusicStorageScreen(path);
+    void onFolderClicked(int position, FolderFileSource folder) {
+        processMultiSelectClick(position, folder, () ->
+                getViewState().goToMusicStorageScreen(folder.getFullPath())
+        );
+    }
+
+    void onItemLongClick(int position, FileSource folder) {
+        selectedFiles.add(folder);
+        getViewState().showSelectionMode(selectedFiles.size());
+        getViewState().onItemSelected(folder, position);
     }
 
     void onFragmentDisplayed() {
@@ -286,6 +301,35 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(renameActionDisposable);
+    }
+
+    void onSelectionModeBackPressed() {
+        closeSelectionMode();
+    }
+
+    LinkedHashSet<FileSource> getSelectedFiles() {
+        return selectedFiles;
+    }
+
+    private void processMultiSelectClick(int position, FileSource folder, Runnable onClick) {
+        if (selectedFiles.isEmpty()) {
+            onClick.run();
+        } else {
+            if (selectedFiles.contains(folder)) {
+                selectedFiles.remove(folder);
+                getViewState().onItemUnselected(folder, position);
+            } else {
+                selectedFiles.add(folder);
+                getViewState().onItemSelected(folder, position);
+            }
+            getViewState().showSelectionMode(selectedFiles.size());
+        }
+    }
+
+    private void closeSelectionMode() {
+        selectedFiles.clear();
+        getViewState().showSelectionMode(0);
+        getViewState().setItemsSelected(false);
     }
 
     private void addCompositionsToPlayNext(List<Composition> compositions) {
