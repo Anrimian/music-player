@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.business.library;
 
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
@@ -60,11 +61,17 @@ public class LibraryFilesInteractor {
         return musicProviderRepository.getAllCompositionsInPath(path);
     }
 
+    public void play(Iterable<FileSource> fileSources) {
+        musicProviderRepository.getAllCompositionsInFolders(fileSources)
+                .doOnSuccess(musicPlayerInteractor::startPlaying)
+                .subscribe();
+    }
+
     public void play(String path, Composition composition) {
         musicProviderRepository.getAllCompositionsInPath(path)
                 .doOnSuccess(compositions -> {
-                        int firstPosition = compositions.indexOf(composition);
-                        musicPlayerInteractor.startPlaying(compositions, firstPosition);
+                    int firstPosition = compositions.indexOf(composition);
+                    musicPlayerInteractor.startPlaying(compositions, firstPosition);
                 })
                 .subscribe();
     }
@@ -110,7 +117,8 @@ public class LibraryFilesInteractor {
         return editorRepository.changeFolderName(folderPath, newName)
                 .flatMapCompletable(newPath ->
                         musicProviderRepository.changeFolderName(folderPath, newPath)
-                        .flatMapCompletable(editorRepository::changeCompositionsFilePath)
+                                .flatMapCompletable(editorRepository::changeCompositionsFilePath)
                 );
     }
+
 }

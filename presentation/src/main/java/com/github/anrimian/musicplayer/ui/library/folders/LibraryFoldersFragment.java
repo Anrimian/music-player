@@ -521,11 +521,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     private boolean onActionModeItemClicked(MenuItem menuItem) {
-//        switch (menuItem.getItemId()) {
-//            case R.id.menu_play: {
-//                presenter.onPlayAllSelectedClicked();
-//                return true;
-//            }
+        switch (menuItem.getItemId()) {
+            case R.id.menu_play: {
+                presenter.onPlayAllSelectedClicked();
+                return true;
+            }
 //            case R.id.menu_select_all: {
 //                presenter.onSelectAllButtonClicked();
 //                return true;
@@ -550,7 +550,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 //                presenter.onDeleteSelectedCompositionButtonClicked();
 //                return true;
 //            }
-//        }
+        }
         return false;
     }
 

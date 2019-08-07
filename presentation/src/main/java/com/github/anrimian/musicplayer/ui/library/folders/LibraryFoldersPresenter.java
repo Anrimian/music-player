@@ -188,7 +188,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onPlayAllButtonClicked() {
-        interactor.playAllMusicInPath(path);
+        if (selectedFiles.isEmpty()) {
+            interactor.playAllMusicInPath(path);
+        } else {
+            playSelectedCompositions();
+        }
     }
 
     void onBackPathButtonClicked() {
@@ -304,6 +308,15 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onSelectionModeBackPressed() {
+        closeSelectionMode();
+    }
+
+    void onPlayAllSelectedClicked() {
+        playSelectedCompositions();
+    }
+
+    private void playSelectedCompositions() {
+        interactor.play(new ArrayList<>(selectedFiles));
         closeSelectionMode();
     }
 
