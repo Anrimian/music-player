@@ -2,11 +2,11 @@ package com.github.anrimian.musicplayer.ui.player_screen.view.slide;
 
 import android.animation.ArgbEvaluator;
 
+import androidx.appcompat.widget.ActionMenuView;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
-
-import androidx.appcompat.widget.ActionMenuView;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -44,7 +44,7 @@ public class ToolbarVisibilityDelegate implements SlideDelegate {
     private void makeVisible(float slideOffset) {
         if (toolbar.isInActionMode()) {
             int startColor = getColorFromAttr(toolbar.getContext(), R.attr.colorPrimary);
-            int endColor = getColorFromAttr(toolbar.getContext(), android.R.attr.windowBackground);
+            int endColor = getColorFromAttr(toolbar.getContext(), R.attr.actionModeBackgroundColor);
             ArgbEvaluator argbEvaluator = new ArgbEvaluator();
             int color = (int) argbEvaluator.evaluate(slideOffset, startColor, endColor);
             toolbar.setBackgroundColor(color);
