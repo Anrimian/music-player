@@ -327,6 +327,16 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         closeSelectionMode();
     }
 
+    void onPlayNextSelectedCompositionsClicked() {
+        interactor.addCompositionsToPlayNext(new ArrayList<>(selectedFiles));
+        closeSelectionMode();
+    }
+
+    void onAddToQueueSelectedCompositionsClicked() {
+        interactor.addCompositionsToEnd(new ArrayList<>(selectedFiles));
+        closeSelectionMode();
+    }
+
     LinkedHashSet<FileSource> getSelectedFiles() {
         return selectedFiles;
     }

@@ -532,14 +532,14 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter.onSelectAllButtonClicked();
                 return true;
             }
-//            case R.id.menu_play_next: {
-//                presenter.onPlayNextSelectedCompositionsClicked();
-//                return true;
-//            }
-//            case R.id.menu_add_to_queue: {
-//                presenter.onAddToQueueSelectedCompositionsClicked();
-//                return true;
-//            }
+            case R.id.menu_play_next: {
+                presenter.onPlayNextSelectedCompositionsClicked();
+                return true;
+            }
+            case R.id.menu_add_to_queue: {
+                presenter.onAddToQueueSelectedCompositionsClicked();
+                return true;
+            }
 //            case R.id.menu_add_to_playlist: {
 //                presenter.onAddSelectedCompositionToPlayListClicked();
 //                return true;

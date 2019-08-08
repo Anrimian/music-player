@@ -61,7 +61,7 @@ public class LibraryFilesInteractor {
         return musicProviderRepository.getAllCompositionsInPath(path);
     }
 
-    public void play(Iterable<FileSource> fileSources) {
+    public void play(List<FileSource> fileSources) {
         musicProviderRepository.getAllCompositionsInFolders(fileSources)
                 .doOnSuccess(musicPlayerInteractor::startPlaying)
                 .subscribe();
@@ -73,6 +73,18 @@ public class LibraryFilesInteractor {
                     int firstPosition = compositions.indexOf(composition);
                     musicPlayerInteractor.startPlaying(compositions, firstPosition);
                 })
+                .subscribe();
+    }
+
+    public void addCompositionsToPlayNext(List<FileSource> fileSources) {
+        musicProviderRepository.getAllCompositionsInFolders(fileSources)
+                .flatMapCompletable(musicPlayerInteractor::addCompositionsToPlayNext)
+                .subscribe();
+    }
+
+    public void addCompositionsToEnd(List<FileSource> fileSources) {
+        musicProviderRepository.getAllCompositionsInFolders(fileSources)
+                .flatMapCompletable(musicPlayerInteractor::addCompositionsToEnd)
                 .subscribe();
     }
 
