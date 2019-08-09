@@ -501,7 +501,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {
-                    presenter.onAddToPlayListButtonClicked(composition);
+                    presenter.onAddToPlayListButtonClicked(musicFileSource);
                     return true;
                 }
                 case R.id.menu_edit: {
@@ -513,7 +513,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                     return true;
                 }
                 case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(composition);
+                    presenter.onDeleteCompositionButtonClicked(musicFileSource);
                     return true;
                 }
             }
@@ -540,10 +540,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter.onAddToQueueSelectedCompositionsClicked();
                 return true;
             }
-//            case R.id.menu_add_to_playlist: {
-//                presenter.onAddSelectedCompositionToPlayListClicked();
-//                return true;
-//            }
+            case R.id.menu_add_to_playlist: {
+                presenter.onAddSelectedCompositionToPlayListClicked();
+                return true;
+            }
 //            case R.id.menu_share: {
 //                presenter.onShareSelectedCompositionsClicked();
 //                return true;

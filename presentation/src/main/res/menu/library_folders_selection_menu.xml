@@ -21,11 +21,11 @@
         android:title="@string/add_to_play_queue"
         app:iconTint="?attr/actionModeTextColor"
         app:showAsAction="ifRoom"/>
-    <!--<item android:id="@+id/menu_add_to_playlist"-->
-        <!--android:icon="@drawable/ic_playlist_plus"-->
-        <!--android:title="@string/add_to_playlist"-->
-        <!--app:iconTint="?attr/actionModeTextColor"-->
-        <!--app:showAsAction="ifRoom"/>-->
+    <item android:id="@+id/menu_add_to_playlist"
+        android:icon="@drawable/ic_playlist_plus"
+        android:title="@string/add_to_playlist"
+        app:iconTint="?attr/actionModeTextColor"
+        app:showAsAction="ifRoom"/>
     <!--<item android:id="@+id/menu_share"-->
         <!--android:icon="@drawable/ic_share_variant"-->
         <!--android:title="@string/share"-->

@@ -68,8 +68,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private List<FileSource> sourceList = new ArrayList<>();
 
-    private final List<Composition> compositionsForPlayList = new LinkedList<>();
-    private final List<Composition> compositionsToDelete = new LinkedList<>();
+    private final List<FileSource> filesForPlayList = new LinkedList<>();
+    private final List<FileSource> filesToDelete = new LinkedList<>();
     private final LinkedHashSet<FileSource> selectedFiles = new LinkedHashSet<>();
 
     @Nullable
@@ -203,10 +203,10 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         goBackToPreviousPath();
     }
 
-    void onDeleteCompositionButtonClicked(Composition composition) {
-        compositionsToDelete.clear();
-        compositionsToDelete.add(composition);
-        getViewState().showConfirmDeleteDialog(compositionsToDelete);
+    void onDeleteCompositionButtonClicked(MusicFileSource fileSource) {
+        filesToDelete.clear();
+        filesToDelete.add(fileSource);
+        getViewState().showConfirmDeleteDialog(asList(fileSource.getComposition()));
     }
 
     void onDeleteFolderButtonClicked(FolderFileSource folder) {
@@ -234,9 +234,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         interactor.setFolderOrder(order);
     }
 
-    void onAddToPlayListButtonClicked(Composition composition) {
-        compositionsForPlayList.clear();
-        compositionsForPlayList.add(composition);
+    void onAddToPlayListButtonClicked(MusicFileSource fileSource) {
+        filesForPlayList.clear();
+        filesForPlayList.add(fileSource);
         getViewState().showSelectPlayListDialog();
     }
 
@@ -337,6 +337,12 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         closeSelectionMode();
     }
 
+    void onAddSelectedCompositionToPlayListClicked() {
+        filesForPlayList.clear();
+        filesForPlayList.addAll(selectedFiles);
+        getViewState().showSelectPlayListDialog();
+    }
+
     LinkedHashSet<FileSource> getSelectedFiles() {
         return selectedFiles;
     }
@@ -391,7 +397,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private void deletePreparedCompositions() {
         dispose(deleteActionDisposable, presenterDisposable);
-        deleteActionDisposable = interactor.deleteCompositions(compositionsToDelete)
+        deleteActionDisposable = interactor.deleteCompositions(filesToDelete)
                 .observeOn(uiScheduler)
                 .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionsError);
         presenterDisposable.add(deleteActionDisposable);
@@ -402,9 +408,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         folderToDelete = null;
     }
 
-    private void onDeleteCompositionsSuccess() {
-        getViewState().showDeleteCompositionMessage(compositionsToDelete);
-        compositionsToDelete.clear();
+    private void onDeleteCompositionsSuccess(List<Composition> compositions) {
+        getViewState().showDeleteCompositionMessage(compositions);
+        filesToDelete.clear();
     }
 
     private void onDeleteCompositionsError(Throwable throwable) {
@@ -414,9 +420,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private void addPreparedCompositionsToPlayList(PlayList playList) {
         dispose(playlistActionDisposable, presenterDisposable);
-        playlistActionDisposable = interactor.addCompositionsToPlayList(compositionsForPlayList, playList)
+        playlistActionDisposable = interactor.addCompositionsToPlayList(filesForPlayList, playList)
                 .observeOn(uiScheduler)
-                .subscribe(() -> onAddingToPlayListCompleted(playList),
+                .subscribe(compositions -> onAddingToPlayListCompleted(compositions, playList),
                         this::onAddingToPlayListError);
         presenterDisposable.add(playlistActionDisposable);
     }
@@ -426,9 +432,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         getViewState().showAddingToPlayListError(errorCommand);
     }
 
-    private void onAddingToPlayListCompleted(PlayList playList) {
-        getViewState().showAddingToPlayListComplete(playList, compositionsForPlayList);
-        compositionsForPlayList.clear();
+    private void onAddingToPlayListCompleted(List<Composition> compositions, PlayList playList) {
+        getViewState().showAddingToPlayListComplete(playList, compositions);
+        filesForPlayList.clear();
+
+        if (!selectedFiles.isEmpty()) {
+            closeSelectionMode();
+        }
     }
 
     private void goBackToPreviousPath() {

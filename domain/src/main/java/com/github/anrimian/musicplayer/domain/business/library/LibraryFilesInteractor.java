@@ -88,8 +88,10 @@ public class LibraryFilesInteractor {
                 .subscribe();
     }
 
-    public Completable deleteCompositions(List<Composition> compositions) {
-        return musicProviderRepository.deleteCompositions(compositions);
+    public Single<List<Composition>> deleteCompositions(List<FileSource> fileSources) {
+        return musicProviderRepository.getAllCompositionsInFolders(fileSources)
+                .flatMap(compositions -> musicProviderRepository.deleteCompositions(compositions)
+                        .toSingleDefault(compositions));
     }
 
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
@@ -104,8 +106,10 @@ public class LibraryFilesInteractor {
                         .toSingleDefault(compositions));
     }
 
-    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
-        return playListsRepository.addCompositionsToPlayList(compositions, playList);
+    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource> fileSources, PlayList playList) {
+        return musicProviderRepository.getAllCompositionsInFolders(fileSources)
+                .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
+                        .toSingleDefault(compositions));
     }
 
     public void setFolderOrder(Order order) {
