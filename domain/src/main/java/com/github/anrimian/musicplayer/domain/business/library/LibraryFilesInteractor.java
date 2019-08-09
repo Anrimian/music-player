@@ -61,6 +61,10 @@ public class LibraryFilesInteractor {
         return musicProviderRepository.getAllCompositionsInPath(path);
     }
 
+    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource> fileSources) {
+        return musicProviderRepository.getAllCompositionsInFolders(fileSources);
+    }
+
     public void play(List<FileSource> fileSources) {
         musicProviderRepository.getAllCompositionsInFolders(fileSources)
                 .doOnSuccess(musicPlayerInteractor::startPlaying)

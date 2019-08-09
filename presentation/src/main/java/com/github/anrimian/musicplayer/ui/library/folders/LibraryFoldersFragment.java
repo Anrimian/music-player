@@ -533,25 +533,25 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 return true;
             }
             case R.id.menu_play_next: {
-                presenter.onPlayNextSelectedCompositionsClicked();
+                presenter.onPlayNextSelectedSourcesClicked();
                 return true;
             }
             case R.id.menu_add_to_queue: {
-                presenter.onAddToQueueSelectedCompositionsClicked();
+                presenter.onAddToQueueSelectedSourcesClicked();
                 return true;
             }
             case R.id.menu_add_to_playlist: {
-                presenter.onAddSelectedCompositionToPlayListClicked();
+                presenter.onAddSelectedSourcesToPlayListClicked();
                 return true;
             }
-//            case R.id.menu_share: {
-//                presenter.onShareSelectedCompositionsClicked();
-//                return true;
-//            }
-//            case R.id.menu_delete: {
-//                presenter.onDeleteSelectedCompositionButtonClicked();
-//                return true;
-//            }
+            case R.id.menu_share: {
+                presenter.onShareSelectedSourcessClicked();
+                return true;
+            }
+            case R.id.menu_delete: {
+                presenter.onDeleteSelectedCompositionButtonClicked();
+                return true;
+            }
         }
         return false;
     }
