@@ -88,6 +88,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
+    public Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources) {
+        return extractAllCompositionsInFolders(fileSources)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Single<List<String>> getAvailablePathsForPath(@Nullable String path) {
         return musicFolderDataSource.getAvailablePathsForPath(path)
                 .subscribeOn(scheduler);
@@ -194,5 +200,21 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                 emitter.onNext(composition);
             }
         });
+    }
+
+    private Single<List<Composition>> extractAllCompositionsInFolders(Iterable<FileSource> fileSources) {
+        return Observable.fromIterable(fileSources)
+                .flatMap(this::fileSourceToComposition)
+                .collect(ArrayList::new, List::add);
+    }
+
+    private Observable<Composition> fileSourceToComposition(FileSource fileSource) {
+        if (fileSource instanceof MusicFileSource) {
+            return Observable.just(((MusicFileSource) fileSource).getComposition());
+        }
+        if (fileSource instanceof FolderFileSource) {
+            return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());
+        }
+        throw new IllegalStateException("unexpected file source: " + fileSource);
     }
 }

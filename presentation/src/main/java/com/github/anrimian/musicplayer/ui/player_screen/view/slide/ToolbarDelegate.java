@@ -7,7 +7,6 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 
-import static androidx.core.content.ContextCompat.getColor;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setStatusBarColor;
 
@@ -24,7 +23,7 @@ public class ToolbarDelegate implements SlideDelegate {
         this.toolbar = toolbar;
         this.window = window;
 
-        startStatusBarColor = getColor(toolbar.getContext(), R.color.selectionStatusBarColor);
+        startStatusBarColor = getColorFromAttr(window.getContext(), R.attr.actionModeStatusBarColor);
         endStatusBarColor = getColorFromAttr(toolbar.getContext(), android.R.attr.statusBarColor);
     }
 

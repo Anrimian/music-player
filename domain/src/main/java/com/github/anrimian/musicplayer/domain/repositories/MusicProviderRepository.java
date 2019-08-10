@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 
@@ -25,6 +26,8 @@ public interface MusicProviderRepository {
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
+
+    Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources);
 
     Single<List<String>> getAvailablePathsForPath(@Nullable String path);
 

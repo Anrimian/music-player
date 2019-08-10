@@ -1,14 +1,18 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
 
 import java.util.List;
 
@@ -17,17 +21,23 @@ import javax.annotation.Nonnull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.FILES_COUNT;
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 
 /**
  * Created on 31.10.2017.
  */
 
-class FolderViewHolder extends BaseViewHolder {
+class FolderViewHolder extends SelectableViewHolder {
 
     @BindView(R.id.clickable_item)
-    View clickableItemView;
+    FrameLayout clickableItem;
 
     @BindView(R.id.tv_folder_name)
     TextView tvFolderName;
@@ -38,18 +48,46 @@ class FolderViewHolder extends BaseViewHolder {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
+    private Drawable foregroundDrawable;
+
     private FolderFileSource folder;
     private String path;
 
+    private boolean selected = false;
+
     FolderViewHolder(ViewGroup parent,
-                     OnItemClickListener<String> onFolderClickListener,
-                     OnViewItemClickListener<FolderFileSource> onMenuClickListener) {
+                     OnPositionItemClickListener<FolderFileSource> onFolderClickListener,
+                     OnViewItemClickListener<FolderFileSource> onMenuClickListener,
+                     OnPositionItemClickListener<FileSource> onLongClickListener) {
         super(parent, R.layout.item_storage_folder);
         ButterKnife.bind(this, itemView);
         if (onFolderClickListener != null) {
-            clickableItemView.setOnClickListener(v -> onFolderClickListener.onItemClick(path));
+            clickableItem.setOnClickListener(v ->
+                    onFolderClickListener.onItemClick(getAdapterPosition(), folder)
+            );
+        }
+        if (onLongClickListener != null) {
+            onLongClick(clickableItem,  () -> {
+                if (selected) {
+                    return;
+                }
+                selectImmediate();
+                onLongClickListener.onItemClick(getAdapterPosition(), folder);
+            });
         }
         btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        if (this.selected != selected) {
+            this.selected = selected;
+            int unselectedColor = Color.TRANSPARENT;
+            int selectedColor = getSelectionColor();
+            int endColor = selected ? selectedColor : unselectedColor;
+            animateBackgroundColor(clickableItem, endColor);
+            setBackgroundClickEffectEnabled(!selected);
+        }
     }
 
     void bind(@Nonnull FolderFileSource folderFileSource) {
@@ -63,18 +101,26 @@ class FolderViewHolder extends BaseViewHolder {
         this.folder = folderFileSource;
         this.path = folderFileSource.getFullPath();
         bind(folderFileSource);
-//        for (Object payload: payloads) {
-//            if (payload instanceof List) {
-//                //noinspection SingleStatementInBlock,unchecked
-//                update(folderFileSource, (List) payload);
-//            }
-//            if (payload == PATH) {
-//                showFolderName();
-//            }
-//            if (payload == FILES_COUNT) {
-//                showFilesCount();
-//            }
-//        }
+        for (Object payload: payloads) {
+            if (payload instanceof List) {
+                //noinspection SingleStatementInBlock,unchecked
+                update(folderFileSource, (List) payload);
+            }
+            if (payload == ITEM_SELECTED) {
+                setSelected(true);
+                return;
+            }
+            if (payload == ITEM_UNSELECTED) {
+                setSelected(false);
+                return;
+            }
+            if (payload == PATH) {
+                showFolderName();
+            }
+            if (payload == FILES_COUNT) {
+                showFilesCount();
+            }
+        }
     }
 
     private void showFilesCount() {
@@ -88,5 +134,23 @@ class FolderViewHolder extends BaseViewHolder {
     private void showFolderName() {
         String displayPath = getFileName(path);
         tvFolderName.setText(displayPath);
+    }
+
+    private void selectImmediate() {
+        setBackgroundClickEffectEnabled(false);
+        clickableItem.setBackgroundColor(getSelectionColor());
+        selected = true;
+    }
+
+    private void setBackgroundClickEffectEnabled(boolean enabled) {
+        Drawable drawable = clickableItem.getForeground();
+        if (drawable != null) {
+            if (!enabled) {
+                foregroundDrawable = drawable;
+                clickableItem.setForeground(null);
+            }
+        } else if (enabled) {
+            clickableItem.setForeground(foregroundDrawable);
+        }
     }
 }

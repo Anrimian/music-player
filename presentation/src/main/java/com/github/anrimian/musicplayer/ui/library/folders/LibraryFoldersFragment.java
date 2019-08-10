@@ -23,6 +23,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
@@ -152,11 +153,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new MusicFileSourceAdapter();
+        adapter = new MusicFileSourceAdapter(presenter.getSelectedFiles());
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(presenter::onFolderClicked);
         adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
         adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
+        adapter.setOnLongClickListener(presenter::onItemLongClick);
         recyclerView.setAdapter(adapter);
 
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
@@ -199,7 +201,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         if (getPath() != null) {//TODO root path -> not root path change case
             SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
             SlidrPanel.replace(contentContainer,
-                    () -> FragmentNavigation.from(requireFragmentManager()).goBack(),
+                    () -> {
+                        toolbar.showSelectionMode(0);
+                        FragmentNavigation.from(requireFragmentManager()).goBack();
+                    },
                     slidrConfig);
         }
     }
@@ -219,6 +224,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void onFragmentMovedOnTop() {
         presenter.onFragmentDisplayed();
+
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setupSelectionModeMenu(R.menu.library_folders_selection_menu,
+                this::onActionModeItemClicked);
     }
 
     @Override
@@ -301,6 +310,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public boolean onBackPressed() {
+        if (toolbar.isInActionMode()) {
+            presenter.onSelectionModeBackPressed();
+            return true;
+        }
         if (toolbar.isInSearchMode()) {
             toolbar.setSearchModeEnabled(false);
             return true;
@@ -443,6 +456,26 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         filenameDialogFragmentRunner.show(fragment);
     }
 
+    @Override
+    public void showSelectionMode(int count) {
+        toolbar.showSelectionMode(count);
+    }
+
+    @Override
+    public void onItemSelected(FileSource item, int position) {
+        adapter.setItemSelected(position);
+    }
+
+    @Override
+    public void onItemUnselected(FileSource item, int position) {
+        adapter.setItemUnselected(position);
+    }
+
+    @Override
+    public void setItemsSelected(boolean selected) {
+        adapter.setItemsSelected(selected);
+    }
+
     private void onCompositionActionSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_play: {
@@ -460,13 +493,15 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         }
     }
 
-    private void onCompositionMenuClicked(View view, Composition composition) {
+    private void onCompositionMenuClicked(View view, MusicFileSource musicFileSource) {
+        Composition composition = musicFileSource.getComposition();
+
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.composition_item_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {
-                    presenter.onAddToPlayListButtonClicked(composition);
+                    presenter.onAddToPlayListButtonClicked(musicFileSource);
                     return true;
                 }
                 case R.id.menu_edit: {
@@ -478,13 +513,47 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                     return true;
                 }
                 case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(composition);
+                    presenter.onDeleteCompositionButtonClicked(musicFileSource);
                     return true;
                 }
             }
             return false;
         });
         popup.show();
+    }
+
+    private boolean onActionModeItemClicked(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_play: {
+                presenter.onPlayAllSelectedClicked();
+                return true;
+            }
+            case R.id.menu_select_all: {
+                presenter.onSelectAllButtonClicked();
+                return true;
+            }
+            case R.id.menu_play_next: {
+                presenter.onPlayNextSelectedSourcesClicked();
+                return true;
+            }
+            case R.id.menu_add_to_queue: {
+                presenter.onAddToQueueSelectedSourcesClicked();
+                return true;
+            }
+            case R.id.menu_add_to_playlist: {
+                presenter.onAddSelectedSourcesToPlayListClicked();
+                return true;
+            }
+            case R.id.menu_share: {
+                presenter.onShareSelectedSourcessClicked();
+                return true;
+            }
+            case R.id.menu_delete: {
+                presenter.onDeleteSelectedCompositionButtonClicked();
+                return true;
+            }
+        }
+        return false;
     }
 
     private void onFolderMenuClicked(View view, FolderFileSource folder) {

@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.library.folders.adapter;
+package com.github.anrimian.musicplayer.ui.library.compositions.adapter;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -13,7 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
 
 import java.util.List;
 
@@ -22,16 +22,14 @@ import javax.annotation.Nonnull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static androidx.core.graphics.ColorUtils.setAlphaComponent;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 
 /**
  * Created on 31.10.2017.
  */
 
-public class MusicViewHolder extends BaseViewHolder {
+public class MusicViewHolder extends SelectableViewHolder {
 
     @BindView(R.id.clickable_item)
     FrameLayout clickableItem;
@@ -87,6 +85,7 @@ public class MusicViewHolder extends BaseViewHolder {
         compositionItemWrapper.showCompositionImage(isCoversEnabled);
     }
 
+    @Override
     public void setSelected(boolean selected) {
         if (this.selected != selected) {
             this.selected = selected;
@@ -138,11 +137,6 @@ public class MusicViewHolder extends BaseViewHolder {
         } else if (enabled) {
             clickableItem.setForeground(foregroundDrawable);
         }
-    }
-
-    @ColorInt
-    private int getSelectionColor() {
-        return setAlphaComponent(getColorFromAttr(getContext(), R.attr.colorAccent), 25);
     }
 
     @ColorInt

@@ -59,7 +59,7 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:text="@string/try_again"
-        android:textColor="?attr/colorPrimary"
+        android:textColor="?attr/colorAccent"
         android:textSize="@dimen/text_size_medium"
         android:textStyle="italic"
         android:layout_marginBottom="@dimen/margin_normal"
