@@ -129,6 +129,8 @@
     <string name="artist">Artist</string>
     <string name="change_file_name">Change file name</string>
     <string name="copied_message">Text copied</string>
+    <string name="folder_name">Folder name</string>
+    <string name="rename_folder">Rename folder</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

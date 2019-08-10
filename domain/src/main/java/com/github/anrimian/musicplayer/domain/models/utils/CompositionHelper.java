@@ -3,9 +3,20 @@ package com.github.anrimian.musicplayer.domain.models.utils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+
+import static com.github.anrimian.musicplayer.domain.Payloads.ALBUM;
+import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
+import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DATE_ADDED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
+import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
+import static com.github.anrimian.musicplayer.domain.Payloads.SIZE;
+import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 
 public class CompositionHelper {
 
@@ -14,12 +25,43 @@ public class CompositionHelper {
                 && Objects.equals(first.getArtist(), second.getArtist())
                 && Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && Objects.equals(first.getDateModified(), second.getDateModified())
-                && Objects.equals(first.getDisplayName(), second.getDisplayName())
                 && first.getDuration() == second.getDuration()
                 && Objects.equals(first.getFilePath(), second.getFilePath())
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
                 && first.isCorrupted() == second.isCorrupted();
+    }
+
+    public static List<Object> getChangePayload(Composition first, Composition second) {
+        List<Object> payloads = new LinkedList<>();
+        if (!Objects.equals(first.getAlbum(), second.getAlbum())) {
+            payloads.add(ALBUM);
+        }
+        if (!Objects.equals(first.getArtist(), second.getArtist())) {
+            payloads.add(ARTIST);
+        }
+        if (!Objects.equals(first.getDateAdded(), second.getDateAdded())) {
+            payloads.add(DATE_ADDED);
+        }
+        if (!Objects.equals(first.getDateModified(), second.getDateModified())) {
+            payloads.add(DATE_MODIFIED);
+        }
+        if (first.getDuration() != second.getDuration()) {
+            payloads.add(DURATION);
+        }
+        if (!Objects.equals(first.getFilePath(), second.getFilePath())) {
+            payloads.add(PATH);
+        }
+        if (first.getSize() != second.getSize()) {
+            payloads.add(SIZE);
+        }
+        if (!Objects.equals(first.getTitle(), second.getTitle())) {
+            payloads.add(TITLE);
+        }
+        if (first.isCorrupted() != second.isCorrupted()) {
+            payloads.add(CORRUPTED);
+        }
+        return payloads;
     }
 
     public static int getTotalDuration(List<Composition> compositions) {

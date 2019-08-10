@@ -4,60 +4,116 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-@SuppressWarnings("NullableProblems")
-public class Change<T> {
+public abstract class Change<T> {
 
-    @Nonnull
-    private ChangeType changeType;
+    public static class AddChange<T> extends Change<T> {
 
-    @Nonnull
-    private T data;
+        @Nonnull
+        protected final List<T> data;
 
-    public Change(@Nonnull ChangeType changeType, @Nonnull T data) {
-        this.changeType = changeType;
-        this.data = data;
+        public AddChange(@Nonnull List<T> data) {
+            this.data = data;
+        }
+
+        @Nonnull
+        public List<T> getData() {
+            return data;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            AddChange<?> addChange = (AddChange<?>) o;
+
+            return data.equals(addChange.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return data.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "Change{" +
+                    "data=" + data +
+                    '}';
+        }
     }
 
-    @Nonnull
-    public ChangeType getChangeType() {
-        return changeType;
+    public static class DeleteChange<T> extends Change<T> {
+
+        @Nonnull
+        protected final List<T> data;
+
+        public DeleteChange(@Nonnull List<T> data) {
+            this.data = data;
+        }
+
+        @Nonnull
+        public List<T> getData() {
+            return data;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            DeleteChange<?> that = (DeleteChange<?>) o;
+
+            return data.equals(that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return data.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "Change{" +
+                    "data=" + data +
+                    '}';
+        }
     }
 
-    public void setChangeType(@Nonnull ChangeType changeType) {
-        this.changeType = changeType;
-    }
+    public static class ModifyChange<T> extends Change<T> {
 
-    @Nonnull
-    public T getData() {
-        return data;
-    }
+        @Nonnull
+        private final List<ModifiedData<T>> data;
 
-    public void setData(@Nonnull T data) {
-        this.data = data;
-    }
+        public ModifyChange(@Nonnull List<ModifiedData<T>> data) {
+            this.data = data;
+        }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        @Nonnull
+        public List<ModifiedData<T>> getData() {
+            return data;
+        }
 
-        Change<?> change = (Change<?>) o;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
 
-        return changeType == change.changeType && data.equals(change.data);
-    }
+            ModifyChange<?> that = (ModifyChange<?>) o;
 
-    @Override
-    public int hashCode() {
-        int result = changeType.hashCode();
-        result = 31 * result + data.hashCode();
-        return result;
-    }
+            return data.equals(that.data);
+        }
 
-    @Override
-    public String toString() {
-        return "Change{" +
-                "changeType=" + changeType +
-                ", data=" + data +
-                '}';
+        @Override
+        public int hashCode() {
+            return data.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "ModifyChange{" +
+                    "data=" + data +
+                    '}';
+        }
     }
 }

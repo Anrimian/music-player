@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
+import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,21 +21,19 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
-import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.ADDED;
-import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.DELETED;
-import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class MusicFolderDataSourceTest {
 
     private StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
-    private PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
+    private PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
 
     private MusicFolderDataSource musicFolderDataSource = new MusicFolderDataSource(
             storageMusicDataSource
@@ -122,7 +121,7 @@ public class MusicFolderDataSourceTest {
 
         Composition compositionTwo = fakeComposition(2L, "root/music/two.dd");
         Composition compositionThree = fakeComposition(3L, "root/music/three.dd");
-        changeSubject.onNext(new Change<>(ADDED, asList(compositionTwo, compositionThree)));
+        changeSubject.onNext(new Change.AddChange<>(asList(compositionTwo, compositionThree)));
 
         childrenObserver.assertValueAt(1, list -> {
             assertEquals(3, list.size());
@@ -152,7 +151,7 @@ public class MusicFolderDataSourceTest {
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
         Composition compositionTwo = fakeComposition(2L, "root/music/basic/two.dd", 4L);
-        changeSubject.onNext(new Change<>(ADDED, singletonList(compositionTwo)));
+        changeSubject.onNext(new Change.AddChange<>(singletonList(compositionTwo)));
 
         childrenObserver.assertValueAt(1, list -> {
             assertEquals(2, list.size());
@@ -161,8 +160,8 @@ public class MusicFolderDataSourceTest {
             FolderFileSource folderNode = ((FolderFileSource) list.get(1));
             assertEquals("root/music/basic", folderNode.getFullPath());
             assertEquals(0, folderNode.getFilesCount());
-            assertEquals(null, folderNode.getEarliestCreateDate());
-            assertEquals(null, folderNode.getLatestCreateDate());
+            assertNull(folderNode.getEarliestCreateDate());
+            assertNull(folderNode.getLatestCreateDate());
             return true;
         });
 
@@ -200,7 +199,7 @@ public class MusicFolderDataSourceTest {
         TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
-        changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
+        changeSubject.onNext(new Change.DeleteChange<>(singletonList(compositionTwo)));
 
         childrenObserver.assertValueAt(1, list -> {
             assertEquals(1, list.size());
@@ -235,7 +234,7 @@ public class MusicFolderDataSourceTest {
         TestObserver<Object> basicFolderDeleteSelfObserver = basicFolder.getSelfDeleteObservable().test();
         TestObserver<List<FileSource>> basicFolderChildObserver = basicFolder.getFilesObservable().test();
 
-        changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
+        changeSubject.onNext(new Change.DeleteChange<>(singletonList(compositionTwo)));
 
         basicFolderChildObserver.assertValueAt(1, list -> {
             assertEquals(0, list.size());
@@ -274,7 +273,7 @@ public class MusicFolderDataSourceTest {
             return true;
         });
 
-        selfChangeObserver.assertValueAt(1,data -> {
+        selfChangeObserver.assertValueAt(1, data -> {
             FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(1, folderNode.getFilesCount());
             assertEquals(2L, folderNode.getLatestCreateDate().getTime());
@@ -305,7 +304,7 @@ public class MusicFolderDataSourceTest {
         TestObserver<FileSource> basicFolderSelfObserver = basicFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> basicFolderChildObserver = basicFolder.getFilesObservable().test();
 
-        changeSubject.onNext(new Change<>(DELETED, singletonList(compositionTwo)));
+        changeSubject.onNext(new Change.DeleteChange<>(singletonList(compositionTwo)));
 
         basicFolderChildObserver.assertValueAt(1, list -> {
             assertEquals(1, list.size());
@@ -359,7 +358,7 @@ public class MusicFolderDataSourceTest {
         compositionTwoChanged.setSize(4);
         compositionTwoChanged.setId(2L);
 
-        changeSubject.onNext(new Change<>(MODIFY, singletonList(compositionTwoChanged)));
+        changeSubject.onNext(new Change.ModifyChange<>(asList(new ModifiedData<>(compositionTwo, compositionTwoChanged))));
 
         childrenObserver.assertValueAt(1, list -> {
             assertEquals(2, list.size());
@@ -393,7 +392,7 @@ public class MusicFolderDataSourceTest {
         TestObserver<List<FileSource>> basicFolderChildObserver = basicFolder.getFilesObservable().test();
 
         Composition compositionTwoChanged = fakeComposition(2L, "root/music/basic/two.dd", 7L);
-        changeSubject.onNext(new Change<>(MODIFY, singletonList(compositionTwoChanged)));
+        changeSubject.onNext(new Change.ModifyChange<>(asList(new ModifiedData<>(compositionTwo, compositionTwoChanged))));
 
         basicFolderChildObserver.assertValueAt(1, list -> {
             assertEquals(compositionTwoChanged, ((MusicFileSource) list.get(0)).getComposition());
@@ -439,7 +438,7 @@ public class MusicFolderDataSourceTest {
         Composition compositionTwo = new Composition();
         compositionTwo.setFilePath("root/music/two.dd");
         compositionTwo.setId(2L);
-        changeSubject.onNext(new Change<>(MODIFY, singletonList(compositionTwo)));
+        changeSubject.onNext(new Change.ModifyChange<>(asList(new ModifiedData<>(compositionTwo, compositionTwo))));
 
         childrenObserver.assertValueAt(1, list -> {
             assertEquals(2, list.size());
@@ -472,7 +471,7 @@ public class MusicFolderDataSourceTest {
 
         Composition compositionTwoChanged = fakeComposition(2L, "root/music/basic/two.dd", 4L);
 
-        changeSubject.onNext(new Change<>(MODIFY, singletonList(compositionTwoChanged)));
+        changeSubject.onNext(new Change.ModifyChange<>(asList(new ModifiedData<>(compositionTwo, compositionTwoChanged))));
 
         childrenObserver.assertValueAt(1, list -> {
             assertEquals(1, list.size());
@@ -496,6 +495,153 @@ public class MusicFolderDataSourceTest {
         selfChangeObserver.assertValueAt(2, data -> {
             FolderFileSource folderNode = (FolderFileSource) data;
             assertEquals(2, folderNode.getFilesCount());
+            return true;
+        });
+    }
+
+    @Test
+    public void changeFileNameTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = fakeComposition(1L, "root/music/one.dd", 4L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = fakeComposition(2L, "root/music/two.dd", 4L);
+        compositions.put(2L, compositionTwo);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
+
+        Composition compositionTwoChanged = fakeComposition(2L, "root/music/two(2).dd", 4L);
+
+        changeSubject.onNext(new Change.ModifyChange<>(asList(new ModifiedData<>(compositionTwo, compositionTwoChanged))));
+
+        childrenObserver.assertValueAt(1, list -> {
+            assertEquals(1, list.size());
+            return true;
+        });
+
+        childrenObserver.assertValueAt(2, list -> {
+            assertEquals(2, list.size());
+
+            MusicFileSource folderNode = (MusicFileSource) list.get(1);
+            assertEquals("root/music/two(2).dd", folderNode.getComposition().getFilePath());
+            return true;
+        });
+
+        selfChangeObserver.assertValueAt(0, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
+            assertEquals(1, folderNode.getFilesCount());
+            return true;
+        });
+
+        selfChangeObserver.assertValueAt(1, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
+            assertEquals(2, folderNode.getFilesCount());
+            return true;
+        });
+    }
+
+    @Test
+    public void changeFolderPathTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = fakeComposition(1L, "root/music/ww/one.dd", 4L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = fakeComposition(2L, "root/music/ww/two.dd", 4L);
+        compositions.put(2L, compositionTwo);
+
+        Composition compositionThree = fakeComposition(3L, "root/music/three.dd", 4L);
+        compositions.put(3L, compositionThree);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
+        TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
+        TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
+
+        Composition compositionOneChanged = fakeComposition(1L, "root/music/ww3/one.dd", 4L);
+        Composition compositionTwoChanged = fakeComposition(2L, "root/music/ww3/two.dd", 4L);
+
+        changeSubject.onNext(new Change.ModifyChange<>(asList(
+                new ModifiedData<>(compositionOne, compositionOneChanged),
+                new ModifiedData<>(compositionTwo, compositionTwoChanged)
+        )));
+
+        childrenObserver.assertValueAt(5, list -> {
+            assertEquals(2, list.size());
+            return true;
+        });
+
+        childrenObserver.assertValueAt(5, list -> {
+            assertEquals(2, list.size());
+
+            FolderFileSource folderNode = (FolderFileSource) list.get(1);
+            assertEquals("root/music/ww3", folderNode.getFullPath());
+            return true;
+        });
+
+        selfChangeObserver.assertValueAt(5, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
+            assertEquals(3, folderNode.getFilesCount());
+            return true;
+        });
+    }
+
+    @Test
+    public void changeFolderNameTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = fakeComposition(1L, "root/music/ww/one.dd", 4L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = fakeComposition(2L, "root/music/ww/two.dd", 4L);
+        compositions.put(2L, compositionTwo);
+
+        Composition compositionThree = fakeComposition(3L, "root/music/three.dd", 4L);
+        compositions.put(3L, compositionThree);
+
+        Composition compositionFour = fakeComposition(4L, "root/music/ww/etc/four.dd", 4L);
+        compositions.put(4L, compositionFour);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        Folder rootFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
+        TestObserver<List<FileSource>> childrenObserver = rootFolder.getFilesObservable().test();
+
+        Folder changedFolder = musicFolderDataSource.getCompositionsInPath("root/music/ww").blockingGet();
+
+        TestObserver<FileSource> changedFolderObserver = changedFolder.getSelfChangeObservable().test();
+        TestObserver<List<FileSource>> changedFolderChildrenObserver = changedFolder.getFilesObservable().test();
+
+        musicFolderDataSource.changeFolderName("root/music/ww", "root/music/zzz")
+                .test()
+                .assertValue(affectedCompositions -> {
+                    assertEquals("root/music/zzz/etc/four.dd", affectedCompositions.get(0).getFilePath());
+                    assertEquals("root/music/zzz/one.dd", affectedCompositions.get(1).getFilePath());
+                    assertEquals("root/music/zzz/two.dd", affectedCompositions.get(2).getFilePath());
+                    return true;
+                })
+                .assertComplete();
+
+        childrenObserver.assertValueAt(1, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data.get(1);
+            assertEquals("root/music/zzz", folderNode.getFullPath());
+            return true;
+        });
+
+        changedFolderObserver.assertValueAt(0, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
+            assertEquals("root/music/zzz", folderNode.getFullPath());
+            return true;
+        });
+
+        changedFolderChildrenObserver.assertValueAt(changedFolderChildrenObserver.valueCount()-1, list -> {
+            assertEquals(3, list.size());
+            assertEquals("root/music/zzz/etc", ((FolderFileSource) list.get(0)).getFullPath());
+            assertEquals("root/music/zzz/one.dd", ((MusicFileSource) list.get(1)).getComposition().getFilePath());
+            assertEquals("root/music/zzz/two.dd", ((MusicFileSource) list.get(2)).getComposition().getFilePath());
             return true;
         });
     }
@@ -533,7 +679,7 @@ public class MusicFolderDataSourceTest {
         musicFolderDataSource.getAvailablePathsForPath("root/music/favorite/kiz")
                 .test()
                 .assertValue(list -> {
-                    assertEquals(null, list.get(0));
+                    assertNull(list.get(0));
                     assertEquals("root/music/favorite", list.get(1));
                     assertEquals("root/music/favorite/kiz", list.get(2));
                     return true;
@@ -564,5 +710,4 @@ public class MusicFolderDataSourceTest {
     private Observable<List<FileSource>> getSourceObservable(String path) {
         return musicFolderDataSource.getCompositionsInPath(path).blockingGet().getFilesObservable();
     }
-
 }

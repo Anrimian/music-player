@@ -13,7 +13,6 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.List;
 
@@ -53,7 +52,7 @@ public interface LibraryFoldersView extends MvpView {
     void goBackToParentFolderScreen();
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updateList(ListUpdate<FileSource> update);
+    void updateList(List<FileSource> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order folderOrder);
@@ -108,4 +107,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void setDisplayCoversEnabled(boolean isCoversEnabled);
+
+    @StateStrategyType(SkipStrategy.class)
+    void showInputFolderNameDialog(String path);
 }

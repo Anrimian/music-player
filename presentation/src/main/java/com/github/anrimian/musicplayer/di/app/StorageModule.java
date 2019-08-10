@@ -2,10 +2,14 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.repositories.music.edit.EditorRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.domain.business.editor.CompositionEditorInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
+import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -15,6 +19,7 @@ import dagger.Module;
 import dagger.Provides;
 import io.reactivex.Scheduler;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
 
 @Module
@@ -49,4 +54,19 @@ public class StorageModule {
     MusicFolderDataSource musicFolderDataSource(StorageMusicDataSource storageMusicDataSource) {
         return new MusicFolderDataSource(storageMusicDataSource);
     }
+
+    @Provides
+    @Nonnull
+    EditorRepository compositionEditorRepository(StorageMusicDataSource storageMusicDataSource,
+                                                 @Named(DB_SCHEDULER) Scheduler scheduler) {
+        return new EditorRepositoryImpl(storageMusicDataSource, scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    CompositionEditorInteractor compositionEditorInteractor(EditorRepository editorRepository,
+                                                            MusicProviderRepository musicProviderRepository) {
+        return new CompositionEditorInteractor(editorRepository, musicProviderRepository);
+    }
+
 }

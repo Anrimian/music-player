@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
-import com.github.anrimian.musicplayer.domain.utils.changes.ChangeType;
+import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class StorageMusicDataSource {
     private final FileManager fileManager;
     private final Scheduler scheduler;
 
-    private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
+    private final PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
     private final BehaviorSubject<Map<Long, Composition>> compositionSubject = BehaviorSubject.create();
 
     private Map<Long, Composition> compositions;
@@ -73,7 +73,7 @@ public class StorageMusicDataSource {
         return compositions.get(id);
     }
 
-    public Observable<Change<List<Composition>>> getChangeObservable() {
+    public Observable<Change<Composition>> getChangeObservable() {
         return changeSubject;
     }
 
@@ -88,7 +88,7 @@ public class StorageMusicDataSource {
                         deleteCompositionInternal(compositions, composition);
                     }
                     compositionSubject.onNext(compositions);
-                    changeSubject.onNext(new Change<>(ChangeType.DELETED, compositionsToDelete));
+                    changeSubject.onNext(new Change.DeleteChange<>(compositionsToDelete));
                 })
                 .ignoreElement()
                 .subscribeOn(scheduler);
@@ -99,7 +99,7 @@ public class StorageMusicDataSource {
                 .doOnSuccess(compositions -> {
                     deleteCompositionInternal(compositions, composition);
                     compositionSubject.onNext(compositions);
-                    changeSubject.onNext(new Change<>(ChangeType.DELETED, singletonList(composition)));
+                    changeSubject.onNext(new Change.DeleteChange<>(singletonList(composition)));
                 })
                 .ignoreElement()
                 .subscribeOn(scheduler);
@@ -117,6 +117,11 @@ public class StorageMusicDataSource {
 
     public Completable updateCompositionFilePath(Composition composition, String filePath) {
         return Completable.fromAction(() -> musicProvider.updateCompositionFilePath(composition, filePath))
+                .subscribeOn(scheduler);
+    }
+
+    public Completable updateCompositionsFilePath(List<Composition> compositions) {
+        return Completable.fromAction(() -> musicProvider.updateCompositionsFilePath(compositions))
                 .subscribeOn(scheduler);
     }
 
@@ -142,11 +147,11 @@ public class StorageMusicDataSource {
                 .subscribe(changeSubject::onNext);
     }
 
-    private Observable<Change<List<Composition>>> calculateChange(Map<Long, Composition> newCompositions) {
+    private Observable<Change<Composition>> calculateChange(Map<Long, Composition> newCompositions) {
         return Observable.create(emitter -> {
             List<Composition> deletedCompositions = new ArrayList<>();
             List<Composition> addedCompositions = new ArrayList<>();
-            List<Composition> changedCompositions = new ArrayList<>();
+            List<ModifiedData<Composition>> changedCompositions = new ArrayList<>();
 
             Map<Long, Composition> existsCompositions = compositions;
 
@@ -164,19 +169,19 @@ public class StorageMusicDataSource {
                     addedCompositions.add(newComposition);
                     existsCompositions.put(newComposition.getId(), newComposition);
                 } else if (!areSourcesTheSame(newComposition, existComposition)) {
-                    changedCompositions.add(newComposition);
+                    changedCompositions.add(new ModifiedData<>(existComposition, newComposition));
                     existsCompositions.put(newComposition.getId(), newComposition);
                 }
             }
 
             if (!deletedCompositions.isEmpty()) {
-                emitter.onNext(new Change<>(ChangeType.DELETED, deletedCompositions));
+                emitter.onNext(new Change.DeleteChange<>(deletedCompositions));
             }
             if (!addedCompositions.isEmpty()) {
-                emitter.onNext(new Change<>(ChangeType.ADDED, addedCompositions));
+                emitter.onNext(new Change.AddChange<>(addedCompositions));
             }
             if (!changedCompositions.isEmpty()) {
-                emitter.onNext(new Change<>(ChangeType.MODIFY, changedCompositions));
+                emitter.onNext(new Change.ModifyChange<>(changedCompositions));
             }
 
             if (!deletedCompositions.isEmpty()

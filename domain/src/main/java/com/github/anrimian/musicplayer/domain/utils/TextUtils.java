@@ -7,7 +7,7 @@ public class TextUtils {
         String result = text;
         int lastSlashIndex = text.lastIndexOf('/');
         if (lastSlashIndex != -1) {
-            result = text.substring(++lastSlashIndex, text.length());
+            result = text.substring(++lastSlashIndex);
         }
         return result;
     }

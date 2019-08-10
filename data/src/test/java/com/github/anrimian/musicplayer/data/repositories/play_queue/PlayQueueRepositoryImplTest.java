@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
+import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,8 +34,6 @@ import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFak
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeItems;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getReversedFakeItems;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
-import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.DELETED;
-import static com.github.anrimian.musicplayer.domain.utils.changes.ChangeType.MODIFY;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
@@ -55,7 +54,7 @@ public class PlayQueueRepositoryImplTest {
     private final SettingsRepositoryImpl settingsPreferences = mock(SettingsRepositoryImpl.class);
     private final UiStatePreferences uiStatePreferences = mock(UiStatePreferences.class);
 
-    private final PublishSubject<Change<List<Composition>>> changeSubject = PublishSubject.create();
+    private final PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
 
     private InOrder inOrder = Mockito.inOrder(playQueueDao);
 
@@ -369,7 +368,7 @@ public class PlayQueueRepositoryImplTest {
                 fakeComposition(1),
                 unexcitedComposition);
 
-        changeSubject.onNext(new Change<>(DELETED, deletedCompositions));
+        changeSubject.onNext(new Change.DeleteChange<>(deletedCompositions));
 
         List<PlayQueueItem> expectedList = getFakeItems();
         expectedList.remove(0);
@@ -413,7 +412,7 @@ public class PlayQueueRepositoryImplTest {
 
         List<Composition> deletedCompositions = asList(fakeComposition(1), fakeComposition(2));
 
-        changeSubject.onNext(new Change<>(DELETED, deletedCompositions));
+        changeSubject.onNext(new Change.DeleteChange<>(deletedCompositions));
 
         inOrder.verify(playQueueDao).deleteCompositionsFromQueue(eq(deletedCompositions));
 
@@ -435,7 +434,7 @@ public class PlayQueueRepositoryImplTest {
         List<PlayQueueItem> expectedList = new ArrayList<>(items);
         expectedList.remove(0);
 
-        changeSubject.onNext(new Change<>(DELETED, singletonList(fakeComposition(0))));
+        changeSubject.onNext(new Change.DeleteChange<>(singletonList(fakeComposition(0))));
 
         playQueueRepository.getPlayQueueObservable()
                 .test()
@@ -449,7 +448,7 @@ public class PlayQueueRepositoryImplTest {
         TestObserver<PlayQueueEvent> compositionObserver = playQueueRepository.getCurrentQueueItemObservable()
                 .test();
 
-        changeSubject.onNext(new Change<>(DELETED, getFakeCompositions()));
+        changeSubject.onNext(new Change.DeleteChange<>(getFakeCompositions()));
 
         compositionObserver.assertValues(currentItem(0), new PlayQueueEvent(null));
 
@@ -470,10 +469,11 @@ public class PlayQueueRepositoryImplTest {
 
         Composition unexcitedComposition = new Composition();
         unexcitedComposition.setId(2000000);
-        changeSubject.onNext(new Change<>(MODIFY, Arrays.asList(changedComposition,
-                fakeComposition(1),
-                unexcitedComposition)
-        ));
+        changeSubject.onNext(new Change.ModifyChange<>(Arrays.asList(
+                new ModifiedData<>(fakeComposition(0), changedComposition),
+                new ModifiedData<>(fakeComposition(1), fakeComposition(1)),
+                new ModifiedData<>(unexcitedComposition, unexcitedComposition)
+        )));
 
         playQueueRepository
                 .getPlayQueueObservable()

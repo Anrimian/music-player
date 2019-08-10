@@ -33,4 +33,6 @@ public interface MusicProviderRepository {
     Completable deleteComposition(Composition composition);
 
     Completable deleteCompositions(List<Composition> compositions);
+
+    Single<List<Composition>> changeFolderName(String folderPath, String newPath);
 }

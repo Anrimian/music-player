@@ -6,14 +6,22 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 
-import androidx.annotation.Nullable;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
+import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
+import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
+import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
@@ -60,18 +68,29 @@ public class CompositionItemWrapper {
 
     public void bind(Composition composition, boolean showCovers) {
         this.composition = composition;
-        String compositionName = formatCompositionName(composition);
-        tvMusicName.setText(compositionName);
-        clickableItem.setContentDescription(compositionName);
-        btnActionsMenu.setContentDescription(getContext().getString(
-                R.string.content_description_menu_template, compositionName));
+        showCompositionName();
         showAdditionalInfo();
-
-        int textColorAttr = composition.isCorrupted()? android.R.attr.textColorSecondary:
-                android.R.attr.textColorPrimary;
-
-        tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
+        showCorrupted();
         showCompositionImage(showCovers);
+    }
+
+    public void update(Composition composition, List<Object> payloads) {
+        this.composition = composition;
+        for (Object payload: payloads) {
+            if (payload instanceof List) {
+                //noinspection SingleStatementInBlock,unchecked
+                update(composition, (List) payload);
+            }
+            if (payload == PATH || payload == TITLE) {
+                showCompositionName();
+            }
+            if (payload == ARTIST || payload == DURATION) {
+                showAdditionalInfo();
+            }
+            if (payload == CORRUPTED) {
+                showCorrupted();
+            }
+        }
     }
 
     public void showCompositionImage(boolean showCovers) {
@@ -111,6 +130,21 @@ public class CompositionItemWrapper {
             showAsPlaying(isPlaying);
         }
     }
+
+    private void showCompositionName() {
+        String compositionName = formatCompositionName(composition);
+        tvMusicName.setText(compositionName);
+        clickableItem.setContentDescription(compositionName);
+        btnActionsMenu.setContentDescription(getContext().getString(
+                R.string.content_description_menu_template, compositionName));
+    }
+
+    private void showCorrupted() {
+        int textColorAttr = composition.isCorrupted()? android.R.attr.textColorSecondary:
+                android.R.attr.textColorPrimary;
+        tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
+    }
+
 
     private void showAsDragging(boolean dragging) {
         int endColor = getItemDragColor(getContext(), dragging? 20: 0);

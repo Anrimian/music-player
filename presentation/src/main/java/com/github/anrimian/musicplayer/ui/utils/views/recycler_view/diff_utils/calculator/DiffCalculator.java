@@ -1,7 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator;
 
 
-
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListUpdateCallback;
 
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.java.Function;
@@ -9,11 +11,8 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.C
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.PayloadFunction;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
 
+import java.util.Collections;
 import java.util.List;
-
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListUpdateCallback;
 
 import static androidx.recyclerview.widget.DiffUtil.calculateDiff;
 
@@ -83,15 +82,17 @@ public class DiffCalculator<T> {
 
     //unsafe of often calls, think about it
     public ListUpdate<T> calculateChange(List<T> newList, boolean detectMoves) {
-        List<T> oldList = currentListFunction.call();
-        DiffUtil.DiffResult diffResult = calculateDiff(new SimpleDiffCallback<>(
-                oldList,
-                newList,
-                contentCheckFunction,
-                payloadFunction), detectMoves);
-        DiffUpdateCallback diffUpdateCallback = new DiffUpdateCallback(oldList);
-        diffResult.dispatchUpdatesTo(diffUpdateCallback);
-        return new ListUpdate<>(newList, diffResult);
+        synchronized (this) {
+            List<T> oldList = currentListFunction.call();
+            DiffUtil.DiffResult diffResult = calculateDiff(new SimpleDiffCallback<>(
+                    oldList,
+                    newList,
+                    contentCheckFunction,
+                    payloadFunction), detectMoves);
+            DiffUpdateCallback diffUpdateCallback = new DiffUpdateCallback(oldList);
+            diffResult.dispatchUpdatesTo(diffUpdateCallback);
+            return new ListUpdate<>(Collections.unmodifiableList(newList), diffResult);
+        }
     }
 
     private class DiffUpdateCallback implements ListUpdateCallback {

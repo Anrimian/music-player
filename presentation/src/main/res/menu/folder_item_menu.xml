@@ -6,6 +6,8 @@
         android:title="@string/add_to_play_queue"/>
     <item android:id="@+id/menu_add_to_playlist"
         android:title="@string/add_to_playlist"/>
+    <item android:id="@+id/menu_rename_folder"
+        android:title="@string/rename_folder"/>
     <item android:id="@+id/menu_share"
         android:title="@string/share"/>
     <item android:id="@+id/menu_delete"

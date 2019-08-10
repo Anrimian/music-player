@@ -24,6 +24,16 @@ public class FolderNode extends NodeData {
         this.fullPath = fullPath;
     }
 
+    FolderNode(String fullPath,
+                      int compositionsCount,
+                      @Nullable Date latestCreateDate,
+                      @Nullable Date earliestCreateDate) {
+        this.fullPath = fullPath;
+        this.compositionsCount = compositionsCount;
+        this.latestCreateDate = latestCreateDate;
+        this.earliestCreateDate = earliestCreateDate;
+    }
+
     @Override
     public boolean onNodesAdded(List<NodeData> nodes) {
         for (NodeData nodeData: nodes) {
