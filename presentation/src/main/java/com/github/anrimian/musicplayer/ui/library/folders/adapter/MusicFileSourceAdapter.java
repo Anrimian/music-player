@@ -47,7 +47,10 @@ public class MusicFileSourceAdapter extends ListAdapter<FileSource, SelectableVi
     private boolean isCoversEnabled;
 
     public MusicFileSourceAdapter(HashSet<FileSource> selectedItems) {
-        super(new SimpleDiffItemCallback<>(FolderHelper::getChangePayload));
+        super(new SimpleDiffItemCallback<>(
+                FolderHelper::areSourcesTheSame,
+                FolderHelper::getChangePayload)
+        );
         this.selectedItems = selectedItems;
     }
 
