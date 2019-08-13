@@ -10,4 +10,9 @@ public class PlayQueueItemHelper {
                                             @Nonnull PlayQueueItem second) {
         return CompositionHelper.areSourcesTheSame(first.getComposition(), second.getComposition());
     }
+
+    public static boolean hasSourceChanges(@Nonnull PlayQueueItem first,
+                                            @Nonnull PlayQueueItem second) {
+        return CompositionHelper.hasSourceChanges(first.getComposition(), second.getComposition());
+    }
 }

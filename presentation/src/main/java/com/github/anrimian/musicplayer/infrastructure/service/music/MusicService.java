@@ -65,6 +65,7 @@ import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils.getCompositionImage;
@@ -282,7 +283,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             stopSelf();
             return;
         }
-        if (!queueItem.equals(currentItem)) {
+        if (!queueItem.equals(currentItem) || !areSourcesTheSame(currentItem, queueItem)) {
             Log.d("KEK", "onCurrentCompositionReceived: set current");
             currentItem = queueItem;
             updateMediaSessionMetadata(currentItem.getComposition(), notificationSetting);
@@ -300,8 +301,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnNotificationSettings() {
-        musicServiceInteractor.getNotificationSettingObservable()
-                .subscribe(this::onNotificationSettingReceived);
+        serviceDisposable.add(musicServiceInteractor.getNotificationSettingObservable()
+                .subscribe(this::onNotificationSettingReceived));
     }
 
     private void onNotificationSettingReceived(MusicNotificationSetting setting) {

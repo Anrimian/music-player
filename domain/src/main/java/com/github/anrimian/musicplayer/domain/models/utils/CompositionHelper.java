@@ -32,6 +32,10 @@ public class CompositionHelper {
                 && first.isCorrupted() == second.isCorrupted();
     }
 
+    public static boolean hasSourceChanges(@Nonnull Composition first, @Nonnull Composition second) {
+        return first.getDuration() != second.getDuration() || first.getSize() != second.getSize();
+    }
+
     public static List<Object> getChangePayload(Composition first, Composition second) {
         List<Object> payloads = new LinkedList<>();
         if (!Objects.equals(first.getAlbum(), second.getAlbum())) {

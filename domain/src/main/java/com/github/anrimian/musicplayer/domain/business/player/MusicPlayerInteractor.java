@@ -36,6 +36,7 @@ import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.P
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
+import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.hasSourceChanges;
 import static io.reactivex.subjects.BehaviorSubject.createDefault;
 
 /**
@@ -273,12 +274,16 @@ public class MusicPlayerInteractor {
     }
 
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
+        PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
             stop();
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
             if (compositionEvent.takePositionFromCurrent()) {
+                if (!hasSourceChanges(previousItem, currentItem)) {
+                    return;
+                }
                 trackPosition = musicPlayerController.getTrackPosition();
             }
             musicPlayerController.prepareToPlay(currentItem.getComposition(), trackPosition);
