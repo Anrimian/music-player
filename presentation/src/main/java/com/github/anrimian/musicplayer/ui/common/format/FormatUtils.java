@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.ui.common.format;
 
 import android.content.Context;
+import android.view.View;
 
 import androidx.annotation.DrawableRes;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -12,6 +14,7 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import java.util.Locale;
 
 import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -88,5 +91,16 @@ public class FormatUtils {
             }
             default: return R.drawable.ic_repeat_off;
         }
+    }
+
+    public static void formatLinkedFabView(View view, View fab) {
+        run(fab, () -> {
+            int width = fab.getWidth();
+            int margin = view.getResources().getDimensionPixelSize(R.dimen.content_horizontal_margin);
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) view.getLayoutParams();
+            params.setMarginEnd(width + margin * 2);
+            params.height = fab.getHeight();
+            view.setLayoutParams(params);
+        });
     }
 }

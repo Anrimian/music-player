@@ -125,6 +125,8 @@
     <string name="copied_message">Текст скопирован</string>
     <string name="folder_name">Имя папки</string>
     <string name="rename_folder">Переименовать папку</string>
+    <string name="cut">Вырезать</string>
+    <string name="copy">Копировать</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

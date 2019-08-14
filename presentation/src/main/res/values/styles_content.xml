@@ -20,6 +20,14 @@
         <item name="android:tint">@color/color_button_secondary</item>
     </style>
 
+    <style name="BrightButtonStyle">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:tint">@android:color/white</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
 
     </style>

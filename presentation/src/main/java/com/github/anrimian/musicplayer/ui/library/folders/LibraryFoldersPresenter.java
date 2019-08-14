@@ -350,6 +350,14 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
                 .subscribe(getViewState()::showConfirmDeleteDialog, this::onDefaultError);
     }
 
+    void onMoveSelectedFoldersButtonClicked() {
+        closeSelectionMode();
+    }
+
+    void onCopySelectedFoldersButtonClicked() {
+        closeSelectionMode();
+    }
+
     LinkedHashSet<FileSource> getSelectedFiles() {
         return selectedFiles;
     }

@@ -51,6 +51,44 @@
                 app:srcCompat="@drawable/ic_play"
                 app:layout_behavior="@string/fab_behavior"/>
 
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/vg_file_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginBottom="@dimen/margin_normal"
+                android:layout_marginStart="@dimen/margin_normal"
+                android:tint="@android:color/white"
+                android:background="@drawable/bg_fab_menu"
+                android:elevation="12dp"
+                app:layout_anchor="@id/recycler_view"
+                app:layout_anchorGravity="bottom|start">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:divider="@drawable/divider"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/content_internal_margin"
+                    android:paddingEnd="@dimen/content_internal_margin">
+
+                    <ImageView
+                        android:id="@+id/iv_cut"
+                        style="@style/BrightButtonStyle"
+                        app:srcCompat="@drawable/ic_cut"
+                        android:contentDescription="@string/cut" />
+
+                    <ImageView
+                        android:id="@+id/iv_copy"
+                        style="@style/BrightButtonStyle"
+                        android:layout_marginStart="@dimen/content_internal_margin"
+                        app:srcCompat="@drawable/ic_copy"
+                        android:contentDescription="@string/copy"/>
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
             <include layout="@layout/partial_progress_state"/>
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

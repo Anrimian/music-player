@@ -55,7 +55,10 @@ import javax.annotation.Nonnull;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
@@ -66,8 +69,10 @@ import static com.github.anrimian.musicplayer.domain.models.composition.Composit
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFiles;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatLinkedFabView;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 /**
  * Created on 23.10.2017.
@@ -93,6 +98,17 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @BindView(R.id.content_container)
     View contentContainer;
+
+    @BindView(R.id.vg_file_menu)
+    View vgFileMenu;
+
+    @BindView(R.id.iv_cut)
+    View ivCut;
+
+    @BindView(R.id.iv_copy)
+    View ivCopy;
+
+    private final CompositeDisposable fragmentDisposable = new CompositeDisposable();
 
     private AdvancedToolbar toolbar;
     private ProgressViewWrapper progressViewWrapper;
@@ -145,6 +161,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
+        fragmentDisposable.add(toolbar.getSelectionModeObservable()
+                .subscribe(this::onSelectionModeChanged));
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
@@ -165,6 +183,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
+        vgFileMenu.setVisibility(INVISIBLE);
+        formatLinkedFabView(vgFileMenu, fab);
+
+        ivCut.setOnClickListener(v -> presenter.onMoveSelectedFoldersButtonClicked());
+        ivCopy.setOnClickListener(v -> presenter.onCopySelectedFoldersButtonClicked());
 
         FragmentManager fm = getChildFragmentManager();
 
@@ -219,6 +242,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public void onStop() {
         super.onStop();
         presenter.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        fragmentDisposable.clear();
     }
 
     @Override
@@ -287,7 +316,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showList() {
         orderMenuItem.call(item -> item.setVisible(true));
-        fab.setVisibility(View.VISIBLE);
+        fab.setVisibility(VISIBLE);
         progressViewWrapper.hideAll();
     }
 
@@ -474,6 +503,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void setItemsSelected(boolean selected) {
         adapter.setItemsSelected(selected);
+    }
+
+    private void onSelectionModeChanged(boolean enabled) {
+        animateVisibility(vgFileMenu, enabled? VISIBLE: INVISIBLE);
     }
 
     private void onCompositionActionSelected(MenuItem menuItem) {

@@ -4,15 +4,18 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.github.anrimian.musicplayer.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * Created on 25.02.2018.
@@ -41,10 +44,26 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     }
 
     @Override
-    public boolean layoutDependsOn(CoordinatorLayout parent,
-                                   FloatingActionButton child,
-                                   View dependency) {
+    public boolean layoutDependsOn(@NonNull CoordinatorLayout parent,
+                                   @NonNull FloatingActionButton child,
+                                   @NonNull View dependency) {
         return dependency instanceof RecyclerView;
+    }
+
+    @Override
+    public boolean onDependentViewChanged(CoordinatorLayout parent,
+                                          FloatingActionButton child,
+                                          View dependency) {
+        RecyclerView recyclerView = (RecyclerView) dependency;
+
+        int height = child.getHeight();
+        int margin = child.getResources().getDimensionPixelSize(R.dimen.content_vertical_margin);
+        recyclerView.setPadding(recyclerView.getPaddingLeft(),
+                recyclerView.getPaddingTop(),
+                recyclerView.getPaddingRight(),
+                height + margin * 2);
+        recyclerView.setClipToPadding(false);
+        return false;
     }
 
     @Override
