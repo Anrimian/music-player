@@ -184,7 +184,7 @@ public class AdvancedToolbar extends FrameLayout {
         if (enabled) {
             etSearch.requestFocus();
             if (showKeyboard){
-                AndroidUtils.showKeyboard(etSearch.getContext());
+                AndroidUtils.showKeyboard(etSearch);
             }
         } else {
             etSearch.setText(null);
