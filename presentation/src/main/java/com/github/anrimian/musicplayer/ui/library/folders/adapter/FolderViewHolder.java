@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -48,8 +47,6 @@ class FolderViewHolder extends SelectableViewHolder {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
-    private Drawable foregroundDrawable;
-
     private FolderFileSource folder;
     private String path;
 
@@ -86,7 +83,6 @@ class FolderViewHolder extends SelectableViewHolder {
             int selectedColor = getSelectionColor();
             int endColor = selected ? selectedColor : unselectedColor;
             animateBackgroundColor(clickableItem, endColor);
-            setBackgroundClickEffectEnabled(!selected);
         }
     }
 
@@ -137,20 +133,7 @@ class FolderViewHolder extends SelectableViewHolder {
     }
 
     private void selectImmediate() {
-        setBackgroundClickEffectEnabled(false);
         clickableItem.setBackgroundColor(getSelectionColor());
         selected = true;
-    }
-
-    private void setBackgroundClickEffectEnabled(boolean enabled) {
-        Drawable drawable = clickableItem.getForeground();
-        if (drawable != null) {
-            if (!enabled) {
-                foregroundDrawable = drawable;
-                clickableItem.setForeground(null);
-            }
-        } else if (enabled) {
-            clickableItem.setForeground(foregroundDrawable);
-        }
     }
 }
