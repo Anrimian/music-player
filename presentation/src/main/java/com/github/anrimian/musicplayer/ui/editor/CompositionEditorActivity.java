@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
@@ -33,6 +34,8 @@ import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setStatusBarColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class CompositionEditorActivity extends MvpAppCompatActivity
@@ -111,7 +114,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         onLongClick(changeTitleClickableArea, () -> copyText(tvTitle, tvTitleHint));
         onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
 
-        Slidr.attach(this);
+        @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
+        Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
+        setStatusBarColor(getWindow(), statusBarColor);
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
