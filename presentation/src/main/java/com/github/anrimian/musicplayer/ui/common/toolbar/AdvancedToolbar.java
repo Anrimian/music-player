@@ -215,8 +215,9 @@ public class AdvancedToolbar extends FrameLayout {
             boolean isKeyboardShown = bundle.getBoolean(IS_KEYBOARD_SHOWN);
             setSearchModeEnabled(isInSearchMode, isKeyboardShown, true);
 
-            boolean inSelectionMode = bundle.getBoolean(IN_SELECTION_MODE);
-            setSelectionModeEnabled(inSelectionMode, false);
+            // disabled because folder screens action mode issues
+//            boolean inSelectionMode = bundle.getBoolean(IN_SELECTION_MODE);
+//            setSelectionModeEnabled(inSelectionMode, false);
 
             state = bundle.getParcelable("superState");
         }

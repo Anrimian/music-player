@@ -11,7 +11,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.C
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.PayloadFunction;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffCallback;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import static androidx.recyclerview.widget.DiffUtil.calculateDiff;
@@ -91,7 +91,7 @@ public class DiffCalculator<T> {
                     payloadFunction), detectMoves);
             DiffUpdateCallback diffUpdateCallback = new DiffUpdateCallback(oldList);
             diffResult.dispatchUpdatesTo(diffUpdateCallback);
-            return new ListUpdate<>(Collections.unmodifiableList(newList), diffResult);
+            return new ListUpdate<>(new ArrayList<>(newList), diffResult);
         }
     }
 
