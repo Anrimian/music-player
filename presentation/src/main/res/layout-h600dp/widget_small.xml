@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_appwidget"
     tools:layout_width="300dp"
-    tools:layout_height="80dp">
+    tools:layout_height="140dp">
 
     <TextView
         android:id="@+id/tv_composition"
@@ -14,9 +14,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/widget_content_margin_horizontal"
-        android:layout_marginEnd="@dimen/widget_content_spacing_margin"
+        android:layout_marginEnd="@dimen/widget_content_margin_horizontal"
         android:layout_marginTop="@dimen/widget_content_margin_vertical"
-        android:layout_toStartOf="@+id/iv_skip_to_previous"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         tools:text="composition_name composition_name composition_name composition_name" />
@@ -27,10 +27,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/widget_content_spacing_margin"
-        android:layout_marginEnd="@dimen/widget_content_spacing_margin"
         android:layout_alignStart="@id/tv_composition"
         android:layout_below="@id/tv_composition"
-        android:layout_toStartOf="@+id/iv_skip_to_previous"
+        android:layout_alignEnd="@+id/tv_composition"
         tools:text="composition_author composition_author composition_author composition_author composition_author" />
 
     <ImageView
@@ -57,7 +56,6 @@
         style="@style/AppWidget_ImageButton"
         android:layout_marginTop="@dimen/widget_content_spacing_margin"
         android:layout_marginStart="@dimen/widget_content_spacing_margin"
-        android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/widget_content_margin_horizontal"
