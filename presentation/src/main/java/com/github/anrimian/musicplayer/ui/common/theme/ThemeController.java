@@ -53,7 +53,7 @@ public class ThemeController {
     private void updateTaskManager(Activity activity) {
         AndroidUtils.updateTaskManager(activity,
                 R.string.app_name,
-                R.mipmap.ic_launcher,
+                activity.getApplicationInfo().icon,
                 getColorFromAttr(activity, R.attr.colorPrimary));
     }
 }

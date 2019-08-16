@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
@@ -43,10 +42,7 @@ public class ImageFormatUtils {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageView::setImageBitmap,
-                        t -> {
-                    imageView.setImageResource(R.drawable.ic_music_placeholder);
-                            Log.d("KEK", "displayImage error: " + t.getMessage());
-                        });
+                        t -> imageView.setImageResource(R.drawable.ic_music_placeholder));
         imageLoadingMap.put(imageView, disposable);
     }
 

@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.compositions.adapter;
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -40,7 +39,6 @@ public class MusicViewHolder extends SelectableViewHolder {
     private CompositionItemWrapper compositionItemWrapper;
 
     private Composition composition;
-    private Drawable foregroundDrawable;
 
     private boolean selected = false;
     private boolean playing = false;
@@ -97,7 +95,6 @@ public class MusicViewHolder extends SelectableViewHolder {
                 int endColor = selected ? selectedColor : unselectedColor;
                 animateBackgroundColor(clickableItem, endColor);
             }
-            setBackgroundClickEffectEnabled(!selected);
         }
     }
 
@@ -122,21 +119,8 @@ public class MusicViewHolder extends SelectableViewHolder {
     }
 
     private void selectImmediate() {
-        setBackgroundClickEffectEnabled(false);
         clickableItem.setBackgroundColor(getSelectionColor());
         selected = true;
-    }
-
-    private void setBackgroundClickEffectEnabled(boolean enabled) {
-        Drawable drawable = clickableItem.getForeground();
-        if (drawable != null) {
-            if (!enabled) {
-                foregroundDrawable = drawable;
-                clickableItem.setForeground(null);
-            }
-        } else if (enabled) {
-            clickableItem.setForeground(foregroundDrawable);
-        }
     }
 
     @ColorInt
