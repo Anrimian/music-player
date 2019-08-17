@@ -14,7 +14,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFi
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgrou
  * Created on 31.10.2017.
  */
 
-public class MusicFileViewHolder extends SelectableViewHolder {
+public class MusicFileViewHolder extends FileViewHolder {
 
     @BindView(R.id.clickable_item)
     FrameLayout clickableItem;
@@ -110,6 +109,19 @@ public class MusicFileViewHolder extends SelectableViewHolder {
                 animateBackgroundColor(clickableItem, endColor);
             }
         }
+    }
+
+    @Override
+    public void setSelectedToMove(boolean selected) {
+        int unselectedColor = Color.TRANSPARENT;
+        int selectedColor = getMoveSelectionColor();
+        int endColor = selected ? selectedColor : unselectedColor;
+        animateBackgroundColor(itemView, endColor);
+    }
+
+    @Override
+    public FileSource getFileSource() {
+        return fileSource;
     }
 
     public void setPlaying(boolean playing) {

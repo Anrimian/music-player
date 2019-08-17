@@ -28,13 +28,14 @@ import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
  * Created on 31.10.2017.
  */
 
-public class MusicFileSourceAdapter extends ListAdapter<FileSource, SelectableViewHolder> {
+public class MusicFileSourceAdapter extends ListAdapter<FileSource, FileViewHolder> {
 
     private static final int TYPE_MUSIC = 1;
     private static final int TYPE_FILE = 2;
 
-    private final Set<SelectableViewHolder> viewHolders = new HashSet<>();
+    private final Set<FileViewHolder> viewHolders = new HashSet<>();
     private final HashSet<FileSource> selectedItems;
+    private final HashSet<FileSource> selectedMoveItems;
 
     private OnPositionItemClickListener<MusicFileSource> onCompositionClickListener;
     private OnPositionItemClickListener<FolderFileSource> onFolderClickListener;
@@ -46,17 +47,19 @@ public class MusicFileSourceAdapter extends ListAdapter<FileSource, SelectableVi
     private Composition currentComposition;
     private boolean isCoversEnabled;
 
-    public MusicFileSourceAdapter(HashSet<FileSource> selectedItems) {
+    public MusicFileSourceAdapter(HashSet<FileSource> selectedItems,
+                                  HashSet<FileSource> selectedMoveItems) {
         super(new SimpleDiffItemCallback<>(
                 FolderHelper::areSourcesTheSame,
                 FolderHelper::getChangePayload)
         );
         this.selectedItems = selectedItems;
+        this.selectedMoveItems = selectedMoveItems;
     }
 
     @NonNull
     @Override
-    public SelectableViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
+    public FileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
         switch (type) {
             case TYPE_MUSIC: {
                 return new MusicFileViewHolder(parent,
@@ -75,13 +78,16 @@ public class MusicFileSourceAdapter extends ListAdapter<FileSource, SelectableVi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SelectableViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FileViewHolder holder, int position) {
         viewHolders.add(holder);
 
         FileSource fileSource = getItem(position);
 
         boolean selected = selectedItems.contains(fileSource);
         holder.setSelected(selected);
+
+        boolean selectedToMove = selectedMoveItems.contains(fileSource);
+        holder.setSelectedToMove(selectedToMove);
 
         switch (holder.getItemViewType()) {
             case TYPE_MUSIC: {
@@ -103,7 +109,7 @@ public class MusicFileSourceAdapter extends ListAdapter<FileSource, SelectableVi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SelectableViewHolder holder,
+    public void onBindViewHolder(@NonNull FileViewHolder holder,
                                  int position,
                                  @NonNull List<Object> payloads) {
         if (payloads.isEmpty()) {
@@ -128,7 +134,7 @@ public class MusicFileSourceAdapter extends ListAdapter<FileSource, SelectableVi
     }
 
     @Override
-    public void onViewRecycled(@NonNull SelectableViewHolder holder) {
+    public void onViewRecycled(@NonNull FileViewHolder holder) {
         super.onViewRecycled(holder);
         viewHolders.remove(holder);
     }
@@ -194,6 +200,13 @@ public class MusicFileSourceAdapter extends ListAdapter<FileSource, SelectableVi
                 MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
                 musicViewHolder.setCoversVisible(isCoversEnabled);
             }
+        }
+    }
+
+    public void updateItemsToMove() {
+        for (FileViewHolder holder: viewHolders) {
+            boolean selectedToMove = selectedMoveItems.contains(holder.getFileSource());
+            holder.setSelectedToMove(selectedToMove);
         }
     }
 }

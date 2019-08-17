@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -171,7 +172,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new MusicFileSourceAdapter(presenter.getSelectedFiles());
+        adapter = new MusicFileSourceAdapter(presenter.getSelectedFiles(),
+                presenter.getSelectedMoveFiles());
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(presenter::onFolderClicked);
         adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
@@ -254,9 +256,15 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public void onFragmentMovedOnTop() {
         presenter.onFragmentDisplayed();
 
-        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        Activity act = requireActivity();
+        AdvancedToolbar toolbar = act.findViewById(R.id.toolbar);
         toolbar.setupSelectionModeMenu(R.menu.library_folders_selection_menu,
                 this::onActionModeItemClicked);
+
+        act.findViewById(R.id.iv_close).setOnClickListener(v -> presenter.onCloseMoveMenuClicked());
+        act.findViewById(R.id.iv_paste).setOnClickListener(v -> presenter.onPasteButtonClicked());
+        act.findViewById(R.id.iv_paste_in_new_folder)
+                .setOnClickListener(v -> presenter.onPasteInNewFolderButtonClicked());
     }
 
     @Override
@@ -503,6 +511,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void setItemsSelected(boolean selected) {
         adapter.setItemsSelected(selected);
+    }
+
+    @Override
+    public void updateMoveFilesList() {
+        adapter.updateItemsToMove();
     }
 
     private void onSelectionModeChanged(boolean enabled) {

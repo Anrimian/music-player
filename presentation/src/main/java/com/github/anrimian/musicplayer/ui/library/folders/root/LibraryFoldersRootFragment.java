@@ -5,6 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
@@ -21,13 +25,13 @@ import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class LibraryFoldersRootFragment extends LibraryFragment
         implements FolderRootView, BackButtonListener {
@@ -37,6 +41,9 @@ public class LibraryFoldersRootFragment extends LibraryFragment
 
     @BindView(R.id.library_folders_container)
     JugglerView jvFoldersContainer;
+
+    @BindView(R.id.vg_move_file_menu)
+    View vgMoveFileMenu;
 
     private FragmentNavigation navigation;
     private final DefferedObject<FragmentNavigation> navigationWrapper = new DefferedObject<>();
@@ -63,6 +70,8 @@ public class LibraryFoldersRootFragment extends LibraryFragment
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onEmptyFolderStackArrived);
+
+        vgMoveFileMenu.setVisibility(INVISIBLE);
 
         navigation = FragmentNavigation.from(getChildFragmentManager());
         navigation.initialize(jvFoldersContainer, savedInstanceState);
@@ -105,6 +114,11 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     public void showFolderScreens(List<String> paths) {
         navigation.addNewFragmentStack(mapList(paths, LibraryFoldersFragment::newInstance),
                 R.anim.anim_alpha_appear);
+    }
+
+    @Override
+    public void showMoveFileMenu(boolean show) {
+        animateVisibility(vgMoveFileMenu, show? VISIBLE: INVISIBLE);
     }
 
     @Override

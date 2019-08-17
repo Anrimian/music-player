@@ -13,12 +13,15 @@ import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Created on 24.10.2017.
@@ -32,6 +35,10 @@ public class LibraryFilesInteractor {
     private final PlayListsRepository playListsRepository;
     private final SettingsRepository settingsRepository;
     private final UiStateRepository uiStateRepository;
+
+    private final BehaviorSubject<Boolean> moveModeSubject = BehaviorSubject.createDefault(false);
+    private final LinkedHashSet<FileSource> filesToCopy = new LinkedHashSet<>();
+    private final LinkedHashSet<FileSource> filesToMove = new LinkedHashSet<>();
 
     public LibraryFilesInteractor(MusicProviderRepository musicProviderRepository,
                                   EditorRepository editorRepository,
@@ -141,4 +148,36 @@ public class LibraryFilesInteractor {
                 );
     }
 
+    public void addFilesToMove(Collection<FileSource> fileSources) {
+        filesToMove.clear();
+        filesToMove.addAll(fileSources);
+        moveModeSubject.onNext(true);
+    }
+
+    public void addFilesToCopy(Collection<FileSource> fileSources) {
+        filesToCopy.clear();
+        filesToCopy.addAll(fileSources);
+        moveModeSubject.onNext(true);
+    }
+
+    public void stopMoveMode() {
+        filesToCopy.clear();
+        filesToMove.clear();
+        moveModeSubject.onNext(false);
+    }
+
+    public void copyFilesTo(String path) {
+        //check mode
+        filesToCopy.clear();
+        filesToMove.clear();
+        moveModeSubject.onNext(false);
+    }
+
+    public BehaviorSubject<Boolean> getMoveModeObservable() {
+        return moveModeSubject;
+    }
+
+    public LinkedHashSet<FileSource> getFilesToMove() {
+        return filesToMove;
+    }
 }

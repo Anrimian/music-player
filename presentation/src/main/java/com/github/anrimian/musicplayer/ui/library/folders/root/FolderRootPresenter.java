@@ -34,6 +34,13 @@ public class FolderRootPresenter extends MvpPresenter<FolderRootView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         getViewState().showIdle();
+        subscribeOnMoveEnabledState();
+    }
+
+    private void subscribeOnMoveEnabledState() {
+        presenterDisposable.add(interactor.getMoveModeObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showMoveFileMenu));
     }
 
     @Override

@@ -281,6 +281,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onItemLongClick(int position, FileSource folder) {
+        interactor.stopMoveMode();
+        getViewState().updateMoveFilesList();
+
         selectedFiles.add(folder);
         getViewState().showSelectionMode(selectedFiles.size());
         getViewState().onItemSelected(folder, position);
@@ -351,15 +354,39 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onMoveSelectedFoldersButtonClicked() {
+        interactor.addFilesToMove(selectedFiles);
         closeSelectionMode();
+        getViewState().updateMoveFilesList();
     }
 
     void onCopySelectedFoldersButtonClicked() {
+        interactor.addFilesToCopy(selectedFiles);
         closeSelectionMode();
+    }
+
+    void onCloseMoveMenuClicked() {
+        interactor.stopMoveMode();
+        getViewState().updateMoveFilesList();
+    }
+
+    void onPasteButtonClicked() {
+        interactor.copyFilesTo(path);
+        getViewState().updateMoveFilesList();
+    }
+
+    void onPasteInNewFolderButtonClicked() {
+//        interactor.copyFilesTo();
+
+        interactor.stopMoveMode();//temp
+        getViewState().updateMoveFilesList();
     }
 
     LinkedHashSet<FileSource> getSelectedFiles() {
         return selectedFiles;
+    }
+
+    LinkedHashSet<FileSource> getSelectedMoveFiles() {
+        return interactor.getFilesToMove();
     }
 
     private void shareFileSources(List<FileSource> fileSources) {

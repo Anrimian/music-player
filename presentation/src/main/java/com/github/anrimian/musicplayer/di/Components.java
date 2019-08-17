@@ -33,6 +33,7 @@ public class Components {
 
     private AppComponent appComponent;
     private LibraryComponent libraryComponent;
+    private LibraryFilesComponent libraryFilesComponent;
 
     public static void init(Context appContext) {
         instance = new Components(appContext);
@@ -61,9 +62,8 @@ public class Components {
         return getLibraryRootFolderComponent().folderComponent(new FolderModule(path));
     }
 
-    //save reference later if need
     public static LibraryFilesComponent getLibraryRootFolderComponent() {
-        return getLibraryComponent().libraryFilesComponent(new LibraryFilesModule());
+        return getInstance().buildLibraryFilesComponent();
     }
 
     public static LibraryCompositionsComponent getLibraryCompositionsComponent() {
@@ -89,6 +89,13 @@ public class Components {
             libraryComponent = getAppComponent().libraryComponent(new LibraryModule());
         }
         return libraryComponent;
+    }
+
+    private LibraryFilesComponent buildLibraryFilesComponent() {
+        if (libraryFilesComponent == null) {
+            libraryFilesComponent = getLibraryComponent().libraryFilesComponent(new LibraryFilesModule());
+        }
+        return libraryFilesComponent;
     }
 
     private AppComponent buildAppComponent(Context appContext) {

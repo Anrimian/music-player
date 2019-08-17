@@ -133,6 +133,8 @@
     <string name="rename_folder">Rename folder</string>
     <string name="cut">Cut</string>
     <string name="copy">Copy</string>
+    <string name="paste">Paste</string>
+    <string name="paste_in_new_folder">Paste in new folder</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

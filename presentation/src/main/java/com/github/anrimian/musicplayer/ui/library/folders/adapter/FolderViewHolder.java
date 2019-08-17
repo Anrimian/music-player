@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSou
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
 
 import java.util.List;
 
@@ -33,7 +32,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
  * Created on 31.10.2017.
  */
 
-class FolderViewHolder extends SelectableViewHolder {
+class FolderViewHolder extends FileViewHolder {
 
     @BindView(R.id.clickable_item)
     FrameLayout clickableItem;
@@ -84,6 +83,19 @@ class FolderViewHolder extends SelectableViewHolder {
             int endColor = selected ? selectedColor : unselectedColor;
             animateBackgroundColor(clickableItem, endColor);
         }
+    }
+
+    @Override
+    public void setSelectedToMove(boolean selected) {
+        int unselectedColor = Color.TRANSPARENT;
+        int selectedColor = getMoveSelectionColor();
+        int endColor = selected ? selectedColor : unselectedColor;
+        animateBackgroundColor(itemView, endColor);
+    }
+
+    @Override
+    public FileSource getFileSource() {
+        return folder;
     }
 
     void bind(@Nonnull FolderFileSource folderFileSource) {
