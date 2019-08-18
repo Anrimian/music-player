@@ -61,7 +61,8 @@
                 android:background="@drawable/bg_fab_menu"
                 android:elevation="12dp"
                 app:layout_anchor="@id/recycler_view"
-                app:layout_anchorGravity="bottom|start">
+                app:layout_anchorGravity="bottom|start"
+                app:layout_dodgeInsetEdges="bottom">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -84,6 +85,54 @@
                         android:layout_marginStart="@dimen/content_internal_margin"
                         app:srcCompat="@drawable/ic_copy"
                         android:contentDescription="@string/copy"/>
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/vg_move_file_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginBottom="@dimen/margin_normal"
+                android:layout_marginStart="@dimen/margin_normal"
+                android:tint="@android:color/white"
+                android:background="@drawable/bg_fab_menu"
+                android:elevation="12dp"
+                android:layout_gravity="bottom"
+                app:layout_anchor="@id/recycler_view"
+                app:layout_anchorGravity="bottom|start"
+                app:layout_dodgeInsetEdges="bottom">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:divider="@drawable/divider"
+                    android:showDividers="middle"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/content_internal_margin"
+                    android:paddingEnd="@dimen/content_internal_margin">
+
+                    <ImageView
+                        android:id="@+id/iv_close"
+                        style="@style/BrightButtonStyle"
+                        app:srcCompat="@drawable/ic_close"
+                        android:contentDescription="@string/close" />
+
+                    <ImageView
+                        android:id="@+id/iv_paste"
+                        style="@style/BrightButtonStyle"
+                        android:layout_marginStart="@dimen/content_internal_margin"
+                        app:srcCompat="@drawable/ic_paste"
+                        android:contentDescription="@string/paste"/>
+
+                    <ImageView
+                        android:id="@+id/iv_paste_in_new_folder"
+                        style="@style/BrightButtonStyle"
+                        android:layout_marginStart="@dimen/content_internal_margin"
+                        app:srcCompat="@drawable/ic_folder_plus_outline"
+                        android:contentDescription="@string/paste_in_new_folder"/>
 
                 </LinearLayout>
 

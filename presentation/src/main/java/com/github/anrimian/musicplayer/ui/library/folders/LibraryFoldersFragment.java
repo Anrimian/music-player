@@ -109,6 +109,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @BindView(R.id.iv_copy)
     View ivCopy;
 
+    @BindView(R.id.vg_move_file_menu)
+    View vgMoveFileMenu;
+
     private final CompositeDisposable fragmentDisposable = new CompositeDisposable();
 
     private AdvancedToolbar toolbar;
@@ -186,10 +189,18 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
         vgFileMenu.setVisibility(INVISIBLE);
+        vgMoveFileMenu.setVisibility(INVISIBLE);
         formatLinkedFabView(vgFileMenu, fab);
+        formatLinkedFabView(vgMoveFileMenu, fab);
 
         ivCut.setOnClickListener(v -> presenter.onMoveSelectedFoldersButtonClicked());
         ivCopy.setOnClickListener(v -> presenter.onCopySelectedFoldersButtonClicked());
+
+        //maybe will be moved to root fragment later
+        view.findViewById(R.id.iv_close).setOnClickListener(v -> presenter.onCloseMoveMenuClicked());
+        view.findViewById(R.id.iv_paste).setOnClickListener(v -> presenter.onPasteButtonClicked());
+        view.findViewById(R.id.iv_paste_in_new_folder)
+                .setOnClickListener(v -> presenter.onPasteInNewFolderButtonClicked());
 
         FragmentManager fm = getChildFragmentManager();
 
@@ -260,11 +271,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         AdvancedToolbar toolbar = act.findViewById(R.id.toolbar);
         toolbar.setupSelectionModeMenu(R.menu.library_folders_selection_menu,
                 this::onActionModeItemClicked);
-
-        act.findViewById(R.id.iv_close).setOnClickListener(v -> presenter.onCloseMoveMenuClicked());
-        act.findViewById(R.id.iv_paste).setOnClickListener(v -> presenter.onPasteButtonClicked());
-        act.findViewById(R.id.iv_paste_in_new_folder)
-                .setOnClickListener(v -> presenter.onPasteInNewFolderButtonClicked());
     }
 
     @Override
@@ -516,6 +522,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void updateMoveFilesList() {
         adapter.updateItemsToMove();
+    }
+
+    @Override
+    public void showMoveFileMenu(boolean show) {
+        animateVisibility(vgMoveFileMenu, show? VISIBLE: INVISIBLE);
     }
 
     private void onSelectionModeChanged(boolean enabled) {

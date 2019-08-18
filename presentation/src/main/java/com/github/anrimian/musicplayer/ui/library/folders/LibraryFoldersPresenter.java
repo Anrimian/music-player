@@ -113,6 +113,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
         loadMusic();
         subscribeOnUiSettings();
+        subscribeOnMoveEnabledState();
     }
 
     @Override
@@ -594,5 +595,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private void onUiSettingsReceived(boolean isCoversEnabled) {
         getViewState().setDisplayCoversEnabled(isCoversEnabled);
+    }
+
+    private void subscribeOnMoveEnabledState() {
+        presenterDisposable.add(interactor.getMoveModeObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showMoveFileMenu));
     }
 }

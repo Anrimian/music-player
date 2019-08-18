@@ -12,6 +12,8 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
+
 @InjectViewState
 public class FolderRootPresenter extends MvpPresenter<FolderRootView> {
 
@@ -34,13 +36,6 @@ public class FolderRootPresenter extends MvpPresenter<FolderRootView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         getViewState().showIdle();
-        subscribeOnMoveEnabledState();
-    }
-
-    private void subscribeOnMoveEnabledState() {
-        presenterDisposable.add(interactor.getMoveModeObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showMoveFileMenu));
     }
 
     @Override
@@ -51,9 +46,11 @@ public class FolderRootPresenter extends MvpPresenter<FolderRootView> {
 
     void onEmptyFolderStackArrived() {
         getViewState().showProgress();
-        interactor.getCurrentFolderScreens()
+        dispose(filesDisposable, presenterDisposable);
+        filesDisposable = interactor.getCurrentFolderScreens()
                 .observeOn(uiScheduler)
                 .subscribe(this::onScreensReceived, this::onScreensReceivingError);
+        presenterDisposable.add(filesDisposable);
     }
 
     private void onScreensReceivingError(Throwable throwable) {

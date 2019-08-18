@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.root;
 
 import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -25,6 +24,4 @@ public interface FolderRootView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LOADING_STATE)
     void showIdle();
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showMoveFileMenu(boolean show);
 }
