@@ -40,6 +40,9 @@ public class FolderNode extends NodeData {
             if (nodeData instanceof CompositionNode) {
                 compositionsCount++;
             }
+            if (nodeData instanceof FolderNode) {
+                compositionsCount += ((FolderNode) nodeData).compositionsCount;
+            }
             recalculateDate(nodeData);
         }
         return true;
@@ -53,6 +56,10 @@ public class FolderNode extends NodeData {
         for (NodeData nodeData: nodes) {
             if (nodeData instanceof CompositionNode) {
                 compositionsCount--;
+                updated = true;
+            }
+            if (nodeData instanceof FolderNode) {
+                compositionsCount -= ((FolderNode) nodeData).compositionsCount;
                 updated = true;
             }
 

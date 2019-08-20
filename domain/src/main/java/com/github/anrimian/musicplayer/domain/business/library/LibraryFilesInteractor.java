@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -39,6 +40,7 @@ public class LibraryFilesInteractor {
     private final BehaviorSubject<Boolean> moveModeSubject = BehaviorSubject.createDefault(false);
     private final LinkedHashSet<FileSource> filesToCopy = new LinkedHashSet<>();
     private final LinkedHashSet<FileSource> filesToMove = new LinkedHashSet<>();
+    private String fromMovePath;
 
     public LibraryFilesInteractor(MusicProviderRepository musicProviderRepository,
                                   EditorRepository editorRepository,
@@ -148,29 +150,46 @@ public class LibraryFilesInteractor {
                 );
     }
 
-    public void addFilesToMove(Collection<FileSource> fileSources) {
+    public void addFilesToMove(String fromMovePath, Collection<FileSource> fileSources) {
         filesToMove.clear();
         filesToMove.addAll(fileSources);
+        this.fromMovePath = fromMovePath;
         moveModeSubject.onNext(true);
     }
 
-    public void addFilesToCopy(Collection<FileSource> fileSources) {
+    public void addFilesToCopy(String fromMovePath, Collection<FileSource> fileSources) {
         filesToCopy.clear();
         filesToCopy.addAll(fileSources);
+        this.fromMovePath = fromMovePath;
         moveModeSubject.onNext(true);
     }
 
     public void stopMoveMode() {
         filesToCopy.clear();
         filesToMove.clear();
+        fromMovePath = null;
         moveModeSubject.onNext(false);
     }
 
     public void copyFilesTo(String path) {
-        //check mode
-        filesToCopy.clear();
-        filesToMove.clear();
+        if (!filesToMove.isEmpty()) {
+            //and move files!
+            musicProviderRepository.moveCompositionsTo(fromMovePath, path, new ArrayList<>(filesToMove))
+                    .flatMapCompletable(editorRepository::changeCompositionsFilePath);
+            //move files
+            filesToMove.clear();
+        } else if (!filesToCopy.isEmpty()) {
+            //copy files
+            filesToCopy.clear();
+        }
+        //on complete
+        fromMovePath = null;
         moveModeSubject.onNext(false);
+    }
+
+    public void copyFilesToNewFolder(String path, String folderName) {
+        //create folder
+        copyFilesTo(path);//new folder path
     }
 
     public BehaviorSubject<Boolean> getMoveModeObservable() {

@@ -122,6 +122,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         return musicFolderDataSource.changeFolderName(folderPath, newPath);
     }
 
+    @Override
+    public Single<List<Composition>> moveCompositionsTo(String fromFolderPath, String folderPath, List<FileSource> fileSources) {
+        return musicFolderDataSource.moveCompositionsTo(fromFolderPath, folderPath, fileSources);
+    }
+
     private Comparator<FileSource> getFileComparator(Order order) {
         Comparator<FileSource> comparator;
         switch (order.getOrderType()) {

@@ -355,13 +355,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onMoveSelectedFoldersButtonClicked() {
-        interactor.addFilesToMove(selectedFiles);
+        interactor.addFilesToMove(path, selectedFiles);
         closeSelectionMode();
         getViewState().updateMoveFilesList();
     }
 
     void onCopySelectedFoldersButtonClicked() {
-        interactor.addFilesToCopy(selectedFiles);
+        interactor.addFilesToCopy(path, selectedFiles);
         closeSelectionMode();
     }
 
