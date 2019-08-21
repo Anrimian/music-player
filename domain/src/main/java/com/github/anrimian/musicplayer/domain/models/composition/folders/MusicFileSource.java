@@ -17,6 +17,11 @@ public class MusicFileSource implements FileSource {
         this.composition = composition;
     }
 
+    @Override
+    public String getPath() {
+        return composition.getFilePath();
+    }
+
     @Nonnull
     public Composition getComposition() {
         return composition;

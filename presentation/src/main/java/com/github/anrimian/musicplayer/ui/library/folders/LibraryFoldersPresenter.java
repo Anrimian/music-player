@@ -138,7 +138,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onCompositionClicked(int position, MusicFileSource musicFileSource) {
         processMultiSelectClick(position, musicFileSource, () -> {
-           Composition composition = musicFileSource.getComposition();
+            Composition composition = musicFileSource.getComposition();
             if (currentComposition != null) {
                 compositionInAction = composition;
                 getViewState().showCompositionActionDialog(composition);
@@ -164,7 +164,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onPlayNextFolderClicked(FolderFileSource folder) {
         dispose(playActionDisposable, presenterDisposable);
-        playActionDisposable = interactor.getAllCompositionsInPath(folder.getFullPath())
+        playActionDisposable = interactor.getAllCompositionsInPath(folder.getPath())
                 .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
@@ -173,7 +173,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onAddToQueueFolderClicked(FolderFileSource folder) {
         dispose(playActionDisposable, presenterDisposable);
-        playActionDisposable = interactor.getAllCompositionsInPath(folder.getFullPath())
+        playActionDisposable = interactor.getAllCompositionsInPath(folder.getPath())
                 .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
@@ -277,7 +277,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onFolderClicked(int position, FolderFileSource folder) {
         processMultiSelectClick(position, folder, () ->
-                getViewState().goToMusicStorageScreen(folder.getFullPath())
+                getViewState().goToMusicStorageScreen(folder.getPath())
         );
     }
 
@@ -371,8 +371,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onPasteButtonClicked() {
-        interactor.copyFilesTo(path);
-        getViewState().updateMoveFilesList();
+        dispose(renameActionDisposable, presenterDisposable);
+        renameActionDisposable = interactor.copyFilesTo(path)
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
+        presenterDisposable.add(renameActionDisposable);
     }
 
     void onPasteInNewFolderButtonClicked() {

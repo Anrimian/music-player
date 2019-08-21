@@ -89,7 +89,7 @@ public class MusicFolderDataSourceTest {
                     assertEquals(compositionTwo, ((MusicFileSource) list.get(1)).getComposition());
 
                     FolderFileSource folderNode = (FolderFileSource) list.get(2);
-                    assertEquals("root/music/favorite", folderNode.getFullPath());
+                    assertEquals("root/music/favorite", folderNode.getPath());
                     assertEquals(2, folderNode.getFilesCount());
                     assertEquals(4L, folderNode.getLatestCreateDate().getTime());
                     assertEquals(3L, folderNode.getEarliestCreateDate().getTime());
@@ -159,7 +159,7 @@ public class MusicFolderDataSourceTest {
             assertEquals(compositionOne, ((MusicFileSource) list.get(0)).getComposition());
 
             FolderFileSource folderNode = ((FolderFileSource) list.get(1));
-            assertEquals("root/music/basic", folderNode.getFullPath());
+            assertEquals("root/music/basic", folderNode.getPath());
             assertEquals(0, folderNode.getFilesCount());
             assertNull(folderNode.getEarliestCreateDate());
             assertNull(folderNode.getLatestCreateDate());
@@ -171,7 +171,7 @@ public class MusicFolderDataSourceTest {
             assertEquals(compositionOne, ((MusicFileSource) list.get(0)).getComposition());
 
             FolderFileSource folderNode = ((FolderFileSource) list.get(1));
-            assertEquals("root/music/basic", folderNode.getFullPath());
+            assertEquals("root/music/basic", folderNode.getPath());
             assertEquals(1, folderNode.getFilesCount());
             assertEquals(4L, folderNode.getEarliestCreateDate().getTime());
             assertEquals(4L, folderNode.getLatestCreateDate().getTime());
@@ -244,7 +244,7 @@ public class MusicFolderDataSourceTest {
 
         basicFolderSelfObserver.assertValueAt(0, data -> {
             FolderFileSource folderNode = (FolderFileSource) data;
-            assertEquals("root/music/basic", folderNode.getFullPath());
+            assertEquals("root/music/basic", folderNode.getPath());
             assertEquals(0, folderNode.getFilesCount());
             return true;
         });
@@ -314,7 +314,7 @@ public class MusicFolderDataSourceTest {
 
         basicFolderSelfObserver.assertValueAt(0, data -> {
             FolderFileSource folderNode = (FolderFileSource) data;
-            assertEquals("root/music/basic", folderNode.getFullPath());
+            assertEquals("root/music/basic", folderNode.getPath());
             assertEquals(1, folderNode.getFilesCount());
             assertEquals(5L, folderNode.getEarliestCreateDate().getTime());
             assertEquals(5L, folderNode.getLatestCreateDate().getTime());
@@ -483,7 +483,7 @@ public class MusicFolderDataSourceTest {
             assertEquals(2, list.size());
 
             FolderFileSource folderNode = (FolderFileSource) list.get(1);
-            assertEquals("root/music/basic", folderNode.getFullPath());
+            assertEquals("root/music/basic", folderNode.getPath());
             return true;
         });
 
@@ -580,7 +580,7 @@ public class MusicFolderDataSourceTest {
             assertEquals(2, list.size());
 
             FolderFileSource folderNode = (FolderFileSource) list.get(1);
-            assertEquals("root/music/ww3", folderNode.getFullPath());
+            assertEquals("root/music/ww3", folderNode.getPath());
             return true;
         });
 
@@ -628,19 +628,19 @@ public class MusicFolderDataSourceTest {
 
         childrenObserver.assertValueAt(1, data -> {
             FolderFileSource folderNode = (FolderFileSource) data.get(1);
-            assertEquals("root/music/zzz", folderNode.getFullPath());
+            assertEquals("root/music/zzz", folderNode.getPath());
             return true;
         });
 
         changedFolderObserver.assertValueAt(0, data -> {
             FolderFileSource folderNode = (FolderFileSource) data;
-            assertEquals("root/music/zzz", folderNode.getFullPath());
+            assertEquals("root/music/zzz", folderNode.getPath());
             return true;
         });
 
         changedFolderChildrenObserver.assertValueAt(changedFolderChildrenObserver.valueCount()-1, list -> {
             assertEquals(3, list.size());
-            assertEquals("root/music/zzz/etc", ((FolderFileSource) list.get(0)).getFullPath());
+            assertEquals("root/music/zzz/etc", ((FolderFileSource) list.get(0)).getPath());
             assertEquals("root/music/zzz/one.dd", ((MusicFileSource) list.get(1)).getComposition().getFilePath());
             assertEquals("root/music/zzz/two.dd", ((MusicFileSource) list.get(2)).getComposition().getFilePath());
             return true;
@@ -648,7 +648,7 @@ public class MusicFolderDataSourceTest {
     }
 
     @Test
-    public void moveCompositionsToFolderTest() {
+    public void moveCompositionsFromRootToFolderTest() {
         Map<Long, Composition> compositions = new HashMap<>();
         Composition compositionOne = fakeComposition(1L, "root/music/moveFolder/one.dd", 4L);
         compositions.put(1L, compositionOne);
@@ -675,25 +675,31 @@ public class MusicFolderDataSourceTest {
         TestObserver<FileSource> destFolderObserver = destFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> destFolderChildrenObserver = destFolder.getFilesObservable().test();
 
-        musicFolderDataSource.moveCompositionsTo("root/music",
+        musicFolderDataSource.moveFileTo("root/music",
                 "root/music/destFolder",
-                asList(
-                        new FolderFileSource("root/music/moveFolder", 0, new Date(), new Date()),
-                        new MusicFileSource(compositionThree)
-                )
+                "root/music/destFolder/moveFolder",
+                new FolderFileSource("root/music/moveFolder", 0, new Date(), new Date())
+
         ).test().assertValue(affectedCompositions -> {
             assertEquals("root/music/destFolder/moveFolder/one.dd", affectedCompositions.get(0).getFilePath());
             assertEquals("root/music/destFolder/moveFolder/two.dd", affectedCompositions.get(1).getFilePath());
-            assertEquals("root/music/destFolder/three.dd", affectedCompositions.get(2).getFilePath());
             return true;
-        })
-                .assertComplete();
+        }).assertComplete();
+
+        musicFolderDataSource.moveFileTo("root/music",
+                "root/music/destFolder",
+                "root/music/destFolder/three.dd",
+                new MusicFileSource(compositionThree)
+        ).test().assertValue(affectedCompositions -> {
+            assertEquals("root/music/destFolder/three.dd", affectedCompositions.get(0).getFilePath());
+            return true;
+        }).assertComplete();
 
         rootFolderChildrenObserver.assertValueAt(rootFolderChildrenObserver.valueCount() - 1, data -> {
             assertEquals(2, data.size());
 
             FolderFileSource folderNode = (FolderFileSource) data.get(0);
-            assertEquals("root/music/destFolder", folderNode.getFullPath());
+            assertEquals("root/music/destFolder", folderNode.getPath());
             assertEquals(4, folderNode.getFilesCount());
 
             MusicFileSource musicFileSource = (MusicFileSource) data.get(1);
@@ -708,7 +714,7 @@ public class MusicFolderDataSourceTest {
             assertEquals(compositionFive, musicFileSource1.getComposition());
 
             FolderFileSource folderNode = (FolderFileSource) data.get(1);
-            assertEquals("root/music/destFolder/moveFolder", folderNode.getFullPath());
+            assertEquals("root/music/destFolder/moveFolder", folderNode.getPath());
             assertEquals(2, folderNode.getFilesCount());
 
             MusicFileSource musicFileSource = (MusicFileSource) data.get(2);
@@ -719,8 +725,76 @@ public class MusicFolderDataSourceTest {
         destFolderObserver.assertValueAt(destFolderObserver.valueCount()-1, data -> {
             FolderFileSource folderNode = (FolderFileSource) data;
 
-            assertEquals("root/music/destFolder", folderNode.getFullPath());
+            assertEquals("root/music/destFolder", folderNode.getPath());
             assertEquals(4, folderNode.getFilesCount());
+            return true;
+        });
+    }
+
+    @Test
+    public void moveCompositionsFromFolderToFolderTest() {
+        Map<Long, Composition> compositions = new HashMap<>();
+        Composition compositionOne = fakeComposition(1L, "root/music/folderTo/one.dd", 4L);
+        compositions.put(1L, compositionOne);
+
+        Composition compositionTwo = fakeComposition(2L, "root/music/folderTo/two.dd", 4L);
+        compositions.put(2L, compositionTwo);
+
+        Composition compositionThree = fakeComposition(3L, "root/music/three.dd", 4L);
+        compositions.put(3L, compositionThree);
+
+        Composition compositionFour = fakeComposition(4L, "root/music/folderFrom/four.dd", 4L);
+        compositions.put(4L, compositionFour);
+
+        Composition compositionFive = fakeComposition(5L, "root/music/folderFrom/five.dd", 4L);
+        compositions.put(5L, compositionFive);
+
+        when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
+
+        Folder fromFolder = musicFolderDataSource.getCompositionsInPath("root/music/folderFrom").blockingGet();
+        TestObserver<List<FileSource>> fromFolderChildrenObserver = fromFolder.getFilesObservable().test();
+
+        Folder destFolder = musicFolderDataSource.getCompositionsInPath("root/music/folderTo").blockingGet();
+
+        TestObserver<FileSource> destFolderObserver = destFolder.getSelfChangeObservable().test();
+        TestObserver<List<FileSource>> destFolderChildrenObserver = destFolder.getFilesObservable().test();
+
+        musicFolderDataSource.moveFileTo("root/music/folderFrom",
+                "root/music/folderTo",
+                "root/music/folderTo/five.dd",
+                new MusicFileSource(compositionFive)
+        ).test().assertValue(affectedCompositions -> {
+            assertEquals("root/music/folderTo/five.dd", affectedCompositions.get(0).getFilePath());
+            return true;
+        }).assertComplete();
+
+        fromFolderChildrenObserver.assertValueAt(fromFolderChildrenObserver.valueCount() - 1, data -> {
+            assertEquals(1, data.size());
+
+            MusicFileSource musicFileSource = (MusicFileSource) data.get(0);
+            assertEquals(compositionFour, musicFileSource.getComposition());
+            return true;
+        });
+
+        destFolderChildrenObserver.assertValueAt(destFolderChildrenObserver.valueCount() - 1, data -> {
+            assertEquals(3, data.size());
+
+            MusicFileSource musicFileSource2 = (MusicFileSource) data.get(0);
+            assertEquals(compositionOne, musicFileSource2.getComposition());
+
+            MusicFileSource musicFileSource3 = (MusicFileSource) data.get(1);
+            assertEquals(compositionTwo, musicFileSource3.getComposition());
+
+            MusicFileSource musicFileSource1 = (MusicFileSource) data.get(2);
+            assertEquals(compositionFive, musicFileSource1.getComposition());
+            return true;
+        });
+
+        destFolderObserver.assertValueAt(destFolderObserver.valueCount()-1, data -> {
+            FolderFileSource folderNode = (FolderFileSource) data;
+
+            assertEquals("root/music/folderTo", folderNode.getPath());
+            assertEquals(3, folderNode.getFilesCount());
             return true;
         });
     }

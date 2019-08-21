@@ -18,4 +18,6 @@ public interface EditorRepository {
     Completable changeCompositionsFilePath(List<Composition> compositions);
 
     Single<String> changeFolderName(String filePath, String folderName);
+
+    Single<String> moveFile(String filePath, String oldPath, String newPath);
 }

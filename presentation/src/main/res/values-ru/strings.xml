@@ -129,6 +129,7 @@
     <string name="copy">Копировать</string>
     <string name="paste">Вставить</string>
     <string name="paste_in_new_folder">Вставить в новую папку</string>
+    <string name="move_in_the_same_folder_error">Целевая и исходная папка совпадают</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

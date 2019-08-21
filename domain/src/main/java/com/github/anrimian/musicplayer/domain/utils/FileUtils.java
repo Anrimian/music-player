@@ -47,6 +47,12 @@ public class FileUtils {
         return getUniqueFilePath(newPath, newFileName);
     }
 
+    public static String getChangedFilePath(String filePath, String oldPath, String newPath) {
+        String fileName = FileUtils.formatFileName(filePath);
+        String path = filePath.replace(oldPath, newPath);
+        return getUniqueFilePath(path, fileName);
+    }
+
     private static String getUniqueFilePath(String filePath, String fileName) {
         File file = new File(filePath);
         int filesCount = 0;

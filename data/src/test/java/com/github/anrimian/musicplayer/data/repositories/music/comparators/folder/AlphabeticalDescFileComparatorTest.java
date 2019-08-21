@@ -38,8 +38,8 @@ public class AlphabeticalDescFileComparatorTest {
         );
 
 
-        assertEquals("basic", ((FolderFileSource) fileSources.get(0)).getFullPath());
-        assertEquals("aby", ((FolderFileSource) fileSources.get(1)).getFullPath());
+        assertEquals("basic", ((FolderFileSource) fileSources.get(0)).getPath());
+        assertEquals("aby", ((FolderFileSource) fileSources.get(1)).getPath());
         assertEquals(compositionTwo, ((MusicFileSource) fileSources.get(2)).getComposition());
         assertEquals(compositionOne, ((MusicFileSource) fileSources.get(3)).getComposition());
     }

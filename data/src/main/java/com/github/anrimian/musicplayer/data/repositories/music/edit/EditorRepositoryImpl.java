@@ -60,6 +60,16 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .subscribeOn(scheduler);
     }
 
+    @Override
+    public Single<String> moveFile(String filePath, String oldPath, String newPath) {
+        if (oldPath.equals(newPath)) {
+            return Single.error(new MoveInTheSameFolderException("move in the same folder"));
+        }
+        return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, oldPath, newPath))
+                .flatMap(path -> renameFile(filePath, path))
+                .subscribeOn(scheduler);
+    }
+
     private Single<String> renameFile(String oldPath, String newPath) {
         return Single.create(emitter -> {
 

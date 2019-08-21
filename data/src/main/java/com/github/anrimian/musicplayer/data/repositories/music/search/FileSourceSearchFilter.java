@@ -22,7 +22,7 @@ public class FileSourceSearchFilter implements SearchFilter<FileSource> {
             return compositionSearchFilter.isSuitForSearch(composition, search);
         }
         if (data instanceof FolderFileSource) {
-            String path = ((FolderFileSource) data).getFullPath();
+            String path = ((FolderFileSource) data).getPath();
             path = getLastPathSegment(path);
             return containsIgnoreCase(path, search);
         }

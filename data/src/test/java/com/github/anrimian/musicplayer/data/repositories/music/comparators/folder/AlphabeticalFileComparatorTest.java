@@ -31,8 +31,8 @@ public class AlphabeticalFileComparatorTest {
 
         Collections.sort(fileSources, new FolderComparator(new AlphabeticalFileComparator()));
 
-        assertEquals("aby", ((FolderFileSource) fileSources.get(0)).getFullPath());
-        assertEquals("basic", ((FolderFileSource) fileSources.get(1)).getFullPath());
+        assertEquals("aby", ((FolderFileSource) fileSources.get(0)).getPath());
+        assertEquals("basic", ((FolderFileSource) fileSources.get(1)).getPath());
         assertEquals(compositionOne, ((MusicFileSource) fileSources.get(2)).getComposition());
         assertEquals(compositionTwo, ((MusicFileSource) fileSources.get(3)).getComposition());
     }

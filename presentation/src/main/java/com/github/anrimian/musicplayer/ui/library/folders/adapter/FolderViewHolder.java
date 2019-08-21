@@ -100,14 +100,14 @@ class FolderViewHolder extends FileViewHolder {
 
     void bind(@Nonnull FolderFileSource folderFileSource) {
         this.folder = folderFileSource;
-        this.path = folderFileSource.getFullPath();
+        this.path = folderFileSource.getPath();
         showFolderName();
         showFilesCount();
     }
 
     public void update(FolderFileSource folderFileSource, List<Object> payloads) {
         this.folder = folderFileSource;
-        this.path = folderFileSource.getFullPath();
+        this.path = folderFileSource.getPath();
         bind(folderFileSource);
         for (Object payload: payloads) {
             if (payload instanceof List) {

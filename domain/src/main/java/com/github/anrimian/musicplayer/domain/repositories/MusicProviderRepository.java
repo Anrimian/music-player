@@ -39,8 +39,8 @@ public interface MusicProviderRepository {
 
     Single<List<Composition>> changeFolderName(String folderPath, String newPath);
 
-    Single<List<Composition>> moveCompositionsTo(String fromFolderPath,
-                                                 String folderPath,
-                                                 List<FileSource> fileSources);
-
+    Single<List<Composition>> moveFileTo(String fromFolderPath,
+                                         String folderPath,
+                                         String newSourcePath,
+                                         FileSource fileSource);
 }

@@ -14,8 +14,8 @@ public class AlphabeticalFileComparator implements Comparator<FileSource> {
         Collator collator = Collator.getInstance();
         if (first instanceof FolderFileSource) {
             return collator.compare(
-                    ((FolderFileSource) first).getFullPath(),
-                    ((FolderFileSource) second).getFullPath()
+                    ((FolderFileSource) first).getPath(),
+                    ((FolderFileSource) second).getPath()
             );
         } else if (first instanceof MusicFileSource) {
             return collator.compare(

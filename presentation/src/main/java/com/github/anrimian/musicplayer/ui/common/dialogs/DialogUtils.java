@@ -36,7 +36,7 @@ public class DialogUtils {
                                                FolderFileSource folderFileSource,
                                                Runnable deleteCallback) {
         String message = context.getString(R.string.delete_folder_template,
-                getLastPathSegment(folderFileSource.getFullPath()),
+                getLastPathSegment(folderFileSource.getPath()),
                 getDativCompositionsMessage(context, folderFileSource.getFilesCount()));
         showConfirmDeleteDialog(context, message, deleteCallback);
     }

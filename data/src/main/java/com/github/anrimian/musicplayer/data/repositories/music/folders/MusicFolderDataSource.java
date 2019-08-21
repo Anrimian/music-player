@@ -7,8 +7,6 @@ import com.github.anrimian.musicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
@@ -109,9 +107,10 @@ public class MusicFolderDataSource {
                 });
     }
 
-    public Single<List<Composition>> moveCompositionsTo(String fromFolderPath,
-                                                        String toFolderPath,
-                                                        List<FileSource> fileSources) {
+    public Single<List<Composition>> moveFileTo(String fromFolderPath,
+                                                String toFolderPath,
+                                                String newSourcePath,
+                                                FileSource fileSource) {
         return getMusicFileTree()
                 .map(tree -> {
                     List<Composition> affectedCompositions = new LinkedList<>();
@@ -122,19 +121,18 @@ public class MusicFolderDataSource {
                         targetNode = new RxNode<>(key, new FolderNode(toFolderPath));
                     }
 
-                    for (FileSource fileSource: fileSources) {
-                        String path = getPath(fileSource);
-                        RxNode<String> node = findNodeByPath(path, tree);
-                        if (node != null) {
-                            RxNode<String> parentNode = node.getParent();
-                            if (parentNode != null) {
-                                parentNode.removeNode(node.getKey());
-                            }
-                            targetNode.addNode(node);
-
-                            updateNodePaths(node, fromFolderPath, toFolderPath, affectedCompositions);
+                    String path = fileSource.getPath();
+                    RxNode<String> node = findNodeByPath(path, tree);
+                    if (node != null) {
+                        RxNode<String> parentNode = node.getParent();
+                        if (parentNode != null) {
+                            parentNode.removeNode(node.getKey());
                         }
+                        targetNode.addNode(node);
+
+                        updateNodePaths(node, fromFolderPath, toFolderPath, newSourcePath, affectedCompositions);
                     }
+
                     return affectedCompositions;
                 });
     }
@@ -142,18 +140,19 @@ public class MusicFolderDataSource {
     private void updateNodePaths(RxNode<String> node,
                                  String fromFolderPath,
                                  String toFolderPath,
+                                 String newPath,
                                  List<Composition> outAffectedCompositions) {
         NodeData nodeData = node.getData();
         if (nodeData instanceof CompositionNode) {
             CompositionNode compositionNode = (CompositionNode) nodeData;
             Composition composition = compositionNode.getComposition();
-            composition = composition.copy(composition.getFilePath().replace(fromFolderPath, toFolderPath));
+            composition = composition.copy(newPath);
             node.updateData(new CompositionNode(composition));
             outAffectedCompositions.add(composition);
         }
         if (nodeData instanceof FolderNode) {
             FolderNode folderNode = (FolderNode) nodeData;
-            nodeData = new FolderNode(folderNode.getFullPath().replace(fromFolderPath, toFolderPath),
+            nodeData = new FolderNode(newPath,
                     folderNode.getCompositionsCount(),
                     folderNode.getLatestCreateDate(),
                     folderNode.getEarliestCreateDate());
@@ -161,16 +160,6 @@ public class MusicFolderDataSource {
 
             updateNodesPath(node, fromFolderPath, toFolderPath, outAffectedCompositions);
         }
-    }
-
-    private String getPath(FileSource fileSource) {
-        if (fileSource instanceof FolderFileSource) {
-            return ((FolderFileSource) fileSource).getFullPath();
-        }
-        if (fileSource instanceof MusicFileSource) {
-            return ((MusicFileSource) fileSource).getComposition().getFilePath();
-        }
-        throw new IllegalStateException("unexpected file source: " + fileSource);
     }
 
     private void updateNodesPath(RxNode<String> parentNode,

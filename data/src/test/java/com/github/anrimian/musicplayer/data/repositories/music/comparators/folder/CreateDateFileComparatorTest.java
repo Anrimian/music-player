@@ -32,9 +32,9 @@ public class CreateDateFileComparatorTest {
 
         Collections.sort(fileSources, new FolderComparator(new CreateDateFileComparator()));
 
-        assertEquals("basic", ((FolderFileSource) fileSources.get(0)).getFullPath());
-        assertEquals("aby", ((FolderFileSource) fileSources.get(1)).getFullPath());
-        assertEquals("nullabla", ((FolderFileSource) fileSources.get(2)).getFullPath());
+        assertEquals("basic", ((FolderFileSource) fileSources.get(0)).getPath());
+        assertEquals("aby", ((FolderFileSource) fileSources.get(1)).getPath());
+        assertEquals("nullabla", ((FolderFileSource) fileSources.get(2)).getPath());
         assertEquals(compositionOne, ((MusicFileSource) fileSources.get(3)).getComposition());
         assertEquals(compositionTwo, ((MusicFileSource) fileSources.get(4)).getComposition());
     }

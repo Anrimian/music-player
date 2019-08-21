@@ -32,8 +32,9 @@ public class FolderFileSource implements FileSource {
         this.earliestCreateDate = earliestCreateDate;
     }
 
+    @Override
     @Nonnull
-    public String getFullPath() {
+    public String getPath() {
         return fullPath;
     }
 

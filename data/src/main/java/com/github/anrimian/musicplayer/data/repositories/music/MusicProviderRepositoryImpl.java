@@ -123,8 +123,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Single<List<Composition>> moveCompositionsTo(String fromFolderPath, String folderPath, List<FileSource> fileSources) {
-        return musicFolderDataSource.moveCompositionsTo(fromFolderPath, folderPath, fileSources);
+    public Single<List<Composition>> moveFileTo(String fromFolderPath,
+                                                String folderPath,
+                                                String newSourcePath,
+                                                FileSource fileSource) {
+        return musicFolderDataSource.moveFileTo(fromFolderPath, folderPath, newSourcePath, fileSource);
     }
 
     private Comparator<FileSource> getFileComparator(Order order) {
@@ -182,7 +185,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                 .flatMapObservable(Observable::fromIterable)
                 .flatMap(fileSource -> {
                     if (fileSource instanceof FolderFileSource) {
-                        return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());
+                        return getCompositionsObservable(((FolderFileSource) fileSource).getPath());
                     } else if (fileSource instanceof MusicFileSource) {
                         return Observable.just(((MusicFileSource) fileSource).getComposition());
                     }
@@ -218,7 +221,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
             return Observable.just(((MusicFileSource) fileSource).getComposition());
         }
         if (fileSource instanceof FolderFileSource) {
-            return getCompositionsObservable(((FolderFileSource) fileSource).getFullPath());
+            return getCompositionsObservable(((FolderFileSource) fileSource).getPath());
         }
         throw new IllegalStateException("unexpected file source: " + fileSource);
     }

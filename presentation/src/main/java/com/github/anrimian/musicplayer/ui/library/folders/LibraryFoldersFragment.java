@@ -632,11 +632,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                     return true;
                 }
                 case R.id.menu_add_to_playlist: {
-                    presenter.onAddFolderToPlayListButtonClicked(folder.getFullPath());
+                    presenter.onAddFolderToPlayListButtonClicked(folder.getPath());
                     return true;
                 }
                 case R.id.menu_rename_folder: {
-                    presenter.onRenameFolderClicked(folder.getFullPath());
+                    presenter.onRenameFolderClicked(folder.getPath());
                     return true;
                 }
                 case R.id.menu_share: {
