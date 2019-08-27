@@ -128,6 +128,10 @@ public class MusicFolderDataSource {
                         if (parentNode != null) {
                             parentNode.removeNode(node.getKey());
                         }
+
+                        if (targetNode.getChild(node.getKey()) != null) {
+                            node.updateKey(getLastPathSegment(newSourcePath));
+                        }
                         targetNode.addNode(node);
 
                         updateNodePaths(node, fromFolderPath, toFolderPath, newSourcePath, affectedCompositions);
