@@ -123,11 +123,10 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Single<List<Composition>> moveFileTo(String fromFolderPath,
-                                                String folderPath,
+    public Single<List<Composition>> moveFileTo(String folderPath,
                                                 String newSourcePath,
                                                 FileSource fileSource) {
-        return musicFolderDataSource.moveFileTo(fromFolderPath, folderPath, newSourcePath, fileSource);
+        return musicFolderDataSource.moveFileTo(folderPath, newSourcePath, fileSource);
     }
 
     private Comparator<FileSource> getFileComparator(Order order) {

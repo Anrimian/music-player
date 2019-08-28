@@ -199,7 +199,7 @@ public class LibraryFilesInteractor {
 
     private Completable moveFiles(FileSource fileSource, String path) {
         return editorRepository.moveFile(fileSource.getPath(), fromMovePath, path)
-                .flatMap(newPath -> musicProviderRepository.moveFileTo(fromMovePath, path, newPath, fileSource))
+                .flatMap(newPath -> musicProviderRepository.moveFileTo(path, newPath, fileSource))
                 .flatMapCompletable(editorRepository::changeCompositionsFilePath);
     }
 }

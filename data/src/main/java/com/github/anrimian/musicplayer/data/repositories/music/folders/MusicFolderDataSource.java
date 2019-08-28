@@ -107,8 +107,7 @@ public class MusicFolderDataSource {
                 });
     }
 
-    public Single<List<Composition>> moveFileTo(String fromFolderPath,
-                                                String toFolderPath,
+    public Single<List<Composition>> moveFileTo(String toFolderPath,
                                                 String newSourcePath,
                                                 FileSource fileSource) {
         return getMusicFileTree()
@@ -134,7 +133,7 @@ public class MusicFolderDataSource {
                         }
                         targetNode.addNode(node);
 
-                        updateNodePaths(node, fromFolderPath, toFolderPath, newSourcePath, affectedCompositions);
+                        updateNodePaths(node, newSourcePath, affectedCompositions);
                     }
 
                     return affectedCompositions;
@@ -142,8 +141,6 @@ public class MusicFolderDataSource {
     }
 
     private void updateNodePaths(RxNode<String> node,
-                                 String fromFolderPath,
-                                 String toFolderPath,
                                  String newPath,
                                  List<Composition> outAffectedCompositions) {
         NodeData nodeData = node.getData();
@@ -156,13 +153,14 @@ public class MusicFolderDataSource {
         }
         if (nodeData instanceof FolderNode) {
             FolderNode folderNode = (FolderNode) nodeData;
+            String oldPath = folderNode.getFullPath();
             nodeData = new FolderNode(newPath,
                     folderNode.getCompositionsCount(),
                     folderNode.getLatestCreateDate(),
                     folderNode.getEarliestCreateDate());
             node.updateData(nodeData);
 
-            updateNodesPath(node, fromFolderPath, toFolderPath, outAffectedCompositions);
+            updateNodesPath(node, oldPath, newPath, outAffectedCompositions);
         }
     }
 

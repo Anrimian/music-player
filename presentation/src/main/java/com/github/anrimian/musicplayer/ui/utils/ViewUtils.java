@@ -128,7 +128,10 @@ public class ViewUtils {
     }
 
     public static void animateBackgroundColor(View view, @ColorInt int color) {
-        animateColor(getBackgroundColor(view), color, view::setBackgroundColor);
+        int startColor = getBackgroundColor(view);
+        if (startColor != color) {
+            animateColor(startColor, color, view::setBackgroundColor);
+        }
     }
 
     public static Animator getBackgroundAnimatorAttr(View view,

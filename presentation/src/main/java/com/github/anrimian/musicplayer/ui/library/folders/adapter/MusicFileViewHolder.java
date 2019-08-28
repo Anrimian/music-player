@@ -44,6 +44,7 @@ public class MusicFileViewHolder extends FileViewHolder {
     private MusicFileSource fileSource;
 
     private boolean selected = false;
+    private boolean selectedToMove = false;
     private boolean playing = false;
 
     public MusicFileViewHolder(ViewGroup parent,
@@ -113,10 +114,13 @@ public class MusicFileViewHolder extends FileViewHolder {
 
     @Override
     public void setSelectedToMove(boolean selected) {
-        int unselectedColor = Color.TRANSPARENT;
-        int selectedColor = getMoveSelectionColor();
-        int endColor = selected ? selectedColor : unselectedColor;
-        animateBackgroundColor(itemView, endColor);
+        if (this.selectedToMove != selected) {
+            this.selectedToMove = selected;
+            int unselectedColor = Color.TRANSPARENT;
+            int selectedColor = getMoveSelectionColor();
+            int endColor = selected ? selectedColor : unselectedColor;
+            animateBackgroundColor(itemView, endColor);
+        }
     }
 
     @Override

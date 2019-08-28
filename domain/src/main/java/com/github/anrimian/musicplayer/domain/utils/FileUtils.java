@@ -57,7 +57,7 @@ public class FileUtils {
         File file = new File(filePath);
         int filesCount = 0;
         String newFileName;
-        if (file.exists() && !file.isDirectory()) {
+        if (file.exists()) {
             while (file.exists()) {
                 filesCount++;
 
