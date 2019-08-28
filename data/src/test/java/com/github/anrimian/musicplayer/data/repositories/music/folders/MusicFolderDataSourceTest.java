@@ -883,6 +883,9 @@ public class MusicFolderDataSourceTest {
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
 
+        Folder rootFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
+        TestObserver<List<FileSource>> rootFolderChildrenObserver = rootFolder.getFilesObservable().test();
+
         Folder fromFolder = musicFolderDataSource.getCompositionsInPath("root/music/gg(from)").blockingGet();
         TestObserver<List<FileSource>> fromFolderChildrenObserver = fromFolder.getFilesObservable().test();
 
@@ -902,6 +905,14 @@ public class MusicFolderDataSourceTest {
 
         fromFolderChildrenObserver.assertValueAt(fromFolderChildrenObserver.valueCount() - 1, data -> {
             assertEquals(0, data.size());
+            return true;
+        });
+
+        rootFolderChildrenObserver.assertValueAt(rootFolderChildrenObserver.valueCount() - 1, data -> {
+            assertEquals(2, data.size());
+
+            assertEquals("root/music/gg(to)", data.get(0).getPath());
+            assertEquals("root/music/three.dd", data.get(1).getPath());
             return true;
         });
 

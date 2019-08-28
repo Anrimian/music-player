@@ -123,13 +123,13 @@ public class MusicFolderDataSource {
                     String path = fileSource.getPath();
                     RxNode<String> node = findNodeByPath(path, tree);
                     if (node != null) {
+                        if (targetNode.getChild(node.getKey()) != null) {
+                            node.updateKey(getLastPathSegment(newSourcePath));
+                        }
+
                         RxNode<String> parentNode = node.getParent();
                         if (parentNode != null) {
                             parentNode.removeNode(node.getKey());
-                        }
-
-                        if (targetNode.getChild(node.getKey()) != null) {
-                            node.updateKey(getLastPathSegment(newSourcePath));
                         }
                         targetNode.addNode(node);
 
