@@ -83,8 +83,9 @@
                         android:id="@+id/iv_copy"
                         style="@style/BrightButtonStyle"
                         android:layout_marginStart="@dimen/content_internal_margin"
-                        app:srcCompat="@drawable/ic_copy"
-                        android:contentDescription="@string/copy"/>
+                        android:contentDescription="@string/copy"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_copy" />
 
                 </LinearLayout>
 

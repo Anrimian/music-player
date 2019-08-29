@@ -177,7 +177,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new MusicFileSourceAdapter(presenter.getSelectedFiles(),
+        adapter = new MusicFileSourceAdapter(recyclerView,
+                presenter.getSelectedFiles(),
                 presenter.getSelectedMoveFiles());
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(presenter::onFolderClicked);

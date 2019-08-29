@@ -4,7 +4,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -16,6 +15,7 @@ import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter.DiffListAdapter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +28,7 @@ import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
  * Created on 31.10.2017.
  */
 
-public class MusicFileSourceAdapter extends ListAdapter<FileSource, FileViewHolder> {
+public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileViewHolder> {
 
     private static final int TYPE_MUSIC = 1;
     private static final int TYPE_FILE = 2;
@@ -47,9 +47,10 @@ public class MusicFileSourceAdapter extends ListAdapter<FileSource, FileViewHold
     private Composition currentComposition;
     private boolean isCoversEnabled;
 
-    public MusicFileSourceAdapter(HashSet<FileSource> selectedItems,
+    public MusicFileSourceAdapter(RecyclerView recyclerView,
+                                  HashSet<FileSource> selectedItems,
                                   HashSet<FileSource> selectedMoveItems) {
-        super(new SimpleDiffItemCallback<>(
+        super(recyclerView, new SimpleDiffItemCallback<>(
                 FolderHelper::areSourcesTheSame,
                 FolderHelper::getChangePayload)
         );
