@@ -70,6 +70,19 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .subscribeOn(scheduler);
     }
 
+    @Override
+    public Completable createFile(String path) {
+        return Completable.fromAction(() -> {
+            File file = new File(path);
+            if (file.exists()) {
+                throw new FileExistsException();
+            }
+            if (!file.mkdir()) {
+                throw new Exception("file not created");
+            }
+        }).subscribeOn(scheduler);
+    }
+
     private Single<String> renameFile(String oldPath, String newPath) {
         return Single.create(emitter -> {
 

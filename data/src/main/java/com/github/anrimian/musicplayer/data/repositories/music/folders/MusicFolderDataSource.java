@@ -27,6 +27,7 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getParentDi
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.indexOfEnd;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.removeLastPathSegment;
 import static io.reactivex.Observable.fromIterable;
 
 public class MusicFolderDataSource {
@@ -118,6 +119,12 @@ public class MusicFolderDataSource {
                     if (targetNode == null) {
                         String key = getLastPathSegment(toFolderPath);
                         targetNode = new RxNode<>(key, new FolderNode(toFolderPath));
+
+                        RxNode<String> parent = findNodeByPath(removeLastPathSegment(toFolderPath), tree);
+                        if (parent == null) {
+                            throw new FolderNodeNonExistException();
+                        }
+                        parent.addNode(targetNode);
                     }
 
                     String path = fileSource.getPath();
@@ -127,11 +134,12 @@ public class MusicFolderDataSource {
                             node.updateKey(getLastPathSegment(newSourcePath));
                         }
 
-                        RxNode<String> parentNode = node.getParent();
-                        if (parentNode != null) {
-                            parentNode.removeNode(node.getKey());
-                        }
+                        RxNode<String> oldParentNode = node.getParent();
                         targetNode.addNode(node);
+
+                        if (oldParentNode != null) {
+                            oldParentNode.removeNode(node.getKey());
+                        }
 
                         updateNodePaths(node, newSourcePath, affectedCompositions);
                     }

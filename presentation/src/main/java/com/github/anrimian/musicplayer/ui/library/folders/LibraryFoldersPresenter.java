@@ -31,6 +31,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isActive;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
@@ -59,7 +60,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private Disposable deleteActionDisposable;
     private Disposable playlistActionDisposable;
     private Disposable shareActionDisposable;
-    private Disposable renameActionDisposable;
+    private Disposable fileActionDisposable;
 
     @Nullable
     private String path;
@@ -299,11 +300,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onNewFolderNameInputed(String path, String name) {
-        dispose(renameActionDisposable, presenterDisposable);
-        renameActionDisposable = interactor.renameFolder(path, name)
+        if (isActive(fileActionDisposable)) {
+            return;
+        }
+        dispose(fileActionDisposable);
+        fileActionDisposable = interactor.renameFolder(path, name)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
-        presenterDisposable.add(renameActionDisposable);
     }
 
     void onSelectionModeBackPressed() {
@@ -366,23 +369,35 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onCloseMoveMenuClicked() {
+        if (isActive(fileActionDisposable)) {
+            return;
+        }
         interactor.stopMoveMode();
         getViewState().updateMoveFilesList();
     }
 
     void onPasteButtonClicked() {
-        dispose(renameActionDisposable, presenterDisposable);
-        renameActionDisposable = interactor.copyFilesTo(path)
+        if (isActive(fileActionDisposable)) {
+            return;
+        }
+        dispose(fileActionDisposable);
+        fileActionDisposable = interactor.copyFilesTo(path)
                 .observeOn(uiScheduler)
                 .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
-        presenterDisposable.add(renameActionDisposable);
     }
 
     void onPasteInNewFolderButtonClicked() {
-//        interactor.copyFilesTo();
+        getViewState().showInputNewFolderNameDialog();
+    }
 
-        interactor.stopMoveMode();//temp
-        getViewState().updateMoveFilesList();
+    void onNewFileNameForPasteEntered(String name) {
+        if (isActive(fileActionDisposable)) {
+            return;
+        }
+        dispose(fileActionDisposable);
+        fileActionDisposable = interactor.moveFilesToNewFolder(path, name)
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
     }
 
     LinkedHashSet<FileSource> getSelectedFiles() {

@@ -44,6 +44,7 @@ public interface Constants {
         String AUTHOR_TAG = "author_tag";
         String TITLE_TAG = "title_tag";
         String FILE_NAME_TAG = "file_name_tag";
+        String NEW_FOLDER_NAME_TAG = "new_folder_name_tag";
     }
 
     interface Animation {

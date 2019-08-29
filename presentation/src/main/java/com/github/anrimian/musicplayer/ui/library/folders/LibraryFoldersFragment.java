@@ -63,6 +63,7 @@ import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.NEW_FOLDER_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
@@ -125,6 +126,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private boolean showQueueActions;
 
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> newFolderDialogFragmentRunner;
 
     public static LibraryFoldersFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
@@ -233,6 +235,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 fragment -> fragment.setComplexCompleteListener((path, extra) -> {
                     presenter.onNewFolderNameInputed(extra.getString(PATH_ARG), path);
                 }));
+
+        newFolderDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                NEW_FOLDER_NAME_TAG,
+                fragment -> fragment.setOnCompleteListener(presenter::onNewFileNameForPasteEntered));
 
         if (getPath() != null) {//TODO root path -> not root path change case
             SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
@@ -497,6 +503,17 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 false,
                 extra);
         filenameDialogFragmentRunner.show(fragment);
+    }
+
+    @Override
+    public void showInputNewFolderNameDialog() {
+        InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.new_folder,
+                R.string.create,
+                R.string.cancel,
+                R.string.folder_name,
+                null,
+                false);
+        newFolderDialogFragmentRunner.show(fragment);
     }
 
     @Override

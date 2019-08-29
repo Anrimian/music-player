@@ -184,9 +184,19 @@ public class LibraryFilesInteractor {
         return completable.doOnComplete(this::stopMoveMode);
     }
 
-    public void copyFilesToNewFolder(String path, String folderName) {
-        //create folder
-        copyFilesTo(path);//new folder path
+    public Completable moveFilesToNewFolder(String path, String folderName) {
+        String newFolderPath = path + "/" + folderName;
+        Completable completable = editorRepository.createFile(newFolderPath);
+        if (!filesToMove.isEmpty()) {
+            completable = completable.andThen(Observable.fromIterable(filesToMove)
+                    .flatMapCompletable(fileSource -> moveFiles(fileSource, newFolderPath))
+            );
+        } else if (!filesToCopy.isEmpty()) {
+            completable = Completable.error(new Exception("not implemented"));
+        } else {
+            throw new IllegalStateException("unexpected state");
+        }
+        return completable.doOnComplete(this::stopMoveMode);
     }
 
     public BehaviorSubject<Boolean> getMoveModeObservable() {

@@ -7,6 +7,7 @@ import androidx.annotation.StringRes;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
+import com.github.anrimian.musicplayer.data.repositories.music.edit.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.music.edit.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFoundException;
@@ -56,6 +57,9 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof MoveInTheSameFolderException) {
             return new ErrorCommand(getString(R.string.move_in_the_same_folder_error));
+        }
+        if (throwable instanceof FileExistsException) {
+            return new ErrorCommand(getString(R.string.file_already_exists));
         }
         if (throwable instanceof NullPointerException) {
             logException(throwable);

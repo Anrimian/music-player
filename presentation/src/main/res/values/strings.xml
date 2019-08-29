@@ -136,6 +136,8 @@
     <string name="paste">Paste</string>
     <string name="paste_in_new_folder">Paste in new folder</string>
     <string name="move_in_the_same_folder_error">Target and source folder matches</string>
+    <string name="file_already_exists">File with this name already exists</string>
+    <string name="new_folder">New folder</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

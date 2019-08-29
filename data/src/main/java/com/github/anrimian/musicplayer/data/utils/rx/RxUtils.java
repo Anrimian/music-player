@@ -23,6 +23,10 @@ public class RxUtils {
         return disposable == null || disposable.isDisposed();
     }
 
+    public static boolean isActive(@Nullable Disposable disposable) {
+        return disposable != null && !disposable.isDisposed();
+    }
+
     public static void dispose(@Nullable Disposable disposable,
                                @Nonnull CompositeDisposable compositeDisposable) {
         if (disposable != null && !disposable.isDisposed()) {

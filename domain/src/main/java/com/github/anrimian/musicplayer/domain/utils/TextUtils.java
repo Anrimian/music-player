@@ -12,6 +12,15 @@ public class TextUtils {
         return result;
     }
 
+    public static String removeLastPathSegment(String text) {
+        String result = text;
+        int lastSlashIndex = text.lastIndexOf('/');
+        if (lastSlashIndex != -1) {
+            result = text.substring(0, ++lastSlashIndex);
+        }
+        return result;
+    }
+
     public static boolean containsIgnoreCase(String src, String what) {
         final int length = what.length();
         if (length == 0)

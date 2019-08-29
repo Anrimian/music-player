@@ -20,4 +20,6 @@ public interface EditorRepository {
     Single<String> changeFolderName(String filePath, String folderName);
 
     Single<String> moveFile(String filePath, String oldPath, String newPath);
+
+    Completable createFile(String path);
 }
