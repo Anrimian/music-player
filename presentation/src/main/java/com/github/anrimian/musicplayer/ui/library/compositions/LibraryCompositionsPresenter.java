@@ -174,6 +174,14 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         subscribeOnCompositions();
     }
 
+    void onPlayNextCompositionClicked(Composition composition) {
+        addCompositionsToPlayNext(asList(composition));
+    }
+
+    void onAddToQueueCompositionClicked(Composition composition) {
+        addCompositionsToEnd(asList(composition));
+    }
+
     void onAddToPlayListButtonClicked(Composition composition) {
         compositionsForPlayList.clear();
         compositionsForPlayList.add(composition);

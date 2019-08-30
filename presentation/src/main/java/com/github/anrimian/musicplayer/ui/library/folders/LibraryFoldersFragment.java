@@ -575,6 +575,14 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         popup.inflate(R.menu.composition_item_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
+                case R.id.menu_play_next: {
+                    presenter.onPlayNextCompositionClicked(composition);
+                    return true;
+                }
+                case R.id.menu_add_to_queue: {
+                    presenter.onAddToQueueCompositionClicked(composition);
+                    return true;
+                }
                 case R.id.menu_add_to_playlist: {
                     presenter.onAddToPlayListButtonClicked(musicFileSource);
                     return true;

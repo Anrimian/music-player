@@ -163,6 +163,14 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         interactor.play(path, compositionInAction);
     }
 
+    void onPlayNextCompositionClicked(Composition composition) {
+        addCompositionsToPlayNext(asList(composition));
+    }
+
+    void onAddToQueueCompositionClicked(Composition composition) {
+        addCompositionsToEnd(asList(composition));
+    }
+
     void onPlayNextFolderClicked(FolderFileSource folder) {
         dispose(playActionDisposable, presenterDisposable);
         playActionDisposable = interactor.getAllCompositionsInPath(folder.getPath())

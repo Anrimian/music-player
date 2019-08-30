@@ -139,6 +139,14 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         getViewState().showSelectPlayListDialog();
     }
 
+    void onPlayNextCompositionClicked(Composition composition) {
+        addCompositionsToPlayNext(asList(composition));
+    }
+
+    void onAddToQueueCompositionClicked(Composition composition) {
+        addCompositionsToEnd(asList(composition));
+    }
+
     void onPlayListToAddingSelected(PlayList playList) {
         addPreparedCompositionsToPlayList(playList);
     }
