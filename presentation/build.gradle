@@ -55,46 +55,46 @@ android {
 dependencies {
     implementation project(':domain')
     implementation project(':data')
-    def presentationDependencies = rootProject.ext.presentationDependencies
-    def presentationTestDependencies = rootProject.ext.presentationTestDependencies
 
-    implementation presentationDependencies.appCompat
-    implementation presentationDependencies.material
-    implementation presentationDependencies.cardView
-    implementation presentationDependencies.recyclerView
-    implementation presentationDependencies.constraintLayout
-    implementation presentationDependencies.supportMedia
-    implementation presentationDependencies.palette
+    def deps = rootProject.ext
+
+    implementation deps.appCompat
+    implementation deps.material
+    implementation deps.cardView
+    implementation deps.recyclerView
+    implementation deps.constraintLayout
+    implementation deps.supportMedia
+    implementation deps.palette
     implementation 'de.hdodenhof:circleimageview:2.2.0'
 
-    implementation presentationDependencies.recyclerViewAnimation
+    implementation deps.recyclerViewAnimation
 
-    implementation presentationDependencies.rxAndroid
-    implementation presentationDependencies.rxPermissions
+    implementation deps.rxAndroid
+    implementation deps.rxPermissions
 
-    implementation presentationDependencies.acra
+    implementation deps.acra
 
-    implementation presentationDependencies.moxy
-    annotationProcessor presentationDependencies.moxyCompiler
+    implementation deps.moxy
+    annotationProcessor deps.moxyCompiler
 
-    implementation presentationDependencies.butterKnife
-    annotationProcessor presentationDependencies.butterKnifeCompiler
+    implementation deps.butterKnife
+    annotationProcessor deps.butterKnifeCompiler
 
-    implementation presentationDependencies.dagger
-    annotationProcessor presentationDependencies.daggerCompiler
+    implementation deps.dagger
+    annotationProcessor deps.daggerCompiler
 
-    implementation presentationDependencies.room
-    annotationProcessor presentationDependencies.roomCompiler
+    implementation deps.room
+    annotationProcessor deps.roomCompiler
 
-    implementation presentationDependencies.slidr
+    implementation deps.slidr
 
-    compileOnly presentationDependencies.javaxAnnotation
+    compileOnly deps.javaxAnnotation
 
-    testImplementation presentationTestDependencies.junit
-    testImplementation presentationTestDependencies.mockito
+    testImplementation deps.junit
+    testImplementation deps.mockito
 
-    androidTestImplementation presentationTestDependencies.dexmaker
-    androidTestImplementation presentationTestDependencies.dexmakerMockito
-    androidTestImplementation presentationTestDependencies.mockito
-    androidTestImplementation presentationTestDependencies.espresso
+    androidTestImplementation deps.dexmaker
+    androidTestImplementation deps.dexmakerMockito
+    androidTestImplementation deps.mockito
+    androidTestImplementation deps.espresso
 }

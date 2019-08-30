@@ -14,7 +14,7 @@ ext {
     androidTargetSdkVersion = 28
     androidCompileSdkVersion = 28
 
-    //Libraries
+    //support libraries
     androidXVersion = "1.1.0-alpha02"
     googleMaterialVersion = "1.1.0-alpha01"
     cardViewVersion = "1.0.0"
@@ -22,7 +22,7 @@ ext {
     mediaCompatVersion = "1.0.0"
     paletteVersion = "1.0.0"
 
-    constraintLayoutVersion = "2.0.0-alpha5"
+    constraintLayoutVersion = "2.0.0-alpha2"
     rxJavaVersion = "2.2.11"
     rxAndroidVersion = "2.0.1"
     rxPermissionsVersion = "0.9.4@aar"
@@ -42,65 +42,56 @@ ext {
 
     //developing
     javaxAnnotationVersion = "2.0.1"
+}
 
-    presentationDependencies = [
-            appCompat:          "androidx.appcompat:appcompat:$androidXVersion",
-            material:           "com.google.android.material:material:$googleMaterialVersion",
-            cardView:           "androidx.cardview:cardview:$cardViewVersion",
-            recyclerView:       "androidx.recyclerview:recyclerview:$recyclerViewVersion",
-            supportMedia:       "androidx.media:media:$mediaCompatVersion",
-            palette:            "androidx.palette:palette:$paletteVersion",
-            constraintLayout:   "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion",
-            recyclerViewAnimation: 'jp.wasabeef:recyclerview-animators:2.3.0',
-            rxAndroid:          "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion",
-            moxy:               "com.arello-mobile:moxy-app-compat:$moxyVersion",
-            moxyCompiler:       "com.arello-mobile:moxy-compiler:$moxyVersion",
-            rxPermissions:      "com.tbruyelle.rxpermissions2:rxpermissions:$rxPermissionsVersion",
-            acra:               "ch.acra:acra:$acraVersion",
-            room:               "androidx.room:room-runtime:$roomVersion",
-            roomCompiler:       "androidx.room:room-compiler:$roomVersion",
-            butterKnife:        "com.jakewharton:butterknife:$butterKnifeVersion",
-            butterKnifeCompiler: "com.jakewharton:butterknife-compiler:$butterKnifeVersion",
-            dagger:              "com.google.dagger:dagger:$daggerVersion",
-            daggerCompiler:      "com.google.dagger:dagger-compiler:$daggerVersion",
-            javaxAnnotation:    "com.google.code.findbugs:jsr305:$javaxAnnotationVersion",
-            slidr:              "com.r0adkll:slidableactivity:2.0.6"
-    ]
+ext {
+    appCompat = "androidx.appcompat:appcompat:$androidXVersion"
+    material = "com.google.android.material:material:$googleMaterialVersion"
+    cardView = "androidx.cardview:cardview:$cardViewVersion"
+    recyclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    supportMedia = "androidx.media:media:$mediaCompatVersion"
+    palette = "androidx.palette:palette:$paletteVersion"
+    constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
 
-    presentationTestDependencies = [
-            dexmaker:           "com.google.dexmaker:dexmaker:${dexmakerVersion}",
-            dexmakerMockito:    "com.google.dexmaker:dexmaker-mockito:${dexmakerVersion}",
-            junit:              "junit:junit:${jUnitVersion}",
-            espresso:           "androidx.test.espresso:espresso-core:$espressoVersion",
-            mockito:            "org.mockito:mockito-core:${mockitoVersion}",
-    ]
+    //unused?
+    recyclerViewAnimation = 'jp.wasabeef:recyclerview-animators:2.3.0'
 
-    domainDependencies = [
-            rxJava:             "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
-            javaxAnnotation:    'com.google.code.findbugs:jsr305:2.0.1',
-    ]
+    rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:0.20.4"
+    rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    rxPermissions = "com.tbruyelle.rxpermissions2:rxpermissions:$rxPermissionsVersion"
 
-    domainTestDependencies = [
-            junit:              "junit:junit:${jUnitVersion}",
-            mockito:            "org.mockito:mockito-core:${mockitoVersion}",
-    ]
+    moxy = "com.arello-mobile:moxy-app-compat:$moxyVersion"
+    moxyCompiler = "com.arello-mobile:moxy-compiler:$moxyVersion"
 
-    dataDependencies = [
-            rxJava:             "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
-            javaxAnnotation:    'com.google.code.findbugs:jsr305:2.0.1',
-            exoPlayerCore:      "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion",
-            room:               "androidx.room:room-runtime:$roomVersion",
-            roomRx:             "androidx.room:room-rxjava2:$roomVersion",
-            roomCompiler:       "androidx.room:room-compiler:$roomVersion",
-    ]
+    acra = "ch.acra:acra:$acraVersion"
 
-    dataTestDependencies = [
-            junit:              "junit:junit:${jUnitVersion}",
-            espresso:           "androidx.test.espresso:espresso-core:$espressoVersion",
-            supportTest:        "androidx.test:runner:1.1.0",
-            mockito:            "org.mockito:mockito-core:${mockitoVersion}",
-            rules:              "androidx.test:rules:1.1.0",
-            rxJava2Ext:         "com.github.akarnokd:rxjava2-extensions:0.20.4"
-    ]
+    room = "androidx.room:room-runtime:$roomVersion"
+    roomCompiler = "androidx.room:room-compiler:$roomVersion"
 
+    butterKnife = "com.jakewharton:butterknife:$butterKnifeVersion"
+    butterKnifeCompiler = "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
+
+    dagger = "com.google.dagger:dagger:$daggerVersion"
+    daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    slidr = "com.r0adkll:slidableactivity:2.0.6"
+
+    exoPlayerCore = "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
+
+    room = "androidx.room:room-runtime:$roomVersion"
+    roomRx = "androidx.room:room-rxjava2:$roomVersion"
+    roomCompiler = "androidx.room:room-compiler:$roomVersion"
+
+    //develop
+    javaxAnnotation = "com.google.code.findbugs:jsr305:$javaxAnnotationVersion"
+
+    //tests
+    dexmaker = "com.google.dexmaker:dexmaker:${dexmakerVersion}"
+    dexmakerMockito = "com.google.dexmaker:dexmaker-mockito:${dexmakerVersion}"
+    junit = "junit:junit:${jUnitVersion}"
+    espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
+    mockito = "org.mockito:mockito-core:${mockitoVersion}"
+    rules = "androidx.test:rules:1.1.0"
+    supportTest = "androidx.test:runner:1.1.0"
 }

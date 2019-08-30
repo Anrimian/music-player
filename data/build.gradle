@@ -34,24 +34,23 @@ android {
 dependencies {
     implementation project(':domain')
 
-    def dataDependencies = rootProject.ext.dataDependencies
-    def testDependencies = rootProject.ext.dataTestDependencies
+    def deps = rootProject.ext
 
-    implementation dataDependencies.rxJava
-    implementation dataDependencies.exoPlayerCore
-    compileOnly dataDependencies.javaxAnnotation
+    implementation deps.rxJava
+    implementation deps.exoPlayerCore
+    compileOnly deps.javaxAnnotation
 
-    implementation dataDependencies.room
-    implementation dataDependencies.roomRx
-    annotationProcessor dataDependencies.roomCompiler
+    implementation deps.room
+    implementation deps.roomRx
+    annotationProcessor deps.roomCompiler
 
     implementation group: 'org', name: 'jaudiotagger', version: jTaggerVersion
 
-    testImplementation testDependencies.junit
-    testImplementation testDependencies.mockito
-    androidTestImplementation testDependencies.junit
-    androidTestImplementation testDependencies.supportTest
-    androidTestImplementation testDependencies.espresso
-    androidTestImplementation testDependencies.rules
-    androidTestImplementation testDependencies.rxJava2Ext
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    androidTestImplementation deps.junit
+    androidTestImplementation deps.supportTest
+    androidTestImplementation deps.espresso
+    androidTestImplementation deps.rules
+    androidTestImplementation deps.rxJava2Ext
 }

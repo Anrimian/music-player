@@ -6,14 +6,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    def domainDependencies = rootProject.ext.domainDependencies
-    def domainTestDependencies = rootProject.ext.domainTestDependencies
+    def deps = rootProject.ext
 
-    implementation domainDependencies.rxJava
+    implementation deps.rxJava
 
-    compileOnly domainDependencies.javaxAnnotation
+    compileOnly deps.javaxAnnotation
 
-    testImplementation domainTestDependencies.junit
-    testImplementation domainTestDependencies.mockito
+    testImplementation deps.junit
+    testImplementation deps.mockito
 }
 
