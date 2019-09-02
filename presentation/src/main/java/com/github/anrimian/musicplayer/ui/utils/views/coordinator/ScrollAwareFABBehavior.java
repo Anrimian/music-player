@@ -29,6 +29,8 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     private Animator hideAnimator;
     private Animator showAnimator;
 
+    private boolean isAttachedToRecyclerView = false;
+
     public ScrollAwareFABBehavior(Context context, AttributeSet attrs) {
         super();
     }
@@ -54,15 +56,19 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     public boolean onDependentViewChanged(CoordinatorLayout parent,
                                           FloatingActionButton child,
                                           View dependency) {
-        RecyclerView recyclerView = (RecyclerView) dependency;
+        if (!isAttachedToRecyclerView) {
+            RecyclerView recyclerView = (RecyclerView) dependency;
 
-        int height = child.getHeight();
-        int margin = child.getResources().getDimensionPixelSize(R.dimen.content_vertical_margin);
-        recyclerView.setPadding(recyclerView.getPaddingLeft(),
-                recyclerView.getPaddingTop(),
-                recyclerView.getPaddingRight(),
-                height + margin * 2);
-        recyclerView.setClipToPadding(false);
+            int height = child.getHeight();
+            int margin = child.getResources().getDimensionPixelSize(R.dimen.content_vertical_margin);
+            recyclerView.setPadding(recyclerView.getPaddingLeft(),
+                    recyclerView.getPaddingTop(),
+                    recyclerView.getPaddingRight(),
+                    height + margin * 2);
+            recyclerView.setClipToPadding(false);
+
+            isAttachedToRecyclerView = true;
+        }
         return false;
     }
 
