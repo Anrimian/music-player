@@ -1,17 +1,22 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.provider.MediaStore;
 
+import com.github.anrimian.musicplayer.data.storage.providers.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -54,10 +59,28 @@ public class StorageMusicProvider {
         return getCompositions(EXTERNAL_CONTENT_URI);
     }
 
-    public void deleteComposition(String path) {//TODO not become update
+    public void deleteCompositions(List<Composition> compositions) {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
+        for (Composition composition: compositions) {
+            ContentProviderOperation operation = ContentProviderOperation.newDelete(EXTERNAL_CONTENT_URI)
+                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(composition.getId()) })
+                    .build();
+
+            operations.add(operation);
+        }
+
+        try {
+            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
+        } catch (OperationApplicationException | RemoteException e) {
+            throw new UpdateMediaStoreException(e);
+        }
+    }
+
+    public void deleteComposition(long id) {
         contentResolver.delete(EXTERNAL_CONTENT_URI,
-                MediaStore.Images.Media.DATA + " = ?",
-                new String[] { path });
+                MediaStore.Images.Media._ID + " = ?",
+                new String[] { String.valueOf(id) });
     }
 
     @Nullable
@@ -95,8 +118,21 @@ public class StorageMusicProvider {
     }
 
     public void updateCompositionsFilePath(List<Composition> compositions) {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
         for (Composition composition: compositions) {
-            updateComposition(composition.getId(), MediaStore.Images.Media.DATA, composition.getFilePath());
+            ContentProviderOperation operation = ContentProviderOperation.newUpdate(EXTERNAL_CONTENT_URI)
+                    .withValue(MediaStore.Images.Media.DATA, composition.getFilePath())
+                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(composition.getId()) })
+                    .build();
+
+            operations.add(operation);
+        }
+
+        try {
+            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
+        } catch (OperationApplicationException | RemoteException e) {
+            throw new UpdateMediaStoreException(e);
         }
     }
 

@@ -85,8 +85,9 @@ public class StorageMusicDataSource {
         return getCompositions()
                 .doOnSuccess(compositions -> {
                     for (Composition composition: compositionsToDelete) {
-                        deleteCompositionInternal(compositions, composition);
+                        deleteCompositionFile(compositions, composition);
                     }
+                    musicProvider.deleteCompositions(compositionsToDelete);
                     compositionSubject.onNext(compositions);
                     changeSubject.onNext(new Change.DeleteChange<>(compositionsToDelete));
                 })
@@ -97,7 +98,8 @@ public class StorageMusicDataSource {
     public Completable deleteComposition(Composition composition) {
         return getCompositions()
                 .doOnSuccess(compositions -> {
-                    deleteCompositionInternal(compositions, composition);
+                    deleteCompositionFile(compositions, composition);
+                    musicProvider.deleteComposition(composition.getId());
                     compositionSubject.onNext(compositions);
                     changeSubject.onNext(new Change.DeleteChange<>(singletonList(composition)));
                 })
@@ -125,12 +127,11 @@ public class StorageMusicDataSource {
                 .subscribeOn(scheduler);
     }
 
-    private void deleteCompositionInternal(Map<Long, Composition> compositions,
-                                           Composition composition) {
+    private void deleteCompositionFile(Map<Long, Composition> compositions,
+                                       Composition composition) {
         String filePath = composition.getFilePath();
         File parentDirectory = new File(filePath).getParentFile();
 
-        musicProvider.deleteComposition(filePath);
         fileManager.deleteFile(filePath);
         compositions.remove(composition.getId());
 
