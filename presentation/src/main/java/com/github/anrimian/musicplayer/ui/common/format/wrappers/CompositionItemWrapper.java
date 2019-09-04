@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 
 import java.util.List;
@@ -24,7 +25,6 @@ import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
-import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -43,6 +43,10 @@ public class CompositionItemWrapper {
     FrameLayout clickableItem;
 
     @Nullable
+    @BindView(R.id.iv_play)
+    ImageView ivPlay;
+
+    @Nullable
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
@@ -57,13 +61,11 @@ public class CompositionItemWrapper {
     private boolean isPlaying;
     private boolean isDragging;
 
-    public CompositionItemWrapper(View itemView) {
+    public CompositionItemWrapper(View itemView, Callback<Composition> onIconClickListener) {
         ButterKnife.bind(this, itemView);
-    }
-
-    @Deprecated
-    public void bind(Composition composition) {
-        bind(composition, true);
+        if (ivMusicIcon != null) {
+            ivMusicIcon.setOnClickListener(v -> onIconClickListener.call(composition));
+        }
     }
 
     public void bind(Composition composition, boolean showCovers) {
@@ -72,6 +74,8 @@ public class CompositionItemWrapper {
         showAdditionalInfo();
         showCorrupted();
         showCompositionImage(showCovers);
+
+        showAsPlaying(false);
     }
 
     public void update(Composition composition, List<Object> payloads) {
@@ -131,6 +135,17 @@ public class CompositionItemWrapper {
         }
     }
 
+    public void showAsPlaying(boolean isPlaying) {
+//        int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
+//        animateBackgroundColor(clickableItem, endColor);
+//
+//        clickableItem.setClickable(!isPlaying);
+
+        if (ivPlay != null) {
+            ivPlay.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play);
+        }
+    }
+
     private void showCompositionName() {
         String compositionName = formatCompositionName(composition);
         tvMusicName.setText(compositionName);
@@ -149,13 +164,6 @@ public class CompositionItemWrapper {
     private void showAsDragging(boolean dragging) {
         int endColor = getItemDragColor(getContext(), dragging? 20: 0);
         animateBackgroundColor(clickableItem, endColor);
-    }
-
-    private void showAsPlaying(boolean isPlaying) {
-        int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
-        animateBackgroundColor(clickableItem, endColor);
-
-        clickableItem.setClickable(!isPlaying);
     }
 
     private void showAdditionalInfo() {

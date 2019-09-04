@@ -16,7 +16,19 @@
         android:contentDescription="@string/folder"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_composition_name"
-        tools:srcCompat="@drawable/ic_music_placeholder" />
+        tools:srcCompat="@drawable/ic_music_placeholder_simple" />
+
+    <ImageView
+        android:id="@+id/iv_play"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:tint="@android:color/white"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="@id/iv_music_icon"
+        app:layout_constraintEnd_toEndOf="@id/iv_music_icon"
+        app:layout_constraintTop_toTopOf="@id/iv_music_icon"
+        app:layout_constraintBottom_toBottomOf="@id/iv_music_icon"
+        tools:srcCompat="@drawable/ic_play"/>
 
     <TextView
         android:id="@+id/tv_composition_name"

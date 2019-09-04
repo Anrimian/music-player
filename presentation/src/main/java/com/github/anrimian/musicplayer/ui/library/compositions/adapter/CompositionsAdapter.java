@@ -33,6 +33,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     @Nullable
     private Composition currentComposition;
+    private boolean play;
     private boolean isCoversEnabled;
 
     public CompositionsAdapter(List<Composition> musicList,
@@ -58,7 +59,10 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         holder.bind(composition, isCoversEnabled);
         boolean selected = selectedCompositions.contains(composition);
         holder.setSelected(selected);
-        holder.setPlaying(composition.equals(currentComposition));
+
+        boolean isCurrentComposition = composition.equals(currentComposition);
+        holder.showAsCurrentComposition(isCurrentComposition);
+        holder.showAsPlaying(isCurrentComposition && play);
     }
 
     @Override
@@ -122,10 +126,13 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.onLongClickListener = onLongClickListener;
     }
 
-    public void showPlayingComposition(Composition composition) {
-        currentComposition = composition;
+    public void showCurrentComposition(Composition currentComposition) {
+        this.currentComposition = currentComposition;
         for (MusicViewHolder holder: viewHolders) {
-            holder.setPlaying(holder.getComposition().equals(composition));
+            Composition composition = holder.getComposition();
+            boolean isCurrentComposition = composition.equals(currentComposition);
+            holder.showAsCurrentComposition(isCurrentComposition);
+            holder.showAsPlaying(isCurrentComposition && play);
         }
     }
 
@@ -133,6 +140,16 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.isCoversEnabled = isCoversEnabled;
         for (MusicViewHolder holder: viewHolders) {
             holder.setCoversVisible(isCoversEnabled);
+        }
+    }
+
+    public void showPlaying(boolean play) {
+        this.play = play;
+        for (MusicViewHolder holder: viewHolders) {
+            Composition composition = holder.getComposition();
+            boolean isCurrentComposition = composition.equals(currentComposition);
+            holder.showAsCurrentComposition(isCurrentComposition);
+            holder.showAsPlaying(isCurrentComposition && play);
         }
     }
 }

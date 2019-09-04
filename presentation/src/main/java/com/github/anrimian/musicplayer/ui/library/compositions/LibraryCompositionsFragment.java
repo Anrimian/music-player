@@ -326,7 +326,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
 
     @Override
     public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showPlayingComposition(composition);
+        adapter.showCurrentComposition(composition);
     }
 
     @Override
@@ -355,6 +355,11 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
            menu.findItem(R.id.menu_play_next).setVisible(show);
            menu.findItem(R.id.menu_add_to_queue).setVisible(show);
         });
+    }
+
+    @Override
+    public void showPlayState(boolean play) {
+        adapter.showPlaying(play);
     }
 
     private void onCompositionActionSelected(MenuItem menuItem) {

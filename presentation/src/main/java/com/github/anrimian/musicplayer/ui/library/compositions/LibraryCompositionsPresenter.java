@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -99,6 +100,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     void onStart() {
         if (!compositions.isEmpty()) {
             subscribeOnCurrentComposition();
+            subscribeOnPlayState();
         }
     }
 
@@ -366,6 +368,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
             if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
+                subscribeOnPlayState();
             }
         }
     }
@@ -379,4 +382,15 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private void onUiSettingsReceived(boolean isCoversEnabled) {
         getViewState().setDisplayCoversEnabled(isCoversEnabled);
     }
+
+    private void subscribeOnPlayState() {
+        presenterBatterySafeDisposable.add(playerInteractor.getPlayerStateObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onPlayerStateReceived));
+    }
+
+    private void onPlayerStateReceived(PlayerState state) {
+        getViewState().showPlayState(state == PlayerState.PLAY);
+    }
+
 }

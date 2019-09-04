@@ -7,6 +7,7 @@ import android.media.MediaMetadataRetriever;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,7 +33,13 @@ public class ImageFormatUtils {
 
     public static void displayImage(@NonNull ImageView imageView,
                                     @NonNull Composition composition) {
-        imageView.setImageResource(R.drawable.ic_music_placeholder);
+        displayImage(imageView, composition, R.drawable.ic_music_placeholder_simple);
+    }
+
+    public static void displayImage(@NonNull ImageView imageView,
+                                    @NonNull Composition composition,
+                                    @DrawableRes int placeholderResId) {
+        imageView.setImageResource(placeholderResId);
         Disposable disposable = imageLoadingMap.get(imageView);
         if (disposable != null) {
             disposable.dispose();
@@ -42,7 +49,7 @@ public class ImageFormatUtils {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageView::setImageBitmap,
-                        t -> imageView.setImageResource(R.drawable.ic_music_placeholder));
+                        t -> imageView.setImageResource(placeholderResId));
         imageLoadingMap.put(imageView, disposable);
     }
 

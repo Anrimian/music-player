@@ -98,25 +98,26 @@ public class MusicViewHolder extends SelectableViewHolder {
         }
     }
 
-    public void setPlaying(boolean playing) {
+    public void showAsCurrentComposition(boolean playing) {
         if (this.playing != playing) {
             this.playing = playing;
             if (!selected) {
-                showAsPlaying(playing);
+                int unselectedColor = Color.TRANSPARENT;
+                int selectedColor = getPlaySelectionColor();
+                int endColor = playing ? selectedColor : unselectedColor;
+                animateBackgroundColor(clickableItem, endColor);
             }
         }
+    }
+
+    public void showAsPlaying(boolean playing) {
+        compositionItemWrapper.showAsPlaying(playing);
     }
 
     public Composition getComposition() {
         return composition;
     }
 
-    private void showAsPlaying(boolean playing) {
-        int unselectedColor = Color.TRANSPARENT;
-        int selectedColor = getPlaySelectionColor();
-        int endColor = playing ? selectedColor : unselectedColor;
-        animateBackgroundColor(clickableItem, endColor);
-    }
 
     private void selectImmediate() {
         clickableItem.setBackgroundColor(getSelectionColor());
