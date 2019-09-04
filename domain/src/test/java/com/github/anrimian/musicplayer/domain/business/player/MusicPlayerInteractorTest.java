@@ -60,7 +60,6 @@ public class MusicPlayerInteractorTest {
     private SystemMusicController systemMusicController = mock(SystemMusicController.class);
     private SystemServiceController systemServiceController = mock(SystemServiceController.class);
     private Analytics analytics = mock(Analytics.class);
-    private PlayerErrorParser playerErrorParser = mock(PlayerErrorParser.class);
 
     private MusicPlayerInteractor musicPlayerInteractor;
 
@@ -104,8 +103,7 @@ public class MusicPlayerInteractorTest {
                 systemServiceController,
                 playQueueRepository,
                 musicProviderRepository,
-                analytics,
-                playerErrorParser);
+                analytics);
 
         playerStateSubscriber = musicPlayerInteractor.getPlayerStateObservable()
                 .test();
@@ -225,14 +223,11 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onCompositionUnknownErrorTest() {
-        when(playerErrorParser.getErrorType(any())).thenReturn(UNKNOWN);
-
         musicPlayerInteractor.play();
 
         inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
 
-        Throwable throwable = new IllegalStateException();
-        playerEventSubject.onNext(new ErrorEvent(throwable));
+        playerEventSubject.onNext(new ErrorEvent(UNKNOWN));
 
         inOrder.verify(musicProviderRepository)
                 .writeErrorAboutComposition(UNKNOWN, getFakeCompositions().get(0));
@@ -247,7 +242,6 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onCompositionUnknownErrorInEndTest() {
-        when(playerErrorParser.getErrorType(any())).thenReturn(UNKNOWN);
         when(playQueueRepository.skipToNext()).thenReturn(Single.just(0));
 
         musicPlayerInteractor.play();
@@ -255,8 +249,7 @@ public class MusicPlayerInteractorTest {
         inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
         inOrder.verify(musicPlayerController).resume();
 
-        Throwable throwable = new IllegalStateException();
-        playerEventSubject.onNext(new ErrorEvent(throwable));
+        playerEventSubject.onNext(new ErrorEvent(UNKNOWN));
 
         inOrder.verify(musicProviderRepository)
                 .writeErrorAboutComposition(UNKNOWN, getFakeCompositions().get(0));
@@ -272,15 +265,12 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onCompositionDeletedErrorTest() {
-        when(playerErrorParser.getErrorType(any())).thenReturn(DELETED);
-
         musicPlayerInteractor.play();
 
         inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
         inOrder.verify(musicPlayerController).resume();
 
-        Throwable throwable = new IllegalStateException();
-        playerEventSubject.onNext(new ErrorEvent(throwable));
+        playerEventSubject.onNext(new ErrorEvent(DELETED));
         currentCompositionSubject.onNext(currentItem(1));
 
         inOrder.verify(musicProviderRepository).deleteComposition(getFakeCompositions().get(0));

@@ -5,9 +5,11 @@ import android.net.Uri;
 
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
+import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
+import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -50,13 +52,15 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler scheduler;
+    private final PlayerErrorParser playerErrorParser;
 
     @Nullable
     private Disposable trackPositionDisposable;
 
     public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences,
                                      Context context,
-                                     Scheduler scheduler) {
+                                     Scheduler scheduler,
+                                     PlayerErrorParser playerErrorParser) {
         this.uiStatePreferences = uiStatePreferences;
         this.scheduler = scheduler;
         player = ExoPlayerFactory.newSimpleInstance(
@@ -64,8 +68,12 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
+        this.playerErrorParser = playerErrorParser;
 
-        PlayerEventListener playerEventListener = new PlayerEventListener(playerEventSubject);
+        PlayerEventListener playerEventListener = new PlayerEventListener(
+                () -> playerEventSubject.onNext(new FinishedEvent()),
+                error -> playerEventSubject.onNext(new ErrorEvent(playerErrorParser.getErrorType(error)))
+        );
         player.addListener(playerEventListener);
     }
 
@@ -146,7 +154,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         } else {
             seekTo(0);
             player.setPlayWhenReady(false);
-            playerEventSubject.onNext(new ErrorEvent(throwable));
+            playerEventSubject.onNext(new ErrorEvent(playerErrorParser.getErrorType(throwable)));
         }
     }
 

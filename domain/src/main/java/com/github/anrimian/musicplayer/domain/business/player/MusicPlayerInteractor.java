@@ -52,7 +52,6 @@ public class MusicPlayerInteractor {
     private final PlayQueueRepository playQueueRepository;
     private final MusicProviderRepository musicProviderRepository;
     private final Analytics analytics;
-    private final PlayerErrorParser playerErrorParser;
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
@@ -68,8 +67,7 @@ public class MusicPlayerInteractor {
                                  SystemServiceController systemServiceController,
                                  PlayQueueRepository playQueueRepository,
                                  MusicProviderRepository musicProviderRepository,
-                                 Analytics analytics,
-                                 PlayerErrorParser playerErrorParser) {
+                                 Analytics analytics) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
@@ -77,7 +75,6 @@ public class MusicPlayerInteractor {
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
         this.analytics = analytics;
-        this.playerErrorParser = playerErrorParser;
 
         playerDisposable.add(playQueueRepository.getCurrentQueueItemObservable()
                 .subscribe(this::onQueueItemChanged));
@@ -297,7 +294,7 @@ public class MusicPlayerInteractor {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;
-            handleErrorWithComposition(playerErrorParser.getErrorType(errorEvent.getThrowable()));
+            handleErrorWithComposition(errorEvent.getErrorType());
         }
     }
 

@@ -4,11 +4,17 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.PublishSubject;
 
 public class CompositeMediaPlayer implements MediaPlayer {
 
     private final MediaPlayer[] mediaPlayers;
     private final int startPlayerIndex;
+
+    private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
+    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
+    private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
     private MediaPlayer currentPlayer;
     private int currentPlayerIndex;
@@ -22,7 +28,7 @@ public class CompositeMediaPlayer implements MediaPlayer {
 
     @Override
     public Observable<PlayerEvent> getEventsObservable() {
-        return null;
+        return playerEventSubject;
     }
 
     @Override
@@ -60,7 +66,7 @@ public class CompositeMediaPlayer implements MediaPlayer {
 
     @Override
     public Observable<Long> getTrackPositionObservable() {
-        return null;
+        return trackPositionSubject;
     }
 
     @Override
@@ -71,5 +77,14 @@ public class CompositeMediaPlayer implements MediaPlayer {
     private void setPlayer(int index) {
         currentPlayerIndex = index;
         currentPlayer = mediaPlayers[index];
+
+        playerDisposable.clear();
+        playerDisposable.add(currentPlayer.getEventsObservable()
+//                .doOnNext() // if error event, switch to another player and consume event
+                .subscribe(playerEventSubject::onNext)
+        );
+        playerDisposable.add(currentPlayer.getTrackPositionObservable()
+                .subscribe(trackPositionSubject::onNext)
+        );
     }
 }

@@ -1,14 +1,16 @@
 package com.github.anrimian.musicplayer.domain.models.player.events;
 
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
+
 public class ErrorEvent implements PlayerEvent {
 
-    private Throwable throwable;
+    private ErrorType errorType;
 
-    public ErrorEvent(Throwable throwable) {
-        this.throwable = throwable;
+    public ErrorEvent(ErrorType errorType) {
+        this.errorType = errorType;
     }
 
-    public Throwable getThrowable() {
-        return throwable;
+    public ErrorType getErrorType() {
+        return errorType;
     }
 }
