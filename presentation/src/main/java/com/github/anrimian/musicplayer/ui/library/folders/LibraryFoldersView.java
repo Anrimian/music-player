@@ -131,4 +131,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void showInputNewFolderNameDialog();
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showPlayState(boolean play);
 }

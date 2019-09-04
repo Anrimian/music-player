@@ -42,9 +42,11 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
     private OnPositionItemClickListener<FileSource> onLongClickListener;
     private OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener;
     private OnViewItemClickListener<MusicFileSource> onCompositionMenuItemClicked;
+    private OnPositionItemClickListener<Composition> compositionIconClickListener;
 
     @Nullable
     private Composition currentComposition;
+    private boolean play;
     private boolean isCoversEnabled;
 
     public MusicFileSourceAdapter(RecyclerView recyclerView,
@@ -66,7 +68,8 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
                 return new MusicFileViewHolder(parent,
                         onCompositionClickListener,
                         onCompositionMenuItemClicked,
-                        onLongClickListener);
+                        onLongClickListener,
+                        compositionIconClickListener);
             }
             case TYPE_FILE: {
                 return new FolderViewHolder(parent,
@@ -97,7 +100,9 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
                 musicViewHolder.bind(musicFileSource, isCoversEnabled);
 
                 Composition composition = musicFileSource.getComposition();
-                musicViewHolder.setPlaying(composition.equals(currentComposition));
+                boolean isCurrentComposition = composition.equals(currentComposition);
+                musicViewHolder.showAsCurrentComposition(isCurrentComposition);
+                musicViewHolder.showAsPlaying(isCurrentComposition && play);
                 break;
             }
             case TYPE_FILE: {
@@ -184,12 +189,33 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
         this.onFolderMenuClickListener = onFolderMenuClickListener;
     }
 
-    public void showPlayingComposition(Composition composition) {
-        currentComposition = composition;
+    public void setCompositionIconClickListener(OnPositionItemClickListener<Composition> compositionIconClickListener) {
+        this.compositionIconClickListener = compositionIconClickListener;
+    }
+
+    public void showCurrentComposition(Composition currentComposition) {
+        this.currentComposition = currentComposition;
         for (RecyclerView.ViewHolder holder: viewHolders) {
             if (holder instanceof MusicFileViewHolder) {
                 MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
-                musicViewHolder.setPlaying(musicViewHolder.getComposition().equals(composition));
+
+                Composition composition = musicViewHolder.getComposition();
+                boolean isCurrentComposition = composition.equals(currentComposition);
+                musicViewHolder.showAsCurrentComposition(isCurrentComposition);
+                musicViewHolder.showAsPlaying(isCurrentComposition && play);
+            }
+        }
+    }
+
+    public void showPlaying(boolean play) {
+        this.play = play;
+        for (RecyclerView.ViewHolder holder: viewHolders) {
+            if (holder instanceof MusicFileViewHolder) {
+                MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
+                Composition composition = musicViewHolder.getComposition();
+                boolean isCurrentComposition = composition.equals(currentComposition);
+                musicViewHolder.showAsCurrentComposition(isCurrentComposition);
+                musicViewHolder.showAsPlaying(isCurrentComposition && play);
             }
         }
     }

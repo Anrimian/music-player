@@ -38,10 +38,13 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
     PlayQueueViewHolder(LayoutInflater inflater,
                         ViewGroup parent,
                         OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener,
-                        OnViewItemClickListener<PlayQueueItem> menuClickListener) {
+                        OnViewItemClickListener<PlayQueueItem> menuClickListener,
+                        OnPositionItemClickListener<PlayQueueItem> iconClickListener) {
         super(inflater.inflate(R.layout.item_play_queue, parent, false));
         ButterKnife.bind(this, itemView);
-        compositionItemWrapper = new CompositionItemWrapper(itemView);
+        compositionItemWrapper = new CompositionItemWrapper(itemView,
+                o -> iconClickListener.onItemClick(getAdapterPosition(), playQueueItem)
+        );
 
         if (onCompositionClickListener != null) {
             clickableItem.setOnClickListener(v ->
@@ -66,8 +69,12 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
         compositionItemWrapper.showCompositionImage(visible);
     }
 
-    void showAsPlayingComposition(boolean show) {
-        compositionItemWrapper.showAsPlayingComposition(show);
+    void showAsCurrentItem(boolean show) {
+        compositionItemWrapper.showAsCurrentComposition(show);
+    }
+
+    void showAsPlaying(boolean playing) {
+        compositionItemWrapper.showAsPlaying(playing);
     }
 
     PlayQueueItem getPlayQueueItem() {

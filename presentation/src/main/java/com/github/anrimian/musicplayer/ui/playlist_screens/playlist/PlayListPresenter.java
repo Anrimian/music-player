@@ -119,6 +119,10 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         }
     }
 
+    void onItemIconClicked(int position) {
+        playerInteractor.startPlaying(mapList(items, PlayListItem::getComposition), position);
+    }
+
     void onPlayAllButtonClicked() {
         playerInteractor.startPlaying(mapList(items, PlayListItem::getComposition));
     }
@@ -352,4 +356,5 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
         currentItem = playQueueEvent.getPlayQueueItem();
     }
+
 }

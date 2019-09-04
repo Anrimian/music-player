@@ -25,6 +25,7 @@ import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
+import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -124,23 +125,20 @@ public class CompositionItemWrapper {
         }
     }
 
-    public void showAsPlayingComposition(boolean isPlaying) {
+    public void showAsCurrentComposition(boolean isPlaying) {
         if (this.isPlaying != isPlaying) {
             this.isPlaying = isPlaying;
             if (!isPlaying && isDragging) {
                 showAsDragging(true);
                 return;
             }
-            showAsPlaying(isPlaying);
+            int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
+            animateBackgroundColor(clickableItem, endColor);
+            clickableItem.setClickable(!isPlaying);
         }
     }
 
     public void showAsPlaying(boolean isPlaying) {
-//        int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
-//        animateBackgroundColor(clickableItem, endColor);
-//
-//        clickableItem.setClickable(!isPlaying);
-
         if (ivPlay != null) {
             ivPlay.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play);
         }

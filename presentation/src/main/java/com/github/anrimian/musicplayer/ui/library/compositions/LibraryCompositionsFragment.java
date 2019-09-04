@@ -240,6 +240,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
             adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
             adapter.setOnLongClickListener(presenter::onCompositionLongClick);
+            adapter.setIconClickListener(presenter::onCompositionIconClicked);
             adapterWrapper.setObject(adapter);
             recyclerView.setAdapter(adapter);
         } else {

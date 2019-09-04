@@ -445,6 +445,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ivPlayPause.setImageResource(R.drawable.ic_play);
         ivPlayPause.setContentDescription(getString(R.string.play));
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
+        playQueueAdapterWrapper.call(adapter -> adapter.showPlaying(false));
     }
 
     @Override
@@ -452,6 +453,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ivPlayPause.setImageResource(R.drawable.ic_pause);
         ivPlayPause.setContentDescription(getString(R.string.pause));
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
+        playQueueAdapterWrapper.call(adapter -> adapter.showPlaying(true));
     }
 
     @Override
@@ -534,6 +536,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             playQueueAdapterWrapper.setObject(playQueueAdapter);
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
             playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
+            playQueueAdapter.setIconClickListener(presenter::onQueueItemIconClicked);
             rvPlayList.setAdapter(playQueueAdapter);
         } else {
             playQueueAdapter.setItems(list);

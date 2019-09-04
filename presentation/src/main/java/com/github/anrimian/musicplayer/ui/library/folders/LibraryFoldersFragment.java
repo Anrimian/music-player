@@ -185,6 +185,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
         adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
         adapter.setOnLongClickListener(presenter::onItemLongClick);
+        adapter.setCompositionIconClickListener(presenter::onCompositionIconClicked);
         recyclerView.setAdapter(adapter);
 
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
@@ -464,7 +465,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showPlayingComposition(composition);
+        adapter.showCurrentComposition(composition);
     }
 
     @Override
@@ -545,6 +546,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showMoveFileMenu(boolean show) {
         animateVisibility(vgMoveFileMenu, show? VISIBLE: INVISIBLE);
+    }
+
+    @Override
+    public void showPlayState(boolean play) {
+        adapter.showPlaying(play);
     }
 
     private void onSelectionModeChanged(boolean enabled) {

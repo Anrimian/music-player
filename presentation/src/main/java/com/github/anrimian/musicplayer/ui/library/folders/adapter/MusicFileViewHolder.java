@@ -50,10 +50,13 @@ public class MusicFileViewHolder extends FileViewHolder {
     public MusicFileViewHolder(ViewGroup parent,
                                OnPositionItemClickListener<MusicFileSource> onCompositionClickListener,
                                OnViewItemClickListener<MusicFileSource> onMenuClickListener,
-                               OnPositionItemClickListener<FileSource> onLongClickListener) {
+                               OnPositionItemClickListener<FileSource> onLongClickListener,
+                               OnPositionItemClickListener<Composition> iconClickListener) {
         super(parent, R.layout.item_storage_music);
         ButterKnife.bind(this, itemView);
-        compositionItemWrapper = new CompositionItemWrapper(itemView);
+        compositionItemWrapper = new CompositionItemWrapper(itemView,
+                composition -> iconClickListener.onItemClick(getAdapterPosition(), composition)
+        );
 
         if (onCompositionClickListener != null) {
             clickableItem.setOnClickListener(v ->
@@ -128,24 +131,24 @@ public class MusicFileViewHolder extends FileViewHolder {
         return fileSource;
     }
 
-    public void setPlaying(boolean playing) {
+    public void showAsCurrentComposition(boolean playing) {
         if (this.playing != playing) {
             this.playing = playing;
             if (!selected) {
-                showAsPlaying(playing);
+                int unselectedColor = Color.TRANSPARENT;
+                int selectedColor = getPlaySelectionColor();
+                int endColor = playing ? selectedColor : unselectedColor;
+                animateBackgroundColor(clickableItem, endColor);
             }
         }
     }
 
-    public Composition getComposition() {
-        return fileSource.getComposition();
+    public void showAsPlaying(boolean playing) {
+        compositionItemWrapper.showAsPlaying(playing);
     }
 
-    private void showAsPlaying(boolean playing) {
-        int unselectedColor = Color.TRANSPARENT;
-        int selectedColor = getPlaySelectionColor();
-        int endColor = playing ? selectedColor : unselectedColor;
-        animateBackgroundColor(clickableItem, endColor);
+    public Composition getComposition() {
+        return fileSource.getComposition();
     }
 
     private void selectImmediate() {

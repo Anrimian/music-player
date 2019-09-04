@@ -190,6 +190,7 @@ public class PlayListFragment extends MvpAppCompatFragment
             adapter = new PlayListItemAdapter(list, coversEnabled);
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
             adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
+            adapter.setOnIconClickListener(presenter::onItemIconClicked);
             recyclerView.setAdapter(adapter);
         } else {
             adapter.setItems(list);

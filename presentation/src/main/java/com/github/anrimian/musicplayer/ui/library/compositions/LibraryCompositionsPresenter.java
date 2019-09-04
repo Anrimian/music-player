@@ -138,7 +138,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         if (composition.equals(currentComposition)) {
             playerInteractor.playOrPause();
         } else {
-            interactor.play(compositions, position);
+            playerInteractor.startPlaying(compositions, position);
             getViewState().showCurrentPlayingComposition(composition);
         }
     }

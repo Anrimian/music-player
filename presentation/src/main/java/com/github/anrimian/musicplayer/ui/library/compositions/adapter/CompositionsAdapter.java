@@ -30,6 +30,7 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     private OnPositionItemClickListener<Composition> onCompositionClickListener;
     private OnViewItemClickListener<Composition> onMenuItemClickListener;
     private OnPositionItemClickListener<Composition> onLongClickListener;
+    private OnPositionItemClickListener<Composition> iconClickListener;
 
     @Nullable
     private Composition currentComposition;
@@ -48,7 +49,8 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         return new MusicViewHolder(parent,
                 onCompositionClickListener,
                 onMenuItemClickListener,
-                onLongClickListener);
+                onLongClickListener,
+                iconClickListener);
     }
 
     @Override
@@ -124,6 +126,10 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     public void setOnLongClickListener(OnPositionItemClickListener<Composition> onLongClickListener) {
         this.onLongClickListener = onLongClickListener;
+    }
+
+    public void setIconClickListener(OnPositionItemClickListener<Composition> iconClickListener) {
+        this.iconClickListener = iconClickListener;
     }
 
     public void showCurrentComposition(Composition currentComposition) {
