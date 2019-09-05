@@ -41,7 +41,7 @@ public class MusicViewHolder extends SelectableViewHolder {
     private Composition composition;
 
     private boolean selected = false;
-    private boolean playing = false;
+    private boolean isCurrent = false;
 
     public MusicViewHolder(ViewGroup parent,
                            OnPositionItemClickListener<Composition> onCompositionClickListener,
@@ -90,20 +90,20 @@ public class MusicViewHolder extends SelectableViewHolder {
     public void setSelected(boolean selected) {
         if (this.selected != selected) {
             this.selected = selected;
-            int unselectedColor = (!selected && playing)? getPlaySelectionColor(): Color.TRANSPARENT;
+            int unselectedColor = (!selected && isCurrent)? getPlaySelectionColor(): Color.TRANSPARENT;
             int selectedColor = getSelectionColor();
             int endColor = selected ? selectedColor : unselectedColor;
             animateBackgroundColor(clickableItem, endColor);
         }
     }
 
-    public void showAsCurrentComposition(boolean playing) {
-        if (this.playing != playing) {
-            this.playing = playing;
+    public void showAsCurrentComposition(boolean isCurrent) {
+        if (this.isCurrent != isCurrent) {
+            this.isCurrent = isCurrent;
             if (!selected) {
                 int unselectedColor = Color.TRANSPARENT;
                 int selectedColor = getPlaySelectionColor();
-                int endColor = playing ? selectedColor : unselectedColor;
+                int endColor = isCurrent ? selectedColor : unselectedColor;
                 animateBackgroundColor(clickableItem, endColor);
             }
         }

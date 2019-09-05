@@ -45,7 +45,7 @@ public class MusicFileViewHolder extends FileViewHolder {
 
     private boolean selected = false;
     private boolean selectedToMove = false;
-    private boolean playing = false;
+    private boolean isCurrent = false;
 
     public MusicFileViewHolder(ViewGroup parent,
                                OnPositionItemClickListener<MusicFileSource> onCompositionClickListener,
@@ -104,7 +104,7 @@ public class MusicFileViewHolder extends FileViewHolder {
     public void setSelected(boolean selected) {
         if (this.selected != selected) {
             this.selected = selected;
-            int unselectedColor = (!selected && playing)? getPlaySelectionColor(): Color.TRANSPARENT;
+            int unselectedColor = (!selected && isCurrent)? getPlaySelectionColor(): Color.TRANSPARENT;
             int selectedColor = getSelectionColor();
             int endColor = selected ? selectedColor : unselectedColor;
             animateBackgroundColor(clickableItem, endColor);
@@ -127,13 +127,13 @@ public class MusicFileViewHolder extends FileViewHolder {
         return fileSource;
     }
 
-    public void showAsCurrentComposition(boolean playing) {
-        if (this.playing != playing) {
-            this.playing = playing;
+    public void showAsCurrentComposition(boolean isCurrent) {
+        if (this.isCurrent != isCurrent) {
+            this.isCurrent = isCurrent;
             if (!selected) {
                 int unselectedColor = Color.TRANSPARENT;
                 int selectedColor = getPlaySelectionColor();
-                int endColor = playing ? selectedColor : unselectedColor;
+                int endColor = isCurrent ? selectedColor : unselectedColor;
                 animateBackgroundColor(clickableItem, endColor);
             }
         }

@@ -59,7 +59,7 @@ public class CompositionItemWrapper {
 
     private Composition composition;
 
-    private boolean isPlaying;
+    private boolean isCurrent;
     private boolean isDragging;
 
     public CompositionItemWrapper(View itemView, Callback<Composition> onIconClickListener) {
@@ -117,24 +117,18 @@ public class CompositionItemWrapper {
             this.isDragging = dragging;
 
             animateVisibility(divider, dragging? View.INVISIBLE: View.VISIBLE);
-            if (!dragging && isPlaying) {
-                showAsPlaying(true);
+            if (!dragging && isCurrent) {
+                showAsCurrentCompositionInternal(true);
             } else {
                 showAsDragging(dragging);
             }
         }
     }
 
-    public void showAsCurrentComposition(boolean isPlaying) {
-        if (this.isPlaying != isPlaying) {
-            this.isPlaying = isPlaying;
-            if (!isPlaying && isDragging) {
-                showAsDragging(true);
-                return;
-            }
-            int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
-            animateBackgroundColor(clickableItem, endColor);
-            clickableItem.setClickable(!isPlaying);
+    public void showAsCurrentComposition(boolean isCurrent) {
+        if (this.isCurrent != isCurrent) {
+            this.isCurrent = isCurrent;
+            showAsCurrentCompositionInternal(isCurrent);
         }
     }
 
@@ -142,6 +136,16 @@ public class CompositionItemWrapper {
         if (ivPlay != null) {
             ivPlay.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play);
         }
+    }
+
+    private void showAsCurrentCompositionInternal(boolean isPlaying) {
+        if (!isPlaying && isDragging) {
+            showAsDragging(true);
+            return;
+        }
+        int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
+        animateBackgroundColor(clickableItem, endColor);
+        clickableItem.setClickable(!isPlaying);
     }
 
     private void showCompositionName() {
