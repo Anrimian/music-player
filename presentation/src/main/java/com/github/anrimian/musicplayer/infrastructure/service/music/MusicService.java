@@ -223,11 +223,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Log.d("KEK", "onPlayerStateReceived: " + playerState);
         updateMediaSessionState(playerState, trackPosition);
 
-        //ignore first not play state
-//        if (this.playerState == null && playerState != PlayerState.PLAY) {
-//            return;
-//        }
-
         this.playerState = playerState;
         switch (playerState) {
             case PLAY: {
@@ -287,11 +282,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             Log.d("KEK", "onCurrentCompositionReceived: set current");
             currentItem = queueItem;
             updateMediaSessionMetadata(currentItem.getComposition(), notificationSetting);
-            notificationsDisplayer.updateForegroundNotification(
-                    playerState == PlayerState.PLAY,
-                    currentItem,
-                    mediaSession,
-                    notificationSetting);
+            updateMediaSessionState(playerState, 0);
+            updateForegroundNotification();
         }
     }
 
@@ -309,15 +301,19 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         boolean updateNotification = notificationSetting != null;
         notificationSetting = setting;
         if (updateNotification) {
-            notificationsDisplayer.updateForegroundNotification(
-                    playerState == PlayerState.PLAY,
-                    currentItem,
-                    mediaSession,
-                    notificationSetting);
+            updateForegroundNotification();
             if (currentItem != null) {
                 updateMediaSessionMetadata(currentItem.getComposition(), notificationSetting);
             }
         }
+    }
+
+    private void updateForegroundNotification() {
+        notificationsDisplayer.updateForegroundNotification(
+                playerState == PlayerState.PLAY,
+                currentItem,
+                mediaSession,
+                notificationSetting);
     }
 
     private void updateMediaSessionMetadata(Composition composition, MusicNotificationSetting setting) {
@@ -340,8 +336,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     private void updateMediaSessionState(PlayerState playerState, long trackPosition) {
         stateBuilder.setState(toMediaState(playerState),
                 trackPosition,
-                1,
-                System.currentTimeMillis());
+                1);
         mediaSession.setPlaybackState(stateBuilder.build());
     }
 
