@@ -9,4 +9,7 @@
     <dimen name="content_horizontal_margin">8dp</dimen>
     <dimen name="content_vertical_margin">8dp</dimen>
 
+    <!--list margins-->
+    <dimen name="list_vertical_margin">8dp</dimen>
+
 </resources>

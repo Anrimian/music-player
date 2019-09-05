@@ -32,6 +32,10 @@
 
     </style>
 
+    <style name="ItemPrimaryTextStyle" parent="TextStyle">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="Content.Text.Button" parent="@style/Base.TextAppearance.AppCompat.Body1">
         <item name="android:background">?selectableItemBackground</item>
         <item name="android:paddingTop">@dimen/content_vertical_margin</item>
@@ -57,7 +61,16 @@
 
     </style>
 
-    <style name="Content.SecondaryText.Small">
+    <style name="ContentSubtitleTextStyle" parent="Content.SecondaryText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="TextStyle.Small">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="ContentSubtitleTextStyle.Small">
         <item name="android:textSize">11sp</item>
     </style>
 
@@ -74,7 +87,7 @@
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="TextStyle.Small">
+    <style name="ItemPrimaryTextStyle.Small">
         <item name="android:textSize">13sp</item>
     </style>
 

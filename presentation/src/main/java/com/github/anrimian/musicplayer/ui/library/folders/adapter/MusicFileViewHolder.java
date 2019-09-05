@@ -104,14 +104,10 @@ public class MusicFileViewHolder extends FileViewHolder {
     public void setSelected(boolean selected) {
         if (this.selected != selected) {
             this.selected = selected;
-            if (!selected && playing) {
-                showAsPlaying(true);
-            } else {
-                int unselectedColor = Color.TRANSPARENT;
-                int selectedColor = getSelectionColor();
-                int endColor = selected ? selectedColor : unselectedColor;
-                animateBackgroundColor(clickableItem, endColor);
-            }
+            int unselectedColor = (!selected && playing)? getPlaySelectionColor(): Color.TRANSPARENT;
+            int selectedColor = getSelectionColor();
+            int endColor = selected ? selectedColor : unselectedColor;
+            animateBackgroundColor(clickableItem, endColor);
         }
     }
 
