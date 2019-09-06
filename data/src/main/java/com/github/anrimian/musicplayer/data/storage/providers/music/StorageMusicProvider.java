@@ -106,15 +106,15 @@ public class StorageMusicProvider {
     }
 
     public void updateCompositionAuthor(Composition composition, String author) {
-        updateComposition(composition.getId(), ARTIST, author);
+        updateComposition(composition.getId(), MediaStore.Audio.AudioColumns.ARTIST, author);
     }
 
     public void updateCompositionTitle(Composition composition, String title) {
-        updateComposition(composition.getId(), TITLE, title);
+        updateComposition(composition.getId(), MediaStore.Audio.AudioColumns.TITLE, title);
     }
 
     public void updateCompositionFilePath(Composition composition, String filePath) {
-        updateComposition(composition.getId(), MediaStore.Images.Media.DATA, filePath);
+        updateComposition(composition.getId(), MediaStore.Audio.AudioColumns.DATA, filePath);
     }
 
     public void updateCompositionsFilePath(List<Composition> compositions) {
@@ -137,12 +137,18 @@ public class StorageMusicProvider {
     }
 
     private void updateComposition(long id, String key, String value) {
+
+
         ContentValues cv = new ContentValues();
         cv.put(key, value);
-        contentResolver.update(EXTERNAL_CONTENT_URI,
+        int updatedRows = contentResolver.update(EXTERNAL_CONTENT_URI,
                 cv,
-                MediaStore.Audio.Playlists._ID + " = ?",
+                _ID + " = ?",
                 new String[] { String.valueOf(id) });
+
+        if (updatedRows == 0) {
+            throw new UpdateMediaStoreException("media storage not updated");
+        }
     }
 
     private Map<Long, Composition> getCompositions(Uri uri) {
@@ -183,6 +189,7 @@ public class StorageMusicProvider {
     }
 
     private Composition getCompositionFromCursor(CursorWrapper cursorWrapper) {
+
         String artist = cursorWrapper.getString(ARTIST);
         String title = cursorWrapper.getString(TITLE);
         String album = cursorWrapper.getString(ALBUM);
