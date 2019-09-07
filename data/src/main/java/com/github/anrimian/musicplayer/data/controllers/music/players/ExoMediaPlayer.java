@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.controllers.music;
+package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
