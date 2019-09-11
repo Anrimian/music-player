@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 
 import javax.annotation.Nonnull;
@@ -30,17 +30,13 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder implements D
     @BindView(R.id.clickable_item)
     View clickableItem;
 
-    @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
-
     private CompositionItemWrapper compositionItemWrapper;
 
     private PlayListItem item;
 
     PlayListItemViewHolder(LayoutInflater inflater,
                            ViewGroup parent,
-                           OnItemClickListener<Integer> onCompositionClickListener,
-                           OnViewPositionItemClickListener<PlayListItem> onMenuClickListener,
+                           BiCallback<PlayListItem, Integer> onCompositionClickListener,
                            OnItemClickListener<Integer> onIconClickListener) {
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
         ButterKnife.bind(this, itemView);
@@ -50,12 +46,9 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder implements D
 
         if (onCompositionClickListener != null) {
             clickableItem.setOnClickListener(v ->
-                    onCompositionClickListener.onItemClick(getAdapterPosition())
+                    onCompositionClickListener.call(item, getAdapterPosition())
             );
         }
-        btnActionsMenu.setOnClickListener(v ->
-                onMenuClickListener.onItemClick(v, item, getAdapterPosition())
-        );
     }
 
     public void bind(@Nonnull PlayListItem item, boolean coversEnabled) {

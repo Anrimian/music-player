@@ -16,8 +16,8 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.DialogFragment;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.domain.utils.java.PairCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,7 +43,7 @@ public class InputTextDialogFragment extends DialogFragment {
     private Callback<String> onCompleteListener;
 
     @Nullable
-    private PairCallback<String, Bundle> complexCompleteListener;
+    private BiCallback<String, Bundle> complexCompleteListener;
 
     public static InputTextDialogFragment newInstance(@StringRes int title,
                                                       @StringRes int positiveButtonText,
@@ -136,7 +136,7 @@ public class InputTextDialogFragment extends DialogFragment {
         this.onCompleteListener = onCompleteListener;
     }
 
-    public void setComplexCompleteListener(@Nullable PairCallback<String, Bundle> complexCompleteListener) {
+    public void setComplexCompleteListener(@Nullable BiCallback<String, Bundle> complexCompleteListener) {
         this.complexCompleteListener = complexCompleteListener;
     }
 

@@ -161,8 +161,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         }
     }
 
-    void onPlayActionSelected() {
-        interactor.play(path, compositionInAction);
+    void onPlayActionSelected(Composition composition) {
+        interactor.play(path, composition);
     }
 
     void onPlayNextCompositionClicked(Composition composition) {
@@ -215,10 +215,10 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         goBackToPreviousPath();
     }
 
-    void onDeleteCompositionButtonClicked(MusicFileSource fileSource) {
+    void onDeleteCompositionButtonClicked(Composition composition) {
         filesToDelete.clear();
-        filesToDelete.add(fileSource);
-        getViewState().showConfirmDeleteDialog(asList(fileSource.getComposition()));
+        filesToDelete.add(new MusicFileSource(composition));
+        getViewState().showConfirmDeleteDialog(asList(composition));
     }
 
     void onDeleteFolderButtonClicked(FolderFileSource folder) {
@@ -246,9 +246,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         interactor.setFolderOrder(order);
     }
 
-    void onAddToPlayListButtonClicked(MusicFileSource fileSource) {
+    void onAddToPlayListButtonClicked(Composition composition) {
         filesForPlayList.clear();
-        filesForPlayList.add(fileSource);
+        filesForPlayList.add(new MusicFileSource(composition));
         getViewState().showSelectPlayListDialog();
     }
 

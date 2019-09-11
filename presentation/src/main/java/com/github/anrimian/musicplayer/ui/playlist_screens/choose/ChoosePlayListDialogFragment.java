@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -54,9 +53,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.view.View.INVISIBLE;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.setupBottomSheetDialogMaxWidth;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getContentView;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getFloat;
@@ -160,17 +159,8 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     @Override
     public void onResume() {
         super.onResume();
-        //set max width in large width cases
-        int width = requireContext().getResources().getDimensionPixelSize(R.dimen.bottom_sheet_width);
-        Dialog dialog = getDialog();
-        if (dialog != null) {
-            Window window = dialog.getWindow();
-            if (window != null) {
-                window.setLayout(width > 0 ? width : MATCH_PARENT, MATCH_PARENT);
-            }
-        }
+        setupBottomSheetDialogMaxWidth(this);
     }
-
 
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {

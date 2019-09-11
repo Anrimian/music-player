@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewPositionItemClickListener;
 
 import java.util.List;
 
@@ -21,8 +21,7 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
     private final boolean coversEnabled;
 
     private List<PlayListItem> musicList;
-    private OnItemClickListener<Integer> onCompositionClickListener;
-    private OnViewPositionItemClickListener<PlayListItem> onMenuItemClickListener;
+    private BiCallback<PlayListItem, Integer> onCompositionClickListener;
     private OnItemClickListener<Integer> onIconClickListener;
 
     public PlayListItemAdapter(List<PlayListItem> musicList, boolean coversEnabled) {
@@ -36,7 +35,6 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
         return new PlayListItemViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
                 onCompositionClickListener,
-                onMenuItemClickListener,
                 onIconClickListener);
     }
 
@@ -55,12 +53,8 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
         musicList = list;
     }
 
-    public void setOnCompositionClickListener(OnItemClickListener<Integer> onCompositionClickListener) {
+    public void setOnCompositionClickListener(BiCallback<PlayListItem, Integer> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
-    }
-
-    public void setOnMenuItemClickListener(OnViewPositionItemClickListener<PlayListItem> onMenuItemClickListener) {
-        this.onMenuItemClickListener = onMenuItemClickListener;
     }
 
     public void setOnIconClickListener(OnItemClickListener<Integer> onIconClickListener) {

@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.compositions.adapter;
 
 import android.graphics.Color;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -11,7 +10,6 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
 
 import java.util.List;
@@ -33,9 +31,6 @@ public class MusicViewHolder extends SelectableViewHolder {
     @BindView(R.id.clickable_item)
     FrameLayout clickableItem;
 
-    @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
-
     private CompositionItemWrapper compositionItemWrapper;
 
     private Composition composition;
@@ -45,7 +40,6 @@ public class MusicViewHolder extends SelectableViewHolder {
 
     public MusicViewHolder(ViewGroup parent,
                            OnPositionItemClickListener<Composition> onCompositionClickListener,
-                           OnViewItemClickListener<Composition> onMenuClickListener,
                            OnPositionItemClickListener<Composition> onLongClickListener,
                            OnPositionItemClickListener<Composition> iconClickListener) {
         super(parent, R.layout.item_storage_music);
@@ -69,7 +63,6 @@ public class MusicViewHolder extends SelectableViewHolder {
                 return true;
             });
         }
-        btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, composition));
     }
 
     public void bind(@Nonnull Composition composition, boolean isCoversEnabled) {

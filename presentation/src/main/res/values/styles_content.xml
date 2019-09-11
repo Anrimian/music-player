@@ -32,11 +32,15 @@
 
     </style>
 
-    <style name="ItemPrimaryTextStyle" parent="TextStyle">
+    <style name="TextStyleItemPrimary" parent="TextStyle">
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Content.Text.Button" parent="@style/Base.TextAppearance.AppCompat.Body1">
+    <style name="TextStyleItemPrimary.Medium">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="TextStyleButton" parent="@style/Base.TextAppearance.AppCompat.Body1">
         <item name="android:background">?selectableItemBackground</item>
         <item name="android:paddingTop">@dimen/content_vertical_margin</item>
         <item name="android:paddingBottom">@dimen/content_vertical_margin</item>
@@ -45,7 +49,7 @@
         <item name="android:textSize">17sp</item>
     </style>
 
-    <style name="Content.Text.Button.Single" parent="@style/Base.TextAppearance.AppCompat.Body1">
+    <style name="TextStyleButtonSingle" parent="@style/Base.TextAppearance.AppCompat.Body1">
         <item name="android:background">?selectableItemBackground</item>
         <item name="android:paddingTop">@dimen/content_vertical_margin</item>
         <item name="android:paddingBottom">@dimen/content_vertical_margin</item>
@@ -53,15 +57,15 @@
         <item name="android:textSize">17sp</item>
     </style>
 
-    <style name="Content.Dialog.Text" parent="@style/TextStyle">
-        <item name="android:textSize">16sp</item>
+    <style name="TextStyleDialogItem" parent="@style/TextStyle">
+        <item name="android:textSize">15sp</item>
     </style>
 
     <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">
 
     </style>
 
-    <style name="ContentSubtitleTextStyle" parent="Content.SecondaryText">
+    <style name="TextStyleContentSubtitle" parent="Content.SecondaryText">
         <item name="android:textSize">12sp</item>
         <item name="android:lineSpacingExtra">2dp</item>
     </style>
@@ -70,8 +74,12 @@
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="ContentSubtitleTextStyle.Small">
+    <style name="TextStyleContentSubtitle.Small">
         <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="TextStyleContentSubtitle.Medium">
+        <item name="android:textSize">13sp</item>
     </style>
 
     <style name="TextStyle.Time">
@@ -87,7 +95,7 @@
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="ItemPrimaryTextStyle.Small">
+    <style name="TextStyleItemPrimary.Small">
         <item name="android:textSize">13sp</item>
     </style>
 
@@ -100,12 +108,12 @@
         <item name="android:layout_height">@dimen/play_button_expand_size</item>
     </style>
 
-    <style name="Content.Image" parent="AppTheme">
+    <style name="ImageStyle" parent="AppTheme">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
     </style>
 
-    <style name="Content.Image.Small" parent="Content.Image">
+    <style name="ImageStyle.Small">
         <item name="android:layout_width">24dp</item>
         <item name="android:layout_height">24dp</item>
     </style>

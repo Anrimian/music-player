@@ -64,9 +64,6 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private PlayQueueItem currentItem;
 
-    private Composition compositionInAction;
-    private int compositionPositionInAction;
-
     private Item<PlayListItem> deletedItem;
 
     public PlayListPresenter(long playListId,
@@ -88,6 +85,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         super.onFirstViewAttach();
         subscribeOnCompositions();
         subscribePlayList();
+        subscribeOnCurrentComposition();
     }
 
     @Override
@@ -106,16 +104,14 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         presenterBatterySafeDisposable.clear();
     }
 
-    void onCompositionClicked(int position) {
+    void onCompositionClicked(PlayListItem playListItem, int position) {
         if (currentItem == null) {
             playerInteractor.startPlaying(
                     mapList(items, PlayListItem::getComposition),
                     position
             );
         } else {
-            compositionInAction = items.get(position).getComposition();
-            compositionPositionInAction = position;
-            getViewState().showCompositionActionDialog(compositionInAction);
+            getViewState().showCompositionActionDialog(playListItem, position);
         }
     }
 
@@ -197,19 +193,11 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         playListsInteractor.moveItemInPlayList(playListId, startDragPosition, position);//lock update and subscribe on complete?
     }
 
-    void onPlayActionSelected() {
+    void onPlayActionSelected(int position) {
         playerInteractor.startPlaying(
                 mapList(items, PlayListItem::getComposition),
-                compositionPositionInAction
+                position
         );
-    }
-
-    void onPlayNextActionSelected() {
-        addCompositionsToPlayNext(asList(compositionInAction));
-    }
-
-    void onAddToQueueActionSelected() {
-        addCompositionsToEnd(asList(compositionInAction));
     }
 
     void onRestoreRemovedItemClicked() {

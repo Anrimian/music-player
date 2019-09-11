@@ -8,10 +8,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.AttrRes;
+import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +25,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
+import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -31,8 +34,8 @@ import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
@@ -48,10 +51,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
@@ -78,6 +81,8 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
 
     private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
     private final MenuItemWrapper searchMenuItem = new MenuItemWrapper();
+
+    private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
 
     @ProvidePresenter
     LibraryCompositionsPresenter providePresenter() {
@@ -118,6 +123,8 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
+        FragmentManager fm = getChildFragmentManager();
+
         SelectOrderDialogFragment fragment = (SelectOrderDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(ORDER_TAG);
         if (fragment != null) {
@@ -130,11 +137,9 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
 
-        MenuDialogFragment compositionDialog = (MenuDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(COMPOSITION_ACTION_TAG);
-        if (compositionDialog != null) {
-            compositionDialog.setOnCompleteListener(this::onCompositionActionSelected);
-        }
+        compositionActionDialogRunner = new DialogFragmentRunner<>(fm,
+                COMPOSITION_ACTION_TAG,
+                f -> f.setOnTripleCompleteListener(this::onCompositionActionSelected));
     }
 
     @Override
@@ -238,7 +243,6 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
         if (adapter == null) {
             adapter = new CompositionsAdapter(list, selectedCompositionsMap);
             adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-            adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
             adapter.setOnLongClickListener(presenter::onCompositionLongClick);
             adapter.setIconClickListener(presenter::onCompositionIconClicked);
             adapterWrapper.setObject(adapter);
@@ -336,13 +340,18 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
     }
 
     @Override
-    public void showCompositionActionDialog(Composition composition) {
-        MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance(
+    public void showCompositionActionDialog(Composition composition, int position) {
+        Bundle extra = new Bundle();
+        extra.putInt(POSITION_ARG, position);
+
+        @AttrRes int statusBarColor = toolbar.isInActionMode()?
+                R.attr.actionModeStatusBarColor: android.R.attr.statusBarColor;
+        CompositionActionDialogFragment fragment = CompositionActionDialogFragment.newInstance(
+                composition,
                 R.menu.composition_actions_menu,
-                formatCompositionName(composition)
-        );
-        menuDialogFragment.setOnCompleteListener(this::onCompositionActionSelected);
-        menuDialogFragment.show(getChildFragmentManager(), COMPOSITION_ACTION_TAG);
+                statusBarColor,
+                extra);
+        compositionActionDialogRunner.show(fragment);
     }
 
     @Override
@@ -363,18 +372,36 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
         adapter.showPlaying(play);
     }
 
-    private void onCompositionActionSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
+    private void onCompositionActionSelected(Composition composition,
+                                             @MenuRes int menuItemId,
+                                             Bundle extra) {
+        switch (menuItemId) {
             case R.id.menu_play: {
-                presenter.onPlayActionSelected();
+                presenter.onPlayActionSelected(extra.getInt(POSITION_ARG));
                 break;
             }
             case R.id.menu_play_next: {
-                presenter.onPlayNextActionSelected();
+                presenter.onPlayNextCompositionClicked(composition);
                 break;
             }
             case R.id.menu_add_to_queue: {
-                presenter.onAddToQueueActionSelected();
+                presenter.onAddToQueueCompositionClicked(composition);
+                break;
+            }
+            case R.id.menu_add_to_playlist: {
+                presenter.onAddToPlayListButtonClicked(composition);
+                break;
+            }
+            case R.id.menu_edit: {
+                startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                break;
+            }
+            case R.id.menu_share: {
+                shareFile(requireContext(), composition.getFilePath());
+                break;
+            }
+            case R.id.menu_delete: {
+                presenter.onDeleteCompositionButtonClicked(composition);
                 break;
             }
         }
@@ -412,40 +439,5 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
             }
         }
         return false;
-    }
-
-    private void onCompositionMenuClicked(View view, Composition composition) {
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.composition_item_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_play_next: {
-                    presenter.onPlayNextCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_add_to_queue: {
-                    presenter.onAddToQueueCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddToPlayListButtonClicked(composition);
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
-                    return true;
-                }
-                case R.id.menu_share: {
-                    shareFile(requireContext(), composition.getFilePath());
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(composition);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
     }
 }

@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
 import android.graphics.Color;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -13,7 +12,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSou
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import java.util.List;
 
@@ -36,9 +34,6 @@ public class MusicFileViewHolder extends FileViewHolder {
     @BindView(R.id.clickable_item)
     FrameLayout clickableItem;
 
-    @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
-
     private CompositionItemWrapper compositionItemWrapper;
 
     private MusicFileSource fileSource;
@@ -49,7 +44,6 @@ public class MusicFileViewHolder extends FileViewHolder {
 
     public MusicFileViewHolder(ViewGroup parent,
                                OnPositionItemClickListener<MusicFileSource> onCompositionClickListener,
-                               OnViewItemClickListener<MusicFileSource> onMenuClickListener,
                                OnPositionItemClickListener<FileSource> onLongClickListener,
                                OnPositionItemClickListener<Composition> iconClickListener) {
         super(parent, R.layout.item_storage_music);
@@ -73,7 +67,6 @@ public class MusicFileViewHolder extends FileViewHolder {
                 return true;
             });
         }
-        btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, fileSource));
     }
 
     public void bind(@Nonnull MusicFileSource fileSource, boolean isCoversEnabled) {

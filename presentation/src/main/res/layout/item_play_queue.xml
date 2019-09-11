@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/tv_composition_name"
-        style="@style/ItemPrimaryTextStyle"
+        style="@style/TextStyleItemPrimary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_internal_margin"
@@ -23,7 +23,7 @@
 
     <TextView
         android:id="@+id/tv_additional_info"
-        style="@style/ContentSubtitleTextStyle"
+        style="@style/TextStyleContentSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/content_vertical_spacing_margin"

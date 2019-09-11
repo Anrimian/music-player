@@ -679,7 +679,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private void onCompositionMenuClicked(View view) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.composition_full_actions_menu);
+        popup.inflate(R.menu.composition_short_actions_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {

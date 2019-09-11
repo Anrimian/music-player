@@ -79,7 +79,7 @@ public interface LibraryCompositionsView extends MvpView {
     void showCurrentPlayingComposition(Composition composition);
 
     @StateStrategyType(SkipStrategy.class)
-    void showCompositionActionDialog(Composition composition);
+    void showCompositionActionDialog(Composition composition, int position);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);

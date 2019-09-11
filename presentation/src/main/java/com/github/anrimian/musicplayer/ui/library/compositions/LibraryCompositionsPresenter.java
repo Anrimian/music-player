@@ -66,9 +66,6 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     @Nullable
     private Composition currentComposition;
 
-    private Composition compositionInAction;
-    private int compositionPositionInAction;
-
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
                                         MusicPlayerInteractor playerInteractor,
@@ -115,9 +112,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     void onCompositionClicked(int position, Composition composition) {
         if (selectedCompositions.isEmpty()) {
             if (currentComposition != null) {
-                compositionInAction = composition;
-                compositionPositionInAction = position;
-                getViewState().showCompositionActionDialog(composition);
+                getViewState().showCompositionActionDialog(composition, position);
             } else {
                 interactor.play(compositions, position);
                 getViewState().showCurrentPlayingComposition(composition);
@@ -245,16 +240,8 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         closeSelectionMode();
     }
 
-    void onPlayActionSelected() {
-        interactor.play(compositions, compositionPositionInAction);
-    }
-
-    void onPlayNextActionSelected() {
-        addCompositionsToPlayNext(asList(compositionInAction));
-    }
-
-    void onAddToQueueActionSelected() {
-        addCompositionsToEnd(asList(compositionInAction));
+    void onPlayActionSelected(int position) {
+        interactor.play(compositions, position);
     }
 
     private void addCompositionsToPlayNext(List<Composition> compositions) {

@@ -41,7 +41,6 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
     private OnPositionItemClickListener<FolderFileSource> onFolderClickListener;
     private OnPositionItemClickListener<FileSource> onLongClickListener;
     private OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener;
-    private OnViewItemClickListener<MusicFileSource> onCompositionMenuItemClicked;
     private OnPositionItemClickListener<Composition> compositionIconClickListener;
 
     @Nullable
@@ -67,7 +66,6 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
             case TYPE_MUSIC: {
                 return new MusicFileViewHolder(parent,
                         onCompositionClickListener,
-                        onCompositionMenuItemClicked,
                         onLongClickListener,
                         compositionIconClickListener);
             }
@@ -175,10 +173,6 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
 
     public void setOnFolderClickListener(OnPositionItemClickListener<FolderFileSource> onFolderClickListener) {
         this.onFolderClickListener = onFolderClickListener;
-    }
-
-    public void setOnCompositionMenuItemClicked(OnViewItemClickListener<MusicFileSource> onCompositionMenuItemClicked) {
-        this.onCompositionMenuItemClicked = onCompositionMenuItemClicked;
     }
 
     public void setOnLongClickListener(OnPositionItemClickListener<FileSource> onLongClickListener) {

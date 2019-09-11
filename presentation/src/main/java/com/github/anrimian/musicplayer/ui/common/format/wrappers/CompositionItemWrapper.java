@@ -51,9 +51,6 @@ public class CompositionItemWrapper {
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
-    @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
-
     @BindView(R.id.divider)
     View divider;
 
@@ -152,8 +149,6 @@ public class CompositionItemWrapper {
         String compositionName = formatCompositionName(composition);
         tvMusicName.setText(compositionName);
         clickableItem.setContentDescription(compositionName);
-        btnActionsMenu.setContentDescription(getContext().getString(
-                R.string.content_description_menu_template, compositionName));
     }
 
     private void showCorrupted() {

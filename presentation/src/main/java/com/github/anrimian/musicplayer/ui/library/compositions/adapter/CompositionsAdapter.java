@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     private List<Composition> musicList;
     private final HashSet<Composition> selectedCompositions;
     private OnPositionItemClickListener<Composition> onCompositionClickListener;
-    private OnViewItemClickListener<Composition> onMenuItemClickListener;
     private OnPositionItemClickListener<Composition> onLongClickListener;
     private OnPositionItemClickListener<Composition> iconClickListener;
 
@@ -48,7 +46,6 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MusicViewHolder(parent,
                 onCompositionClickListener,
-                onMenuItemClickListener,
                 onLongClickListener,
                 iconClickListener);
     }
@@ -118,10 +115,6 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
 
     public void setOnCompositionClickListener(OnPositionItemClickListener<Composition> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
-    }
-
-    public void setOnMenuItemClickListener(OnViewItemClickListener<Composition> onMenuItemClickListener) {
-        this.onMenuItemClickListener = onMenuItemClickListener;
     }
 
     public void setOnLongClickListener(OnPositionItemClickListener<Composition> onLongClickListener) {
