@@ -103,6 +103,10 @@
         <item name="android:textSize">15sp</item>
     </style>
 
+    <style name="TextStyle.Composition">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="ButtonStyle.Main.Expanded">
         <item name="android:layout_width">@dimen/play_button_expand_size</item>
         <item name="android:layout_height">@dimen/play_button_expand_size</item>
