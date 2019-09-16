@@ -27,6 +27,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
@@ -61,7 +62,6 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback.withSwipeToDelete;
 
 public class PlayListFragment extends MvpAppCompatFragment
         implements PlayListView, FragmentLayerListener {
@@ -115,10 +115,12 @@ public class PlayListFragment extends MvpAppCompatFragment
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.hideAll();
 
-        DragAndSwipeTouchHelperCallback callback = withSwipeToDelete(recyclerView,
+        DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(recyclerView,
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
-                ItemTouchHelper.START);
+                ItemTouchHelper.START,
+                R.drawable.ic_delete_outline,
+                R.string.delete_from_play_list);
         callback.setOnMovedListener(presenter::onItemMoved);
         callback.setOnStartDragListener(presenter::onDragStarted);
         callback.setOnEndDragListener(presenter::onDragEnded);

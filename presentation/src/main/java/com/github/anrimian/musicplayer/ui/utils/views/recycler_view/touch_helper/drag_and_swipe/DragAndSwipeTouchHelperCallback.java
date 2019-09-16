@@ -2,12 +2,22 @@ package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helpe
 
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.DimenRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,7 +34,6 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     private static final float BOTTOM_Z = 0f;
     private static final float TOP_Z = 8f;
 
-    private final Paint paint = new Paint();
 
     private final Callback<Integer> swipeCallback;
 
@@ -37,19 +46,53 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
     private boolean dragging;
 
+    //canvas
+    private final TextPaint textPaint = new TextPaint();
+    private final Paint bgPaint = new Paint();
+
+    private final StaticLayout textStaticLayout;
+
+    private final Drawable icon;
+
+    private final int panelWidth;
+    private final int panelEndPadding;
+    private final int textTopPadding;
+    private final int iconSize;
+
     public static DragAndSwipeTouchHelperCallback withSwipeToDelete(RecyclerView recyclerView,
                                                                     @ColorInt int backgroundColor,
-                                                                    Callback<Integer> swipeCallback) {
+                                                                    Callback<Integer> swipeCallback,
+                                                                    @DrawableRes int iconRes,
+                                                                    @StringRes int textResId,
+                                                                    @DimenRes int panelWidthRes,
+                                                                    @DimenRes int panelEndPaddingRes,
+                                                                    @DimenRes int textTopPaddingRes,
+                                                                    @DimenRes int iconSizeRes,
+                                                                    @DimenRes int textSizeRes) {
         return withSwipeToDelete(recyclerView,
                 backgroundColor,
                 swipeCallback,
-                ItemTouchHelper.START | ItemTouchHelper.END);
+                ItemTouchHelper.START | ItemTouchHelper.END,
+                iconRes,
+                textResId,
+                panelWidthRes,
+                panelEndPaddingRes,
+                textTopPaddingRes,
+                iconSizeRes,
+                textSizeRes);
     }
 
     public static DragAndSwipeTouchHelperCallback withSwipeToDelete(RecyclerView recyclerView,
                                                                     @ColorInt int backgroundColor,
                                                                     Callback<Integer> swipeCallback,
-                                                                    int swipeFlags) {
+                                                                    int swipeFlags,
+                                                                    @DrawableRes int iconRes,
+                                                                    @StringRes int textResId,
+                                                                    @DimenRes int panelWidthRes,
+                                                                    @DimenRes int panelEndPaddingRes,
+                                                                    @DimenRes int textTopPaddingRes,
+                                                                    @DimenRes int iconSizeRes,
+                                                                    @DimenRes int textSizeRes) {
         CompositeCallback<Integer> compositeCallback = new CompositeCallback<>();
         compositeCallback.add(swipeCallback);
         compositeCallback.add(i -> {
@@ -63,27 +106,110 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
             }
         });
 
-        return new DragAndSwipeTouchHelperCallback(backgroundColor, compositeCallback, swipeFlags);
-    }
-
-    public DragAndSwipeTouchHelperCallback(@ColorInt int color, Callback<Integer> swipeCallback) {
-        this(color, swipeCallback, ItemTouchHelper.START | ItemTouchHelper.END);
+        return new DragAndSwipeTouchHelperCallback(backgroundColor,
+                compositeCallback,
+                swipeFlags,
+                iconRes,
+                textResId,
+                panelWidthRes,
+                panelEndPaddingRes,
+                textTopPaddingRes,
+                iconSizeRes,
+                textSizeRes,
+                recyclerView.getContext());
     }
 
     public DragAndSwipeTouchHelperCallback(@ColorInt int color,
                                            Callback<Integer> swipeCallback,
-                                           int swipeFlags) {
-        this(color, swipeCallback, swipeFlags, UP | DOWN);
+                                           @DrawableRes int iconRes,
+                                           @StringRes int textResId,
+                                           @DimenRes int panelWidthRes,
+                                           @DimenRes int panelEndPaddingRes,
+                                           @DimenRes int textTopPaddingRes,
+                                           @DimenRes int iconSizeRes,
+                                           @DimenRes int textSizeRes,
+                                           Context context) {
+        this(color,
+                swipeCallback,
+                ItemTouchHelper.START | ItemTouchHelper.END,
+                iconRes,
+                textResId,
+                panelWidthRes,
+                panelEndPaddingRes,
+                textTopPaddingRes,
+                iconSizeRes,
+                textSizeRes,
+                context);
     }
 
     public DragAndSwipeTouchHelperCallback(@ColorInt int color,
                                            Callback<Integer> swipeCallback,
                                            int swipeFlags,
-                                           int dragFlags) {
+                                           @DrawableRes int iconRes,
+                                           @StringRes int textResId,
+                                           @DimenRes int panelWidthRes,
+                                           @DimenRes int panelEndPaddingRes,
+                                           @DimenRes int textTopPaddingRes,
+                                           @DimenRes int iconSizeRes,
+                                           @DimenRes int textSizeRes,
+                                           Context context) {
+        this(color,
+                swipeCallback,
+                swipeFlags,
+                UP | DOWN,
+                iconRes,
+                textResId,
+                panelWidthRes,
+                panelEndPaddingRes,
+                textTopPaddingRes,
+                iconSizeRes,
+                textSizeRes,
+                context);
+    }
+
+    public DragAndSwipeTouchHelperCallback(@ColorInt int color,
+                                           Callback<Integer> swipeCallback,
+                                           int swipeFlags,
+                                           int dragFlags,
+                                           @DrawableRes int iconRes,
+                                           @StringRes int textResId,
+                                           @DimenRes int panelWidthRes,
+                                           @DimenRes int panelEndPaddingRes,
+                                           @DimenRes int textTopPaddingRes,
+                                           @DimenRes int iconSizeRes,
+                                           @DimenRes int textSizeRes,
+                                           Context context) {
         this.swipeFlags = swipeFlags;
         this.dragFlags = dragFlags;
         this.swipeCallback = swipeCallback;
-        paint.setColor(color);
+
+        Resources resources = context.getResources();
+
+        icon = resources.getDrawable(iconRes);
+        iconSize = resources.getDimensionPixelSize(iconSizeRes);
+        textTopPadding = resources.getDimensionPixelSize(textTopPaddingRes);
+        panelEndPadding = resources.getDimensionPixelSize(panelEndPaddingRes);
+        panelWidth = resources.getDimensionPixelSize(panelWidthRes);
+
+        //canvas
+        bgPaint.setColor(color);
+        icon.setBounds(0,
+                0,
+                iconSize,
+                iconSize);
+
+        textPaint.setColor(Color.WHITE);
+        textPaint.setAntiAlias(true);
+        textPaint.setTextSize(resources.getDimension(textSizeRes));
+
+        String text = context.getString(textResId);
+        textStaticLayout = new StaticLayout(text,
+                textPaint,
+                panelWidth,
+                Layout.Alignment.ALIGN_CENTER,
+                1.0f,
+                0.0f,
+                false);
     }
 
     @Override
@@ -163,10 +289,21 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
             float bottom = itemView.getBottom();
             float left = dX > 0? itemView.getLeft() : itemView.getRight() + dX;
             float right = dX > 0? dX : itemView.getRight();
+            float centerY = top + (itemView.getHeight()/2f);
 
-            c.drawRect(left, top, right, bottom, paint);
+            //draw bg
+            c.drawRect(left, top, right, bottom, bgPaint);
 
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            //draw icon
+            c.save();
+            c.translate(itemView.getRight() - (((panelWidth/2) + panelEndPadding) + (iconSize/2)), centerY - iconSize);
+            icon.draw(c);
+            c.restore();
+
+            //draw text
+            c.translate(itemView.getRight() - (panelWidth + panelEndPadding), centerY + textTopPadding);
+            textStaticLayout.draw(c);
+            c.restore();
         }
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }
