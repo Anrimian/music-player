@@ -1,7 +1,10 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -12,17 +15,22 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DimenRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.java.CompositeCallback;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteItemDecorator;
 
@@ -31,9 +39,10 @@ import static androidx.recyclerview.widget.ItemTouchHelper.UP;
 
 public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
-    private static final float BOTTOM_Z = 0f;
-    private static final float TOP_Z = 8f;
+    private static final float DRAG_BOTTOM_Z = 0f;
+    private static final float DRAG_TOP_Z = 8f;
 
+    private static final int SWIPE_EFFECT_ANIMATION_TIME = 400;
 
     private final Callback<Integer> swipeCallback;
 
@@ -45,10 +54,15 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     private OnEndDragListener onEndDragListener;
 
     private boolean dragging;
+    private Boolean swipedFromSwipeEdge;
 
-    //canvas
-    private final TextPaint textPaint = new TextPaint();
     private final Paint bgPaint = new Paint();
+    private final Paint bgAnimationPaint = new Paint();
+
+    @ColorInt
+    private final int regularBgColor;
+    @ColorInt
+    private final int unswipedBgColor;
 
     private final StaticLayout textStaticLayout;
 
@@ -59,28 +73,8 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     private final int textTopPadding;
     private final int iconSize;
 
-    public static DragAndSwipeTouchHelperCallback withSwipeToDelete(RecyclerView recyclerView,
-                                                                    @ColorInt int backgroundColor,
-                                                                    Callback<Integer> swipeCallback,
-                                                                    @DrawableRes int iconRes,
-                                                                    @StringRes int textResId,
-                                                                    @DimenRes int panelWidthRes,
-                                                                    @DimenRes int panelEndPaddingRes,
-                                                                    @DimenRes int textTopPaddingRes,
-                                                                    @DimenRes int iconSizeRes,
-                                                                    @DimenRes int textSizeRes) {
-        return withSwipeToDelete(recyclerView,
-                backgroundColor,
-                swipeCallback,
-                ItemTouchHelper.START | ItemTouchHelper.END,
-                iconRes,
-                textResId,
-                panelWidthRes,
-                panelEndPaddingRes,
-                textTopPaddingRes,
-                iconSizeRes,
-                textSizeRes);
-    }
+    @Nullable
+    private ValueAnimator swipeEffectAnimator;
 
     public static DragAndSwipeTouchHelperCallback withSwipeToDelete(RecyclerView recyclerView,
                                                                     @ColorInt int backgroundColor,
@@ -121,29 +115,6 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
     public DragAndSwipeTouchHelperCallback(@ColorInt int color,
                                            Callback<Integer> swipeCallback,
-                                           @DrawableRes int iconRes,
-                                           @StringRes int textResId,
-                                           @DimenRes int panelWidthRes,
-                                           @DimenRes int panelEndPaddingRes,
-                                           @DimenRes int textTopPaddingRes,
-                                           @DimenRes int iconSizeRes,
-                                           @DimenRes int textSizeRes,
-                                           Context context) {
-        this(color,
-                swipeCallback,
-                ItemTouchHelper.START | ItemTouchHelper.END,
-                iconRes,
-                textResId,
-                panelWidthRes,
-                panelEndPaddingRes,
-                textTopPaddingRes,
-                iconSizeRes,
-                textSizeRes,
-                context);
-    }
-
-    public DragAndSwipeTouchHelperCallback(@ColorInt int color,
-                                           Callback<Integer> swipeCallback,
                                            int swipeFlags,
                                            @DrawableRes int iconRes,
                                            @StringRes int textResId,
@@ -167,7 +138,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                 context);
     }
 
-    public DragAndSwipeTouchHelperCallback(@ColorInt int color,
+    public DragAndSwipeTouchHelperCallback(@ColorInt int regularBgColor,
                                            Callback<Integer> swipeCallback,
                                            int swipeFlags,
                                            int dragFlags,
@@ -179,12 +150,14 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                                            @DimenRes int iconSizeRes,
                                            @DimenRes int textSizeRes,
                                            Context context) {
+        this.regularBgColor = regularBgColor;
         this.swipeFlags = swipeFlags;
         this.dragFlags = dragFlags;
         this.swipeCallback = swipeCallback;
 
         Resources resources = context.getResources();
 
+        unswipedBgColor = AndroidUtils.getColorFromAttr(context, R.attr.colorAccent);
         icon = resources.getDrawable(iconRes);
         iconSize = resources.getDimensionPixelSize(iconSizeRes);
         textTopPadding = resources.getDimensionPixelSize(textTopPaddingRes);
@@ -192,12 +165,14 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
         panelWidth = resources.getDimensionPixelSize(panelWidthRes);
 
         //canvas
-        bgPaint.setColor(color);
+        bgPaint.setColor(regularBgColor);
         icon.setBounds(0,
                 0,
                 iconSize,
                 iconSize);
 
+        //canvas
+        TextPaint textPaint = new TextPaint();
         textPaint.setColor(Color.WHITE);
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(resources.getDimension(textSizeRes));
@@ -233,6 +208,10 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                 onEndDragListener.onEndDrag(viewHolder.getAdapterPosition());
             }
             setIsDragging(viewHolder, false);
+        }
+        swipedFromSwipeEdge = null;
+        if (swipeEffectAnimator != null) {
+            swipeEffectAnimator.cancel();
         }
         super.clearView(recyclerView, viewHolder);
     }
@@ -284,19 +263,59 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                             boolean isCurrentlyActive) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             View itemView = viewHolder.itemView;
-
             float top = itemView.getTop();
             float bottom = itemView.getBottom();
             float left = dX > 0? itemView.getLeft() : itemView.getRight() + dX;
             float right = dX > 0? dX : itemView.getRight();
             float centerY = top + (itemView.getHeight()/2f);
+            float centerX = panelWidth / 2;
+
+            boolean draggedFromSwipeEdge = Math.abs(dX) > itemView.getWidth() * getSwipeThreshold(viewHolder);
+            if (this.swipedFromSwipeEdge == null) {
+                this.swipedFromSwipeEdge = draggedFromSwipeEdge;
+                bgPaint.setColor(draggedFromSwipeEdge? regularBgColor: unswipedBgColor);
+            } else if (this.swipedFromSwipeEdge != draggedFromSwipeEdge) {
+                this.swipedFromSwipeEdge = draggedFromSwipeEdge;
+                bgAnimationPaint.setColor(regularBgColor);
+
+                float currentAnimationValue = -1;
+                long currentAnimationPlayTime = 0;
+                if (swipeEffectAnimator != null && swipeEffectAnimator.isRunning()) {
+                    currentAnimationValue = (float) swipeEffectAnimator.getAnimatedValue();
+                    currentAnimationPlayTime = swipeEffectAnimator.getCurrentPlayTime();
+                    swipeEffectAnimator.cancel();
+                }
+
+                int maxEndValue = itemView.getMeasuredWidth();
+                float start = currentAnimationValue == -1? (draggedFromSwipeEdge? 0 : maxEndValue) : currentAnimationValue;
+                float end = draggedFromSwipeEdge? maxEndValue : 0;
+                swipeEffectAnimator = ValueAnimator.ofFloat(start, end);
+                swipeEffectAnimator.setDuration(currentAnimationPlayTime == 0? SWIPE_EFFECT_ANIMATION_TIME : currentAnimationPlayTime);
+                swipeEffectAnimator.addUpdateListener(valueAnimator -> recyclerView.invalidate());
+                swipeEffectAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        bgPaint.setColor(draggedFromSwipeEdge? regularBgColor: unswipedBgColor);
+                    }
+                });
+                swipeEffectAnimator.setInterpolator(draggedFromSwipeEdge? new AccelerateInterpolator(): new DecelerateInterpolator());
+                swipeEffectAnimator.start();
+
+                if (!draggedFromSwipeEdge) {
+                    bgPaint.setColor(unswipedBgColor);
+                }
+            }
 
             //draw bg
             c.drawRect(left, top, right, bottom, bgPaint);
 
+            if (swipeEffectAnimator != null && swipeEffectAnimator.isRunning()) {
+                c.drawCircle(itemView.getRight() - ((centerX + panelEndPadding)), centerY, (float) swipeEffectAnimator.getAnimatedValue(), bgAnimationPaint);
+            }
+
             //draw icon
             c.save();
-            c.translate(itemView.getRight() - (((panelWidth/2) + panelEndPadding) + (iconSize/2)), centerY - iconSize);
+            c.translate(itemView.getRight() - ((centerX + panelEndPadding) + (iconSize/2)), centerY - iconSize);
             icon.draw(c);
             c.restore();
 
@@ -327,7 +346,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
         if (viewHolder instanceof DragListener) {
             ((DragListener) viewHolder).onDragStateChanged(dragging);
         }
-        float dragElevation = dragging? TOP_Z: BOTTOM_Z;
+        float dragElevation = dragging? DRAG_TOP_Z : DRAG_BOTTOM_Z;
         View itemView = viewHolder.itemView;
         ObjectAnimator elevationAnimator = ObjectAnimator.ofFloat(itemView,
                 "translationZ",
