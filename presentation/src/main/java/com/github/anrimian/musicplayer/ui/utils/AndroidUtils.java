@@ -14,6 +14,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -192,5 +194,20 @@ public class AndroidUtils {
         Menu menu = p.getMenu();
         new SupportMenuInflater(context).inflate(menuRes, menu);
         return menu;
+    }
+
+    public static void playShortVibration(Context context) {
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v == null) {
+            return;
+        }
+        long vibrationTime = 10;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(vibrationTime, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            v.vibrate(vibrationTime);
+        }
     }
 }

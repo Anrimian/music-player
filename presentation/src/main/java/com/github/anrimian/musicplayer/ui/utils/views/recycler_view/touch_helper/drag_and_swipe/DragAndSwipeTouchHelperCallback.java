@@ -276,6 +276,8 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                 bgPaint.setColor(draggedFromSwipeEdge? regularBgColor: unswipedBgColor);
             } else if (this.swipedFromSwipeEdge != draggedFromSwipeEdge) {
                 this.swipedFromSwipeEdge = draggedFromSwipeEdge;
+                AndroidUtils.playShortVibration(recyclerView.getContext());
+
                 bgAnimationPaint.setColor(regularBgColor);
 
                 float currentAnimationValue = -1;
