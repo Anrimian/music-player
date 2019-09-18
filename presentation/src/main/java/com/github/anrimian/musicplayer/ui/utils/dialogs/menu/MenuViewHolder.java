@@ -36,6 +36,8 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
     void bind(MenuItem menuItem) {
         this.menuItem = menuItem;
         tvTitle.setText(menuItem.getTitle());
+
+        ivIcon.setColorFilter(tvTitle.getCurrentTextColor());
         ivIcon.setImageDrawable(menuItem.getIcon());
         ivIcon.setContentDescription(menuItem.getTitle());
     }

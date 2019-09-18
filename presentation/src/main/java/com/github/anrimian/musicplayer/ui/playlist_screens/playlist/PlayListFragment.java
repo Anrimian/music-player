@@ -119,7 +119,7 @@ public class PlayListFragment extends MvpAppCompatFragment
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
                 ItemTouchHelper.START,
-                R.drawable.ic_delete_outline,
+                R.drawable.ic_playlist_remove,
                 R.string.delete_from_play_list);
         callback.setOnMovedListener(presenter::onItemMoved);
         callback.setOnStartDragListener(presenter::onDragStarted);

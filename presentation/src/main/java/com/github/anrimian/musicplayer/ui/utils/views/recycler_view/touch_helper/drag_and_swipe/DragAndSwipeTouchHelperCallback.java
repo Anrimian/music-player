@@ -29,10 +29,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.domain.utils.java.CompositeCallback;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteItemDecorator;
 
 import static androidx.recyclerview.widget.ItemTouchHelper.DOWN;
 import static androidx.recyclerview.widget.ItemTouchHelper.UP;
@@ -87,21 +85,8 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                                                                     @DimenRes int textTopPaddingRes,
                                                                     @DimenRes int iconSizeRes,
                                                                     @DimenRes int textSizeRes) {
-        CompositeCallback<Integer> compositeCallback = new CompositeCallback<>();
-        compositeCallback.add(swipeCallback);
-        compositeCallback.add(i -> {
-            RecyclerView.ItemDecoration decoration = new SwipeToDeleteItemDecorator(backgroundColor);
-            recyclerView.addItemDecoration(decoration);
-            RecyclerView.ItemAnimator itemAnimator = recyclerView.getItemAnimator();
-            if (itemAnimator != null) {
-                recyclerView.postDelayed(() ->
-                                itemAnimator.isRunning(() -> recyclerView.removeItemDecoration(decoration)),
-                        itemAnimator.getRemoveDuration());
-            }
-        });
-
         return new DragAndSwipeTouchHelperCallback(backgroundColor,
-                compositeCallback,
+                swipeCallback,
                 swipeFlags,
                 iconRes,
                 textResId,
@@ -165,7 +150,9 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
         panelWidth = resources.getDimensionPixelSize(panelWidthRes);
 
         //canvas
+        int textColor = Color.WHITE;
         bgPaint.setColor(regularBgColor);
+        icon.setTint(textColor);
         icon.setBounds(0,
                 0,
                 iconSize,
@@ -173,7 +160,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
         //canvas
         TextPaint textPaint = new TextPaint();
-        textPaint.setColor(Color.WHITE);
+        textPaint.setColor(textColor);
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(resources.getDimension(textSizeRes));
 
