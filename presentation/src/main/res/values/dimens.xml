@@ -3,6 +3,7 @@
 
     <!--specific sizes-->
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
+    <item name="composition_action_dialog_height" type="dimen" format="float">0.5</item>
 
     <dimen name="music_control_button_padding_collapsed">12dp</dimen>
     <dimen name="music_control_button_padding_expanded">7dp</dimen>

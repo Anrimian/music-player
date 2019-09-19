@@ -44,6 +44,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.createMenu;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getContentView;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getFloat;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getStatusBarHeight;
 import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils.attachDynamicShadow;
 
@@ -112,10 +113,12 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
 
         DisplayMetrics displayMetrics = requireActivity().getResources().getDisplayMetrics();
         int height = displayMetrics.heightPixels;
+        float heightPercent = getFloat(getResources(), R.dimen.composition_action_dialog_height);
+        int minHeight = (int) (height * heightPercent);
 
         slideDelegate = buildSlideDelegate();
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
-        bottomSheetBehavior.setPeekHeight(height);
+        bottomSheetBehavior.setPeekHeight(minHeight);
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 dismiss();

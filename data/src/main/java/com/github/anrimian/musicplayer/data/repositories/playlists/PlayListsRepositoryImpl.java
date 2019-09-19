@@ -10,7 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
-import com.github.anrimian.musicplayer.domain.utils.changes.MapChangeProcessor;
+import com.github.anrimian.musicplayer.domain.utils.changes.map.MapChangeProcessor;
 import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
