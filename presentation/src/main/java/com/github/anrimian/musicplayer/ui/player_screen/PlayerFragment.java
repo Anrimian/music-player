@@ -511,7 +511,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void scrollQueueToPosition(int position, boolean smoothScroll) {
         if (position > playQueueLayoutManager.findFirstVisibleItemPosition() &&
-                position < playQueueLayoutManager.findLastVisibleItemPosition()) {
+                position < playQueueLayoutManager.findLastCompletelyVisibleItemPosition()) {
             return;
         }
 
