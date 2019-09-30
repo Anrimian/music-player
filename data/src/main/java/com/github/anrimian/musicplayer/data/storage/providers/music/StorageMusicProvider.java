@@ -227,7 +227,7 @@ public class StorageMusicProvider {
         composition.setAlbum(album);
         composition.setFilePath(filePath);
 //        composition.setComposer(composer);
-        composition.setDisplayName(displayName);
+//        composition.setDisplayName(displayName);
 
         composition.setDuration(duration);
         composition.setSize(size);

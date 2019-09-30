@@ -29,6 +29,7 @@
 
     <!--text-->
     <attr name="dialogTitleColor" format="color"/>
+    <attr name="dialogButtonColor" format="color"/>
     <attr name="colorError" format="color"/>
     <attr name="toolbarTextColorPrimary" format="color"/>
     <attr name="toolbarTextColorSecondary" format="color"/>

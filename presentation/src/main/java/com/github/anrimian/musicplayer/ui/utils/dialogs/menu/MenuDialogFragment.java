@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.utils.dialogs.menu;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -8,19 +7,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
-
 import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.view.SupportMenuInflater;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.createMenu;
 
 public class MenuDialogFragment extends DialogFragment {
 
@@ -71,13 +71,8 @@ public class MenuDialogFragment extends DialogFragment {
         dismiss();
     }
 
-    @SuppressLint("RestrictedApi")
     private Menu getMenu() {
-        @MenuRes int menuRes = getArguments().getInt(MENU_ARG);
-        PopupMenu p  = new PopupMenu(requireContext(), null);
-        Menu menu = p.getMenu();
-        new SupportMenuInflater(requireContext()).inflate(menuRes, menu);
-        return menu;
+        return createMenu(requireContext(), getArguments().getInt(MENU_ARG));
     }
 
     private String getTitle() {

@@ -1,7 +1,6 @@
-package com.github.anrimian.musicplayer.domain.utils.changes;
+package com.github.anrimian.musicplayer.domain.utils.changes.map;
 
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.domain.utils.java.ChangeInspector;
 
 import java.util.HashMap;
 import java.util.Map;

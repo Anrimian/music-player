@@ -15,9 +15,6 @@ public class Composition {
     private String title;
     private String album;
     private String filePath;
-    @Nullable
-    @Deprecated
-    private String displayName;
 
     private long duration;
     private long size;
@@ -32,7 +29,6 @@ public class Composition {
                        String title,
                        String album,
                        String filePath,
-                       @Nullable String displayName,
                        long duration,
                        long size,
                        long id,
@@ -43,7 +39,6 @@ public class Composition {
         this.title = title;
         this.album = album;
         this.filePath = filePath;
-        this.displayName = displayName;
         this.duration = duration;
         this.size = size;
         this.id = id;
@@ -61,7 +56,6 @@ public class Composition {
                 title,
                 album,
                 newPath,
-                displayName,
                 duration,
                 size,
                 id,
@@ -109,17 +103,6 @@ public class Composition {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
-    }
-
-    @Nullable
-    @Deprecated
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    @Deprecated
-    public void setDisplayName(@Nullable String displayName) {
-        this.displayName = displayName;
     }
 
     public long getDuration() {

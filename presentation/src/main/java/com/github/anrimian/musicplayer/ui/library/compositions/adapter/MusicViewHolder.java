@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.compositions.adapter;
 
 import android.graphics.Color;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -11,7 +10,6 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
 
 import java.util.List;
@@ -33,23 +31,22 @@ public class MusicViewHolder extends SelectableViewHolder {
     @BindView(R.id.clickable_item)
     FrameLayout clickableItem;
 
-    @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
-
     private CompositionItemWrapper compositionItemWrapper;
 
     private Composition composition;
 
     private boolean selected = false;
-    private boolean playing = false;
+    private boolean isCurrent = false;
 
     public MusicViewHolder(ViewGroup parent,
                            OnPositionItemClickListener<Composition> onCompositionClickListener,
-                           OnViewItemClickListener<Composition> onMenuClickListener,
-                           OnPositionItemClickListener<Composition> onLongClickListener) {
+                           OnPositionItemClickListener<Composition> onLongClickListener,
+                           OnPositionItemClickListener<Composition> iconClickListener) {
         super(parent, R.layout.item_storage_music);
         ButterKnife.bind(this, itemView);
-        compositionItemWrapper = new CompositionItemWrapper(itemView);
+        compositionItemWrapper = new CompositionItemWrapper(itemView,
+                o -> iconClickListener.onItemClick(getAdapterPosition(), composition)
+        );
 
         if (onCompositionClickListener != null) {
             clickableItem.setOnClickListener(v ->
@@ -66,7 +63,6 @@ public class MusicViewHolder extends SelectableViewHolder {
                 return true;
             });
         }
-        btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, composition));
     }
 
     public void bind(@Nonnull Composition composition, boolean isCoversEnabled) {
@@ -87,36 +83,33 @@ public class MusicViewHolder extends SelectableViewHolder {
     public void setSelected(boolean selected) {
         if (this.selected != selected) {
             this.selected = selected;
-            if (!selected && playing) {
-                showAsPlaying(true);
-            } else {
+            int unselectedColor = (!selected && isCurrent)? getPlaySelectionColor(): Color.TRANSPARENT;
+            int selectedColor = getSelectionColor();
+            int endColor = selected ? selectedColor : unselectedColor;
+            animateBackgroundColor(clickableItem, endColor);
+        }
+    }
+
+    public void showAsCurrentComposition(boolean isCurrent) {
+        if (this.isCurrent != isCurrent) {
+            this.isCurrent = isCurrent;
+            if (!selected) {
                 int unselectedColor = Color.TRANSPARENT;
-                int selectedColor = getSelectionColor();
-                int endColor = selected ? selectedColor : unselectedColor;
+                int selectedColor = getPlaySelectionColor();
+                int endColor = isCurrent ? selectedColor : unselectedColor;
                 animateBackgroundColor(clickableItem, endColor);
             }
         }
     }
 
-    public void setPlaying(boolean playing) {
-        if (this.playing != playing) {
-            this.playing = playing;
-            if (!selected) {
-                showAsPlaying(playing);
-            }
-        }
+    public void showAsPlaying(boolean playing) {
+        compositionItemWrapper.showAsPlaying(playing);
     }
 
     public Composition getComposition() {
         return composition;
     }
 
-    private void showAsPlaying(boolean playing) {
-        int unselectedColor = Color.TRANSPARENT;
-        int selectedColor = getPlaySelectionColor();
-        int endColor = playing ? selectedColor : unselectedColor;
-        animateBackgroundColor(clickableItem, endColor);
-    }
 
     private void selectImmediate() {
         clickableItem.setBackgroundColor(getSelectionColor());

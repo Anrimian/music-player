@@ -118,7 +118,9 @@
     <string name="about_app_text">Found a issue? Is the screen displayed incorrectly or slowly? Lacking any features? Write me about it, I will be appreciated for feedback.</string>
     <string name="send_email">Send email</string>
     <string name="theme">Theme</string>
-    <string name="white_theme">White</string>
+    <string name="white_purple_theme">White(Purple)</string>
+    <string name="white_indigo_theme">White(Indigo)</string>
+    <string name="white_teal_theme">White(Teal)</string>
     <string name="dark_theme">Dark</string>
     <string name="edit">Edit</string>
     <string name="edit_tags">Edit tags</string>
