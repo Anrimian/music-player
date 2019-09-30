@@ -28,6 +28,7 @@ import io.reactivex.subjects.PublishSubject;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.currentItem;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeCompositionWithTitle;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeItem;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
@@ -362,8 +363,7 @@ public class PlayQueueRepositoryImplTest {
         TestObserver<PlayQueueEvent> compositionObserver = playQueueRepository.getCurrentQueueItemObservable()
                 .test();
 
-        Composition unexcitedComposition = new Composition();
-        unexcitedComposition.setId(2000000);
+        Composition unexcitedComposition = fakeComposition(2000000);
         List<Composition> deletedCompositions = Arrays.asList(fakeComposition(0),
                 fakeComposition(1),
                 unexcitedComposition);
@@ -464,11 +464,9 @@ public class PlayQueueRepositoryImplTest {
         TestObserver<PlayQueueEvent> compositionObserver = playQueueRepository.getCurrentQueueItemObservable()
                 .test();
 
-        Composition changedComposition = fakeComposition(0);
-        changedComposition.setTitle("changed title");
+        Composition changedComposition = fakeCompositionWithTitle(0, "changed title");
 
-        Composition unexcitedComposition = new Composition();
-        unexcitedComposition.setId(2000000);
+        Composition unexcitedComposition = fakeComposition(2000000);
         changeSubject.onNext(new Change.ModifyChange<>(Arrays.asList(
                 new ModifiedData<>(fakeComposition(0), changedComposition),
                 new ModifiedData<>(fakeComposition(1), fakeComposition(1)),

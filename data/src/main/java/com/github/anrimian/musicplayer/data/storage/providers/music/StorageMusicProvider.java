@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,12 +31,12 @@ import static android.provider.MediaStore.Audio.Media.ALBUM;
 import static android.provider.MediaStore.Audio.Media.ARTIST;
 import static android.provider.MediaStore.Audio.Media.DATE_ADDED;
 import static android.provider.MediaStore.Audio.Media.DATE_MODIFIED;
-import static android.provider.MediaStore.Audio.Media.DISPLAY_NAME;
 import static android.provider.MediaStore.Audio.Media.DURATION;
 import static android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 import static android.provider.MediaStore.Audio.Media.IS_MUSIC;
 import static android.provider.MediaStore.Audio.Media.TITLE;
 import static android.provider.MediaStore.Audio.Media._ID;
+import static android.text.TextUtils.isEmpty;
 import static java.util.Collections.emptyMap;
 
 public class StorageMusicProvider {
@@ -161,7 +162,6 @@ public class StorageMusicProvider {
                             TITLE,
                             ALBUM,
                             MediaStore.Images.Media.DATA,
-                            DISPLAY_NAME,
                             DURATION,
                             MediaStore.Images.Media.SIZE,
                             _ID,
@@ -179,8 +179,9 @@ public class StorageMusicProvider {
                 cursor.moveToPosition(i);
 
                 Composition composition = getCompositionFromCursor(cursorWrapper);
-                checkCorruptedComposition(composition);
-                compositions.put(composition.getId(), composition);
+                if (composition != null) {
+                    compositions.put(composition.getId(), composition);
+                }
             }
             return compositions;
         } finally {
@@ -196,7 +197,7 @@ public class StorageMusicProvider {
         String filePath = cursorWrapper.getString(MediaStore.Images.Media.DATA);
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
-        String displayName = cursorWrapper.getString(DISPLAY_NAME);
+//        String displayName = cursorWrapper.getString(DISPLAY_NAME);
 //        String mimeType = cursorWrapper.getString(MediaStore.Audio.Media.MIME_TYPE);
 
         long duration = cursorWrapper.getLong(DURATION);
@@ -205,8 +206,8 @@ public class StorageMusicProvider {
 //        long artistId = cursorWrapper.getLong(MediaStore.Audio.Media.ARTIST_ID);
 //        long bookmark = cursorWrapper.getLong(MediaStore.Audio.Media.BOOKMARK);
 //        long albumId = cursorWrapper.getLong(MediaStore.Audio.Media.ALBUM_ID);
-        long dateAdded = cursorWrapper.getLong(DATE_ADDED);
-        long dateModified = cursorWrapper.getLong(DATE_MODIFIED);
+        long dateAddedMillis = cursorWrapper.getLong(DATE_ADDED);
+        long dateModifiedMillis = cursorWrapper.getLong(DATE_MODIFIED);
 
 //        boolean isAlarm = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_ALARM);
 //        boolean isMusic = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_MUSIC);
@@ -216,38 +217,41 @@ public class StorageMusicProvider {
 
 //        @Nullable Integer year = cursorWrapper.getInt(YEAR);
 
+        if (isEmpty(filePath)) {
+            return null;
+        }
+        Date dateAdded;
+        if (dateAddedMillis == 0) {
+            dateAdded = new Date(System.currentTimeMillis());
+        } else {
+            dateAdded = new Date(dateAddedMillis * 1000L);
+        }
+        Date dateModified;
+        if (dateModifiedMillis == 0) {
+            dateModified = new Date(System.currentTimeMillis());
+        } else {
+            dateModified  = new Date(dateModifiedMillis * 1000L);
+        }
+
         if (artist.equals("<unknown>")) {
             artist = null;
         }
 
-        Composition composition = new Composition();
-        //composition
-        composition.setArtist(artist);
-        composition.setTitle(title);
-        composition.setAlbum(album);
-        composition.setFilePath(filePath);
-//        composition.setComposer(composer);
-//        composition.setDisplayName(displayName);
-
-        composition.setDuration(duration);
-        composition.setSize(size);
-        composition.setId(id);
-        composition.setDateAdded(new Date(dateAdded * 1000L));
-        composition.setDateModified(new Date(dateModified * 1000L));
-
-//        composition.setAlarm(isAlarm);
-//        composition.setMusic(isMusic);
-//        composition.setNotification(isNotification);
-//        composition.setPodcast(isPodcast);
-//        composition.setRingtone(isRingtone);
-
-//        composition.setYear(year);
-        return composition;
-    }
-
-    private void checkCorruptedComposition(Composition composition) {
-        if (composition.getDuration() == 0) {
-            composition.setCorrupted(true);
+        CorruptionType corruptionType = null;
+        if (duration == 0) {
+            corruptionType = CorruptionType.UNKNOWN;
         }
+
+        return new Composition(
+                artist,
+                title,
+                album,
+                filePath,
+                duration,
+                size,
+                id,
+                dateAdded,
+                dateModified,
+                corruptionType);
     }
 }

@@ -12,13 +12,13 @@ public class DatabaseManager {
 
     private static final String DATABASE_NAME = "music_player_database";
 
-    private Context context;
+    private final Context context;
 
     public DatabaseManager(Context context) {
         this.context = context;
     }
 
     public AppDatabase getAppDatabase() {
-        return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
+        return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();//TODO create migration later
     }
 }

@@ -152,7 +152,7 @@ public class CompositionItemWrapper {
     }
 
     private void showCorrupted() {
-        int textColorAttr = composition.isCorrupted()? android.R.attr.textColorSecondary:
+        int textColorAttr = composition.getCorruptionType() != null? android.R.attr.textColorSecondary:
                 android.R.attr.textColorPrimary;
         tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
     }

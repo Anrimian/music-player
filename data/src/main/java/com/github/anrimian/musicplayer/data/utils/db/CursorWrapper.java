@@ -4,7 +4,7 @@ import android.database.Cursor;
 
 public class CursorWrapper {
 
-    private Cursor cursor;
+    private final Cursor cursor;
 
     public CursorWrapper(Cursor cursor) {
         this.cursor = cursor;

@@ -3,8 +3,10 @@ package com.github.anrimian.musicplayer.ui.common.serealization;
 import android.os.Bundle;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 
 import java.util.Date;
+import java.util.Objects;
 
 public interface CompositionSerialaser {
 
@@ -17,7 +19,7 @@ public interface CompositionSerialaser {
     String ID = "id";
     String DATE_ADDED = "date_added";
     String DATE_MODIFIED = "date_modified";
-    String IS_CORRUPTED = "is_corrupted";
+    String CORRUPTION_TYPE = "corruption_type";
 
     static Bundle serialize(Composition composition) {
         Bundle bundle = new Bundle();
@@ -29,7 +31,7 @@ public interface CompositionSerialaser {
         bundle.putLong(ID, composition.getId());
         bundle.putLong(DATE_ADDED, composition.getDateAdded().getTime());
         bundle.putLong(DATE_MODIFIED, composition.getDateModified().getTime());
-        bundle.putBoolean(IS_CORRUPTED, composition.isCorrupted());
+        bundle.putSerializable(CORRUPTION_TYPE, composition.getCorruptionType());
         return bundle;
     }
 
@@ -38,13 +40,13 @@ public interface CompositionSerialaser {
                 bundle.getString(ARTIST),
                 bundle.getString(TITLE),
                 bundle.getString(ALBUM),
-                bundle.getString(FILE_PATH),
+                Objects.requireNonNull(bundle.getString(FILE_PATH)),
                 bundle.getLong(DURATION),
                 bundle.getLong(SIZE),
                 bundle.getLong(ID),
                 new Date(bundle.getLong(DATE_ADDED)),
                 new Date(bundle.getLong(DATE_MODIFIED)),
-                bundle.getBoolean(IS_CORRUPTED)
+                (CorruptionType) bundle.getSerializable(CORRUPTION_TYPE)
         );
     }
 }

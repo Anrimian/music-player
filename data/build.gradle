@@ -29,6 +29,10 @@ android {
             initWith release
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {

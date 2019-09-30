@@ -13,6 +13,7 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -79,8 +80,7 @@ public class StorageMusicDataSourceTest {
         storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
-        Composition addedComposition = new Composition();
-        addedComposition.setId(-1L);
+        Composition addedComposition = fakeComposition(-1);
         changedCompositions.put(-1L, addedComposition);
 
         changeSubject.onNext(changedCompositions);
@@ -106,8 +106,8 @@ public class StorageMusicDataSourceTest {
         storageMusicDataSource.getCompositionsMap();
 
         Map<Long, Composition> changedCompositions = getFakeCompositionsMap();
-        Composition changedComposition = changedCompositions.get(0L);
-        changedComposition.setFilePath("test path");
+        Composition changedComposition = fakeComposition(0L, "test path");
+        changedCompositions.put(0L, changedComposition);
 
         changeSubject.onNext(changedCompositions);
 

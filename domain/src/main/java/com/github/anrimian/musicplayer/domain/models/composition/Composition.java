@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.models.composition;
 
 import java.util.Date;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -12,29 +13,34 @@ public class Composition {
 
     @Nullable
     private String artist;
+    @Nullable
     private String title;
+    @Nullable
     private String album;
+    @Nonnull
     private String filePath;
 
     private long duration;
     private long size;
     private long id;
 
+    @Nonnull
     private Date dateAdded;
+    @Nonnull
     private Date dateModified;
 
-    private boolean isCorrupted;
+    private CorruptionType corruptionType;
 
     public Composition(@Nullable String artist,
-                       String title,
-                       String album,
-                       String filePath,
+                       @Nullable String title,
+                       @Nullable String album,
+                       @Nonnull String filePath,
                        long duration,
                        long size,
                        long id,
-                       Date dateAdded,
-                       Date dateModified,
-                       boolean isCorrupted) {
+                       @Nonnull Date dateAdded,
+                       @Nonnull Date dateModified,
+                       CorruptionType corruptionType) {
         this.artist = artist;
         this.title = title;
         this.album = album;
@@ -44,11 +50,7 @@ public class Composition {
         this.id = id;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.isCorrupted = isCorrupted;
-    }
-
-    @Deprecated
-    public Composition() {
+        this.corruptionType = corruptionType;
     }
 
     public Composition copy(String newPath) {
@@ -61,15 +63,7 @@ public class Composition {
                 id,
                 dateAdded,
                 dateModified,
-                isCorrupted);
-    }
-
-    public boolean isCorrupted() {
-        return isCorrupted;
-    }
-
-    public void setCorrupted(boolean corrupted) {
-        isCorrupted = corrupted;
+                corruptionType);
     }
 
     @Nullable
@@ -77,72 +71,45 @@ public class Composition {
         return artist;
     }
 
-    public void setArtist(@Nullable String artist) {
-        this.artist = artist;
-    }
-
+    @Nullable
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
+    @Nullable
     public String getAlbum() {
         return album;
     }
 
-    public void setAlbum(String album) {
-        this.album = album;
-    }
-
+    @Nonnull
     public String getFilePath() {
         return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
     }
 
     public long getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
-
     public long getSize() {
         return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
     }
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
+    @Nonnull
     public Date getDateAdded() {
         return dateAdded;
     }
 
-    public void setDateAdded(Date dateAdded) {
-        this.dateAdded = dateAdded;
-    }
-
+    @Nonnull
     public Date getDateModified() {
         return dateModified;
     }
 
-    public void setDateModified(Date dateModified) {
-        this.dateModified = dateModified;
+    public CorruptionType getCorruptionType() {
+        return corruptionType;
     }
 
     @Override

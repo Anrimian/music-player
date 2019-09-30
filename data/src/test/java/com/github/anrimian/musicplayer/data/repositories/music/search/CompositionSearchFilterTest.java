@@ -4,15 +4,24 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import org.junit.Test;
 
+import java.util.Date;
+
 public class CompositionSearchFilterTest {
 
     private CompositionSearchFilter searchFilter = new CompositionSearchFilter();
 
     @Test
     public void isSuitForSearchTest() {
-        Composition composition = new Composition();
-        composition.setArtist("marylin manson");
-        composition.setDisplayName("kek.mp3");
+        Composition composition = new Composition("marylin manson",
+                "kek",
+                null,
+                "kek.mp3",
+                0,
+                0,
+                0,
+                new Date(0),
+                new Date(0),
+                null);
 
         assert searchFilter.isSuitForSearch(composition, "mary");
         assert searchFilter.isSuitForSearch(composition, "son");
