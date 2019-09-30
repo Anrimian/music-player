@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.domain.utils.java;
+package com.github.anrimian.musicplayer.domain.utils.changes.map;
 
 public interface ChangeInspector<T> {
 

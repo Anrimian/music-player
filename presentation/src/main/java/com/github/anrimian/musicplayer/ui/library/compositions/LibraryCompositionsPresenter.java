@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -65,9 +66,6 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     @Nullable
     private Composition currentComposition;
 
-    private Composition compositionInAction;
-    private int compositionPositionInAction;
-
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
                                         MusicPlayerInteractor playerInteractor,
@@ -99,6 +97,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     void onStart() {
         if (!compositions.isEmpty()) {
             subscribeOnCurrentComposition();
+            subscribeOnPlayState();
         }
     }
 
@@ -113,9 +112,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     void onCompositionClicked(int position, Composition composition) {
         if (selectedCompositions.isEmpty()) {
             if (currentComposition != null) {
-                compositionInAction = composition;
-                compositionPositionInAction = position;
-                getViewState().showCompositionActionDialog(composition);
+                getViewState().showCompositionActionDialog(composition, position);
             } else {
                 interactor.play(compositions, position);
                 getViewState().showCurrentPlayingComposition(composition);
@@ -136,7 +133,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         if (composition.equals(currentComposition)) {
             playerInteractor.playOrPause();
         } else {
-            interactor.play(compositions, position);
+            playerInteractor.startPlaying(compositions, position);
             getViewState().showCurrentPlayingComposition(composition);
         }
     }
@@ -243,16 +240,8 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         closeSelectionMode();
     }
 
-    void onPlayActionSelected() {
-        interactor.play(compositions, compositionPositionInAction);
-    }
-
-    void onPlayNextActionSelected() {
-        addCompositionsToPlayNext(asList(compositionInAction));
-    }
-
-    void onAddToQueueActionSelected() {
-        addCompositionsToEnd(asList(compositionInAction));
+    void onPlayActionSelected(int position) {
+        interactor.play(compositions, position);
     }
 
     private void addCompositionsToPlayNext(List<Composition> compositions) {
@@ -366,6 +355,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
             if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
+                subscribeOnPlayState();
             }
         }
     }
@@ -379,4 +369,15 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private void onUiSettingsReceived(boolean isCoversEnabled) {
         getViewState().setDisplayCoversEnabled(isCoversEnabled);
     }
+
+    private void subscribeOnPlayState() {
+        presenterBatterySafeDisposable.add(playerInteractor.getPlayerStateObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onPlayerStateReceived));
+    }
+
+    private void onPlayerStateReceived(PlayerState state) {
+        getViewState().showPlayState(state == PlayerState.PLAY);
+    }
+
 }

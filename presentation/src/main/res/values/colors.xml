@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--first theme-->
+    <!--light theme(purple)-->
     <color name="colorPrimary">#673AB7</color>
     <color name="colorPrimaryDark">#512DA8</color>
     <color name="colorAccent">#009688</color>
@@ -62,4 +62,14 @@
     <!--other-->
     <color name="startShadowColor">#00000000</color>
     <color name="endShadowColor">#33000000</color>
+
+    <!--light theme(indigo)-->
+    <color name="colorBluePrimary">#3F51B5</color>
+    <color name="colorBluePrimaryDark">#303F9F</color>
+    <color name="colorGreenAccent">#4CAF50</color>
+
+    <!--light theme(teal)-->
+    <color name="colorTealPrimary">#009688</color>
+    <color name="colorTealPrimaryDark">#00796B</color>
+    <color name="colorPinkAccent">#FF4081</color>
 </resources>

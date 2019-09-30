@@ -5,10 +5,20 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.R;
 
 public enum AppTheme {
-    WHITE_DEFAULT(0,
+    WHITE_PURPLE_DEFAULT(0,
             R.style.PrimaryLightTheme,
-            R.string.white_theme,
+            R.string.white_purple_theme,
             R.color.colorPrimary,
+            R.color.light_light_gray),
+    WHITE_INDIGO(2,
+            R.style.PrimaryBlueTheme,
+            R.string.white_indigo_theme,
+            R.color.colorBluePrimary,
+            R.color.light_light_gray),
+    WHITE_TEAL(3,
+            R.style.PrimaryTealTheme,
+            R.string.white_teal_theme,
+            R.color.colorTealPrimary,
             R.color.light_light_gray),
     DARK(1,
             R.style.PrimaryDarkTheme,
@@ -29,7 +39,7 @@ public enum AppTheme {
                 return type;
             }
         }
-        return WHITE_DEFAULT;
+        return WHITE_PURPLE_DEFAULT;
     }
 
     AppTheme(int id, int themeResId, int descriptionId, int primaryColorId, int backgroundColorId) {

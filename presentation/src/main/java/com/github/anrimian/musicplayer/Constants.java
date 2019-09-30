@@ -32,6 +32,9 @@ public interface Constants {
         String EDIT_TEXT_VALUE = "edit_text_value";
         String CAN_BE_EMPTY_ARG = "can_be_empty_arg";
         String EXTRA_DATA_ARG = "extra_data_arg";
+        String COMPOSITION_ARG = "composition_arg";
+        String MENU_ARG = "menu_arg";
+        String POSITION_ARG = "position_arg";
     }
 
     interface Tags {

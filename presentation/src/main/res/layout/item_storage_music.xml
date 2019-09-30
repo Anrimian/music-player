@@ -6,27 +6,15 @@
     android:layout_height="wrap_content"
     android:background="?android:attr/windowBackground">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/iv_music_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:scaleType="centerCrop"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
-        android:contentDescription="@string/folder"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_composition_name"
-        tools:srcCompat="@drawable/ic_music_placeholder" />
-
     <TextView
         android:id="@+id/tv_composition_name"
-        style="@style/TextStyle"
+        style="@style/TextStyleItemPrimary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/content_spacing_margin"
-        android:layout_marginStart="@dimen/content_margin"
-        android:layout_marginTop="@dimen/content_vertical_margin"
-        app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginTop="@dimen/list_vertical_margin"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
         app:layout_constraintTop_toTopOf="parent"
         tools:targetApi="lollipop"
@@ -34,11 +22,10 @@
 
     <TextView
         android:id="@+id/tv_additional_info"
-        style="@style/Content.SecondaryText"
+        style="@style/TextStyleContentSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/content_spacing_margin"
-        android:lineSpacingExtra="2dp"
+        android:layout_marginTop="@dimen/content_vertical_spacing_margin"
         app:layout_constraintEnd_toEndOf="@+id/tv_composition_name"
         app:layout_constraintStart_toStartOf="@+id/tv_composition_name"
         app:layout_constraintTop_toBottomOf="@+id/tv_composition_name"
@@ -47,7 +34,7 @@
     <View
         android:id="@+id/divider"
         style="@style/Divider.Horizontal.Constraint"
-        android:layout_marginTop="@dimen/content_vertical_margin"
+        android:layout_marginTop="@dimen/list_vertical_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tv_composition_name"
         app:layout_constraintTop_toBottomOf="@id/tv_additional_info" />
@@ -62,13 +49,28 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_music_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:contentDescription="@string/folder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_composition_name"
+        tools:srcCompat="@drawable/ic_music_placeholder_simple" />
+
     <ImageView
-        android:id="@+id/btn_actions_menu"
-        style="@style/ButtonStyle.Menu"
-        android:layout_marginTop="2dp"
-        android:contentDescription="@string/content_description_menu"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_dots_vertical" />
+        android:id="@+id/iv_play"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:tint="@android:color/white"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="@id/iv_music_icon"
+        app:layout_constraintEnd_toEndOf="@id/iv_music_icon"
+        app:layout_constraintTop_toTopOf="@id/iv_music_icon"
+        app:layout_constraintBottom_toBottomOf="@id/iv_music_icon"
+        tools:srcCompat="@drawable/ic_play"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

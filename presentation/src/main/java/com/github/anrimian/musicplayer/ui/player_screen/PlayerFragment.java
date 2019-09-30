@@ -40,6 +40,7 @@ import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -288,10 +289,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
-        DragAndSwipeTouchHelperCallback callback = DragAndSwipeTouchHelperCallback.withSwipeToDelete(rvPlayList,
+        DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(rvPlayList,
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
-                ItemTouchHelper.START);
+                ItemTouchHelper.START,
+                R.drawable.ic_delete_outline,
+                R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvPlayList);
@@ -445,6 +448,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ivPlayPause.setImageResource(R.drawable.ic_play);
         ivPlayPause.setContentDescription(getString(R.string.play));
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
+        playQueueAdapterWrapper.call(adapter -> adapter.showPlaying(false));
     }
 
     @Override
@@ -452,6 +456,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ivPlayPause.setImageResource(R.drawable.ic_pause);
         ivPlayPause.setContentDescription(getString(R.string.pause));
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
+        playQueueAdapterWrapper.call(adapter -> adapter.showPlaying(true));
     }
 
     @Override
@@ -494,7 +499,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             sbTrackState.setContentDescription(null);
 
             if (showCover) {
-                ImageFormatUtils.displayImage(ivMusicIcon, composition);
+                ImageFormatUtils.displayImage(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             }
@@ -506,7 +511,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void scrollQueueToPosition(int position, boolean smoothScroll) {
         if (position > playQueueLayoutManager.findFirstVisibleItemPosition() &&
-                position < playQueueLayoutManager.findLastVisibleItemPosition()) {
+                position < playQueueLayoutManager.findLastCompletelyVisibleItemPosition()) {
             return;
         }
 
@@ -534,6 +539,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             playQueueAdapterWrapper.setObject(playQueueAdapter);
             playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
             playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
+            playQueueAdapter.setIconClickListener(presenter::onQueueItemIconClicked);
             rvPlayList.setAdapter(playQueueAdapter);
         } else {
             playQueueAdapter.setItems(list);
@@ -676,7 +682,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private void onCompositionMenuClicked(View view) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.composition_full_actions_menu);
+        popup.inflate(R.menu.composition_short_actions_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {

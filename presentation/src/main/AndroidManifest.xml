@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <!-- support for tablets -->
     <supports-screens
@@ -15,6 +16,7 @@
         android:normalScreens="true"
         android:smallScreens="true" />
 
+    <!--suppress AndroidUnknownAttribute -->
     <application
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher_2"
@@ -24,7 +26,8 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:name=".App"
-        tools:ignore="GoogleAppIndexingWarning"
+        android:requestLegacyExternalStorage="true"
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android:allowBackup">
 
         <activity android:name=".utils.acra.AcraReportDialog"/>

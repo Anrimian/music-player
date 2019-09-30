@@ -1,9 +1,11 @@
 package com.github.anrimian.musicplayer.ui.common.dialogs;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.view.Window;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
@@ -12,12 +14,14 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
 
@@ -114,6 +118,20 @@ public class DialogUtils {
         sbTitle.append(")");
 
         context.startActivity(Intent.createChooser(intent, sbTitle.toString()));
+    }
+
+    /**
+     * Call in onResume()
+     */
+    public static void setupBottomSheetDialogMaxWidth(BottomSheetDialogFragment fragment) {
+        int width = fragment.requireContext().getResources().getDimensionPixelSize(R.dimen.bottom_sheet_width);
+        Dialog dialog = fragment.getDialog();
+        if (dialog != null) {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setLayout(width > 0 ? width : MATCH_PARENT, MATCH_PARENT);
+            }
+        }
     }
 
     private static String getDativCompositionsMessage(Context context, int count) {
