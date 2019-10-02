@@ -1,10 +1,13 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
+import com.github.anrimian.musicplayer.domain.utils.changes.map.MapChangeProcessor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,12 +27,14 @@ import io.reactivex.subjects.PublishSubject;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.Constants.TIMEOUTS.STORAGE_LOADING_TIMEOUT_SECONDS;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToMap;
 import static java.util.Collections.singletonList;
 
 
 public class StorageMusicDataSource {
 
     private final StorageMusicProvider musicProvider;
+    private final CompositionsDaoWrapper compositionsDao;
     private final FileManager fileManager;
     private final Scheduler scheduler;
 
@@ -39,14 +44,25 @@ public class StorageMusicDataSource {
     private Map<Long, Composition> compositions;
     private Disposable changeDisposable;
 
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    private Disposable changeDisposable2;
+
     public StorageMusicDataSource(StorageMusicProvider musicProvider,
+                                  CompositionsDaoWrapper compositionsDao,
                                   FileManager fileManager,
                                   Scheduler scheduler) {
         this.musicProvider = musicProvider;
+        this.compositionsDao = compositionsDao;
         this.fileManager = fileManager;
         this.scheduler = scheduler;
+
+        changeDisposable2 = musicProvider.getCompositionsObservable()
+                .startWith(musicProvider.getCompositions())
+                .subscribeOn(scheduler)
+                .subscribe(this::onNewCompositionsFromMediaStorageReceived);
     }
 
+    @Deprecated
     public Single<Map<Long, Composition>> getCompositions() {
         return Single.fromCallable(this::getCompositionsMap)
 //                .delay(3, TimeUnit.SECONDS)//test timeout error
@@ -77,8 +93,15 @@ public class StorageMusicDataSource {
         return changeSubject;
     }
 
+    @Deprecated
     public Observable<Map<Long, Composition>> getCompositionObservable() {
         return withDefaultValue(compositionSubject, getCompositions());
+    }
+
+    public Observable<Map<Long, Composition>> getCompositionObservable2() {
+        return compositionsDao.getAllObservable()
+                .map(compositions -> mapToMap(compositions, new HashMap<>(), Composition::getId))
+                .toObservable();
     }
 
     public Completable deleteCompositions(List<Composition> compositionsToDelete) {
@@ -127,6 +150,24 @@ public class StorageMusicDataSource {
                 .subscribeOn(scheduler);
     }
 
+    private void onNewCompositionsFromMediaStorageReceived(Map<Long, Composition> newCompositions) {
+        Map<Long, Composition> currentCompositions = compositionsDao.getAllMap();
+
+        List<Composition> addedCompositions = new ArrayList<>();
+        List<Composition> deletedCompositions = new ArrayList<>();
+        List<Composition> changedCompositions = new ArrayList<>();
+        boolean hasChanges = MapChangeProcessor.processChanges2(currentCompositions,
+                newCompositions,
+                CompositionHelper::hasChanges,
+                deletedCompositions::add,
+                addedCompositions::add,
+                changedCompositions::add);
+
+        if (hasChanges) {
+            compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
+        }
+    }
+
     private void deleteCompositionFile(Map<Long, Composition> compositions,
                                        Composition composition) {
         String filePath = composition.getFilePath();
@@ -142,7 +183,7 @@ public class StorageMusicDataSource {
         if (changeDisposable != null) {
             throw new IllegalStateException("subscribe on composition changes twice");
         }
-        changeDisposable = musicProvider.getChangeObservable()
+        changeDisposable = musicProvider.getCompositionsObservable()
                 .flatMap(this::calculateChange)
                 .subscribeOn(scheduler)
                 .subscribe(changeSubject::onNext);

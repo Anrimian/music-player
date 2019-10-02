@@ -16,6 +16,7 @@ import java.util.List;
 
 import static androidx.recyclerview.widget.DiffUtil.calculateDiff;
 
+@Deprecated
 public class DiffCalculator<T> {
 
     private final Function<List<T>> currentListFunction;

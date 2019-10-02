@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
@@ -15,6 +16,7 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.eq;
@@ -26,17 +28,19 @@ public class StorageMusicDataSourceTest {
 
     private StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
     private FileManager fileManager = mock(FileManager.class);
+    private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
 
-    private PublishSubject<Map<Long, Composition>> changeSubject = PublishSubject.create();
+    private PublishSubject<Map<Long, Composition>> newCompositionsSubject = PublishSubject.create();
 
     private StorageMusicDataSource storageMusicDataSource;
 
     @Before
     public void setUp() {
         when(musicProvider.getCompositions()).thenReturn(getFakeCompositionsMap());
-        when(musicProvider.getChangeObservable()).thenReturn(changeSubject);
+        when(musicProvider.getCompositionsObservable()).thenReturn(newCompositionsSubject);
 
         storageMusicDataSource = new StorageMusicDataSource(musicProvider,
+                compositionsDao,
                 fileManager,
                 Schedulers.trampoline());
     }
@@ -52,7 +56,7 @@ public class StorageMusicDataSourceTest {
         changedCompositions.remove(1L);
         changedCompositions.remove(0L);
 
-        changeSubject.onNext(changedCompositions);
+        newCompositionsSubject.onNext(changedCompositions);
 
         changeTestObserver.assertValue(change -> {
             Change.DeleteChange deleteChange = (Change.DeleteChange) change;
@@ -75,6 +79,29 @@ public class StorageMusicDataSourceTest {
     }
 
     @Test
+    public void changeDatabaseTest() {
+        Map<Long, Composition> currentCompositions = getFakeCompositionsMap();
+        when(compositionsDao.getAllMap()).thenReturn(currentCompositions);
+
+        Map<Long, Composition> newCompositions = getFakeCompositionsMap();
+        Composition removedComposition = newCompositions.remove(100L);
+
+        Composition changedComposition = fakeComposition(1, "new path");
+        newCompositions.put(1L, changedComposition);
+
+        Composition newComposition = fakeComposition(-1L, "new composition");
+        newCompositions.put(-1L, newComposition);
+
+        newCompositionsSubject.onNext(newCompositions);
+
+        verify(compositionsDao).applyChanges(
+                eq(asList(newComposition)),
+                eq(asList(removedComposition)),
+                eq(asList(changedComposition))
+        );
+    }
+
+    @Test
     public void addChangeTest() {
         TestObserver<Change<Composition>> changeTestObserver = storageMusicDataSource.getChangeObservable().test();
         storageMusicDataSource.getCompositionsMap();
@@ -83,7 +110,7 @@ public class StorageMusicDataSourceTest {
         Composition addedComposition = fakeComposition(-1);
         changedCompositions.put(-1L, addedComposition);
 
-        changeSubject.onNext(changedCompositions);
+        newCompositionsSubject.onNext(changedCompositions);
 
         changeTestObserver.assertValue(change -> {
             Change.AddChange addChange = (Change.AddChange) change;
@@ -109,7 +136,7 @@ public class StorageMusicDataSourceTest {
         Composition changedComposition = fakeComposition(0L, "test path");
         changedCompositions.put(0L, changedComposition);
 
-        changeSubject.onNext(changedCompositions);
+        newCompositionsSubject.onNext(changedCompositions);
 
         changeTestObserver.assertValue(change -> {
             Change.ModifyChange<Composition> modifyChange = (Change.ModifyChange) change;

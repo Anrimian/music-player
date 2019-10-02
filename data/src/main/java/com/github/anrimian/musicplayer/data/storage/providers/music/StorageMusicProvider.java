@@ -49,7 +49,7 @@ public class StorageMusicProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<Map<Long, Composition>> getChangeObservable() {
+    public Observable<Map<Long, Composition>> getCompositionsObservable() {
         return RxContentObserver.getObservable(contentResolver, EXTERNAL_CONTENT_URI)
 //                .doOnNext(o -> Log.d("KEK", "received update"))
 //                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)//TODO not this, ask on so

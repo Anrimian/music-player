@@ -27,7 +27,6 @@ public class CompositionEntity {
 
     private long duration;
     private long size;
-    private long mediaStoreId;
 
     @Nonnull
     private Date dateAdded;
@@ -37,14 +36,13 @@ public class CompositionEntity {
     @Nullable
     private CorruptionType corruptionType;
 
-    public CompositionEntity(long id,
-                             @Nullable String artist,
+    public CompositionEntity(@Nullable String artist,
                              @Nullable String title,
                              @Nullable String album,
                              @Nonnull String filePath,
                              long duration,
                              long size,
-                             long mediaStoreId,
+                             long id,
                              @Nonnull Date dateAdded,
                              @Nonnull Date dateModified,
                              @Nullable CorruptionType corruptionType) {
@@ -55,7 +53,6 @@ public class CompositionEntity {
         this.filePath = filePath;
         this.duration = duration;
         this.size = size;
-        this.mediaStoreId = mediaStoreId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
@@ -93,10 +90,6 @@ public class CompositionEntity {
         return size;
     }
 
-    public long getMediaStoreId() {
-        return mediaStoreId;
-    }
-
     @Nonnull
     public Date getDateAdded() {
         return dateAdded;
@@ -108,7 +101,7 @@ public class CompositionEntity {
     }
 
     @Nullable
-    public CorruptionType isCorrupted() {
+    public CorruptionType getCorruptionType() {
         return corruptionType;
     }
 }

@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.edit.EditorRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
@@ -44,8 +45,9 @@ public class StorageModule {
     @Singleton
     StorageMusicDataSource storageMusicDataSource(StorageMusicProvider musicProvider,
                                                   FileManager fileManager,
+                                                  CompositionsDaoWrapper compositionsDao,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new StorageMusicDataSource(musicProvider, fileManager, scheduler);
+        return new StorageMusicDataSource(musicProvider, compositionsDao, fileManager, scheduler);
     }
 
     @Provides

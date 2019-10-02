@@ -33,6 +33,13 @@ public class ListUtils {
         return to;
     }
 
+    public static <K, E>  Map<K, E> mapToMap(List<E> from, Map<K, E> to, MapperFunction<E, K> keySelector) {
+        for (E t: from) {
+            to.put(keySelector.map(t), t);
+        }
+        return to;
+    }
+
     public static <K, E, T> List<T> mapToList(Map<K, E> from, MapperFunction<E, T> mapper) {
         return mapToList(from, new ArrayList<>(from.size()), mapper);
     }

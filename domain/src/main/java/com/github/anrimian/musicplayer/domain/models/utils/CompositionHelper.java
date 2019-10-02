@@ -32,6 +32,10 @@ public class CompositionHelper {
                 && first.getCorruptionType() == second.getCorruptionType();
     }
 
+    public static boolean hasChanges(@Nonnull Composition first, @Nonnull Composition second) {
+        return !areSourcesTheSame(first, second);
+    }
+
     public static boolean hasSourceChanges(@Nonnull Composition first, @Nonnull Composition second) {
         return first.getDuration() != second.getDuration() || first.getSize() != second.getSize();
     }
