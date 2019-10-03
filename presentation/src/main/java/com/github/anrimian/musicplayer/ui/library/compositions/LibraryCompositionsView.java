@@ -11,10 +11,8 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 public interface LibraryCompositionsView extends MvpView {
@@ -37,7 +35,7 @@ public interface LibraryCompositionsView extends MvpView {
     void showLoadingError(ErrorCommand errorCommand);
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updateList(ListUpdate<Composition> update, HashSet<Composition> selectedCompositionsMap);
+    void updateList(List<Composition> list);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order order);

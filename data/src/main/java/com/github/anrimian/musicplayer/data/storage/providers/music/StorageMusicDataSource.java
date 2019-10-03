@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
@@ -15,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -98,10 +101,15 @@ public class StorageMusicDataSource {
         return withDefaultValue(compositionSubject, getCompositions());
     }
 
+    @Deprecated
     public Observable<Map<Long, Composition>> getCompositionObservable2() {
         return compositionsDao.getAllObservable()
-                .map(compositions -> mapToMap(compositions, new HashMap<>(), Composition::getId))
-                .toObservable();
+                .map(compositions -> mapToMap(compositions, new HashMap<>(), Composition::getId));
+    }
+
+    public Observable<List<Composition>> getCompositionObservable2(Order order,
+                                                                   @Nullable String query) {
+        return compositionsDao.getAllObservable(order, query);
     }
 
     public Completable deleteCompositions(List<Composition> compositionsToDelete) {

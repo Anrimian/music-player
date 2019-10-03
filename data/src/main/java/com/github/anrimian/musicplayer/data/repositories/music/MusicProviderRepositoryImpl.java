@@ -7,7 +7,6 @@ import com.github.anrimian.musicplayer.data.repositories.music.comparators.folde
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.CreateDateFileComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.FolderComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.musicplayer.data.repositories.music.search.CompositionSearchFilter;
 import com.github.anrimian.musicplayer.data.repositories.music.search.FileSourceSearchFilter;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -33,8 +32,6 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.domain.utils.search.ListSearchFilter.filterList;
-
 /**
  * Created on 24.10.2017.
  */
@@ -58,9 +55,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText) {
-        return storageMusicDataSource.getCompositionObservable2()
-                .map(this::toSortedList)
-                .map(list -> filterList(list, searchText, new CompositionSearchFilter()))
+        return storageMusicDataSource.getCompositionObservable2(settingsPreferences.getCompositionsOrder(), searchText)
                 .subscribeOn(scheduler);
     }
 

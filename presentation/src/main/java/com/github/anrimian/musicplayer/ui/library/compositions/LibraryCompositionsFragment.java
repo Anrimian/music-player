@@ -38,14 +38,10 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import butterknife.BindView;
@@ -76,7 +72,6 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
 
     private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
-    private final DefferedObject<CompositionsAdapter> adapterWrapper = new DefferedObject<>();
     private ProgressViewWrapper progressViewWrapper;
 
     private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
@@ -120,6 +115,13 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        adapter = new CompositionsAdapter(recyclerView,
+                presenter.getSelectedCompositions());
+        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
+        adapter.setOnLongClickListener(presenter::onCompositionLongClick);
+        adapter.setIconClickListener(presenter::onCompositionIconClicked);
+        recyclerView.setAdapter(adapter);
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
@@ -237,20 +239,8 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
     }
 
     @Override
-    public void updateList(ListUpdate<Composition> update,
-                           HashSet<Composition> selectedCompositionsMap) {
-        List<Composition> list = update.getNewList();
-        if (adapter == null) {
-            adapter = new CompositionsAdapter(list, selectedCompositionsMap);
-            adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-            adapter.setOnLongClickListener(presenter::onCompositionLongClick);
-            adapter.setIconClickListener(presenter::onCompositionIconClicked);
-            adapterWrapper.setObject(adapter);
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.setItems(list);
-            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
-        }
+    public void updateList(List<Composition> list) {
+        adapter.submitList(list);
     }
 
     @Override
@@ -336,7 +326,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
 
     @Override
     public void setDisplayCoversEnabled(boolean isCoversEnabled) {
-        adapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
+        adapter.setCoversEnabled(isCoversEnabled);
     }
 
     @Override

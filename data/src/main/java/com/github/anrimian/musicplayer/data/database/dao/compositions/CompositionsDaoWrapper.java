@@ -1,17 +1,23 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import androidx.sqlite.db.SimpleSQLiteQuery;
+
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Flowable;
+import javax.annotation.Nullable;
+
+import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToMap;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class CompositionsDaoWrapper {
 
@@ -24,8 +30,18 @@ public class CompositionsDaoWrapper {
         this.compositionsDao = compositionsDao;
     }
 
-    public Flowable<List<Composition>> getAllObservable() {
+    public Observable<List<Composition>> getAllObservable() {
         return compositionsDao.getAllObservable()
+                .map(list -> mapList(list, this::toComposition));
+    }
+
+    public Observable<List<Composition>> getAllObservable(Order order,
+                                                          @Nullable String searchText) {
+        String query =  "SELECT * FROM compositions";
+        query += getSearchQuery(searchText);
+        query += getOrderQuery(order);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        return compositionsDao.getAllObservable(sqlQuery)
                 .map(list -> mapList(list, this::toComposition));
     }
 
@@ -99,5 +115,38 @@ public class CompositionsDaoWrapper {
                 composition.getDateAdded(),
                 composition.getDateModified(),
                 composition.getCorruptionType());
+    }
+
+    private String getOrderQuery(Order order) {
+        StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
+        switch (order.getOrderType()) {
+            case ALPHABETICAL: {
+                orderQuery.append("title");
+                break;
+            }
+            case ADD_TIME: {
+                orderQuery.append("dateAdded");
+                break;
+            }
+            default: throw new IllegalStateException("unknown order type" + order);
+        }
+        orderQuery.append(" ");
+        orderQuery.append(order.isReversed()? "DESC" : "ASC");
+        return orderQuery.toString();
+    }
+
+    private String getSearchQuery(String searchText) {
+        if (isEmpty(searchText)) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(" WHERE ");
+        sb.append("title LIKE '%");
+        sb.append(searchText);
+        sb.append("%'");
+        sb.append(" OR artist NOTNULL AND artist LIKE '%");
+        sb.append(searchText);
+        sb.append("%'");
+
+        return sb.toString();
     }
 }

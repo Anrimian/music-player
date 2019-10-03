@@ -3,19 +3,29 @@ package com.github.anrimian.musicplayer.data.database.dao.compositions;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.RawQuery;
 import androidx.room.Update;
+import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 @Dao
 public interface CompositionsDao {
 
     @Query("SELECT * FROM compositions")
-    Flowable<List<CompositionEntity>> getAllObservable();
+    Observable<List<CompositionEntity>> getAllObservable();
+
+//    @Query("SELECT * FROM compositions " +
+//            "ORDER BY :orderField")
+//    Observable<List<CompositionEntity>> getAllObservable(String orderField,
+//                                                       String asc);
+
+    @RawQuery(observedEntities = CompositionEntity.class)
+    Observable<List<CompositionEntity>> getAllObservable(SupportSQLiteQuery query);
 
     @Query("SELECT * FROM compositions")
     List<CompositionEntity> getAll();

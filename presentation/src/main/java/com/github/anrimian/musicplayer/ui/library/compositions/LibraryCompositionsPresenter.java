@@ -12,14 +12,12 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,11 +49,6 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     private List<Composition> compositions = new ArrayList<>();
     private final LinkedHashSet<Composition> selectedCompositions = new LinkedHashSet<>();
-
-    private final DiffCalculator<Composition> diffCalculator = new DiffCalculator<>(
-            () -> compositions,
-            CompositionHelper::areSourcesTheSame,
-            selectedCompositions::remove);
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
@@ -244,6 +237,10 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         interactor.play(compositions, position);
     }
 
+    HashSet<Composition> getSelectedCompositions() {
+        return selectedCompositions;
+    }
+
     private void addCompositionsToPlayNext(List<Composition> compositions) {
         playerInteractor.addCompositionsToPlayNext(compositions)
                 .observeOn(uiScheduler)
@@ -330,7 +327,6 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         }
         dispose(compositionsDisposable, presenterDisposable);
         compositionsDisposable = interactor.getCompositionsObservable(searchText)
-                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onCompositionsReceived, this::onCompositionsReceivingError);
         presenterDisposable.add(compositionsDisposable);
@@ -341,9 +337,9 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         getViewState().showLoadingError(errorCommand);
     }
 
-    private void onCompositionsReceived(ListUpdate<Composition> listUpdate) {
-        compositions = listUpdate.getNewList();
-        getViewState().updateList(listUpdate, selectedCompositions);
+    private void onCompositionsReceived(List<Composition> compositions) {
+        this.compositions = compositions;
+        getViewState().updateList(compositions);
         if (compositions.isEmpty()) {
             if (TextUtils.isEmpty(searchText)) {
                 getViewState().showEmptyList();
@@ -379,5 +375,4 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private void onPlayerStateReceived(PlayerState state) {
         getViewState().showPlayState(state == PlayerState.PLAY);
     }
-
 }
