@@ -35,6 +35,11 @@ public class CompositionsDaoWrapper {
                 .map(list -> mapList(list, this::toComposition));
     }
 
+    public Observable<Composition> getCompoisitionObservable(long id) {
+        return compositionsDao.getCompoisitionObservable(id)
+                .map(this::toComposition);
+    }
+
     public Observable<List<Composition>> getAllObservable(Order order,
                                                           @Nullable String searchText) {
         String query =  "SELECT * FROM compositions";

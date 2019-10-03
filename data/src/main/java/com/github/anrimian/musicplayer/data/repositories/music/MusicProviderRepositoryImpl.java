@@ -61,8 +61,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Observable<Composition> getCompositionObservable(long id) {
-        return storageMusicDataSource.getCompositionObservable2()
-                .flatMap(compositions -> findComposition(compositions, id))
+        return storageMusicDataSource.getCompositionObservable(id)
                 .subscribeOn(scheduler);
     }
 

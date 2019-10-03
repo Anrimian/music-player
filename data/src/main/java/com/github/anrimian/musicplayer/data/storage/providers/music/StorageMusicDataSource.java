@@ -107,6 +107,10 @@ public class StorageMusicDataSource {
                 .map(compositions -> mapToMap(compositions, new HashMap<>(), Composition::getId));
     }
 
+    public Observable<Composition> getCompositionObservable(long id) {
+        return compositionsDao.getCompoisitionObservable(id);
+    }
+
     public Observable<List<Composition>> getCompositionObservable2(Order order,
                                                                    @Nullable String query) {
         return compositionsDao.getAllObservable(order, query);
@@ -139,18 +143,24 @@ public class StorageMusicDataSource {
     }
 
     public Completable updateCompositionAuthor(Composition composition, String author) {
-        return Completable.fromAction(() -> musicProvider.updateCompositionAuthor(composition, author))
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            compositionsDao.updateArtist(composition.getId(), author);
+            musicProvider.updateCompositionAuthor(composition, author);
+        });
     }
 
     public Completable updateCompositionTitle(Composition composition, String title) {
-        return Completable.fromAction(() -> musicProvider.updateCompositionTitle(composition, title))
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            compositionsDao.updateTitle(composition.getId(), title);
+            musicProvider.updateCompositionTitle(composition, title);
+        });
     }
 
     public Completable updateCompositionFilePath(Composition composition, String filePath) {
-        return Completable.fromAction(() -> musicProvider.updateCompositionFilePath(composition, filePath))
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            compositionsDao.updateFilePath(composition.getId(), filePath);
+            musicProvider.updateCompositionFilePath(composition, filePath);
+        });
     }
 
     public Completable updateCompositionsFilePath(List<Composition> compositions) {

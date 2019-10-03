@@ -138,18 +138,12 @@ public class StorageMusicProvider {
     }
 
     private void updateComposition(long id, String key, String value) {
-
-
         ContentValues cv = new ContentValues();
         cv.put(key, value);
-        int updatedRows = contentResolver.update(EXTERNAL_CONTENT_URI,
+        contentResolver.update(EXTERNAL_CONTENT_URI,
                 cv,
                 _ID + " = ?",
                 new String[] { String.valueOf(id) });
-
-        if (updatedRows == 0) {
-            throw new UpdateMediaStoreException("media storage not updated");
-        }
     }
 
     private Map<Long, Composition> getCompositions(Uri uri) {

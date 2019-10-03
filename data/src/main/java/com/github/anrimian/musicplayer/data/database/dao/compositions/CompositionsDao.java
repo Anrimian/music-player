@@ -19,6 +19,9 @@ public interface CompositionsDao {
     @Query("SELECT * FROM compositions")
     Observable<List<CompositionEntity>> getAllObservable();
 
+    @Query("SELECT * FROM compositions WHERE id = :id")
+    Observable<CompositionEntity> getCompoisitionObservable(long id);
+
 //    @Query("SELECT * FROM compositions " +
 //            "ORDER BY :orderField")
 //    Observable<List<CompositionEntity>> getAllObservable(String orderField,
