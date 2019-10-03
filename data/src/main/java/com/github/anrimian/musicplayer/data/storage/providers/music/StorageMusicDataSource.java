@@ -30,6 +30,7 @@ import io.reactivex.subjects.PublishSubject;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.Constants.TIMEOUTS.STORAGE_LOADING_TIMEOUT_SECONDS;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToMap;
 import static java.util.Collections.singletonList;
 
@@ -117,29 +118,23 @@ public class StorageMusicDataSource {
     }
 
     public Completable deleteCompositions(List<Composition> compositionsToDelete) {
-        return getCompositions()
-                .doOnSuccess(compositions -> {
-                    for (Composition composition: compositionsToDelete) {
-                        deleteCompositionFile(compositions, composition);
-                    }
-                    musicProvider.deleteCompositions(compositionsToDelete);
-                    compositionSubject.onNext(compositions);
-                    changeSubject.onNext(new Change.DeleteChange<>(compositionsToDelete));
-                })
-                .ignoreElement()
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            for (Composition composition: compositionsToDelete) {
+                deleteCompositionFile(composition);
+            }
+            compositionsDao.deleteAll(mapList(compositionsToDelete, Composition::getId));
+            musicProvider.deleteCompositions(compositionsToDelete);
+            changeSubject.onNext(new Change.DeleteChange<>(compositionsToDelete));
+        });
     }
 
     public Completable deleteComposition(Composition composition) {
-        return getCompositions()
-                .doOnSuccess(compositions -> {
-                    deleteCompositionFile(compositions, composition);
-                    musicProvider.deleteComposition(composition.getId());
-                    compositionSubject.onNext(compositions);
-                    changeSubject.onNext(new Change.DeleteChange<>(singletonList(composition)));
-                })
-                .ignoreElement()
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            deleteCompositionFile(composition);
+            musicProvider.deleteComposition(composition.getId());
+            compositionsDao.delete(composition.getId());
+            changeSubject.onNext(new Change.DeleteChange<>(singletonList(composition)));
+        });
     }
 
     public Completable updateCompositionAuthor(Composition composition, String author) {
@@ -186,14 +181,11 @@ public class StorageMusicDataSource {
         }
     }
 
-    private void deleteCompositionFile(Map<Long, Composition> compositions,
-                                       Composition composition) {
+    private void deleteCompositionFile(Composition composition) {
         String filePath = composition.getFilePath();
         File parentDirectory = new File(filePath).getParentFile();
 
         fileManager.deleteFile(filePath);
-        compositions.remove(composition.getId());
-
         fileManager.deleteEmptyDirectory(parentDirectory);
     }
 

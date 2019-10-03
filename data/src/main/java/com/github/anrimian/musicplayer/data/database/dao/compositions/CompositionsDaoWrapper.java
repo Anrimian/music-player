@@ -70,6 +70,10 @@ public class CompositionsDaoWrapper {
         compositionsDao.delete(id);
     }
 
+    public void deleteAll(List<Long> ids) {
+        compositionsDao.delete(ids);
+    }
+
     public void deleteAll() {
         compositionsDao.deleteAll();
     }
