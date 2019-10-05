@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <!-- support for tablets -->
     <supports-screens
@@ -75,7 +76,6 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-                <action android:name="test.update.plah"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -89,12 +89,18 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-                <action android:name="test.update.plah"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_medium_metadata">
             </meta-data>
+        </receiver>
+
+        <receiver android:name=".infrastructure.receivers.BluetoothConnectionReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+            </intent-filter>
         </receiver>
 
     </application>

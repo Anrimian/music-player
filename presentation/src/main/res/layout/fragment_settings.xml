@@ -33,6 +33,17 @@
             android:layout_marginStart="@dimen/toolbar_content_start"/>
 
         <TextView
+            android:id="@+id/tv_headset"
+            style="@style/TextStyleButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/headset"/>
+
+        <View
+            style="@style/Divider.Horizontal"
+            android:layout_marginStart="@dimen/toolbar_content_start"/>
+
+        <TextView
             android:id="@+id/tv_theme_name"
             style="@style/TextStyleButton"
             android:layout_width="match_parent"
