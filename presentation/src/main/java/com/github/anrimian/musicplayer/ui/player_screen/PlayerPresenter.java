@@ -10,11 +10,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,10 +42,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final CompositeDisposable batterySafeDisposable = new CompositeDisposable();
 
     private List<PlayQueueItem> playQueue = new ArrayList<>();
-
-    private final DiffCalculator<PlayQueueItem> diffCalculator = new DiffCalculator<>(
-            () -> playQueue,
-            PlayQueueItemHelper::areSourcesTheSame);
 
     private PlayQueueItem currentItem;
     private boolean isCoversEnabled = false;
@@ -363,17 +356,16 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void subscribeOnPlayQueue() {
         batterySafeDisposable.add(playerInteractor.getPlayQueueObservable()
-                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError));
     }
 
-    private void onPlayQueueChanged(ListUpdate<PlayQueueItem> update) {
-        playQueue = update.getNewList();
+    private void onPlayQueueChanged(List<PlayQueueItem> list) {
+        playQueue = list;
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setMusicControlsEnabled(!playQueue.isEmpty());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
-        getViewState().updatePlayQueue(update, !scrollToPositionAfterUpdate);
+        getViewState().updatePlayQueue(list);
         if (scrollToPositionAfterUpdate) {
             scrollToPositionAfterUpdate = false;
             if (currentItem != null) {

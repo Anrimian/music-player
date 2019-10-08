@@ -7,8 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter.DiffListAdapter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,11 +23,10 @@ import javax.annotation.Nullable;
  * Created on 31.10.2017.
  */
 
-public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> {
+public class PlayQueueAdapter extends DiffListAdapter<PlayQueueItem, PlayQueueViewHolder> {
 
     private final Set<PlayQueueViewHolder> viewHolders = new HashSet<>();
 
-    private List<PlayQueueItem> musicList;
     private OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener;
     private OnViewItemClickListener<PlayQueueItem> menuClickListener;
     private OnPositionItemClickListener<PlayQueueItem> iconClickListener;
@@ -34,8 +36,11 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
     private boolean play;
     private boolean isCoversEnabled;
 
-    public PlayQueueAdapter(List<PlayQueueItem> musicList) {
-        this.musicList = musicList;
+    public PlayQueueAdapter(RecyclerView recyclerView) {
+        super(recyclerView, new SimpleDiffItemCallback<>(
+                PlayQueueItemHelper::areSourcesTheSame,
+                PlayQueueItemHelper::getChangePayload)
+        );
     }
 
     @NonNull
@@ -52,7 +57,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
     public void onBindViewHolder(@NonNull PlayQueueViewHolder holder, int position) {
         viewHolders.add(holder);
 
-        PlayQueueItem item = musicList.get(position);
+        PlayQueueItem item = getItem(position);
         holder.bind(item, isCoversEnabled);
 
         boolean isCurrentItem = item.equals(currentItem);
@@ -67,11 +72,6 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position);
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return musicList.size();
     }
 
     @Override
@@ -104,10 +104,6 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueViewHolder> 
         for (PlayQueueViewHolder holder: viewHolders) {
             holder.setCoversVisible(isCoversEnabled);
         }
-    }
-
-    public void setItems(List<PlayQueueItem> list) {
-        musicList = list;
     }
 
     public void setOnCompositionClickListener(OnPositionItemClickListener<PlayQueueItem> onCompositionClickListener) {

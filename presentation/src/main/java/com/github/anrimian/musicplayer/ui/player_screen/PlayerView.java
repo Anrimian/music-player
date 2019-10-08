@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ public interface PlayerView extends MvpView {
     void scrollQueueToPosition(int position, boolean smoothScroll);
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updatePlayQueue(ListUpdate<PlayQueueItem> update, boolean keepPosition);
+    void updatePlayQueue(List<PlayQueueItem> items);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showRepeatMode(int mode);
