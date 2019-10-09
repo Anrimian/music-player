@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -27,7 +28,7 @@ public interface PlayQueueRepository {
 
     Observable<PlayQueueEvent> getCurrentQueueItemObservable();
 
-    Observable<List<PlayQueueItem>> getPlayQueueObservable();
+    Flowable<List<PlayQueueItem>> getPlayQueueObservable();
 
     void setRandomPlayingEnabled(boolean enabled);
 

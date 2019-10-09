@@ -1,9 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
-import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 
@@ -15,13 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.queueEntity;
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -34,31 +29,6 @@ public class PlayQueueDaoWrapperTest {
 
     private final PlayQueueDaoWrapper daoWrapper = new PlayQueueDaoWrapper(
             appDatabase, playQueueDao);
-
-    @Test
-    public void getPlayQueueNewTest() {
-        ArrayList<PlayQueueEntity> entities = new ArrayList<>();
-        entities.add(queueEntity(1, Long.MAX_VALUE, 0, 2));
-        entities.add(queueEntity(2, 1, 1, 3));
-        entities.add(queueEntity(3, 2, 30, 8));
-        entities.add(queueEntity(4, 3, 2, 1));
-        when(playQueueDao.getPlayQueue()).thenReturn(entities);
-
-        PlayQueueLists lists = daoWrapper.getPlayQueue(TestDataProvider::getFakeCompositionsMap);
-        verify(playQueueDao).deleteItem(eq(Long.MAX_VALUE));
-
-        List<PlayQueueItem> items = lists.getQueue();
-        assertEquals(3, items.size());
-        assertEquals(2, items.get(0).getId());
-        assertEquals(4, items.get(1).getId());
-        assertEquals(3, items.get(2).getId());
-
-        List<PlayQueueItem> shuffledItems = lists.getShuffledQueue();
-        assertEquals(3, shuffledItems.size());
-        assertEquals(4, shuffledItems.get(0).getId());
-        assertEquals(2, shuffledItems.get(1).getId());
-        assertEquals(3, shuffledItems.get(2).getId());
-    }
 
     @Test
     public void insertNewPlayQueue() {
@@ -77,7 +47,7 @@ public class PlayQueueDaoWrapperTest {
 
         when(playQueueDao.insertItems(any())).thenReturn(ids);
 
-        PlayQueueLists queueLists = daoWrapper.insertNewPlayQueue(list, shuffledList, randomSeed);
+        PlayQueueLists queueLists = daoWrapper.insertNewPlayQueue(list);
 
         List<PlayQueueItem> items = queueLists.getQueue();
         assertEquals(list.get(0), items.get(0).getComposition());

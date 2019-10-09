@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.data.database.dao.compositions;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
-import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
@@ -32,12 +32,12 @@ public class CompositionsDaoWrapper {
 
     public Observable<List<Composition>> getAllObservable() {
         return compositionsDao.getAllObservable()
-                .map(list -> mapList(list, this::toComposition));
+                .map(list -> mapList(list, CompositionMapper::toComposition));
     }
 
     public Observable<Composition> getCompoisitionObservable(long id) {
         return compositionsDao.getCompoisitionObservable(id)
-                .map(this::toComposition);
+                .map(CompositionMapper::toComposition);
     }
 
     public Observable<List<Composition>> getAllObservable(Order order,
@@ -47,11 +47,11 @@ public class CompositionsDaoWrapper {
         query += getOrderQuery(order);
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
         return compositionsDao.getAllObservable(sqlQuery)
-                .map(list -> mapList(list, this::toComposition));
+                .map(list -> mapList(list, CompositionMapper::toComposition));
     }
 
     public List<Composition> getAll() {
-        return mapList(compositionsDao.getAll(), this::toComposition);
+        return mapList(compositionsDao.getAll(), CompositionMapper::toComposition);
     }
 
     public Map<Long, Composition> getAllMap() {
@@ -59,11 +59,11 @@ public class CompositionsDaoWrapper {
     }
 
     public long insert(Composition compositionEntity) {
-        return compositionsDao.insert(toEntity(compositionEntity));
+        return compositionsDao.insert(CompositionMapper.toEntity(compositionEntity));
     }
 
     public void insert(List<Composition> compositions) {
-        compositionsDao.insert(mapList(compositions, this::toEntity));
+        compositionsDao.insert(mapList(compositions, CompositionMapper::toEntity));
     }
 
     public void delete(long id) {
@@ -94,36 +94,10 @@ public class CompositionsDaoWrapper {
                              List<Composition> deletedCompositions,
                              List<Composition> changedCompositions) {
         appDatabase.runInTransaction(() -> {
-            compositionsDao.insert(mapList(addedCompositions, this::toEntity));
+            compositionsDao.insert(mapList(addedCompositions, CompositionMapper::toEntity));
             compositionsDao.delete(mapList(deletedCompositions, Composition::getId));
-            compositionsDao.update(mapList(changedCompositions, this::toEntity));
+            compositionsDao.update(mapList(changedCompositions, CompositionMapper::toEntity));
         });
-    }
-
-    private Composition toComposition(CompositionEntity entity) {
-        return new Composition(entity.getArtist(),
-                entity.getTitle(),
-                entity.getAlbum(),
-                entity.getFilePath(),
-                entity.getDuration(),
-                entity.getSize(),
-                entity.getId(),
-                entity.getDateAdded(),
-                entity.getDateModified(),
-                entity.getCorruptionType());
-    }
-
-    private CompositionEntity toEntity(Composition composition) {
-        return new CompositionEntity(composition.getArtist(),
-                composition.getTitle(),
-                composition.getAlbum(),
-                composition.getFilePath(),
-                composition.getDuration(),
-                composition.getSize(),
-                composition.getId(),
-                composition.getDateAdded(),
-                composition.getDateModified(),
-                composition.getCorruptionType());
     }
 
     private String getOrderQuery(Order order) {

@@ -68,12 +68,10 @@ class MusicModule {
     @NonNull
     @Singleton
     PlayQueueRepository playQueueRepository(PlayQueueDaoWrapper playQueueDao,
-                                               StorageMusicDataSource storageMusicDataSource,
-                                               SettingsRepository settingsPreferences,
-                                               UiStatePreferences uiStatePreferences,
-                                               @Named(DB_SCHEDULER) Scheduler dbScheduler) {
+                                            SettingsRepository settingsPreferences,
+                                            UiStatePreferences uiStatePreferences,
+                                            @Named(DB_SCHEDULER) Scheduler dbScheduler) {
         return new PlayQueueRepositoryImpl(playQueueDao,
-                storageMusicDataSource,
                 settingsPreferences,
                 uiStatePreferences,
                 dbScheduler);

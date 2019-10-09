@@ -329,10 +329,15 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showCurrentQueueItem(newItem, isCoversEnabled);
         if (newItem != null) {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
-            Integer position = playerInteractor.getQueuePosition(newItem);
-            if (position != null) {
-                scrollToItemPosition(position);
-            }
+            scrollToItemPosition(newItem);
+        }
+    }
+
+    private void scrollToItemPosition(PlayQueueItem newItem) {
+        Integer position = playerInteractor.getQueuePosition(newItem);
+//        Integer position = playQueue.indexOf(newItem);//temp!
+        if (position != null/* position != -1*/) {
+            scrollToItemPosition(position);
         }
     }
 
@@ -369,10 +374,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (scrollToPositionAfterUpdate) {
             scrollToPositionAfterUpdate = false;
             if (currentItem != null) {
-                Integer position = playerInteractor.getQueuePosition(currentItem);
-                if (position != null) {
-                    scrollToItemPosition(position);
-                }
+                scrollToItemPosition(currentItem);
             }
         }
     }

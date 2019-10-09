@@ -24,6 +24,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -234,7 +235,7 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getCurrentQueueItemObservable();
     }
 
-    public Observable<List<PlayQueueItem>> getPlayQueueObservable() {
+    public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
         return playQueueRepository.getPlayQueueObservable();
     }
 
