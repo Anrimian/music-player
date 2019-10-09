@@ -17,6 +17,10 @@ public class IndexedList<T> {
         }
     }
 
+    public List<T> getList() {
+        return list;
+    }
+
     public Integer indexOf(T item) {
         return map.get(item);
     }

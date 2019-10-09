@@ -53,6 +53,23 @@ public interface PlayQueueDao {
             "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ")
     Flowable<List<PlayQueueCompositionEntity>> getPlayQueueObservable();
 
+    @Query("SELECT " +
+            "play_queue.id AS itemId," +
+            "play_queue.position AS position," +
+            "play_queue.shuffledPosition AS shuffledPosition," +
+            "compositions.id AS id, " +
+            "compositions.artist AS artist, " +
+            "compositions.title AS title, " +
+            "compositions.album AS album, " +
+            "compositions.filePath AS filePath, " +
+            "compositions.duration AS duration, " +
+            "compositions.size AS size, " +
+            "compositions.dateAdded AS dateAdded, " +
+            "compositions.dateModified AS dateModified, " +
+            "compositions.corruptionType AS corruptionType " +
+            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ")
+    List<PlayQueueCompositionEntity> getFullPlayQueue();
+
     @Insert
     List<Long> insertItems(List<PlayQueueEntity> playQueueEntityList);
 

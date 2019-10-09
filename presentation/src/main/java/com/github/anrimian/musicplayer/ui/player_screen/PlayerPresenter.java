@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
+import android.util.Log;
+
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
@@ -334,11 +336,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void scrollToItemPosition(PlayQueueItem newItem) {
-        Integer position = playerInteractor.getQueuePosition(newItem);
-//        Integer position = playQueue.indexOf(newItem);//temp!
-        if (position != null/* position != -1*/) {
-            scrollToItemPosition(position);
-        }
+        playerInteractor.getQueuePosition(newItem)
+                .observeOn(uiScheduler)
+                .doOnSuccess(this::scrollToItemPosition)
+                .onErrorComplete()
+                .subscribe();
     }
 
     private void subscribeOnPlayerStateChanges() {
@@ -381,6 +383,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void scrollToItemPosition(int position) {
         boolean fastScroll = Math.abs(position - currentPosition) > 1;
+        Log.d("KEK3", "scrollToItemPosition: " + position);
 
         getViewState().scrollQueueToPosition(position, !jumpToNewItem && !fastScroll);
         jumpToNewItem = false;

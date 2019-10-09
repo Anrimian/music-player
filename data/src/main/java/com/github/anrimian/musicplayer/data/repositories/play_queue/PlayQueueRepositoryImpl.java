@@ -21,9 +21,11 @@ import javax.annotation.Nullable;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
+import io.reactivex.processors.PublishProcessor;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
@@ -40,9 +42,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final Scheduler scheduler;
 
     private final BehaviorSubject<PlayQueueEvent> currentCompositionSubject = create();
+    private final PublishProcessor<List<PlayQueueItem>> fastUpdateQueueSubject = PublishProcessor.create();
 
-    @Nullable
-    private IndexedList<PlayQueueItem> currentQueue;
+    private final PlayQueueCache queueCache;
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
                                    SettingsRepository settingsPreferences,
@@ -52,6 +54,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         this.settingsPreferences = settingsPreferences;
         this.uiStatePreferences = uiStatePreferences;
         this.scheduler = scheduler;
+
+        queueCache = new PlayQueueCache(() -> {
+            List<PlayQueueCompositionEntity> entities = playQueueDao.getFullPlayQueue();
+            List<PlayQueueItem> item = toSortedQueue(settingsPreferences.isRandomPlayingEnabled(), entities);
+            return new IndexedList<>(item);
+        });
     }
 
     @Override
@@ -72,11 +80,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Nullable
     @Override
-    public Integer getCompositionPosition(@Nonnull PlayQueueItem playQueueItem) {
-        if (currentQueue == null) {
-            return null;
-        }
-        return currentQueue.indexOf(playQueueItem);
+    public Maybe<Integer> getCompositionPosition(@Nonnull PlayQueueItem playQueueItem) {
+        return Maybe.fromCallable(() -> queueCache.getCurrentQueue().indexOf(playQueueItem))
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -93,12 +99,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .doOnNext(list -> {
                     IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
                     checkForCurrentItemInNewQueue(newQueue);
-                    this.currentQueue = newQueue;
-                });
+                    queueCache.updateQueue(newQueue);
+                }).mergeWith(fastUpdateQueueSubject);
     }
 
     @Override
-    public void setRandomPlayingEnabled(boolean enabled) {
+    public void setRandomPlayingEnabled(boolean enabled) {//performance issue
         Completable.fromAction(() -> {
             if (enabled) {
                 PlayQueueItem item = getCurrentItem();
@@ -112,9 +118,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Single<Integer> skipToNext() {
         return Single.fromCallable(() -> {
-            if (currentQueue == null) {
-                return 0;
-            }
+            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
             Integer position = currentQueue.indexOf(getCurrentItem());
             if (position == null) {
                 return 0;
@@ -126,15 +130,13 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             }
             setCurrentItem(currentQueue.get(position));
             return position;
-        });
+        }).subscribeOn(scheduler);
     }
 
     @Override
     public Single<Integer> skipToPrevious() {
         return Single.fromCallable(() -> {
-            if (currentQueue == null) {
-                return 0;
-            }
+            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
             Integer position = currentQueue.indexOf(getCurrentItem());
             if (position == null) {
                 return 0;
@@ -145,25 +147,21 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             }
             setCurrentItem(currentQueue.get(position));
             return position;
-        });
+        }).subscribeOn(scheduler);
     }
 
     @Override
     public Completable skipToPosition(int position) {
         return Completable.fromAction(() -> {
-            if (currentQueue == null) {
-                return;
-            }
+            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
             setCurrentItem(currentQueue.get(position));
-        });
+        }).subscribeOn(scheduler);
     }
 
     @Override
     public Completable removeQueueItem(PlayQueueItem item) {
         return Completable.fromAction(() -> {
-            if (currentQueue == null) {
-                return;
-            }
+            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
             Integer currentPosition = null;
             PlayQueueItem currentItem = getCurrentItem();
             if (item.equals(currentItem)) {
@@ -193,9 +191,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable addCompositionsToPlayNext(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
-            if (currentQueue == null) {
-                return;
-            }
             PlayQueueItem currentItem = getCurrentItem();
             playQueueDao.addCompositionsToQueue(compositions, currentItem);
         }).subscribeOn(scheduler);
@@ -204,9 +199,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable addCompositionsToEnd(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
-            if (currentQueue == null) {
-                return;
-            }
             playQueueDao.addCompositionsToEndQueue(compositions);
         }).subscribeOn(scheduler);
     }
@@ -291,13 +283,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private void checkForCurrentItemInNewQueue(IndexedList<PlayQueueItem> newQueue) {
-        if (this.currentQueue != null) {
-            PlayQueueItem currentItem = getCurrentItem();
-            if (!newQueue.contains(currentItem)) {
-                Integer currentPosition = this.currentQueue.indexOf(currentItem);
-                if (currentPosition != null) {
-                    selectItemAt(newQueue, currentPosition);
-                }
+        IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
+        PlayQueueItem currentItem = getCurrentItem();
+        if (!newQueue.contains(currentItem)) {
+            Integer currentPosition = currentQueue.indexOf(currentItem);
+            if (currentPosition != null) {
+                selectItemAt(newQueue, currentPosition);
             }
         }
     }

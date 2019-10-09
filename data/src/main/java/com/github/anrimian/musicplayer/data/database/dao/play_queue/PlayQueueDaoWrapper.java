@@ -31,6 +31,10 @@ public class PlayQueueDaoWrapper {
         return playQueueDao.getPlayQueueObservable();
     }
 
+    public List<PlayQueueCompositionEntity> getFullPlayQueue() {
+        return playQueueDao.getFullPlayQueue();
+    }
+
     public PlayQueueCompositionEntity getPlayQueueItem(long id) {
         return playQueueDao.getPlayQueueEntity(id);
     }
@@ -112,18 +116,30 @@ public class PlayQueueDaoWrapper {
     }
 
     public void addCompositionsToQueue(List<Composition> compositions,
-                                                      PlayQueueItem currentItem) {
+                                       PlayQueueItem currentItem) {
         appDatabase.runInTransaction(() -> {
-            int position = playQueueDao.getPosition(currentItem.getId());
-            int shuffledPosition = playQueueDao.getShuffledPosition(currentItem.getId());
+            int position = 0;
+            int shuffledPosition = 0;
+            if (currentItem != null) {
+                position = playQueueDao.getPosition(currentItem.getId());
+                shuffledPosition = playQueueDao.getShuffledPosition(currentItem.getId());
 
-            int increaseBy = compositions.size();
-            playQueueDao.increasePositions(increaseBy, position);
-            playQueueDao.increaseShuffledPositions(increaseBy, shuffledPosition);
+                int increaseBy = compositions.size();
+                playQueueDao.increasePositions(increaseBy, position);
+                playQueueDao.increaseShuffledPositions(increaseBy, shuffledPosition);
+            }
 
             List<PlayQueueEntity> entities = toEntityList(compositions, position, shuffledPosition);
             playQueueDao.insertItems(entities);
         });
+    }
+
+    public int getPosition(long id, boolean isShuffle) {
+        if (isShuffle) {
+            return playQueueDao.getShuffledPosition(id);
+        } else {
+            return playQueueDao.getPosition(id);
+        }
     }
 
     private List<PlayQueueEntity> toEntityList(List<Composition> compositions,
