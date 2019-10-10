@@ -193,15 +193,22 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     public Completable addCompositionsToPlayNext(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
             PlayQueueItem currentItem = getCurrentItem();
-            playQueueDao.addCompositionsToQueue(compositions, currentItem);
+            List<PlayQueueItem> list = playQueueDao.addCompositionsToQueue(compositions, currentItem);
+            if (currentItem == null) {
+                setCurrentItem(list.get(0));
+            }
         }).subscribeOn(scheduler);
     }
 
     @Override
     public Completable addCompositionsToEnd(List<Composition> compositions) {
-        return Completable.fromRunnable(() ->
-                playQueueDao.addCompositionsToEndQueue(compositions)
-        ).subscribeOn(scheduler);
+        return Completable.fromRunnable(() -> {
+            PlayQueueItem currentItem = getCurrentItem();
+            List<PlayQueueItem> list = playQueueDao.addCompositionsToEndQueue(compositions);
+            if (currentItem == null) {
+                setCurrentItem(list.get(0));
+            }
+        }).subscribeOn(scheduler);
     }
 
     @Nonnull
@@ -209,7 +216,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         if (currentCompositionSubject.getValue() != null) {
             return currentCompositionSubject.getValue();
         }
-
         return new PlayQueueEvent(getSavedQueueItem(), uiStatePreferences.getTrackPosition());
     }
 

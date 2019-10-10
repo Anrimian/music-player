@@ -105,14 +105,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     void onCompositionClicked(PlayListItem playListItem, int position) {
-        if (currentItem == null) {
-            playerInteractor.startPlaying(
-                    mapList(items, PlayListItem::getComposition),
-                    position
-            );
-        } else {
-            getViewState().showCompositionActionDialog(playListItem, position);
-        }
+        getViewState().showCompositionActionDialog(playListItem, position);
     }
 
     void onItemIconClicked(int position) {

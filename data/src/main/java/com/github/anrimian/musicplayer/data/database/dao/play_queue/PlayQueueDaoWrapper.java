@@ -107,17 +107,18 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public void addCompositionsToEndQueue(List<Composition> compositions) {
-        appDatabase.runInTransaction(() -> {
+    public List<PlayQueueItem> addCompositionsToEndQueue(List<Composition> compositions) {
+        return appDatabase.runInTransaction(() -> {
             int positionToInsert = playQueueDao.getLastPosition();
             List<PlayQueueEntity> entities = toEntityList(compositions, positionToInsert, positionToInsert);
-            playQueueDao.insertItems(entities);
+            List<Long> ids = playQueueDao.insertItems(entities);
+            return toPlayQueueItems(compositions, ids);
         });
     }
 
-    public void addCompositionsToQueue(List<Composition> compositions,
-                                       PlayQueueItem currentItem) {
-        appDatabase.runInTransaction(() -> {
+    public List<PlayQueueItem> addCompositionsToQueue(List<Composition> compositions,
+                                                      PlayQueueItem currentItem) {
+        return appDatabase.runInTransaction(() -> {
             int position = 0;
             int shuffledPosition = 0;
             if (currentItem != null) {
@@ -130,7 +131,8 @@ public class PlayQueueDaoWrapper {
             }
 
             List<PlayQueueEntity> entities = toEntityList(compositions, position, shuffledPosition);
-            playQueueDao.insertItems(entities);
+            List<Long> ids = playQueueDao.insertItems(entities);
+            return toPlayQueueItems(compositions, ids);
         });
     }
 

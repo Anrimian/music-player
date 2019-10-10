@@ -104,12 +104,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     void onCompositionClicked(int position, Composition composition) {
         if (selectedCompositions.isEmpty()) {
-            if (currentComposition != null) {
-                getViewState().showCompositionActionDialog(composition, position);
-            } else {
-                interactor.play(compositions, position);
-                getViewState().showCurrentPlayingComposition(composition);
-            }
+            getViewState().showCompositionActionDialog(composition, position);
         } else {
             if (selectedCompositions.contains(composition)) {
                 selectedCompositions.remove(composition);

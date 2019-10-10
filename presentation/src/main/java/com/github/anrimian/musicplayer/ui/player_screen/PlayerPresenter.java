@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import android.util.Log;
-
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
@@ -383,7 +381,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void scrollToItemPosition(int position) {
         boolean fastScroll = Math.abs(position - currentPosition) > 1;
-        Log.d("KEK3", "scrollToItemPosition: " + position);
 
         getViewState().scrollQueueToPosition(position, !jumpToNewItem && !fastScroll);
         jumpToNewItem = false;
