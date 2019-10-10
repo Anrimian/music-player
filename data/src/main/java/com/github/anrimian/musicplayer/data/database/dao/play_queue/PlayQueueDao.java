@@ -10,7 +10,7 @@ import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQue
 
 import java.util.List;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 @Dao
 public interface PlayQueueDao {
@@ -51,7 +51,7 @@ public interface PlayQueueDao {
             "compositions.dateModified AS dateModified, " +
             "compositions.corruptionType AS corruptionType " +
             "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ")
-    Flowable<List<PlayQueueCompositionEntity>> getPlayQueueObservable();
+    Observable<List<PlayQueueCompositionEntity>> getPlayQueueObservable();
 
     @Query("SELECT " +
             "play_queue.id AS itemId," +

@@ -93,9 +93,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
-        return Flowable.combineLatest(settingsPreferences.getRandomPlayingObservable().toFlowable(BackpressureStrategy.BUFFER),
+        return Observable.combineLatest(settingsPreferences.getRandomPlayingObservable(),
                 playQueueDao.getPlayQueueObservable(),
                 this::toSortedQueue)
+                .toFlowable(BackpressureStrategy.BUFFER)
                 .doOnNext(list -> {
                     IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
                     checkForCurrentItemInNewQueue(newQueue);
@@ -104,7 +105,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public void setRandomPlayingEnabled(boolean enabled) {//performance issue
+    public void setRandomPlayingEnabled(boolean enabled) {//performance issue with large lists
         Completable.fromAction(() -> {
             if (enabled) {
                 PlayQueueItem item = getCurrentItem();
@@ -198,9 +199,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Completable addCompositionsToEnd(List<Composition> compositions) {
-        return Completable.fromRunnable(() -> {
-            playQueueDao.addCompositionsToEndQueue(compositions);
-        }).subscribeOn(scheduler);
+        return Completable.fromRunnable(() ->
+                playQueueDao.addCompositionsToEndQueue(compositions)
+        ).subscribeOn(scheduler);
     }
 
     @Nonnull

@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 /**
  * Created on 02.07.2018.
@@ -27,7 +27,7 @@ public class PlayQueueDaoWrapper {
         this.playQueueDao = playQueueDao;
     }
 
-    public Flowable<List<PlayQueueCompositionEntity>> getPlayQueueObservable() {
+    public Observable<List<PlayQueueCompositionEntity>> getPlayQueueObservable() {
         return playQueueDao.getPlayQueueObservable();
     }
 
