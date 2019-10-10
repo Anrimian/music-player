@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.music.folders;
 
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
@@ -34,7 +33,7 @@ import static org.mockito.Mockito.when;
 
 public class MusicFolderDataSourceTest {
 
-    private StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
+    private CompositionFoldersCache storageMusicDataSource = mock(CompositionFoldersCache.class);
     private PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
 
     private MusicFolderDataSource musicFolderDataSource = new MusicFolderDataSource(

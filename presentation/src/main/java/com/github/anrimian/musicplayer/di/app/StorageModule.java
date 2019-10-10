@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.edit.EditorRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.music.folders.CompositionFoldersCache;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
@@ -53,7 +54,14 @@ public class StorageModule {
     @Provides
     @Nonnull
     @Singleton
-    MusicFolderDataSource musicFolderDataSource(StorageMusicDataSource storageMusicDataSource) {
+    CompositionFoldersCache compositionFoldersCache(CompositionsDaoWrapper compositionsDao) {
+        return new CompositionFoldersCache(compositionsDao);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    MusicFolderDataSource musicFolderDataSource(CompositionFoldersCache storageMusicDataSource) {
         return new MusicFolderDataSource(storageMusicDataSource);
     }
 

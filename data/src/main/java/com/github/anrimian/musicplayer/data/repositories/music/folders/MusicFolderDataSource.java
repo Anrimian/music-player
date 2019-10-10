@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music.folders;
 
 import com.github.anrimian.musicplayer.data.models.exceptions.FolderNodeNonExistException;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.utils.folders.NodeData;
 import com.github.anrimian.musicplayer.data.utils.folders.RxNode;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -34,12 +33,12 @@ public class MusicFolderDataSource {
 
     private final FolderMapper folderMapper = new FolderMapper();
 
-    private final StorageMusicDataSource storageMusicDataSource;
+    private final CompositionFoldersCache storageMusicDataSource;
 
     @Nullable
     private RxNode<String> root;
 
-    public MusicFolderDataSource(StorageMusicDataSource storageMusicDataSource) {
+    public MusicFolderDataSource(CompositionFoldersCache storageMusicDataSource) {
         this.storageMusicDataSource = storageMusicDataSource;
     }
 

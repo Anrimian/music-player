@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import io.reactivex.BackpressureStrategy;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
@@ -52,7 +51,7 @@ public class PlayQueueRepositoryImplTest {
         when(playQueueDao.insertNewPlayQueue(any())).thenReturn(
                 new PlayQueueLists(getFakeItems(), getReversedFakeItems()));
         when(playQueueDao.getPlayQueueObservable())
-                .thenReturn(playQueueDaoSubject.toFlowable(BackpressureStrategy.BUFFER));
+                .thenReturn(playQueueDaoSubject);
 
         when(uiStatePreferences.getCurrentPlayQueueId()).thenReturn(NO_COMPOSITION);
         when(uiStatePreferences.getCurrentCompositionId()).thenReturn(NO_COMPOSITION);
