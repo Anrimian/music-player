@@ -14,6 +14,8 @@ import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import butterknife.BindView;
@@ -65,6 +67,10 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
 //        compositionItemWrapper.showNumber(getAdapterPosition());
     }
 
+    void update(PlayQueueItem item, List<Object> payloads) {
+        compositionItemWrapper.update(item.getComposition(), payloads);
+    }
+
     void setCoversVisible(boolean visible) {
         compositionItemWrapper.showCompositionImage(visible);
     }
@@ -80,4 +86,6 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
     PlayQueueItem getPlayQueueItem() {
         return playQueueItem;
     }
+
+
 }

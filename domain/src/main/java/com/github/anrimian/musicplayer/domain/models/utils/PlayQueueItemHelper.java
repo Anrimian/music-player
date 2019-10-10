@@ -10,8 +10,7 @@ public class PlayQueueItemHelper {
 
     public static boolean areSourcesTheSame(@Nonnull PlayQueueItem first,
                                             @Nonnull PlayQueueItem second) {
-        return first.getId() == second.getId()
-                && CompositionHelper.areSourcesTheSame(first.getComposition(), second.getComposition());
+        return CompositionHelper.areSourcesTheSame(first.getComposition(), second.getComposition());
     }
 
     public static List<Object> getChangePayload(@Nonnull PlayQueueItem first,

@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.utils.collections.IndexedList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -292,7 +293,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private void checkForCurrentItemInNewQueue(IndexedList<PlayQueueItem> newQueue) {
         IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
         PlayQueueItem currentItem = getCurrentItem();
-        if (!newQueue.contains(currentItem)) {
+        if (currentItem != null && newQueue.contains(currentItem)) {
+            //check for update
+            Integer currentPosition = newQueue.indexOf(currentItem);
+            PlayQueueItem newItem = newQueue.get(currentPosition);
+            if (!PlayQueueItemHelper.areSourcesTheSame(newItem, currentItem)) {
+                setCurrentItem(newItem);
+            }
+        } else {
+            //select new item
             Integer currentPosition = currentQueue.indexOf(currentItem);
             if (currentPosition != null) {
                 selectItemAt(newQueue, currentPosition);

@@ -71,6 +71,8 @@ public class PlayQueueAdapter extends DiffListAdapter<PlayQueueItem, PlayQueueVi
                                  @NonNull List<Object> payloads) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position);
+        } else {
+            holder.update(getItem(position), payloads);
         }
     }
 
