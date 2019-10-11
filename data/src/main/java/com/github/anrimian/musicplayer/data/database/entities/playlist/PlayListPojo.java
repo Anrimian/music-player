@@ -1,10 +1,12 @@
-package com.github.anrimian.musicplayer.domain.models.playlist;
+package com.github.anrimian.musicplayer.data.database.entities.playlist;
+
+import androidx.annotation.NonNull;
 
 import java.util.Date;
 
 import javax.annotation.Nonnull;
 
-public class PlayList {
+public class PlayListPojo {
 
     private final long id;
 
@@ -21,12 +23,12 @@ public class PlayList {
 
     private final long totalDuration;
 
-    public PlayList(long id,
-                    @Nonnull String name,
-                    @Nonnull Date dateAdded,
-                    @Nonnull Date dateModified,
-                    int compositionsCount,
-                    long totalDuration) {
+    public PlayListPojo(long id,
+                        @Nonnull String name,
+                        @Nonnull Date dateAdded,
+                        @Nonnull Date dateModified,
+                        int compositionsCount,
+                        long totalDuration) {
         this.id = id;
         this.name = name;
         this.dateAdded = dateAdded;
@@ -62,21 +64,7 @@ public class PlayList {
         return dateModified;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        PlayList playList = (PlayList) o;
-
-        return id == playList.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (id ^ (id >>> 32));
-    }
-
+    @NonNull
     @Override
     public String toString() {
         return "PlayList{" +

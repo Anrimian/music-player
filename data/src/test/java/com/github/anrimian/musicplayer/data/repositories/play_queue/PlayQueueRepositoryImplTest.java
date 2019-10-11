@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionEntity;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
@@ -35,7 +35,7 @@ public class PlayQueueRepositoryImplTest {
     private final SettingsRepositoryImpl settingsPreferences = mock(SettingsRepositoryImpl.class);
     private final UiStatePreferences uiStatePreferences = mock(UiStatePreferences.class);
 
-    private final PublishSubject<List<PlayQueueCompositionEntity>> playQueueDaoSubject = PublishSubject.create();
+    private final PublishSubject<List<PlayQueueCompositionDto>> playQueueDaoSubject = PublishSubject.create();
     private final BehaviorSubject<Boolean> randomModeObservable = BehaviorSubject.createDefault(false);
 
     private PlayQueueRepository playQueueRepository = new PlayQueueRepositoryImpl(playQueueDao,

@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionEntity;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -27,15 +27,15 @@ public class PlayQueueDaoWrapper {
         this.playQueueDao = playQueueDao;
     }
 
-    public Observable<List<PlayQueueCompositionEntity>> getPlayQueueObservable() {
+    public Observable<List<PlayQueueCompositionDto>> getPlayQueueObservable() {
         return playQueueDao.getPlayQueueObservable();
     }
 
-    public List<PlayQueueCompositionEntity> getFullPlayQueue() {
+    public List<PlayQueueCompositionDto> getFullPlayQueue() {
         return playQueueDao.getFullPlayQueue();
     }
 
-    public PlayQueueCompositionEntity getPlayQueueItem(long id) {
+    public PlayQueueCompositionDto getPlayQueueItem(long id) {
         return playQueueDao.getPlayQueueEntity(id);
     }
 

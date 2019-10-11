@@ -5,7 +5,7 @@ import androidx.room.Embedded;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 
-public class PlayQueueCompositionEntity {
+public class PlayQueueCompositionDto {
 
     private final long itemId;
     private final int position;
@@ -14,10 +14,10 @@ public class PlayQueueCompositionEntity {
     @Embedded
     private final CompositionEntity composition;
 
-    public PlayQueueCompositionEntity(long itemId,
-                                      int position,
-                                      int shuffledPosition,
-                                      CompositionEntity composition) {
+    public PlayQueueCompositionDto(long itemId,
+                                   int position,
+                                   int shuffledPosition,
+                                   CompositionEntity composition) {
         this.itemId = itemId;
         this.position = position;
         this.shuffledPosition = shuffledPosition;
@@ -43,7 +43,7 @@ public class PlayQueueCompositionEntity {
     @NonNull
     @Override
     public String toString() {
-        return "PlayQueueCompositionEntity{" +
+        return "PlayQueueCompositionDto{" +
                 "itemId=" + itemId +
                 ", composition=" + composition +
                 '}';

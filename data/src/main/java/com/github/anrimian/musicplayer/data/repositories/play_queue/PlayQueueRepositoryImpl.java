@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionEntity;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
@@ -57,7 +57,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         this.scheduler = scheduler;
 
         queueCache = new PlayQueueCache(() -> {
-            List<PlayQueueCompositionEntity> entities = playQueueDao.getFullPlayQueue();
+            List<PlayQueueCompositionDto> entities = playQueueDao.getFullPlayQueue();
             List<PlayQueueItem> item = toSortedQueue(settingsPreferences.isRandomPlayingEnabled(), entities);
             return new IndexedList<>(item);
         });
@@ -223,7 +223,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Nullable
     private PlayQueueItem getSavedQueueItem() {
         long id = uiStatePreferences.getCurrentPlayQueueId();
-        PlayQueueCompositionEntity entity = playQueueDao.getPlayQueueItem(id);
+        PlayQueueCompositionDto entity = playQueueDao.getPlayQueueItem(id);
         if (entity == null) {
             return null;
         }
@@ -262,7 +262,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         setCurrentItem(item);
     }
 
-    private List<PlayQueueItem> toSortedQueue(boolean isRandom, List<PlayQueueCompositionEntity> items) {
+    private List<PlayQueueItem> toSortedQueue(boolean isRandom, List<PlayQueueCompositionDto> items) {
         Collections.sort(items, (first, second) -> {
             if (isRandom) {
                 return Integer.compare(first.getShuffledPosition(), second.getShuffledPosition());
@@ -273,7 +273,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return mapList(items, this::toPlayQueueItem);
     }
 
-    private PlayQueueItem toPlayQueueItem(PlayQueueCompositionEntity entity) {
+    private PlayQueueItem toPlayQueueItem(PlayQueueCompositionDto entity) {
         return new PlayQueueItem(entity.getItemId(),
                 CompositionMapper.toComposition(entity.getComposition())
         );

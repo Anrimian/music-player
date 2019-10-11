@@ -5,7 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionEntity;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public interface PlayQueueDao {
             "compositions.corruptionType AS corruptionType " +
             "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
             "WHERE play_queue.id = :id")
-    PlayQueueCompositionEntity getPlayQueueEntity(long id);
+    PlayQueueCompositionDto getPlayQueueEntity(long id);
 
     @Query("SELECT " +
             "play_queue.id AS itemId," +
@@ -51,7 +51,7 @@ public interface PlayQueueDao {
             "compositions.dateModified AS dateModified, " +
             "compositions.corruptionType AS corruptionType " +
             "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ")
-    Observable<List<PlayQueueCompositionEntity>> getPlayQueueObservable();
+    Observable<List<PlayQueueCompositionDto>> getPlayQueueObservable();
 
     @Query("SELECT " +
             "play_queue.id AS itemId," +
@@ -68,7 +68,7 @@ public interface PlayQueueDao {
             "compositions.dateModified AS dateModified, " +
             "compositions.corruptionType AS corruptionType " +
             "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ")
-    List<PlayQueueCompositionEntity> getFullPlayQueue();
+    List<PlayQueueCompositionDto> getFullPlayQueue();
 
     @Insert
     List<Long> insertItems(List<PlayQueueEntity> playQueueEntityList);

@@ -7,11 +7,13 @@ import java.util.Date;
 
 import javax.annotation.Nonnull;
 
-@Entity
+@Entity(tableName = "play_lists")
 public class PlayListEntity {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
+
+    private long storageId;
 
     @Nonnull
     private String name;
@@ -22,26 +24,26 @@ public class PlayListEntity {
     @Nonnull
     private Date dateModified;
 
-    private int compositionsCount;
-
-    private long totalDuration;
-
-    public PlayListEntity(long id,
+    public PlayListEntity(long storageId,
                           @Nonnull String name,
                           @Nonnull Date dateAdded,
-                          @Nonnull Date dateModified,
-                          int compositionsCount,
-                          long totalDuration) {
-        this.id = id;
+                          @Nonnull Date dateModified) {
+        this.storageId = storageId;
         this.name = name;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.compositionsCount = compositionsCount;
-        this.totalDuration = totalDuration;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public long getId() {
         return id;
+    }
+
+    public long getStorageId() {
+        return storageId;
     }
 
     @Nonnull
@@ -57,13 +59,5 @@ public class PlayListEntity {
     @Nonnull
     public Date getDateModified() {
         return dateModified;
-    }
-
-    public int getCompositionsCount() {
-        return compositionsCount;
-    }
-
-    public long getTotalDuration() {
-        return totalDuration;
     }
 }
