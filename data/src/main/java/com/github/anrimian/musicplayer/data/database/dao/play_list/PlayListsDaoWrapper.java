@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
@@ -19,14 +20,25 @@ import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
-public class PlayQueueDaoWrapper {
+public class PlayListsDaoWrapper {
 
     private final PlayListDao playListDao;
     private final AppDatabase appDatabase;
 
-    public PlayQueueDaoWrapper(PlayListDao playListDao, AppDatabase appDatabase) {
+    public PlayListsDaoWrapper(PlayListDao playListDao, AppDatabase appDatabase) {
         this.playListDao = playListDao;
         this.appDatabase = appDatabase;
+    }
+
+    public void applyChanges(List<StoragePlayList> addedPlayLists,
+                             List<StoragePlayList> changedPlayLists) {
+        appDatabase.runInTransaction(() -> {
+            playListDao.insertPlayListEntities(mapList(addedPlayLists, this::toEntity));
+            for (StoragePlayList playList: changedPlayLists) {
+                playListDao.updatePlayListModifyTimeByStorageId(playList.getId(), playList.getDateModified());
+                playListDao.updatePlayListNameByStorageId(playList.getId(), playList.getName());
+            }
+        });
     }
 
     public void insertPlayList(@Nullable Long storageId,
@@ -39,6 +51,10 @@ public class PlayQueueDaoWrapper {
                 dateAdded,
                 dateModified);
         playListDao.insertPlayListEntity(entity);
+    }
+
+    public List<StoragePlayList> getAllAsStoragePlayLists() {
+        return playListDao.getAllAsStoragePlayLists();
     }
 
     public void deletePlayList(long id) {
@@ -117,5 +133,12 @@ public class PlayQueueDaoWrapper {
                 pojo.getDateModified(),
                 pojo.getCompositionsCount(),
                 pojo.getTotalDuration());
+    }
+
+    private PlayListEntity toEntity(StoragePlayList storagePlayList) {
+        return new PlayListEntity(storagePlayList.getId(),
+                storagePlayList.getName(),
+                storagePlayList.getDateAdded(),
+                storagePlayList.getDateModified());
     }
 }

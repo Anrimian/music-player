@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
+import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotFoundException;
 import com.github.anrimian.musicplayer.data.repositories.playlists.comparators.PlayListModifyDateComparator;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
@@ -11,7 +12,6 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.map.MapChangeProcessor;
-import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,13 +28,14 @@ import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper.getTotalDuration;
 
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     private final StoragePlayListsProvider storagePlayListsProvider;
+    @Deprecated
     private final StorageMusicDataSource storageMusicDataSource;
+    private final PlayListsDaoWrapper playListsDaoWrapper;
     private final Scheduler scheduler;
 
     private final BehaviorSubject<Map<Long, PlayListDataSource>> playListsSubject = BehaviorSubject.create();
@@ -44,31 +45,22 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
                                    StorageMusicDataSource storageMusicDataSource,
+                                   PlayListsDaoWrapper playListsDaoWrapper,
                                    Scheduler scheduler) {
         this.storagePlayListsProvider = storagePlayListsProvider;
         this.storageMusicDataSource = storageMusicDataSource;
+        this.playListsDaoWrapper = playListsDaoWrapper;
         this.scheduler = scheduler;
     }
 
     @Override
     public Observable<List<PlayList>> getPlayListsObservable() {
-        return withDefaultValue(playListsSubject, this::getPlayListsMap)
-                .flatMapSingle(this::toPlayLists)
-                .map(this::toSortedPlayLists)
-                .debounce(new FastDebounceFilter<>())//issues with often updates
-                .subscribeOn(scheduler);
+        return playListsDaoWrapper.getPlayListsObservable();
     }
 
     @Override
     public Observable<PlayList> getPlayListObservable(long playlistId) {
-        PlayListDataSource playListFullModel = getPlayListsMap().get(playlistId);
-        Observable<PlayList> observable;
-        if (playListFullModel == null) {
-            observable = Observable.error(new PlayListNotFoundException());
-        } else {
-            observable = playListFullModel.getPlayListObservable();
-        }
-        return observable.subscribeOn(scheduler);
+        return playListsDaoWrapper.getPlayListsObservable(playlistId);
     }
 
     @Override
@@ -164,7 +156,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     private void subscribeOnPlayListChanges() {
-        changeDisposable = storagePlayListsProvider.getChangeObservable()
+        changeDisposable = storagePlayListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)
                 .subscribe(this::onPlayListsChanged);
     }

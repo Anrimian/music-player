@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
+import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
@@ -38,19 +39,23 @@ public class PlayListsRepositoryImplTest {
 
     private StoragePlayListsProvider storagePlayListsProvider = mock(StoragePlayListsProvider.class);
     private StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
+    private PlayListsDaoWrapper playListsDaoWrapper = mock(PlayListsDaoWrapper.class);
 
     private PublishSubject<Map<Long, StoragePlayList>> playListSubject = PublishSubject.create();
     private PublishSubject<List<StoragePlayListItem>> itemsSubject = PublishSubject.create();
     private PublishSubject<Map<Long, Composition>> compositionsSubject = PublishSubject.create();
 
     private PlayListsRepositoryImpl playListsRepositoryImpl = new PlayListsRepositoryImpl(
-            storagePlayListsProvider, storageMusicDataSource, Schedulers.trampoline());
+            storagePlayListsProvider,
+            storageMusicDataSource,
+            playListsDaoWrapper,
+            Schedulers.trampoline());
 
     @Before
     public void setUp() {
         when(storagePlayListsProvider.getPlayLists()).thenReturn(Collections.singletonMap(1L, storagePlayList(1L)));
         when(storagePlayListsProvider.getPlayListItems(anyLong())).thenReturn(getFakeStoragePlayListItems());
-        when(storagePlayListsProvider.getChangeObservable()).thenReturn(playListSubject);
+        when(storagePlayListsProvider.getPlayListsObservable()).thenReturn(playListSubject);
         when(storagePlayListsProvider.getPlayListChangeObservable(anyLong())).thenReturn(itemsSubject);
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(getFakeCompositionsMap());

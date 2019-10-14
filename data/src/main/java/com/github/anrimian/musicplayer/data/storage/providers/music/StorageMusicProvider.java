@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 
-import com.github.anrimian.musicplayer.data.storage.providers.UpdateMediaStoreException;
+import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;

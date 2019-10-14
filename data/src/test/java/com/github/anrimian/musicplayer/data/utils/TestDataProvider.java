@@ -46,11 +46,20 @@ public class TestDataProvider {
         return items;
     }
 
+    public static Map<Long, StoragePlayListItem> getFakeStoragePlayListItemsMap() {
+        Map<Long, StoragePlayListItem> items = new HashMap<>();
+        for (long i = 0; i < 100000; i++) {
+            StoragePlayListItem item = new StoragePlayListItem(i, i);
+            items.put(i, item);
+        }
+        return items;
+    }
+
     public static List<PlayListItem> getFakePlayListItems() {
         List<PlayListItem> items = new ArrayList<>();
         for (int i = 0; i < 100000; i++) {
             Composition composition = fakeComposition(i, "music-" + i);
-            PlayListItem item = new PlayListItem(i, composition);
+            PlayListItem item = new PlayListItem(i, (long) i, composition);
             items.add(item);
         }
         return items;
@@ -194,12 +203,12 @@ public class TestDataProvider {
         return new StoragePlayList(i, "test" + i, new Date(i), new Date(i));
     }
 
-    public static List<StoragePlayList> storagePlayLists(long count) {
-        List<StoragePlayList> compositions = new ArrayList<>((int) count);
+    public static Map<Long, StoragePlayList> storagePlayLists(long count) {
+        Map<Long, StoragePlayList> items = new HashMap<>();
         for (long i = 0; i < count; i++) {
-            compositions.add(storagePlayList(i));
+            items.put(i, storagePlayList(i));
         }
-        return compositions;
+        return items;
     }
 
     public static PlayQueueEntity queueEntity(long id,

@@ -5,10 +5,8 @@ import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
-import com.github.anrimian.musicplayer.domain.utils.changes.map.MapChangeProcessor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,9 +46,6 @@ public class StorageMusicDataSource {
     private Map<Long, Composition> compositions;
     private Disposable changeDisposable;
 
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
-    private Disposable changeDisposable2;
-
     public StorageMusicDataSource(StorageMusicProvider musicProvider,
                                   CompositionsDaoWrapper compositionsDao,
                                   FileManager fileManager,
@@ -59,11 +54,6 @@ public class StorageMusicDataSource {
         this.compositionsDao = compositionsDao;
         this.fileManager = fileManager;
         this.scheduler = scheduler;
-
-        changeDisposable2 = musicProvider.getCompositionsObservable()
-                .startWith(musicProvider.getCompositions())
-                .subscribeOn(scheduler)
-                .subscribe(this::onNewCompositionsFromMediaStorageReceived);
     }
 
     @Deprecated
@@ -161,24 +151,6 @@ public class StorageMusicDataSource {
     public Completable updateCompositionsFilePath(List<Composition> compositions) {
         return Completable.fromAction(() -> musicProvider.updateCompositionsFilePath(compositions))
                 .subscribeOn(scheduler);
-    }
-
-    private void onNewCompositionsFromMediaStorageReceived(Map<Long, Composition> newCompositions) {
-        Map<Long, Composition> currentCompositions = compositionsDao.getAllMap();
-
-        List<Composition> addedCompositions = new ArrayList<>();
-        List<Composition> deletedCompositions = new ArrayList<>();
-        List<Composition> changedCompositions = new ArrayList<>();
-        boolean hasChanges = MapChangeProcessor.processChanges2(currentCompositions,
-                newCompositions,
-                CompositionHelper::hasChanges,
-                deletedCompositions::add,
-                addedCompositions::add,
-                changedCompositions::add);
-
-        if (hasChanges) {
-            compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
-        }
     }
 
     private void deleteCompositionFile(Composition composition) {

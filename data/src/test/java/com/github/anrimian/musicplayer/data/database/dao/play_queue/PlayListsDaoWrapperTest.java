@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created on 02.07.2018.
  */
-public class PlayQueueDaoWrapperTest {
+public class PlayListsDaoWrapperTest {
 
     private final PlayQueueDao playQueueDao = mock(PlayQueueDao.class);
     private final AppDatabase appDatabase = mock(AppDatabase.class);

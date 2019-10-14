@@ -45,7 +45,7 @@ public class StoragePlayListsProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<Map<Long, StoragePlayList>> getChangeObservable() {
+    public Observable<Map<Long, StoragePlayList>> getPlayListsObservable() {
         return RxContentObserver.getObservable(contentResolver, Playlists.EXTERNAL_CONTENT_URI)
                 .map(o -> getPlayLists());
     }

@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,9 @@ public interface PlayListDao {
     @Insert
     void insertPlayListEntity(PlayListEntity entity);
 
+    @Insert
+    void insertPlayListEntities(List<PlayListEntity> entities);
+
     @Query("DELETE FROM play_lists WHERE id = :id")
     void deletePlayList(long id);
 
@@ -29,6 +33,12 @@ public interface PlayListDao {
     @Query("UPDATE play_lists SET dateModified = :modifyTime WHERE id = :id")
     void updatePlayListModifyTime(long id, Date modifyTime);
 
+    @Query("UPDATE play_lists SET name = :name WHERE storageId = :storageId")
+    void updatePlayListNameByStorageId(long storageId, String name);
+
+    @Query("UPDATE play_lists SET dateModified = :modifyTime WHERE storageId = :storageId")
+    void updatePlayListModifyTimeByStorageId(long storageId, Date modifyTime);
+
     //can we cache duplicates?
     @Query("SELECT " +
             "play_lists.id as id, " +
@@ -37,10 +47,18 @@ public interface PlayListDao {
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount, " +
-            "sum(compositions.duration) as totalDuration " +
-            "FROM play_lists INNER JOIN compositions WHERE compositions.id IN (SELECT storageId FROM play_lists_entries WHERE playListId = play_lists.id) " +
+            "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM play_lists_entries WHERE playListId = play_lists.id)) as totalDuration " +
+            "FROM play_lists " +
             "ORDER BY dateModified")
     Observable<List<PlayListPojo>> getPlayListsObservable();
+
+    @Query("SELECT " +
+            "play_lists.storageId as id, " +
+            "play_lists.name as name, " +
+            "play_lists.dateAdded as dateAdded, " +
+            "play_lists.dateModified as dateModified " +
+            "FROM play_lists")
+    List<StoragePlayList> getAllAsStoragePlayLists();
 
     @Query("SELECT " +
             "play_lists.id as id, " +
@@ -49,9 +67,8 @@ public interface PlayListDao {
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount, " +
-            "sum(compositions.duration) as totalDuration " +
+            "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM play_lists_entries WHERE playListId = play_lists.id)) as totalDuration " +
             "FROM play_lists " +
-            "INNER JOIN compositions ON compositions.id IN (SELECT storageId FROM play_lists_entries WHERE playListId = play_lists.id) " +
             "WHERE play_lists.id = :id " +
             "ORDER BY dateModified")
     Observable<List<PlayListPojo>> getPlayListObservable(long id);

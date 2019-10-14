@@ -16,7 +16,6 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.eq;
@@ -76,29 +75,6 @@ public class StorageMusicDataSourceTest {
                     assertNull(compositions.get(getFakeCompositionsMap().size() - 1L));
                     return true;
                 });
-    }
-
-    @Test
-    public void changeDatabaseTest() {
-        Map<Long, Composition> currentCompositions = getFakeCompositionsMap();
-        when(compositionsDao.getAllMap()).thenReturn(currentCompositions);
-
-        Map<Long, Composition> newCompositions = getFakeCompositionsMap();
-        Composition removedComposition = newCompositions.remove(100L);
-
-        Composition changedComposition = fakeComposition(1, "new path");
-        newCompositions.put(1L, changedComposition);
-
-        Composition newComposition = fakeComposition(-1L, "new composition");
-        newCompositions.put(-1L, newComposition);
-
-        newCompositionsSubject.onNext(newCompositions);
-
-        verify(compositionsDao).applyChanges(
-                eq(asList(newComposition)),
-                eq(asList(removedComposition)),
-                eq(asList(changedComposition))
-        );
     }
 
     @Test

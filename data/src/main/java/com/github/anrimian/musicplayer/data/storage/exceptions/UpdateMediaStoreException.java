@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.storage.providers;
+package com.github.anrimian.musicplayer.data.storage.exceptions;
 
 public class UpdateMediaStoreException extends RuntimeException {
 

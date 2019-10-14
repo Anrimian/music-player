@@ -45,7 +45,7 @@ public class StoragePlayListProviderTest {
 
     @Test
     public void createAndDeletePlayListTest() {
-        TestObserver<Map<Long, StoragePlayList>> playListsObserver = storagePlayListsProvider.getChangeObservable()
+        TestObserver<Map<Long, StoragePlayList>> playListsObserver = storagePlayListsProvider.getPlayListsObservable()
                 .test();
 
         StoragePlayList createdPlayList = storagePlayListsProvider.createPlayList("test playlist10");
