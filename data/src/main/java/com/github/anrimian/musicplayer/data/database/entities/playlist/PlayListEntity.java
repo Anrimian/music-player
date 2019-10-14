@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @Entity(tableName = "play_lists")
 public class PlayListEntity {
@@ -13,7 +14,8 @@ public class PlayListEntity {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-    private long storageId;
+    @Nullable
+    private Long storageId;
 
     @Nonnull
     private String name;
@@ -24,7 +26,7 @@ public class PlayListEntity {
     @Nonnull
     private Date dateModified;
 
-    public PlayListEntity(long storageId,
+    public PlayListEntity(@Nullable Long storageId,
                           @Nonnull String name,
                           @Nonnull Date dateAdded,
                           @Nonnull Date dateModified) {
@@ -42,7 +44,8 @@ public class PlayListEntity {
         return id;
     }
 
-    public long getStorageId() {
+    @Nullable
+    public Long getStorageId() {
         return storageId;
     }
 

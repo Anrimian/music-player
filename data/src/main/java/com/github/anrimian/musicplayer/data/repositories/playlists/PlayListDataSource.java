@@ -56,7 +56,8 @@ class PlayListDataSource {
         if (playList == null) {
             return;
         }
-        PlayList updatedPlayList = new PlayList(rawPlayList.getId(),
+        PlayList updatedPlayList = new PlayList(rawPlayList.getId(),//replace!!!
+                rawPlayList.getId(),
                 newPlayList.getName(),
                 newPlayList.getDateAdded(),
                 newPlayList.getDateModified(),
@@ -98,7 +99,8 @@ class PlayListDataSource {
     }
 
     private PlayList createPlayList(StoragePlayList rawPlayList, List<PlayListItem> items) {
-        return new PlayList(rawPlayList.getId(),
+        return new PlayList(rawPlayList.getId(),//replace!!!!
+                rawPlayList.getId(),
                 rawPlayList.getName(),
                 rawPlayList.getDateAdded(),
                 rawPlayList.getDateModified(),
@@ -122,7 +124,9 @@ class PlayListDataSource {
             if (composition == null) {
                 continue;
             }
-            playListItems.add(new PlayListItem(item.getItemId(), composition));
+            playListItems.add(new PlayListItem(item.getItemId(),//replace!!!
+                    item.getItemId(),
+                    composition));
         }
         return playListItems;
     }
@@ -134,7 +138,8 @@ class PlayListDataSource {
         if (playList == null) {
             return;
         }
-        PlayList updatedPlayList = new PlayList(playList.getId(),
+        PlayList updatedPlayList = new PlayList(playList.getId(),//replace!!!!
+                playList.getId(),
                 playList.getName(),
                 playList.getDateAdded(),
                 playList.getDateModified(),

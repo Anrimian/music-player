@@ -214,7 +214,8 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     private PlayList toPlayList(StoragePlayList storagePlayList, List<PlayListItem> items) {
-        return new PlayList(storagePlayList.getId(),
+        return new PlayList(storagePlayList.getId(),//replace!!!
+                storagePlayList.getId(),
                 storagePlayList.getName(),
                 storagePlayList.getDateAdded(),
                 storagePlayList.getDateModified(),

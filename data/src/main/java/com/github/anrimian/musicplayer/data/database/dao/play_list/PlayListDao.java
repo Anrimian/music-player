@@ -32,6 +32,7 @@ public interface PlayListDao {
     //can we cache duplicates?
     @Query("SELECT " +
             "play_lists.id as id, " +
+            "play_lists.storageId as storageId, " +
             "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
@@ -43,6 +44,7 @@ public interface PlayListDao {
 
     @Query("SELECT " +
             "play_lists.id as id, " +
+            "play_lists.storageId as storageId, " +
             "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
@@ -52,10 +54,11 @@ public interface PlayListDao {
             "INNER JOIN compositions ON compositions.id IN (SELECT storageId FROM play_lists_entries WHERE playListId = play_lists.id) " +
             "WHERE play_lists.id = :id " +
             "ORDER BY dateModified")
-    Observable<PlayListPojo> getPlayListObservable(long id);
+    Observable<List<PlayListPojo>> getPlayListObservable(long id);
 
     @Query("SELECT " +
             "play_lists_entries.itemId AS itemId," +
+            "play_lists_entries.storageItemId as storageItemId, " +
             "compositions.id AS id, " +
             "compositions.artist AS artist, " +
             "compositions.title AS title, " +
@@ -68,14 +71,18 @@ public interface PlayListDao {
             "compositions.corruptionType AS corruptionType " +
             "FROM play_lists_entries " +
             "INNER JOIN compositions ON play_lists_entries.audioId = compositions.id " +
+            "WHERE play_lists_entries.playListId = :playListId " +
             "ORDER BY orderPosition")
-    Observable<List<PlayListEntryDto>> getPlayQueueObservable();
+    Observable<List<PlayListEntryDto>> getPlayQueueObservable(long playListId);
 
     @Query("DELETE FROM play_lists_entries WHERE itemId = :id")
     void deletePlayListEntry(long id);
 
     @Insert
     void addPlayListEntry(PlayListEntryEntity entity);
+
+    @Query("SELECT MAX(orderPosition) FROM play_lists_entries WHERE playListId = :playListId")
+    int selectMaxOrder(long playListId);
 
     @Query("UPDATE play_lists_entries SET orderPosition = :position WHERE itemId = :itemId")
     void updateItemPosition(long itemId, int position);
