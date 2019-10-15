@@ -137,6 +137,22 @@ public class TestDataProvider {
                 null);
     }
 
+    public static Composition fakeComposition(long id,
+                                              String filePath,
+                                              long createDate,
+                                              long modifyDate) {
+        return new Composition(null,
+                null,
+                null,
+                filePath,
+                0,
+                0,
+                id,
+                new Date(createDate),
+                new Date(modifyDate),
+                null);
+    }
+
     public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
         return new Composition(null,
                 null,
@@ -209,6 +225,14 @@ public class TestDataProvider {
             items.put(i, storagePlayList(i));
         }
         return items;
+    }
+
+    public static List<StoragePlayList> storagePlayListsAsList(long count) {
+        List<StoragePlayList> compositions = new ArrayList<>((int) count);
+        for (long i = 0; i < count; i++) {
+            compositions.add(storagePlayList(i));
+        }
+        return compositions;
     }
 
     public static PlayQueueEntity queueEntity(long id,

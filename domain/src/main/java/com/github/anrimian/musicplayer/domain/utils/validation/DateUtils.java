@@ -8,6 +8,13 @@ public class DateUtils {
         if (first == null || second == null) {
             return false;
         }
-        return first.compareTo(second) < 0;
+        return first.compareTo(second) <= 0;
+    }
+
+    public static boolean isAfter(Date first, Date second) {
+        if (first == null || second == null) {
+            return false;
+        }
+        return first.compareTo(second) > 0;
     }
 }

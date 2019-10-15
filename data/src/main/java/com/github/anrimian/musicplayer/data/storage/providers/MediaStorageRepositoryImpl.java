@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 
@@ -65,7 +67,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         List<Composition> changedCompositions = new ArrayList<>();
         boolean hasChanges = MapChangeProcessor.processChanges2(currentCompositions,
                 newCompositions,
-                CompositionHelper::hasChanges,
+                this::hasActualChanges,
                 deletedCompositions::add,
                 addedCompositions::add,
                 changedCompositions::add);
@@ -92,8 +94,9 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         List<StoragePlayList> changedPlayLists = new ArrayList<>();
         boolean hasChanges = MapChangeProcessor.processChanges2(currentPlayListsMap,
                 newPlayLists,
-                this::wasPlayListChanged,
-                playList -> {},
+                this::hasActualChanges,
+                playList -> {
+                },
                 addedPlayLists::add,
                 changedPlayLists::add);
 
@@ -102,10 +105,15 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
-    private boolean wasPlayListChanged(StoragePlayList first, StoragePlayList second) {
+    private boolean hasActualChanges(StoragePlayList first, StoragePlayList second) {
         return (!Objects.equals(first.getName(), second.getName())
                 || !Objects.equals(first.getDateAdded(), second.getDateAdded())
                 || !Objects.equals(first.getDateModified(), second.getDateModified()))
-                && DateUtils.isBefore(first.getDateModified(), second.getDateModified());
+                && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
+    }
+
+    private boolean hasActualChanges(@Nonnull Composition first, @Nonnull Composition second) {
+        return !CompositionHelper.areSourcesTheSame(first, second)
+                && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
     }
 }
