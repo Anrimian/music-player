@@ -108,13 +108,8 @@ public class PlayListsDaoWrapper {
 
     public Observable<PlayList> getPlayListsObservable(long id) {
         return playListDao.getPlayListObservable(id)
-                .flatMap(entities -> Observable.create(emitter -> {
-                    if (entities.isEmpty()) {
-                        emitter.onComplete();
-                    } else {
-                        emitter.onNext(toPlayList(entities.get(0)));
-                    }
-                }));
+                .takeWhile(entities -> !entities.isEmpty())
+                .map(entities -> toPlayList(entities.get(0)));
     }
 
     public Observable<List<PlayListItem>> getPlayListItemsObservable(long playListId) {
