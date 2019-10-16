@@ -34,7 +34,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     private final StoragePlayListsProvider storagePlayListsProvider;
     @Deprecated
     private final StorageMusicDataSource storageMusicDataSource;
-    private final PlayListsDaoWrapper playListsDaoWrapper;
+    private final PlayListsDaoWrapper playListsDao;
     private final Scheduler scheduler;
 
     private final BehaviorSubject<Map<Long, PlayListDataSource>> playListsSubject = BehaviorSubject.create();
@@ -44,33 +44,33 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
                                    StorageMusicDataSource storageMusicDataSource,
-                                   PlayListsDaoWrapper playListsDaoWrapper,
+                                   PlayListsDaoWrapper playListsDao,
                                    Scheduler scheduler) {
         this.storagePlayListsProvider = storagePlayListsProvider;
         this.storageMusicDataSource = storageMusicDataSource;
-        this.playListsDaoWrapper = playListsDaoWrapper;
+        this.playListsDao = playListsDao;
         this.scheduler = scheduler;
     }
 
     @Override
     public Observable<List<PlayList>> getPlayListsObservable() {
-        return playListsDaoWrapper.getPlayListsObservable();
+        return playListsDao.getPlayListsObservable();
     }
 
     @Override
     public Observable<PlayList> getPlayListObservable(long playlistId) {
-        return playListsDaoWrapper.getPlayListsObservable(playlistId);
+        return playListsDao.getPlayListsObservable(playlistId);
     }
 
     @Override
     public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId) {
-        return playListsDaoWrapper.getPlayListItemsObservable(playlistId);
+        return playListsDao.getPlayListItemsObservable(playlistId);
     }
 
     @Override
     public Single<PlayList> createPlayList(String name) {
         return Single.fromCallable(() -> storagePlayListsProvider.createPlayList(name))
-                .map(playList -> toPlayList(playList, Collections.emptyList()))
+                .map(playListsDao::insertPlayList)
                 .subscribeOn(scheduler);
     }
 
@@ -118,8 +118,13 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     @Override
     public Completable updatePlayListName(long playListId, String name) {
-        return Completable.fromAction(() -> storagePlayListsProvider.updatePlayListName(
-                playListId, name)
+        return Completable.fromAction(() -> {
+                    playListsDao.updatePlayListName(playListId, name);
+                    Long storageId = playListsDao.selectStorageId(playListId);
+                    if (storageId != null) {
+                        storagePlayListsProvider.updatePlayListName(storageId, name);
+                    }
+                }
         ).subscribeOn(scheduler);
     }
 

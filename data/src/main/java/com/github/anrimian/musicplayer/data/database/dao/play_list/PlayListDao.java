@@ -15,13 +15,15 @@ import com.github.anrimian.musicplayer.data.storage.providers.playlists.StorageP
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 
 @Dao
 public interface PlayListDao {
 
     @Insert
-    void insertPlayListEntity(PlayListEntity entity);
+    long insertPlayListEntity(PlayListEntity entity);
 
     @Insert
     void insertPlayListEntities(List<PlayListEntity> entities);
@@ -121,4 +123,8 @@ public interface PlayListDao {
 
     @Query("UPDATE play_lists_entries SET orderPosition = :position WHERE itemId = :itemId")
     void updateItemPosition(long itemId, int position);
+
+    @Nullable
+    @Query("SELECT storageId FROM play_lists WHERE id = :id")
+    Long selectStorageId(long id);
 }

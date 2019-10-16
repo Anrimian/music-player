@@ -57,6 +57,25 @@ public class PlayListsDaoWrapper {
         playListDao.insertPlayListEntity(entity);
     }
 
+    public PlayList insertPlayList(StoragePlayList playList) {
+        PlayListEntity entity = new PlayListEntity(
+                playList.getId(),
+                playList.getName(),
+                playList.getDateAdded(),
+                playList.getDateModified());
+        long id = playListDao.insertPlayListEntity(entity);
+        if (id == -1) {
+            throw new IllegalStateException("db not modified");
+        }
+        return new PlayList(id,
+                playList.getId(),
+                playList.getName(),
+                playList.getDateAdded(),
+                playList.getDateModified(),
+                0,
+                0);
+    }
+
     public List<StoragePlayList> getAllAsStoragePlayLists() {
         return playListDao.getAllAsStoragePlayLists();
     }
@@ -144,6 +163,10 @@ public class PlayListsDaoWrapper {
             }
             playListDao.insertPlayListEntries(entities);
         });
+    }
+
+    public Long selectStorageId(long id) {
+        return playListDao.selectStorageId(id);
     }
 
     public void swapItems(long firstItemId,
