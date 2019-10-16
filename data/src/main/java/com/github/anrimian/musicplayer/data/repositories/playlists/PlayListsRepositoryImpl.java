@@ -104,8 +104,8 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     @Override
     public Completable deletePlayList(long playListId) {
         return Completable.fromAction(() -> {
-            playListsDao.deletePlayList(playListId);
             Long storageId = playListsDao.selectStorageId(playListId);
+            playListsDao.deletePlayList(playListId);
             if (storageId != null) {
                 storagePlayListsProvider.deletePlayList(storageId);
             }
