@@ -46,6 +46,15 @@ public class TestDataProvider {
         return items;
     }
 
+    public static List<StoragePlayListItem> getFakeStoragePlayListItems(int count) {
+        List<StoragePlayListItem> items = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            StoragePlayListItem item = new StoragePlayListItem(i, i);
+            items.add(item);
+        }
+        return items;
+    }
+
     public static Map<Long, StoragePlayListItem> getFakeStoragePlayListItemsMap() {
         Map<Long, StoragePlayListItem> items = new HashMap<>();
         for (long i = 0; i < 100000; i++) {

@@ -35,7 +35,10 @@ public class ListUtils {
 
     public static <K, E>  Map<K, E> mapToMap(List<E> from, Map<K, E> to, MapperFunction<E, K> keySelector) {
         for (E t: from) {
-            to.put(keySelector.map(t), t);
+            K key = keySelector.map(t);
+            if (key != null) {
+                to.put(key, t);
+            }
         }
         return to;
     }

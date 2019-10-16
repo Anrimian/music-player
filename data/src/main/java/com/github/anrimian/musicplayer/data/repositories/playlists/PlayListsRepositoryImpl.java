@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotFoundException;
 import com.github.anrimian.musicplayer.data.repositories.playlists.comparators.PlayListModifyDateComparator;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
@@ -65,14 +64,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     @Override
     public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId) {
-        PlayListDataSource playListFullModel = getPlayListsMap().get(playlistId);
-        Observable<List<PlayListItem>> observable;
-        if (playListFullModel == null) {
-            observable = Observable.error(new PlayListNotFoundException());
-        } else {
-            observable = playListFullModel.getPlayListItemsObservable();
-        }
-        return observable.subscribeOn(scheduler);
+        return playListsDaoWrapper.getPlayListItemsObservable(playlistId);
     }
 
     @Override

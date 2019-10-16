@@ -1,15 +1,19 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
+import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -74,6 +78,15 @@ public class PlayListsDaoWrapper {
                 .map(entities -> mapList(entities, this::toPlayList));
     }
 
+    public List<IdPair> getPlayListsIds() {
+        return playListDao.getPlayListsIds();
+    }
+
+    public Observable<List<PlayList>> getPlayLists() {
+        return playListDao.getPlayListsObservable()
+                .map(entities -> mapList(entities, this::toPlayList));
+    }
+
     public Observable<PlayList> getPlayListsObservable(long id) {
         return playListDao.getPlayListObservable(id)
                 .flatMap(entities -> Observable.create(emitter -> {
@@ -85,27 +98,51 @@ public class PlayListsDaoWrapper {
                 }));
     }
 
-    public Observable<List<PlayListItem>> getPlayQueueObservable(long playListId) {
-        return playListDao.getPlayQueueObservable(playListId)
+    public Observable<List<PlayListItem>> getPlayListItemsObservable(long playListId) {
+        return playListDao.getPlayListItemsObservable(playListId)
                 .map(entities -> mapList(entities, this::toItem));
+    }
+
+    public List<StoragePlayListItem> getPlayListItemsAsStorageItems(long playlistId) {
+        return playListDao.getPlayListItemsAsStorageItems(playlistId);
     }
 
     public void deletePlayListEntry(long id) {
         playListDao.deletePlayList(id);
     }
 
-    public void addPlayListEntry(@Nullable Long storageItemId,
-                                 @Nullable Long storagePlayListId,
-                                 long audioId,
-                                 long playListId) {
+    public void insertPlayListEntry(@Nullable Long storageItemId,
+                                    @Nullable Long storagePlayListId,
+                                    long audioId,
+                                    long playListId) {
         appDatabase.runInTransaction(() -> {
             int maxOrder = playListDao.selectMaxOrder(playListId);
-            playListDao.addPlayListEntry(new PlayListEntryEntity(storageItemId,
+            playListDao.insertPlayListEntry(new PlayListEntryEntity(storageItemId,
                     storagePlayListId,
                     audioId,
                     playListId,
                     ++maxOrder));
             playListDao.updatePlayListModifyTime(playListId, new Date(System.currentTimeMillis()));
+        });
+    }
+
+    public void insertPlayListItems(List<RawPlayListItem> items,
+                                    long playListId,
+                                    @Nullable Long storagePlayListId) {
+        appDatabase.runInTransaction(() -> {
+            List<PlayListEntryEntity> entities = new ArrayList<>(items.size());
+            int position = playListDao.selectMaxOrder(playListId);
+            for (RawPlayListItem item : items) {
+                PlayListEntryEntity entryEntity = new PlayListEntryEntity(
+                        item.getStorageItemId(),
+                        storagePlayListId,
+                        item.getAudioId(),
+                        playListId,
+                        ++position
+                );
+                entities.add(entryEntity);
+            }
+            playListDao.insertPlayListEntries(entities);
         });
     }
 

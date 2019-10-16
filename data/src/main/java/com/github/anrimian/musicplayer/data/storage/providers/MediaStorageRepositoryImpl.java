@@ -2,8 +2,11 @@ package com.github.anrimian.musicplayer.data.storage.providers;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
@@ -33,6 +36,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     private Disposable compositionsDisposable;
     private Disposable playListsDisposable;
+    private HashMap<Long, Disposable> playListEntriesDisposable = new HashMap<>();
 
     public MediaStorageRepositoryImpl(StorageMusicProvider musicProvider,
                                       StoragePlayListsProvider playListsProvider,
@@ -56,7 +60,8 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     @Override
     public void rescanStorage() {
-        onNewCompositionsFromMediaStorageReceived(musicProvider.getCompositions());
+        // not implemented
+//        onNewCompositionsFromMediaStorageReceived(musicProvider.getCompositions());
     }
 
     private void onNewCompositionsFromMediaStorageReceived(Map<Long, Composition> newCompositions) {
@@ -95,14 +100,61 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         boolean hasChanges = MapChangeProcessor.processChanges2(currentPlayListsMap,
                 newPlayLists,
                 this::hasActualChanges,
-                playList -> {
-                },
+                playList -> {},
                 addedPlayLists::add,
                 changedPlayLists::add);
 
         if (hasChanges) {
             playListsDao.applyChanges(addedPlayLists, changedPlayLists);
         }
+
+        List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
+        for (IdPair playListids: allPlayLists) {
+            Long storageId = playListids.getStorageId();
+            if (storageId == null) {
+                continue;
+            }
+            long dbId = playListids.getDbId();
+            if (!playListEntriesDisposable.containsKey(dbId)) {
+                Disposable disposable = playListsProvider.getPlayListEntriesObservable(storageId)
+                        .startWith(playListsProvider.getPlayListItems(storageId))
+                        .subscribeOn(scheduler)
+                        .subscribe(entries -> onPlayListEntriesReceived(dbId, storageId, entries));
+                playListEntriesDisposable.put(dbId, disposable);
+            }
+        }
+    }
+
+    private void onPlayListEntriesReceived(long playListId,
+                                           long storagePlayListId,
+                                           List<StoragePlayListItem> newItems) {
+        List<StoragePlayListItem> currentItems = playListsDao.getPlayListItemsAsStorageItems(playListId);
+        Map<Long, StoragePlayListItem> currentItemsMap = ListUtils.mapToMap(currentItems,
+                new HashMap<>(),
+                StoragePlayListItem::getItemId);
+
+        Map<Long, StoragePlayListItem> newItemsMap = ListUtils.mapToMap(newItems,
+                new HashMap<>(),
+                StoragePlayListItem::getItemId);
+
+        List<RawPlayListItem> addedItems = new ArrayList<>();
+        boolean hasChanges = MapChangeProcessor.processChanges2(currentItemsMap,
+                newItemsMap,
+                (o1, o2) -> true,
+                item -> {},
+                item -> addedItems.add(rawPlayListItem(item.getItemId(), item.getCompositionId())),
+                item -> {});
+
+        if (hasChanges) {
+            playListsDao.insertPlayListItems(addedItems, playListId, storagePlayListId);
+        }
+    }
+
+    private RawPlayListItem rawPlayListItem(long itemId, long storageCompositionId) {
+        return new RawPlayListItem(
+                itemId,
+                compositionsDao.selectIdByStorageId(storageCompositionId)
+        );
     }
 
     private boolean hasActualChanges(StoragePlayList first, StoragePlayList second) {

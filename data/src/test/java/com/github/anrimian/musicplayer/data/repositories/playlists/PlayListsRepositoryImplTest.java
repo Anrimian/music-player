@@ -56,7 +56,7 @@ public class PlayListsRepositoryImplTest {
         when(storagePlayListsProvider.getPlayLists()).thenReturn(Collections.singletonMap(1L, storagePlayList(1L)));
         when(storagePlayListsProvider.getPlayListItems(anyLong())).thenReturn(getFakeStoragePlayListItems());
         when(storagePlayListsProvider.getPlayListsObservable()).thenReturn(playListSubject);
-        when(storagePlayListsProvider.getPlayListChangeObservable(anyLong())).thenReturn(itemsSubject);
+        when(storagePlayListsProvider.getPlayListEntriesObservable(anyLong())).thenReturn(itemsSubject);
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(getFakeCompositionsMap());
         when(storageMusicDataSource.getCompositionObservable()).thenReturn(compositionsSubject);

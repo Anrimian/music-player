@@ -106,7 +106,7 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public Observable<List<StoragePlayListItem>> getPlayListChangeObservable(long playListId) {
+    public Observable<List<StoragePlayListItem>> getPlayListEntriesObservable(long playListId) {
         return RxContentObserver.getObservable(contentResolver, getContentUri("external", playListId))
                 .debounce(new FastDebounceFilter<>())
                 .map(o -> getPlayListItems(playListId));

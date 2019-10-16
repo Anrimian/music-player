@@ -100,6 +100,10 @@ public class CompositionsDaoWrapper {
         });
     }
 
+    public long selectIdByStorageId(long compositionId) {
+        return compositionId;//TODO add storage id and return it
+    }
+
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {

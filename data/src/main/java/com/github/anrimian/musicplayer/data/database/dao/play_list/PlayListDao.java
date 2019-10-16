@@ -4,11 +4,13 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
+import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 
 import java.util.Date;
 import java.util.List;
@@ -49,7 +51,7 @@ public interface PlayListDao {
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount, " +
             "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM play_lists_entries WHERE playListId = play_lists.id)) as totalDuration " +
             "FROM play_lists " +
-            "ORDER BY dateModified")
+            "ORDER BY dateModified DESC")
     Observable<List<PlayListPojo>> getPlayListsObservable();
 
     @Query("SELECT " +
@@ -61,6 +63,12 @@ public interface PlayListDao {
     List<StoragePlayList> getAllAsStoragePlayLists();
 
     @Query("SELECT " +
+            "play_lists.id as dbId, " +
+            "play_lists.storageId as storageId " +
+            "FROM play_lists")
+    List<IdPair> getPlayListsIds();
+
+    @Query("SELECT " +
             "play_lists.id as id, " +
             "play_lists.storageId as storageId, " +
             "play_lists.name as name, " +
@@ -69,8 +77,7 @@ public interface PlayListDao {
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount, " +
             "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM play_lists_entries WHERE playListId = play_lists.id)) as totalDuration " +
             "FROM play_lists " +
-            "WHERE play_lists.id = :id " +
-            "ORDER BY dateModified")
+            "WHERE play_lists.id = :id ")
     Observable<List<PlayListPojo>> getPlayListObservable(long id);
 
     @Query("SELECT " +
@@ -90,13 +97,24 @@ public interface PlayListDao {
             "INNER JOIN compositions ON play_lists_entries.audioId = compositions.id " +
             "WHERE play_lists_entries.playListId = :playListId " +
             "ORDER BY orderPosition")
-    Observable<List<PlayListEntryDto>> getPlayQueueObservable(long playListId);
+    Observable<List<PlayListEntryDto>> getPlayListItemsObservable(long playListId);
+
+    @Query("SELECT " +
+            "play_lists_entries.storageItemId as itemId, " +
+            "play_lists_entries.audioId as compositionId " +//wrong id
+            "FROM play_lists_entries " +
+            "WHERE play_lists_entries.playListId = :playListId " +
+            "ORDER BY orderPosition")
+    List<StoragePlayListItem> getPlayListItemsAsStorageItems(long playListId);
 
     @Query("DELETE FROM play_lists_entries WHERE itemId = :id")
     void deletePlayListEntry(long id);
 
     @Insert
-    void addPlayListEntry(PlayListEntryEntity entity);
+    void insertPlayListEntry(PlayListEntryEntity entity);
+
+    @Insert
+    void insertPlayListEntries(List<PlayListEntryEntity> entities);
 
     @Query("SELECT MAX(orderPosition) FROM play_lists_entries WHERE playListId = :playListId")
     int selectMaxOrder(long playListId);

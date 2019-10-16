@@ -2,8 +2,11 @@ package com.github.anrimian.musicplayer.data.storage.providers;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
@@ -13,6 +16,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.schedulers.Schedulers;
@@ -20,6 +24,7 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayList;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayLists;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayListsAsList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
@@ -38,6 +43,7 @@ public class MediaStorageRepositoryImplTest {
 
     private PublishSubject<Map<Long, Composition>> newCompositionsSubject = PublishSubject.create();
     private PublishSubject<Map<Long, StoragePlayList>> newPlayListsSubject = PublishSubject.create();
+    private PublishSubject<List<StoragePlayListItem>> newPlayListItemsSubject = PublishSubject.create();
 
     private MediaStorageRepositoryImpl mediaStorageRepository;
 
@@ -47,6 +53,9 @@ public class MediaStorageRepositoryImplTest {
 
         when(playListsProvider.getPlayLists()).thenReturn(storagePlayLists(10));
         when(playListsProvider.getPlayListsObservable()).thenReturn(newPlayListsSubject);
+        when(playListsProvider.getPlayListEntriesObservable(1L)).thenReturn(newPlayListItemsSubject);
+
+        when(playListsDao.getPlayListsIds()).thenReturn(asList(new IdPair(1L, 1L)));
 
         mediaStorageRepository = new MediaStorageRepositoryImpl(musicProvider,
                 playListsProvider,
@@ -124,6 +133,24 @@ public class MediaStorageRepositoryImplTest {
         verify(playListsDao).applyChanges(
                 eq(asList(newPlayList)),
                 eq(asList(changedPlayList))
+        );
+    }
+
+    @Test
+    public void changePlayListItemsTest() {
+        when(playListsDao.getAllAsStoragePlayLists()).thenReturn(asList(storagePlayList(1L)));
+        when(playListsDao.getPlayListItemsAsStorageItems(1L)).thenReturn(Collections.emptyList());
+
+        List<StoragePlayListItem> newItems = asList(
+                new StoragePlayListItem(1L, 1L)
+        );
+
+        newPlayListItemsSubject.onNext(newItems);
+
+        verify(playListsDao).insertPlayListItems(
+                eq(asList(new RawPlayListItem(1L, 0))),
+                eq(1L),
+                eq(1L)
         );
     }
 }

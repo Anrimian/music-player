@@ -110,7 +110,7 @@ class PlayListDataSource {
 
     private void subscribeOnPlayListItemsChanges(List<StoragePlayListItem> items, Map<Long, Composition> compositionMap) {
         disposable = Observable.combineLatest(
-                Observable.just(items).mergeWith(storagePlayListsProvider.getPlayListChangeObservable(rawPlayList.getId())),
+                Observable.just(items).mergeWith(storagePlayListsProvider.getPlayListEntriesObservable(rawPlayList.getId())),
                 Observable.just(compositionMap).mergeWith(storageMusicDataSource.getCompositionObservable()),//can be optimized
                 this::mergeItems)
                 .skip(1)

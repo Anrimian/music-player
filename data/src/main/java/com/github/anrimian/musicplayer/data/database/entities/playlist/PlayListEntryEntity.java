@@ -50,6 +50,7 @@ public class PlayListEntryEntity {
         this.storagePlayListId = storagePlayListId;
         this.audioId = audioId;
         this.playListId = playListId;
+        this.orderPosition = orderPosition;
     }
 
     @Nullable
