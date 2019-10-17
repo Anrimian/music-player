@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.DescComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.AlphabeticalCompositionComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.CreateDateCompositionComparator;
@@ -39,15 +40,18 @@ import io.reactivex.Single;
 public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     private final StorageMusicDataSource storageMusicDataSource;
+    private final CompositionsDaoWrapper compositionsDao;
     private final MusicFolderDataSource musicFolderDataSource;
     private final SettingsRepository settingsPreferences;
     private final Scheduler scheduler;
 
     public MusicProviderRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
+                                       CompositionsDaoWrapper compositionsDao,
                                        MusicFolderDataSource musicFolderDataSource,
                                        SettingsRepository settingsPreferences,
                                        Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
+        this.compositionsDao = compositionsDao;
         this.musicFolderDataSource = musicFolderDataSource;
         this.settingsPreferences = settingsPreferences;
         this.scheduler = scheduler;
@@ -55,14 +59,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText) {
-        return storageMusicDataSource.getCompositionObservable2(settingsPreferences.getCompositionsOrder(), searchText)
-                .subscribeOn(scheduler);
+        return compositionsDao.getAllObservable(settingsPreferences.getCompositionsOrder(), searchText);
     }
 
     @Override
     public Observable<Composition> getCompositionObservable(long id) {
-        return storageMusicDataSource.getCompositionObservable(id)
-                .subscribeOn(scheduler);
+        return compositionsDao.getCompositionObservable(id);
     }
 
     @Override

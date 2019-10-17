@@ -4,6 +4,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
@@ -35,8 +36,8 @@ public class CompositionsDaoWrapper {
                 .map(list -> mapList(list, CompositionMapper::toComposition));
     }
 
-    public Observable<Composition> getCompoisitionObservable(long id) {
-        return compositionsDao.getCompoisitionObservable(id)
+    public Observable<Composition> getCompositionObservable(long id) {
+        return compositionsDao.getCompoisitionObservable(id)//TODO takeUntil()
                 .map(CompositionMapper::toComposition);
     }
 
@@ -58,12 +59,10 @@ public class CompositionsDaoWrapper {
         return mapToMap(getAll(), new HashMap<>(), Composition::getId);
     }
 
-    public long insert(Composition compositionEntity) {
-        return compositionsDao.insert(CompositionMapper.toEntity(compositionEntity));
-    }
-
-    public void insert(List<Composition> compositions) {
-        compositionsDao.insert(mapList(compositions, CompositionMapper::toEntity));
+    public Map<Long, StorageComposition> selectAllAsStorageCompositions() {
+        return mapToMap(compositionsDao.selectAllAsStorageCompositions(),
+                new HashMap<>(),
+                StorageComposition::getId);
     }
 
     public void delete(long id) {
@@ -90,18 +89,33 @@ public class CompositionsDaoWrapper {
         compositionsDao.updateTitle(id, title);
     }
 
-    public void applyChanges(List<Composition> addedCompositions,
-                             List<Composition> deletedCompositions,
-                             List<Composition> changedCompositions) {
+    public void applyChanges(List<StorageComposition> addedCompositions,
+                             List<StorageComposition> deletedCompositions,
+                             List<StorageComposition> changedCompositions) {
         appDatabase.runInTransaction(() -> {
             compositionsDao.insert(mapList(addedCompositions, CompositionMapper::toEntity));
-            compositionsDao.delete(mapList(deletedCompositions, Composition::getId));
-            compositionsDao.update(mapList(changedCompositions, CompositionMapper::toEntity));
+            compositionsDao.deleteByStorageId(mapList(
+                    deletedCompositions,
+                    StorageComposition::getId)
+            );
+            for (StorageComposition composition: changedCompositions) {
+                compositionsDao.update(
+                        composition.getArtist(),
+                        composition.getTitle(),
+                        composition.getAlbum(),
+                        composition.getFilePath(),
+                        composition.getDuration(),
+                        composition.getSize(),
+                        composition.getDateAdded(),
+                        composition.getDateModified(),
+                        composition.getId()
+                );
+            }
         });
     }
 
     public long selectIdByStorageId(long compositionId) {
-        return compositionId;//TODO add storage id and return it
+        return compositionsDao.selectIdByStorageId(compositionId);
     }
 
     private String getOrderQuery(Order order) {

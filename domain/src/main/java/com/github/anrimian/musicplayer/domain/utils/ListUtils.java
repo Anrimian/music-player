@@ -51,6 +51,17 @@ public class ListUtils {
         return mapList(from, new ArrayList<>(from.size()), mapper);
     }
 
+    public static <T, E> List<E> mapListNotNull(List<T> from, MapperFunction<T, E> mapper) {
+        List<E> to = new ArrayList<>(from.size());
+        for (T t: from) {
+            E value = mapper.map(t);
+            if (value != null) {
+                to.add(value);
+            }
+        }
+        return to;
+    }
+
     public static <K, V> void update(Map<K, V> map, K key, V value) {
         if (map.containsKey(key)) {
             map.put(key, value);

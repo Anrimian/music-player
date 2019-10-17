@@ -8,7 +8,9 @@ import androidx.room.Update;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -33,6 +35,19 @@ public interface CompositionsDao {
     @Query("SELECT * FROM compositions")
     List<CompositionEntity> getAll();
 
+    @Query("SELECT " +
+            "compositions.artist as artist, " +
+            "compositions.title as title, " +
+            "compositions.album as album, " +
+            "compositions.filePath as filePath, " +
+            "compositions.duration as duration, " +
+            "compositions.size as size, " +
+            "compositions.storageId as id, " +
+            "compositions.dateAdded as dateAdded, " +
+            "compositions.dateModified as dateModified " +
+            "FROM compositions WHERE storageId NOTNULL")
+    List<StorageComposition> selectAllAsStorageCompositions();
+
     @Insert
     long insert(CompositionEntity entity);
 
@@ -42,11 +57,34 @@ public interface CompositionsDao {
     @Update
     void update(List<CompositionEntity> entities);
 
+    @Query("UPDATE compositions SET " +
+            "artist = :artist, " +
+            "title = :title, " +
+            "album = :album, " +
+            "filePath = :filePath, " +
+            "duration = :duration, " +
+            "size = :size, " +
+            "dateAdded = :dateAdded, " +
+            "dateModified = :dateModified " +
+            "WHERE storageId = :storageId")
+    void update(String artist,
+                String title,
+                String album,
+                String filePath,
+                long duration,
+                long size,
+                Date dateAdded,
+                Date dateModified,
+                long storageId);
+
     @Query("DELETE FROM compositions WHERE id = :id")
     void delete(long id);
 
     @Query("DELETE FROM compositions WHERE id in (:ids)")
     void delete(List<Long> ids);
+
+    @Query("DELETE FROM compositions WHERE storageId in (:ids)")
+    void deleteByStorageId(List<Long> ids);
 
     @Query("DELETE FROM compositions")
     void deleteAll();
@@ -59,4 +97,7 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
+
+    @Query("SELECT id FROM compositions WHERE storageId = :storageId")
+    long selectIdByStorageId(long storageId);
 }

@@ -1,33 +1,19 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.repositories.playlists.comparators.PlayListModifyDateComparator;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
-import com.github.anrimian.musicplayer.domain.utils.changes.map.MapChangeProcessor;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.Nonnull;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.BehaviorSubject;
-
-import static com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper.getTotalDuration;
 
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
@@ -36,11 +22,6 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     private final StorageMusicDataSource storageMusicDataSource;
     private final PlayListsDaoWrapper playListsDao;
     private final Scheduler scheduler;
-
-    private final BehaviorSubject<Map<Long, PlayListDataSource>> playListsSubject = BehaviorSubject.create();
-
-    private Disposable changeDisposable;
-    private Map<Long, StoragePlayList> playListMap;
 
     public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
                                    StorageMusicDataSource storageMusicDataSource,
@@ -87,10 +68,15 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     @Override
     public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
-        return Completable.fromAction(() -> storagePlayListsProvider.addCompositionsToPlayList(
-                compositions,
-                playList.getId(),
-                playList.getCompositionsCount())
+        return Completable.fromAction(() -> {
+                    storagePlayListsProvider.addCompositionsToPlayList(
+                            compositions,
+                            playList.getId(),
+                            playList.getCompositionsCount());
+
+//                    playListsDao.insertPlayListItems();
+
+                }
         ).subscribeOn(scheduler);
     }
 
@@ -131,89 +117,5 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                     }
                 }
         ).subscribeOn(scheduler);
-    }
-
-    private List<PlayList> toSortedPlayLists(List<PlayList> list) {
-        Collections.sort(list, new PlayListModifyDateComparator());
-        return list;
-    }
-
-    private Single<List<PlayList>> toPlayLists(Map<Long, PlayListDataSource> map) {
-        return Observable.fromIterable(map.values())
-                .flatMapSingle(PlayListDataSource::getPlayList)
-                .collect(ArrayList::new, List::add);
-    }
-
-    private Map<Long, PlayListDataSource> getPlayListsMap() {
-        Map<Long, PlayListDataSource> playListMap = playListsSubject.getValue();
-        if (playListMap == null) {
-            synchronized (this) {
-                this.playListMap = storagePlayListsProvider.getPlayLists();
-                playListMap = createPlayListMap(this.playListMap);
-                subscribeOnPlayListChanges();
-
-            }
-        }
-        return playListMap;
-    }
-
-    private void subscribeOnPlayListChanges() {
-        changeDisposable = storagePlayListsProvider.getPlayListsObservable()
-                .subscribeOn(scheduler)
-                .subscribe(this::onPlayListsChanged);
-    }
-
-    private void onPlayListsChanged(Map<Long, StoragePlayList> newPlayListMap) {
-        Map<Long, PlayListDataSource> playListDataSourceMap = playListsSubject.getValue();
-        boolean updated = MapChangeProcessor.processChanges(playListMap,
-                newPlayListMap,
-                this::hasDirectChanges,
-                deletedEntry -> playListDataSourceMap.remove(deletedEntry.getKey()).dispose(),
-                this::onNewPlayListReceived,
-                modifiedEntry -> playListDataSourceMap.get(modifiedEntry.getKey()).updatePlayList(modifiedEntry.getValue()));
-
-        if (updated) {
-            playListsSubject.onNext(playListDataSourceMap);
-        }
-    }
-
-    private void onNewPlayListReceived(Map.Entry<Long, StoragePlayList> entry) {
-        Map<Long, PlayListDataSource> playListDataSourceMap = playListsSubject.getValue();
-
-        StoragePlayList storagePlayList = entry.getValue();
-        PlayListDataSource playListDataSource = new PlayListDataSource(storagePlayList,
-                storagePlayListsProvider,
-                storageMusicDataSource);
-        playListDataSourceMap.put(entry.getKey(), playListDataSource);
-    }
-
-    private boolean hasDirectChanges(@Nonnull StoragePlayList first,
-                                     @Nonnull StoragePlayList second) {
-        return !Objects.equals(first.getName(), second.getName())
-                || !Objects.equals(first.getDateAdded(), second.getDateAdded())
-                || !Objects.equals(first.getDateModified(), second.getDateModified());
-    }
-
-    private Map<Long, PlayListDataSource> createPlayListMap(Map<Long, StoragePlayList> storagePlayLists) {
-        Map<Long, PlayListDataSource> playListMap = new ConcurrentHashMap<>();
-        for (StoragePlayList storagePlayList: storagePlayLists.values()) {
-            long id = storagePlayList.getId();
-
-            PlayListDataSource playListDataSource = new PlayListDataSource(storagePlayList,
-                    storagePlayListsProvider,
-                    storageMusicDataSource);
-            playListMap.put(id, playListDataSource);
-        }
-        return playListMap;
-    }
-
-    private PlayList toPlayList(StoragePlayList storagePlayList, List<PlayListItem> items) {
-        return new PlayList(storagePlayList.getId(),//replace!!!
-                storagePlayList.getId(),
-                storagePlayList.getName(),
-                storagePlayList.getDateAdded(),
-                storagePlayList.getDateModified(),
-                items.size(),
-                getTotalDuration(items));
     }
 }

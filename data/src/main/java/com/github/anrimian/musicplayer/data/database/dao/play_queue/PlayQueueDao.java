@@ -23,6 +23,7 @@ public interface PlayQueueDao {
             "play_queue.position AS position," +
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
+            "compositions.storageId AS storageId, " +
             "compositions.artist AS artist, " +
             "compositions.title AS title, " +
             "compositions.album AS album, " +
@@ -41,6 +42,7 @@ public interface PlayQueueDao {
             "play_queue.position AS position," +
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
+            "compositions.storageId AS storageId, " +
             "compositions.artist AS artist, " +
             "compositions.title AS title, " +
             "compositions.album AS album, " +
@@ -58,6 +60,7 @@ public interface PlayQueueDao {
             "play_queue.position AS position," +
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
+            "compositions.storageId AS storageId, " +
             "compositions.artist AS artist, " +
             "compositions.title AS title, " +
             "compositions.album AS album, " +

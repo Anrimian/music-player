@@ -155,7 +155,10 @@ public class StoragePlayListsProvider {
         int position = startPosition;
         ContentValues[] valuesList = new ContentValues[compositions.size()];
         for (int i = 0; i < compositions.size(); i++) {
-            long compositionId = compositions.get(i).getId();
+            Long compositionId = compositions.get(i).getStorageId();
+            if (compositionId == null) {
+                continue;
+            }
             ContentValues values = new ContentValues();
             values.put(Playlists.Members.PLAY_ORDER, position);
             values.put(Playlists.Members.AUDIO_ID, compositionId);

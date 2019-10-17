@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.domain.models.composition;
+package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import java.util.Date;
 
@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
  * Created on 24.10.2017.
  */
 
-public class Composition {
+public class StorageComposition {
 
     @Nullable
     private final String artist;
@@ -24,28 +24,20 @@ public class Composition {
     private final long size;
     private final long id;
 
-    @Nullable
-    private final Long storageId;
-
     @Nonnull
     private final Date dateAdded;
     @Nonnull
     private final Date dateModified;
 
-    @Nullable
-    private final CorruptionType corruptionType;
-
-    public Composition(@Nullable String artist,
-                       @Nullable String title,
-                       @Nullable String album,
-                       @Nonnull String filePath,
-                       long duration,
-                       long size,
-                       long id,
-                       @Nullable Long storageId,
-                       @Nonnull Date dateAdded,
-                       @Nonnull Date dateModified,
-                       @Nullable CorruptionType corruptionType) {
+    public StorageComposition(@Nullable String artist,
+                              @Nullable String title,
+                              @Nullable String album,
+                              @Nonnull String filePath,
+                              long duration,
+                              long size,
+                              long id,
+                              @Nonnull Date dateAdded,
+                              @Nonnull Date dateModified) {
         this.artist = artist;
         this.title = title;
         this.album = album;
@@ -53,29 +45,20 @@ public class Composition {
         this.duration = duration;
         this.size = size;
         this.id = id;
-        this.storageId = storageId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.corruptionType = corruptionType;
     }
 
-    public Composition copy(String newPath) {
-        return new Composition(artist,
+    public StorageComposition copy(String newPath) {
+        return new StorageComposition(artist,
                 title,
                 album,
                 newPath,
                 duration,
                 size,
                 id,
-                storageId,
                 dateAdded,
-                dateModified,
-                corruptionType);
-    }
-
-    @Nullable
-    public Long getStorageId() {
-        return storageId;
+                dateModified);
     }
 
     @Nullable
@@ -120,11 +103,6 @@ public class Composition {
         return dateModified;
     }
 
-    @Nullable
-    public CorruptionType getCorruptionType() {
-        return corruptionType;
-    }
-
     @Override
     public String toString() {
         return "Composition{" +
@@ -142,7 +120,7 @@ public class Composition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Composition that = (Composition) o;
+        StorageComposition that = (StorageComposition) o;
 
         return id == that.id;
 

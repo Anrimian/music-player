@@ -15,7 +15,6 @@ import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,23 +48,23 @@ public class StorageMusicProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<Map<Long, Composition>> getCompositionsObservable() {
+    public Observable<Map<Long, StorageComposition>> getCompositionsObservable() {
         return RxContentObserver.getObservable(contentResolver, EXTERNAL_CONTENT_URI)
 //                .doOnNext(o -> Log.d("KEK", "received update"))
 //                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)//TODO not this, ask on so
                 .map(o -> getCompositions());
     }
 
-    public Map<Long, Composition> getCompositions() {
+    public Map<Long, StorageComposition> getCompositions() {
         return getCompositions(EXTERNAL_CONTENT_URI);
     }
 
-    public void deleteCompositions(List<Composition> compositions) {
+    public void deleteCompositions(List<Long> ids) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
-        for (Composition composition: compositions) {
+        for (Long storageId: ids) {
             ContentProviderOperation operation = ContentProviderOperation.newDelete(EXTERNAL_CONTENT_URI)
-                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(composition.getId()) })
+                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
             operations.add(operation);
@@ -85,7 +84,7 @@ public class StorageMusicProvider {
     }
 
     @Nullable
-    public Composition getComposition(long id) {
+    public StorageComposition getComposition(long id) {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -106,25 +105,29 @@ public class StorageMusicProvider {
         }
     }
 
-    public void updateCompositionAuthor(Composition composition, String author) {
-        updateComposition(composition.getId(), MediaStore.Audio.AudioColumns.ARTIST, author);
+    public void updateCompositionAuthor(long id, String author) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.ARTIST, author);
     }
 
-    public void updateCompositionTitle(Composition composition, String title) {
-        updateComposition(composition.getId(), MediaStore.Audio.AudioColumns.TITLE, title);
+    public void updateCompositionTitle(long id, String title) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.TITLE, title);
     }
 
-    public void updateCompositionFilePath(Composition composition, String filePath) {
-        updateComposition(composition.getId(), MediaStore.Audio.AudioColumns.DATA, filePath);
+    public void updateCompositionFilePath(long id, String filePath) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.DATA, filePath);
     }
 
     public void updateCompositionsFilePath(List<Composition> compositions) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         for (Composition composition: compositions) {
+            Long storageId = composition.getStorageId();
+            if (storageId == null) {
+                continue;
+            }
             ContentProviderOperation operation = ContentProviderOperation.newUpdate(EXTERNAL_CONTENT_URI)
                     .withValue(MediaStore.Images.Media.DATA, composition.getFilePath())
-                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(composition.getId()) })
+                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
             operations.add(operation);
@@ -146,7 +149,7 @@ public class StorageMusicProvider {
                 new String[] { String.valueOf(id) });
     }
 
-    private Map<Long, Composition> getCompositions(Uri uri) {
+    private Map<Long, StorageComposition> getCompositions(Uri uri) {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -168,11 +171,11 @@ public class StorageMusicProvider {
                 return emptyMap();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            Map<Long, Composition> compositions = new ConcurrentHashMap<>(cursor.getCount());
+            Map<Long, StorageComposition> compositions = new ConcurrentHashMap<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
-                Composition composition = getCompositionFromCursor(cursorWrapper);
+                StorageComposition composition = getCompositionFromCursor(cursorWrapper);
                 if (composition != null) {
                     compositions.put(composition.getId(), composition);
                 }
@@ -183,7 +186,7 @@ public class StorageMusicProvider {
         }
     }
 
-    private Composition getCompositionFromCursor(CursorWrapper cursorWrapper) {
+    private StorageComposition getCompositionFromCursor(CursorWrapper cursorWrapper) {
 
         String artist = cursorWrapper.getString(ARTIST);
         String title = cursorWrapper.getString(TITLE);
@@ -231,12 +234,12 @@ public class StorageMusicProvider {
             artist = null;
         }
 
-        CorruptionType corruptionType = null;
-        if (duration == 0) {
-            corruptionType = CorruptionType.UNKNOWN;
-        }
+//        CorruptionType corruptionType = null;
+//        if (duration == 0) {
+//            corruptionType = CorruptionType.UNKNOWN;
+//        }
 
-        return new Composition(
+        return new StorageComposition(
                 artist,
                 title,
                 album,
@@ -245,7 +248,6 @@ public class StorageMusicProvider {
                 size,
                 id,
                 dateAdded,
-                dateModified,
-                corruptionType);
+                dateModified);
     }
 }

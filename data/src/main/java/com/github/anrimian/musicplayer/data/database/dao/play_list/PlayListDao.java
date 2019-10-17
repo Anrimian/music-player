@@ -86,6 +86,7 @@ public interface PlayListDao {
             "play_lists_entries.itemId AS itemId," +
             "play_lists_entries.storageItemId as storageItemId, " +
             "compositions.id AS id, " +
+            "compositions.storageId AS storageId, " +
             "compositions.artist AS artist, " +
             "compositions.title AS title, " +
             "compositions.album AS album, " +

@@ -19,6 +19,7 @@ public class CompositionSearchFilterTest {
                 0,
                 0,
                 0,
+                1L,
                 new Date(0),
                 new Date(0),
                 null);

@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
@@ -23,7 +24,8 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositionsMap;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeStorageCompositionsMap;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayList;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayLists;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayListsAsList;
@@ -41,7 +43,7 @@ public class MediaStorageRepositoryImplTest {
     private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
     private PlayListsDaoWrapper playListsDao = mock(PlayListsDaoWrapper.class);
 
-    private PublishSubject<Map<Long, Composition>> newCompositionsSubject = PublishSubject.create();
+    private PublishSubject<Map<Long, StorageComposition>> newCompositionsSubject = PublishSubject.create();
     private PublishSubject<Map<Long, StoragePlayList>> newPlayListsSubject = PublishSubject.create();
     private PublishSubject<List<StoragePlayListItem>> newPlayListItemsSubject = PublishSubject.create();
 
@@ -67,16 +69,16 @@ public class MediaStorageRepositoryImplTest {
 
     @Test
     public void changeDatabaseTest() {
-        Map<Long, Composition> currentCompositions = getFakeCompositionsMap();
-        when(compositionsDao.getAllMap()).thenReturn(currentCompositions);
+        Map<Long, StorageComposition> currentCompositions = getFakeStorageCompositionsMap();
+        when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
-        Map<Long, Composition> newCompositions = getFakeCompositionsMap();
-        Composition removedComposition = newCompositions.remove(100L);
+        Map<Long, StorageComposition> newCompositions = getFakeStorageCompositionsMap();
+        StorageComposition removedComposition = newCompositions.remove(100L);
 
-        Composition changedComposition = fakeComposition(1, "changed composition", 1L, 10000L);
+        StorageComposition changedComposition = fakeStorageComposition(1, "changed composition", 1L, 10000L);
         newCompositions.put(1L, changedComposition);
 
-        Composition newComposition = fakeComposition(-1L, "new composition");
+        StorageComposition newComposition = fakeStorageComposition(-1L, "new composition");
         newCompositions.put(-1L, newComposition);
 
         newCompositionsSubject.onNext(newCompositions);
@@ -95,8 +97,8 @@ public class MediaStorageRepositoryImplTest {
 
         when(compositionsDao.getAllMap()).thenReturn(map);
 
-        HashMap<Long, Composition> newCompositions = new HashMap<>();
-        Composition changedComposition = fakeComposition(1, "new path", 1, 1000);
+        HashMap<Long, StorageComposition> newCompositions = new HashMap<>();
+        StorageComposition changedComposition = fakeStorageComposition(1, "new path", 1, 1000);
         newCompositions.put(1L, changedComposition);
 
         newCompositionsSubject.onNext(newCompositions);

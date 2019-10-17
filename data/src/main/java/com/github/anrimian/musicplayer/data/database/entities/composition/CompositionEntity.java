@@ -17,6 +17,9 @@ public class CompositionEntity {
     private long id;
 
     @Nullable
+    private Long storageId;
+
+    @Nullable
     private String artist;
     @Nullable
     private String title;
@@ -42,11 +45,11 @@ public class CompositionEntity {
                              @Nonnull String filePath,
                              long duration,
                              long size,
-                             long id,
+                             @Nullable Long storageId,
                              @Nonnull Date dateAdded,
                              @Nonnull Date dateModified,
                              @Nullable CorruptionType corruptionType) {
-        this.id = id;
+        this.storageId = storageId;
         this.artist = artist;
         this.title = title;
         this.album = album;
@@ -56,6 +59,15 @@ public class CompositionEntity {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Nullable
+    public Long getStorageId() {
+        return storageId;
     }
 
     public long getId() {

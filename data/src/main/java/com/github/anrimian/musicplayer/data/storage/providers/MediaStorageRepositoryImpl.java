@@ -4,12 +4,11 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
@@ -20,8 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nonnull;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
@@ -64,12 +61,12 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 //        onNewCompositionsFromMediaStorageReceived(musicProvider.getCompositions());
     }
 
-    private void onNewCompositionsFromMediaStorageReceived(Map<Long, Composition> newCompositions) {
-        Map<Long, Composition> currentCompositions = compositionsDao.getAllMap();
+    private void onNewCompositionsFromMediaStorageReceived(Map<Long, StorageComposition> newCompositions) {
+        Map<Long, StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
-        List<Composition> addedCompositions = new ArrayList<>();
-        List<Composition> deletedCompositions = new ArrayList<>();
-        List<Composition> changedCompositions = new ArrayList<>();
+        List<StorageComposition> addedCompositions = new ArrayList<>();
+        List<StorageComposition> deletedCompositions = new ArrayList<>();
+        List<StorageComposition> changedCompositions = new ArrayList<>();
         boolean hasChanges = MapChangeProcessor.processChanges2(currentCompositions,
                 newCompositions,
                 this::hasActualChanges,
@@ -164,8 +161,15 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
     }
 
-    private boolean hasActualChanges(@Nonnull Composition first, @Nonnull Composition second) {
-        return !CompositionHelper.areSourcesTheSame(first, second)
+    private boolean hasActualChanges(StorageComposition first, StorageComposition second) {
+        return !(Objects.equals(first.getAlbum(), second.getAlbum())
+                && Objects.equals(first.getArtist(), second.getArtist())
+                && Objects.equals(first.getDateAdded(), second.getDateAdded())
+                && Objects.equals(first.getDateModified(), second.getDateModified())
+                && first.getDuration() == second.getDuration()
+                && Objects.equals(first.getFilePath(), second.getFilePath())
+                && first.getSize() == second.getSize()
+                && Objects.equals(first.getTitle(), second.getTitle()))
                 && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
     }
 }

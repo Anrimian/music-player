@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.utils;
 
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -98,6 +99,7 @@ public class TestDataProvider {
                 0,
                 0,
                 id,
+                ++id,
                 new Date(0),
                 new Date(0),
                 null);
@@ -125,6 +127,15 @@ public class TestDataProvider {
         return compositions;
     }
 
+    public static Map<Long, StorageComposition> getFakeStorageCompositionsMap() {
+        Map<Long, StorageComposition> compositions = new HashMap<>();
+        for (long i = 0; i < 100000; i++) {
+            StorageComposition composition = fakeStorageComposition(i, "music-" + i);
+            compositions.put(i, composition);
+        }
+        return compositions;
+    }
+
     public static PlayQueueEvent currentItem(int pos) {
         return new PlayQueueEvent(new PlayQueueItem(pos, fakeComposition(pos)), 0L);
     }
@@ -141,6 +152,7 @@ public class TestDataProvider {
                 0,
                 0,
                 id,
+                ++id,
                 new Date(createDate),
                 new Date(0),
                 null);
@@ -157,9 +169,25 @@ public class TestDataProvider {
                 0,
                 0,
                 id,
+                ++id,
                 new Date(createDate),
                 new Date(modifyDate),
                 null);
+    }
+
+    public static StorageComposition fakeStorageComposition(long id,
+                                              String filePath,
+                                              long createDate,
+                                              long modifyDate) {
+        return new StorageComposition(null,
+                null,
+                null,
+                filePath,
+                0,
+                0,
+                id,
+                new Date(createDate),
+                new Date(modifyDate));
     }
 
     public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
@@ -170,6 +198,7 @@ public class TestDataProvider {
                 0,
                 size,
                 id,
+                ++id,
                 new Date(0),
                 new Date(0),
                 null);
@@ -183,6 +212,7 @@ public class TestDataProvider {
                 0,
                 0,
                 id,
+                ++id,
                 new Date(createDate * 1000L),
                 new Date(0),
                 null);
@@ -196,9 +226,22 @@ public class TestDataProvider {
                 0,
                 0,
                 id,
+                ++id,
                 new Date(0),
                 new Date(0),
                 null);
+    }
+
+    public static StorageComposition fakeStorageComposition(long id, String filePath) {
+        return new StorageComposition(null,
+                null,
+                null,
+                filePath,
+                0,
+                0,
+                id,
+                new Date(0),
+                new Date(0));
     }
 
     public static Composition fakeCompositionWithTitle(long id, String title) {
@@ -209,6 +252,7 @@ public class TestDataProvider {
                 0,
                 0,
                 id,
+                ++id,
                 new Date(0),
                 new Date(0),
                 null);
