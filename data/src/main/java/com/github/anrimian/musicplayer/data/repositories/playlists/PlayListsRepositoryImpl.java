@@ -1,6 +1,9 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -14,6 +17,8 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
+
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
@@ -59,32 +64,51 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     public Completable addCompositionsToPlayList(List<Composition> compositions,
                                                  PlayList playList,
                                                  int position) {
-        return Completable.fromAction(() -> storagePlayListsProvider.addCompositionsToPlayList(
-                compositions,
-                playList.getId(),
-                position)
-        ).subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
         return Completable.fromAction(() -> {
-                    storagePlayListsProvider.addCompositionsToPlayList(
-                            compositions,
+                    //don't modify storage playlists now
+
+
+//                    Long playListId = playList.getStorageId();
+//                    if (playListId != null) {
+//                        storagePlayListsProvider.addCompositionsToPlayList(compositions,
+//                                playListId,
+//                                position);
+//                    }
+                    playListsDao.insertPlayListItems(
+                            mapList(compositions, composition -> new RawPlayListItem(
+                                    null,//composition.getStorageId(),//not this//TODO get inserted id in storage
+                                    composition.getId()
+                            )),
                             playList.getId(),
-                            playList.getCompositionsCount());
-
-//                    playListsDao.insertPlayListItems();
-
+                            playList.getStorageId(),
+                            position);
                 }
         ).subscribeOn(scheduler);
     }
 
     @Override
-    public Completable deleteItemFromPlayList(long itemId, long playListId) {
-        return Completable.fromAction(() ->
-                storagePlayListsProvider.deleteItemFromPlayList(itemId, playListId)
-        ).subscribeOn(scheduler);
+    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
+        return addCompositionsToPlayList(compositions, playList, playList.getCompositionsCount())
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable deleteItemFromPlayList(PlayListItem playListItem, long playListId) {
+        return Completable.fromAction(() -> {
+            //don't modify storage playlists now
+
+//            Long storageItemId = playListItem.getStorageItemId();
+//            if (storageItemId != null) {
+//                Long storagePlayListId = playListsDao.selectStorageId(playListId);
+//                if (storagePlayListId != null) {
+//                    storagePlayListsProvider.deleteItemFromPlayList(
+//                            playListItem.getStorageItemId(),
+//                            storagePlayListId
+//                    );
+//                }
+//            }
+            playListsDao.deletePlayListEntry(playListItem.getItemId(), playListId);
+        }).subscribeOn(scheduler);
     }
 
     @Override
@@ -99,11 +123,26 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Completable moveItemInPlayList(long playListId, int from, int to) {
-        return Completable.fromAction(() -> storagePlayListsProvider.moveItemInPlayList(
-                playListId,
-                from,
-                to)
+    public Completable moveItemInPlayList(PlayList playList,
+                                          PlayListItem fromItem,
+                                          int from,
+                                          PlayListItem toItem,
+                                          int to) {
+        return Completable.fromAction(() -> {
+                    Log.d("KEK7", "moveItems, fromItem: " + fromItem.getComposition().getTitle() + ", toItem: " + toItem.getComposition().getTitle());
+
+                    //don't modify storage playlists now
+
+//            storagePlayListsProvider.moveItemInPlayList(
+//                            playListId,
+//                            from,
+//                            to);
+            playListsDao.moveItems(playList.getId(),
+                    fromItem.getItemId(),
+                    from,
+                    toItem.getItemId(),
+                    to);
+                }
         ).subscribeOn(scheduler);
     }
 

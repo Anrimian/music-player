@@ -57,16 +57,20 @@ public class PlayListsInteractor {
         return playListsRepository.addCompositionsToPlayList(compositions, playList);
     }
 
-    public Completable deleteItemFromPlayList(long itemId, long playListId) {
-        return playListsRepository.deleteItemFromPlayList(itemId, playListId);
+    public Completable deleteItemFromPlayList(PlayListItem playListItem, long playListId) {
+        return playListsRepository.deleteItemFromPlayList(playListItem, playListId);
     }
 
     public Completable deletePlayList(long playListId) {
         return playListsRepository.deletePlayList(playListId);
     }
 
-    public void moveItemInPlayList(long playListId, int from, int to) {
-        playListsRepository.moveItemInPlayList(playListId, from, to)
+    public void moveItemInPlayList(PlayList playList,
+                                   PlayListItem fromItem,
+                                   int from,
+                                   PlayListItem toItem,
+                                   int to) {
+        playListsRepository.moveItemInPlayList(playList, fromItem, from, toItem, to)
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
                 .subscribe();

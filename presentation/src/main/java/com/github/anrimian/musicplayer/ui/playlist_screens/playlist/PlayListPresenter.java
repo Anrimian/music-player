@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
+import android.util.Log;
+
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
@@ -183,7 +185,13 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     void onDragEnded(int position) {
-        playListsInteractor.moveItemInPlayList(playListId, startDragPosition, position);//lock update and subscribe on complete?
+        Log.d("KEK7", "onDragEnded, position: " + position + ", startDragPosition: " + startDragPosition);
+        playListsInteractor.moveItemInPlayList(playList,
+                items.get(position),
+                startDragPosition,
+                items.get(startDragPosition),//wrong items!
+                position);
+        //lock update and subscribe on complete?
     }
 
     void onPlayActionSelected(int position) {
@@ -226,7 +234,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     private void deleteItem(PlayListItem playListItem, int position) {
-        playListsInteractor.deleteItemFromPlayList(playListItem.getItemId(), playListId)
+        playListsInteractor.deleteItemFromPlayList(playListItem, playListId)
                 .observeOn(uiScheduler)
                 .subscribe(() -> onDeleteItemCompleted(playListItem, position), this::onDeleteItemError);
     }

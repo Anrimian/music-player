@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
@@ -43,18 +44,6 @@ public class PlayListsDaoWrapper {
                 playListDao.updatePlayListNameByStorageId(playList.getId(), playList.getName());
             }
         });
-    }
-
-    public void insertPlayList(@Nullable Long storageId,
-                               @Nonnull String name,
-                               @Nonnull Date dateAdded,
-                               @Nonnull Date dateModified) {
-        PlayListEntity entity = new PlayListEntity(
-                storageId,
-                name,
-                dateAdded,
-                dateModified);
-        playListDao.insertPlayListEntity(entity);
     }
 
     public PlayList insertPlayList(StoragePlayList playList) {
@@ -101,11 +90,6 @@ public class PlayListsDaoWrapper {
         return playListDao.getPlayListsIds();
     }
 
-    public Observable<List<PlayList>> getPlayLists() {
-        return playListDao.getPlayListsObservable()
-                .map(entities -> mapList(entities, this::toPlayList));
-    }
-
     public Observable<PlayList> getPlayListsObservable(long id) {
         return playListDao.getPlayListObservable(id)
                 .takeWhile(entities -> !entities.isEmpty())
@@ -121,42 +105,58 @@ public class PlayListsDaoWrapper {
         return playListDao.getPlayListItemsAsStorageItems(playlistId);
     }
 
-    public void deletePlayListEntry(long id) {
-        playListDao.deletePlayList(id);
-    }
-
-    public void insertPlayListEntry(@Nullable Long storageItemId,
-                                    @Nullable Long storagePlayListId,
-                                    long audioId,
-                                    long playListId) {
+    public void deletePlayListEntry(long id, long playListId) {
         appDatabase.runInTransaction(() -> {
-            int maxOrder = playListDao.selectMaxOrder(playListId);
-            playListDao.insertPlayListEntry(new PlayListEntryEntity(storageItemId,
-                    storagePlayListId,
-                    audioId,
-                    playListId,
-                    ++maxOrder));
-            playListDao.updatePlayListModifyTime(playListId, new Date(System.currentTimeMillis()));
+            int position = playListDao.selectPositionById(id);
+            playListDao.deletePlayListEntry(id);
+            playListDao.decreasePositionsAfter(position, playListId);
         });
     }
+
+//    public void insertPlayListEntry(@Nullable Long storageItemId,
+//                                    @Nullable Long storagePlayListId,
+//                                    long audioId,
+//                                    long playListId) {
+//        appDatabase.runInTransaction(() -> {
+//            int maxOrder = playListDao.selectMaxOrder(playListId);
+//            playListDao.insertPlayListEntry(new PlayListEntryEntity(storageItemId,
+//                    storagePlayListId,
+//                    audioId,
+//                    playListId,
+//                    ++maxOrder));
+//            playListDao.updatePlayListModifyTime(playListId, new Date(System.currentTimeMillis()));
+//        });
+//    }
 
     public void insertPlayListItems(List<RawPlayListItem> items,
                                     long playListId,
                                     @Nullable Long storagePlayListId) {
+        insertPlayListItems(items,
+                playListId,
+                storagePlayListId,
+                playListDao.selectMaxOrder(playListId)
+        );
+    }
+
+    public void insertPlayListItems(List<RawPlayListItem> items,
+                                    long playListId,
+                                    @Nullable Long storagePlayListId,
+                                    int position) {
         appDatabase.runInTransaction(() -> {
             List<PlayListEntryEntity> entities = new ArrayList<>(items.size());
-            int position = playListDao.selectMaxOrder(playListId);
+            int orderPosition = position;
             for (RawPlayListItem item : items) {
                 PlayListEntryEntity entryEntity = new PlayListEntryEntity(
                         item.getStorageItemId(),
                         storagePlayListId,
                         item.getAudioId(),
                         playListId,
-                        ++position
+                        orderPosition++
                 );
                 entities.add(entryEntity);
             }
             playListDao.insertPlayListEntries(entities);
+            playListDao.increasePositionsByCountAfter(items.size(), --orderPosition, playListId);
         });
     }
 
@@ -164,14 +164,47 @@ public class PlayListsDaoWrapper {
         return playListDao.selectStorageId(id);
     }
 
-    public void swapItems(long firstItemId,
-                          int firstPosition,
-                          long secondItemId,
-                          int secondPosition) {
-        appDatabase.runInTransaction(() -> {
-            playListDao.updateItemPosition(firstItemId, secondPosition);
-            playListDao.updateItemPosition(secondItemId, firstPosition);
-        });
+    public void moveItems(long playListId,
+                          long fromItemId,
+                          int fromPos1,
+                          long toItemId,
+                          int toPos1) {
+        Log.d("KEK7", "moveItems, from: " + fromPos1 + ", to: " + toPos1);
+
+        int fromPos = playListDao.selectPositionById(fromItemId);
+        int toPos = playListDao.selectPositionById(toItemId);//mmmmm
+//        Log.d("KEK7", "moveItems, from(db): " + fromPos + ", to(db): " + toPos);
+
+        playListDao.moveItems(playListId, fromPos, toPos);
+
+//        appDatabase.runInTransaction(() -> {
+//            // increment position
+//            int fromPos = playListDao.selectPositionById(fromItemId);
+//            int toPos = playListDao.selectPositionById(toItemId);
+//
+//            if (toPos > fromPos) {
+//                // move other items
+//                playListDao.moveItemsToBottom(playListId, fromPos, toPos);
+//                playListDao.updateItemPosition(playListId, fromPos, toPos);
+//            }
+//            else if (toPos < fromPos) {
+//                playListDao.moveItemsToTop(playListId, fromPos, toPos);
+//                playListDao.updateItemPosition(playListId, fromPos, toPos);
+//            }
+//
+//        });
+    }
+
+    private void swapItems(long playListId, int fromPos, int toPos) {
+//        long prio1 = DatabaseUtils.longForQuery(db,
+//                "SELECT priority FROM rules WHERE rule_id = " + 1, null);
+//        long prio4 = playListDao.selectPositionById().longForQuery(db,
+//                "SELECT priority FROM rules WHERE rule_id = " + 4, null);
+//        db.execSQL("UPDATE rules SET priority = " + prio4 + " WHERE rule_id = " + 1);
+//        db.execSQL("UPDATE rules SET priority = " + prio1 + " WHERE rule_id = " + 4);
+//
+//        playListDao.updateItemPosition(playListId, fromPos, toPos);
+//        playListDao.updateItemPosition(playListId, fromPos, toPos);
     }
 
     private PlayListItem toItem(PlayListEntryDto entryDto) {

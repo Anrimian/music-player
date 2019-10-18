@@ -167,11 +167,16 @@ public class StoragePlayListsProvider {
             position++;
         }
 
-        int inserted = contentResolver.bulkInsert(getContentUri("external", playListId), valuesList);
-        if (inserted == 0) {
-            throw new PlayListNotModifiedException();
-        }
-        updateModifyTime(playListId);
+        try {
+            int inserted = contentResolver.bulkInsert(
+                    getContentUri("external", playListId),
+                    valuesList
+            );
+            if (inserted == 0) {
+                throw new PlayListNotModifiedException();
+            }
+            updateModifyTime(playListId);
+        } catch (SecurityException ignored) {}
     }
 
     public void deleteItemFromPlayList(long itemId, long playListId) {
