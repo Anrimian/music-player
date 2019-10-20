@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
-import android.util.Log;
-
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
@@ -123,13 +121,8 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Completable moveItemInPlayList(PlayList playList,
-                                          PlayListItem fromItem,
-                                          int from,
-                                          PlayListItem toItem,
-                                          int to) {
+    public Completable moveItemInPlayList(PlayList playList, int from, int to) {
         return Completable.fromAction(() -> {
-                    Log.d("KEK7", "moveItems, fromItem: " + fromItem.getComposition().getTitle() + ", toItem: " + toItem.getComposition().getTitle());
 
                     //don't modify storage playlists now
 
@@ -137,11 +130,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 //                            playListId,
 //                            from,
 //                            to);
-            playListsDao.moveItems(playList.getId(),
-                    fromItem.getItemId(),
-                    from,
-                    toItem.getItemId(),
-                    to);
+                    playListsDao.moveItems(playList.getId(), from, to);
                 }
         ).subscribeOn(scheduler);
     }

@@ -22,8 +22,7 @@ import javax.annotation.Nullable;
         },
         indices = {
                 @Index({"audioId"}),
-                @Index({"playListId"}),
-                @Index(value = {"orderPosition", "playListId"}, unique = true)
+                @Index({"playListId"})
         }
 )
 public class PlayListEntryEntity {

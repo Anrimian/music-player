@@ -65,12 +65,8 @@ public class PlayListsInteractor {
         return playListsRepository.deletePlayList(playListId);
     }
 
-    public void moveItemInPlayList(PlayList playList,
-                                   PlayListItem fromItem,
-                                   int from,
-                                   PlayListItem toItem,
-                                   int to) {
-        playListsRepository.moveItemInPlayList(playList, fromItem, from, toItem, to)
+    public void moveItemInPlayList(PlayList playList, int from, int to) {
+        playListsRepository.moveItemInPlayList(playList, from, to)
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
                 .subscribe();

@@ -30,11 +30,7 @@ public interface PlayListsRepository {
 
     Completable deletePlayList(long playListId);
 
-    Completable moveItemInPlayList(PlayList playList,
-                                   PlayListItem fromItem,
-                                   int from,
-                                   PlayListItem toItem,
-                                   int to);
+    Completable moveItemInPlayList(PlayList playList, int from, int to);
 
     Completable updatePlayListName(long playListId, String name);
 }

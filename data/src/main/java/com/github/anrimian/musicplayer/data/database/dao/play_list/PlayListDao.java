@@ -114,46 +114,13 @@ public interface PlayListDao {
     void deletePlayListEntry(long id);
 
     @Insert
-    void insertPlayListEntry(PlayListEntryEntity entity);
-
-    @Insert
     void insertPlayListEntries(List<PlayListEntryEntity> entities);
 
     @Query("SELECT MAX(orderPosition) FROM play_lists_entries WHERE playListId = :playListId")
     int selectMaxOrder(long playListId);
 
-//    @Query("UPDATE play_lists_entries " +
-//            "SET orderPosition = :position " +
-//            "WHERE itemId = :itemId AND playListId = :playListId")
-//    void updateItemPosition(long playListId, long itemId, int position);
-
-    @Query("UPDATE play_lists_entries " +
-            "SET orderPosition = :newPos " +
-            "WHERE orderPosition = :oldPos AND playListId = :playListId;")
-    void updateItemPosition(long playListId, long oldPos, int newPos);
-
     @Query("SELECT orderPosition FROM play_lists_entries WHERE itemId = :id")
     int selectPositionById(long id);
-
-    @Query("UPDATE play_lists_entries " +
-            "SET orderPosition = :newPos " +
-            "WHERE itemId = :id")
-    void updateItemPosition(long id, int newPos);
-
-    @Query("UPDATE play_lists_entries " +
-            "SET orderPosition = orderPosition - 1 " +
-            "WHERE orderPosition > :toPos AND orderPosition <= :fromPos AND playListId = :playListId")
-    void moveItemsToBottom(long playListId, int fromPos, int toPos);
-
-    @Query("UPDATE play_lists_entries " +
-            "SET orderPosition = orderPosition + 1 " +
-            "WHERE orderPosition >= :toPos AND orderPosition < :fromPos AND playListId = :playListId")
-    void moveItemsToTop(long playListId, int fromPos, int toPos);
-
-    @Query("UPDATE play_lists_entries " +
-            "SET orderPosition = :toPos " +
-            "WHERE orderPosition = :fromPos AND playListId = :playListId")
-    void updateItemPosition(long playListId, int fromPos, int toPos);
 
     @Query("UPDATE play_lists_entries SET orderPosition = " +
             "  case " +
@@ -161,12 +128,13 @@ public interface PlayListDao {
             "    when orderPosition > :fromPos then orderPosition - 1" +
             "    else :toPos" +
             "  end " +
-            "WHERE orderPosition between min(:fromPos, :toPos) and max(:fromPos,:toPos) AND playListId = :playListId")
+            "WHERE (orderPosition between min(:fromPos, :toPos) and max(:fromPos,:toPos)) " +
+            "AND playListId = :playListId")
     void moveItems(long playListId, int fromPos, int toPos);
 
     @Query("UPDATE play_lists_entries " +
             "SET orderPosition = orderPosition + :increaseBy " +
-            "WHERE orderPosition > :position AND playListId = :playListId")
+            "WHERE orderPosition >= :position AND playListId = :playListId")
     void increasePositionsByCountAfter(int increaseBy, int position, long playListId);
 
     @Query("UPDATE play_lists_entries " +
@@ -177,4 +145,7 @@ public interface PlayListDao {
     @Nullable
     @Query("SELECT storageId FROM play_lists WHERE id = :id")
     Long selectStorageId(long id);
+
+//    @Query("SELECT * FROM play_lists_entries WHERE playListId = :playListId")
+//    List<PlayListEntryEntity> getPlayListEntries(long playListId);
 }
