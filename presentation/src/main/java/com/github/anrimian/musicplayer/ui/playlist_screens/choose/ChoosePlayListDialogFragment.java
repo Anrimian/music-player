@@ -41,8 +41,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDel
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextColorDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
@@ -135,6 +133,13 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        adapter = new PlayListsAdapter(
+                recyclerView,
+                this::onPlayListSelected,
+                presenter::onPlayListLongClick
+        );
+        recyclerView.setAdapter(adapter);
+
         attachDynamicShadow(recyclerView, titleShadow);
 
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
@@ -202,17 +207,8 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     }
 
     @Override
-    public void updateList(ListUpdate<PlayList> update) {
-        List<PlayList> list = update.getNewList();
-        if (adapter == null) {
-            adapter = new PlayListsAdapter(list);
-            adapter.setOnItemClickListener(this::onPlayListSelected);
-            adapter.setOnItemLongClickListener(presenter::onPlayListLongClick);
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.setItems(list);
-            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
-        }
+    public void updateList(List<PlayList> list) {
+        adapter.submitList(list);
     }
 
     @Override
