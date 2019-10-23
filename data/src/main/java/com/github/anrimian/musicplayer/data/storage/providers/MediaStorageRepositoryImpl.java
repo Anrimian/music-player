@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 
@@ -56,75 +57,51 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     }
 
     @Override
-    public void rescanStorage() {
-        // not implemented
-//        onNewCompositionsFromMediaStorageReceived(musicProvider.getCompositions());
+    public synchronized void rescanStorage() {
+        Completable.fromAction(() -> {
+            applyCompositionsData(musicProvider.getCompositions());
+            applyPlayListData(playListsProvider.getPlayLists());
+
+            List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
+            for (IdPair playListIds: allPlayLists) {
+                long storageId = playListIds.getStorageId();
+                long dbId = playListIds.getDbId();
+                applyPlayListItemsData(dbId, storageId, playListsProvider.getPlayListItems(storageId));
+            }
+        }).subscribeOn(scheduler).subscribe();
     }
 
     private void onNewCompositionsFromMediaStorageReceived(Map<Long, StorageComposition> newCompositions) {
-        Map<Long, StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
+        applyCompositionsData(newCompositions);
 
-        List<StorageComposition> addedCompositions = new ArrayList<>();
-        List<StorageComposition> deletedCompositions = new ArrayList<>();
-        List<StorageComposition> changedCompositions = new ArrayList<>();
-        boolean hasChanges = MapChangeProcessor.processChanges2(currentCompositions,
-                newCompositions,
-                this::hasActualChanges,
-                deletedCompositions::add,
-                addedCompositions::add,
-                changedCompositions::add);
-
-        if (hasChanges) {
-            compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
-        }
         if (playListsDisposable == null) {
             playListsDisposable = playListsProvider.getPlayListsObservable()
                     .startWith(playListsProvider.getPlayLists())
                     .subscribeOn(scheduler)
                     .subscribe(this::onStoragePlayListReceived);
         }
-
     }
 
     private void onStoragePlayListReceived(Map<Long, StoragePlayList> newPlayLists) {
-        List<StoragePlayList> currentPlayLists = playListsDao.getAllAsStoragePlayLists();
-        Map<Long, StoragePlayList> currentPlayListsMap = ListUtils.mapToMap(currentPlayLists,
-                new HashMap<>(),
-                StoragePlayList::getId);
-
-        List<StoragePlayList> addedPlayLists = new ArrayList<>();
-        List<StoragePlayList> changedPlayLists = new ArrayList<>();
-        boolean hasChanges = MapChangeProcessor.processChanges2(currentPlayListsMap,
-                newPlayLists,
-                this::hasActualChanges,
-                playList -> {},
-                addedPlayLists::add,
-                changedPlayLists::add);
-
-        if (hasChanges) {
-            playListsDao.applyChanges(addedPlayLists, changedPlayLists);
-        }
+        applyPlayListData(newPlayLists);
 
         List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
         for (IdPair playListids: allPlayLists) {
-            Long storageId = playListids.getStorageId();
-            if (storageId == null) {
-                continue;
-            }
+            long storageId = playListids.getStorageId();
             long dbId = playListids.getDbId();
             if (!playListEntriesDisposable.containsKey(dbId)) {
                 Disposable disposable = playListsProvider.getPlayListEntriesObservable(storageId)
                         .startWith(playListsProvider.getPlayListItems(storageId))
                         .subscribeOn(scheduler)
-                        .subscribe(entries -> onPlayListEntriesReceived(dbId, storageId, entries));
+                        .subscribe(entries -> applyPlayListItemsData(dbId, storageId, entries));
                 playListEntriesDisposable.put(dbId, disposable);
             }
         }
     }
 
-    private void onPlayListEntriesReceived(long playListId,
-                                           long storagePlayListId,
-                                           List<StoragePlayListItem> newItems) {
+    private synchronized void applyPlayListItemsData(long playListId,
+                                        long storagePlayListId,
+                                        List<StoragePlayListItem> newItems) {
         List<StoragePlayListItem> currentItems = playListsDao.getPlayListItemsAsStorageItems(playListId);
         Map<Long, StoragePlayListItem> currentItemsMap = ListUtils.mapToMap(currentItems,
                 new HashMap<>(),
@@ -144,6 +121,44 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
         if (hasChanges) {
             playListsDao.insertPlayListItems(addedItems, playListId, storagePlayListId);
+        }
+    }
+
+    private synchronized void applyPlayListData(Map<Long, StoragePlayList> newPlayLists) {
+        List<StoragePlayList> currentPlayLists = playListsDao.getAllAsStoragePlayLists();
+        Map<Long, StoragePlayList> currentPlayListsMap = ListUtils.mapToMap(currentPlayLists,
+                new HashMap<>(),
+                StoragePlayList::getId);
+
+        List<StoragePlayList> addedPlayLists = new ArrayList<>();
+        List<StoragePlayList> changedPlayLists = new ArrayList<>();
+        boolean hasChanges = MapChangeProcessor.processChanges2(currentPlayListsMap,
+                newPlayLists,
+                this::hasActualChanges,
+                playList -> {},
+                addedPlayLists::add,
+                changedPlayLists::add);
+
+        if (hasChanges) {
+            playListsDao.applyChanges(addedPlayLists, changedPlayLists);
+        }
+    }
+
+    private synchronized void applyCompositionsData(Map<Long, StorageComposition> newCompositions) {
+        Map<Long, StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
+
+        List<StorageComposition> addedCompositions = new ArrayList<>();
+        List<StorageComposition> deletedCompositions = new ArrayList<>();
+        List<StorageComposition> changedCompositions = new ArrayList<>();
+        boolean hasChanges = MapChangeProcessor.processChanges2(currentCompositions,
+                newCompositions,
+                this::hasActualChanges,
+                deletedCompositions::add,
+                addedCompositions::add,
+                changedCompositions::add);
+
+        if (hasChanges) {
+            compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
         }
     }
 

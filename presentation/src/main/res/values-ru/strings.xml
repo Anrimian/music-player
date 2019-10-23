@@ -134,6 +134,7 @@
     <string name="move_in_the_same_folder_error">Целевая и исходная папка совпадают</string>
     <string name="file_already_exists">Файл с таким именем уже существует</string>
     <string name="new_folder">Новая папка</string>
+    <string name="scan_storage">Пересканировать системную библиотеку</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

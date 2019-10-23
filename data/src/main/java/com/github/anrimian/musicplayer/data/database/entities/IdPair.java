@@ -1,15 +1,11 @@
 package com.github.anrimian.musicplayer.data.database.entities;
 
-import javax.annotation.Nullable;
-
 public class IdPair {
 
     private final long dbId;
+    private final long storageId;
 
-    @Nullable
-    private final Long storageId;
-
-    public IdPair(long dbId, @Nullable Long storageId) {
+    public IdPair(long dbId, long storageId) {
         this.dbId = dbId;
         this.storageId = storageId;
     }
@@ -18,8 +14,7 @@ public class IdPair {
         return dbId;
     }
 
-    @Nullable
-    public Long getStorageId() {
+    public long getStorageId() {
         return storageId;
     }
 }

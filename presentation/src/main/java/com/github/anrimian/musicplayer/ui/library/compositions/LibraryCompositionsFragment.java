@@ -183,6 +183,10 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
                 toolbar.setSearchModeEnabled(true);
                 return true;
             }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaStorageRepository().rescanStorage();
+                return true;
+            }
             default: return super.onOptionsItemSelected(item);
         }
     }

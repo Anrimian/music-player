@@ -67,7 +67,7 @@ public interface PlayListDao {
     @Query("SELECT " +
             "play_lists.id as dbId, " +
             "play_lists.storageId as storageId " +
-            "FROM play_lists")
+            "FROM play_lists WHERE play_lists.storageId IS NOT NULL")
     List<IdPair> getPlayListsIds();
 
     @Query("SELECT " +

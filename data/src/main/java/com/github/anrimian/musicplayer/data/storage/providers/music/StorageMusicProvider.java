@@ -40,8 +40,6 @@ import static java.util.Collections.emptyMap;
 
 public class StorageMusicProvider {
 
-    private static final int CHANGE_EVENTS_WINDOW_SECONDS = 5;
-
     private final ContentResolver contentResolver;
 
     public StorageMusicProvider(Context context) {
@@ -50,8 +48,6 @@ public class StorageMusicProvider {
 
     public Observable<Map<Long, StorageComposition>> getCompositionsObservable() {
         return RxContentObserver.getObservable(contentResolver, EXTERNAL_CONTENT_URI)
-//                .doOnNext(o -> Log.d("KEK", "received update"))
-//                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)//TODO not this, ask on so
                 .map(o -> getCompositions());
     }
 
