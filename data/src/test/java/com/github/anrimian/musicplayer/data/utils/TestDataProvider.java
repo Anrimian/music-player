@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.utils;
 
+import androidx.collection.LongSparseArray;
+
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
@@ -127,8 +129,8 @@ public class TestDataProvider {
         return compositions;
     }
 
-    public static Map<Long, StorageComposition> getFakeStorageCompositionsMap() {
-        Map<Long, StorageComposition> compositions = new HashMap<>();
+    public static LongSparseArray<StorageComposition> getFakeStorageCompositionsMap() {
+        LongSparseArray<StorageComposition> compositions = new LongSparseArray<>();
         for (long i = 0; i < 100000; i++) {
             StorageComposition composition = fakeStorageComposition(i, "music-" + i);
             compositions.put(i, composition);
@@ -272,8 +274,8 @@ public class TestDataProvider {
         return new StoragePlayList(i, "test" + i, new Date(i), new Date(i));
     }
 
-    public static Map<Long, StoragePlayList> storagePlayLists(long count) {
-        Map<Long, StoragePlayList> items = new HashMap<>();
+    public static LongSparseArray<StoragePlayList> storagePlayLists(long count) {
+        LongSparseArray<StoragePlayList> items = new LongSparseArray<>();
         for (long i = 0; i < count; i++) {
             items.put(i, storagePlayList(i));
         }

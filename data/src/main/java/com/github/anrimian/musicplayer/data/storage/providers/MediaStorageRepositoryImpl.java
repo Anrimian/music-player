@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.providers;
 
+import androidx.collection.LongSparseArray;
+
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
@@ -9,16 +11,13 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
+import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
-import com.github.anrimian.musicplayer.domain.utils.changes.map.MapChangeProcessor;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -34,7 +33,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     private Disposable compositionsDisposable;
     private Disposable playListsDisposable;
-    private HashMap<Long, Disposable> playListEntriesDisposable = new HashMap<>();
+    private LongSparseArray<Disposable> playListEntriesDisposable = new LongSparseArray<>();
 
     public MediaStorageRepositoryImpl(StorageMusicProvider musicProvider,
                                       StoragePlayListsProvider playListsProvider,
@@ -71,7 +70,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }).subscribeOn(scheduler).subscribe();
     }
 
-    private void onNewCompositionsFromMediaStorageReceived(Map<Long, StorageComposition> newCompositions) {
+    private void onNewCompositionsFromMediaStorageReceived(LongSparseArray<StorageComposition> newCompositions) {
         applyCompositionsData(newCompositions);
 
         if (playListsDisposable == null) {
@@ -82,7 +81,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
-    private void onStoragePlayListReceived(Map<Long, StoragePlayList> newPlayLists) {
+    private void onStoragePlayListReceived(LongSparseArray<StoragePlayList> newPlayLists) {
         applyPlayListData(newPlayLists);
 
         List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
@@ -100,19 +99,19 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     }
 
     private synchronized void applyPlayListItemsData(long playListId,
-                                        long storagePlayListId,
-                                        List<StoragePlayListItem> newItems) {
+                                                     long storagePlayListId,
+                                                     List<StoragePlayListItem> newItems) {
         List<StoragePlayListItem> currentItems = playListsDao.getPlayListItemsAsStorageItems(playListId);
-        Map<Long, StoragePlayListItem> currentItemsMap = ListUtils.mapToMap(currentItems,
-                new HashMap<>(),
+        LongSparseArray<StoragePlayListItem> currentItemsMap = AndroidCollectionUtils.mapToSparseArray(
+                currentItems,
                 StoragePlayListItem::getItemId);
 
-        Map<Long, StoragePlayListItem> newItemsMap = ListUtils.mapToMap(newItems,
-                new HashMap<>(),
+        LongSparseArray<StoragePlayListItem> newItemsMap = AndroidCollectionUtils.mapToSparseArray(
+                newItems,
                 StoragePlayListItem::getItemId);
 
         List<RawPlayListItem> addedItems = new ArrayList<>();
-        boolean hasChanges = MapChangeProcessor.processChanges2(currentItemsMap,
+        boolean hasChanges = AndroidCollectionUtils.processChanges(currentItemsMap,
                 newItemsMap,
                 (o1, o2) -> true,
                 item -> {},
@@ -124,15 +123,14 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
-    private synchronized void applyPlayListData(Map<Long, StoragePlayList> newPlayLists) {
+    private synchronized void applyPlayListData(LongSparseArray<StoragePlayList> newPlayLists) {
         List<StoragePlayList> currentPlayLists = playListsDao.getAllAsStoragePlayLists();
-        Map<Long, StoragePlayList> currentPlayListsMap = ListUtils.mapToMap(currentPlayLists,
-                new HashMap<>(),
+        LongSparseArray<StoragePlayList> currentPlayListsMap = AndroidCollectionUtils.mapToSparseArray(currentPlayLists,
                 StoragePlayList::getId);
 
         List<StoragePlayList> addedPlayLists = new ArrayList<>();
         List<StoragePlayList> changedPlayLists = new ArrayList<>();
-        boolean hasChanges = MapChangeProcessor.processChanges2(currentPlayListsMap,
+        boolean hasChanges = AndroidCollectionUtils.processChanges(currentPlayListsMap,
                 newPlayLists,
                 this::hasActualChanges,
                 playList -> {},
@@ -144,13 +142,13 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
-    private synchronized void applyCompositionsData(Map<Long, StorageComposition> newCompositions) {
-        Map<Long, StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
+    private synchronized void applyCompositionsData(LongSparseArray<StorageComposition> newCompositions) {
+        LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
         List<StorageComposition> addedCompositions = new ArrayList<>();
         List<StorageComposition> deletedCompositions = new ArrayList<>();
         List<StorageComposition> changedCompositions = new ArrayList<>();
-        boolean hasChanges = MapChangeProcessor.processChanges2(currentCompositions,
+        boolean hasChanges = AndroidCollectionUtils.processChanges(currentCompositions,
                 newCompositions,
                 this::hasActualChanges,
                 deletedCompositions::add,

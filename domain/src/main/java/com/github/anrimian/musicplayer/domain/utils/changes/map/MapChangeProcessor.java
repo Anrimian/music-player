@@ -8,7 +8,7 @@ import java.util.Map;
 public class MapChangeProcessor {
 
     @Deprecated
-    public static <K, V> boolean processChanges(Map<K, V> oldMap,
+    public static <K, V> boolean processChangesOld(Map<K, V> oldMap,
                                                 Map<K, V> newMap,
                                                 ChangeInspector<V> changeInspector,
                                                 Callback<Map.Entry<K, V>> onDeleteCallback,
@@ -37,12 +37,12 @@ public class MapChangeProcessor {
         return hasChanges;
     }
 
-    public static <K, V> boolean processChanges2(Map<K, V> oldMap,
-                                                 Map<K, V> newMap,
-                                                 ChangeInspector<V> changeInspector,
-                                                 Callback<V> onDeleteCallback,
-                                                 Callback<V> onAddedCallback,
-                                                 Callback<V> onModifyCallback) {
+    public static <K, V> boolean processChanges(Map<K, V> oldMap,
+                                                Map<K, V> newMap,
+                                                ChangeInspector<V> changeInspector,
+                                                Callback<V> onDeleteCallback,
+                                                Callback<V> onAddedCallback,
+                                                Callback<V> onModifyCallback) {
         boolean hasChanges = false;
 
         for (Map.Entry<K, V> existEntry: oldMap.entrySet()) {

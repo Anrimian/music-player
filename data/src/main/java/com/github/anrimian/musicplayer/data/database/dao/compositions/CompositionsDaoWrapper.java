@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
@@ -59,9 +61,8 @@ public class CompositionsDaoWrapper {
         return mapToMap(getAll(), new HashMap<>(), Composition::getId);
     }
 
-    public Map<Long, StorageComposition> selectAllAsStorageCompositions() {
-        return mapToMap(compositionsDao.selectAllAsStorageCompositions(),
-                new HashMap<>(),
+    public LongSparseArray<StorageComposition> selectAllAsStorageCompositions() {
+        return AndroidCollectionUtils.mapToSparseArray(compositionsDao.selectAllAsStorageCompositions(),
                 StorageComposition::getId);
     }
 

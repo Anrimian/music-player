@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 
+import androidx.collection.LongSparseArray;
+
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
@@ -19,8 +21,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
@@ -36,7 +36,6 @@ import static android.provider.MediaStore.Audio.Media.IS_MUSIC;
 import static android.provider.MediaStore.Audio.Media.TITLE;
 import static android.provider.MediaStore.Audio.Media._ID;
 import static android.text.TextUtils.isEmpty;
-import static java.util.Collections.emptyMap;
 
 public class StorageMusicProvider {
 
@@ -46,12 +45,12 @@ public class StorageMusicProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<Map<Long, StorageComposition>> getCompositionsObservable() {
+    public Observable<LongSparseArray<StorageComposition>> getCompositionsObservable() {
         return RxContentObserver.getObservable(contentResolver, EXTERNAL_CONTENT_URI)
                 .map(o -> getCompositions());
     }
 
-    public Map<Long, StorageComposition> getCompositions() {
+    public LongSparseArray<StorageComposition> getCompositions() {
         return getCompositions(EXTERNAL_CONTENT_URI);
     }
 
@@ -145,7 +144,7 @@ public class StorageMusicProvider {
                 new String[] { String.valueOf(id) });
     }
 
-    private Map<Long, StorageComposition> getCompositions(Uri uri) {
+    private LongSparseArray<StorageComposition> getCompositions(Uri uri) {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -164,10 +163,10 @@ public class StorageMusicProvider {
                     new String[] { String.valueOf(1) },
                     null);
             if (cursor == null) {
-                return emptyMap();
+                return new LongSparseArray<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            Map<Long, StorageComposition> compositions = new ConcurrentHashMap<>(cursor.getCount());
+            LongSparseArray<StorageComposition> compositions = new LongSparseArray<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 

@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore.Audio.Playlists;
 
+import androidx.collection.LongSparseArray;
+
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotMovedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
@@ -21,9 +23,7 @@ import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -35,7 +35,6 @@ import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 public class StoragePlayListsProvider {
 
@@ -45,12 +44,12 @@ public class StoragePlayListsProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<Map<Long, StoragePlayList>> getPlayListsObservable() {
+    public Observable<LongSparseArray<StoragePlayList>> getPlayListsObservable() {
         return RxContentObserver.getObservable(contentResolver, Playlists.EXTERNAL_CONTENT_URI)
                 .map(o -> getPlayLists());
     }
 
-    public Map<Long, StoragePlayList> getPlayLists() {
+    public LongSparseArray<StoragePlayList> getPlayLists() {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -60,11 +59,11 @@ public class StoragePlayListsProvider {
                     null,
                     null);
             if (cursor == null) {
-                return emptyMap();
+                return new LongSparseArray<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
 
-            Map<Long, StoragePlayList> map = new HashMap<>();
+            LongSparseArray<StoragePlayList> map = new LongSparseArray<>();
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
                 StoragePlayList playList = getPlayListFromCursor(cursorWrapper);

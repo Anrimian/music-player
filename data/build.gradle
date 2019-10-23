@@ -40,6 +40,7 @@ dependencies {
 
     def deps = rootProject.ext
 
+    implementation deps.appCompat
     implementation deps.rxJava
     implementation deps.exoPlayerCore
     compileOnly deps.javaxAnnotation
