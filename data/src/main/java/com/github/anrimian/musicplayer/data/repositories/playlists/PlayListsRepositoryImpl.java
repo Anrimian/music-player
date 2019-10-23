@@ -2,13 +2,13 @@ package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -21,17 +21,13 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     private final StoragePlayListsProvider storagePlayListsProvider;
-    @Deprecated
-    private final StorageMusicDataSource storageMusicDataSource;
     private final PlayListsDaoWrapper playListsDao;
     private final Scheduler scheduler;
 
     public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
-                                   StorageMusicDataSource storageMusicDataSource,
                                    PlayListsDaoWrapper playListsDao,
                                    Scheduler scheduler) {
         this.storagePlayListsProvider = storagePlayListsProvider;
-        this.storageMusicDataSource = storageMusicDataSource;
         this.playListsDao = playListsDao;
         this.scheduler = scheduler;
     }
@@ -53,9 +49,23 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     @Override
     public Single<PlayList> createPlayList(String name) {
-        return Single.fromCallable(() -> storagePlayListsProvider.createPlayList(name))
-                .map(playListsDao::insertPlayList)
-                .subscribeOn(scheduler);
+        return Single.fromCallable(() -> {
+            Date currentDate = new Date();
+            long id = playListsDao.insertPlayList(name, currentDate, currentDate);
+
+            //don't modify storage playlists now
+//            Long storageId = storagePlayListsProvider.createPlayList(name,
+//                    currentDate,
+//                    currentDate);
+//            playListsDao.updateStorageId(id, storageId);
+            return new PlayList(id,
+                    null,
+                    name,
+                    currentDate,
+                    currentDate,
+                    0,
+                    0);
+        }).subscribeOn(scheduler);
     }
 
     @Override
@@ -74,7 +84,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 //                    }
                     playListsDao.insertPlayListItems(
                             mapList(compositions, composition -> new RawPlayListItem(
-                                    null,//composition.getStorageId(),//not this//TODO get inserted id in storage
+                                    null,//composition.getStorageId(),//get inserted id in storage
                                     composition.getId()
                             )),
                             playList.getId(),
@@ -138,12 +148,11 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     @Override
     public Completable updatePlayListName(long playListId, String name) {
         return Completable.fromAction(() -> {
-                    playListsDao.updatePlayListName(playListId, name);
-                    Long storageId = playListsDao.selectStorageId(playListId);
-                    if (storageId != null) {
-                        storagePlayListsProvider.updatePlayListName(storageId, name);
-                    }
-                }
-        ).subscribeOn(scheduler);
+            playListsDao.updatePlayListName(playListId, name);
+            Long storageId = playListsDao.selectStorageId(playListId);
+            if (storageId != null) {
+                storagePlayListsProvider.updatePlayListName(storageId, name);
+            }
+        }).subscribeOn(scheduler);
     }
 }

@@ -146,6 +146,12 @@ public interface PlayListDao {
     @Query("SELECT storageId FROM play_lists WHERE id = :id")
     Long selectStorageId(long id);
 
+    @Query("UPDATE play_lists SET storageId = :storageId WHERE id = :id")//update entries?
+    void updateStorageId(long id, Long storageId);
+
+    @Query("SELECT * FROM play_lists WHERE name = :name")
+    PlayListEntity getPlayListByName(String name);
+
 //    @Query("SELECT * FROM play_lists_entries WHERE playListId = :playListId")
 //    List<PlayListEntryEntity> getPlayListEntries(long playListId);
 }

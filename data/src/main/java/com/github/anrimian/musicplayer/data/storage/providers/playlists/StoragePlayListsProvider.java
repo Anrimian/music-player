@@ -76,6 +76,23 @@ public class StoragePlayListsProvider {
         }
     }
 
+    public Long createPlayList(String name, Date dateAdded, Date dateModified) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Playlists.NAME, name);
+        contentValues.put(Playlists.DATE_ADDED, dateAdded.getTime() / 1000L);
+        contentValues.put(Playlists.DATE_MODIFIED, dateModified.getTime() / 1000L);
+        Uri uri = contentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, contentValues);
+        if (uri == null || isEmpty(uri.getLastPathSegment())) {
+            return null;
+        }
+        long id = Long.valueOf(uri.getLastPathSegment());
+        StoragePlayList playList = findPlayList(id);
+        if (playList == null) {
+            return null;
+        }
+        return playList.getId();
+    }
+
     public StoragePlayList createPlayList(String name) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);

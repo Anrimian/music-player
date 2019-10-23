@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.entities.playlist;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.util.Date;
@@ -8,7 +9,9 @@ import java.util.Date;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Entity(tableName = "play_lists")
+@Entity(tableName = "play_lists",
+        indices = @Index(value = "name", unique = true)
+)
 public class PlayListEntity {
 
     @PrimaryKey(autoGenerate = true)

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
+import android.database.sqlite.SQLiteConstraintException;
+
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
@@ -8,6 +10,7 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
+import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -36,7 +39,19 @@ public class PlayListsDaoWrapper {
     public void applyChanges(List<StoragePlayList> addedPlayLists,
                              List<StoragePlayList> changedPlayLists) {
         appDatabase.runInTransaction(() -> {
-            playListDao.insertPlayListEntities(mapList(addedPlayLists, this::toEntity));
+            //add
+            List<PlayListEntity> entities = new ArrayList<>(addedPlayLists.size());
+            for (StoragePlayList storagePlayList: addedPlayLists) {
+                entities.add(new PlayListEntity(
+                        storagePlayList.getId(),
+                        getUniquePlayListName(storagePlayList.getName()),
+                        storagePlayList.getDateAdded(),
+                        storagePlayList.getDateModified()
+                ));
+            }
+            playListDao.insertPlayListEntities(entities);
+
+            //update
             for (StoragePlayList playList: changedPlayLists) {
                 playListDao.updatePlayListModifyTimeByStorageId(playList.getId(), playList.getDateModified());
                 playListDao.updatePlayListNameByStorageId(playList.getId(), playList.getName());
@@ -44,7 +59,20 @@ public class PlayListsDaoWrapper {
         });
     }
 
-    public PlayList insertPlayList(StoragePlayList playList) {
+    public long insertPlayList(String name, Date dateAdded, Date dateModified) {
+        PlayListEntity entity = new PlayListEntity(null, name, dateAdded, dateModified);
+        try {
+            long id = playListDao.insertPlayListEntity(entity);
+            if (id == -1) {
+                throw new IllegalStateException("db not modified");
+            }
+            return id;
+        } catch (SQLiteConstraintException e) {
+            throw new PlayListNotCreatedException();
+        }
+    }
+
+    public long insertPlayList(StoragePlayList playList) {
         PlayListEntity entity = new PlayListEntity(
                 playList.getId(),
                 playList.getName(),
@@ -54,13 +82,7 @@ public class PlayListsDaoWrapper {
         if (id == -1) {
             throw new IllegalStateException("db not modified");
         }
-        return new PlayList(id,
-                playList.getId(),
-                playList.getName(),
-                playList.getDateAdded(),
-                playList.getDateModified(),
-                0,
-                0);
+        return id;
     }
 
     public List<StoragePlayList> getAllAsStoragePlayLists() {
@@ -173,5 +195,19 @@ public class PlayListsDaoWrapper {
                 storagePlayList.getName(),
                 storagePlayList.getDateAdded(),
                 storagePlayList.getDateModified());
+    }
+
+    public void updateStorageId(long id, Long storageId) {
+        playListDao.updateStorageId(id, storageId);
+    }
+
+    private String getUniquePlayListName(String name) {
+        String uniqueName = name;
+        int i = 0;
+        while (playListDao.getPlayListByName(uniqueName) != null) {
+            i++;
+            uniqueName = name + "("+ i + ")";
+        }
+        return uniqueName;
     }
 }
