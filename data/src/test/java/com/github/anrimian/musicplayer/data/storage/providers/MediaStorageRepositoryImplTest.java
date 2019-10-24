@@ -153,7 +153,6 @@ public class MediaStorageRepositoryImplTest {
 
         verify(playListsDao).insertPlayListItems(
                 eq(asList(new RawPlayListItem(1L, 0))),
-                eq(1L),
                 eq(1L)
         );
     }

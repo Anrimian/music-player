@@ -88,7 +88,6 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                                     composition.getId()
                             )),
                             playList.getId(),
-                            playList.getStorageId(),
                             position);
                 }
         ).subscribeOn(scheduler);

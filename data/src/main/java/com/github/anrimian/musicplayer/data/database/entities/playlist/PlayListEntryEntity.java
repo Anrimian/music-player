@@ -33,29 +33,19 @@ public class PlayListEntryEntity {
     @Nullable
     private Long storageItemId;
 
-    @Nullable
-    private Long storagePlayListId;
-
     private long audioId;
     private long playListId;
 
     private int orderPosition;
 
     public PlayListEntryEntity(@Nullable Long storageItemId,
-                               @Nullable Long storagePlayListId,
                                long audioId,
                                long playListId,
                                int orderPosition) {
         this.storageItemId = storageItemId;
-        this.storagePlayListId = storagePlayListId;
         this.audioId = audioId;
         this.playListId = playListId;
         this.orderPosition = orderPosition;
-    }
-
-    @Nullable
-    public Long getStoragePlayListId() {
-        return storagePlayListId;
     }
 
     public void setItemId(long itemId) {

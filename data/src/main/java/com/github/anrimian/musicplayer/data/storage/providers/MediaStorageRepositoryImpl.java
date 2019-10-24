@@ -65,7 +65,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
             for (IdPair playListIds: allPlayLists) {
                 long storageId = playListIds.getStorageId();
                 long dbId = playListIds.getDbId();
-                applyPlayListItemsData(dbId, storageId, playListsProvider.getPlayListItems(storageId));
+                applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
             }
         }).subscribeOn(scheduler).subscribe();
     }
@@ -92,14 +92,13 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 Disposable disposable = playListsProvider.getPlayListEntriesObservable(storageId)
                         .startWith(playListsProvider.getPlayListItems(storageId))
                         .subscribeOn(scheduler)
-                        .subscribe(entries -> applyPlayListItemsData(dbId, storageId, entries));
+                        .subscribe(entries -> applyPlayListItemsData(dbId, entries));
                 playListEntriesDisposable.put(dbId, disposable);
             }
         }
     }
 
     private synchronized void applyPlayListItemsData(long playListId,
-                                                     long storagePlayListId,
                                                      List<StoragePlayListItem> newItems) {
         List<StoragePlayListItem> currentItems = playListsDao.getPlayListItemsAsStorageItems(playListId);
         LongSparseArray<StoragePlayListItem> currentItemsMap = AndroidCollectionUtils.mapToSparseArray(
@@ -119,7 +118,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 item -> {});
 
         if (hasChanges) {
-            playListsDao.insertPlayListItems(addedItems, playListId, storagePlayListId);
+            playListsDao.insertPlayListItems(addedItems, playListId);
         }
     }
 

@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
@@ -134,18 +132,15 @@ public class PlayListsDaoWrapper {
     }
 
     public void insertPlayListItems(List<RawPlayListItem> items,
-                                    long playListId,
-                                    @Nullable Long storagePlayListId) {
+                                    long playListId) {
         insertPlayListItems(items,
                 playListId,
-                storagePlayListId,
                 playListDao.selectMaxOrder(playListId) + 1
         );
     }
 
     public void insertPlayListItems(List<RawPlayListItem> items,
                                     long playListId,
-                                    @Nullable Long storagePlayListId,
                                     int position) {
         appDatabase.runInTransaction(() -> {
             playListDao.increasePositionsByCountAfter(items.size(), position, playListId);
@@ -155,7 +150,6 @@ public class PlayListsDaoWrapper {
             for (RawPlayListItem item : items) {
                 PlayListEntryEntity entryEntity = new PlayListEntryEntity(
                         item.getStorageItemId(),
-                        storagePlayListId,
                         item.getAudioId(),
                         playListId,
                         orderPosition++
