@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.database;
 
+import android.app.Instrumentation;
+import android.content.Context;
+
 import androidx.room.testing.MigrationTestHelper;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
@@ -9,16 +12,17 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static com.github.anrimian.musicplayer.data.database.Migrations.MIGRATION_1_2;
-
 public class MigrationsTest {
 
     private static final String TEST_DB_NAME = "music_player_database";
 
+    private Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+    private Context context = instrumentation.getContext();
+
     @Rule
     public MigrationTestHelper testHelper =
             new MigrationTestHelper(
-                    InstrumentationRegistry.getInstrumentation(),
+                    instrumentation,
                     AppDatabase.class.getCanonicalName(),
                     new FrameworkSQLiteOpenHelperFactory());
 
@@ -35,6 +39,6 @@ public class MigrationsTest {
         db = testHelper.runMigrationsAndValidate(TEST_DB_NAME,
                 2,
                 false,
-                MIGRATION_1_2);
+                Migrations.getMigration1_2(context));
     }
 }

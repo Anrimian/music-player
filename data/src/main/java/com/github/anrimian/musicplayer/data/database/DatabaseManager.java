@@ -19,6 +19,8 @@ public class DatabaseManager {
     }
 
     public AppDatabase getAppDatabase() {
-        return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();//TODO create migration later
+        return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME)
+                .addMigrations(Migrations.getMigration1_2(context))
+                .build();
     }
 }
