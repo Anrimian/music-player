@@ -22,6 +22,9 @@ android {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
+        sourceSets {
+            androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+        }
     }
 
     buildTypes {
@@ -53,9 +56,11 @@ dependencies {
 
     testImplementation deps.junit
     testImplementation deps.mockito
+
     androidTestImplementation deps.junit
     androidTestImplementation deps.supportTest
     androidTestImplementation deps.espresso
     androidTestImplementation deps.rules
     androidTestImplementation deps.rxJava2Ext
+    androidTestImplementation deps.roomTest
 }

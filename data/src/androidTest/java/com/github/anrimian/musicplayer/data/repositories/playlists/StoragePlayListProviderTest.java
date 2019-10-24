@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.collection.LongSparseArray;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 
@@ -16,7 +17,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.observers.TestObserver;
 
@@ -39,19 +39,21 @@ public class StoragePlayListProviderTest {
 
     @Test
     public void getPlayLists() {
-        Map<Long, StoragePlayList> playLists = storagePlayListsProvider.getPlayLists();
+        LongSparseArray<StoragePlayList> playLists = storagePlayListsProvider.getPlayLists();
         assertNotNull(playLists);
     }
 
     @Test
     public void createAndDeletePlayListTest() {
-        TestObserver<Map<Long, StoragePlayList>> playListsObserver = storagePlayListsProvider.getPlayListsObservable()
+        TestObserver<LongSparseArray<StoragePlayList>> playListsObserver = storagePlayListsProvider.getPlayListsObservable()
                 .test();
 
         StoragePlayList createdPlayList = storagePlayListsProvider.createPlayList("test playlist10");
         assertEquals("test playlist10", createdPlayList.getName());
 
-        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists().values()) {
+        LongSparseArray<StoragePlayList> map = storagePlayListsProvider.getPlayLists();
+        for(int i = 0, size = map.size(); i < size; i++) {
+            StoragePlayList playList = map.valueAt(i);
             if (playList.getName().equals("test playlist10")) {
                 storagePlayListsProvider.deletePlayList(playList.getId());
             }
@@ -141,7 +143,9 @@ public class StoragePlayListProviderTest {
     }
 
     private StoragePlayList getPlayList(String name) {
-        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists().values()) {
+        LongSparseArray<StoragePlayList> map = storagePlayListsProvider.getPlayLists();
+        for(int i = 0, size = map.size(); i < size; i++) {
+            StoragePlayList playList = map.valueAt(i);
             if (playList.getName().equals(name)) {
                 return playList;
             }
@@ -150,7 +154,9 @@ public class StoragePlayListProviderTest {
     }
 
     private StoragePlayListItem findComposition(int index) {
-        for (StoragePlayList playList: storagePlayListsProvider.getPlayLists().values()) {
+        LongSparseArray<StoragePlayList> map = storagePlayListsProvider.getPlayLists();
+        for(int i = 0, size = map.size(); i < size; i++) {
+            StoragePlayList playList = map.valueAt(i);
             List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
 
             if (index < items.size()) {

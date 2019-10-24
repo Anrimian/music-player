@@ -4,14 +4,13 @@ import android.Manifest;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.collection.LongSparseArray;
 import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.Map;
 
 import hu.akarnokd.rxjava2.math.MathObservable;
 import io.reactivex.Observable;
@@ -33,8 +32,9 @@ public class StorageMusicProviderTest {
 
     @Test
     public void testRepositoryReturnValues() {
-        Map<Long, StorageComposition> compositions = storageMusicProvider.getCompositions();
-        for (StorageComposition composition: compositions.values()) {
+        LongSparseArray<StorageComposition> map = storageMusicProvider.getCompositions();
+        for(int i = 0, size = map.size(); i < size; i++) {
+            StorageComposition composition = map.valueAt(i);
             System.out.println(composition);
             Assert.assertNotNull(composition.getFilePath());
         }

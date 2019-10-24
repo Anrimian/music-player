@@ -82,6 +82,7 @@ ext {
     room = "androidx.room:room-runtime:$roomVersion"
     roomRx = "androidx.room:room-rxjava2:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
+    roomTest = "android.arch.persistence.room:testing:$roomVersion"
 
     //develop
     javaxAnnotation = "com.google.code.findbugs:jsr305:$javaxAnnotationVersion"
