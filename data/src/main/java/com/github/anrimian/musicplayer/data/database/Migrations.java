@@ -9,23 +9,26 @@ import androidx.collection.LongSparseArray;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionCorruptionDetector;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 
 class Migrations {
 
-    public static Migration getMigration1_2(Context context) {
+    static Migration getMigration1_2(Context context) {
         return new Migration(1, 2) {
             @Override
             public void migrate(@NonNull SupportSQLiteDatabase database) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `compositions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `artist` TEXT, `title` TEXT, `album` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT)");
                 StorageMusicProvider provider = new StorageMusicProvider(context);
 
+                EnumConverter enumConverter = new EnumConverter();
                 LongSparseArray<StorageComposition> map = provider.getCompositions();
                 for(int i = 0, size = map.size(); i < size; i++) {
                     StorageComposition composition = map.valueAt(i);
                     ContentValues cv = new ContentValues();
+                    cv.put("storageId", composition.getId());
                     cv.put("artist", composition.getArtist());
                     cv.put("title", composition.getTitle());
                     cv.put("album", composition.getAlbum());
@@ -34,7 +37,7 @@ class Migrations {
                     cv.put("size", composition.getSize());
                     cv.put("dateAdded", composition.getDateAdded().getTime());
                     cv.put("dateModified", composition.getDateModified().getTime());
-                    cv.put("corruptionType", CompositionCorruptionDetector.getCorruptionType(composition).name());
+                    cv.put("corruptionType", enumConverter.toName(CompositionCorruptionDetector.getCorruptionType(composition)));
                     database.insert("compositions", SQLiteDatabase.CONFLICT_REPLACE, cv);
                 }
 
