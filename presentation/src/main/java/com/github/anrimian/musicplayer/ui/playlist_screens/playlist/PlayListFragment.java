@@ -39,8 +39,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLay
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
@@ -130,6 +128,12 @@ public class PlayListFragment extends MvpAppCompatFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        adapter = new PlayListItemAdapter(recyclerView,
+                presenter.isCoversEnabled(),
+                presenter::onCompositionClicked,
+                presenter::onItemIconClicked);
+        recyclerView.setAdapter(adapter);
+
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
@@ -195,17 +199,8 @@ public class PlayListFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void updateItemsList(ListUpdate<PlayListItem> update, boolean coversEnabled) {
-        List<PlayListItem> list = update.getNewList();
-        if (adapter == null) {
-            adapter = new PlayListItemAdapter(list, coversEnabled);
-            adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-            adapter.setOnIconClickListener(presenter::onItemIconClicked);
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.setItems(list);
-            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
-        }
+    public void updateItemsList(List<PlayListItem> list) {
+        adapter.submitList(list);
     }
 
     @Override
