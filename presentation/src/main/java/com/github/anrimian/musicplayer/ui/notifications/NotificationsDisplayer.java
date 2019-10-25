@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.media.session.MediaSessionCompat;
 
@@ -20,7 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
+import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 
@@ -178,11 +177,7 @@ public class NotificationsDisplayer {
             Composition composition = queueItem.getComposition();
 
             if (notificationSetting.isShowCovers()) {
-                Bitmap bitmap = CoverImageLoader.getInstance().getImage(composition);
-
-                if (bitmap == null) {
-                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_notification_large_icon);//default icon
-                }
+                Bitmap bitmap = ImageFormatUtils.getNotificationImage(composition);
                 builder.setLargeIcon(bitmap);
             }
 
