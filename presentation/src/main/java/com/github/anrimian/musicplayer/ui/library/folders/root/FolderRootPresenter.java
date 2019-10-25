@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.library.folders.root;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -11,6 +9,8 @@ import java.util.List;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 

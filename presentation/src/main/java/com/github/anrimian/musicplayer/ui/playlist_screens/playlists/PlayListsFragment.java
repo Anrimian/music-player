@@ -12,8 +12,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -35,6 +33,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
 

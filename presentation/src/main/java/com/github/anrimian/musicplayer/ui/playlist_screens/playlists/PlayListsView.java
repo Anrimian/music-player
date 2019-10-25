@@ -1,14 +1,15 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlists;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
+
+import moxy.MvpView;
+import moxy.viewstate.strategy.OneExecutionStateStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 
 public interface PlayListsView extends MvpView {
 

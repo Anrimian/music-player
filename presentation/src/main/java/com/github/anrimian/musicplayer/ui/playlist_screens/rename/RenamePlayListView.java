@@ -1,10 +1,11 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.rename;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+
+import moxy.MvpView;
+import moxy.viewstate.strategy.OneExecutionStateStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 
 public interface RenamePlayListView extends MvpView {
 

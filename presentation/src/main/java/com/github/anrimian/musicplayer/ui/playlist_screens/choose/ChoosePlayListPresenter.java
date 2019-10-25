@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.choose;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -11,6 +9,8 @@ import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 @InjectViewState
 public class ChoosePlayListPresenter extends MvpPresenter<ChoosePlayListView> {

@@ -19,8 +19,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -58,6 +56,8 @@ import javax.annotation.Nonnull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;

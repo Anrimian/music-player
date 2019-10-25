@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.editor;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.editor.CompositionEditorInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -10,6 +8,8 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 

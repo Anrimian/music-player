@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
@@ -27,6 +25,8 @@ import javax.annotation.Nullable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;

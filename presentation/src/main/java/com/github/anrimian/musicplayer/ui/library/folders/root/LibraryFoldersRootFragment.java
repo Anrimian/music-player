@@ -9,8 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -27,6 +25,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 

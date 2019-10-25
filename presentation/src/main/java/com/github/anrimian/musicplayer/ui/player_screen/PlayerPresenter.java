@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
@@ -20,6 +18,8 @@ import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;

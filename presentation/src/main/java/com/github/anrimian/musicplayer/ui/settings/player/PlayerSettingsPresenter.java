@@ -1,8 +1,9 @@
 package com.github.anrimian.musicplayer.ui.settings.player;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.settings.PlayerSettingsInteractor;
+
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 @InjectViewState
 public class PlayerSettingsPresenter extends MvpPresenter<PlayerSettingsView> {

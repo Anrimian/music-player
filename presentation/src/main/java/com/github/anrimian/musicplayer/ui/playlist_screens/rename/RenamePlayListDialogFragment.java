@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -24,6 +22,8 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setSoftInputVisible;

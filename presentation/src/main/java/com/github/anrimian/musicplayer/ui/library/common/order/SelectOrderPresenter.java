@@ -1,9 +1,10 @@
 package com.github.anrimian.musicplayer.ui.library.common.order;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 @InjectViewState
 public class SelectOrderPresenter extends MvpPresenter<SelectOrderView> {
