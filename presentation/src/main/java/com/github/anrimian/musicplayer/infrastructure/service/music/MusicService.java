@@ -30,6 +30,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.utils.Permissions;
@@ -68,7 +69,6 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils.getCompositionImage;
 import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
@@ -324,7 +324,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 .putLong(METADATA_KEY_DURATION, composition.getDuration());
         Bitmap bitmap = null;
         if (setting.isCoversOnLockScreen()) {
-            bitmap = getCompositionImage(composition);
+            bitmap = CoverImageLoader.getInstance().getImage(composition);
             if (bitmap == null) {
                 bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification_large_icon);//default icon
             }

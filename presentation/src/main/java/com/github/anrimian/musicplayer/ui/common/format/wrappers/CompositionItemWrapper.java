@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 import java.util.List;
 
@@ -98,7 +98,7 @@ public class CompositionItemWrapper {
     public void showCompositionImage(boolean showCovers) {
         if (ivMusicIcon != null) {
             if (showCovers) {
-                ImageFormatUtils.displayImage(ivMusicIcon, composition);
+                CoverImageLoader.getInstance().displayImage(ivMusicIcon, composition);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             }

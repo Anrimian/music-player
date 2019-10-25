@@ -41,8 +41,8 @@ import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
-import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
@@ -501,7 +501,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             sbTrackState.setContentDescription(null);
 
             if (showCover) {
-                ImageFormatUtils.displayImage(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
+                CoverImageLoader.getInstance()
+                        .displayImage(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             }

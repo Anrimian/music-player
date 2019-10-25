@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 
@@ -32,7 +33,6 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEU
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils.getCompositionImage;
 
 
 /**
@@ -178,7 +178,7 @@ public class NotificationsDisplayer {
             Composition composition = queueItem.getComposition();
 
             if (notificationSetting.isShowCovers()) {
-                Bitmap bitmap = getCompositionImage(composition);
+                Bitmap bitmap = CoverImageLoader.getInstance().getImage(composition);
 
                 if (bitmap == null) {
                     bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_notification_large_icon);//default icon
