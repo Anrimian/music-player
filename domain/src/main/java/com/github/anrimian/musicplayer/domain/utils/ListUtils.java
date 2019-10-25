@@ -33,12 +33,33 @@ public class ListUtils {
         return to;
     }
 
+    public static <K, E>  Map<K, E> mapToMap(List<E> from, Map<K, E> to, MapperFunction<E, K> keySelector) {
+        for (E t: from) {
+            K key = keySelector.map(t);
+            if (key != null) {
+                to.put(key, t);
+            }
+        }
+        return to;
+    }
+
     public static <K, E, T> List<T> mapToList(Map<K, E> from, MapperFunction<E, T> mapper) {
         return mapToList(from, new ArrayList<>(from.size()), mapper);
     }
 
     public static <T, E> List<E> mapList(List<T> from, MapperFunction<T, E> mapper) {
         return mapList(from, new ArrayList<>(from.size()), mapper);
+    }
+
+    public static <T, E> List<E> mapListNotNull(List<T> from, MapperFunction<T, E> mapper) {
+        List<E> to = new ArrayList<>(from.size());
+        for (T t: from) {
+            E value = mapper.map(t);
+            if (value != null) {
+                to.add(value);
+            }
+        }
+        return to;
     }
 
     public static <K, V> void update(Map<K, V> map, K key, V value) {

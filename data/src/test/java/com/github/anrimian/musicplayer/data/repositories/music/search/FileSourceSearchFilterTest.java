@@ -26,9 +26,17 @@ public class FileSourceSearchFilterTest {
 
     @Test
     public void compositionSearchFilterTest() {
-        Composition composition = new Composition();
-        composition.setArtist("marylin manson");
-        composition.setDisplayName("kek.mp3");
+        Composition composition = new Composition("marylin manson",
+                "kek",
+                null,
+                "kek.mp3",
+                0,
+                0,
+                0,
+                0L,
+                new Date(0),
+                new Date(0),
+                null);
 
         FileSource fileSource = new MusicFileSource(composition);
         assert searchFilter.isSuitForSearch(fileSource, "mary");

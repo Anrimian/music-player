@@ -7,26 +7,34 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper;
 import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-
-import java.util.List;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter.DiffListAdapter;
 
 /**
  * Created on 31.10.2017.
  */
 
-public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHolder> {
+public class PlayListItemAdapter extends DiffListAdapter<PlayListItem, PlayListItemViewHolder> {
 
     private final boolean coversEnabled;
 
-    private List<PlayListItem> musicList;
-    private BiCallback<PlayListItem, Integer> onCompositionClickListener;
-    private OnItemClickListener<Integer> onIconClickListener;
+    private final BiCallback<PlayListItem, Integer> onCompositionClickListener;
+    private final OnItemClickListener<Integer> onIconClickListener;
 
-    public PlayListItemAdapter(List<PlayListItem> musicList, boolean coversEnabled) {
-        this.musicList = musicList;
+    public PlayListItemAdapter(RecyclerView recyclerView,
+                               boolean coversEnabled,
+                               BiCallback<PlayListItem, Integer> onCompositionClickListener,
+                               OnItemClickListener<Integer> onIconClickListener) {
+        super(recyclerView, new SimpleDiffItemCallback<>(
+                PlayListItemHelper::areSourcesTheSame,
+                PlayListItemHelper::getChangePayload)
+        );
         this.coversEnabled = coversEnabled;
+        this.onCompositionClickListener = onCompositionClickListener;
+        this.onIconClickListener = onIconClickListener;
     }
 
     @NonNull
@@ -40,24 +48,7 @@ public class PlayListItemAdapter extends RecyclerView.Adapter<PlayListItemViewHo
 
     @Override
     public void onBindViewHolder(@NonNull PlayListItemViewHolder holder, int position) {
-        PlayListItem composition = musicList.get(position);
+        PlayListItem composition = getItem(position);
         holder.bind(composition, coversEnabled);
-    }
-
-    @Override
-    public int getItemCount() {
-        return musicList.size();
-    }
-
-    public void setItems(List<PlayListItem> list) {
-        musicList = list;
-    }
-
-    public void setOnCompositionClickListener(BiCallback<PlayListItem, Integer> onCompositionClickListener) {
-        this.onCompositionClickListener = onCompositionClickListener;
-    }
-
-    public void setOnIconClickListener(OnItemClickListener<Integer> onIconClickListener) {
-        this.onIconClickListener = onIconClickListener;
     }
 }

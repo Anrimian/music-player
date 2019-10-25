@@ -86,8 +86,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     @Nullable
     private Composition currentComposition;
 
-    private Composition compositionInAction;
-
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFilesInteractor interactor,
                                    MusicPlayerInteractor playerInteractor,
@@ -142,13 +140,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     void onCompositionClicked(int position, MusicFileSource musicFileSource) {
         processMultiSelectClick(position, musicFileSource, () -> {
             Composition composition = musicFileSource.getComposition();
-            if (currentComposition != null) {
-                compositionInAction = composition;
-                getViewState().showCompositionActionDialog(composition);
-            } else {
-                interactor.play(path, composition);
-                getViewState().showCurrentPlayingComposition(composition);
-            }
+            getViewState().showCompositionActionDialog(composition);
         });
     }
 
@@ -189,14 +181,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(playActionDisposable);
-    }
-
-    void onPlayNextActionSelected() {
-        addCompositionsToPlayNext(asList(compositionInAction));
-    }
-
-    void onAddToQueueActionSelected() {
-        addCompositionsToEnd(asList(compositionInAction));
     }
 
     void onPlayAllButtonClicked() {

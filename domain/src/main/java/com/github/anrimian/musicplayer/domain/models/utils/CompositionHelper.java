@@ -29,7 +29,11 @@ public class CompositionHelper {
                 && Objects.equals(first.getFilePath(), second.getFilePath())
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
-                && first.isCorrupted() == second.isCorrupted();
+                && first.getCorruptionType() == second.getCorruptionType();
+    }
+
+    public static boolean hasChanges(@Nonnull Composition first, @Nonnull Composition second) {
+        return !areSourcesTheSame(first, second);
     }
 
     public static boolean hasSourceChanges(@Nonnull Composition first, @Nonnull Composition second) {
@@ -62,7 +66,7 @@ public class CompositionHelper {
         if (!Objects.equals(first.getTitle(), second.getTitle())) {
             payloads.add(TITLE);
         }
-        if (first.isCorrupted() != second.isCorrupted()) {
+        if (first.getCorruptionType() != second.getCorruptionType()) {
             payloads.add(CORRUPTED);
         }
         return payloads;

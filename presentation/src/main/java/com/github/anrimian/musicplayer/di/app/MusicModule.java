@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.MusicProviderRepositoryImpl;
@@ -68,12 +69,10 @@ class MusicModule {
     @NonNull
     @Singleton
     PlayQueueRepository playQueueRepository(PlayQueueDaoWrapper playQueueDao,
-                                               StorageMusicDataSource storageMusicDataSource,
-                                               SettingsRepository settingsPreferences,
-                                               UiStatePreferences uiStatePreferences,
-                                               @Named(DB_SCHEDULER) Scheduler dbScheduler) {
+                                            SettingsRepository settingsPreferences,
+                                            UiStatePreferences uiStatePreferences,
+                                            @Named(DB_SCHEDULER) Scheduler dbScheduler) {
         return new PlayQueueRepositoryImpl(playQueueDao,
-                storageMusicDataSource,
                 settingsPreferences,
                 uiStatePreferences,
                 dbScheduler);
@@ -99,10 +98,12 @@ class MusicModule {
     @NonNull
     @Singleton
     MusicProviderRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
+                                                    CompositionsDaoWrapper compositionsDao,
                                                     MusicFolderDataSource musicFolderDataSource,
                                                     SettingsRepository settingsPreferences,
                                                     @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MusicProviderRepositoryImpl(storageMusicDataSource,
+                compositionsDao,
                 musicFolderDataSource,
                 settingsPreferences,
                 scheduler);

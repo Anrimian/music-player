@@ -9,7 +9,8 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
+import org.jaudiotagger.tag.TagOptionSingleton;
+import org.jaudiotagger.tag.id3.ID3v23Tag;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,10 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 
 public class CompositionSourceEditor {
+
+    public CompositionSourceEditor() {
+        TagOptionSingleton.getInstance().setAndroid(true);
+    }
 
     public Completable setCompositionTitle(String filePath, String title) {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.TITLE, title));
@@ -44,13 +49,13 @@ public class CompositionSourceEditor {
     private void editFile(String filePath, FieldKey genericKey, String value) throws IOException,
             TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException,
             CannotWriteException {
-        AudioFile f = AudioFileIO.read(new File(filePath));
-        Tag tag = f.getTag();
+        AudioFile file = AudioFileIO.read(new File(filePath));
+        Tag tag = file.getTag();
         if (tag == null) {
-            tag = new ID3v24Tag();
-            f.setTag(tag);
+            tag = new ID3v23Tag();
+            file.setTag(tag);
         }
         tag.addField(genericKey, value);
-        AudioFileIO.write(f);
+        AudioFileIO.write(file);
     }
 }

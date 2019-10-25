@@ -142,6 +142,7 @@
     <string name="new_folder">New folder</string>
     <string name="play_on_connect_bluetooth_device">Start playing when bluetooth device is connected</string>
     <string name="headset">Headset</string>
+    <string name="scan_storage">Rescan media storage</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

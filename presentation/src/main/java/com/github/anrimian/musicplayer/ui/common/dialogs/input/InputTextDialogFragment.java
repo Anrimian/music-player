@@ -118,7 +118,8 @@ public class InputTextDialogFragment extends DialogFragment {
             onCompleteButtonClicked();
             return true;
         });
-        setEditableText(editText, args.getString(EDIT_TEXT_VALUE));
+        String startText = args.getString(EDIT_TEXT_VALUE);
+        setEditableText(editText, startText);
 
         editText.requestFocus();
 
@@ -126,6 +127,7 @@ public class InputTextDialogFragment extends DialogFragment {
         btnCreate.setOnClickListener(v -> onCompleteButtonClicked());
 
         if (!args.getBoolean(CAN_BE_EMPTY_ARG)) {
+            btnCreate.setEnabled(!isEmpty(startText));
             onTextChanged(editText, text -> btnCreate.setEnabled(!isEmpty(text)));
         }
 

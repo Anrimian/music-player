@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public interface PlayListView extends MvpView {
     void showLoading();
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updateItemsList(ListUpdate<PlayListItem> update, boolean coversEnabled);
+    void updateItemsList(List<PlayListItem> list);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);

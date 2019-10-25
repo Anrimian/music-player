@@ -9,7 +9,7 @@ allprojects {
 
 ext {
     //Android
-    androidBuildToolsVersion = "28.0.3"
+    androidBuildToolsVersion = "29.0.2"
     androidMinSdkVersion = 21//16
     androidTargetSdkVersion = 29
     androidCompileSdkVersion = 29
@@ -82,6 +82,7 @@ ext {
     room = "androidx.room:room-runtime:$roomVersion"
     roomRx = "androidx.room:room-rxjava2:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
+    roomTest = "android.arch.persistence.room:testing:$roomVersion"
 
     //develop
     javaxAnnotation = "com.google.code.findbugs:jsr305:$javaxAnnotationVersion"

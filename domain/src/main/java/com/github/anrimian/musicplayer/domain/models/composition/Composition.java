@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.models.composition;
 
 import java.util.Date;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -11,30 +12,40 @@ import javax.annotation.Nullable;
 public class Composition {
 
     @Nullable
-    private String artist;
-    private String title;
-    private String album;
-    private String filePath;
+    private final String artist;
+    @Nullable
+    private final String title;
+    @Nullable
+    private final String album;
+    @Nonnull
+    private final String filePath;
 
-    private long duration;
-    private long size;
-    private long id;
+    private final long duration;
+    private final long size;
+    private final long id;
 
-    private Date dateAdded;
-    private Date dateModified;
+    @Nullable
+    private final Long storageId;
 
-    private boolean isCorrupted;
+    @Nonnull
+    private final Date dateAdded;
+    @Nonnull
+    private final Date dateModified;
+
+    @Nullable
+    private final CorruptionType corruptionType;
 
     public Composition(@Nullable String artist,
-                       String title,
-                       String album,
-                       String filePath,
+                       @Nullable String title,
+                       @Nullable String album,
+                       @Nonnull String filePath,
                        long duration,
                        long size,
                        long id,
-                       Date dateAdded,
-                       Date dateModified,
-                       boolean isCorrupted) {
+                       @Nullable Long storageId,
+                       @Nonnull Date dateAdded,
+                       @Nonnull Date dateModified,
+                       @Nullable CorruptionType corruptionType) {
         this.artist = artist;
         this.title = title;
         this.album = album;
@@ -42,13 +53,10 @@ public class Composition {
         this.duration = duration;
         this.size = size;
         this.id = id;
+        this.storageId = storageId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.isCorrupted = isCorrupted;
-    }
-
-    @Deprecated
-    public Composition() {
+        this.corruptionType = corruptionType;
     }
 
     public Composition copy(String newPath) {
@@ -59,17 +67,15 @@ public class Composition {
                 duration,
                 size,
                 id,
+                storageId,
                 dateAdded,
                 dateModified,
-                isCorrupted);
+                corruptionType);
     }
 
-    public boolean isCorrupted() {
-        return isCorrupted;
-    }
-
-    public void setCorrupted(boolean corrupted) {
-        isCorrupted = corrupted;
+    @Nullable
+    public Long getStorageId() {
+        return storageId;
     }
 
     @Nullable
@@ -77,72 +83,46 @@ public class Composition {
         return artist;
     }
 
-    public void setArtist(@Nullable String artist) {
-        this.artist = artist;
-    }
-
+    @Nullable
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
+    @Nullable
     public String getAlbum() {
         return album;
     }
 
-    public void setAlbum(String album) {
-        this.album = album;
-    }
-
+    @Nonnull
     public String getFilePath() {
         return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
     }
 
     public long getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
-
     public long getSize() {
         return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
     }
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
+    @Nonnull
     public Date getDateAdded() {
         return dateAdded;
     }
 
-    public void setDateAdded(Date dateAdded) {
-        this.dateAdded = dateAdded;
-    }
-
+    @Nonnull
     public Date getDateModified() {
         return dateModified;
     }
 
-    public void setDateModified(Date dateModified) {
-        this.dateModified = dateModified;
+    @Nullable
+    public CorruptionType getCorruptionType() {
+        return corruptionType;
     }
 
     @Override

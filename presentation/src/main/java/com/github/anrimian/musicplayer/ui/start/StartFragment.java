@@ -64,10 +64,11 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     }
 
     @Override
-    public void startSystemUi() {
+    public void startSystemServices() {
         AppComponent appComponent = Components.getAppComponent();
         appComponent.widgetUpdater().start();
         appComponent.notificationDisplayer().removeErrorNotification();
+        appComponent.mediaStorageRepository().initialize();
     }
 
     @Override

@@ -9,8 +9,12 @@ import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
+import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
+
+import java.util.Date;
 
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_SHUFFLE_NODE;
@@ -58,7 +62,14 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
         widgetView.setImageViewResource(R.id.iv_repeat_mode, iconRes);
 
         if (showCovers) {
-            ImageFormatUtils.displayImage(widgetView, R.id.iv_cover, compositionFile, compositionId);
+//            ImageFormatUtils.displayImage(widgetView, R.id.iv_cover, compositionFile, compositionId);
+
+
+            CoverImageLoader.getInstance().displayImage(widgetView,
+                    R.id.iv_cover,
+                    compositionForLoading(compositionId, compositionFile),
+                    ImageUtils::toCircleBitmap,
+                    R.drawable.ic_music_placeholder);
         } else {
             widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);
         }
@@ -83,5 +94,20 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
     @Override
     protected int getRemoteViewId() {
         return R.layout.widget_medium;
+    }
+
+    //not so clear, but leave it here
+    private Composition compositionForLoading(long id, String filePath) {
+        return new Composition(null,
+                null,
+                null,
+                filePath,
+                0,
+                0,
+                id,
+                null,
+                new Date(),
+                new Date(),
+                null);
     }
 }

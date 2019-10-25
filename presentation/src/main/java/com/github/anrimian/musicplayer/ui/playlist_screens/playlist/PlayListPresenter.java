@@ -10,12 +10,9 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
-import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper;
 import com.github.anrimian.musicplayer.domain.utils.model.Item;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,10 +46,6 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private final long playListId;
 
     private List<PlayListItem> items = new ArrayList<>();
-
-    private final DiffCalculator<PlayListItem> diffCalculator = new DiffCalculator<>(
-            () -> items,
-            PlayListItemHelper::areSourcesTheSame);
 
     @Nullable
     private PlayList playList;
@@ -105,14 +98,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     void onCompositionClicked(PlayListItem playListItem, int position) {
-        if (currentItem == null) {
-            playerInteractor.startPlaying(
-                    mapList(items, PlayListItem::getComposition),
-                    position
-            );
-        } else {
-            getViewState().showCompositionActionDialog(playListItem, position);
-        }
+        getViewState().showCompositionActionDialog(playListItem, position);
     }
 
     void onItemIconClicked(int position) {
@@ -190,7 +176,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     void onDragEnded(int position) {
-        playListsInteractor.moveItemInPlayList(playListId, startDragPosition, position);//lock update and subscribe on complete?
+        playListsInteractor.moveItemInPlayList(playList, startDragPosition, position);
     }
 
     void onPlayActionSelected(int position) {
@@ -215,6 +201,10 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         }
     }
 
+    boolean isCoversEnabled() {
+        return displaySettingsInteractor.isCoversEnabled();
+    }
+
     private void addCompositionsToPlayNext(List<Composition> compositions) {
         playerInteractor.addCompositionsToPlayNext(compositions)
                 .observeOn(uiScheduler)
@@ -233,7 +223,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     private void deleteItem(PlayListItem playListItem, int position) {
-        playListsInteractor.deleteItemFromPlayList(playListItem.getItemId(), playListId)
+        playListsInteractor.deleteItemFromPlayList(playListItem, playListId)
                 .observeOn(uiScheduler)
                 .subscribe(() -> onDeleteItemCompleted(playListItem, position), this::onDeleteItemError);
     }
@@ -300,7 +290,6 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private void subscribeOnCompositions() {
         getViewState().showLoading();
         presenterDisposable.add(playListsInteractor.getCompositionsObservable(playListId)
-                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayListsReceived,
                         t -> getViewState().closeScreen(),
@@ -320,9 +309,9 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         getViewState().showPlayListInfo(playList);
     }
 
-    private void onPlayListsReceived(ListUpdate<PlayListItem> listUpdate) {
-        items = listUpdate.getNewList();
-        getViewState().updateItemsList(listUpdate, displaySettingsInteractor.isCoversEnabled());
+    private void onPlayListsReceived(List<PlayListItem> list) {
+        this.items = list;
+        getViewState().updateItemsList(list);
         if (items.isEmpty()) {
             getViewState().showEmptyList();
         } else {

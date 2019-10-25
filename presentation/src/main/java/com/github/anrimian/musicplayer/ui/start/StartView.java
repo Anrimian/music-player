@@ -26,5 +26,5 @@ interface StartView extends MvpView {
     void showStub();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void startSystemUi();
+    void startSystemServices();
 }

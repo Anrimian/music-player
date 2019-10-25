@@ -62,7 +62,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public Observable<Boolean> getRandomPlayingObservable() {
-        return withDefaultValue(randomModeSubject, this::isRandomPlayingEnabled);
+        return withDefaultValue(randomModeSubject, this::isRandomPlayingEnabled)
+                .distinctUntilChanged();
     }
 
     @Override

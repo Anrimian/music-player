@@ -7,7 +7,8 @@ import java.util.Map;
 
 public class MapChangeProcessor {
 
-    public static <K, V> boolean processChanges(Map<K, V> oldMap,
+    @Deprecated
+    public static <K, V> boolean processChangesOld(Map<K, V> oldMap,
                                                 Map<K, V> newMap,
                                                 ChangeInspector<V> changeInspector,
                                                 Callback<Map.Entry<K, V>> onDeleteCallback,
@@ -30,6 +31,36 @@ public class MapChangeProcessor {
                 hasChanges = true;
             } else if (changeInspector.hasChanges(newEntry.getValue(), existValue)) {
                 onModifyCallback.call(newEntry);
+                hasChanges = true;
+            }
+        }
+        return hasChanges;
+    }
+
+    public static <K, V> boolean processChanges(Map<K, V> oldMap,
+                                                Map<K, V> newMap,
+                                                ChangeInspector<V> changeInspector,
+                                                Callback<V> onDeleteCallback,
+                                                Callback<V> onAddedCallback,
+                                                Callback<V> onModifyCallback) {
+        boolean hasChanges = false;
+
+        for (Map.Entry<K, V> existEntry: oldMap.entrySet()) {
+            V value = newMap.get(existEntry.getKey());
+            if (value == null) {
+                onDeleteCallback.call(existEntry.getValue());
+                hasChanges = true;
+            }
+        }
+
+        for (Map.Entry<K, V> newEntry: newMap.entrySet()) {
+            V existValue = oldMap.get(newEntry.getKey());
+            V newValue = newEntry.getValue();
+            if (existValue == null) {
+                onAddedCallback.call(newValue);
+                hasChanges = true;
+            } else if (changeInspector.hasChanges(newValue, existValue)) {
+                onModifyCallback.call(newValue);
                 hasChanges = true;
             }
         }
