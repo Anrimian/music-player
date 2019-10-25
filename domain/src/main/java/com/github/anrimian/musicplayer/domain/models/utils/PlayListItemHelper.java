@@ -8,16 +8,12 @@ import javax.annotation.Nonnull;
 
 public class PlayListItemHelper {
 
-    public static int getTotalDuration(List<PlayListItem> items) {
-        int totalDuration = 0;
-        for (PlayListItem item: items) {
-            totalDuration += item.getComposition().getDuration();
-        }
-        return totalDuration;
-    }
-
     public static boolean areSourcesTheSame(@Nonnull PlayListItem first,
                                             @Nonnull PlayListItem second) {
         return CompositionHelper.areSourcesTheSame(first.getComposition(), second.getComposition());
+    }
+
+    public static List<Object> getChangePayload(PlayListItem first, PlayListItem second) {
+        return CompositionHelper.getChangePayload(first.getComposition(), second.getComposition());
     }
 }

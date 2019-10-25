@@ -4,6 +4,7 @@
     <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">?attr/dialogBackground</item>
         <item name="android:windowTitleStyle">@style/DialogTitleStyle</item>
+        <item name="android:textColorPrimary">?attr/dialogTitleColor</item>
         <item name="android:buttonBarButtonStyle">@style/DialogButtonStyle</item>
     </style>
 
