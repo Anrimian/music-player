@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 
@@ -51,7 +50,40 @@ public class StorageMusicProvider {
     }
 
     public LongSparseArray<StorageComposition> getCompositions() {
-        return getCompositions(EXTERNAL_CONTENT_URI);
+        Cursor cursor = null;
+        try {
+            cursor = contentResolver.query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[] {
+                            ARTIST,
+                            TITLE,
+                            ALBUM,
+                            MediaStore.Images.Media.DATA,
+                            DURATION,
+                            MediaStore.Images.Media.SIZE,
+                            _ID,
+                            DATE_ADDED,
+                            DATE_MODIFIED},
+                    IS_MUSIC + " = ?",
+                    new String[] { String.valueOf(1) },
+                    null);
+            if (cursor == null) {
+                return new LongSparseArray<>();
+            }
+            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+            LongSparseArray<StorageComposition> compositions = new LongSparseArray<>(cursor.getCount());
+            for (int i = 0; i < cursor.getCount(); i++) {
+                cursor.moveToPosition(i);
+
+                StorageComposition composition = getCompositionFromCursor(cursorWrapper);
+                if (composition != null) {
+                    compositions.put(composition.getId(), composition);
+                }
+            }
+            return compositions;
+        } finally {
+            IOUtils.closeSilently(cursor);
+        }
     }
 
     public void deleteCompositions(List<Long> ids) {
@@ -142,43 +174,6 @@ public class StorageMusicProvider {
                 cv,
                 _ID + " = ?",
                 new String[] { String.valueOf(id) });
-    }
-
-    private LongSparseArray<StorageComposition> getCompositions(Uri uri) {
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(
-                    uri,
-                    new String[] {
-                            ARTIST,
-                            TITLE,
-                            ALBUM,
-                            MediaStore.Images.Media.DATA,
-                            DURATION,
-                            MediaStore.Images.Media.SIZE,
-                            _ID,
-                            DATE_ADDED,
-                            DATE_MODIFIED},
-                    IS_MUSIC + " = ?",
-                    new String[] { String.valueOf(1) },
-                    null);
-            if (cursor == null) {
-                return new LongSparseArray<>();
-            }
-            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            LongSparseArray<StorageComposition> compositions = new LongSparseArray<>(cursor.getCount());
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-
-                StorageComposition composition = getCompositionFromCursor(cursorWrapper);
-                if (composition != null) {
-                    compositions.put(composition.getId(), composition);
-                }
-            }
-            return compositions;
-        } finally {
-            IOUtils.closeSilently(cursor);
-        }
     }
 
     private StorageComposition getCompositionFromCursor(CursorWrapper cursorWrapper) {
