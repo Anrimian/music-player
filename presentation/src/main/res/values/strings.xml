@@ -1,5 +1,7 @@
 <resources>
-    <string name="file_provider_authorities" translatable="false">share_file_provider</string>
+    <string name="file_provider_authorities" translatable="false">
+        com.github.anrimian.simplemusicplayer.share_file_provider
+    </string>
     <string name="feedback_email" translatable="false">anrimian.developer@gmail.com</string>
 
     <string name="app_name" translatable="false">Music Player</string>
