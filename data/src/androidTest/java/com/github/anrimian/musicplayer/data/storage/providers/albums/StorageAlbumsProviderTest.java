@@ -1,7 +1,8 @@
-package com.github.anrimian.musicplayer.data.storage.providers.artist;
+package com.github.anrimian.musicplayer.data.storage.providers.albums;
 
 import android.Manifest;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.collection.LongSparseArray;
 import androidx.test.rule.GrantPermissionRule;
@@ -12,24 +13,25 @@ import org.junit.Test;
 
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 
-public class StorageArtistsProviderTest {
+public class StorageAlbumsProviderTest {
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 
-    private StorageArtistsProvider artistsProvider;
+    private StorageAlbumsProvider albumsProvider;
 
     @Before
     public void setUp() {
         Context appContext = getInstrumentation().getTargetContext();
-        artistsProvider = new StorageArtistsProvider(appContext);
+        albumsProvider = new StorageAlbumsProvider(appContext);
     }
 
     @Test
     public void testStorageReturnValues() {
-        LongSparseArray<StorageArtist> map = artistsProvider.getArtists();
+        LongSparseArray<StorageAlbum> map = albumsProvider.getAlbums();
         for(int i = 0, size = map.size(); i < size; i++) {
-            StorageArtist item = map.valueAt(i);
+            StorageAlbum item = map.valueAt(i);
+            Log.i("TEST_STORAGE", "item: " + item);
             System.out.println(item);
         }
     }
