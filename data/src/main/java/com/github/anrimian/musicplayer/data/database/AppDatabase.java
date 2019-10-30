@@ -9,7 +9,11 @@ import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
+import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
@@ -22,8 +26,12 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
         PlayQueueEntity.class,
         CompositionEntity.class,
         PlayListEntity.class,
-        PlayListEntryEntity.class
-}, version = 2)
+        PlayListEntryEntity.class,
+        ArtistEntity.class,
+        AlbumEntity.class,
+        GenreEntity.class,
+        GenreEntryEntity.class
+}, version = 3)
 @TypeConverters({
         DateConverter.class,
         EnumConverter.class
