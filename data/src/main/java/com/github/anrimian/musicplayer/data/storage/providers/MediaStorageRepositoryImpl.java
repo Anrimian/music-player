@@ -2,10 +2,13 @@ package com.github.anrimian.musicplayer.data.storage.providers;
 
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
+import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
+import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
@@ -27,37 +30,45 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     private final StorageMusicProvider musicProvider;
     private final StoragePlayListsProvider playListsProvider;
+    private final StorageArtistsProvider artistsProvider;
     private final CompositionsDaoWrapper compositionsDao;
     private final PlayListsDaoWrapper playListsDao;
+    private final ArtistsDaoWrapper artistsDao;
     private final Scheduler scheduler;
 
+    private Disposable artistsDisposable;
     private Disposable compositionsDisposable;
     private Disposable playListsDisposable;
     private LongSparseArray<Disposable> playListEntriesDisposable = new LongSparseArray<>();
 
     public MediaStorageRepositoryImpl(StorageMusicProvider musicProvider,
                                       StoragePlayListsProvider playListsProvider,
+                                      StorageArtistsProvider artistsProvider,
                                       CompositionsDaoWrapper compositionsDao,
                                       PlayListsDaoWrapper playListsDao,
+                                      ArtistsDaoWrapper artistsDao,
                                       Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.playListsProvider = playListsProvider;
+        this.artistsProvider = artistsProvider;
         this.compositionsDao = compositionsDao;
         this.playListsDao = playListsDao;
+        this.artistsDao = artistsDao;
         this.scheduler = scheduler;
     }
 
     @Override
     public void initialize() {
-        compositionsDisposable = musicProvider.getCompositionsObservable()
-                .startWith(musicProvider.getCompositions())
-                .subscribeOn(scheduler)
-                .subscribe(this::onNewCompositionsFromMediaStorageReceived);
+        artistsDisposable = artistsProvider.getArtistsObservable()
+                .startWith(artistsProvider.getArtists())
+                .observeOn(scheduler)
+                .subscribe(this::onStorageArtistReceived);
     }
 
     @Override
     public synchronized void rescanStorage() {
         Completable.fromAction(() -> {
+            applyArtistsChanges(artistsProvider.getArtists());
             applyCompositionsData(musicProvider.getCompositions());
             applyPlayListData(playListsProvider.getPlayLists());
 
@@ -68,6 +79,17 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
             }
         }).subscribeOn(scheduler).subscribe();
+    }
+
+    private void onStorageArtistReceived(LongSparseArray<StorageArtist> artists) {
+        applyArtistsChanges(artists);
+
+        if (compositionsDisposable == null) {
+            compositionsDisposable = musicProvider.getCompositionsObservable()
+                    .startWith(musicProvider.getCompositions())
+                    .subscribeOn(scheduler)
+                    .subscribe(this::onNewCompositionsFromMediaStorageReceived);
+        }
     }
 
     private void onNewCompositionsFromMediaStorageReceived(LongSparseArray<StorageComposition> newCompositions) {
@@ -112,7 +134,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         List<RawPlayListItem> addedItems = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processChanges(currentItemsMap,
                 newItemsMap,
-                (o1, o2) -> true,
+                (o1, o2) -> false,
                 item -> {},
                 item -> addedItems.add(rawPlayListItem(item.getItemId(), item.getCompositionId())),
                 item -> {});
@@ -156,6 +178,22 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
         if (hasChanges) {
             compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
+        }
+    }
+
+    private synchronized void applyArtistsChanges(LongSparseArray<StorageArtist> newArtists) {
+        LongSparseArray<StorageArtist> currentArtists = artistsDao.selectAllAsStorageArtists();
+
+        List<StorageArtist> addedArtists = new ArrayList<>();
+        boolean hasChanges = AndroidCollectionUtils.processChanges(currentArtists,
+                newArtists,
+                (o1, o2) -> false,
+                item -> {},
+                addedArtists::add,
+                item -> {});
+
+        if (hasChanges) {
+            artistsDao.insertArtists(addedArtists);
         }
     }
 

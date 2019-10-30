@@ -4,6 +4,8 @@ import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
@@ -26,10 +28,13 @@ public class CompositionsDaoWrapper {
 
     private final AppDatabase appDatabase;
     private final CompositionsDao compositionsDao;
+    private final ArtistsDao artistsDao;
 
     public CompositionsDaoWrapper(AppDatabase appDatabase,
+                                  ArtistsDao artistsDao,
                                   CompositionsDao compositionsDao) {
         this.appDatabase = appDatabase;
+        this.artistsDao = artistsDao;
         this.compositionsDao = compositionsDao;
     }
 
@@ -94,7 +99,7 @@ public class CompositionsDaoWrapper {
                              List<StorageComposition> deletedCompositions,
                              List<StorageComposition> changedCompositions) {
         appDatabase.runInTransaction(() -> {
-            compositionsDao.insert(mapList(addedCompositions, CompositionMapper::toEntity));
+            compositionsDao.insert(mapList(addedCompositions, this::toCompositionEntity));
             compositionsDao.deleteByStorageId(mapList(
                     deletedCompositions,
                     StorageComposition::getId)
@@ -113,6 +118,11 @@ public class CompositionsDaoWrapper {
                 );
             }
         });
+    }
+
+    private CompositionEntity toCompositionEntity(StorageComposition composition) {
+        Long artistId = artistsDao.selectIdByStorageId(composition.getArtistId());
+        return CompositionMapper.toEntity(composition, artistId);
     }
 
     public long selectIdByStorageId(long compositionId) {

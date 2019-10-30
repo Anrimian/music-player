@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
+import androidx.annotation.NonNull;
+
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -23,6 +25,7 @@ public class StorageComposition {
     private final long duration;
     private final long size;
     private final long id;
+    private final long artistId;
 
     @Nonnull
     private final Date dateAdded;
@@ -36,6 +39,7 @@ public class StorageComposition {
                               long duration,
                               long size,
                               long id,
+                              long artistId,
                               @Nonnull Date dateAdded,
                               @Nonnull Date dateModified) {
         this.artist = artist;
@@ -45,6 +49,7 @@ public class StorageComposition {
         this.duration = duration;
         this.size = size;
         this.id = id;
+        this.artistId = artistId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
     }
@@ -57,8 +62,13 @@ public class StorageComposition {
                 duration,
                 size,
                 id,
+                artistId,
                 dateAdded,
                 dateModified);
+    }
+
+    public long getArtistId() {
+        return artistId;
     }
 
     @Nullable
@@ -103,6 +113,7 @@ public class StorageComposition {
         return dateModified;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Composition{" +

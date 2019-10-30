@@ -10,6 +10,8 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 
 public class StorageArtistsProvider {
@@ -46,16 +48,23 @@ public class StorageArtistsProvider {
                 cursor.moveToPosition(i);
 
                 StorageArtist artist = getArtistFromCursor(cursorWrapper);
-                artists.put(artist.getId(), artist);
+                if (artist != null) {
+                    artists.put(artist.getId(), artist);
+                }
             }
             return artists;
         }
     }
 
+    @Nullable
     private StorageArtist getArtistFromCursor(CursorWrapper cursorWrapper) {
+        String artistName = cursorWrapper.getString(Artists.ARTIST);
+        if (artistName.equals("<unknown>")) {
+            return null;
+        }
         return new StorageArtist(
                 cursorWrapper.getLong(Artists._ID),
-                cursorWrapper.getString(Artists.ARTIST),
+                artistName,
                 cursorWrapper.getString(Artists.ARTIST_KEY)
         );
     }

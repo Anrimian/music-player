@@ -6,6 +6,7 @@ import androidx.room.TypeConverters;
 
 import com.github.anrimian.musicplayer.data.database.converters.DateConverter;
 import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
@@ -40,4 +41,5 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract PlayQueueDao playQueueDao();
     public abstract CompositionsDao compositionsDao();
     public abstract PlayListDao playListDao();
+    public abstract ArtistsDao artistsDao();
 }

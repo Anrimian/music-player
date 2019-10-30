@@ -4,6 +4,8 @@ import com.github.anrimian.musicplayer.data.database.entities.composition.Compos
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
+import javax.annotation.Nullable;
+
 public class CompositionMapper {
 
     public static Composition toComposition(CompositionEntity entity) {
@@ -20,8 +22,10 @@ public class CompositionMapper {
                 entity.getCorruptionType());
     }
 
-    public static CompositionEntity toEntity(StorageComposition composition) {
-        return new CompositionEntity(composition.getArtist(),
+    public static CompositionEntity toEntity(StorageComposition composition,
+                                             @Nullable Long artistId) {
+        return new CompositionEntity(artistId,
+                composition.getArtist(),
                 composition.getTitle(),
                 composition.getAlbum(),
                 composition.getFilePath(),

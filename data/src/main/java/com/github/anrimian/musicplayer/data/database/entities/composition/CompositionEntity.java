@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.data.database.entities.composition;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 
 import java.util.Date;
@@ -10,11 +12,19 @@ import java.util.Date;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Entity(tableName = "compositions")
+@Entity(tableName = "compositions",
+        foreignKeys = {
+                @ForeignKey(entity = ArtistEntity.class,
+                        parentColumns = "id",
+                        childColumns = "artistId")
+        })
 public class CompositionEntity {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
+
+    @Nullable
+    private Long artistId;
 
     @Nullable
     private Long storageId;
@@ -39,7 +49,8 @@ public class CompositionEntity {
     @Nullable
     private CorruptionType corruptionType;
 
-    public CompositionEntity(@Nullable String artist,
+    public CompositionEntity(@Nullable Long artistId,
+                             @Nullable String artist,
                              @Nullable String title,
                              @Nullable String album,
                              @Nonnull String filePath,
@@ -49,6 +60,7 @@ public class CompositionEntity {
                              @Nonnull Date dateAdded,
                              @Nonnull Date dateModified,
                              @Nullable CorruptionType corruptionType) {
+        this.artistId = artistId;
         this.storageId = storageId;
         this.artist = artist;
         this.title = title;
@@ -59,6 +71,11 @@ public class CompositionEntity {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
+    }
+
+    @Nullable
+    public Long getArtistId() {
+        return artistId;
     }
 
     public void setId(long id) {

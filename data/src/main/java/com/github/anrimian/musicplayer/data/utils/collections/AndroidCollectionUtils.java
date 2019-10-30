@@ -23,12 +23,12 @@ public class AndroidCollectionUtils {
     }
 
 
-    public static <K, V> boolean processChanges(LongSparseArray<V> oldMap,
-                                                LongSparseArray<V> newMap,
-                                                ChangeInspector<V> changeInspector,
-                                                Callback<V> onDeleteCallback,
-                                                Callback<V> onAddedCallback,
-                                                Callback<V> onModifyCallback) {
+    public static <V> boolean processChanges(LongSparseArray<V> oldMap,
+                                             LongSparseArray<V> newMap,
+                                             ChangeInspector<V> changeInspector,
+                                             Callback<V> onDeleteCallback,
+                                             Callback<V> onAddedCallback,
+                                             Callback<V> onModifyCallback) {
         boolean hasChanges = false;
 
         for(int i = 0, size = oldMap.size(); i < size; i++) {

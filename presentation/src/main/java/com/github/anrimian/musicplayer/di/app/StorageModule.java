@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.edit.EditorRepositoryImpl;
@@ -9,6 +10,7 @@ import com.github.anrimian.musicplayer.data.repositories.music.folders.Compositi
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.data.storage.providers.MediaStorageRepositoryImpl;
+import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
@@ -36,6 +38,13 @@ public class StorageModule {
     @Singleton
     StorageMusicProvider storageMusicProvider(Context context) {
         return new StorageMusicProvider(context);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    StorageArtistsProvider storageArtistProvider(Context context) {
+        return new StorageArtistsProvider(context);
     }
 
     @Provides
@@ -88,13 +97,17 @@ public class StorageModule {
     @Singleton
     MediaStorageRepository mediaStorageRepository(StorageMusicProvider musicProvider,
                                                   StoragePlayListsProvider playListsProvider,
+                                                  StorageArtistsProvider artistsProvider,
                                                   CompositionsDaoWrapper compositionsDao,
                                                   PlayListsDaoWrapper playListsDao,
+                                                  ArtistsDaoWrapper artistsDao,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MediaStorageRepositoryImpl(musicProvider,
                 playListsProvider,
+                artistsProvider,
                 compositionsDao,
                 playListsDao,
+                artistsDao,
                 scheduler);
     }
 
