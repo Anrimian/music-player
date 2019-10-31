@@ -2,10 +2,11 @@ package com.github.anrimian.musicplayer.ui.utils.moxy.ui;
 
 import android.os.Bundle;
 
-import com.arellomobile.mvp.MvpDelegate;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import androidx.fragment.app.Fragment;
+import moxy.MvpDelegate;
 
 public class MvpBottomSheetDialogFragment extends BottomSheetDialogFragment {
 

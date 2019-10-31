@@ -1,11 +1,12 @@
 package com.github.anrimian.musicplayer.ui.library.common.order;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
-import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+
+import moxy.MvpView;
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
+import moxy.viewstate.strategy.SkipStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 
 public interface SelectOrderView extends MvpView {
 

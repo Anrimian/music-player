@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.arellomobile.mvp.MvpDelegate;
+import moxy.MvpDelegate;
 
 public abstract class MvpAppCompatActivity extends AppCompatActivity {
     private MvpDelegate<? extends MvpAppCompatActivity> mMvpDelegate;

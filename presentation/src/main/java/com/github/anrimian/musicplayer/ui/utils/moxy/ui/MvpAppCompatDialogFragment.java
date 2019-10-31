@@ -2,11 +2,11 @@ package com.github.anrimian.musicplayer.ui.utils.moxy.ui;
 
 import android.os.Bundle;
 
-import com.arellomobile.mvp.MvpDelegate;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.fragment.app.Fragment;
+
+import moxy.MvpDelegate;
 
 /**
  * Date: 17-Dec-16

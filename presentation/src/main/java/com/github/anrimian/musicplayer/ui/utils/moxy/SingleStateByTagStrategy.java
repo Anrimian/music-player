@@ -1,11 +1,11 @@
 package com.github.anrimian.musicplayer.ui.utils.moxy;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.ViewCommand;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategy;
-
 import java.util.Iterator;
 import java.util.List;
+
+import moxy.MvpView;
+import moxy.viewstate.ViewCommand;
+import moxy.viewstate.strategy.StateStrategy;
 
 public class SingleStateByTagStrategy implements StateStrategy {
 
