@@ -54,7 +54,6 @@ public class PlayQueueRepositoryImplTest {
                 .thenReturn(playQueueDaoSubject);
 
         when(uiStatePreferences.getCurrentPlayQueueId()).thenReturn(NO_COMPOSITION);
-        when(uiStatePreferences.getCurrentCompositionId()).thenReturn(NO_COMPOSITION);
     }
 
     @Test

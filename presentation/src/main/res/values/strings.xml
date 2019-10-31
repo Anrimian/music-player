@@ -140,6 +140,8 @@
     <string name="move_in_the_same_folder_error">Target and source folder matches</string>
     <string name="file_already_exists">File with this name already exists</string>
     <string name="new_folder">New folder</string>
+    <string name="play_on_connect_bluetooth_device">Start playing when bluetooth device is connected</string>
+    <string name="headset">Headset</string>
     <string name="scan_storage">Rescan media storage</string>
 
     <plurals name="compositions_count">

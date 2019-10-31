@@ -298,7 +298,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             Integer currentPosition = newQueue.indexOf(currentItem);
             PlayQueueItem newItem = newQueue.get(currentPosition);
             if (!PlayQueueItemHelper.areSourcesTheSame(newItem, currentItem)) {
-                setCurrentItem(newItem);
+                currentCompositionSubject.onNext(new PlayQueueEvent(newItem, true));
             }
         } else {
             //select new item
