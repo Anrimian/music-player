@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.Collection;
@@ -34,7 +34,7 @@ public interface LibraryCompositionsView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoadingError(ErrorCommand errorCommand);
 
-    @StateStrategyType(ListStateStrategyStrategy.class)
+    @StateStrategyType(ListStateStrategy.class)
     void updateList(List<Composition> list);
 
     @StateStrategyType(OneExecutionStateStrategy.class)

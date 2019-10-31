@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.entities.albums;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
@@ -13,7 +14,8 @@ import javax.annotation.Nullable;
                 @ForeignKey(entity = ArtistEntity.class,
                 parentColumns = {"id"},
                 childColumns = {"artistId"})
-        }
+        },
+        indices = @Index("artistId")
 )
 public class AlbumEntity {
 

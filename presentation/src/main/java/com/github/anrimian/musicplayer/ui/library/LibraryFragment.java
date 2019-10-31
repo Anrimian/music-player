@@ -3,20 +3,21 @@ package com.github.anrimian.musicplayer.ui.library;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
 
 public class LibraryFragment extends MvpAppCompatFragment implements FragmentLayerListener {
 
@@ -52,6 +53,11 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
                             .newRootFragment(new LibraryFoldersRootFragment());
                     uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_FOLDERS);
                     break;
+                }
+                case R.id.menu_artists: {
+                    uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_ARTISTS);
+                    FragmentNavigation.from(requireFragmentManager())
+                            .newRootFragment(new ArtistsListFragment());
                 }
             }
             return true;

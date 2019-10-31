@@ -31,6 +31,13 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class FormatUtils {
 
+    public static String formatCompositionsCount(Context context, int compositionsCount) {
+        return context.getResources().getQuantityString(
+                R.plurals.compositions_count,
+                compositionsCount,
+                compositionsCount);
+    }
+
     public static StringBuilder formatCompositionAuthor(Composition composition, Context context) {
         String author = composition.getArtist();
 

@@ -4,4 +4,6 @@
         android:title="@string/compositions"/>
     <item android:id="@+id/menu_files"
         android:title="@string/folders"/>
+    <item android:id="@+id/menu_artists"
+        android:title="@string/artists"/>
 </menu>

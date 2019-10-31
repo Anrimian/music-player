@@ -45,6 +45,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
@@ -436,6 +437,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             }
             case Screens.LIBRARY_FOLDERS: {
                 fragment = new LibraryFoldersRootFragment();
+                break;
+            }
+            case Screens.LIBRARY_ARTISTS: {
+                fragment = new ArtistsListFragment();
                 break;
             }
             default: {

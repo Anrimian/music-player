@@ -5,8 +5,11 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
+import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 
 import java.util.List;
+
+import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
@@ -26,6 +29,10 @@ public class ArtistsDaoWrapper {
         return AndroidCollectionUtils.mapToSparseArray(
                 artistsDao.selectAllAsStorageArtists(),
                 StorageArtist::getId);
+    }
+
+    public Observable<List<Artist>> getAllObservable() {
+        return artistsDao.getAllObservable();
     }
 
     private ArtistEntity toEntity(StorageArtist artist) {

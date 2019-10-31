@@ -6,8 +6,11 @@ import androidx.room.Query;
 
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
+import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 
 import java.util.List;
+
+import io.reactivex.Observable;
 
 @Dao
 public interface ArtistsDao {
@@ -23,4 +26,10 @@ public interface ArtistsDao {
 
     @Insert
     void insertAll(List<ArtistEntity> artists);
+
+    @Query("SELECT id as id," +
+            "artistName as name, " +
+            "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount " +
+            "FROM artists")
+    Observable<List<Artist>> getAllObservable();
 }

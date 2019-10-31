@@ -11,7 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderF
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goBackToParentFolderScreen();
 
-    @StateStrategyType(ListStateStrategyStrategy.class)
+    @StateStrategyType(ListStateStrategy.class)
     void updateList(List<FileSource> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)

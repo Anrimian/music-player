@@ -6,7 +6,7 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategy;
 
 import java.util.List;
 
-public class ListStateStrategyStrategy implements StateStrategy {
+public class ListStateStrategy implements StateStrategy {
 
     private static final int NO_POSITION = -1;
 

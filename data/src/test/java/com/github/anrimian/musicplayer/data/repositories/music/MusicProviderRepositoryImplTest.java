@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music;
 
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
@@ -29,6 +30,7 @@ public class MusicProviderRepositoryImplTest {
 
     private StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
     private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
+    private ArtistsDaoWrapper artistsDao = mock(ArtistsDaoWrapper.class);
     private MusicFolderDataSource musicFolderDataSource = mock(MusicFolderDataSource.class);
     private SettingsRepositoryImpl settingsPreferences = mock(SettingsRepositoryImpl.class);
     private Scheduler scheduler = Schedulers.trampoline();
@@ -36,6 +38,7 @@ public class MusicProviderRepositoryImplTest {
     private MusicProviderRepository musicProviderRepository = new MusicProviderRepositoryImpl(
             storageMusicDataSource,
             compositionsDao,
+            artistsDao,
             musicFolderDataSource,
             settingsPreferences,
             scheduler

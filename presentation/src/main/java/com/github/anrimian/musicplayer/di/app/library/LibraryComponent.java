@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.di.app.library;
 
+import com.github.anrimian.musicplayer.di.app.library.artists.ArtistsComponent;
+import com.github.anrimian.musicplayer.di.app.library.artists.ArtistsModule;
 import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompositionsComponent;
 import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompositionsModule;
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesComponent;
@@ -19,6 +21,7 @@ public interface LibraryComponent {
 
     LibraryFilesComponent libraryFilesComponent(LibraryFilesModule module);
     LibraryCompositionsComponent libraryCompositionsComponent(LibraryCompositionsModule module);
+    ArtistsComponent artistsComponent(ArtistsModule module);
 
     PlayerPresenter playerPresenter();
     SelectOrderPresenter selectOrderPresenter();

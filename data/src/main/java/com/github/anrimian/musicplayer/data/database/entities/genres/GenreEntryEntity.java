@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.entities.genres;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
@@ -14,7 +15,8 @@ import javax.annotation.Nullable;
                         parentColumns = "id",
                         childColumns = "audioId",
                         onDelete = ForeignKey.CASCADE)
-        }
+        },
+        indices = @Index("audioId")
 )
 public class GenreEntryEntity {
 

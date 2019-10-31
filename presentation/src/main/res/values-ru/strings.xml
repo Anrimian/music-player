@@ -137,6 +137,8 @@
     <string name="play_on_connect_bluetooth_device">Начинать воспроизведение при подключении bluetooth гарнитуры</string>
     <string name="headset">Гарнитура</string>
     <string name="scan_storage">Пересканировать системную библиотеку</string>
+    <string name="artists">Иполнители</string>
+    <string name="no_artists_in_library">Нет исполнителей в библиотеке</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
