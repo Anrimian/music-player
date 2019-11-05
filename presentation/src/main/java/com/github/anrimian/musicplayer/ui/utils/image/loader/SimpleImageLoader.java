@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.utils.image.loader;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
@@ -15,9 +14,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
-import io.reactivex.Single;
+import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class SimpleImageLoader<K, T> {
@@ -35,7 +33,7 @@ public class SimpleImageLoader<K, T> {
 
     private final ImageCache<K> imageCache;
 
-    private final WeakHashMap<ImageView, Disposable> imageLoadingMap = new WeakHashMap<>();
+    private final WeakHashMap<ImageView, K> imageLoadingMap = new WeakHashMap<>();
 
     public SimpleImageLoader(int loadingPlaceholder,
                              int errorPlaceholder,
@@ -59,7 +57,8 @@ public class SimpleImageLoader<K, T> {
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull T data,
                              @DrawableRes int errorPlaceholder) {
-        Bitmap cachedBitmap = imageCache.getBitmap(keyFetcher.getKey(data));
+        K key = keyFetcher.getKey(data);
+        Bitmap cachedBitmap = imageCache.getBitmap(key);
         if (cachedBitmap != null) {
             imageView.setImageBitmap(cachedBitmap);
             return;
@@ -70,17 +69,15 @@ public class SimpleImageLoader<K, T> {
         } else {
             imageView.setImageResource(loadingPlaceholder);
         }
-        Disposable disposable = imageLoadingMap.get(imageView);
-        if (disposable != null) {
-            disposable.dispose();
-        }
-        disposable = Single.fromCallable(() -> getDataOrThrow(data))
+        Maybe.fromCallable(() -> getDataOrThrow(data))
                 .timeout(timeoutSeconds, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(imageView::setImageBitmap,
-                        t -> imageView.setImageResource(errorPlaceholder));
-        imageLoadingMap.put(imageView, disposable);
+                .doOnSuccess(bitmap -> onImageLoaded(bitmap, imageView, key))
+                .doOnError(t -> imageView.setImageResource(errorPlaceholder))
+                .onErrorComplete()
+                .subscribe();
+        imageLoadingMap.put(imageView, key);
     }
 
     @Nullable
@@ -88,8 +85,6 @@ public class SimpleImageLoader<K, T> {
         return getData(data);
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @SuppressLint("CheckResult")
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
                              @NonNull T data,
@@ -106,11 +101,20 @@ public class SimpleImageLoader<K, T> {
         } else {
             widgetView.setImageViewResource(viewId, loadingPlaceholder);
         }
-        Single.fromCallable(() -> getDataOrThrow(data))
+        Maybe.fromCallable(() -> getDataOrThrow(data))
                 .timeout(timeoutSeconds, TimeUnit.SECONDS)
                 .map(bitmapTransformer::transform)
-                .subscribe(bitmap -> widgetView.setImageViewBitmap(viewId, bitmap),
-                        t -> widgetView.setImageViewResource(viewId, placeholder));
+                .doOnSuccess(bitmap -> widgetView.setImageViewBitmap(viewId, bitmap))
+                .doOnError(t -> widgetView.setImageViewResource(viewId, placeholder))
+                .onErrorComplete()
+                .subscribe();
+    }
+
+    private void onImageLoaded(Bitmap bitmap, ImageView imageView, K key) {
+        //if task is actual
+        if (imageLoadingMap.get(imageView) == key) {
+            imageView.setImageBitmap(bitmap);
+        }
     }
 
     @Nonnull
