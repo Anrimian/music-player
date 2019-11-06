@@ -4,6 +4,7 @@ import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
@@ -29,13 +30,16 @@ public class CompositionsDaoWrapper {
     private final AppDatabase appDatabase;
     private final CompositionsDao compositionsDao;
     private final ArtistsDao artistsDao;
+    private final AlbumsDao albumsDao;
 
     public CompositionsDaoWrapper(AppDatabase appDatabase,
                                   ArtistsDao artistsDao,
-                                  CompositionsDao compositionsDao) {
+                                  CompositionsDao compositionsDao,
+                                  AlbumsDao albumsDao) {
         this.appDatabase = appDatabase;
         this.artistsDao = artistsDao;
         this.compositionsDao = compositionsDao;
+        this.albumsDao = albumsDao;
     }
 
     public Observable<List<Composition>> getAllObservable() {
@@ -122,7 +126,8 @@ public class CompositionsDaoWrapper {
 
     private CompositionEntity toCompositionEntity(StorageComposition composition) {
         Long artistId = artistsDao.selectIdByStorageId(composition.getArtistId());
-        return CompositionMapper.toEntity(composition, artistId);
+        Long albumId = albumsDao.selectIdByStorageId(composition.getAlbumId());
+        return CompositionMapper.toEntity(composition, artistId, albumId);
     }
 
     public long selectIdByStorageId(long compositionId) {

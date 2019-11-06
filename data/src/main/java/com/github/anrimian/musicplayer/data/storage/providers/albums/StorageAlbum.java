@@ -8,19 +8,21 @@ public class StorageAlbum {
     private final String album;
     private final String albumKey;
 
+    @Deprecated
     private final String artist;
+
     private final long artistId;
 
-    private final long firstYear;
-    private final long lastYear;
+    private final int firstYear;
+    private final int lastYear;
 
     public StorageAlbum(long id,
                         String album,
                         String albumKey,
                         String artist,
                         long artistId,
-                        long firstYear,
-                        long lastYear) {
+                        int firstYear,
+                        int lastYear) {
         this.id = id;
         this.album = album;
         this.albumKey = albumKey;
@@ -50,11 +52,11 @@ public class StorageAlbum {
         return artistId;
     }
 
-    public long getFirstYear() {
+    public int getFirstYear() {
         return firstYear;
     }
 
-    public long getLastYear() {
+    public int getLastYear() {
         return lastYear;
     }
 

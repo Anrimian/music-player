@@ -62,8 +62,8 @@ public class StorageAlbumsProvider {
                 cursorWrapper.getString(Albums.ALBUM_KEY),
                 cursorWrapper.getString(Albums.ARTIST),
                 cursorWrapper.getLong(Albums.ARTIST_ID),
-                cursorWrapper.getLong(Albums.FIRST_YEAR),
-                cursorWrapper.getLong(Albums.LAST_YEAR)
+                cursorWrapper.getInt(Albums.FIRST_YEAR),
+                cursorWrapper.getInt(Albums.LAST_YEAR)
         );
     }
 }

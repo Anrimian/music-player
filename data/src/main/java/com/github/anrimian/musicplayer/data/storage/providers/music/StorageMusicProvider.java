@@ -55,6 +55,7 @@ public class StorageMusicProvider {
                             Media.SIZE,
                             Media._ID,
                             Media.ARTIST_ID,
+                            Media.ALBUM_ID,
                             Media.DATE_ADDED,
                             Media.DATE_MODIFIED},
                     Media.IS_MUSIC + " = ?",
@@ -185,7 +186,7 @@ public class StorageMusicProvider {
         long id = cursorWrapper.getLong(Media._ID);
         long artistId = cursorWrapper.getLong(Media.ARTIST_ID);
 //        long bookmark = cursorWrapper.getLong(Media.BOOKMARK);
-//        long albumId = cursorWrapper.getLong(Media.ALBUM_ID);
+        long albumId = cursorWrapper.getLong(Media.ALBUM_ID);
         long dateAddedMillis = cursorWrapper.getLong(Media.DATE_ADDED);
         long dateModifiedMillis = cursorWrapper.getLong(Media.DATE_MODIFIED);
 
@@ -231,6 +232,7 @@ public class StorageMusicProvider {
                 size,
                 id,
                 artistId,
+                albumId,
                 dateAdded,
                 dateModified);
     }

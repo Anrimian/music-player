@@ -22,7 +22,8 @@ public class AlbumEntity {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-    private long artistId;
+    @Nullable
+    private Long artistId;
 
     @Nullable
     private Long storageId;
@@ -33,7 +34,7 @@ public class AlbumEntity {
     private int firstYear;
     private int lastYear;
 
-    public AlbumEntity(long artistId,
+    public AlbumEntity(@Nullable Long artistId,
                        @Nullable Long storageId,
                        String albumName,
                        String albumKey,
@@ -55,7 +56,8 @@ public class AlbumEntity {
         this.id = id;
     }
 
-    public long getArtistId() {
+    @Nullable
+    public Long getArtistId() {
         return artistId;
     }
 

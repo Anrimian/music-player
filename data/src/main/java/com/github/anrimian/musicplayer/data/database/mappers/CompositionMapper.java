@@ -23,8 +23,10 @@ public class CompositionMapper {
     }
 
     public static CompositionEntity toEntity(StorageComposition composition,
-                                             @Nullable Long artistId) {
+                                             @Nullable Long artistId,
+                                             @Nullable Long albumId) {
         return new CompositionEntity(artistId,
+                albumId,
                 composition.getArtist(),
                 composition.getTitle(),
                 composition.getAlbum(),

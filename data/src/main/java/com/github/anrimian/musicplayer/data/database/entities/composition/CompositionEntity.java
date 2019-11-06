@@ -5,6 +5,7 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 
@@ -17,9 +18,15 @@ import javax.annotation.Nullable;
         foreignKeys = {
                 @ForeignKey(entity = ArtistEntity.class,
                         parentColumns = "id",
-                        childColumns = "artistId")
+                        childColumns = "artistId"),
+                @ForeignKey(entity = AlbumEntity.class,
+                        parentColumns = "id",
+                        childColumns = "albumId")
         },
-        indices = @Index("artistId")
+        indices = {
+                @Index("artistId"),
+                @Index("albumId")
+        }
 )
 public class CompositionEntity {
 
@@ -28,6 +35,9 @@ public class CompositionEntity {
 
     @Nullable
     private Long artistId;
+
+    @Nullable
+    private Long albumId;
 
     @Nullable
     private Long storageId;
@@ -53,6 +63,7 @@ public class CompositionEntity {
     private CorruptionType corruptionType;
 
     public CompositionEntity(@Nullable Long artistId,
+                             @Nullable Long albumId,
                              @Nullable String artist,
                              @Nullable String title,
                              @Nullable String album,
@@ -64,6 +75,7 @@ public class CompositionEntity {
                              @Nonnull Date dateModified,
                              @Nullable CorruptionType corruptionType) {
         this.artistId = artistId;
+        this.albumId = albumId;
         this.storageId = storageId;
         this.artist = artist;
         this.title = title;
@@ -74,6 +86,11 @@ public class CompositionEntity {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
+    }
+
+    @Nullable
+    public Long getAlbumId() {
+        return albumId;
     }
 
     @Nullable

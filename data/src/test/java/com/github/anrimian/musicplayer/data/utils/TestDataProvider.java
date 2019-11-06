@@ -189,6 +189,7 @@ public class TestDataProvider {
                 0,
                 id,
                 0,
+                0,
                 new Date(createDate),
                 new Date(modifyDate));
     }
@@ -243,6 +244,7 @@ public class TestDataProvider {
                 0,
                 0,
                 id,
+                0,
                 0,
                 new Date(0),
                 new Date(0));

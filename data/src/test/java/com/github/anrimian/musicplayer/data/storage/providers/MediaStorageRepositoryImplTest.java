@@ -2,11 +2,14 @@ package com.github.anrimian.musicplayer.data.storage.providers;
 
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
@@ -42,11 +45,14 @@ public class MediaStorageRepositoryImplTest {
     private StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
     private StoragePlayListsProvider playListsProvider = mock(StoragePlayListsProvider.class);
     private StorageArtistsProvider artistsProvider = mock(StorageArtistsProvider.class);
+    private StorageAlbumsProvider albumsProvider = mock(StorageAlbumsProvider.class);
     private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
     private PlayListsDaoWrapper playListsDao = mock(PlayListsDaoWrapper.class);
     private ArtistsDaoWrapper artistsDao = mock(ArtistsDaoWrapper.class);
+    private AlbumsDaoWrapper albumsDao = mock(AlbumsDaoWrapper.class);
 
     private PublishSubject<LongSparseArray<StorageComposition>> newCompositionsSubject = PublishSubject.create();
+    private PublishSubject<LongSparseArray<StorageAlbum>> newAlbumssSubject = PublishSubject.create();
     private PublishSubject<LongSparseArray<StorageArtist>> newArtistsSubject = PublishSubject.create();
     private PublishSubject<LongSparseArray<StoragePlayList>> newPlayListsSubject = PublishSubject.create();
     private PublishSubject<List<StoragePlayListItem>> newPlayListItemsSubject = PublishSubject.create();
@@ -55,6 +61,9 @@ public class MediaStorageRepositoryImplTest {
 
     @Before
     public void setUp() {
+        when(albumsProvider.getAlbumsObservable()).thenReturn(newAlbumssSubject);
+        when(albumsProvider.getAlbums()).thenReturn(new LongSparseArray<>());
+
         when(artistsProvider.getArtistsObservable()).thenReturn(newArtistsSubject);
         when(artistsProvider.getArtists()).thenReturn(new LongSparseArray<>());
 
@@ -65,6 +74,8 @@ public class MediaStorageRepositoryImplTest {
         when(playListsProvider.getPlayListsObservable()).thenReturn(newPlayListsSubject);
         when(playListsProvider.getPlayListEntriesObservable(1L)).thenReturn(newPlayListItemsSubject);
 
+        when(albumsDao.selectAllAsStorageAlbums()).thenReturn(new LongSparseArray<>());
+
         when(artistsDao.selectAllAsStorageArtists()).thenReturn(new LongSparseArray<>());
 
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());
@@ -74,9 +85,11 @@ public class MediaStorageRepositoryImplTest {
         mediaStorageRepository = new MediaStorageRepositoryImpl(musicProvider,
                 playListsProvider,
                 artistsProvider,
+                albumsProvider,
                 compositionsDao,
                 playListsDao,
                 artistsDao,
+                albumsDao,
                 Schedulers.trampoline());
         mediaStorageRepository.initialize();
     }

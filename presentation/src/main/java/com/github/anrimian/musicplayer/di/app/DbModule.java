@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.DatabaseManager;
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
@@ -71,6 +73,20 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
+    AlbumsDao albumssDao(AppDatabase appDatabase) {
+        return appDatabase.albumsDao();
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    AlbumsDaoWrapper albumsDaoWrapper(AlbumsDao albumsDao, ArtistsDao artistsDao) {
+        return new AlbumsDaoWrapper(albumsDao, artistsDao);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
     ArtistsDaoWrapper artistsDaoWrapper(ArtistsDao artistsDao) {
         return new ArtistsDaoWrapper(artistsDao);
     }
@@ -80,8 +96,9 @@ public class DbModule {
     @Singleton
     CompositionsDaoWrapper compositionsDaoWrapper(AppDatabase appDatabase,
                                                   ArtistsDao artistsDao,
-                                                  CompositionsDao compositionsDao) {
-        return new CompositionsDaoWrapper(appDatabase, artistsDao, compositionsDao);
+                                                  CompositionsDao compositionsDao,
+                                                  AlbumsDao albumsDao) {
+        return new CompositionsDaoWrapper(appDatabase, artistsDao, compositionsDao, albumsDao);
     }
 
     @Provides
