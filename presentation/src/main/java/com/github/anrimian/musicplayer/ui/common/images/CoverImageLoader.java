@@ -18,7 +18,7 @@ public class CoverImageLoader extends SimpleImageLoader<Long, Composition> {
         super(R.drawable.ic_music_placeholder_simple,
                 R.drawable.ic_music_placeholder_simple,
                 5,
-                1024*1024,
+                2*1024*1024,
                 CoverImageLoader::extractImageComposition,
                 Composition::getId);
     }
