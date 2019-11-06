@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/tv_author_name"
+        android:id="@+id/tv_artist_name"
         style="@style/TextStyleItemPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

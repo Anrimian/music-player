@@ -6,4 +6,6 @@
         android:title="@string/folders"/>
     <item android:id="@+id/menu_artists"
         android:title="@string/artists"/>
+    <item android:id="@+id/menu_albums"
+        android:title="@string/albums"/>
 </menu>

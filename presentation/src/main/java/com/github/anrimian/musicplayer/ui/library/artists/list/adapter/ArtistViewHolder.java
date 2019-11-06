@@ -21,7 +21,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 
 public class ArtistViewHolder extends BaseViewHolder {
 
-    @BindView(R.id.tv_author_name)
+    @BindView(R.id.tv_artist_name)
     TextView tvAuthorName;
 
     @BindView(R.id.tv_compositions_count)
@@ -29,8 +29,8 @@ public class ArtistViewHolder extends BaseViewHolder {
 
     private Artist artist;
 
-    public ArtistViewHolder(@NonNull ViewGroup parent,
-                            Callback<Artist> itemClickListener) {
+    ArtistViewHolder(@NonNull ViewGroup parent,
+                     Callback<Artist> itemClickListener) {
         super(parent, R.layout.item_artist);
         ButterKnife.bind(this, itemView);
         itemView.setOnClickListener(v -> itemClickListener.call(artist));

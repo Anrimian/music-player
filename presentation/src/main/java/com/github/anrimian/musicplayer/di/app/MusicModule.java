@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
@@ -101,12 +102,14 @@ class MusicModule {
     MusicProviderRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
                                                     CompositionsDaoWrapper compositionsDao,
                                                     ArtistsDaoWrapper artistsDao,
+                                                    AlbumsDaoWrapper albumsDao,
                                                     MusicFolderDataSource musicFolderDataSource,
                                                     SettingsRepository settingsPreferences,
                                                     @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MusicProviderRepositoryImpl(storageMusicDataSource,
                 compositionsDao,
                 artistsDao,
+                albumsDao,
                 musicFolderDataSource,
                 settingsPreferences,
                 scheduler);

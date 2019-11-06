@@ -7,4 +7,5 @@ public interface Screens {
     int LIBRARY_COMPOSITIONS = 3;
     int LIBRARY_FOLDERS = 4;
     int LIBRARY_ARTISTS = 5;
+    int LIBRARY_ALBUMS = 6;
 }

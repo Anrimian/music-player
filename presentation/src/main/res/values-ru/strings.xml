@@ -139,6 +139,8 @@
     <string name="scan_storage">Пересканировать системную библиотеку</string>
     <string name="artists">Иполнители</string>
     <string name="no_artists_in_library">Нет исполнителей в библиотеке</string>
+    <string name="albums">Альбомы</string>
+    <string name="no_albums_in_library">Нет альбомов в библиотеке</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

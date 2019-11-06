@@ -3,12 +3,14 @@ package com.github.anrimian.musicplayer.domain.models.albums;
 public class Album {
 
     private final long id;
+    private final Long storageId;
     private final String name;
     private final String artist;
     private final int compositionsCount;
 
-    public Album(long id, String name, String artist, int compositionsCount) {
+    public Album(long id, Long storageId, String name, String artist, int compositionsCount) {
         this.id = id;
+        this.storageId = storageId;
         this.name = name;
         this.artist = artist;
         this.compositionsCount = compositionsCount;
@@ -28,6 +30,10 @@ public class Album {
 
     public int getCompositionsCount() {
         return compositionsCount;
+    }
+
+    public Long getStorageId() {
+        return storageId;
     }
 
     @Override

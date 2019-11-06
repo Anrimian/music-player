@@ -32,9 +32,10 @@ public interface AlbumsDao {
     void insertAll(List<AlbumEntity> artists);
 
     @Query("SELECT id as id," +
+            "storageId as storageId, " +
             "albumName as name, " +
-            "(SELECT artistName FROM artists WHERE artists.id = artistId) as artist, " +
-            "(SELECT count() FROM compositions WHERE albumId = id) as compositionsCount " +
+            "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
+            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums")
     Observable<List<Album>> getAllObservable();
 }

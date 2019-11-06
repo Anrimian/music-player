@@ -147,6 +147,8 @@
     <string name="scan_storage">Rescan media storage</string>
     <string name="artists">Artists</string>
     <string name="no_artists_in_library">No artists in library</string>
+    <string name="albums">Albums</string>
+    <string name="no_albums_in_library">No albums in library</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music;
 
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.DescComparator;
@@ -11,6 +12,7 @@ import com.github.anrimian.musicplayer.data.repositories.music.comparators.folde
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.music.search.FileSourceSearchFilter;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
@@ -44,6 +46,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     private final StorageMusicDataSource storageMusicDataSource;
     private final CompositionsDaoWrapper compositionsDao;
     private final ArtistsDaoWrapper artistsDao;
+    private final AlbumsDaoWrapper albumsDao;
     private final MusicFolderDataSource musicFolderDataSource;
     private final SettingsRepository settingsPreferences;
     private final Scheduler scheduler;
@@ -51,12 +54,14 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     public MusicProviderRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
                                        CompositionsDaoWrapper compositionsDao,
                                        ArtistsDaoWrapper artistsDao,
+                                       AlbumsDaoWrapper albumsDao,
                                        MusicFolderDataSource musicFolderDataSource,
                                        SettingsRepository settingsPreferences,
                                        Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
         this.compositionsDao = compositionsDao;
         this.artistsDao = artistsDao;
+        this.albumsDao = albumsDao;
         this.musicFolderDataSource = musicFolderDataSource;
         this.settingsPreferences = settingsPreferences;
         this.scheduler = scheduler;
@@ -75,6 +80,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Observable<List<Artist>> getArtistsObservable() {
         return artistsDao.getAllObservable();
+    }
+
+    @Override
+    public Observable<List<Album>> getAlbumsObservable() {
+        return albumsDao.getAllObservable();
     }
 
     @Override
