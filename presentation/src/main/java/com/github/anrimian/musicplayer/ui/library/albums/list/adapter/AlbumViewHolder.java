@@ -72,7 +72,7 @@ public class AlbumViewHolder extends BaseViewHolder {
     private void showCompositionsCount() {
         StringBuilder sb = new StringBuilder();
         String artist = album.getArtist();
-        if (isEmpty(artist)) {
+        if (!isEmpty(artist)) {
             sb.append(artist);
             sb.append(" ● ");//TODO split problem • ●
         }
