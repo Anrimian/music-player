@@ -3,6 +3,10 @@ package com.github.anrimian.musicplayer.ui.library;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.di.Components;
@@ -12,11 +16,8 @@ import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositio
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
+import moxy.MvpAppCompatFragment;
 
 public class LibraryFragment extends MvpAppCompatFragment implements FragmentLayerListener {
 
