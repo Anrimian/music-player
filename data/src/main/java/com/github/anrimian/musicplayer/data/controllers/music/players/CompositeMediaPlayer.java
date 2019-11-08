@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
+import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import io.reactivex.Observable;
@@ -10,7 +12,7 @@ import io.reactivex.subjects.PublishSubject;
 public class CompositeMediaPlayer implements MediaPlayer {
 
     private final MediaPlayer[] mediaPlayers;
-    private final int startPlayerIndex;
+    private final int startPlayerIndex = 0;
 
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
@@ -19,9 +21,11 @@ public class CompositeMediaPlayer implements MediaPlayer {
     private MediaPlayer currentPlayer;
     private int currentPlayerIndex;
 
-    public CompositeMediaPlayer(MediaPlayer[] mediaPlayers, int startPlayerIndex) {
+    private Composition currentComposition;
+    private long currentTrackPosition;
+
+    public CompositeMediaPlayer(MediaPlayer[] mediaPlayers) {
         this.mediaPlayers = mediaPlayers;
-        this.startPlayerIndex = startPlayerIndex;
 
         setPlayer(startPlayerIndex);
     }
@@ -33,6 +37,9 @@ public class CompositeMediaPlayer implements MediaPlayer {
 
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
+        currentComposition = composition;
+        currentTrackPosition = startPosition;
+
         if (currentPlayerIndex != startPlayerIndex) {
             setPlayer(startPlayerIndex);
         }
@@ -80,11 +87,34 @@ public class CompositeMediaPlayer implements MediaPlayer {
 
         playerDisposable.clear();
         playerDisposable.add(currentPlayer.getEventsObservable()
-//                .doOnNext() // if error event, switch to another player and consume event
+                .flatMap(this::onPlayerEventReceived)
                 .subscribe(playerEventSubject::onNext)
         );
         playerDisposable.add(currentPlayer.getTrackPositionObservable()
-                .subscribe(trackPositionSubject::onNext)
+                .subscribe(this::onTrackPositionReceived)
         );
+    }
+
+    private void onTrackPositionReceived(long position) {
+        this.currentTrackPosition = position;
+        trackPositionSubject.onNext(position);
+    }
+
+    private Observable<PlayerEvent> onPlayerEventReceived(PlayerEvent event) {
+        return Observable.create(emitter -> {
+            // if error event, switch to another player and consume event
+            if (event instanceof ErrorEvent) {
+                if (((ErrorEvent) event).getErrorType() == ErrorType.UNKNOWN) {//unsupported instead?
+                    int newPlayerIndex = currentPlayerIndex + 1;
+                    //don't switch player when we reached end of available players
+                    if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.length) {
+                        setPlayer(newPlayerIndex);
+                        currentPlayer.prepareToPlay(currentComposition, currentTrackPosition);
+                        return;
+                    }
+                }
+            }
+            emitter.onNext(event);
+        });
     }
 }

@@ -13,4 +13,19 @@ public class ErrorEvent implements PlayerEvent {
     public ErrorType getErrorType() {
         return errorType;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ErrorEvent that = (ErrorEvent) o;
+
+        return errorType == that.errorType;
+    }
+
+    @Override
+    public int hashCode() {
+        return errorType.hashCode();
+    }
 }
