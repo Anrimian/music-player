@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,8 +18,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -32,7 +29,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.Pla
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpBottomSheetDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
@@ -42,8 +38,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDel
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextColorDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
@@ -52,11 +46,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.MvpBottomSheetDialogFragment;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static android.view.View.INVISIBLE;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.setupBottomSheetDialogMaxWidth;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getContentView;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getFloat;
@@ -136,6 +133,13 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        adapter = new PlayListsAdapter(
+                recyclerView,
+                this::onPlayListSelected,
+                presenter::onPlayListLongClick
+        );
+        recyclerView.setAdapter(adapter);
+
         attachDynamicShadow(recyclerView, titleShadow);
 
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
@@ -160,17 +164,8 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     @Override
     public void onResume() {
         super.onResume();
-        //set max width in large width cases
-        int width = requireContext().getResources().getDimensionPixelSize(R.dimen.bottom_sheet_width);
-        Dialog dialog = getDialog();
-        if (dialog != null) {
-            Window window = dialog.getWindow();
-            if (window != null) {
-                window.setLayout(width > 0 ? width : MATCH_PARENT, MATCH_PARENT);
-            }
-        }
+        setupBottomSheetDialogMaxWidth(this);
     }
-
 
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
@@ -212,17 +207,8 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     }
 
     @Override
-    public void updateList(ListUpdate<PlayList> update) {
-        List<PlayList> list = update.getNewList();
-        if (adapter == null) {
-            adapter = new PlayListsAdapter(list);
-            adapter.setOnItemClickListener(this::onPlayListSelected);
-            adapter.setOnItemLongClickListener(presenter::onPlayListLongClick);
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.setItems(list);
-            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
-        }
+    public void updateList(List<PlayList> list) {
+        adapter.submitList(list);
     }
 
     @Override

@@ -4,6 +4,10 @@ import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.DatabaseManager;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListDao;
+import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 
@@ -44,7 +48,36 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
+    CompositionsDao compositionsDao(AppDatabase appDatabase) {
+        return appDatabase.compositionsDao();
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
     PlayQueueDaoWrapper playQueueDaoWrapper(AppDatabase appDatabase, PlayQueueDao playQueueDao) {
         return new PlayQueueDaoWrapper(appDatabase, playQueueDao);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    CompositionsDaoWrapper compositionsDaoWrapper(AppDatabase appDatabase,
+                                                  CompositionsDao compositionsDao) {
+        return new CompositionsDaoWrapper(appDatabase, compositionsDao);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    PlayListDao playListDao(AppDatabase appDatabase) {
+        return appDatabase.playListDao();
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    PlayListsDaoWrapper playListsDaoWrapper(PlayListDao playListDao, AppDatabase appDatabase) {
+        return new PlayListsDaoWrapper(playListDao, appDatabase);
     }
 }

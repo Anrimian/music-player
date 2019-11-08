@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.AttrRes;
+import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
@@ -17,17 +19,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
+import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
@@ -37,12 +37,10 @@ import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialog
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
@@ -57,6 +55,9 @@ import javax.annotation.Nonnull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
+import moxy.MvpAppCompatFragment;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -67,7 +68,6 @@ import static com.github.anrimian.musicplayer.Constants.Tags.NEW_FOLDER_NAME_TAG
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFiles;
@@ -127,6 +127,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> newFolderDialogFragmentRunner;
+    private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
 
     public static LibraryFoldersFragment newInstance(@Nullable String path) {
         Bundle args = new Bundle();
@@ -183,8 +184,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(presenter::onFolderClicked);
         adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
-        adapter.setOnCompositionMenuItemClicked(this::onCompositionMenuClicked);
         adapter.setOnLongClickListener(presenter::onItemLongClick);
+        adapter.setCompositionIconClickListener(presenter::onCompositionIconClicked);
         recyclerView.setAdapter(adapter);
 
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
@@ -225,11 +226,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             folderPlayListDialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
         }
 
-        MenuDialogFragment compositionDialog = (MenuDialogFragment) fm
-                .findFragmentByTag(COMPOSITION_ACTION_TAG);
-        if (compositionDialog != null) {
-            compositionDialog.setOnCompleteListener(this::onCompositionActionSelected);
-        }
+        compositionActionDialogRunner = new DialogFragmentRunner<>(fm,
+                COMPOSITION_ACTION_TAG,
+                f -> f.setOnCompleteListener(this::onCompositionActionSelected));
 
         filenameDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 FILE_NAME_TAG,
@@ -298,6 +297,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             }
             case R.id.menu_search: {
                 presenter.onSearchButtonClicked();
+                return true;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaStorageRepository().rescanStorage();
                 return true;
             }
             default: return super.onOptionsItemSelected(item);
@@ -464,17 +467,18 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showPlayingComposition(composition);
+        adapter.showCurrentComposition(composition);
     }
 
     @Override
     public void showCompositionActionDialog(Composition composition) {
-        MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance(
+        @AttrRes int statusBarColor = toolbar.isInActionMode()?
+                R.attr.actionModeStatusBarColor: android.R.attr.statusBarColor;
+        CompositionActionDialogFragment fragment = CompositionActionDialogFragment.newInstance(
+                composition,
                 R.menu.composition_actions_menu,
-                formatCompositionName(composition)
-        );
-        menuDialogFragment.setOnCompleteListener(this::onCompositionActionSelected);
-        menuDialogFragment.show(getChildFragmentManager(), COMPOSITION_ACTION_TAG);
+                statusBarColor);
+        compositionActionDialogRunner.show(fragment);
     }
 
     @Override
@@ -547,62 +551,46 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         animateVisibility(vgMoveFileMenu, show? VISIBLE: INVISIBLE);
     }
 
+    @Override
+    public void showPlayState(boolean play) {
+        adapter.showPlaying(play);
+    }
+
     private void onSelectionModeChanged(boolean enabled) {
         animateVisibility(vgFileMenu, enabled? VISIBLE: INVISIBLE);
     }
 
-    private void onCompositionActionSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
+    private void onCompositionActionSelected(Composition composition, @MenuRes int menuItemId) {
+        switch (menuItemId) {
             case R.id.menu_play: {
-                presenter.onPlayActionSelected();
+                presenter.onPlayActionSelected(composition);
                 break;
             }
             case R.id.menu_play_next: {
-                presenter.onPlayNextActionSelected();
+                presenter.onPlayNextCompositionClicked(composition);
                 break;
             }
             case R.id.menu_add_to_queue: {
-                presenter.onAddToQueueActionSelected();
+                presenter.onAddToQueueCompositionClicked(composition);
+                break;
+            }
+            case R.id.menu_add_to_playlist: {
+                presenter.onAddToPlayListButtonClicked(composition);
+                break;
+            }
+            case R.id.menu_edit: {
+                startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                break;
+            }
+            case R.id.menu_share: {
+                shareFile(requireContext(), composition.getFilePath());
+                break;
+            }
+            case R.id.menu_delete: {
+                presenter.onDeleteCompositionButtonClicked(composition);
                 break;
             }
         }
-    }
-
-    private void onCompositionMenuClicked(View view, MusicFileSource musicFileSource) {
-        Composition composition = musicFileSource.getComposition();
-
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.composition_item_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_play_next: {
-                    presenter.onPlayNextCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_add_to_queue: {
-                    presenter.onAddToQueueCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddToPlayListButtonClicked(musicFileSource);
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
-                    return true;
-                }
-                case R.id.menu_share: {
-                    shareFile(requireContext(), composition.getFilePath());
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(musicFileSource);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
     }
 
     private boolean onActionModeItemClicked(MenuItem menuItem) {

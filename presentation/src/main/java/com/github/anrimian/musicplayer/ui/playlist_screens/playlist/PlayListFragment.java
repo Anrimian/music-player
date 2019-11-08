@@ -8,36 +8,34 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
+import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
@@ -49,17 +47,19 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.MvpAppCompatFragment;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback.withSwipeToDelete;
 
 public class PlayListFragment extends MvpAppCompatFragment
         implements PlayListView, FragmentLayerListener {
@@ -79,6 +79,8 @@ public class PlayListFragment extends MvpAppCompatFragment
     private AdvancedToolbar toolbar;
     private PlayListItemAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
+
+    private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
 
     public static PlayListFragment newInstance(long playListId) {
         Bundle args = new Bundle();
@@ -111,10 +113,12 @@ public class PlayListFragment extends MvpAppCompatFragment
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.hideAll();
 
-        DragAndSwipeTouchHelperCallback callback = withSwipeToDelete(recyclerView,
+        DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(recyclerView,
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
-                ItemTouchHelper.START);
+                ItemTouchHelper.START,
+                R.drawable.ic_playlist_remove,
+                R.string.delete_from_play_list);
         callback.setOnMovedListener(presenter::onItemMoved);
         callback.setOnStartDragListener(presenter::onDragStarted);
         callback.setOnEndDragListener(presenter::onDragEnded);
@@ -124,18 +128,29 @@ public class PlayListFragment extends MvpAppCompatFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        adapter = new PlayListItemAdapter(recyclerView,
+                presenter.isCoversEnabled(),
+                presenter::onCompositionClicked,
+                presenter::onItemIconClicked);
+        recyclerView.setAdapter(adapter);
+
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
         SlidrPanel.replace(clListContainer, slidrConfig, () ->
-                FragmentNavigation.from(requireFragmentManager()).goBack(0),
+                        FragmentNavigation.from(requireFragmentManager()).goBack(0),
                 toolbar::onStackFragmentSlided);
 
-        ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) getChildFragmentManager()
+        FragmentManager fm = getChildFragmentManager();
+        ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) fm
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (playListDialog != null) {
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
+
+        compositionActionDialogRunner = new DialogFragmentRunner<>(fm,
+                COMPOSITION_ACTION_TAG,
+                f -> f.setOnTripleCompleteListener(this::onCompositionActionSelected));
     }
 
     @Override
@@ -184,17 +199,8 @@ public class PlayListFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void updateItemsList(ListUpdate<PlayListItem> update, boolean coversEnabled) {
-        List<PlayListItem> list = update.getNewList();
-        if (adapter == null) {
-            adapter = new PlayListItemAdapter(list, coversEnabled);
-            adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-            adapter.setOnMenuItemClickListener(this::onCompositionMenuClicked);
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.setItems(list);
-            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
-        }
+    public void updateItemsList(List<PlayListItem> list) {
+        adapter.submitList(list);
     }
 
     @Override
@@ -225,7 +231,6 @@ public class PlayListFragment extends MvpAppCompatFragment
         dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_TAG);
     }
-
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
@@ -305,13 +310,16 @@ public class PlayListFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showCompositionActionDialog(Composition composition) {
-        MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance(
-                R.menu.composition_actions_menu,
-                formatCompositionName(composition)
-        );
-        menuDialogFragment.setOnCompleteListener(this::onCompositionActionSelected);
-        menuDialogFragment.show(getChildFragmentManager(), COMPOSITION_ACTION_TAG);
+    public void showCompositionActionDialog(PlayListItem playListItem, int position) {
+        Bundle extra = new Bundle();
+        extra.putLong(PLAY_LIST_ID_ARG, playListItem.getItemId());
+        extra.putInt(POSITION_ARG, position);
+        Composition composition = playListItem.getComposition();
+        CompositionActionDialogFragment fragment = CompositionActionDialogFragment.newInstance(
+                composition,
+                R.menu.play_list_item_menu,
+                extra);
+        compositionActionDialogRunner.show(fragment);
     }
 
     @Override
@@ -326,62 +334,49 @@ public class PlayListFragment extends MvpAppCompatFragment
         MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
-    private void onCompositionActionSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
+    private void onCompositionActionSelected(Composition composition,
+                                             @MenuRes int menuItemId,
+                                             Bundle extra) {
+        long playListId = extra.getLong(PLAY_LIST_ID_ARG);
+        int position = extra.getInt(POSITION_ARG);
+
+        switch (menuItemId) {
             case R.id.menu_play: {
-                presenter.onPlayActionSelected();
+                presenter.onPlayActionSelected(position);
                 break;
             }
             case R.id.menu_play_next: {
-                presenter.onPlayNextActionSelected();
+                presenter.onPlayNextCompositionClicked(composition);
                 break;
             }
             case R.id.menu_add_to_queue: {
-                presenter.onAddToQueueActionSelected();
+                presenter.onAddToQueueCompositionClicked(composition);
+                break;
+            }
+            case R.id.menu_add_to_playlist: {
+                presenter.onAddToPlayListButtonClicked(composition);
+                break;
+            }
+            case R.id.menu_edit: {
+                startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                break;
+            }
+            case R.id.menu_share: {
+                shareFile(requireContext(), composition.getFilePath());
+                break;
+            }
+            case R.id.menu_delete_from_play_list: {
+                presenter.onDeleteFromPlayListButtonClicked(new PlayListItem(playListId,//TODO replace!!!
+                                playListId,
+                                composition),
+                        position);
+                break;
+            }
+            case R.id.menu_delete: {
+                presenter.onDeleteCompositionButtonClicked(composition);
                 break;
             }
         }
-    }
-
-    private void onCompositionMenuClicked(View view, PlayListItem playListItem, int position) {
-        Composition composition = playListItem.getComposition();
-
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.play_list_item_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_play_next: {
-                    presenter.onPlayNextCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_add_to_queue: {
-                    presenter.onAddToQueueCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddToPlayListButtonClicked(composition);
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
-                    return true;
-                }
-                case R.id.menu_share: {
-                    shareFile(requireContext(), composition.getFilePath());
-                    return true;
-                }
-                case R.id.menu_delete_from_play_list: {
-                    presenter.onDeleteFromPlayListButtonClicked(playListItem, position);
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(composition);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
     }
 
     private long getPlayListId() {

@@ -27,8 +27,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.Screens;
@@ -40,8 +38,9 @@ import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
@@ -60,14 +59,10 @@ import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -77,6 +72,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.MvpAppCompatFragment;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static android.view.View.VISIBLE;
 import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
@@ -178,7 +176,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     TextView tvQueueSubtitle;
 
     private PlayQueueAdapter playQueueAdapter;
-    private DefferedObject<PlayQueueAdapter> playQueueAdapterWrapper = new DefferedObject<>();
 
     private int selectedDrawerItemId = NO_ITEM;
     private int itemIdToStart = NO_ITEM;
@@ -288,10 +285,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
-        DragAndSwipeTouchHelperCallback callback = DragAndSwipeTouchHelperCallback.withSwipeToDelete(rvPlayList,
+        playQueueAdapter = new PlayQueueAdapter(rvPlayList);
+        playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
+        playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
+        playQueueAdapter.setIconClickListener(presenter::onQueueItemIconClicked);
+        rvPlayList.setAdapter(playQueueAdapter);
+
+        DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(rvPlayList,
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
-                ItemTouchHelper.START);
+                ItemTouchHelper.START,
+                R.drawable.ic_delete_outline,
+                R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvPlayList);
@@ -445,6 +450,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ivPlayPause.setImageResource(R.drawable.ic_play);
         ivPlayPause.setContentDescription(getString(R.string.play));
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
+        playQueueAdapter.showPlaying(false);
     }
 
     @Override
@@ -452,6 +458,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         ivPlayPause.setImageResource(R.drawable.ic_pause);
         ivPlayPause.setContentDescription(getString(R.string.pause));
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
+        playQueueAdapter.showPlaying(true);
     }
 
     @Override
@@ -494,7 +501,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             sbTrackState.setContentDescription(null);
 
             if (showCover) {
-                ImageFormatUtils.displayImage(ivMusicIcon, composition);
+                CoverImageLoader.getInstance()
+                        .displayImage(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             }
@@ -506,7 +514,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void scrollQueueToPosition(int position, boolean smoothScroll) {
         if (position > playQueueLayoutManager.findFirstVisibleItemPosition() &&
-                position < playQueueLayoutManager.findLastVisibleItemPosition()) {
+                position < playQueueLayoutManager.findLastCompletelyVisibleItemPosition()) {
             return;
         }
 
@@ -527,22 +535,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void updatePlayQueue(ListUpdate<PlayQueueItem> update, boolean keepPosition) {
-        List<PlayQueueItem> list = update.getNewList();
-        if (playQueueAdapter == null) {
-            playQueueAdapter = new PlayQueueAdapter(list);
-            playQueueAdapterWrapper.setObject(playQueueAdapter);
-            playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
-            playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
-            rvPlayList.setAdapter(playQueueAdapter);
-        } else {
-            playQueueAdapter.setItems(list);
-            if (keepPosition) {
-                DiffUtilHelper.update(update.getDiffResult(), rvPlayList);
-            } else {
-                update.getDiffResult().dispatchUpdatesTo(playQueueAdapter);
-            }
-        }
+    public void updatePlayQueue(List<PlayQueueItem> items) {
+        playQueueAdapter.submitList(items);
     }
 
     @Override
@@ -591,7 +585,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void setPlayQueueCoversEnabled(boolean isCoversEnabled) {
-        playQueueAdapterWrapper.call(adapter -> adapter.setCoversEnabled(isCoversEnabled));
+        playQueueAdapter.setCoversEnabled(isCoversEnabled);
     }
 
     @Override
@@ -676,7 +670,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private void onCompositionMenuClicked(View view) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.composition_full_actions_menu);
+        popup.inflate(R.menu.composition_short_actions_menu);
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_add_to_playlist: {

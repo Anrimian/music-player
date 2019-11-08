@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -30,6 +29,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
+import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
+import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.utils.Permissions;
@@ -38,6 +39,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -68,7 +70,6 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils.getCompositionImage;
 import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
@@ -87,6 +88,9 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
     @Inject
     MusicServiceInteractor musicServiceInteractor;
+
+    @Inject
+    ThemeController themeController;
 
     @Named(UI_SCHEDULER)
     @Inject
@@ -293,7 +297,10 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnNotificationSettings() {
-        serviceDisposable.add(musicServiceInteractor.getNotificationSettingObservable()
+        serviceDisposable.add(Observable.combineLatest(
+                musicServiceInteractor.getNotificationSettingObservable(),
+                themeController.getAppThemeObservable(),
+                (setting, theme) -> setting)
                 .subscribe(this::onNotificationSettingReceived));
     }
 
@@ -324,10 +331,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 .putLong(METADATA_KEY_DURATION, composition.getDuration());
         Bitmap bitmap = null;
         if (setting.isCoversOnLockScreen()) {
-            bitmap = getCompositionImage(composition);
-            if (bitmap == null) {
-                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification_large_icon);//default icon
-            }
+            bitmap = ImageFormatUtils.getNotificationImage(composition);
         }
         builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
         mediaSession.setMetadata(builder.build());

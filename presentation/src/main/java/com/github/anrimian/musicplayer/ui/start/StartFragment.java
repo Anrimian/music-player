@@ -9,14 +9,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import moxy.MvpAppCompatFragment;
+import moxy.presenter.InjectPresenter;
 
 /**
  * Created on 19.10.2017.
@@ -64,10 +65,11 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     }
 
     @Override
-    public void startSystemUi() {
+    public void startSystemServices() {
         AppComponent appComponent = Components.getAppComponent();
         appComponent.widgetUpdater().start();
         appComponent.notificationDisplayer().removeErrorNotification();
+        appComponent.mediaStorageRepository().initialize();
     }
 
     @Override

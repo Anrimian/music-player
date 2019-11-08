@@ -4,10 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.ColorInt;
+import androidx.core.content.ContextCompat;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
+
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class ThemeController {
@@ -16,9 +23,13 @@ public class ThemeController {
 
     private static final String THEME_ID = "theme_id";
 
-    private SharedPreferencesHelper preferences;
+    private BehaviorSubject<AppTheme> themeSubject = BehaviorSubject.create();
+
+    private final Context context;
+    private final SharedPreferencesHelper preferences;
 
     public ThemeController(Context context) {
+        this.context = context;
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         this.preferences = new SharedPreferencesHelper(sharedPreferences);
     }
@@ -44,10 +55,21 @@ public class ThemeController {
         updateTaskManager(activity);
 
         activity.recreate();
+
+        themeSubject.onNext(appTheme);
     }
 
     public AppTheme getCurrentTheme() {
         return AppTheme.getTheme(preferences.getInt(THEME_ID, 0));
+    }
+
+    @ColorInt
+    public int getPrimaryThemeColor() {
+        return ContextCompat.getColor(context, getCurrentTheme().getBackgroundColorId());
+    }
+
+    public Observable<AppTheme> getAppThemeObservable() {
+        return withDefaultValue(themeSubject, this::getCurrentTheme);
     }
 
     private void updateTaskManager(Activity activity) {

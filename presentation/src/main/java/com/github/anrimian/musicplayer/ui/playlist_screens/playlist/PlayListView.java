@@ -1,19 +1,19 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.List;
+
+import moxy.MvpView;
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
+import moxy.viewstate.strategy.OneExecutionStateStrategy;
+import moxy.viewstate.strategy.SkipStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 
 public interface PlayListView extends MvpView {
 
@@ -29,7 +29,7 @@ public interface PlayListView extends MvpView {
     void showLoading();
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updateItemsList(ListUpdate<PlayListItem> update, boolean coversEnabled);
+    void updateItemsList(List<PlayListItem> list);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
@@ -74,7 +74,7 @@ public interface PlayListView extends MvpView {
     void notifyItemMoved(int from, int to);
 
     @StateStrategyType(SkipStrategy.class)
-    void showCompositionActionDialog(Composition composition);
+    void showCompositionActionDialog(PlayListItem playListItem, int position);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);

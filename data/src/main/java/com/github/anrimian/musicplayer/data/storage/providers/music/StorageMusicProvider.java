@@ -10,7 +10,9 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 
-import com.github.anrimian.musicplayer.data.storage.providers.UpdateMediaStoreException;
+import androidx.collection.LongSparseArray;
+
+import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
@@ -19,8 +21,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
@@ -30,17 +30,14 @@ import static android.provider.MediaStore.Audio.Media.ALBUM;
 import static android.provider.MediaStore.Audio.Media.ARTIST;
 import static android.provider.MediaStore.Audio.Media.DATE_ADDED;
 import static android.provider.MediaStore.Audio.Media.DATE_MODIFIED;
-import static android.provider.MediaStore.Audio.Media.DISPLAY_NAME;
 import static android.provider.MediaStore.Audio.Media.DURATION;
 import static android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 import static android.provider.MediaStore.Audio.Media.IS_MUSIC;
 import static android.provider.MediaStore.Audio.Media.TITLE;
 import static android.provider.MediaStore.Audio.Media._ID;
-import static java.util.Collections.emptyMap;
+import static android.text.TextUtils.isEmpty;
 
 public class StorageMusicProvider {
-
-    private static final int CHANGE_EVENTS_WINDOW_SECONDS = 5;
 
     private final ContentResolver contentResolver;
 
@@ -48,23 +45,21 @@ public class StorageMusicProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<Map<Long, Composition>> getChangeObservable() {
+    public Observable<LongSparseArray<StorageComposition>> getCompositionsObservable() {
         return RxContentObserver.getObservable(contentResolver, EXTERNAL_CONTENT_URI)
-//                .doOnNext(o -> Log.d("KEK", "received update"))
-//                .throttleFirst(CHANGE_EVENTS_WINDOW_SECONDS, TimeUnit.SECONDS)//TODO not this, ask on so
                 .map(o -> getCompositions());
     }
 
-    public Map<Long, Composition> getCompositions() {
+    public LongSparseArray<StorageComposition> getCompositions() {
         return getCompositions(EXTERNAL_CONTENT_URI);
     }
 
-    public void deleteCompositions(List<Composition> compositions) {
+    public void deleteCompositions(List<Long> ids) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
-        for (Composition composition: compositions) {
+        for (Long storageId: ids) {
             ContentProviderOperation operation = ContentProviderOperation.newDelete(EXTERNAL_CONTENT_URI)
-                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(composition.getId()) })
+                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
             operations.add(operation);
@@ -84,7 +79,7 @@ public class StorageMusicProvider {
     }
 
     @Nullable
-    public Composition getComposition(long id) {
+    public StorageComposition getComposition(long id) {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -105,25 +100,29 @@ public class StorageMusicProvider {
         }
     }
 
-    public void updateCompositionAuthor(Composition composition, String author) {
-        updateComposition(composition.getId(), ARTIST, author);
+    public void updateCompositionAuthor(long id, String author) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.ARTIST, author);
     }
 
-    public void updateCompositionTitle(Composition composition, String title) {
-        updateComposition(composition.getId(), TITLE, title);
+    public void updateCompositionTitle(long id, String title) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.TITLE, title);
     }
 
-    public void updateCompositionFilePath(Composition composition, String filePath) {
-        updateComposition(composition.getId(), MediaStore.Images.Media.DATA, filePath);
+    public void updateCompositionFilePath(long id, String filePath) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.DATA, filePath);
     }
 
     public void updateCompositionsFilePath(List<Composition> compositions) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         for (Composition composition: compositions) {
+            Long storageId = composition.getStorageId();
+            if (storageId == null) {
+                continue;
+            }
             ContentProviderOperation operation = ContentProviderOperation.newUpdate(EXTERNAL_CONTENT_URI)
                     .withValue(MediaStore.Images.Media.DATA, composition.getFilePath())
-                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(composition.getId()) })
+                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
             operations.add(operation);
@@ -141,11 +140,11 @@ public class StorageMusicProvider {
         cv.put(key, value);
         contentResolver.update(EXTERNAL_CONTENT_URI,
                 cv,
-                MediaStore.Audio.Playlists._ID + " = ?",
+                _ID + " = ?",
                 new String[] { String.valueOf(id) });
     }
 
-    private Map<Long, Composition> getCompositions(Uri uri) {
+    private LongSparseArray<StorageComposition> getCompositions(Uri uri) {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -155,7 +154,6 @@ public class StorageMusicProvider {
                             TITLE,
                             ALBUM,
                             MediaStore.Images.Media.DATA,
-                            DISPLAY_NAME,
                             DURATION,
                             MediaStore.Images.Media.SIZE,
                             _ID,
@@ -165,16 +163,17 @@ public class StorageMusicProvider {
                     new String[] { String.valueOf(1) },
                     null);
             if (cursor == null) {
-                return emptyMap();
+                return new LongSparseArray<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            Map<Long, Composition> compositions = new ConcurrentHashMap<>(cursor.getCount());
+            LongSparseArray<StorageComposition> compositions = new LongSparseArray<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
-                Composition composition = getCompositionFromCursor(cursorWrapper);
-                checkCorruptedComposition(composition);
-                compositions.put(composition.getId(), composition);
+                StorageComposition composition = getCompositionFromCursor(cursorWrapper);
+                if (composition != null) {
+                    compositions.put(composition.getId(), composition);
+                }
             }
             return compositions;
         } finally {
@@ -182,14 +181,15 @@ public class StorageMusicProvider {
         }
     }
 
-    private Composition getCompositionFromCursor(CursorWrapper cursorWrapper) {
+    private StorageComposition getCompositionFromCursor(CursorWrapper cursorWrapper) {
+
         String artist = cursorWrapper.getString(ARTIST);
         String title = cursorWrapper.getString(TITLE);
         String album = cursorWrapper.getString(ALBUM);
         String filePath = cursorWrapper.getString(MediaStore.Images.Media.DATA);
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
-        String displayName = cursorWrapper.getString(DISPLAY_NAME);
+//        String displayName = cursorWrapper.getString(DISPLAY_NAME);
 //        String mimeType = cursorWrapper.getString(MediaStore.Audio.Media.MIME_TYPE);
 
         long duration = cursorWrapper.getLong(DURATION);
@@ -198,8 +198,8 @@ public class StorageMusicProvider {
 //        long artistId = cursorWrapper.getLong(MediaStore.Audio.Media.ARTIST_ID);
 //        long bookmark = cursorWrapper.getLong(MediaStore.Audio.Media.BOOKMARK);
 //        long albumId = cursorWrapper.getLong(MediaStore.Audio.Media.ALBUM_ID);
-        long dateAdded = cursorWrapper.getLong(DATE_ADDED);
-        long dateModified = cursorWrapper.getLong(DATE_MODIFIED);
+        long dateAddedMillis = cursorWrapper.getLong(DATE_ADDED);
+        long dateModifiedMillis = cursorWrapper.getLong(DATE_MODIFIED);
 
 //        boolean isAlarm = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_ALARM);
 //        boolean isMusic = cursorWrapper.getBoolean(MediaStore.Audio.Media.IS_MUSIC);
@@ -209,38 +209,40 @@ public class StorageMusicProvider {
 
 //        @Nullable Integer year = cursorWrapper.getInt(YEAR);
 
+        if (isEmpty(filePath)) {
+            return null;
+        }
+        Date dateAdded;
+        if (dateAddedMillis == 0) {
+            dateAdded = new Date(System.currentTimeMillis());
+        } else {
+            dateAdded = new Date(dateAddedMillis * 1000L);
+        }
+        Date dateModified;
+        if (dateModifiedMillis == 0) {
+            dateModified = new Date(System.currentTimeMillis());
+        } else {
+            dateModified  = new Date(dateModifiedMillis * 1000L);
+        }
+
         if (artist.equals("<unknown>")) {
             artist = null;
         }
 
-        Composition composition = new Composition();
-        //composition
-        composition.setArtist(artist);
-        composition.setTitle(title);
-        composition.setAlbum(album);
-        composition.setFilePath(filePath);
-//        composition.setComposer(composer);
-        composition.setDisplayName(displayName);
+//        CorruptionType corruptionType = null;
+//        if (duration == 0) {
+//            corruptionType = CorruptionType.UNKNOWN;
+//        }
 
-        composition.setDuration(duration);
-        composition.setSize(size);
-        composition.setId(id);
-        composition.setDateAdded(new Date(dateAdded * 1000L));
-        composition.setDateModified(new Date(dateModified * 1000L));
-
-//        composition.setAlarm(isAlarm);
-//        composition.setMusic(isMusic);
-//        composition.setNotification(isNotification);
-//        composition.setPodcast(isPodcast);
-//        composition.setRingtone(isRingtone);
-
-//        composition.setYear(year);
-        return composition;
-    }
-
-    private void checkCorruptedComposition(Composition composition) {
-        if (composition.getDuration() == 0) {
-            composition.setCorrupted(true);
-        }
+        return new StorageComposition(
+                artist,
+                title,
+                album,
+                filePath,
+                duration,
+                size,
+                id,
+                dateAdded,
+                dateModified);
     }
 }

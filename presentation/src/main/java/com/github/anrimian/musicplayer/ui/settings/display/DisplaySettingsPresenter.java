@@ -1,11 +1,11 @@
 package com.github.anrimian.musicplayer.ui.settings.display;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 @InjectViewState
 public class DisplaySettingsPresenter extends MvpPresenter<DisplaySettingsView> {

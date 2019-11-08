@@ -112,7 +112,9 @@
     <string name="about_app_text">Нашли ошибку? Экран отображается некорректо или медленно? Недостаёт какой-либо функциональности? Напишите мне об этом, буду благодарен обратной связи.</string>
     <string name="send_email">Отправить email</string>
     <string name="theme">Тема оформления</string>
-    <string name="white_theme">Светлая</string>
+    <string name="white_purple_theme">Светлая(Фиолетовая)</string>
+    <string name="white_indigo_theme">Светлая(Синяя)</string>
+    <string name="white_teal_theme">Светлая(Зелёная)</string>
     <string name="dark_theme">Тёмная</string>
     <string name="edit">Редактировать</string>
     <string name="edit_tags">Редактировать теги</string>
@@ -132,6 +134,9 @@
     <string name="move_in_the_same_folder_error">Целевая и исходная папка совпадают</string>
     <string name="file_already_exists">Файл с таким именем уже существует</string>
     <string name="new_folder">Новая папка</string>
+    <string name="play_on_connect_bluetooth_device">Начинать воспроизведение при подключении bluetooth гарнитуры</string>
+    <string name="headset">Гарнитура</string>
+    <string name="scan_storage">Пересканировать системную библиотеку</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

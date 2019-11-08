@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.start;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 /**
  * Created on 19.10.2017.
@@ -18,7 +18,7 @@ public class StartPresenter extends MvpPresenter<StartView> {
 
     void onFilesPermissionResult(boolean granted) {
         if (granted) {
-            getViewState().startSystemUi();
+            getViewState().startSystemServices();
             getViewState().goToMainScreen();
         } else {
             getViewState().showDeniedPermissionMessage();

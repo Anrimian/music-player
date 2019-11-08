@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore.Audio.Playlists;
 
+import androidx.collection.LongSparseArray;
+
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotMovedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
@@ -21,9 +23,7 @@ import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -33,9 +33,7 @@ import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
 import static android.text.TextUtils.isEmpty;
-import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 public class StoragePlayListsProvider {
 
@@ -45,12 +43,12 @@ public class StoragePlayListsProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<Map<Long, StoragePlayList>> getChangeObservable() {
+    public Observable<LongSparseArray<StoragePlayList>> getPlayListsObservable() {
         return RxContentObserver.getObservable(contentResolver, Playlists.EXTERNAL_CONTENT_URI)
                 .map(o -> getPlayLists());
     }
 
-    public Map<Long, StoragePlayList> getPlayLists() {
+    public LongSparseArray<StoragePlayList> getPlayLists() {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -60,20 +58,39 @@ public class StoragePlayListsProvider {
                     null,
                     null);
             if (cursor == null) {
-                return emptyMap();
+                return new LongSparseArray<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
 
-            Map<Long, StoragePlayList> map = new HashMap<>();
+            LongSparseArray<StoragePlayList> map = new LongSparseArray<>();
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
                 StoragePlayList playList = getPlayListFromCursor(cursorWrapper);
-                map.put(playList.getId(), playList);
+                if (playList != null) {
+                    map.put(playList.getId(), playList);
+                }
             }
             return map;
         } finally {
             IOUtils.closeSilently(cursor);
         }
+    }
+
+    public Long createPlayList(String name, Date dateAdded, Date dateModified) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Playlists.NAME, name);
+        contentValues.put(Playlists.DATE_ADDED, dateAdded.getTime() / 1000L);
+        contentValues.put(Playlists.DATE_MODIFIED, dateModified.getTime() / 1000L);
+        Uri uri = contentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, contentValues);
+        if (uri == null || isEmpty(uri.getLastPathSegment())) {
+            return null;
+        }
+        long id = Long.valueOf(uri.getLastPathSegment());
+        StoragePlayList playList = findPlayList(id);
+        if (playList == null) {
+            return null;
+        }
+        return playList.getId();
     }
 
     public StoragePlayList createPlayList(String name) {
@@ -106,7 +123,7 @@ public class StoragePlayListsProvider {
         }
     }
 
-    public Observable<List<StoragePlayListItem>> getPlayListChangeObservable(long playListId) {
+    public Observable<List<StoragePlayListItem>> getPlayListEntriesObservable(long playListId) {
         return RxContentObserver.getObservable(contentResolver, getContentUri("external", playListId))
                 .debounce(new FastDebounceFilter<>())
                 .map(o -> getPlayListItems(playListId));
@@ -155,7 +172,10 @@ public class StoragePlayListsProvider {
         int position = startPosition;
         ContentValues[] valuesList = new ContentValues[compositions.size()];
         for (int i = 0; i < compositions.size(); i++) {
-            long compositionId = compositions.get(i).getId();
+            Long compositionId = compositions.get(i).getStorageId();
+            if (compositionId == null) {
+                continue;
+            }
             ContentValues values = new ContentValues();
             values.put(Playlists.Members.PLAY_ORDER, position);
             values.put(Playlists.Members.AUDIO_ID, compositionId);
@@ -164,11 +184,16 @@ public class StoragePlayListsProvider {
             position++;
         }
 
-        int inserted = contentResolver.bulkInsert(getContentUri("external", playListId), valuesList);
-        if (inserted == 0) {
-            throw new PlayListNotModifiedException();
-        }
-        updateModifyTime(playListId);
+        try {
+            int inserted = contentResolver.bulkInsert(
+                    getContentUri("external", playListId),
+                    valuesList
+            );
+            if (inserted == 0) {
+                throw new PlayListNotModifiedException();
+            }
+            updateModifyTime(playListId);
+        } catch (SecurityException ignored) {}
     }
 
     public void deleteItemFromPlayList(long itemId, long playListId) {
@@ -236,14 +261,18 @@ public class StoragePlayListsProvider {
         return new StoragePlayListItem(itemId, audioId);
     }
 
+    @Nullable
     private StoragePlayList getPlayListFromCursor(CursorWrapper cursorWrapper) {
         long id = cursorWrapper.getLong(Playlists._ID);
         String name = cursorWrapper.getString(Playlists.NAME);
+        if (name == null) {
+            return null;
+        }
         long dateAdded = cursorWrapper.getLong(Playlists.DATE_ADDED);
         long dateModified = cursorWrapper.getLong(Playlists.DATE_MODIFIED);
 
         return new StoragePlayList(id,
-                requireNonNull(name),
+                name,
                 new Date(dateAdded * 1000L),
                 new Date(dateModified * 1000L));
     }

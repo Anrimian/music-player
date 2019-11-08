@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.DescComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.AlphabeticalCompositionComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.CreateDateCompositionComparator;
@@ -7,7 +8,6 @@ import com.github.anrimian.musicplayer.data.repositories.music.comparators.folde
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.CreateDateFileComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.folder.FolderComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.musicplayer.data.repositories.music.search.CompositionSearchFilter;
 import com.github.anrimian.musicplayer.data.repositories.music.search.FileSourceSearchFilter;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -33,8 +33,6 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.domain.utils.search.ListSearchFilter.filterList;
-
 /**
  * Created on 24.10.2017.
  */
@@ -42,15 +40,18 @@ import static com.github.anrimian.musicplayer.domain.utils.search.ListSearchFilt
 public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     private final StorageMusicDataSource storageMusicDataSource;
+    private final CompositionsDaoWrapper compositionsDao;
     private final MusicFolderDataSource musicFolderDataSource;
     private final SettingsRepository settingsPreferences;
     private final Scheduler scheduler;
 
     public MusicProviderRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
+                                       CompositionsDaoWrapper compositionsDao,
                                        MusicFolderDataSource musicFolderDataSource,
                                        SettingsRepository settingsPreferences,
                                        Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
+        this.compositionsDao = compositionsDao;
         this.musicFolderDataSource = musicFolderDataSource;
         this.settingsPreferences = settingsPreferences;
         this.scheduler = scheduler;
@@ -58,17 +59,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText) {
-        return storageMusicDataSource.getCompositionObservable()
-                .map(this::toSortedList)
-                .map(list -> filterList(list, searchText, new CompositionSearchFilter()))
-                .subscribeOn(scheduler);
+        return compositionsDao.getAllObservable(settingsPreferences.getCompositionsOrder(), searchText);
     }
 
     @Override
     public Observable<Composition> getCompositionObservable(long id) {
-        return storageMusicDataSource.getCompositionObservable()
-                .flatMap(compositions -> findComposition(compositions, id))
-                .subscribeOn(scheduler);
+        return compositionsDao.getCompositionObservable(id);
     }
 
     @Override

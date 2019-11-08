@@ -63,7 +63,7 @@
 
     <TextView
         android:id="@+id/tv_current_composition"
-        style="@style/TextStyle.Medium"
+        style="@style/TextStyle.Composition"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"

@@ -1,21 +1,21 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
+
+import moxy.MvpView;
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
+import moxy.viewstate.strategy.OneExecutionStateStrategy;
+import moxy.viewstate.strategy.SkipStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 
 /**
  * Created on 02.11.2017.
@@ -48,7 +48,7 @@ public interface PlayerView extends MvpView {
     void scrollQueueToPosition(int position, boolean smoothScroll);
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updatePlayQueue(ListUpdate<PlayQueueItem> update, boolean keepPosition);
+    void updatePlayQueue(List<PlayQueueItem> items);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showRepeatMode(int mode);

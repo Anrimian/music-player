@@ -12,8 +12,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -27,9 +25,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayList
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.DiffUtilHelper;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -37,6 +32,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.MvpAppCompatFragment;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
 
@@ -85,6 +83,13 @@ public class PlayListsFragment extends MvpAppCompatFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        adapter = new PlayListsAdapter(
+                recyclerView,
+                this::goToPlayListScreen,
+                presenter::onPlayListLongClick
+        );
+        recyclerView.setAdapter(adapter);
+
         MenuDialogFragment fragment = (MenuDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(PLAY_LIST_MENU);
         if (fragment != null) {
@@ -119,17 +124,8 @@ public class PlayListsFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void updateList(ListUpdate<PlayList> update) {
-        List<PlayList> list = update.getNewList();
-        if (adapter == null) {
-            adapter = new PlayListsAdapter(list);
-            adapter.setOnItemClickListener(this::goToPlayListScreen);
-            adapter.setOnItemLongClickListener(presenter::onPlayListLongClick);
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.setItems(list);
-            DiffUtilHelper.update(update.getDiffResult(), recyclerView);
-        }
+    public void updateList(List<PlayList> lists) {
+        adapter.submitList(lists);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
@@ -10,11 +8,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +18,8 @@ import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
@@ -35,7 +32,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 @InjectViewState
 public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
-    private final MusicPlayerInteractor musicPlayerInteractor;
+    private final MusicPlayerInteractor playerInteractor;
     private final PlayListsInteractor playListsInteractor;
     private final PlayerScreenInteractor playerScreenInteractor;
     private final ErrorParser errorParser;
@@ -45,10 +42,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final CompositeDisposable batterySafeDisposable = new CompositeDisposable();
 
     private List<PlayQueueItem> playQueue = new ArrayList<>();
-
-    private final DiffCalculator<PlayQueueItem> diffCalculator = new DiffCalculator<>(
-            () -> playQueue,
-            PlayQueueItemHelper::areSourcesTheSame);
 
     private PlayQueueItem currentItem;
     private boolean isCoversEnabled = false;
@@ -66,7 +59,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                            PlayerScreenInteractor playerScreenInteractor,
                            ErrorParser errorParser,
                            Scheduler uiScheduler) {
-        this.musicPlayerInteractor = musicPlayerInteractor;
+        this.playerInteractor = musicPlayerInteractor;
         this.playListsInteractor = playListsInteractor;
         this.playerScreenInteractor = playerScreenInteractor;
         this.errorParser = errorParser;
@@ -77,7 +70,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         getViewState().setSkipToNextButtonEnabled(true);
-        getViewState().showRandomPlayingButton(musicPlayerInteractor.isRandomPlayingEnabled());
+        getViewState().showRandomPlayingButton(playerInteractor.isRandomPlayingEnabled());
         if (playerScreenInteractor.isPlayerPanelOpen()) {
             getViewState().expandBottomPanel();
         } else {
@@ -134,28 +127,28 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onPlayButtonClicked() {
-        musicPlayerInteractor.play();
+        playerInteractor.play();
     }
 
     void onStopButtonClicked() {
-        musicPlayerInteractor.pause();
+        playerInteractor.pause();
     }
 
     void onSkipToPreviousButtonClicked() {
-        musicPlayerInteractor.skipToPrevious();
+        playerInteractor.skipToPrevious();
     }
 
     void onSkipToNextButtonClicked() {
-        musicPlayerInteractor.skipToNext();
+        playerInteractor.skipToNext();
     }
 
     void onRepeatModeChanged(int mode) {
-        musicPlayerInteractor.setRepeatMode(mode);
+        playerInteractor.setRepeatMode(mode);
     }
 
     void onRandomPlayingButtonClicked(boolean enable) {
         scrollToPositionAfterUpdate = true;
-        musicPlayerInteractor.setRandomPlayingEnabled(enable);
+        playerInteractor.setRandomPlayingEnabled(enable);
         getViewState().showRandomPlayingButton(enable);
     }
 
@@ -165,13 +158,22 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onCompositionItemClicked(int position, PlayQueueItem item) {
         this.currentItem = item;
-        musicPlayerInteractor.skipToPosition(position);
+        playerInteractor.skipToPosition(position);
 
         onCurrentCompositionChanged(item, 0);
     }
 
+    void onQueueItemIconClicked(int position, PlayQueueItem playQueueItem) {
+        if (playQueueItem.equals(currentItem)) {
+            playerInteractor.playOrPause();
+        } else {
+            playerInteractor.play();
+            onCompositionItemClicked(position, playQueueItem);
+        }
+    }
+
     void onTrackRewoundTo(int progress) {
-        musicPlayerInteractor.seekTo(progress);
+        playerInteractor.seekTo(progress);
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
@@ -215,11 +217,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onSeekStart() {
-        musicPlayerInteractor.onSeekStarted();
+        playerInteractor.onSeekStarted();
     }
 
     void onSeekStop(int progress) {
-        musicPlayerInteractor.onSeekFinished(progress);
+        playerInteractor.onSeekFinished(progress);
     }
 
     void onItemSwipedToDelete(Integer position) {
@@ -259,17 +261,17 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (toItem.equals(currentItem)) {
             currentPosition = from;
         }
-        musicPlayerInteractor.swapItems(fromItem, from, toItem, to);
+        playerInteractor.swapItems(fromItem, from, toItem, to);
     }
 
     private void deletePlayQueueItem(PlayQueueItem item) {
-        musicPlayerInteractor.removeQueueItem(item)
+        playerInteractor.removeQueueItem(item)
                 .observeOn(uiScheduler)
                 .subscribe();
     }
 
     private void subscribeOnRepeatMode() {
-        musicPlayerInteractor.getRepeatModeObservable()
+        playerInteractor.getRepeatModeObservable()
                 .observeOn(uiScheduler)
                 .subscribe(getViewState()::showRepeatMode);
     }
@@ -282,7 +284,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void deletePreparedCompositions() {
-        musicPlayerInteractor.deleteCompositions(compositionsToDelete)
+        playerInteractor.deleteCompositions(compositionsToDelete)
                 .observeOn(uiScheduler)
                 .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionError);
     }
@@ -309,7 +311,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnCurrentCompositionChanging() {
-        batterySafeDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
+        batterySafeDisposable.add(playerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayQueueEventReceived));
     }
@@ -327,15 +329,20 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showCurrentQueueItem(newItem, isCoversEnabled);
         if (newItem != null) {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
-            Integer position = musicPlayerInteractor.getQueuePosition(newItem);
-            if (position != null) {
-                scrollToItemPosition(position);
-            }
+            scrollToItemPosition(newItem);
         }
     }
 
+    private void scrollToItemPosition(PlayQueueItem newItem) {
+        playerInteractor.getQueuePosition(newItem)
+                .observeOn(uiScheduler)
+                .doOnSuccess(this::scrollToItemPosition)
+                .onErrorComplete()
+                .subscribe();
+    }
+
     private void subscribeOnPlayerStateChanges() {
-        batterySafeDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+        batterySafeDisposable.add(playerInteractor.getPlayerStateObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayerStateChanged));
     }
@@ -353,25 +360,21 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnPlayQueue() {
-        batterySafeDisposable.add(musicPlayerInteractor.getPlayQueueObservable()
-                .map(diffCalculator::calculateChange)
+        batterySafeDisposable.add(playerInteractor.getPlayQueueObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError));
     }
 
-    private void onPlayQueueChanged(ListUpdate<PlayQueueItem> update) {
-        playQueue = update.getNewList();
+    private void onPlayQueueChanged(List<PlayQueueItem> list) {
+        playQueue = list;
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setMusicControlsEnabled(!playQueue.isEmpty());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
-        getViewState().updatePlayQueue(update, !scrollToPositionAfterUpdate);
+        getViewState().updatePlayQueue(list);
         if (scrollToPositionAfterUpdate) {
             scrollToPositionAfterUpdate = false;
             if (currentItem != null) {
-                Integer position = musicPlayerInteractor.getQueuePosition(currentItem);
-                if (position != null) {
-                    scrollToItemPosition(position);
-                }
+                scrollToItemPosition(currentItem);
             }
         }
     }
@@ -391,7 +394,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnTrackPositionChanging() {
-        batterySafeDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
+        batterySafeDisposable.add(playerInteractor.getTrackPositionObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onTrackPositionChanged));
     }

@@ -1,14 +1,16 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.choose;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
+
+import java.util.List;
+
+import moxy.MvpView;
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
+import moxy.viewstate.strategy.OneExecutionStateStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 
 public interface ChoosePlayListView extends MvpView {
 
@@ -24,7 +26,7 @@ public interface ChoosePlayListView extends MvpView {
     void showLoading();
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updateList(ListUpdate<PlayList> listUpdate);
+    void updateList(List<PlayList> list);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showBottomSheetSlided(float slideOffset);

@@ -1,21 +1,20 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
+
+import moxy.MvpView;
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
+import moxy.viewstate.strategy.OneExecutionStateStrategy;
+import moxy.viewstate.strategy.SkipStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 
 public interface LibraryCompositionsView extends MvpView {
 
@@ -37,7 +36,7 @@ public interface LibraryCompositionsView extends MvpView {
     void showLoadingError(ErrorCommand errorCommand);
 
     @StateStrategyType(ListStateStrategyStrategy.class)
-    void updateList(ListUpdate<Composition> update, HashSet<Composition> selectedCompositionsMap);
+    void updateList(List<Composition> list);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order order);
@@ -79,7 +78,7 @@ public interface LibraryCompositionsView extends MvpView {
     void showCurrentPlayingComposition(Composition composition);
 
     @StateStrategyType(SkipStrategy.class)
-    void showCompositionActionDialog(Composition composition);
+    void showCompositionActionDialog(Composition composition, int position);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);
@@ -89,4 +88,7 @@ public interface LibraryCompositionsView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void setDisplayCoversEnabled(boolean isCoversEnabled);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showPlayState(boolean play);
 }

@@ -7,8 +7,10 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter.DiffListAdapter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,23 +23,26 @@ import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
  * Created on 31.10.2017.
  */
 
-public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
+public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewHolder> {
 
     private final Set<MusicViewHolder> viewHolders = new HashSet<>();
 
-    private List<Composition> musicList;
     private final HashSet<Composition> selectedCompositions;
     private OnPositionItemClickListener<Composition> onCompositionClickListener;
-    private OnViewItemClickListener<Composition> onMenuItemClickListener;
     private OnPositionItemClickListener<Composition> onLongClickListener;
+    private OnPositionItemClickListener<Composition> iconClickListener;
 
     @Nullable
     private Composition currentComposition;
+    private boolean play;
     private boolean isCoversEnabled;
 
-    public CompositionsAdapter(List<Composition> musicList,
+    public CompositionsAdapter(RecyclerView recyclerView,
                                HashSet<Composition> selectedCompositions) {
-        this.musicList = musicList;
+        super(recyclerView, new SimpleDiffItemCallback<>(
+                CompositionHelper::areSourcesTheSame,
+                CompositionHelper::getChangePayload)
+        );
         this.selectedCompositions = selectedCompositions;
     }
 
@@ -46,19 +51,22 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MusicViewHolder(parent,
                 onCompositionClickListener,
-                onMenuItemClickListener,
-                onLongClickListener);
+                onLongClickListener,
+                iconClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MusicViewHolder holder, int position) {
         viewHolders.add(holder);
 
-        Composition composition = musicList.get(position);
+        Composition composition = getItem(position);
         holder.bind(composition, isCoversEnabled);
         boolean selected = selectedCompositions.contains(composition);
         holder.setSelected(selected);
-        holder.setPlaying(composition.equals(currentComposition));
+
+        boolean isCurrentComposition = composition.equals(currentComposition);
+        holder.showAsCurrentComposition(isCurrentComposition);
+        holder.showAsPlaying(isCurrentComposition && play);
     }
 
     @Override
@@ -78,22 +86,14 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
                 holder.setSelected(false);
                 return;
             }
+            holder.update(getItem(position), payloads);
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return musicList.size();
     }
 
     @Override
     public void onViewRecycled(@NonNull MusicViewHolder holder) {
         super.onViewRecycled(holder);
         viewHolders.remove(holder);
-    }
-
-    public void setItems(List<Composition> list) {
-        musicList = list;
     }
 
     public void setItemSelected(int position) {
@@ -114,18 +114,21 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
-    public void setOnMenuItemClickListener(OnViewItemClickListener<Composition> onMenuItemClickListener) {
-        this.onMenuItemClickListener = onMenuItemClickListener;
-    }
-
     public void setOnLongClickListener(OnPositionItemClickListener<Composition> onLongClickListener) {
         this.onLongClickListener = onLongClickListener;
     }
 
-    public void showPlayingComposition(Composition composition) {
-        currentComposition = composition;
+    public void setIconClickListener(OnPositionItemClickListener<Composition> iconClickListener) {
+        this.iconClickListener = iconClickListener;
+    }
+
+    public void showCurrentComposition(Composition currentComposition) {
+        this.currentComposition = currentComposition;
         for (MusicViewHolder holder: viewHolders) {
-            holder.setPlaying(holder.getComposition().equals(composition));
+            Composition composition = holder.getComposition();
+            boolean isCurrentComposition = composition.equals(currentComposition);
+            holder.showAsCurrentComposition(isCurrentComposition);
+            holder.showAsPlaying(isCurrentComposition && play);
         }
     }
 
@@ -133,6 +136,16 @@ public class CompositionsAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.isCoversEnabled = isCoversEnabled;
         for (MusicViewHolder holder: viewHolders) {
             holder.setCoversVisible(isCoversEnabled);
+        }
+    }
+
+    public void showPlaying(boolean play) {
+        this.play = play;
+        for (MusicViewHolder holder: viewHolders) {
+            Composition composition = holder.getComposition();
+            boolean isCurrentComposition = composition.equals(currentComposition);
+            holder.showAsCurrentComposition(isCurrentComposition);
+            holder.showAsPlaying(isCurrentComposition && play);
         }
     }
 }

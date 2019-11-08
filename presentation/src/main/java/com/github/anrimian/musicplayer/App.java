@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer;
 import com.github.anrimian.musicplayer.utils.Permissions;
 import com.github.anrimian.musicplayer.utils.acra.AcraReportDialog;
@@ -33,8 +34,10 @@ public class App extends Application {
             initAcra();
         }
 
+        AppComponent appComponent = Components.getAppComponent();
         if (Permissions.hasFilePermission(this)) {
-            Components.getAppComponent().widgetUpdater().start();
+            appComponent.widgetUpdater().start();
+            appComponent.mediaStorageRepository().initialize();
         }
     }
 

@@ -9,7 +9,7 @@ allprojects {
 
 ext {
     //Android
-    androidBuildToolsVersion = "28.0.3"
+    androidBuildToolsVersion = "29.0.2"
     androidMinSdkVersion = 21//16
     androidTargetSdkVersion = 29
     androidCompileSdkVersion = 29
@@ -27,7 +27,7 @@ ext {
     rxAndroidVersion = "2.0.1"
     rxPermissionsVersion = "0.9.4@aar"
     acraVersion = "4.9.0"
-    moxyVersion = "1.5.3"
+    moxyVersion = "2.0.2"
     butterKnifeVersion = "10.1.0"
     daggerVersion = "2.24"
     exoPlayerVersion = "2.9.6"
@@ -61,8 +61,10 @@ ext {
     rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     rxPermissions = "com.tbruyelle.rxpermissions2:rxpermissions:$rxPermissionsVersion"
 
-    moxy = "com.arello-mobile:moxy-app-compat:$moxyVersion"
-    moxyCompiler = "com.arello-mobile:moxy-compiler:$moxyVersion"
+    moxy = "com.github.moxy-community:moxy:$moxyVersion"
+    moxyCompiler = "com.github.moxy-community:moxy-compiler:$moxyVersion"
+    moxyAppcompat = "com.github.moxy-community:moxy-androidx:$moxyVersion"
+    moxyMaterial = "com.github.moxy-community:moxy-material:$moxyVersion"
 
     acra = "ch.acra:acra:$acraVersion"
 
@@ -82,6 +84,7 @@ ext {
     room = "androidx.room:room-runtime:$roomVersion"
     roomRx = "androidx.room:room-rxjava2:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
+    roomTest = "android.arch.persistence.room:testing:$roomVersion"
 
     //develop
     javaxAnnotation = "com.google.code.findbugs:jsr305:$javaxAnnotationVersion"

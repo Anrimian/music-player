@@ -1,9 +1,10 @@
 package com.github.anrimian.musicplayer.ui.start;
 
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+
+import moxy.MvpView;
+import moxy.viewstate.strategy.OneExecutionStateStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 
 /**
  * Created on 19.10.2017.
@@ -26,5 +27,5 @@ interface StartView extends MvpView {
     void showStub();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void startSystemUi();
+    void startSystemServices();
 }

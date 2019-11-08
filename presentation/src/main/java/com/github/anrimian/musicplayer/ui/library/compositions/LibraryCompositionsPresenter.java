@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
@@ -10,15 +8,14 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.DiffCalculator;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.calculator.ListUpdate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +25,8 @@ import javax.annotation.Nullable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
@@ -51,11 +50,6 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     private List<Composition> compositions = new ArrayList<>();
     private final LinkedHashSet<Composition> selectedCompositions = new LinkedHashSet<>();
 
-    private final DiffCalculator<Composition> diffCalculator = new DiffCalculator<>(
-            () -> compositions,
-            CompositionHelper::areSourcesTheSame,
-            selectedCompositions::remove);
-
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
 
@@ -64,9 +58,6 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     @Nullable
     private Composition currentComposition;
-
-    private Composition compositionInAction;
-    private int compositionPositionInAction;
 
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
@@ -99,6 +90,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
     void onStart() {
         if (!compositions.isEmpty()) {
             subscribeOnCurrentComposition();
+            subscribeOnPlayState();
         }
     }
 
@@ -112,14 +104,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     void onCompositionClicked(int position, Composition composition) {
         if (selectedCompositions.isEmpty()) {
-            if (currentComposition != null) {
-                compositionInAction = composition;
-                compositionPositionInAction = position;
-                getViewState().showCompositionActionDialog(composition);
-            } else {
-                interactor.play(compositions, position);
-                getViewState().showCurrentPlayingComposition(composition);
-            }
+            getViewState().showCompositionActionDialog(composition, position);
         } else {
             if (selectedCompositions.contains(composition)) {
                 selectedCompositions.remove(composition);
@@ -136,7 +121,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         if (composition.equals(currentComposition)) {
             playerInteractor.playOrPause();
         } else {
-            interactor.play(compositions, position);
+            playerInteractor.startPlaying(compositions, position);
             getViewState().showCurrentPlayingComposition(composition);
         }
     }
@@ -243,16 +228,12 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         closeSelectionMode();
     }
 
-    void onPlayActionSelected() {
-        interactor.play(compositions, compositionPositionInAction);
+    void onPlayActionSelected(int position) {
+        interactor.play(compositions, position);
     }
 
-    void onPlayNextActionSelected() {
-        addCompositionsToPlayNext(asList(compositionInAction));
-    }
-
-    void onAddToQueueActionSelected() {
-        addCompositionsToEnd(asList(compositionInAction));
+    HashSet<Composition> getSelectedCompositions() {
+        return selectedCompositions;
     }
 
     private void addCompositionsToPlayNext(List<Composition> compositions) {
@@ -341,7 +322,6 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         }
         dispose(compositionsDisposable, presenterDisposable);
         compositionsDisposable = interactor.getCompositionsObservable(searchText)
-                .map(diffCalculator::calculateChange)
                 .observeOn(uiScheduler)
                 .subscribe(this::onCompositionsReceived, this::onCompositionsReceivingError);
         presenterDisposable.add(compositionsDisposable);
@@ -352,9 +332,9 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
         getViewState().showLoadingError(errorCommand);
     }
 
-    private void onCompositionsReceived(ListUpdate<Composition> listUpdate) {
-        compositions = listUpdate.getNewList();
-        getViewState().updateList(listUpdate, selectedCompositions);
+    private void onCompositionsReceived(List<Composition> compositions) {
+        this.compositions = compositions;
+        getViewState().updateList(compositions);
         if (compositions.isEmpty()) {
             if (TextUtils.isEmpty(searchText)) {
                 getViewState().showEmptyList();
@@ -366,6 +346,7 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
             if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
+                subscribeOnPlayState();
             }
         }
     }
@@ -378,5 +359,15 @@ public class LibraryCompositionsPresenter extends MvpPresenter<LibraryCompositio
 
     private void onUiSettingsReceived(boolean isCoversEnabled) {
         getViewState().setDisplayCoversEnabled(isCoversEnabled);
+    }
+
+    private void subscribeOnPlayState() {
+        presenterBatterySafeDisposable.add(playerInteractor.getPlayerStateObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onPlayerStateReceived));
+    }
+
+    private void onPlayerStateReceived(PlayerState state) {
+        getViewState().showPlayState(state == PlayerState.PLAY);
     }
 }

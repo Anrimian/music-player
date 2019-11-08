@@ -7,9 +7,10 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -22,12 +23,11 @@ public interface PlayQueueRepository {
 
     Completable setPlayQueue(List<Composition> compositions, int startPosition);
 
-    @Nullable
-    Integer getCompositionPosition(@Nonnull PlayQueueItem playQueueItem);
+    Maybe<Integer> getCompositionPosition(@Nonnull PlayQueueItem playQueueItem);
 
     Observable<PlayQueueEvent> getCurrentQueueItemObservable();
 
-    Observable<List<PlayQueueItem>> getPlayQueueObservable();
+    Flowable<List<PlayQueueItem>> getPlayQueueObservable();
 
     void setRandomPlayingEnabled(boolean enabled);
 

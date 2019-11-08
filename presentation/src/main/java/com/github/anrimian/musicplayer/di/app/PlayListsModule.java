@@ -2,8 +2,8 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepositoryImpl;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
@@ -64,9 +64,11 @@ public class PlayListsModule {
     @Nonnull
     @Singleton
     PlayListsRepository storagePlayListDataSource(StoragePlayListsProvider playListsProvider,
-                                                  StorageMusicDataSource storageMusicDataSource,
+                                                  PlayListsDaoWrapper playListsDaoWrapper,
                                                   @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new PlayListsRepositoryImpl(playListsProvider, storageMusicDataSource, scheduler);
+        return new PlayListsRepositoryImpl(playListsProvider,
+                playListsDaoWrapper,
+                scheduler);
     }
 
     @Provides

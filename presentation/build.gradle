@@ -39,8 +39,8 @@ android {
             applicationIdSuffix ".QA"
         }
         debug {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             applicationIdSuffix ".debug"
         }
 
@@ -75,6 +75,8 @@ dependencies {
     implementation deps.acra
 
     implementation deps.moxy
+    implementation deps.moxyAppcompat
+    implementation deps.moxyMaterial
     annotationProcessor deps.moxyCompiler
 
     implementation deps.butterKnife

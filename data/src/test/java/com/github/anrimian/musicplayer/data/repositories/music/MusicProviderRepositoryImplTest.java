@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
@@ -27,12 +28,14 @@ import static org.mockito.Mockito.when;
 public class MusicProviderRepositoryImplTest {
 
     private StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
+    private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
     private MusicFolderDataSource musicFolderDataSource = mock(MusicFolderDataSource.class);
     private SettingsRepositoryImpl settingsPreferences = mock(SettingsRepositoryImpl.class);
     private Scheduler scheduler = Schedulers.trampoline();
 
     private MusicProviderRepository musicProviderRepository = new MusicProviderRepositoryImpl(
             storageMusicDataSource,
+            compositionsDao,
             musicFolderDataSource,
             settingsPreferences,
             scheduler

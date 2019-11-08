@@ -3,13 +3,18 @@ package com.github.anrimian.musicplayer.ui.common.format;
 import android.content.Context;
 import android.view.View;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 
 import java.util.Locale;
 
@@ -102,5 +107,24 @@ public class FormatUtils {
             params.height = fab.getHeight();
             view.setLayoutParams(params);
         });
+    }
+
+    public static DragAndSwipeTouchHelperCallback withSwipeToDelete(RecyclerView recyclerView,
+                                                                    @ColorInt int backgroundColor,
+                                                                    Callback<Integer> swipeCallback,
+                                                                    int swipeFlags,
+                                                                    @DrawableRes int iconRes,
+                                                                    @StringRes int textResId) {
+        return DragAndSwipeTouchHelperCallback.withSwipeToDelete(recyclerView,
+                backgroundColor,
+                swipeCallback,
+                swipeFlags,
+                iconRes,
+                textResId,
+                R.dimen.swipe_panel_width,
+                R.dimen.swipe_panel_padding_end,
+                R.dimen.swipe_panel_text_top_padding,
+                R.dimen.swipe_panel_icon_size,
+                R.dimen.swipe_panel_text_size);
     }
 }

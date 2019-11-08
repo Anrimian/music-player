@@ -4,21 +4,18 @@ import android.Manifest;
 import android.content.Context;
 import android.util.Log;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import androidx.collection.LongSparseArray;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Map;
-
-import androidx.test.InstrumentationRegistry;
-import androidx.test.rule.GrantPermissionRule;
 import hu.akarnokd.rxjava2.math.MathObservable;
 import io.reactivex.Observable;
 
-import static androidx.test.platform.app.InstrumentationRegistry.*;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 
 public class StorageMusicProviderTest {
 
@@ -35,8 +32,9 @@ public class StorageMusicProviderTest {
 
     @Test
     public void testRepositoryReturnValues() {
-        Map<Long, Composition> compositions = storageMusicProvider.getCompositions();
-        for (Composition composition: compositions.values()) {
+        LongSparseArray<StorageComposition> map = storageMusicProvider.getCompositions();
+        for(int i = 0, size = map.size(); i < size; i++) {
+            StorageComposition composition = map.valueAt(i);
             System.out.println(composition);
             Assert.assertNotNull(composition.getFilePath());
         }

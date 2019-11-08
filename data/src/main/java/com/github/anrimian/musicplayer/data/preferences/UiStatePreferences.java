@@ -80,6 +80,7 @@ public class UiStatePreferences {
         preferences.putLong(CURRENT_COMPOSITION_ID, id);
     }
 
+    @Deprecated
     public void setCurrentPlayQueueItemId(long id) {
         preferences.putLong(CURRENT_PLAY_QUEUE_ID, id);
     }
@@ -88,6 +89,7 @@ public class UiStatePreferences {
         return preferences.getLong(CURRENT_PLAY_QUEUE_ID, NO_COMPOSITION);
     }
 
+    @Deprecated
     public Long getCurrentCompositionId() {
         return preferences.getLong(CURRENT_COMPOSITION_ID, NO_COMPOSITION);
     }

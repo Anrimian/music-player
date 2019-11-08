@@ -21,9 +21,9 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -231,7 +231,7 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getCurrentQueueItemObservable();
     }
 
-    public Observable<List<PlayQueueItem>> getPlayQueueObservable() {
+    public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
         return playQueueRepository.getPlayQueueObservable();
     }
 
@@ -243,8 +243,7 @@ public class MusicPlayerInteractor {
         return musicProviderRepository.deleteCompositions(compositions);
     }
 
-    @Nullable
-    public Integer getQueuePosition(PlayQueueItem item) {
+    public Maybe<Integer> getQueuePosition(PlayQueueItem item) {
         return playQueueRepository.getCompositionPosition(item);
     }
 

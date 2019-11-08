@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.music.folders;
 
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
@@ -22,6 +21,7 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeCompositionWithSize;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 
 public class MusicFolderDataSourceTest {
 
-    private StorageMusicDataSource storageMusicDataSource = mock(StorageMusicDataSource.class);
+    private CompositionFoldersCache storageMusicDataSource = mock(CompositionFoldersCache.class);
     private PublishSubject<Change<Composition>> changeSubject = PublishSubject.create();
 
     private MusicFolderDataSource musicFolderDataSource = new MusicFolderDataSource(
@@ -48,9 +48,7 @@ public class MusicFolderDataSourceTest {
 
     @Test
     public void getSingleCompositionTest() {
-        Composition composition = new Composition();
-        composition.setFilePath("simple path");
-        composition.setId(1L);
+        Composition composition = fakeComposition(1L, "simple path");
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(singletonMap(1L, composition));
 
@@ -109,9 +107,7 @@ public class MusicFolderDataSourceTest {
     @Test
     public void newCompositionChangeTest() {
         Map<Long, Composition> compositions = new HashMap<>();
-        Composition compositionOne = new Composition();
-        compositionOne.setFilePath("root/music/one.dd");
-        compositionOne.setId(1L);
+        Composition compositionOne = fakeComposition(1L, "root/music/one.dd");
         compositions.put(1L, compositionOne);
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
@@ -338,15 +334,10 @@ public class MusicFolderDataSourceTest {
     @Test
     public void modifyFileTest() {
         Map<Long, Composition> compositions = new HashMap<>();
-        Composition compositionOne = new Composition();
-        compositionOne.setFilePath("root/music/one.dd");
-        compositionOne.setId(1L);
+        Composition compositionOne = fakeComposition(1L, "root/music/one.dd");
         compositions.put(1L, compositionOne);
 
-        Composition compositionTwo = new Composition();
-        compositionTwo.setFilePath("root/music/two.dd");
-        compositionTwo.setSize(2);
-        compositionTwo.setId(2L);
+        Composition compositionTwo = fakeCompositionWithSize(2L, "root/music/two.dd", 2);
         compositions.put(2L, compositionTwo);
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
@@ -354,10 +345,7 @@ public class MusicFolderDataSourceTest {
         Folder observerFolder = musicFolderDataSource.getCompositionsInPath(null).blockingGet();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
-        Composition compositionTwoChanged = new Composition();
-        compositionTwoChanged.setFilePath("root/music/two.dd");
-        compositionTwoChanged.setSize(4);
-        compositionTwoChanged.setId(2L);
+        Composition compositionTwoChanged = fakeCompositionWithSize(2L, "root/music/two.dd", 4);
 
         changeSubject.onNext(new Change.ModifyChange<>(asList(new ModifiedData<>(compositionTwo, compositionTwoChanged))));
 
@@ -425,9 +413,7 @@ public class MusicFolderDataSourceTest {
     @Test
     public void modifyUnexcitedFileTest() {
         Map<Long, Composition> compositions = new HashMap<>();
-        Composition compositionOne = new Composition();
-        compositionOne.setFilePath("root/music/one.dd");
-        compositionOne.setId(1L);
+        Composition compositionOne = fakeComposition(1L, "root/music/one.dd");
         compositions.put(1L, compositionOne);
 
         when(storageMusicDataSource.getCompositionsMap()).thenReturn(compositions);
@@ -436,9 +422,7 @@ public class MusicFolderDataSourceTest {
         TestObserver<FileSource> selfChangeObserver = observerFolder.getSelfChangeObservable().test();
         TestObserver<List<FileSource>> childrenObserver = observerFolder.getFilesObservable().test();
 
-        Composition compositionTwo = new Composition();
-        compositionTwo.setFilePath("root/music/two.dd");
-        compositionTwo.setId(2L);
+        Composition compositionTwo = fakeComposition(2L, "root/music/two.dd");
         changeSubject.onNext(new Change.ModifyChange<>(asList(new ModifiedData<>(compositionTwo, compositionTwo))));
 
         childrenObserver.assertValueAt(1, list -> {
@@ -1027,9 +1011,7 @@ public class MusicFolderDataSourceTest {
     private static Map<Long, Composition> getManyCompositionsMap() {
         Map<Long, Composition> compositions = new HashMap<>();
         for (long i = 0; i < 100000; i++) {
-            Composition composition = new Composition();
-            composition.setFilePath("0/1/2/3/4/5/6/7/8/9/10/music-" + i);
-            composition.setId(i);
+            Composition composition = fakeComposition(i, "0/1/2/3/4/5/6/7/8/9/10/music-" + i);
             compositions.put(i, composition);
         }
         return compositions;
@@ -1037,10 +1019,7 @@ public class MusicFolderDataSourceTest {
 
     private static Map<Long, Composition> getFakeCompositionsMap() {
         Map<Long, Composition> compositions = new HashMap<>();
-        Composition composition = new Composition();
-
-        composition.setFilePath("music-" + 1L);
-        composition.setId(1L);
+        Composition composition = fakeComposition(1L, "music-" + 1L);
         compositions.put(1L, composition);
         return compositions;
     }

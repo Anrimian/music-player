@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
@@ -13,8 +14,11 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -26,8 +30,11 @@ import android.widget.Toast;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DimenRes;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.MenuRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.appcompat.view.SupportMenuInflater;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 
 import static android.text.TextUtils.isEmpty;
@@ -174,7 +181,33 @@ public class AndroidUtils {
 
     public static void copyText(Context context, String text, String label) {
         ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clipData = ClipData.newPlainText(label, text);
-        cm.setPrimaryClip(clipData);
+        if (cm != null) {
+            ClipData clipData = ClipData.newPlainText(label, text);
+            cm.setPrimaryClip(clipData);
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    public static Menu createMenu(Context context, @MenuRes int menuRes) {
+        //noinspection ConstantConditions
+        PopupMenu p  = new PopupMenu(context, null);
+        Menu menu = p.getMenu();
+        new SupportMenuInflater(context).inflate(menuRes, menu);
+        return menu;
+    }
+
+    public static void playShortVibration(Context context) {
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v == null) {
+            return;
+        }
+        long vibrationTime = 10;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(vibrationTime, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            v.vibrate(vibrationTime);
+        }
     }
 }

@@ -1,60 +1,66 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
+import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
+import com.github.anrimian.musicplayer.data.utils.collections.IndexedList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.utils.changes.Change;
-import com.github.anrimian.musicplayer.domain.utils.changes.ModifiedData;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.processors.PublishProcessor;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static io.reactivex.subjects.BehaviorSubject.create;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private final PlayQueueDaoWrapper playQueueDao;
-    private final StorageMusicDataSource storageMusicDataSource;
     private final SettingsRepository settingsPreferences;
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler scheduler;
 
-    private final BehaviorSubject<List<PlayQueueItem>> playQueueSubject = create();
     private final BehaviorSubject<PlayQueueEvent> currentCompositionSubject = create();
+    private final PublishProcessor<List<PlayQueueItem>> fastUpdateQueueSubject = PublishProcessor.create();
 
-    @Nullable
-    private PlayQueue playQueue;
-
-    private Disposable changeDisposable;
+    private final PlayQueueCache queueCache;
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
-                                   StorageMusicDataSource storageMusicDataSource,
                                    SettingsRepository settingsPreferences,
                                    UiStatePreferences uiStatePreferences,
                                    Scheduler scheduler) {
         this.playQueueDao = playQueueDao;
-        this.storageMusicDataSource = storageMusicDataSource;
         this.settingsPreferences = settingsPreferences;
         this.uiStatePreferences = uiStatePreferences;
         this.scheduler = scheduler;
+
+        queueCache = new PlayQueueCache(() -> {
+            List<PlayQueueCompositionDto> entities = playQueueDao.getFullPlayQueue();
+            List<PlayQueueItem> item = toSortedQueue(settingsPreferences.isRandomPlayingEnabled(), entities);
+            return new IndexedList<>(item);
+        });
     }
 
     @Override
@@ -67,31 +73,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         if (compositions.isEmpty()) {
             return Completable.complete();
         }
-        return Single.fromCallable(() -> createPlayQueue(compositions))
-                .doOnSuccess(playQueue -> {
-                    this.playQueue = playQueue;
-                    subscribeOnCompositionChanges();
-                })
-                .doOnSuccess(playQueue -> {
-                    List<PlayQueueItem> currentQueue = playQueue.getCurrentPlayQueue();
-                    playQueueSubject.onNext(currentQueue);
-
-                    PlayQueueItem item;
-                    if (startPosition == NO_POSITION) {
-                        item = currentQueue.get(0);
-                    } else {
-                        item = playQueue.getCompositionQueue().get(startPosition);
-                    }
-                    setCurrentItem(item);
-                })
+        return Single.fromCallable(() -> playQueueDao.insertNewPlayQueue(compositions))
+                .doOnSuccess(playQueue -> selectCurrentItem(playQueue, startPosition))
                 .ignoreElement()
                 .subscribeOn(scheduler);
     }
 
     @Nullable
     @Override
-    public Integer getCompositionPosition(@Nonnull PlayQueueItem playQueueItem) {
-        return getPlayQueue().getCurrentPosition(playQueueItem);
+    public Maybe<Integer> getCompositionPosition(@Nonnull PlayQueueItem playQueueItem) {
+        return Maybe.fromCallable(() -> queueCache.getCurrentQueue().indexOf(playQueueItem))
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -101,244 +93,123 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Observable<List<PlayQueueItem>> getPlayQueueObservable() {
-        return withDefaultValue(playQueueSubject, () -> getPlayQueue().getCurrentPlayQueue())
-                .subscribeOn(scheduler);
+    public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
+        return Observable.combineLatest(settingsPreferences.getRandomPlayingObservable(),
+                playQueueDao.getPlayQueueObservable(),
+                this::toSortedQueue)
+                .toFlowable(BackpressureStrategy.BUFFER)
+                .doOnNext(list -> {
+                    IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
+                    checkForCurrentItemInNewQueue(newQueue);
+                    queueCache.updateQueue(newQueue);
+                }).mergeWith(fastUpdateQueueSubject);
     }
 
     @Override
-    public void setRandomPlayingEnabled(boolean enabled) {
-        Single.fromCallable(this::getPlayQueue)
-                .doOnSuccess(playQueue -> {
-                    PlayQueueItem item = getCurrentItem();
-                    settingsPreferences.setRandomPlayingEnabled(enabled);
-                    playQueue.changeShuffleMode(enabled);
-                    if (enabled) {
-                        playQueue.moveItemToTopInShuffledList(item);
-                        playQueueDao.moveShuffledPositionToTop(item);
-                    }
-                    playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
-                }).subscribeOn(scheduler)
+    public void setRandomPlayingEnabled(boolean enabled) {//performance issue with large lists
+        Completable.fromAction(() -> {
+            if (enabled) {
+                PlayQueueItem item = getCurrentItem();
+                playQueueDao.reshuffleQueue(item);
+            }
+            settingsPreferences.setRandomPlayingEnabled(enabled);
+        }).subscribeOn(scheduler)
                 .subscribe();
     }
 
     @Override
     public Single<Integer> skipToNext() {
-        return Single.fromCallable(this::getPlayQueue)
-                .map(playQueue -> {
-                    List<PlayQueueItem> items = playQueue.getCurrentPlayQueue();
-                    Integer position = playQueue.getCurrentPosition(getCurrentItem());
-                    if (position == null) {
-                        return 0;
-                    }
-                    if (position >= items.size() - 1) {
-                        position = 0;
-                    } else {
-                        position++;
-                    }
-                    setCurrentItem(items.get(position));
-                    return position;
-                })
-                .subscribeOn(scheduler);
+        return Single.fromCallable(() -> {
+            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
+            Integer position = currentQueue.indexOf(getCurrentItem());
+            if (position == null) {
+                return 0;
+            }
+            if (position >= currentQueue.size() - 1) {
+                position = 0;
+            } else {
+                position++;
+            }
+            setCurrentItem(currentQueue.get(position));
+            return position;
+        }).subscribeOn(scheduler);
     }
 
     @Override
     public Single<Integer> skipToPrevious() {
-        return Single.fromCallable(this::getPlayQueue)
-                .map(playQueue -> {
-                    List<PlayQueueItem> compositions = playQueue.getCurrentPlayQueue();
-                    Integer position = playQueue.getCurrentPosition(getCurrentItem());
-                    if (position == null) {
-                        return 0;
-                    }
-                    position--;
-                    if (position < 0) {
-                        position = compositions.size() - 1;
-                    }
-                    setCurrentItem(compositions.get(position));
-                    return position;
-                })
-                .subscribeOn(scheduler);
+        return Single.fromCallable(() -> {
+            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
+            Integer position = currentQueue.indexOf(getCurrentItem());
+            if (position == null) {
+                return 0;
+            }
+            position--;
+            if (position < 0) {
+                position = currentQueue.size() - 1;
+            }
+            setCurrentItem(currentQueue.get(position));
+            return position;
+        }).subscribeOn(scheduler);
     }
 
     @Override
     public Completable skipToPosition(int position) {
-        return Single.fromCallable(this::getPlayQueue)
-                .map(PlayQueue::getCurrentPlayQueue)
-                .doOnSuccess(list -> setCurrentItem(list.get(position)))
-                .ignoreElement()
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
+            setCurrentItem(currentQueue.get(position));
+        }).subscribeOn(scheduler);
     }
 
     @Override
     public Completable removeQueueItem(PlayQueueItem item) {
-        return Completable.fromRunnable(() -> {
+        return Completable.fromAction(() -> {
+            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
             Integer currentPosition = null;
             PlayQueueItem currentItem = getCurrentItem();
-            PlayQueue playQueue = getPlayQueue();
             if (item.equals(currentItem)) {
-                currentPosition = playQueue.getCurrentPosition(currentItem);
+                currentPosition = currentQueue.indexOf(currentItem);
             }
-
-            playQueue.removeQueueItem(item);
             playQueueDao.deleteItem(item.getId());
-            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
 
             if (currentPosition != null) {
-                List<PlayQueueItem> items = playQueue.getCurrentPlayQueue();
-                PlayQueueItem newItem = null;
-                if (!items.isEmpty()) {
-                    if (currentPosition >= items.size()) {
-                        currentPosition = 0;
-                    }
-                    newItem = items.get(currentPosition);
-                }
-                setCurrentItem(newItem);
+                selectItemAt(currentQueue, currentPosition + 1);
             }
         }).subscribeOn(scheduler);
     }
 
-    /**
-     * update current play queue silently, doesn't send update to subscribers
-     */
     @Override
     public Completable swapItems(PlayQueueItem firstItem,
                                  int firstPosition,
                                  PlayQueueItem secondItem,
                                  int secondPosition) {
-        return Completable.fromRunnable(() -> {
-            getPlayQueue().swapItems(firstItem, firstPosition, secondItem, secondPosition);
-            playQueueDao.swapItems(firstItem,
-                    firstPosition,
-                    secondItem,
-                    secondPosition,
-                    settingsPreferences.isRandomPlayingEnabled());
-        }).subscribeOn(scheduler);
+        return Completable.fromRunnable(() -> playQueueDao.swapItems(firstItem,
+                firstPosition,
+                secondItem,
+                secondPosition,
+                settingsPreferences.isRandomPlayingEnabled())
+        ).subscribeOn(scheduler);
     }
 
     @Override
     public Completable addCompositionsToPlayNext(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
-            PlayQueue playQueue = getPlayQueue();
-            if (playQueue.isEmpty()) {
-                return;
-            }
             PlayQueueItem currentItem = getCurrentItem();
-            Integer position = playQueue.getPosition(currentItem);
-            if (position == null) {
-                return;
+            List<PlayQueueItem> list = playQueueDao.addCompositionsToQueue(compositions, currentItem);
+            if (currentItem == null) {
+                setCurrentItem(list.get(0));
             }
-            Integer shuffledPosition = playQueue.getShuffledPosition(currentItem);
-            if (shuffledPosition == null) {
-                return;
-            }
-            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToQueue(compositions, currentItem);
-            playQueue.addItems(newItems, position, shuffledPosition);
-            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
         }).subscribeOn(scheduler);
     }
 
     @Override
     public Completable addCompositionsToEnd(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
-            PlayQueue playQueue = getPlayQueue();
-            if (playQueue.isEmpty()) {
-                return;
+            PlayQueueItem currentItem = getCurrentItem();
+            List<PlayQueueItem> list = playQueueDao.addCompositionsToEndQueue(compositions);
+            if (currentItem == null) {
+                setCurrentItem(list.get(0));
             }
-            List<PlayQueueItem> newItems = playQueueDao.addCompositionsToEndQueue(compositions);
-            playQueue.addItems(newItems);
-            playQueueSubject.onNext(playQueue.getCurrentPlayQueue());
         }).subscribeOn(scheduler);
-    }
-
-    private PlayQueue getPlayQueue() {
-        if (playQueue == null) {
-            synchronized (this) {
-                if (playQueue == null) {
-                    playQueue = loadPlayQueue();
-                    if (!playQueue.isEmpty()) {
-                        subscribeOnCompositionChanges();
-                    }
-                }
-            }
-        }
-        return playQueue;
-    }
-
-    private void subscribeOnCompositionChanges() {
-        if (changeDisposable == null) {
-            changeDisposable = storageMusicDataSource.getChangeObservable()
-                    .subscribe(this::processCompositionChange);
-        }
-    }
-
-    private void processCompositionChange(Change<Composition> change) {
-        if (change instanceof Change.DeleteChange) {
-            processDeleteChange(((Change.DeleteChange<Composition>) change).getData());
-            return;
-        }
-        if (change instanceof Change.ModifyChange) {
-            processModifyChange(((Change.ModifyChange<Composition>) change).getData());
-        }
-    }
-
-    private void processDeleteChange(List<Composition> deletedCompositions) {
-        boolean currentItemDeleted = false;
-        PlayQueueItem currentItem = getCurrentItem();
-
-        for (Composition deletedComposition : deletedCompositions) {
-            if (currentItem != null && currentItem.getComposition().equals(deletedComposition)) {
-                currentItemDeleted = true;
-
-                List<PlayQueueItem> items = getPlayQueue().getCurrentPlayQueue();
-                int nextCurrentPosition;
-                Integer currentPosition = getPlayQueue().getCurrentPosition(currentItem);
-                if (currentPosition == null || currentPosition >= items.size() - 1) {
-                    nextCurrentPosition = 0;
-                } else {
-                    nextCurrentPosition = currentPosition + 1;
-                }
-                currentItem = items.get(nextCurrentPosition);
-            }
-        }
-
-        boolean updated = getPlayQueue().deleteCompositions(deletedCompositions);
-        if (updated) {
-            playQueueDao.deleteCompositionsFromQueue(deletedCompositions);
-            playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
-
-            if (currentItemDeleted) {
-                if (getPlayQueue().isEmpty()) {
-                    currentItem = null;
-                }
-                setCurrentItem(currentItem);
-            }
-        }
-    }
-
-    private void processModifyChange(List<ModifiedData<Composition>> changedCompositions) {
-        PlayQueueItem currentItem = getCurrentItem();
-        boolean updatedCurrentComposition = false;
-        boolean updated = false;
-
-        for (ModifiedData<Composition> modifiedData : changedCompositions) {
-            Composition modifiedComposition = modifiedData.getNewData();
-            boolean updatedItem = getPlayQueue().updateComposition(modifiedComposition);
-            if (!updated) {
-                updated = updatedItem;
-            }
-
-            if (currentItem != null && currentItem.getComposition().equals(modifiedComposition)) {
-                currentItem = new PlayQueueItem(currentItem.getId(), modifiedComposition);
-                updatedCurrentComposition = true;
-            }
-        }
-        if (updated) {
-            playQueueSubject.onNext(getPlayQueue().getCurrentPlayQueue());
-        }
-        if (updatedCurrentComposition) {
-            currentCompositionSubject.onNext(new PlayQueueEvent(currentItem, true));
-        }
     }
 
     @Nonnull
@@ -346,26 +217,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         if (currentCompositionSubject.getValue() != null) {
             return currentCompositionSubject.getValue();
         }
-
         return new PlayQueueEvent(getSavedQueueItem(), uiStatePreferences.getTrackPosition());
     }
 
     @Nullable
     private PlayQueueItem getSavedQueueItem() {
         long id = uiStatePreferences.getCurrentPlayQueueId();
-        Composition composition = storageMusicDataSource.getCompositionById(uiStatePreferences.getCurrentCompositionId());
-        if (composition == null) {
+        PlayQueueCompositionDto entity = playQueueDao.getPlayQueueItem(id);
+        if (entity == null) {
             return null;
         }
-        return new PlayQueueItem(id, composition);
-    }
-
-    private PlayQueue loadPlayQueue() {
-        PlayQueueLists lists = playQueueDao.getPlayQueue(storageMusicDataSource::getCompositionsMap);
-        return new PlayQueue(
-                lists.getQueue(),
-                lists.getShuffledQueue(),
-                settingsPreferences.isRandomPlayingEnabled());
+        return toPlayQueueItem(entity);
     }
 
     private void setCurrentItem(@Nullable PlayQueueItem item) {
@@ -388,10 +250,62 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return getSavedQueueItem();
     }
 
-    private PlayQueue createPlayQueue(List<Composition> compositions) {
-        PlayQueueLists lists = playQueueDao.insertNewPlayQueue(compositions);
-        return new PlayQueue(lists.getQueue(),
-                lists.getShuffledQueue(),
-                settingsPreferences.isRandomPlayingEnabled());
+    private void selectCurrentItem(PlayQueueLists queueLists, int startPosition) {
+        PlayQueueItem item;
+        if (startPosition == NO_POSITION) {
+            List<PlayQueueItem> currentQueue = settingsPreferences.isRandomPlayingEnabled()?
+                    queueLists.getShuffledQueue() : queueLists.getQueue();
+            item = currentQueue.get(0);
+        } else {
+            item = queueLists.getQueue().get(startPosition);
+        }
+        setCurrentItem(item);
+    }
+
+    private List<PlayQueueItem> toSortedQueue(boolean isRandom, List<PlayQueueCompositionDto> items) {
+        Collections.sort(items, (first, second) -> {
+            if (isRandom) {
+                return Integer.compare(first.getShuffledPosition(), second.getShuffledPosition());
+            } else {
+                return Integer.compare(first.getPosition(), second.getPosition());
+            }
+        });
+        return mapList(items, this::toPlayQueueItem);
+    }
+
+    private PlayQueueItem toPlayQueueItem(PlayQueueCompositionDto entity) {
+        return new PlayQueueItem(entity.getItemId(),
+                CompositionMapper.toComposition(entity.getComposition())
+        );
+    }
+
+    private void selectItemAt(IndexedList<PlayQueueItem> queue, int position) {
+        PlayQueueItem newItem = null;
+        if (queue.size() > 1) {
+            if (position >= queue.size()) {
+                position = 0;
+            }
+            newItem = queue.get(position);
+        }
+        setCurrentItem(newItem);
+    }
+
+    private void checkForCurrentItemInNewQueue(IndexedList<PlayQueueItem> newQueue) {
+        IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
+        PlayQueueItem currentItem = getCurrentItem();
+        if (currentItem != null && newQueue.contains(currentItem)) {
+            //check for update
+            Integer currentPosition = newQueue.indexOf(currentItem);
+            PlayQueueItem newItem = newQueue.get(currentPosition);
+            if (!PlayQueueItemHelper.areSourcesTheSame(newItem, currentItem)) {
+                currentCompositionSubject.onNext(new PlayQueueEvent(newItem, true));
+            }
+        } else {
+            //select new item
+            Integer currentPosition = currentQueue.indexOf(currentItem);
+            if (currentPosition != null) {
+                selectItemAt(newQueue, currentPosition);
+            }
+        }
     }
 }
