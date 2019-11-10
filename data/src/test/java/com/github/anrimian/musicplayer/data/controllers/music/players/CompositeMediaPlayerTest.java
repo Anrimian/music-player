@@ -42,7 +42,7 @@ public class CompositeMediaPlayerTest {
         when(player2.getTrackPositionObservable()).thenReturn(player2PositionSubject);
         when(player2.getEventsObservable()).thenReturn(player2EventSubject);
 
-        compositeMediaPlayer = new CompositeMediaPlayer(new MediaPlayer[] { player1, player2 });
+        compositeMediaPlayer = new CompositeMediaPlayer(() -> player1, () -> player2);
     }
 
     @Test
@@ -53,6 +53,7 @@ public class CompositeMediaPlayerTest {
         inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));
 
         player1EventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN));
+        inOrder.verify(player1).release();
         inOrder.verify(player2).prepareToPlay(eq(composition), eq(0L));
     }
 
@@ -66,6 +67,7 @@ public class CompositeMediaPlayerTest {
         inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));
 
         player1EventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN));
+        inOrder.verify(player1).release();
         inOrder.verify(player2).prepareToPlay(eq(composition), eq(0L));
 
         player2EventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN));
@@ -75,6 +77,7 @@ public class CompositeMediaPlayerTest {
         Composition composition2 = TestDataProvider.fakeComposition(2);
 
         compositeMediaPlayer.prepareToPlay(composition2, 0L);
+        inOrder.verify(player2).release();
         inOrder.verify(player1).prepareToPlay(eq(composition2), eq(0L));
     }
 
@@ -88,6 +91,7 @@ public class CompositeMediaPlayerTest {
         player1PositionSubject.onNext(100L);
 
         player1EventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN));
+        inOrder.verify(player1).release();
         inOrder.verify(player2).prepareToPlay(eq(composition), eq(100L));
     }
 }

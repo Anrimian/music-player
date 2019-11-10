@@ -322,7 +322,7 @@ public class MusicPlayerInteractor {
                 musicProviderRepository.writeErrorAboutComposition(errorType, currentItem.getComposition())
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
-                        .andThen(playQueueRepository.skipToNext())
+                        .andThen(playQueueRepository.skipToNext())//TODO problem when all prepares gives errors
                         .doOnSuccess(currentPosition -> {
                             if (currentPosition == 0) {
                                 stop();

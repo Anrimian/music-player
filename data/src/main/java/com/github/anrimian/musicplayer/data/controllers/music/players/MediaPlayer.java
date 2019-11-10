@@ -24,4 +24,6 @@ public interface MediaPlayer {
     Observable<Long> getTrackPositionObservable();
 
     long getTrackPosition();
+
+    void release();
 }
