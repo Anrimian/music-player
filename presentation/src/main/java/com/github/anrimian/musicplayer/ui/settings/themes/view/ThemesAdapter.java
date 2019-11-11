@@ -8,11 +8,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ThemesAdapter extends RecyclerView.Adapter<ThemesViewHolder> {
 
+    private final Set<ThemesViewHolder> viewHolders = new HashSet<>();
+
     private final AppTheme[] themes;
-    private final AppTheme currentTheme;
     private final Callback<AppTheme> themeClickListener;
+
+    private AppTheme currentTheme;
 
     public ThemesAdapter(AppTheme[] themes,
                          AppTheme currentTheme,
@@ -30,6 +36,8 @@ public class ThemesAdapter extends RecyclerView.Adapter<ThemesViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ThemesViewHolder holder, int position) {
+        viewHolders.add(holder);
+
         AppTheme theme = themes[position];
         holder.bind(theme, theme.equals(currentTheme));
     }
@@ -37,5 +45,18 @@ public class ThemesAdapter extends RecyclerView.Adapter<ThemesViewHolder> {
     @Override
     public int getItemCount() {
         return themes.length;
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ThemesViewHolder holder) {
+        super.onViewRecycled(holder);
+        viewHolders.remove(holder);
+    }
+
+    public void setCurrentTheme(AppTheme currentTheme) {
+        this.currentTheme = currentTheme;
+        for (ThemesViewHolder holder: viewHolders) {
+            holder.setSelected(holder.getAppTheme() == currentTheme);
+        }
     }
 }

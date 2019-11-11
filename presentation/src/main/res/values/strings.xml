@@ -143,6 +143,7 @@
     <string name="play_on_connect_bluetooth_device">Start playing when bluetooth device is connected</string>
     <string name="headset">Headset</string>
     <string name="scan_storage">Rescan media storage</string>
+    <string name="auto_night_mode">Auto night mode</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
