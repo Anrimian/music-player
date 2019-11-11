@@ -39,9 +39,18 @@ class ThemesViewHolder extends BaseViewHolder {
 
         String description = getContext().getString(appTheme.getDescriptionId());
         tvTheme.setText(description);
-        rbTheme.setChecked(isSelected);
 
         flClickableArea.setContentDescription(description);
+
+        setSelected(isSelected);
+    }
+
+    void setSelected(boolean isSelected) {
+        rbTheme.setChecked(isSelected);
         flClickableArea.setClickable(!isSelected);
+    }
+
+    AppTheme getAppTheme() {
+        return appTheme;
     }
 }

@@ -18,7 +18,8 @@ import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositio
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
+
+import moxy.MvpAppCompatFragment;
 
 public class LibraryFragment extends MvpAppCompatFragment implements FragmentLayerListener {
 

@@ -3,13 +3,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_themes"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsv_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="ifContentScrolls"
         android:background="?android:attr/colorBackground">
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_themes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:background="?android:attr/colorBackground"/>
+
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cb_auto_night_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/auto_night_mode"
+                android:layout_marginTop="@dimen/content_spacing_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </FrameLayout>

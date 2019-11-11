@@ -18,10 +18,10 @@ import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.ui.library.common.order.adapter.OrderAdapter;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatDialogFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.MvpAppCompatDialogFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 

@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,12 +28,22 @@ import com.r0adkll.slidr.model.SlidrPosition;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
+
 public class ThemeSettingsFragment extends Fragment {
 
     @BindView(R.id.rv_themes)
     RecyclerView rvThemes;
 
+    @BindView(R.id.cb_auto_night_mode)
+    CheckBox cbAutoNightMode;
+
+    @BindView(R.id.nsv_container)
+    NestedScrollView container;
+
     private ThemeController themeController;
+
+    private ThemesAdapter adapter;
 
     @Nullable
     @Override
@@ -54,7 +66,7 @@ public class ThemeSettingsFragment extends Fragment {
         toolbar.setTitleClickListener(null);
 
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(rvThemes,
+        SlidrPanel.replace(container,
                 slidrConfig,
                 () -> FragmentNavigation.from(requireFragmentManager()).goBack(0),
                 toolbar::onStackFragmentSlided);
@@ -66,13 +78,19 @@ public class ThemeSettingsFragment extends Fragment {
                 false);
         rvThemes.addItemDecoration(itemDecorator);
 
-        ThemesAdapter adapter = new ThemesAdapter(AppTheme.values(),
+        adapter = new ThemesAdapter(AppTheme.values(),
                 themeController.getCurrentTheme(),
                 this::onThemeClicked);
         rvThemes.setAdapter(adapter);
+
+        setChecked(cbAutoNightMode, themeController.isAutoDarkThemeEnabled());
+        cbAutoNightMode.setOnCheckedChangeListener((v, isChecked) ->
+                themeController.setAutoDarkModeEnabled(requireActivity(), isChecked)
+        );
     }
 
     private void onThemeClicked(AppTheme appTheme) {
         themeController.setTheme(requireActivity(), appTheme);
+        adapter.setCurrentTheme(appTheme);
     }
 }

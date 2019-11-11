@@ -9,28 +9,33 @@ public enum AppTheme {
             R.style.PrimaryLightTheme,
             R.string.white_purple_theme,
             R.color.colorPrimary,
-            R.color.light_light_gray),
+            android.R.color.white,
+            false),
     WHITE_INDIGO(2,
             R.style.PrimaryBlueTheme,
             R.string.white_indigo_theme,
             R.color.colorBluePrimary,
-            R.color.light_light_gray),
+            android.R.color.white,
+            false),
     WHITE_TEAL(3,
             R.style.PrimaryTealTheme,
             R.string.white_teal_theme,
             R.color.colorTealPrimary,
-            R.color.light_light_gray),
+            android.R.color.white,
+            false),
     DARK(1,
             R.style.PrimaryDarkTheme,
             R.string.dark_theme,
             R.color.darkColorPrimary,
-            R.color.dark_background_level_0);
+            android.R.color.black,
+            true);
 
     private final int id;
     private final int themeResId;
     private final int descriptionId;
     private final int primaryColorId;
     private final int backgroundColorId;
+    private final boolean isDark;
 
     @NonNull
     public static AppTheme getTheme(int id) {
@@ -42,12 +47,18 @@ public enum AppTheme {
         return WHITE_PURPLE_DEFAULT;
     }
 
-    AppTheme(int id, int themeResId, int descriptionId, int primaryColorId, int backgroundColorId) {
+    AppTheme(int id,
+             int themeResId,
+             int descriptionId,
+             int primaryColorId,
+             int backgroundColorId,
+             boolean isDark) {
         this.id = id;
         this.themeResId = themeResId;
         this.descriptionId = descriptionId;
         this.primaryColorId = primaryColorId;
         this.backgroundColorId = backgroundColorId;
+        this.isDark = isDark;
     }
 
     public int getId() {
@@ -68,5 +79,9 @@ public enum AppTheme {
 
     public int getBackgroundColorId() {
         return backgroundColorId;
+    }
+
+    public boolean isDark() {
+        return isDark;
     }
 }

@@ -63,6 +63,8 @@ ext {
 
     moxy = "com.github.moxy-community:moxy:$moxyVersion"
     moxyCompiler = "com.github.moxy-community:moxy-compiler:$moxyVersion"
+    moxyAppcompat = "com.github.moxy-community:moxy-androidx:$moxyVersion"
+    moxyMaterial = "com.github.moxy-community:moxy-material:$moxyVersion"
 
     acra = "ch.acra:acra:$acraVersion"
 

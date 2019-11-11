@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -61,7 +62,6 @@ import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ui.MvpAppCompatFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
@@ -75,6 +75,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
@@ -532,11 +533,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 || position == playQueueLayoutManager.findFirstVisibleItemPosition()
                 || position == playQueueLayoutManager.findLastVisibleItemPosition();
 
+        Context context = requireContext();
         rvPlayList.post(() -> {
             if (smooth) {
                 RecyclerViewUtils.smoothScrollToTop(position,
                         playQueueLayoutManager,
-                        requireContext(),
+                        context,
                         170);
             } else {
                 playQueueLayoutManager.scrollToPositionWithOffset(position, 0);

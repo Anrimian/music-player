@@ -33,7 +33,6 @@ import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
 import static android.text.TextUtils.isEmpty;
-import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 import static java.util.Collections.emptyList;
 
 public class StoragePlayListsProvider {
@@ -67,7 +66,9 @@ public class StoragePlayListsProvider {
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
                 StoragePlayList playList = getPlayListFromCursor(cursorWrapper);
-                map.put(playList.getId(), playList);
+                if (playList != null) {
+                    map.put(playList.getId(), playList);
+                }
             }
             return map;
         } finally {
@@ -260,14 +261,18 @@ public class StoragePlayListsProvider {
         return new StoragePlayListItem(itemId, audioId);
     }
 
+    @Nullable
     private StoragePlayList getPlayListFromCursor(CursorWrapper cursorWrapper) {
         long id = cursorWrapper.getLong(Playlists._ID);
         String name = cursorWrapper.getString(Playlists.NAME);
+        if (name == null) {
+            return null;
+        }
         long dateAdded = cursorWrapper.getLong(Playlists.DATE_ADDED);
         long dateModified = cursorWrapper.getLong(Playlists.DATE_MODIFIED);
 
         return new StoragePlayList(id,
-                requireNonNull(name),
+                name,
                 new Date(dateAdded * 1000L),
                 new Date(dateModified * 1000L));
     }

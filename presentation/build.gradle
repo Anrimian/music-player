@@ -75,6 +75,8 @@ dependencies {
     implementation deps.acra
 
     implementation deps.moxy
+    implementation deps.moxyAppcompat
+    implementation deps.moxyMaterial
     annotationProcessor deps.moxyCompiler
 
     implementation deps.butterKnife
