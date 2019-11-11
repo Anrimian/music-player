@@ -52,6 +52,7 @@ import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_T
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SEEK_TO;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP;
@@ -103,7 +104,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                     | ACTION_PAUSE
                     | ACTION_PLAY_PAUSE
                     | ACTION_SKIP_TO_NEXT
-                    | ACTION_SKIP_TO_PREVIOUS);
+                    | ACTION_SKIP_TO_PREVIOUS
+                    | ACTION_SEEK_TO);
 
     private final MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private final CompositeDisposable serviceDisposable = new CompositeDisposable();
@@ -371,12 +373,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             musicPlayerInteractor.skipToPrevious();
         }
 
-        //next - test it
-
         @Override
         public void onSeekTo(long pos) {
-            musicPlayerInteractor.seekTo(pos);
+            musicPlayerInteractor.onSeekFinished(pos);
         }
+
+        //next - test it
 
         @Override
         public void onSetRepeatMode(int repeatMode) {
