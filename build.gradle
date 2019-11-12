@@ -14,8 +14,8 @@ buildscript {
 allprojects {
     ext {
         androidApplicationId = 'com.github.anrimian.musicplayer'
-        androidVersionCode = 36
-        androidVersionName = "0.8.0.1"
+        androidVersionCode = 37
+        androidVersionName = "0.8.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId = 'com.github.anrimian.musicplayer.test'
     }
