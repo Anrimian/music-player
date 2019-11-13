@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
@@ -44,4 +45,5 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract PlayListDao playListDao();
     public abstract ArtistsDao artistsDao();
     public abstract AlbumsDao albumsDao();
+    public abstract GenreDao genreDao();
 }

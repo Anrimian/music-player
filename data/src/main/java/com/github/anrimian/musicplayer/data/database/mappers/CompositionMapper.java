@@ -8,6 +8,8 @@ import javax.annotation.Nullable;
 
 public class CompositionMapper {
 
+    //TODO optimize, select directly from db
+    @Deprecated
     public static Composition toComposition(CompositionEntity entity) {
         return new Composition(entity.getArtist(),
                 entity.getTitle(),

@@ -14,9 +14,16 @@ import javax.annotation.Nullable;
                 @ForeignKey(entity = CompositionEntity.class,
                         parentColumns = "id",
                         childColumns = "audioId",
+                        onDelete = ForeignKey.CASCADE),
+                @ForeignKey(entity = GenreEntity.class,
+                        parentColumns = {"id"},
+                        childColumns = {"genreId"},
                         onDelete = ForeignKey.CASCADE)
         },
-        indices = @Index("audioId")
+        indices = {
+                @Index("audioId"),
+                @Index("genreId")
+        }
 )
 public class GenreEntryEntity {
 
@@ -24,13 +31,19 @@ public class GenreEntryEntity {
     private long id;
 
     private long audioId;
+    private long genreId;
 
     @Nullable
     private Long storageId;
 
-    public GenreEntryEntity(long audioId, @Nullable Long storageId) {
+    public GenreEntryEntity(long audioId, long genreId, @Nullable Long storageId) {
         this.audioId = audioId;
+        this.genreId = genreId;
         this.storageId = storageId;
+    }
+
+    public long getGenreId() {
+        return genreId;
     }
 
     public long getId() {
