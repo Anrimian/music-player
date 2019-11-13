@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.entities.playlist;
 
 import javax.annotation.Nullable;
 
+@Deprecated
 public class RawPlayListItem {
 
     @Nullable

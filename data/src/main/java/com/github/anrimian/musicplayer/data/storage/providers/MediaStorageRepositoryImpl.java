@@ -5,6 +5,7 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
@@ -12,6 +13,9 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
+import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
+import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
@@ -35,35 +39,43 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     private final StoragePlayListsProvider playListsProvider;
     private final StorageArtistsProvider artistsProvider;
     private final StorageAlbumsProvider albumsProvider;
+    private final StorageGenresProvider genresProvider;
     private final CompositionsDaoWrapper compositionsDao;
     private final PlayListsDaoWrapper playListsDao;
     private final ArtistsDaoWrapper artistsDao;
     private final AlbumsDaoWrapper albumsDao;
+    private final GenresDaoWrapper genresDao;
     private final Scheduler scheduler;
 
     private Disposable albumsDisposable;
     private Disposable artistsDisposable;
     private Disposable compositionsDisposable;
     private Disposable playListsDisposable;
+    private Disposable genresDisposable;
     private LongSparseArray<Disposable> playListEntriesDisposable = new LongSparseArray<>();
+    private LongSparseArray<Disposable> genreEntriesDisposable = new LongSparseArray<>();
 
     public MediaStorageRepositoryImpl(StorageMusicProvider musicProvider,
                                       StoragePlayListsProvider playListsProvider,
                                       StorageArtistsProvider artistsProvider,
                                       StorageAlbumsProvider albumsProvider,
+                                      StorageGenresProvider genresProvider,
                                       CompositionsDaoWrapper compositionsDao,
                                       PlayListsDaoWrapper playListsDao,
                                       ArtistsDaoWrapper artistsDao,
                                       AlbumsDaoWrapper albumsDao,
+                                      GenresDaoWrapper genresDao,
                                       Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.playListsProvider = playListsProvider;
         this.artistsProvider = artistsProvider;
         this.albumsProvider = albumsProvider;
+        this.genresProvider = genresProvider;
         this.compositionsDao = compositionsDao;
         this.playListsDao = playListsDao;
         this.artistsDao = artistsDao;
         this.albumsDao = albumsDao;
+        this.genresDao = genresDao;
         this.scheduler = scheduler;
     }
 
@@ -89,6 +101,15 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 long dbId = playListIds.getDbId();
                 applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
             }
+
+            applyGenresData(genresProvider.getGenres());
+            List<IdPair> genresIds = genresDao.getGenresIds();
+            for (IdPair genreId: genresIds) {
+                long storageId = genreId.getStorageId();
+                long dbId = genreId.getDbId();
+                applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
+            }
+
         }).subscribeOn(scheduler).subscribe();
     }
 
@@ -140,6 +161,30 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 playListEntriesDisposable.put(dbId, disposable);
             }
         }
+
+        if (genresDisposable == null) {
+            genresDisposable = genresProvider.getGenresObservable()
+                    .startWith(genresProvider.getGenres())
+                    .subscribeOn(scheduler)
+                    .subscribe(this::onStorageGenresReceived);
+        }
+    }
+
+    private void onStorageGenresReceived(LongSparseArray<StorageGenre> newGenres) {
+        applyGenresData(newGenres);
+
+        List<IdPair> genresIds = genresDao.getGenresIds();
+        for (IdPair genreId: genresIds) {
+            long storageId = genreId.getStorageId();
+            long dbId = genreId.getDbId();
+            if (!genreEntriesDisposable.containsKey(dbId)) {
+                Disposable disposable = genresProvider.getGenreItemsObservable(storageId)
+                        .startWith(genresProvider.getGenreItems(storageId))
+                        .subscribeOn(scheduler)
+                        .subscribe(entries -> applyGenreItemsData(dbId, entries));
+                genreEntriesDisposable.put(dbId, disposable);
+            }
+        }
     }
 
     private synchronized void applyPlayListItemsData(long playListId,
@@ -166,6 +211,22 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
+    private synchronized void applyGenreItemsData(long genreId,
+                                                  LongSparseArray<StorageGenreItem> newGenreItems) {
+        LongSparseArray<StorageGenreItem> currentItems = genresDao.selectAllAsStorageGenreItems(genreId);
+        List<StorageGenreItem> addedItems = new ArrayList<>();
+        boolean hasChanges = AndroidCollectionUtils.processChanges(currentItems,
+                newGenreItems,
+                (o1, o2) -> false,
+                item -> {},
+                addedItems::add,
+                item -> {});
+
+        if (hasChanges) {
+            genresDao.applyChanges(addedItems, genreId);
+        }
+    }
+
     private synchronized void applyPlayListData(LongSparseArray<StoragePlayList> newPlayLists) {
         List<StoragePlayList> currentPlayLists = playListsDao.getAllAsStoragePlayLists();
         LongSparseArray<StoragePlayList> currentPlayListsMap = AndroidCollectionUtils.mapToSparseArray(currentPlayLists,
@@ -182,6 +243,22 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
         if (hasChanges) {
             playListsDao.applyChanges(addedPlayLists, changedPlayLists);
+        }
+    }
+
+    private synchronized void applyGenresData(LongSparseArray<StorageGenre> newGenres) {
+        LongSparseArray<StorageGenre> currentGenres = genresDao.selectAllAsStorageGenre();
+
+        List<StorageGenre> addedGenres = new ArrayList<>();
+        boolean hasChanges = AndroidCollectionUtils.processChanges(currentGenres,
+                newGenres,
+                (o1, o2) -> false,
+                o -> {},
+                addedGenres::add,
+                o -> {});
+
+        if (hasChanges) {
+            genresDao.applyChanges(addedGenres);
         }
     }
 

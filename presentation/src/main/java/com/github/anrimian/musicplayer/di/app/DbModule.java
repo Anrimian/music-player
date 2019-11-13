@@ -10,6 +10,8 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
@@ -80,6 +82,13 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
+    GenreDao genreDao(AppDatabase appDatabase) {
+        return appDatabase.genreDao();
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
     AlbumsDaoWrapper albumsDaoWrapper(AlbumsDao albumsDao, ArtistsDao artistsDao) {
         return new AlbumsDaoWrapper(albumsDao, artistsDao);
     }
@@ -89,6 +98,13 @@ public class DbModule {
     @Singleton
     ArtistsDaoWrapper artistsDaoWrapper(ArtistsDao artistsDao) {
         return new ArtistsDaoWrapper(artistsDao);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    GenresDaoWrapper genresDaoWrapper(GenreDao genreDao, CompositionsDao compositionsDao) {
+        return new GenresDaoWrapper(genreDao, compositionsDao);
     }
 
     @Provides

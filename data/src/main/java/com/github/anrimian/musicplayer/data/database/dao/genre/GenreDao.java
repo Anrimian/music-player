@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
+import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
@@ -49,5 +50,11 @@ public interface GenreDao {
             "FROM compositions " +
             "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
     Observable<List<CompositionEntity>> getCompositionsInGenre(long genreId);
+
+    @Query("SELECT " +
+            "id as dbId, " +
+            "storageId as storageId " +
+            "FROM genres WHERE genres.storageId IS NOT NULL")
+    List<IdPair> getGenresIds();
 
 }
