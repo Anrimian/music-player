@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
@@ -25,7 +26,7 @@ public interface PlayListDao {
     @Insert
     long insertPlayListEntity(PlayListEntity entity);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertPlayListEntities(List<PlayListEntity> entities);
 
     @Query("DELETE FROM play_lists WHERE id = :id")
