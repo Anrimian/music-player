@@ -8,6 +8,8 @@ import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompos
 import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompositionsModule;
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesComponent;
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesModule;
+import com.github.anrimian.musicplayer.di.app.library.genres.GenresComponent;
+import com.github.anrimian.musicplayer.di.app.library.genres.GenresModule;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerPresenter;
 
@@ -25,6 +27,7 @@ public interface LibraryComponent {
     LibraryCompositionsComponent libraryCompositionsComponent(LibraryCompositionsModule module);
     ArtistsComponent artistsComponent(ArtistsModule module);
     AlbumsComponent albumsComponent(AlbumsModule module);
+    GenresComponent genresComponent(GenresModule module);
 
     PlayerPresenter playerPresenter();
     SelectOrderPresenter selectOrderPresenter();

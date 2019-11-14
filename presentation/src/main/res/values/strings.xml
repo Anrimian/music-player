@@ -150,6 +150,8 @@
     <string name="no_artists_in_library">No artists in library</string>
     <string name="albums">Albums</string>
     <string name="no_albums_in_library">No albums in library</string>
+    <string name="genres">Genres</string>
+    <string name="no_genres_in_library">No genres in library</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

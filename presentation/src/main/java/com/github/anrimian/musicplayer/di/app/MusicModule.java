@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControl
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.MusicProviderRepositoryImpl;
@@ -103,6 +104,7 @@ class MusicModule {
                                                     CompositionsDaoWrapper compositionsDao,
                                                     ArtistsDaoWrapper artistsDao,
                                                     AlbumsDaoWrapper albumsDao,
+                                                    GenresDaoWrapper genresDao,
                                                     MusicFolderDataSource musicFolderDataSource,
                                                     SettingsRepository settingsPreferences,
                                                     @Named(IO_SCHEDULER) Scheduler scheduler) {
@@ -110,6 +112,7 @@ class MusicModule {
                 compositionsDao,
                 artistsDao,
                 albumsDao,
+                genresDao,
                 musicFolderDataSource,
                 settingsPreferences,
                 scheduler);

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.music;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.DescComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.AlphabeticalCompositionComparator;
 import com.github.anrimian.musicplayer.data.repositories.music.comparators.composition.CreateDateCompositionComparator;
@@ -20,6 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -47,6 +49,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     private final CompositionsDaoWrapper compositionsDao;
     private final ArtistsDaoWrapper artistsDao;
     private final AlbumsDaoWrapper albumsDao;
+    private final GenresDaoWrapper genresDao;
     private final MusicFolderDataSource musicFolderDataSource;
     private final SettingsRepository settingsPreferences;
     private final Scheduler scheduler;
@@ -55,6 +58,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                                        CompositionsDaoWrapper compositionsDao,
                                        ArtistsDaoWrapper artistsDao,
                                        AlbumsDaoWrapper albumsDao,
+                                       GenresDaoWrapper genresDao,
                                        MusicFolderDataSource musicFolderDataSource,
                                        SettingsRepository settingsPreferences,
                                        Scheduler scheduler) {
@@ -62,6 +66,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
         this.compositionsDao = compositionsDao;
         this.artistsDao = artistsDao;
         this.albumsDao = albumsDao;
+        this.genresDao = genresDao;
         this.musicFolderDataSource = musicFolderDataSource;
         this.settingsPreferences = settingsPreferences;
         this.scheduler = scheduler;
@@ -85,6 +90,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Observable<List<Album>> getAlbumsObservable() {
         return albumsDao.getAllObservable();
+    }
+
+    @Override
+    public Observable<List<Genre>> getGenresObservable() {
+        return genresDao.getAllObservable();
     }
 
     @Override

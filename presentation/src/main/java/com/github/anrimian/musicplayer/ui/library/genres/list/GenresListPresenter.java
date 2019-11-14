@@ -1,7 +1,7 @@
-package com.github.anrimian.musicplayer.ui.library.albums.list;
+package com.github.anrimian.musicplayer.ui.library.genres.list;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryAlbumsInteractor;
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.business.library.LibraryGenresInteractor;
+import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -17,18 +17,18 @@ import moxy.MvpPresenter;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
 @InjectViewState
-public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
+public class GenresListPresenter extends MvpPresenter<GenresListView> {
 
-    private final LibraryAlbumsInteractor interactor;
+    private final LibraryGenresInteractor interactor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-    private Disposable albumsDisposable;
+    private Disposable listDisposable;
 
-    private List<Album> albums = new ArrayList<>();
+    private List<Genre> genres = new ArrayList<>();
 
-    public AlbumsListPresenter(LibraryAlbumsInteractor interactor,
+    public GenresListPresenter(LibraryGenresInteractor interactor,
                                ErrorParser errorParser,
                                Scheduler uiScheduler) {
         this.interactor = interactor;
@@ -39,7 +39,7 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        subscribeOnAlbumsList();
+        subscribeOnGenresList();
     }
 
     @Override
@@ -50,29 +50,29 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
 
 
     void onTryAgainLoadCompositionsClicked() {
-        subscribeOnAlbumsList();
+        subscribeOnGenresList();
     }
 
-    private void subscribeOnAlbumsList() {
-        if (albums.isEmpty()) {
+    private void subscribeOnGenresList() {
+        if (genres.isEmpty()) {
             getViewState().showLoading();
         }
-        dispose(albumsDisposable, presenterDisposable);
-        albumsDisposable = interactor.getAlbumsObservable()
+        dispose(listDisposable, presenterDisposable);
+        listDisposable = interactor.getGenresObservable()
                 .observeOn(uiScheduler)
-                .subscribe(this::onAlbumsReceived, this::onAlbumsReceivingError);
-        presenterDisposable.add(albumsDisposable);
+                .subscribe(this::onGenresReceived, this::onGenresReceivingError);
+        presenterDisposable.add(listDisposable);
     }
 
-    private void onAlbumsReceivingError(Throwable throwable) {
+    private void onGenresReceivingError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showLoadingError(errorCommand);
     }
 
-    private void onAlbumsReceived(List<Album> albums) {
-        this.albums = albums;
-        getViewState().submitList(albums);
-        if (albums.isEmpty()) {
+    private void onGenresReceived(List<Genre> genres) {
+        this.genres = genres;
+        getViewState().submitList(genres);
+        if (genres.isEmpty()) {
 //            if (TextUtils.isEmpty(searchText)) {
                 getViewState().showEmptyList();
 //            } else {
