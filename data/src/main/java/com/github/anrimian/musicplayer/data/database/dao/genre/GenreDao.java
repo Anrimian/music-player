@@ -57,4 +57,11 @@ public interface GenreDao {
             "FROM genres WHERE genres.storageId IS NOT NULL")
     List<IdPair> getGenresIds();
 
+    @Query("SELECT id as id," +
+            "name as name, " +
+            "(SELECT count() FROM genre_entries WHERE genreId = genres.id) as compositionsCount, " +
+            "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM genre_entries WHERE genreId = genres.id)) as totalDuration " +
+            "FROM genres " +
+            "WHERE id = :genreId")
+    Observable<Genre> getGenreObservable(long genreId);
 }

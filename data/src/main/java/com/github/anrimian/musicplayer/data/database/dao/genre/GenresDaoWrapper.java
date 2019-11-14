@@ -53,6 +53,10 @@ public class GenresDaoWrapper {
         return genreDao.getAllObservable();
     }
 
+    public Observable<Genre> getGenreObservable(long genreId) {
+        return genreDao.getGenreObservable(genreId);
+    }
+
     public Observable<List<Composition>> getCompositionsInGenre(long genreId) {
         return genreDao.getCompositionsInGenre(genreId)
                 .map(list -> mapList(list, CompositionMapper::toComposition));

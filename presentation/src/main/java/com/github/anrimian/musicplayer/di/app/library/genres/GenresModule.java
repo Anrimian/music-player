@@ -19,13 +19,13 @@ public class GenresModule {
 
     @Provides
     @Nonnull
-    LibraryGenresInteractor libraryArtistsInteractor(MusicProviderRepository repository) {
+    LibraryGenresInteractor libraryGenresInteractor(MusicProviderRepository repository) {
         return new LibraryGenresInteractor(repository);
     }
 
     @Provides
     @Nonnull
-    GenresListPresenter artistsListPresenter(LibraryGenresInteractor interactor,
+    GenresListPresenter genreListPresenter(LibraryGenresInteractor interactor,
                                              ErrorParser errorParser,
                                              @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new GenresListPresenter(interactor, errorParser, uiScheduler);

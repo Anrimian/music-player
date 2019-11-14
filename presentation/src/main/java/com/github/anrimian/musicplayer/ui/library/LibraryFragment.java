@@ -61,16 +61,19 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
                     uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_ARTISTS);
                     FragmentNavigation.from(requireFragmentManager())
                             .newRootFragment(new ArtistsListFragment());
+                    break;
                 }
                 case R.id.menu_albums: {
                     uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_ALBUMS);
                     FragmentNavigation.from(requireFragmentManager())
                             .newRootFragment(new AlbumsListFragment());
+                    break;
                 }
                 case R.id.menu_genres: {
                     uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_GENRES);
                     FragmentNavigation.from(requireFragmentManager())
                             .newRootFragment(new GenresListFragment());
+                    break;
                 }
             }
             return true;

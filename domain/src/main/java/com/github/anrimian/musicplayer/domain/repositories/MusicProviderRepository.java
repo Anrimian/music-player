@@ -32,6 +32,8 @@ public interface MusicProviderRepository {
 
     Observable<List<Genre>> getGenresObservable();
 
+    Observable<List<Composition>> getGenreItemsObservable(long genreId);
+
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
@@ -51,4 +53,6 @@ public interface MusicProviderRepository {
     Single<List<Composition>> moveFileTo(String folderPath,
                                          String newSourcePath,
                                          FileSource fileSource);
+
+    Observable<Genre> getGenreObservable(long genreId);
 }

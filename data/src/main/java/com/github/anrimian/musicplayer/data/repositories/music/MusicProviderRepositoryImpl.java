@@ -98,6 +98,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
+    public Observable<List<Composition>> getGenreItemsObservable(long genreId) {
+        return genresDao.getCompositionsInGenre(genreId);
+    }
+
+    @Override
     public Single<Folder> getCompositionsInPath(@Nullable String path,
                                                 @Nullable String searchText) {
         return musicFolderDataSource.getCompositionsInPath(path)
@@ -153,6 +158,11 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
                                                 String newSourcePath,
                                                 FileSource fileSource) {
         return musicFolderDataSource.moveFileTo(folderPath, newSourcePath, fileSource);
+    }
+
+    @Override
+    public Observable<Genre> getGenreObservable(long genreId) {
+        return genresDao.getGenreObservable(genreId);
     }
 
     private Comparator<FileSource> getFileComparator(Order order) {

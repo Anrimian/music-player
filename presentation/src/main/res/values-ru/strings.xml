@@ -144,6 +144,7 @@
     <string name="no_albums_in_library">Нет альбомов в библиотеке</string>
     <string name="genres">Жанры</string>
     <string name="no_genres_in_library">Нет жанров в библиотеке</string>
+    <string name="no_items_in_genre">Нет композиций в выбранном жанре</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

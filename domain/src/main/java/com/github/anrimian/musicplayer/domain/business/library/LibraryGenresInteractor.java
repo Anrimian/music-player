@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.business.library;
 
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 
@@ -17,5 +18,13 @@ public class LibraryGenresInteractor {
 
     public Observable<List<Genre>> getGenresObservable() {
         return musicProviderRepository.getGenresObservable();
+    }
+
+    public Observable<List<Composition>> getGenreItemsObservable(long genreId) {
+        return musicProviderRepository.getGenreItemsObservable(genreId);
+    }
+
+    public Observable<Genre> getGenreObservable(long genreId) {
+        return musicProviderRepository.getGenreObservable(genreId);
     }
 }
