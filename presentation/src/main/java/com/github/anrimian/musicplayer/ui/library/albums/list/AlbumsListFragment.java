@@ -17,8 +17,10 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
+import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
@@ -117,6 +119,7 @@ public class AlbumsListFragment extends LibraryFragment implements
     }
 
     private void goToAlbumScreen(Album album) {
-
+        FragmentNavigation.from(requireFragmentManager())
+                .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));
     }
 }

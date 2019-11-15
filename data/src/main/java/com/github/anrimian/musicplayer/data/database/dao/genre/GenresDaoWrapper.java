@@ -54,7 +54,9 @@ public class GenresDaoWrapper {
     }
 
     public Observable<Genre> getGenreObservable(long genreId) {
-        return genreDao.getGenreObservable(genreId);
+        return genreDao.getGenreObservable(genreId)
+                .takeWhile(list -> !list.isEmpty())
+                .map(list -> list.get(0));
     }
 
     public Observable<List<Composition>> getCompositionsInGenre(long genreId) {

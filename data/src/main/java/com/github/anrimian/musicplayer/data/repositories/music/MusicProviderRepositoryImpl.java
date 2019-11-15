@@ -103,6 +103,16 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
+    public Observable<List<Composition>> getAlbumItemsObservable(long albumId) {
+        return albumsDao.getCompositionsInAlbum(albumId);
+    }
+
+    @Override
+    public Observable<Album> getAlbumObservable(long albumId) {
+        return albumsDao.getAlbumObservable(albumId);
+    }
+
+    @Override
     public Single<Folder> getCompositionsInPath(@Nullable String path,
                                                 @Nullable String searchText) {
         return musicFolderDataSource.getCompositionsInPath(path)

@@ -12,6 +12,8 @@ import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.library.albums.AlbumsComponent;
 import com.github.anrimian.musicplayer.di.app.library.albums.AlbumsModule;
+import com.github.anrimian.musicplayer.di.app.library.albums.items.AlbumItemsComponent;
+import com.github.anrimian.musicplayer.di.app.library.albums.items.AlbumItemsModule;
 import com.github.anrimian.musicplayer.di.app.library.artists.ArtistsComponent;
 import com.github.anrimian.musicplayer.di.app.library.artists.ArtistsModule;
 import com.github.anrimian.musicplayer.di.app.library.compositions.LibraryCompositionsComponent;
@@ -84,6 +86,10 @@ public class Components {
 
     public static AlbumsComponent albumsComponent() {
         return getLibraryComponent().albumsComponent(new AlbumsModule());
+    }
+
+    public static AlbumItemsComponent albumItemsComponent(long albumId) {
+        return albumsComponent().albumItemsComponent(new AlbumItemsModule(albumId));
     }
 
     public static GenresComponent genresComponent() {

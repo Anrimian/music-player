@@ -4,9 +4,11 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import java.util.List;
 
@@ -38,6 +40,17 @@ public class AlbumsDaoWrapper {
         return albumsDao.getAllObservable();
     }
 
+    public Observable<List<Composition>> getCompositionsInAlbum(long albumId) {
+        return albumsDao.getCompositionsInAlbum(albumId)
+                .map(list -> mapList(list, CompositionMapper::toComposition));
+    }
+
+    public Observable<Album> getAlbumObservable(long albumId) {
+        return albumsDao.getAlbumObservable(albumId)
+                .takeWhile(list -> !list.isEmpty())
+                .map(list -> list.get(0));
+    }
+
     private AlbumEntity toEntity(StorageAlbum album) {
         Long artistId = artistsDao.selectIdByStorageId(album.getArtistId());
         return new AlbumEntity(
@@ -49,4 +62,5 @@ public class AlbumsDaoWrapper {
                 album.getLastYear()
         );
     }
+
 }

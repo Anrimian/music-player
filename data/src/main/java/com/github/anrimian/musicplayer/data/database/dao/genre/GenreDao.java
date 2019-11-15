@@ -62,6 +62,6 @@ public interface GenreDao {
             "(SELECT count() FROM genre_entries WHERE genreId = genres.id) as compositionsCount, " +
             "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM genre_entries WHERE genreId = genres.id)) as totalDuration " +
             "FROM genres " +
-            "WHERE id = :genreId")
-    Observable<Genre> getGenreObservable(long genreId);
+            "WHERE id = :genreId LIMIT 1")
+    Observable<List<Genre>> getGenreObservable(long genreId);
 }

@@ -5,6 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 
@@ -39,6 +40,11 @@ public interface AlbumsDao {
             "FROM albums")
     Observable<List<Album>> getAllObservable();
 
+    @Query("SELECT * " +
+            "FROM compositions " +
+            "WHERE albumId = :albumId")
+    Observable<List<CompositionEntity>> getCompositionsInAlbum(long albumId);
+
     @Query("SELECT id as id," +
             "storageId as storageId, " +
             "albumName as name, " +
@@ -47,4 +53,13 @@ public interface AlbumsDao {
             "FROM albums " +
             "WHERE albums.artistId = :artistId")
     Observable<List<Album>> getAllAlbumsForArtist(long artistId);
+
+    @Query("SELECT id as id," +
+            "storageId as storageId, " +
+            "albumName as name, " +
+            "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
+            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
+            "FROM albums " +
+            "WHERE id = :albumId LIMIT 1")
+    Observable<List<Album>> getAlbumObservable(long albumId);
 }

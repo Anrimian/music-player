@@ -34,6 +34,10 @@ public interface MusicProviderRepository {
 
     Observable<List<Composition>> getGenreItemsObservable(long genreId);
 
+    Observable<List<Composition>> getAlbumItemsObservable(long albumId);
+
+    Observable<Album> getAlbumObservable(long albumId);
+
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
