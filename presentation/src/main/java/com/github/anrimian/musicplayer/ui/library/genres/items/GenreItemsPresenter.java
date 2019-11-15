@@ -1,64 +1,55 @@
 package com.github.anrimian.musicplayer.ui.library.genres.items;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryGenresInteractor;
+import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import moxy.InjectViewState;
-import moxy.MvpPresenter;
-
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
 @InjectViewState
-public class GenreItemsPresenter extends MvpPresenter<GenreItemsView> {
+public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreItemsView> {
 
     private final long genreId;
     private final LibraryGenresInteractor interactor;
-    private final ErrorParser errorParser;
-    private final Scheduler uiScheduler;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-    private Disposable listDisposable;
-
-    private List<Composition> compositions = new ArrayList<>();
 
     public GenreItemsPresenter(long genreId,
                                LibraryGenresInteractor interactor,
+                               PlayListsInteractor playListsInteractor,
+                               MusicPlayerInteractor playerInteractor,
+                               DisplaySettingsInteractor displaySettingsInteractor,
                                ErrorParser errorParser,
                                Scheduler uiScheduler) {
+        super(playerInteractor,
+                playListsInteractor,
+                displaySettingsInteractor,
+                errorParser,
+                uiScheduler);
         this.genreId = genreId;
         this.interactor = interactor;
-        this.errorParser = errorParser;
-        this.uiScheduler = uiScheduler;
     }
 
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        subscribeOnGenresList();
         subscribeOnGenreInfo();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
-    }
-
-    void onTryAgainLoadCompositionsClicked() {
-        subscribeOnGenresList();
+    protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
+        return interactor.getGenreItemsObservable(genreId);
     }
 
     void onFragmentMovedToTop() {
-        //save selected genre screen
+        //save selected genre screen. Wait a little for all screens
     }
 
     private void subscribeOnGenreInfo() {
@@ -71,35 +62,5 @@ public class GenreItemsPresenter extends MvpPresenter<GenreItemsView> {
 
     private void onGenreInfoReceived(Genre genre) {
         getViewState().showGenreInfo(genre);
-    }
-
-    private void subscribeOnGenresList() {
-        if (compositions.isEmpty()) {
-            getViewState().showLoading();
-        }
-        dispose(listDisposable, presenterDisposable);
-        listDisposable = interactor.getGenreItemsObservable(genreId)
-                .observeOn(uiScheduler)
-                .subscribe(this::onCompositionsReceived, this::onListReceivingError);
-        presenterDisposable.add(listDisposable);
-    }
-
-    private void onListReceivingError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showLoadingError(errorCommand);
-    }
-
-    private void onCompositionsReceived(List<Composition> compositions) {
-        this.compositions = compositions;
-        getViewState().submitList(compositions);
-        if (compositions.isEmpty()) {
-//            if (TextUtils.isEmpty(searchText)) {
-                getViewState().showEmptyList();
-//            } else {
-//                getViewState().showEmptySearchResult();
-//            }
-        } else {
-            getViewState().showList();
-        }
     }
 }

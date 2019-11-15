@@ -44,10 +44,8 @@ public class LibraryCompositionsModule {
     @Provides
     @Nonnull
     LibraryCompositionsInteractor libraryCompositionsInteractor(MusicProviderRepository musicProviderRepository,
-                                                                MusicPlayerInteractor musicPlayerInteractor,
                                                                 SettingsRepository settingsRepository) {
         return new LibraryCompositionsInteractor(musicProviderRepository,
-                musicPlayerInteractor,
                 settingsRepository);
     }
 }

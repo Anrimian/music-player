@@ -38,4 +38,13 @@ public interface AlbumsDao {
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums")
     Observable<List<Album>> getAllObservable();
+
+    @Query("SELECT id as id," +
+            "storageId as storageId, " +
+            "albumName as name, " +
+            "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
+            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
+            "FROM albums " +
+            "WHERE albums.artistId = :artistId")
+    Observable<List<Album>> getAllAlbumsForArtist(long artistId);
 }
