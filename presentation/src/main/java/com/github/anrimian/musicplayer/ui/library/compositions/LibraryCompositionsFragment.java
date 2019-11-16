@@ -122,10 +122,10 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new CompositionsAdapter(recyclerView,
-                presenter.getSelectedCompositions());
-        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-        adapter.setOnLongClickListener(presenter::onCompositionLongClick);
-        adapter.setIconClickListener(presenter::onCompositionIconClicked);
+                presenter.getSelectedCompositions(),
+                presenter::onCompositionClicked,
+                presenter::onCompositionLongClick,
+                presenter::onCompositionIconClicked);
         recyclerView.setAdapter(adapter);
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
