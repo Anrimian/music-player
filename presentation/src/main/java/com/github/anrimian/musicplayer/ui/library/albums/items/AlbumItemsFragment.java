@@ -34,8 +34,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNav
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.Collection;
 import java.util.List;
@@ -127,10 +125,7 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(clListContainer, slidrConfig, () ->
-                        FragmentNavigation.from(requireFragmentManager()).goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
 

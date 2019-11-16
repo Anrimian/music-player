@@ -39,8 +39,6 @@ import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
 import java.util.Objects;
@@ -136,10 +134,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(clListContainer, slidrConfig, () ->
-                        FragmentNavigation.from(requireFragmentManager()).goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
         ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) fm
