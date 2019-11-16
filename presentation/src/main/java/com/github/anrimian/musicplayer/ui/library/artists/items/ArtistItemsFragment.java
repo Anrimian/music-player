@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.library.albums.items;
+package com.github.anrimian.musicplayer.ui.library.artists.items;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
@@ -51,11 +51,11 @@ import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
-public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implements
-        AlbumItemsView, FragmentLayerListener, BackButtonListener {
+public class ArtistItemsFragment extends BaseLibraryCompositionsFragment implements
+        ArtistItemsView, FragmentLayerListener, BackButtonListener {
 
     @InjectPresenter
-    AlbumItemsPresenter presenter;
+    ArtistItemsPresenter presenter;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -73,17 +73,17 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
 
-    public static AlbumItemsFragment newInstance(long albumId) {
+    public static ArtistItemsFragment newInstance(long artistId) {
         Bundle args = new Bundle();
-        args.putLong(ID_ARG, albumId);
-        AlbumItemsFragment fragment = new AlbumItemsFragment();
+        args.putLong(ID_ARG, artistId);
+        ArtistItemsFragment fragment = new ArtistItemsFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
     @ProvidePresenter
-    AlbumItemsPresenter providePresenter() {
-        return Components.albumItemsComponent(getAlbumId()).albumItemsPresenter();
+    ArtistItemsPresenter providePresenter() {
+        return Components.artistItemsComponent(getAlbumId()).artistItemsPresenter();
     }
 
     @Override
@@ -158,18 +158,18 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     }
 
     @Override
-    public void showAlbumInfo(Album album) {
-        toolbar.setTitle(album.getName());
+    public void showArtistInfo(Artist artist) {
+        toolbar.setTitle(artist.getName());
         toolbar.setSubtitle(getResources().getQuantityString(
                 R.plurals.compositions_count,
-                album.getCompositionsCount(),
-                album.getCompositionsCount()));
+                artist.getCompositionsCount(),
+                artist.getCompositionsCount()));
     }
 
     @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.no_items_in_genre);
+        progressViewWrapper.showMessage(R.string.no_compositions);
     }
 
     @Override

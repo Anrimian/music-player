@@ -40,6 +40,10 @@ public class AlbumsDaoWrapper {
         return albumsDao.getAllObservable();
     }
 
+    public Observable<List<Album>> getAllAlbumsForArtist(long artistId) {
+        return albumsDao.getAllAlbumsForArtist(artistId);
+    }
+
     public Observable<List<Composition>> getCompositionsInAlbum(long albumId) {
         return albumsDao.getCompositionsInAlbum(albumId)
                 .map(list -> mapList(list, CompositionMapper::toComposition));
