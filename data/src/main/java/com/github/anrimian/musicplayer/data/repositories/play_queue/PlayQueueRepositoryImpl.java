@@ -87,6 +87,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
+    public int getCurrentPosition() {
+        return queueCache.getCurrentQueue().indexOf(getCurrentItem());
+    }
+
+    @Override
     public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
         return withDefaultValue(currentCompositionSubject, this::getSavedQueueEvent)
                 .subscribeOn(scheduler);

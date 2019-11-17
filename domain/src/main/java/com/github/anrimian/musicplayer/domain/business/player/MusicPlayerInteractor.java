@@ -310,6 +310,10 @@ public class MusicPlayerInteractor {
     }
 
     private void handleErrorWithComposition(ErrorType errorType) {
+        if (currentItem == null) {
+            return;
+        }
+
         switch (errorType) {
             case DELETED: {
                 musicProviderRepository.deleteComposition(currentItem.getComposition())
@@ -322,10 +326,11 @@ public class MusicPlayerInteractor {
                 musicProviderRepository.writeErrorAboutComposition(errorType, currentItem.getComposition())
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
-                        .andThen(playQueueRepository.skipToNext())//TODO problem when all prepares gives errors
-                        .doOnSuccess(currentPosition -> {
-                            if (currentPosition == 0) {
+                        .doOnComplete(() -> {
+                            if (playQueueRepository.getCurrentPosition() == 0) {//mm, no!
                                 stop();
+                            } else {
+                                playQueueRepository.skipToNext().subscribe();
                             }
                         })
                         .subscribe();

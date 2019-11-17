@@ -25,6 +25,8 @@ public interface PlayQueueRepository {
 
     Maybe<Integer> getCompositionPosition(@Nonnull PlayQueueItem playQueueItem);
 
+    int getCurrentPosition();
+
     Observable<PlayQueueEvent> getCurrentQueueItemObservable();
 
     Flowable<List<PlayQueueItem>> getPlayQueueObservable();

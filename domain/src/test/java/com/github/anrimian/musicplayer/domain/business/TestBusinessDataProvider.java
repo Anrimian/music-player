@@ -35,9 +35,9 @@ public class TestBusinessDataProvider {
 
     public static List<PlayListItem> getFakePlayListItems() {
         List<PlayListItem> items = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
+        for (long i = 0; i < 100000; i++) {
             Composition composition = fakeComposition(i, "music-" + i);
-            PlayListItem item = new PlayListItem(i, composition);
+            PlayListItem item = new PlayListItem(i, i, composition);
             items.add(item);
         }
         return items;
@@ -66,6 +66,7 @@ public class TestBusinessDataProvider {
                 String.valueOf(id),
                 0,
                 0,
+                id,
                 id,
                 new Date(0),
                 new Date(0),
@@ -106,6 +107,7 @@ public class TestBusinessDataProvider {
                 0,
                 0,
                 id,
+                id,
                 new Date(createDate),
                 new Date(0),
                 null);
@@ -118,6 +120,7 @@ public class TestBusinessDataProvider {
                 filePath,
                 0,
                 size,
+                id,
                 id,
                 new Date(0),
                 new Date(0),
@@ -132,6 +135,7 @@ public class TestBusinessDataProvider {
                 0,
                 0,
                 id,
+                id,
                 new Date(createDate * 1000L),
                 new Date(0),
                 null);
@@ -145,6 +149,7 @@ public class TestBusinessDataProvider {
                 0,
                 0,
                 id,
+                id,
                 new Date(0),
                 new Date(0),
                 null);
@@ -157,6 +162,7 @@ public class TestBusinessDataProvider {
                 String.valueOf(id),
                 0,
                 0,
+                id,
                 id,
                 new Date(0),
                 new Date(0),
