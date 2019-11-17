@@ -28,9 +28,9 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
     private final Set<MusicViewHolder> viewHolders = new HashSet<>();
 
     private final HashSet<Composition> selectedCompositions;
-    private OnPositionItemClickListener<Composition> onCompositionClickListener;
-    private OnPositionItemClickListener<Composition> onLongClickListener;
-    private OnPositionItemClickListener<Composition> iconClickListener;
+    private final OnPositionItemClickListener<Composition> onCompositionClickListener;
+    private final OnPositionItemClickListener<Composition> onLongClickListener;
+    private final OnPositionItemClickListener<Composition> iconClickListener;
 
     @Nullable
     private Composition currentComposition;
@@ -38,12 +38,18 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
     private boolean isCoversEnabled;
 
     public CompositionsAdapter(RecyclerView recyclerView,
-                               HashSet<Composition> selectedCompositions) {
+                               HashSet<Composition> selectedCompositions,
+                               OnPositionItemClickListener<Composition> onCompositionClickListener,
+                               OnPositionItemClickListener<Composition> onLongClickListener,
+                               OnPositionItemClickListener<Composition> iconClickListener) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 CompositionHelper::areSourcesTheSame,
                 CompositionHelper::getChangePayload)
         );
         this.selectedCompositions = selectedCompositions;
+        this.onCompositionClickListener = onCompositionClickListener;
+        this.onLongClickListener = onLongClickListener;
+        this.iconClickListener = iconClickListener;
     }
 
     @NonNull
@@ -108,18 +114,6 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
         for (MusicViewHolder holder: viewHolders) {
             holder.setSelected(selected);
         }
-    }
-
-    public void setOnCompositionClickListener(OnPositionItemClickListener<Composition> onCompositionClickListener) {
-        this.onCompositionClickListener = onCompositionClickListener;
-    }
-
-    public void setOnLongClickListener(OnPositionItemClickListener<Composition> onLongClickListener) {
-        this.onLongClickListener = onLongClickListener;
-    }
-
-    public void setIconClickListener(OnPositionItemClickListener<Composition> iconClickListener) {
-        this.iconClickListener = iconClickListener;
     }
 
     public void showCurrentComposition(Composition currentComposition) {

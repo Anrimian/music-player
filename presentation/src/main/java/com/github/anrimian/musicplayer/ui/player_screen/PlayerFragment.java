@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -522,11 +523,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 || position == playQueueLayoutManager.findFirstVisibleItemPosition()
                 || position == playQueueLayoutManager.findLastVisibleItemPosition();
 
+        Context context = requireContext();
         rvPlayList.post(() -> {
             if (smooth) {
                 RecyclerViewUtils.smoothScrollToTop(position,
                         playQueueLayoutManager,
-                        requireContext(),
+                        context,
                         170);
             } else {
                 playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
