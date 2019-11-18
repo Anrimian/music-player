@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -23,9 +24,11 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
+import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistAlbumsPresenter;
+import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistItemsAdapter;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
-import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
@@ -34,7 +37,9 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNav
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
+import com.r0adkll.slidr.model.SlidrInterface;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -67,11 +72,15 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     View fab;
 
     private AdvancedToolbar toolbar;
-    private CompositionsAdapter adapter;
+    private ArtistItemsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
+
+    private final ArtistAlbumsPresenter artistAlbumsPresenter = new ArtistAlbumsPresenter();
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
+
+    private SlidrInterface slidrInterface;
 
     public static ArtistItemsFragment newInstance(long artistId) {
         Bundle args = new Bundle();
@@ -115,17 +124,21 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
         progressViewWrapper.hideAll();
 
-        adapter = new CompositionsAdapter(recyclerView,
+        adapter = new ArtistItemsAdapter(recyclerView,
                 presenter.getSelectedCompositions(),
                 presenter::onCompositionClicked,
                 presenter::onCompositionLongClick,
-                presenter::onCompositionIconClicked);
+                presenter::onCompositionIconClicked,
+                this::onAlbumClicked,
+                this::onAlbumsScrolled);
         recyclerView.setAdapter(adapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
+        slidrInterface = SlidrPanel.simpleSwipeBack(clListContainer,
+                this,
+                toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
 
@@ -195,9 +208,18 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     }
 
     @Override
-    public void updateList(List<Composition> genres) {
-        adapter.submitList(genres);
+    public void updateList(List<Composition> compositions) {
+        List<Object> list = new ArrayList<>();
+        list.add(artistAlbumsPresenter);
+        list.addAll(compositions);
+        adapter.submitList(list);
     }
+
+    @Override
+    public void showArtistAlbums(List<Album> albums) {
+        artistAlbumsPresenter.submitAlbums(albums);
+    }
+
     @Override
     public void onCompositionSelected(Composition composition, int position) {
         adapter.setItemSelected(position);
@@ -306,7 +328,21 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         FragmentNavigation.from(requireFragmentManager()).goBack();
     }
 
+    //scroll horizontally then scroll to bottom issue
+    private void onAlbumsScrolled(boolean onStart) {
+        if (onStart) {
+            slidrInterface.unlock();
+        } else {
+            slidrInterface.lock();
+        }
+    }
+
     private long getAlbumId() {
         return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
+    }
+
+    private void onAlbumClicked(Album album) {
+        FragmentNavigation.from(requireFragmentManager())
+                .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));
     }
 }

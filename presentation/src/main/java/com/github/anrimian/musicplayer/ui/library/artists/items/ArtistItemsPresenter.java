@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.business.library.LibraryArtistsInt
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -20,6 +21,8 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
 
     private final long artistId;
     private final LibraryArtistsInteractor interactor;
+
+    private Artist artist;
 
     public ArtistItemsPresenter(long artistId,
                                 LibraryArtistsInteractor interactor,
@@ -41,6 +44,7 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         subscribeOnArtistInfo();
+        subscribeOnArtistAlbums();
     }
 
     @Override
@@ -50,6 +54,9 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
 
     void onFragmentMovedToTop() {
         //save selected screen. Wait a little for all screens
+        if (artist != null) {
+            getViewState().showArtistInfo(artist);
+        }
     }
 
     private void subscribeOnArtistInfo() {
@@ -61,6 +68,19 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
     }
 
     private void onArtistInfoReceived(Artist artist) {
+        this.artist = artist;
         getViewState().showArtistInfo(artist);
+    }
+
+    private void subscribeOnArtistAlbums() {
+        presenterDisposable.add(interactor.getAllAlbumsForArtist(artistId)
+                .observeOn(uiScheduler)
+                .subscribe(this::onArtistInfoReceived,
+                        t -> getViewState().closeScreen(),
+                        getViewState()::closeScreen));
+    }
+
+    private void onArtistInfoReceived(List<Album> albums) {
+        getViewState().showArtistAlbums(albums);
     }
 }

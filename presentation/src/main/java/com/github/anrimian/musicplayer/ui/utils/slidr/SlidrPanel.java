@@ -15,11 +15,11 @@ import com.r0adkll.slidr.widget.SliderPanel;
 
 public class SlidrPanel {
 
-    public static void simpleSwipeBack(@NonNull View oldScreen,
-                                       @NonNull Fragment fragment,
-                                       @Nullable SlideListener slideListener) {
+    public static SlidrInterface simpleSwipeBack(@NonNull View oldScreen,
+                                                 @NonNull Fragment fragment,
+                                                 @Nullable SlideListener slideListener) {
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(oldScreen,
+        return SlidrPanel.replace(oldScreen,
                 slidrConfig,
                 () -> FragmentNavigation.from(fragment.requireFragmentManager()).goBack(0),
                 slideListener);

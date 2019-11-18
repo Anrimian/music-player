@@ -48,7 +48,6 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
         presenterDisposable.dispose();
     }
 
-
     void onTryAgainLoadCompositionsClicked() {
         subscribeOnArtistsList();
     }

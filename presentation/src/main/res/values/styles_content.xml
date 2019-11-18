@@ -138,4 +138,11 @@
         <item name="android:textColorHint">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="TextStyle.ContentTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
 </resources>
