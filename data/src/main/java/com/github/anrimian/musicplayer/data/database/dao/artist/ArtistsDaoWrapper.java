@@ -50,8 +50,7 @@ public class ArtistsDaoWrapper {
     private ArtistEntity toEntity(StorageArtist artist) {
         return new ArtistEntity(
                 artist.getId(),
-                artist.getArtist(),
-                artist.getArtistKey()
+                artist.getArtist()
         );
     }
 }

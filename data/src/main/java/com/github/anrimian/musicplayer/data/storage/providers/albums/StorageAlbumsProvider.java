@@ -31,7 +31,7 @@ public class StorageAlbumsProvider {
                         Albums._ID,
                         Albums.ALBUM,
 //                        Albums.ALBUM_ID,
-                        Albums.ALBUM_KEY,
+//                        Albums.ALBUM_KEY,
                         Albums.FIRST_YEAR,
                         Albums.LAST_YEAR,
                         Albums.ARTIST,
@@ -59,7 +59,6 @@ public class StorageAlbumsProvider {
         return new StorageAlbum(
                 cursorWrapper.getLong(Albums._ID),
                 cursorWrapper.getString(Albums.ALBUM),
-                cursorWrapper.getString(Albums.ALBUM_KEY),
                 cursorWrapper.getString(Albums.ARTIST),
                 cursorWrapper.getLong(Albums.ARTIST_ID),
                 cursorWrapper.getInt(Albums.FIRST_YEAR),

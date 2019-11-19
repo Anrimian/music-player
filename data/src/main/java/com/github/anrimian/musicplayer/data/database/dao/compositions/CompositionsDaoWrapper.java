@@ -6,10 +6,13 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
@@ -91,8 +94,47 @@ public class CompositionsDaoWrapper {
         compositionsDao.updateFilePath(id, filePath);
     }
 
-    public void updateArtist(long id, String artist) {
-        compositionsDao.updateArtist(id, artist);
+    public void updateArtist(long id, String authorName) {
+        appDatabase.runInTransaction(() -> {
+            // 1) find new artist by name from artists
+            long artistId = artistsDao.findArtistIdByName(authorName);
+
+            // 2) if artist not exists - create artist
+//            boolean isArtistExists = artistId != 0;
+            if (artistId == 0) {
+                artistId = artistsDao.insertArtist(new ArtistEntity(null, authorName));//hmm, storage?
+            }
+            // 3) set new artistId
+            long oldArtistId = compositionsDao.getArtistId(id);
+            compositionsDao.updateArtist(id, artistId);
+
+            //find album
+            long albumId = compositionsDao.getAlbumId(id);
+            if (albumId != 0) {
+                Album album = albumsDao.getAlbum(albumId);
+
+                //if album has only 1 composition - change album author
+                if (album.getCompositionsCount() == 1) {
+                    albumsDao.setAuthorId(albumId, artistId);
+                } else {
+                    //else copy album with new author
+                    AlbumEntity albumEntity = albumsDao.getAlbumEntity(albumId);
+                    long newAlbumId = albumsDao.insert(new AlbumEntity(
+                            artistId,
+                            null,
+                            album.getName(),
+                            albumEntity.getFirstYear(),
+                            albumEntity.getLastYear()
+                    ));
+                    compositionsDao.setAlbumId(id, newAlbumId);
+                }
+            }
+
+            // 4) if OLD artist exists and has no references - delete him
+            if (oldArtistId != 0) {
+                artistsDao.deleteEmptyArtists(oldArtistId);
+            }
+        });
     }
 
     public void updateTitle(long id, String title) {

@@ -20,8 +20,7 @@ public interface ArtistsDao {
     Long selectIdByStorageId(long storageId);
 
     @Query("SELECT storageId as id," +
-            "artistName as artist," +
-            "artistKey as artistKey " +
+            "artistName as artist " +
             "FROM artists")
     List<StorageArtist> selectAllAsStorageArtists();
 
@@ -31,7 +30,8 @@ public interface ArtistsDao {
     @Query("SELECT id as id," +
             "artistName as name, " +
             "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount " +
-            "FROM artists")
+            "FROM artists " +
+            "ORDER BY id DESC")
     Observable<List<Artist>> getAllObservable();
 
     @Query("SELECT id as id," +
@@ -45,4 +45,14 @@ public interface ArtistsDao {
             "FROM compositions " +
             "WHERE artistId = :artist")
     Observable<List<CompositionEntity>> getCompositionsByArtist(long artist);
+
+    @Query("SELECT id FROM artists WHERE artistName = :author")
+    long findArtistIdByName(String author);
+
+    @Insert
+    long insertArtist(ArtistEntity artistEntity);
+
+    @Query("DELETE FROM artists " +
+            "WHERE id = :id AND (SELECT count() FROM compositions WHERE artistId = artists.id) = 0")
+    void deleteEmptyArtists(long id);
 }

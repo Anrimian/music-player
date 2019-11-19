@@ -169,7 +169,7 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.no_items_in_genre);
+        progressViewWrapper.showMessage(R.string.no_compositions);
     }
 
     @Override

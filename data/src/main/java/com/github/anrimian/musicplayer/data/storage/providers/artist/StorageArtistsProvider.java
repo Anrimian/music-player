@@ -32,7 +32,7 @@ public class StorageArtistsProvider {
                 new String[] {
                         Artists._ID,
                         Artists.ARTIST,
-                        Artists.ARTIST_KEY,
+//                        Artists.ARTIST_KEY,
 //                        MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS,
 //                        MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS
                 },
@@ -64,8 +64,7 @@ public class StorageArtistsProvider {
         }
         return new StorageArtist(
                 cursorWrapper.getLong(Artists._ID),
-                artistName,
-                cursorWrapper.getString(Artists.ARTIST_KEY)
+                artistName
         );
     }
 }

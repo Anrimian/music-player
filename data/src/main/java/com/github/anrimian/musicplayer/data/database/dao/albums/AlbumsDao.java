@@ -21,7 +21,6 @@ public interface AlbumsDao {
 
     @Query("SELECT storageId as id," +
             "albumName as album," +
-            "albumKey as albumKey," +
             "(SELECT artistName FROM artists WHERE artists.id = artistId) as artist," +
             "(SELECT storageId FROM artists WHERE artists.id = artistId) as artistId," +
             "firstYear as firstYear," +
@@ -31,6 +30,9 @@ public interface AlbumsDao {
 
     @Insert
     void insertAll(List<AlbumEntity> artists);
+
+    @Insert
+    long insert(AlbumEntity entity);
 
     @Query("SELECT id as id," +
             "storageId as storageId, " +
@@ -62,4 +64,19 @@ public interface AlbumsDao {
             "FROM albums " +
             "WHERE id = :albumId LIMIT 1")
     Observable<List<Album>> getAlbumObservable(long albumId);
+
+    @Query("SELECT id as id," +
+            "storageId as storageId, " +
+            "albumName as name, " +
+            "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
+            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
+            "FROM albums " +
+            "WHERE id = :albumId LIMIT 1")
+    Album getAlbum(long albumId);
+
+    @Query("UPDATE albums SET artistId = :artistId WHERE id = :albumId")
+    void setAuthorId(long albumId, long artistId);
+
+    @Query("SELECT * FROM albums WHERE id = :id")
+    AlbumEntity getAlbumEntity(long id);
 }

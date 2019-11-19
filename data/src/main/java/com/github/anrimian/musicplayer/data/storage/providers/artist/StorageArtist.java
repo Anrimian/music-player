@@ -6,12 +6,10 @@ public class StorageArtist {
 
     private final long id;
     private final String artist;
-    private final String artistKey;
 
-    public StorageArtist(long id, String artist, String artistKey) {
+    public StorageArtist(long id, String artist) {
         this.id = id;
         this.artist = artist;
-        this.artistKey = artistKey;
     }
 
     public long getId() {
@@ -22,9 +20,6 @@ public class StorageArtist {
         return artist;
     }
 
-    public String getArtistKey() {
-        return artistKey;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -47,7 +42,6 @@ public class StorageArtist {
         return "StorageArtist{" +
                 "id=" + id +
                 ", artist='" + artist + '\'' +
-                ", artistKey='" + artistKey + '\'' +
                 '}';
     }
 }

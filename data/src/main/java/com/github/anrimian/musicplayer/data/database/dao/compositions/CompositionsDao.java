@@ -97,9 +97,21 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET artist = :artist WHERE id = :id")
     void updateArtist(long id, String artist);
 
+    @Query("UPDATE compositions SET artistId = :artistId WHERE id = :id")
+    void updateArtist(long id, long artistId);
+
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
 
     @Query("SELECT id FROM compositions WHERE storageId = :storageId")
     long selectIdByStorageId(long storageId);
+
+    @Query("SELECT albumId FROM compositions WHERE id = :compositionId")
+    long getAlbumId(long compositionId);
+
+    @Query("UPDATE compositions SET albumId = :newAlbumId WHERE id = :compositionId")
+    void setAlbumId(long compositionId, long newAlbumId);
+
+    @Query("SELECT artistId FROM compositions WHERE id = :id")
+    long getArtistId(long id);
 }

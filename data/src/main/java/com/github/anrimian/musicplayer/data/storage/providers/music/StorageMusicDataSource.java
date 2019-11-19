@@ -59,12 +59,12 @@ public class StorageMusicDataSource {
         });
     }
 
-    public Completable updateCompositionAuthor(Composition composition, String author) {
+    public Completable updateCompositionAuthor(Composition composition, String authorName) {
         return Completable.fromAction(() -> {
-            compositionsDao.updateArtist(composition.getId(), author);
+            compositionsDao.updateArtist(composition.getId(), authorName);
             Long storageId = composition.getStorageId();
             if (storageId != null) {
-                musicProvider.updateCompositionAuthor(storageId, author);
+                musicProvider.updateCompositionAuthor(storageId, authorName);
             }
         });
     }
@@ -99,6 +99,8 @@ public class StorageMusicDataSource {
         File parentDirectory = new File(filePath).getParentFile();
 
         fileManager.deleteFile(filePath);
-        fileManager.deleteEmptyDirectory(parentDirectory);
+        if (parentDirectory != null) {
+            fileManager.deleteEmptyDirectory(parentDirectory);
+        }
     }
 }

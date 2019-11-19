@@ -61,7 +61,6 @@ public class AlbumsDaoWrapper {
                 artistId,
                 album.getId(),
                 album.getAlbum(),
-                album.getAlbumKey(),
                 album.getFirstYear(),
                 album.getLastYear()
         );
