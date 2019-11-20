@@ -54,5 +54,5 @@ public interface ArtistsDao {
 
     @Query("DELETE FROM artists " +
             "WHERE id = :id AND (SELECT count() FROM compositions WHERE artistId = artists.id) = 0")
-    void deleteEmptyArtists(long id);
+    void deleteEmptyArtist(long id);
 }

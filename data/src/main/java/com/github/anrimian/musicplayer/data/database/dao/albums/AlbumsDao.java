@@ -74,9 +74,16 @@ public interface AlbumsDao {
             "WHERE id = :albumId LIMIT 1")
     Album getAlbum(long albumId);
 
+    @Query("SELECT id FROM albums WHERE artistId = :artistId AND albumName = :name")
+    long findAlbum(long artistId, String name);
+
     @Query("UPDATE albums SET artistId = :artistId WHERE id = :albumId")
     void setAuthorId(long albumId, long artistId);
 
     @Query("SELECT * FROM albums WHERE id = :id")
     AlbumEntity getAlbumEntity(long id);
+
+    @Query("DELETE FROM albums " +
+            "WHERE id = :id AND (SELECT count() FROM compositions WHERE albumId = albums.id) = 0")
+    void deleteEmptyAlbum(long id);
 }
