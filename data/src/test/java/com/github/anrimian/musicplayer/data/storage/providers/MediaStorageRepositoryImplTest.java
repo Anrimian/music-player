@@ -8,7 +8,6 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
@@ -191,7 +190,7 @@ public class MediaStorageRepositoryImplTest {
         newPlayListItemsSubject.onNext(newItems);
 
         verify(playListsDao).insertPlayListItems(
-                eq(asList(new RawPlayListItem(1L, 0))),
+                eq(asList(new StoragePlayListItem(1L, 0))),
                 eq(1L)
         );
     }

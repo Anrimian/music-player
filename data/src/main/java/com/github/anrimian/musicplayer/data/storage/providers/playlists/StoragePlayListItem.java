@@ -3,19 +3,19 @@ package com.github.anrimian.musicplayer.data.storage.providers.playlists;
 public class StoragePlayListItem {
 
     private long itemId;
-    private long compositionId;
+    private long audioId;
 
-    public StoragePlayListItem(long itemId, long compositionId) {
+    public StoragePlayListItem(long itemId, long audioId) {
         this.itemId = itemId;
-        this.compositionId = compositionId;
+        this.audioId = audioId;
     }
 
     public long getItemId() {
         return itemId;
     }
 
-    public long getCompositionId() {
-        return compositionId;
+    public long getAudioId() {
+        return audioId;
     }
 
     @Override

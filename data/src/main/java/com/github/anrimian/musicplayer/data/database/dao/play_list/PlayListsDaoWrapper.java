@@ -3,15 +3,16 @@ package com.github.anrimian.musicplayer.data.database.dao.play_list;
 import android.database.sqlite.SQLiteConstraintException;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
@@ -26,10 +27,14 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 public class PlayListsDaoWrapper {
 
     private final PlayListDao playListDao;
+    private final CompositionsDao compositionsDao;
     private final AppDatabase appDatabase;
 
-    public PlayListsDaoWrapper(PlayListDao playListDao, AppDatabase appDatabase) {
+    public PlayListsDaoWrapper(PlayListDao playListDao,
+                               CompositionsDao compositionsDao,
+                               AppDatabase appDatabase) {
         this.playListDao = playListDao;
+        this.compositionsDao = compositionsDao;
         this.appDatabase = appDatabase;
     }
 
@@ -130,7 +135,7 @@ public class PlayListsDaoWrapper {
         });
     }
 
-    public void insertPlayListItems(List<RawPlayListItem> items,
+    public void insertPlayListItems(List<StoragePlayListItem> items,
                                     long playListId) {
         insertPlayListItems(items,
                 playListId,
@@ -138,7 +143,28 @@ public class PlayListsDaoWrapper {
         );
     }
 
-    public void insertPlayListItems(List<RawPlayListItem> items,
+    public void addCompositions(List<Composition> compositions,
+                                long playListId,
+                                int position) {
+        appDatabase.runInTransaction(() -> {
+            playListDao.increasePositionsByCountAfter(compositions.size(), position, playListId);
+
+            List<PlayListEntryEntity> entities = new ArrayList<>(compositions.size());
+            int orderPosition = position;
+            for (Composition item : compositions) {
+                PlayListEntryEntity entryEntity = new PlayListEntryEntity(
+                        null,
+                        item.getId(),
+                        playListId,
+                        orderPosition++
+                );
+                entities.add(entryEntity);
+            }
+            playListDao.insertPlayListEntries(entities);
+        });
+    }
+
+    public void insertPlayListItems(List<StoragePlayListItem> items,
                                     long playListId,
                                     int position) {
         appDatabase.runInTransaction(() -> {
@@ -146,10 +172,10 @@ public class PlayListsDaoWrapper {
 
             List<PlayListEntryEntity> entities = new ArrayList<>(items.size());
             int orderPosition = position;
-            for (RawPlayListItem item : items) {
+            for (StoragePlayListItem item : items) {
                 PlayListEntryEntity entryEntity = new PlayListEntryEntity(
-                        item.getStorageItemId(),
-                        item.getAudioId(),
+                        item.getItemId(),
+                        compositionsDao.selectIdByStorageId(item.getAudioId()),
                         playListId,
                         orderPosition++
                 );

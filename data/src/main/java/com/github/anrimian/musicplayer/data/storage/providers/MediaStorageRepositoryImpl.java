@@ -8,7 +8,6 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
@@ -198,12 +197,12 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 newItems,
                 StoragePlayListItem::getItemId);
 
-        List<RawPlayListItem> addedItems = new ArrayList<>();
+        List<StoragePlayListItem> addedItems = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processChanges(currentItemsMap,
                 newItemsMap,
                 (o1, o2) -> false,
                 item -> {},
-                item -> addedItems.add(rawPlayListItem(item.getItemId(), item.getCompositionId())),
+                addedItems::add,
                 item -> {});
 
         if (hasChanges) {
@@ -310,13 +309,6 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         if (hasChanges) {
             artistsDao.insertArtists(addedArtists);
         }
-    }
-
-    private RawPlayListItem rawPlayListItem(long itemId, long storageCompositionId) {
-        return new RawPlayListItem(
-                itemId,
-                compositionsDao.selectIdByStorageId(storageCompositionId)
-        );
     }
 
     private boolean hasActualChanges(StoragePlayList first, StoragePlayList second) {

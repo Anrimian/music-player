@@ -127,7 +127,9 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
-    PlayListsDaoWrapper playListsDaoWrapper(PlayListDao playListDao, AppDatabase appDatabase) {
-        return new PlayListsDaoWrapper(playListDao, appDatabase);
+    PlayListsDaoWrapper playListsDaoWrapper(PlayListDao playListDao,
+                                            CompositionsDao compositionsDao,
+                                            AppDatabase appDatabase) {
+        return new PlayListsDaoWrapper(playListDao, compositionsDao, appDatabase);
     }
 }

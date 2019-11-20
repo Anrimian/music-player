@@ -24,7 +24,6 @@ import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFak
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeItems;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getReversedFakeItems;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -64,8 +63,6 @@ public class PlayQueueRepositoryImplTest {
 
         verify(playQueueDao).insertNewPlayQueue(getFakeCompositions());
 
-        verify(uiStatePreferences).setCurrentCompositionId(0L);
-
         playQueueRepository.getCurrentQueueItemObservable()
                 .test()
                 .assertValue(new PlayQueueEvent(new PlayQueueItem(0, fakeComposition(0))));
@@ -78,8 +75,6 @@ public class PlayQueueRepositoryImplTest {
                 .assertComplete();
 
         verify(playQueueDao).insertNewPlayQueue(getFakeCompositions());
-
-        verify(uiStatePreferences).setCurrentCompositionId(1000L);
 
         playQueueRepository.getCurrentQueueItemObservable()
                 .test()
@@ -94,8 +89,6 @@ public class PlayQueueRepositoryImplTest {
                 .test()
                 .assertComplete();
 
-        verify(uiStatePreferences).setCurrentCompositionId(anyLong());
-
         playQueueRepository.getCurrentQueueItemObservable()
                 .test()
                 .assertValueCount(1);
@@ -108,8 +101,6 @@ public class PlayQueueRepositoryImplTest {
         playQueueRepository.setPlayQueue(getFakeCompositions(), 1000)
                 .test()
                 .assertComplete();
-
-        verify(uiStatePreferences).setCurrentCompositionId(1000L);
 
         playQueueRepository.getCurrentQueueItemObservable()
                 .test()

@@ -105,7 +105,7 @@ public interface PlayListDao {
 
     @Query("SELECT " +
             "play_lists_entries.storageItemId as itemId, " +
-            "play_lists_entries.audioId as compositionId " +//wrong id
+            "(SELECT storageId FROM compositions WHERE id = audioId) as audioId " +
             "FROM play_lists_entries " +
             "WHERE play_lists_entries.playListId = :playListId " +
             "ORDER BY orderPosition")
