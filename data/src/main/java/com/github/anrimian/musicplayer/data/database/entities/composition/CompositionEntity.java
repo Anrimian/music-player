@@ -43,11 +43,8 @@ public class CompositionEntity {
     private Long storageId;
 
     @Nullable
-    private String artist;
-    @Nullable
     private String title;
-    @Nullable
-    private String album;
+
     @Nonnull
     private String filePath;
 
@@ -64,9 +61,7 @@ public class CompositionEntity {
 
     public CompositionEntity(@Nullable Long artistId,
                              @Nullable Long albumId,
-                             @Nullable String artist,
                              @Nullable String title,
-                             @Nullable String album,
                              @Nonnull String filePath,
                              long duration,
                              long size,
@@ -77,9 +72,7 @@ public class CompositionEntity {
         this.artistId = artistId;
         this.albumId = albumId;
         this.storageId = storageId;
-        this.artist = artist;
         this.title = title;
-        this.album = album;
         this.filePath = filePath;
         this.duration = duration;
         this.size = size;
@@ -112,18 +105,8 @@ public class CompositionEntity {
     }
 
     @Nullable
-    public String getArtist() {
-        return artist;
-    }
-
-    @Nullable
     public String getTitle() {
         return title;
-    }
-
-    @Nullable
-    public String getAlbum() {
-        return album;
     }
 
     @Nonnull

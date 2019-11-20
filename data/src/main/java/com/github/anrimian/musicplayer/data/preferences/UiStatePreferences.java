@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 
-import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.CURRENT_COMPOSITION_ID;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.CURRENT_PLAY_QUEUE_ID;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.IS_PLAYER_PANEL_OPEN;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.PREFERENCES_NAME;
@@ -28,7 +27,6 @@ public class UiStatePreferences {
 
         String TRACK_POSITION = "track_position";
         String CURRENT_PLAY_QUEUE_ID = "current_play_queue_id";
-        String CURRENT_COMPOSITION_ID = "current_composition_id";
         String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
         String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
         String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
@@ -76,22 +74,12 @@ public class UiStatePreferences {
         return preferences.getLong(TRACK_POSITION);
     }
 
-    public void setCurrentCompositionId(long id) {
-        preferences.putLong(CURRENT_COMPOSITION_ID, id);
-    }
-
-    @Deprecated
     public void setCurrentPlayQueueItemId(long id) {
         preferences.putLong(CURRENT_PLAY_QUEUE_ID, id);
     }
 
     public Long getCurrentPlayQueueId() {
         return preferences.getLong(CURRENT_PLAY_QUEUE_ID, NO_COMPOSITION);
-    }
-
-    @Deprecated
-    public Long getCurrentCompositionId() {
-        return preferences.getLong(CURRENT_COMPOSITION_ID, NO_COMPOSITION);
     }
 
     public void setSelectedFolderScreen(String path) {

@@ -24,11 +24,9 @@ public interface PlayQueueDao {
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
             "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
-            "compositions.artistId AS artistId, " +
-            "compositions.albumId AS albumId, " +
+            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
             "compositions.title AS title, " +
-            "compositions.album AS album, " +
             "compositions.filePath AS filePath, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
@@ -44,12 +42,10 @@ public interface PlayQueueDao {
             "play_queue.position AS position," +
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
-            "compositions.artistId AS artistId, " +
-            "compositions.albumId AS albumId, " +
             "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
+            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
             "compositions.title AS title, " +
-            "compositions.album AS album, " +
             "compositions.filePath AS filePath, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
@@ -64,13 +60,10 @@ public interface PlayQueueDao {
             "play_queue.position AS position," +
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
-            "compositions.artistId AS artistId, " +
-            "compositions.albumId AS albumId, " +
-            "compositions.artist AS artist, " +
+            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
             "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
             "compositions.title AS title, " +
-            "compositions.album AS album, " +
             "compositions.filePath AS filePath, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +

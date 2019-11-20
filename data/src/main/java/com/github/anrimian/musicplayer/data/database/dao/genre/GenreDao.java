@@ -5,11 +5,11 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
-import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 
 import java.util.List;
@@ -46,10 +46,21 @@ public interface GenreDao {
             "FROM genres")
     Observable<List<Genre>> getAllObservable();
 
-    @Query("SELECT * " +
+    @Query("SELECT " +
+            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "title as title, " +
+            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
+            "filePath as filePath, " +
+            "duration as duration, " +
+            "size as size, " +
+            "id as id, " +
+            "storageId as storageId, " +
+            "dateAdded as dateAdded, " +
+            "dateModified as dateModified, " +
+            "corruptionType as corruptionType " +
             "FROM compositions " +
             "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
-    Observable<List<CompositionEntity>> getCompositionsInGenre(long genreId);
+    Observable<List<Composition>> getCompositionsInGenre(long genreId);
 
     @Query("SELECT " +
             "id as dbId, " +

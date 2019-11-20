@@ -6,7 +6,6 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
-import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
@@ -60,8 +59,7 @@ public class GenresDaoWrapper {
     }
 
     public Observable<List<Composition>> getCompositionsInGenre(long genreId) {
-        return genreDao.getCompositionsInGenre(genreId)
-                .map(list -> mapList(list, CompositionMapper::toComposition));
+        return genreDao.getCompositionsInGenre(genreId);
     }
 
     public List<IdPair> getGenresIds() {

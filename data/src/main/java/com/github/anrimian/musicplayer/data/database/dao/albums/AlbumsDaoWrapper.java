@@ -4,7 +4,6 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
-import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
@@ -45,8 +44,7 @@ public class AlbumsDaoWrapper {
     }
 
     public Observable<List<Composition>> getCompositionsInAlbum(long albumId) {
-        return albumsDao.getCompositionsInAlbum(albumId)
-                .map(list -> mapList(list, CompositionMapper::toComposition));
+        return albumsDao.getCompositionsInAlbum(albumId);
     }
 
     public Observable<Album> getAlbumObservable(long albumId) {

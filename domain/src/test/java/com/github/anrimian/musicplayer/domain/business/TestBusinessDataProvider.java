@@ -33,17 +33,17 @@ public class TestBusinessDataProvider {
         return compositions;
     }
 
-    public static List<PlayListItem> getFakePlayListItems() {
+    private static List<PlayListItem> getFakePlayListItems() {
         List<PlayListItem> items = new ArrayList<>();
         for (int i = 0; i < 100000; i++) {
             Composition composition = fakeComposition(i, "music-" + i);
-            PlayListItem item = new PlayListItem(i, composition);
+            PlayListItem item = new PlayListItem(i, (long) i, composition);
             items.add(item);
         }
         return items;
     }
 
-    public static List<PlayQueueItem> getFakeItems() {
+    private static List<PlayQueueItem> getFakeItems() {
         List<PlayQueueItem> items = new ArrayList<>();
         for (int i = 0; i < 100000; i++) {
             Composition composition = fakeComposition(i, "music-" + i);
@@ -66,6 +66,7 @@ public class TestBusinessDataProvider {
                 String.valueOf(id),
                 0,
                 0,
+                id,
                 id,
                 new Date(0),
                 new Date(0),
@@ -106,6 +107,7 @@ public class TestBusinessDataProvider {
                 0,
                 0,
                 id,
+                id,
                 new Date(createDate),
                 new Date(0),
                 null);
@@ -118,6 +120,7 @@ public class TestBusinessDataProvider {
                 filePath,
                 0,
                 size,
+                id,
                 id,
                 new Date(0),
                 new Date(0),
@@ -132,6 +135,7 @@ public class TestBusinessDataProvider {
                 0,
                 0,
                 id,
+                id,
                 new Date(createDate * 1000L),
                 new Date(0),
                 null);
@@ -144,6 +148,7 @@ public class TestBusinessDataProvider {
                 filePath,
                 0,
                 0,
+                id,
                 id,
                 new Date(0),
                 new Date(0),
@@ -158,6 +163,7 @@ public class TestBusinessDataProvider {
                 0,
                 0,
                 id,
+                id,
                 new Date(0),
                 new Date(0),
                 null);
@@ -167,7 +173,7 @@ public class TestBusinessDataProvider {
         return Single.just(getTestFolder(fileSources));
     }
 
-    public static Folder getTestFolder(FileSource... fileSources) {
+    private static Folder getTestFolder(FileSource... fileSources) {
         return new Folder(Observable.create(emitter -> emitter.onNext(asList(fileSources))),
                 Observable.never(),
                 Observable.never());

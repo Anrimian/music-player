@@ -9,7 +9,6 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
-import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
@@ -171,7 +170,7 @@ public class PlayListsDaoWrapper {
     private PlayListItem toItem(PlayListEntryDto entryDto) {
         return new PlayListItem(entryDto.getItemId(),
                 entryDto.getStorageItemId(),
-                CompositionMapper.toComposition(entryDto.getComposition()));
+                entryDto.getComposition());
     }
 
     private PlayList toPlayList(PlayListPojo pojo) {

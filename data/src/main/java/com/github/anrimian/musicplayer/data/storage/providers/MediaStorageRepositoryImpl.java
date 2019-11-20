@@ -327,9 +327,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     }
 
     private boolean hasActualChanges(StorageComposition first, StorageComposition second) {
-        return !(Objects.equals(first.getAlbum(), second.getAlbum())
-                && Objects.equals(first.getArtist(), second.getArtist())
-                && Objects.equals(first.getDateAdded(), second.getDateAdded())
+        return !(Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && Objects.equals(first.getDateModified(), second.getDateModified())
                 && first.getDuration() == second.getDuration()
                 && Objects.equals(first.getFilePath(), second.getFilePath())

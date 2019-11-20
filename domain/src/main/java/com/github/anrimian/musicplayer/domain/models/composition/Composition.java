@@ -35,17 +35,18 @@ public class Composition {
     @Nullable
     private final CorruptionType corruptionType;
 
-    public Composition(@Nullable String artist,
-                       @Nullable String title,
-                       @Nullable String album,
-                       @Nonnull String filePath,
+    @SuppressWarnings("NullableProblems")
+    public Composition(String artist,
+                       String title,
+                       String album,
+                       String filePath,
                        long duration,
                        long size,
                        long id,
-                       @Nullable Long storageId,
-                       @Nonnull Date dateAdded,
-                       @Nonnull Date dateModified,
-                       @Nullable CorruptionType corruptionType) {
+                       Long storageId,
+                       Date dateAdded,
+                       Date dateModified,
+                       CorruptionType corruptionType) {
         this.artist = artist;
         this.title = title;
         this.album = album;

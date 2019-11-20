@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Embedded;
 
-import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 public class PlayListEntryDto {
 
@@ -14,11 +14,11 @@ public class PlayListEntryDto {
     private final Long storageItemId;
 
     @Embedded
-    private final CompositionEntity composition;
+    private final Composition composition;
 
     public PlayListEntryDto(long itemId,
                             @Nullable Long storageItemId,
-                            CompositionEntity composition) {
+                            Composition composition) {
         this.itemId = itemId;
         this.storageItemId = storageItemId;
         this.composition = composition;
@@ -33,7 +33,7 @@ public class PlayListEntryDto {
         return itemId;
     }
 
-    public CompositionEntity getComposition() {
+    public Composition getComposition() {
         return composition;
     }
 

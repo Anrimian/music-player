@@ -45,27 +45,38 @@ public class CompositionsDaoWrapper {
     }
 
     public Observable<List<Composition>> getAllObservable() {
-        return compositionsDao.getAllObservable()
-                .map(list -> mapList(list, CompositionMapper::toComposition));
+        return compositionsDao.getAllObservable();
     }
 
     public Observable<Composition> getCompositionObservable(long id) {
-        return compositionsDao.getCompoisitionObservable(id)//TODO takeUntil()
-                .map(CompositionMapper::toComposition);
+        return compositionsDao.getCompositionObservable(id)
+                .takeWhile(list -> !list.isEmpty())
+                .map(list -> list.get(0));
     }
 
     public Observable<List<Composition>> getAllObservable(Order order,
                                                           @Nullable String searchText) {
-        String query =  "SELECT * FROM compositions";
+        String query = "SELECT " +
+                "(SELECT artistName FROM artists WHERE id = artistId) as artist,  " +
+                "(SELECT albumName FROM albums WHERE id = albumId) as album,  " +
+                "title as title,  " +
+                "filePath as filePath,  " +
+                "duration as duration,  " +
+                "size as size,  " +
+                "id as id,  " +
+                "storageId as storageId,  " +
+                "dateAdded as dateAdded,  " +
+                "dateModified as dateModified,  " +
+                "corruptionType as corruptionType  " +
+                "FROM compositions";
         query += getSearchQuery(searchText);
         query += getOrderQuery(order);
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
-        return compositionsDao.getAllObservable(sqlQuery)
-                .map(list -> mapList(list, CompositionMapper::toComposition));
+        return compositionsDao.getAllObservable(sqlQuery);
     }
 
     public List<Composition> getAll() {
-        return mapList(compositionsDao.getAll(), CompositionMapper::toComposition);
+        return compositionsDao.getAll();
     }
 
     public Map<Long, Composition> getAllMap() {
@@ -152,9 +163,7 @@ public class CompositionsDaoWrapper {
             );
             for (StorageComposition composition: changedCompositions) {
                 compositionsDao.update(
-                        composition.getArtist(),
                         composition.getTitle(),
-                        composition.getAlbum(),
                         composition.getFilePath(),
                         composition.getDuration(),
                         composition.getSize(),

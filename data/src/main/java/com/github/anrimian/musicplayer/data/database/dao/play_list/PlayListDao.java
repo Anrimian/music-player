@@ -87,13 +87,10 @@ public interface PlayListDao {
             "play_lists_entries.itemId AS itemId," +
             "play_lists_entries.storageItemId as storageItemId, " +
             "compositions.id AS id, " +
-            "compositions.artist AS artist, " +
-            "compositions.artistId AS artistId, " +
-            "compositions.albumId AS albumId, " +
+            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
             "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
             "compositions.title AS title, " +
-            "compositions.album AS album, " +
             "compositions.filePath AS filePath, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
@@ -156,6 +153,6 @@ public interface PlayListDao {
     @Query("SELECT * FROM play_lists WHERE name = :name")
     PlayListEntity getPlayListByName(String name);
 
-//    @Query("SELECT * FROM play_lists_entries WHERE playListId = :playListId")
-//    List<PlayListEntryEntity> getPlayListEntries(long playListId);
+    @Query("SELECT * FROM play_lists_entries WHERE playListId = :playListId")
+    List<PlayListEntryEntity> getPlayListEntries(long playListId);
 }

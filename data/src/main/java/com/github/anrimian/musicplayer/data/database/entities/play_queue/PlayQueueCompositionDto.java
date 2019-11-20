@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.data.database.entities.play_queue;
 import androidx.annotation.NonNull;
 import androidx.room.Embedded;
 
-import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 public class PlayQueueCompositionDto {
 
@@ -12,12 +12,12 @@ public class PlayQueueCompositionDto {
     private final int shuffledPosition;
 
     @Embedded
-    private final CompositionEntity composition;
+    private final Composition composition;
 
     public PlayQueueCompositionDto(long itemId,
                                    int position,
                                    int shuffledPosition,
-                                   CompositionEntity composition) {
+                                   Composition composition) {
         this.itemId = itemId;
         this.position = position;
         this.shuffledPosition = shuffledPosition;
@@ -32,7 +32,7 @@ public class PlayQueueCompositionDto {
         return itemId;
     }
 
-    public CompositionEntity getComposition() {
+    public Composition getComposition() {
         return composition;
     }
 

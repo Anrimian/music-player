@@ -167,9 +167,7 @@ public class CompositionsDaoWrapperTest {
         return new CompositionEntity(
                 artistId,
                 albumId,
-                "test artist",
                 title,
-                null,
                 "test file path",
                 100L,
                 100L,

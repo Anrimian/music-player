@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.data.repositories.play_queue;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
-import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.utils.collections.IndexedList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -232,13 +231,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private void setCurrentItem(@Nullable PlayQueueItem item) {
         long itemId = NO_COMPOSITION;
-        long compositionId = NO_COMPOSITION;
         if (item != null) {
             itemId = item.getId();
-            compositionId = item.getComposition().getId();
         }
         uiStatePreferences.setCurrentPlayQueueItemId(itemId);
-        uiStatePreferences.setCurrentCompositionId(compositionId);
         currentCompositionSubject.onNext(new PlayQueueEvent(item));
     }
 
@@ -274,9 +270,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private PlayQueueItem toPlayQueueItem(PlayQueueCompositionDto entity) {
-        return new PlayQueueItem(entity.getItemId(),
-                CompositionMapper.toComposition(entity.getComposition())
-        );
+        return new PlayQueueItem(entity.getItemId(), entity.getComposition());
     }
 
     private void selectItemAt(IndexedList<PlayQueueItem> queue, int position) {
