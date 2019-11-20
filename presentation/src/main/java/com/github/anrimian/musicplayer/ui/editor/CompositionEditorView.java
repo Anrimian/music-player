@@ -26,7 +26,7 @@ public interface CompositionEditorView extends MvpView {
     void showErrorMessage(ErrorCommand errorCommand);
 
     @StateStrategyType(SkipStrategy.class)
-    void showEnterAuthorDialog(Composition composition);
+    void showEnterAuthorDialog(Composition composition, String[] hints);
 
     @StateStrategyType(SkipStrategy.class)
     void showEnterTitleDialog(Composition composition);

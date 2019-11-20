@@ -57,6 +57,9 @@ public interface ArtistsDao {
             "WHERE artistId = :artist")
     Observable<List<Composition>> getCompositionsByArtist(long artist);
 
+    @Query("SELECT artistName FROM artists")
+    String[] getAuthorNames();
+
     @Query("SELECT id FROM artists WHERE artistName = :author")
     long findArtistIdByName(String author);
 

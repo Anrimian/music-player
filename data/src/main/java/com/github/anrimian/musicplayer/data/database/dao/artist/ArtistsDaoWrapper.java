@@ -45,6 +45,11 @@ public class ArtistsDaoWrapper {
                 .takeWhile(list -> !list.isEmpty())
                 .map(list -> list.get(0));
     }
+
+    public String[] getAuthorNames() {
+        return artistsDao.getAuthorNames();
+    }
+
     private ArtistEntity toEntity(StorageArtist artist) {
         return new ArtistEntity(
                 artist.getId(),

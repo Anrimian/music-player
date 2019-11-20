@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.repositories.MusicProviderReposito
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class CompositionEditorInteractor {
 
@@ -32,5 +33,9 @@ public class CompositionEditorInteractor {
 
     public Observable<Composition> getCompositionObservable(long id) {
         return musicProviderRepository.getCompositionObservable(id);
+    }
+
+    public Single<String[]> getAuthorNames() {
+        return musicProviderRepository.getAuthorNames();
     }
 }

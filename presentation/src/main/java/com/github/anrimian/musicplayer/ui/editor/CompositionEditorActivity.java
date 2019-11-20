@@ -156,12 +156,15 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
-    public void showEnterAuthorDialog(Composition composition) {
-        InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.change_author_name,
+    public void showEnterAuthorDialog(Composition composition, String[] hints) {
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
+                R.string.change_author_name,
                 R.string.change,
                 R.string.cancel,
                 R.string.artist,
-                composition.getArtist());
+                composition.getArtist())
+                .hints(hints)
+                .build();
         authorDialogFragmentRunner.show(fragment);
     }
 

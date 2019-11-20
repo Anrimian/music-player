@@ -44,6 +44,8 @@ public interface MusicProviderRepository {
 
     Observable<List<Album>> getAllAlbumsForArtist(long artistId);
 
+    Single<String[]> getAuthorNames();
+
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);

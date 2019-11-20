@@ -52,7 +52,14 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         if (composition == null) {
             return;
         }
-        getViewState().showEnterAuthorDialog(composition);
+        editorInteractor.getAuthorNames()
+                .observeOn(uiScheduler)
+                .doOnSuccess(artists -> getViewState().showEnterAuthorDialog(composition, artists))
+                .doOnError(throwable -> {
+                    getViewState().showEnterAuthorDialog(composition, null);
+                    onDefaultError(throwable);
+                })
+                .subscribe();
     }
 
     void onChangeTitleClicked() {
