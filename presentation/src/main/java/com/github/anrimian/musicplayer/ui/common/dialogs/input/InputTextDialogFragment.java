@@ -82,17 +82,10 @@ public class InputTextDialogFragment extends DialogFragment {
                                                       String editTextValue,
                                                       boolean canBeEmpty,
                                                       Bundle extra) {
-        Bundle args = new Bundle();
-        args.putInt(TITLE_ARG, title);
-        args.putInt(POSITIVE_BUTTON_ARG, positiveButtonText);
-        args.putInt(NEGATIVE_BUTTON_ARG, negativeButtonText);
-        args.putInt(EDIT_TEXT_HINT, editTextHint);
-        args.putString(EDIT_TEXT_VALUE, editTextValue);
-        args.putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty);
-        args.putBundle(EXTRA_DATA_ARG, extra);
-        InputTextDialogFragment fragment = new InputTextDialogFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new InputTextDialogFragment.Builder(title, positiveButtonText, negativeButtonText, editTextHint, editTextValue)
+                .canBeEmpty(canBeEmpty)
+                .extra(extra)
+                .build();
     }
 
     @NonNull
@@ -126,7 +119,8 @@ public class InputTextDialogFragment extends DialogFragment {
         String[] hints = args.getStringArray(HINTS_ARG);
         if (hints != null) {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
-                    android.R.layout.select_dialog_singlechoice,
+                    R.layout.item_autocomplete,
+                    R.id.text_view,
                     hints);
             editText.setAdapter(adapter);
         }
