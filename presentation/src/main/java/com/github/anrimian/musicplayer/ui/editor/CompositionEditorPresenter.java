@@ -76,6 +76,19 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         getViewState().showEnterFileNameDialog(composition);
     }
 
+    void onChangeAlbumClicked() {
+        if (composition == null) {
+            return;
+        }
+        editorInteractor.getAuthorNames()
+                .observeOn(uiScheduler)
+                .doOnSuccess(albums -> getViewState().showEnterAlbumDialog(composition, albums))
+                .doOnError(throwable -> {
+                    getViewState().showEnterAlbumDialog(composition, null);
+                    onDefaultError(throwable);
+                })
+                .subscribe();    }
+
     void onNewAuthorEntered(String author) {
         if (composition == null) {
             return;
@@ -83,6 +96,18 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
 
         dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.editCompositionAuthor(composition, author)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
+
+    void onNewAlbumEntered(String album) {
+        if (composition == null) {
+            return;
+        }
+
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.editCompositionAlbum(composition, album)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);

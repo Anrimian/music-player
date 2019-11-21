@@ -46,6 +46,8 @@ public interface MusicProviderRepository {
 
     Single<String[]> getAuthorNames();
 
+    Single<String[]> getAlbumNames();
+
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);

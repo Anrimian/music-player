@@ -28,6 +28,7 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
@@ -53,6 +54,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.tv_title)
     TextView tvTitle;
 
+    @BindView(R.id.tv_album)
+    TextView tvAlbum;
+
     @BindView(R.id.tv_filename)
     TextView tvFileName;
 
@@ -61,6 +65,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @BindView(R.id.tv_title_hint)
     TextView tvTitleHint;
+
+    @BindView(R.id.tv_album_hint)
+    TextView tvAlbumHint;
 
     @BindView(R.id.tv_filename_hint)
     TextView tvFileNameHint;
@@ -74,12 +81,16 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.change_filename_clickable_area)
     View changeFilenameClickableArea;
 
+    @BindView(R.id.change_album_clickable_area)
+    View changeAlbumClickableArea;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     private DialogFragmentRunner<InputTextDialogFragment> authorDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> titleDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> albumDialogFragmentRunner;
 
     public static Intent newIntent(Context context, long compositionId) {
         Intent intent = new Intent(context, CompositionEditorActivity.class);
@@ -110,9 +121,11 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         changeAuthorClickableArea.setOnClickListener(v -> presenter.onChangeAuthorClicked());
         changeTitleClickableArea.setOnClickListener(v -> presenter.onChangeTitleClicked());
         changeFilenameClickableArea.setOnClickListener(v -> presenter.onChangeFileNameClicked());
+        changeAlbumClickableArea.setOnClickListener(v -> presenter.onChangeAlbumClicked());
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeTitleClickableArea, () -> copyText(tvTitle, tvTitleHint));
         onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
+        onLongClick(changeAlbumClickableArea, () -> copyText(tvAlbum, tvAlbumHint));
 
         @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
         Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
@@ -130,6 +143,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         filenameDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 FILE_NAME_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewFileNameEntered));
+
+        albumDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                ALBUM_TAG,
+                fragment -> fragment.setOnCompleteListener(presenter::onNewAlbumEntered));
     }
 
     @Override
@@ -151,6 +168,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @Override
     public void showComposition(Composition composition) {
         tvTitle.setText(composition.getTitle());
+        tvAlbum.setText(composition.getAlbum());
         tvAuthor.setText(formatCompositionAuthor(composition, this));
         tvFileName.setText(formatFileName(composition.getFilePath(), true));
     }
@@ -187,6 +205,18 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 formatFileName(composition.getFilePath()),
                 false);
         filenameDialogFragmentRunner.show(fragment);
+    }
+
+    @Override
+    public void showEnterAlbumDialog(Composition composition, String[] hints) {
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(R.string.change_album_name,
+                R.string.change,
+                R.string.cancel,
+                R.string.album,
+                composition.getAlbum())
+                .hints(hints)
+                .build();
+        albumDialogFragmentRunner.show(fragment);
     }
 
     @Override

@@ -36,4 +36,7 @@ public interface CompositionEditorView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void copyFileNameText(String filePath);
+
+    @StateStrategyType(SkipStrategy.class)
+    void showEnterAlbumDialog(Composition composition, String[] hints);
 }

@@ -53,6 +53,10 @@ public class AlbumsDaoWrapper {
                 .map(list -> list.get(0));
     }
 
+    public String[] getAlbumNames() {
+        return albumsDao.getAlbumNames();
+    }
+
     private AlbumEntity toEntity(StorageAlbum album) {
         Long artistId = artistsDao.selectIdByStorageId(album.getArtistId());
         return new AlbumEntity(
@@ -63,5 +67,4 @@ public class AlbumsDaoWrapper {
                 album.getLastYear()
         );
     }
-
 }

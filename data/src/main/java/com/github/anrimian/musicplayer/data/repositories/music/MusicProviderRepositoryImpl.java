@@ -134,6 +134,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
+    public Single<String[]> getAlbumNames() {
+        return Single.fromCallable(albumsDao::getAlbumNames)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Single<Folder> getCompositionsInPath(@Nullable String path,
                                                 @Nullable String searchText) {
         return musicFolderDataSource.getCompositionsInPath(path)

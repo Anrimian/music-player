@@ -16,8 +16,8 @@ import javax.annotation.Nullable;
                         childColumns = {"artistId"})
         },
         indices = {
-                @Index("artistId"),
-                @Index(value = {"artistId", "albumName"}, unique = true)
+                @Index("artistId")
+//                @Index(value = {"artistId", "albumName"}, unique = true)//hmmm
         }
 )
 public class AlbumEntity {

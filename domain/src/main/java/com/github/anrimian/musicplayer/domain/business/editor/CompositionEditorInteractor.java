@@ -23,6 +23,10 @@ public class CompositionEditorInteractor {
         return editorRepository.changeCompositionAuthor(composition, newAuthor);
     }
 
+    public Completable editCompositionAlbum(Composition composition, String newAlbum) {
+        return editorRepository.changeCompositionAlbum(composition, newAlbum);
+    }
+
     public Completable editCompositionTitle(Composition composition, String newTitle) {
         return editorRepository.changeCompositionTitle(composition, newTitle);
     }
@@ -37,5 +41,9 @@ public class CompositionEditorInteractor {
 
     public Single<String[]> getAuthorNames() {
         return musicProviderRepository.getAuthorNames();
+    }
+
+    public Single<String[]> getAlbumNames() {
+        return musicProviderRepository.getAlbumNames();
     }
 }
