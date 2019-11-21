@@ -104,13 +104,35 @@ public class CompositionsDaoWrapper {
         compositionsDao.updateFilePath(id, filePath);
     }
 
+    public void updateAlbum(long compositionId, String albumName) {
+        appDatabase.runInTransaction(() -> {
+            // 1) find new album by artist and name from albums
+            Long artistId = compositionsDao.getArtistId(compositionId);
+
+            Long albumId = albumsDao.findAlbum(artistId, albumName);
+
+            // 2) if album not exists - create album
+            if (albumId == null) {
+                albumId = albumsDao.insert(new AlbumEntity(artistId, null, albumName, 0, 0));//hmm, storage?
+            }
+
+            // 3) set new albumId
+            Long oldAlbumId = compositionsDao.getAlbumId(compositionId);
+            compositionsDao.updateAlbum(compositionId, albumId);
+
+            if (oldAlbumId != null) {
+                albumsDao.deleteEmptyAlbum(oldAlbumId);
+            }
+        });
+    }
+
     public void updateArtist(long id, String authorName) {
         appDatabase.runInTransaction(() -> {
             // 1) find new artist by name from artists
-            long artistId = artistsDao.findArtistIdByName(authorName);
+            Long artistId = artistsDao.findArtistIdByName(authorName);
 
             // 2) if artist not exists - create artist
-            if (artistId == 0) {
+            if (artistId == null) {
                 artistId = artistsDao.insertArtist(new ArtistEntity(null, authorName));//hmm, storage?
             }
             // 3) set new artistId
@@ -118,14 +140,14 @@ public class CompositionsDaoWrapper {
             compositionsDao.updateArtist(id, artistId);
 
             //find album
-            long albumId = compositionsDao.getAlbumId(id);
-            if (albumId != 0) {
+            Long albumId = compositionsDao.getAlbumId(id);
+            if (albumId != null) {
                 AlbumEntity albumEntity = albumsDao.getAlbumEntity(albumId);
 
                 //find new album with author id and name
-                long newAlbumId = albumsDao.findAlbum(artistId, albumEntity.getAlbumName());
+                Long newAlbumId = albumsDao.findAlbum(artistId, albumEntity.getAlbumName());
                 //if not exists, create
-                if (newAlbumId == 0) {
+                if (newAlbumId == null) {
                     newAlbumId = albumsDao.insert(new AlbumEntity(
                             artistId,
                             null,

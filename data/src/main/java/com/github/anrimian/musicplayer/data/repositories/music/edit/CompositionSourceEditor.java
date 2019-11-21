@@ -32,12 +32,20 @@ public class CompositionSourceEditor {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.ARTIST, author));
     }
 
+    public Completable setCompositionAlbum(String filePath, String author) {
+        return Completable.fromAction(() -> editFile(filePath, FieldKey.ALBUM, author));
+    }
+
     public Maybe<String> getCompositionTitle(String filePath) {
         return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.TITLE));
     }
 
     public Maybe<String> getCompositionAuthor(String filePath) {
         return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.ARTIST));
+    }
+
+    public Maybe<String> getCompositionAlbum(String filePath) {
+        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.ALBUM));
     }
 
     private Tag getFileTag(String filePath) throws TagException, ReadOnlyFileException,

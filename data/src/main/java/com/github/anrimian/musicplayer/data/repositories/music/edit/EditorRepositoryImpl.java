@@ -33,6 +33,13 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
+    public Completable changeCompositionAlbum(Composition composition, String newAlbum) {
+        return sourceEditor.setCompositionAlbum(composition.getFilePath(), newAlbum)
+                .andThen(storageMusicDataSource.updateCompositionAlbum(composition, newAlbum))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Completable changeCompositionTitle(Composition composition, String title) {
         return sourceEditor.setCompositionTitle(composition.getFilePath(), title)
                 .andThen(storageMusicDataSource.updateCompositionTitle(composition, title))

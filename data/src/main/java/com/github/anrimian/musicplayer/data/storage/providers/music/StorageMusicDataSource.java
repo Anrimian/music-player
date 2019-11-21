@@ -69,6 +69,16 @@ public class StorageMusicDataSource {
         });
     }
 
+    public Completable updateCompositionAlbum(Composition composition, String albumName) {
+        return Completable.fromAction(() -> {
+            compositionsDao.updateAlbum(composition.getId(), albumName);
+            Long storageId = composition.getStorageId();
+            if (storageId != null) {
+                musicProvider.updateCompositionAlbum(storageId, albumName);
+            }
+        });
+    }
+
     public Completable updateCompositionTitle(Composition composition, String title) {
         return Completable.fromAction(() -> {
             compositionsDao.updateTitle(composition.getId(), title);

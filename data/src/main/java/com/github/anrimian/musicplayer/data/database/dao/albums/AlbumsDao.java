@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.dao.albums;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
@@ -28,7 +29,7 @@ public interface AlbumsDao {
             "FROM albums")
     List<StorageAlbum> selectAllAsStorageAlbums();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<AlbumEntity> artists);
 
     @Insert
@@ -85,8 +86,10 @@ public interface AlbumsDao {
             "WHERE id = :albumId LIMIT 1")
     Album getAlbum(long albumId);
 
-    @Query("SELECT id FROM albums WHERE artistId = :artistId AND albumName = :name")
-    long findAlbum(long artistId, String name);
+    @Query("SELECT id FROM albums " +
+            "WHERE (artistId = :artistId OR (artistId IS NULL AND :artistId IS NULL)) " +
+            "AND albumName = :name")
+    Long findAlbum(Long artistId, String name);
 
     @Query("UPDATE albums SET artistId = :artistId WHERE id = :albumId")
     void setAuthorId(long albumId, long artistId);

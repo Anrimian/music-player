@@ -12,10 +12,13 @@ import javax.annotation.Nullable;
 @Entity(tableName = "albums",
         foreignKeys = {
                 @ForeignKey(entity = ArtistEntity.class,
-                parentColumns = {"id"},
-                childColumns = {"artistId"})
+                        parentColumns = {"id"},
+                        childColumns = {"artistId"})
         },
-        indices = @Index("artistId")
+        indices = {
+                @Index("artistId"),
+                @Index(value = {"artistId", "albumName"}, unique = true)
+        }
 )
 public class AlbumEntity {
 

@@ -55,23 +55,23 @@ public class CompositionsDaoWrapperTest {
 
         daoWrapper.updateArtist(compositionId, "test artist2");
 
-        long newArtistId = artistsDao.findArtistIdByName("test artist2");
-        assertEquals(0, artistsDao.findArtistIdByName("test artist"));
-        assertNotEquals(0, newArtistId);
+        Long newArtistId = artistsDao.findArtistIdByName("test artist2");
+        assertNull(artistsDao.findArtistIdByName("test artist"));
+        assertNotNull(newArtistId);
 
         assertEquals(newArtistId, compositionsDao.getArtistId(compositionId));
     }
 
     @Test
     public void updateArtistToKnownName() {
-        long artistId = artistsDao.insertArtist(new ArtistEntity(null, "test artist"));
-        long secondArtistId = artistsDao.insertArtist(new ArtistEntity(null, "test artist2"));
+        Long artistId = artistsDao.insertArtist(new ArtistEntity(null, "test artist"));
+        Long secondArtistId = artistsDao.insertArtist(new ArtistEntity(null, "test artist2"));
         long compositionId = compositionsDao.insert(composition(artistId, null, "test title"));
 
         daoWrapper.updateArtist(compositionId, "test artist2");
 
-        assertEquals(0, artistsDao.findArtistIdByName("test artist"));
-        assertNotEquals(0, secondArtistId);
+        assertNull(artistsDao.findArtistIdByName("test artist"));
+        assertNotNull(artistsDao.findArtistIdByName("test artist2"));
 
         assertEquals(secondArtistId, compositionsDao.getArtistId(compositionId));
     }
@@ -84,21 +84,21 @@ public class CompositionsDaoWrapperTest {
 
         daoWrapper.updateArtist(compositionId, "test artist2");
 
-        long newArtistId = artistsDao.findArtistIdByName("test artist2");
-        assertEquals(0, artistsDao.findArtistIdByName("test artist"));
-        assertNotEquals(0, newArtistId);
+        Long newArtistId = artistsDao.findArtistIdByName("test artist2");
+        assertNull(artistsDao.findArtistIdByName("test artist"));
+        assertNotNull(newArtistId);
 
         assertEquals(newArtistId, compositionsDao.getArtistId(compositionId));
 
         long newAlbumId = compositionsDao.getAlbumId(compositionId);
         Long albumArtist = albumsDao.getAlbumEntity(newAlbumId).getArtistId();
         assertNotNull(albumArtist);
-        assertEquals(newArtistId, (long) albumArtist);
+        assertEquals(newArtistId, albumArtist);
     }
 
     @Test
     public void updateArtistWithMultipleEntriesAlbum() {
-        long artistId = artistsDao.insertArtist(new ArtistEntity(null, "test artist"));
+        Long artistId = artistsDao.insertArtist(new ArtistEntity(null, "test artist"));
         long albumId = albumsDao.insert(new AlbumEntity(artistId, null, "test album", 0, 0));
         long compositionId = compositionsDao.insert(composition(artistId, albumId, "test title"));
         compositionsDao.insert(composition(artistId, albumId, "test title2"));
@@ -106,9 +106,9 @@ public class CompositionsDaoWrapperTest {
         daoWrapper.updateArtist(compositionId, "test artist2");
 
         //check new artist
-        long newArtistId = artistsDao.findArtistIdByName("test artist2");
+        Long newArtistId = artistsDao.findArtistIdByName("test artist2");
         assertEquals(artistId, artistsDao.findArtistIdByName("test artist"));
-        assertNotEquals(0, newArtistId);
+        assertNotNull(newArtistId);
 
         //check composition
         assertEquals(newArtistId, compositionsDao.getArtistId(compositionId));
@@ -116,7 +116,7 @@ public class CompositionsDaoWrapperTest {
         //check old album
         Long albumArtist = albumsDao.getAlbumEntity(albumId).getArtistId();
         assertNotNull(albumArtist);
-        assertEquals(artistId, (long) albumArtist);
+        assertEquals(artistId, albumArtist);
 
         //check new album
         long newAlbumId = compositionsDao.getAlbumId(compositionId);
@@ -125,7 +125,7 @@ public class CompositionsDaoWrapperTest {
         assertEquals("test album", newAlbum.getAlbumName());
         Long newAlbumArtist = newAlbum.getArtistId();
         assertNotNull(newAlbumArtist);
-        assertEquals(newArtistId, (long) newAlbumArtist);
+        assertEquals(newArtistId, newAlbumArtist);
     }
 
     @Test
@@ -139,11 +139,11 @@ public class CompositionsDaoWrapperTest {
         daoWrapper.updateArtist(secondCompositionId, "test artist2");
 
         //check old artist
-        assertEquals(0, artistsDao.findArtistIdByName("test artist"));
+        assertNull(artistsDao.findArtistIdByName("test artist"));
 
         //check new artist
-        long newArtistId = artistsDao.findArtistIdByName("test artist2");
-        assertNotEquals(0, newArtistId);
+        Long newArtistId = artistsDao.findArtistIdByName("test artist2");
+        assertNotNull(newArtistId);
 
         //check composition
         assertEquals(newArtistId, compositionsDao.getArtistId(compositionId));
@@ -153,14 +153,69 @@ public class CompositionsDaoWrapperTest {
         assertNull(albumsDao.getAlbumEntity(albumId));
 
         ////check new album
-        long newAlbumId = compositionsDao.getAlbumId(compositionId);
+        Long newAlbumId = compositionsDao.getAlbumId(compositionId);
         assertEquals(newAlbumId, compositionsDao.getAlbumId(secondCompositionId));
 
         AlbumEntity newAlbum = albumsDao.getAlbumEntity(newAlbumId);
         assertEquals("test album", newAlbum.getAlbumName());
         Long newAlbumArtist = newAlbum.getArtistId();
         assertNotNull(newAlbumArtist);
-        assertEquals(newArtistId, (long) newAlbumArtist);
+        assertEquals(newArtistId, newAlbumArtist);
+    }
+
+    @Test
+    public void updateAlbumToUnknownName() {
+        long artistId = artistsDao.insertArtist(new ArtistEntity(null, "test artist"));
+        albumsDao.insert(new AlbumEntity(artistId, null, "test album", 0, 0));
+        long compositionId = compositionsDao.insert(composition(artistId, null, "test title"));
+
+        daoWrapper.updateAlbum(compositionId, "test album2");
+
+        Long newAlbumId = albumsDao.findAlbum(artistId, "test album2");
+        assertNull(albumsDao.findAlbum(artistId, "test artist"));
+        assertNotNull(newAlbumId);
+
+        assertEquals(newAlbumId, compositionsDao.getAlbumId(compositionId));
+    }
+
+    @Test
+    public void updateAlbumToKnownName() {
+        long artistId = artistsDao.insertArtist(new ArtistEntity(null, "test artist"));
+        albumsDao.insert(new AlbumEntity(artistId, null, "test album", 0, 0));
+        Long secondAlbumId = albumsDao.insert(new AlbumEntity(artistId, null, "test album2", 0, 0));
+        long compositionId = compositionsDao.insert(composition(artistId, null, "test title"));
+
+        daoWrapper.updateAlbum(compositionId, "test album2");
+
+        Long newAlbumId = albumsDao.findAlbum(artistId, "test album2");
+        assertNull(albumsDao.findAlbum(artistId, "test artist"));
+        assertNotNull(newAlbumId);
+
+        assertEquals(secondAlbumId, compositionsDao.getAlbumId(compositionId));
+    }
+
+    @Test
+    public void updateAlbumWithoutArtist() {
+        long compositionId = compositionsDao.insert(composition(null, null, "test title"));
+
+        daoWrapper.updateAlbum(compositionId, "test album2");
+
+        Long newAlbumId = albumsDao.findAlbum(null, "test album2");
+        assertNotNull(newAlbumId);
+        assertEquals(newAlbumId, compositionsDao.getAlbumId(compositionId));
+    }
+
+    @Test
+    public void updateAlbumWithoutArtistAndWithKnownName() {
+        Long secondAlbumId = albumsDao.insert(new AlbumEntity(null, null, "test album2", 0, 0));
+        long compositionId = compositionsDao.insert(composition(null, null, "test title"));
+
+        daoWrapper.updateAlbum(compositionId, "test album2");
+
+        Long newAlbumId = albumsDao.findAlbum(null, "test album2");
+        assertNull(albumsDao.findAlbum(null, "test artist"));
+        assertEquals(secondAlbumId, newAlbumId);
+        assertEquals(newAlbumId, compositionsDao.getAlbumId(compositionId));
     }
 
     private static CompositionEntity composition(Long artistId, Long albumId, String title) {

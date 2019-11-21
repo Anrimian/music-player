@@ -130,6 +130,10 @@ public class StorageMusicProvider {
         updateComposition(id, MediaStore.Audio.AudioColumns.ARTIST, author);
     }
 
+    public void updateCompositionAlbum(long id, String album) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.ALBUM, album);
+    }
+
     public void updateCompositionTitle(long id, String title) {
         updateComposition(id, MediaStore.Audio.AudioColumns.TITLE, title);
     }

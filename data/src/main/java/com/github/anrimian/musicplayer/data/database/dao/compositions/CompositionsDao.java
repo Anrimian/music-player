@@ -127,6 +127,9 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET artistId = :artistId WHERE id = :id")
     void updateArtist(long id, long artistId);
 
+    @Query("UPDATE compositions SET albumId = :albumId WHERE id = :id")
+    void updateAlbum(long id, long albumId);
+
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
 
@@ -134,11 +137,11 @@ public interface CompositionsDao {
     long selectIdByStorageId(long storageId);
 
     @Query("SELECT albumId FROM compositions WHERE id = :compositionId")
-    long getAlbumId(long compositionId);
+    Long getAlbumId(long compositionId);
 
     @Query("UPDATE compositions SET albumId = :newAlbumId WHERE id = :compositionId")
     void setAlbumId(long compositionId, long newAlbumId);
 
     @Query("SELECT artistId FROM compositions WHERE id = :id")
-    long getArtistId(long id);
+    Long getArtistId(long id);
 }

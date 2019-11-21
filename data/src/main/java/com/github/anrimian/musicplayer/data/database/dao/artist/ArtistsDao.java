@@ -61,7 +61,7 @@ public interface ArtistsDao {
     String[] getAuthorNames();
 
     @Query("SELECT id FROM artists WHERE artistName = :author")
-    long findArtistIdByName(String author);
+    Long findArtistIdByName(String author);
 
     @Insert
     long insertArtist(ArtistEntity artistEntity);
