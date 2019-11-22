@@ -49,9 +49,11 @@ public class ExoMediaPlayer implements MediaPlayer {
     @Nullable
     private Disposable trackPositionDisposable;
 
+    private Composition currentComposition;
+
     public ExoMediaPlayer(Context context,
-                                     Scheduler scheduler,
-                                     PlayerErrorParser playerErrorParser) {
+                          Scheduler scheduler,
+                          PlayerErrorParser playerErrorParser) {
         this.scheduler = scheduler;
         player = ExoPlayerFactory.newSimpleInstance(
                 context,
@@ -62,7 +64,7 @@ public class ExoMediaPlayer implements MediaPlayer {
 
         PlayerEventListener playerEventListener = new PlayerEventListener(
                 () -> playerEventSubject.onNext(new FinishedEvent()),
-                error -> playerEventSubject.onNext(new ErrorEvent(playerErrorParser.getErrorType(error)))
+                this::sendErrorEvent
         );
         player.addListener(playerEventListener);
     }
@@ -74,6 +76,7 @@ public class ExoMediaPlayer implements MediaPlayer {
 
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
+        this.currentComposition = composition;
         checkComposition(composition)
                 .flatMap(this::prepareMediaSource)
                 .ignoreElement()
@@ -145,7 +148,16 @@ public class ExoMediaPlayer implements MediaPlayer {
         } else {
             seekTo(0);
             player.setPlayWhenReady(false);
-            playerEventSubject.onNext(new ErrorEvent(playerErrorParser.getErrorType(throwable)));
+            sendErrorEvent(throwable);
+        }
+    }
+
+    private void sendErrorEvent(Throwable throwable) {
+        if (currentComposition != null) {
+            playerEventSubject.onNext(new ErrorEvent(
+                    playerErrorParser.getErrorType(throwable),
+                    currentComposition)
+            );
         }
     }
 

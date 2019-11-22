@@ -217,6 +217,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         }).subscribeOn(scheduler);
     }
 
+    @Override
+    public int getQueueSize() {
+        return queueCache.getCurrentQueue().size();
+    }
+
     @Nonnull
     private PlayQueueEvent getSavedQueueEvent() {
         if (currentCompositionSubject.getValue() != null) {

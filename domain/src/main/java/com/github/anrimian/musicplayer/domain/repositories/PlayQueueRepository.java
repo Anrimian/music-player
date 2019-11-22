@@ -49,4 +49,6 @@ public interface PlayQueueRepository {
     Completable addCompositionsToPlayNext(List<Composition> compositions);
 
     Completable addCompositionsToEnd(List<Composition> compositions);
+
+    int getQueueSize();
 }

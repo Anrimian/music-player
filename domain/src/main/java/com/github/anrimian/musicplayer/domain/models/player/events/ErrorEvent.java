@@ -1,13 +1,18 @@
 package com.github.anrimian.musicplayer.domain.models.player.events;
 
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
+
+import javax.annotation.Nonnull;
 
 public class ErrorEvent implements PlayerEvent {
 
-    private ErrorType errorType;
+    private final ErrorType errorType;
+    private final Composition composition;
 
-    public ErrorEvent(ErrorType errorType) {
+    public ErrorEvent(@Nonnull ErrorType errorType, @Nonnull Composition composition) {
         this.errorType = errorType;
+        this.composition = composition;
     }
 
     public ErrorType getErrorType() {
@@ -27,5 +32,9 @@ public class ErrorEvent implements PlayerEvent {
     @Override
     public int hashCode() {
         return errorType.hashCode();
+    }
+
+    public Composition getComposition() {
+        return composition;
     }
 }

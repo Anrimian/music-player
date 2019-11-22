@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
@@ -225,9 +226,12 @@ public class MusicPlayerInteractorTest {
     public void onCompositionUnknownErrorTest() {
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
+        when(playQueueRepository.getQueueSize()).thenReturn(getFakeCompositions().size());
 
-        playerEventSubject.onNext(new ErrorEvent(UNKNOWN));
+        Composition composition = getFakeCompositions().get(0);
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
+
+        playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
 
         inOrder.verify(musicProviderRepository)
                 .writeErrorAboutComposition(UNKNOWN, getFakeCompositions().get(0));
@@ -242,24 +246,29 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onCompositionUnknownErrorInEndTest() {
-        when(playQueueRepository.skipToNext()).thenReturn(Single.just(0));
+        when(playQueueRepository.getQueueSize()).thenReturn(getFakeCompositions().size());
 
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
+        Composition composition = getFakeCompositions().get(0);
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
         inOrder.verify(musicPlayerController).resume();
 
-        playerEventSubject.onNext(new ErrorEvent(UNKNOWN));
+        when(playQueueRepository.getCurrentPosition()).thenReturn(0);
+
+        playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
 
         inOrder.verify(musicProviderRepository)
                 .writeErrorAboutComposition(UNKNOWN, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
 
+        when(playQueueRepository.getCurrentPosition()).thenReturn(getFakeCompositions().size() - 1);
+
         currentCompositionSubject.onNext(currentItem(1));
-
         inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(1)), anyLong());
-        inOrder.verify(musicPlayerController, never()).resume();
 
+        playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
+        inOrder.verify(musicPlayerController, never()).resume();
         playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 
@@ -267,10 +276,11 @@ public class MusicPlayerInteractorTest {
     public void onCompositionDeletedErrorTest() {
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
+        Composition composition = getFakeCompositions().get(0);
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
         inOrder.verify(musicPlayerController).resume();
 
-        playerEventSubject.onNext(new ErrorEvent(DELETED));
+        playerEventSubject.onNext(new ErrorEvent(DELETED, composition));
         currentCompositionSubject.onNext(currentItem(1));
 
         inOrder.verify(musicProviderRepository).deleteComposition(getFakeCompositions().get(0));

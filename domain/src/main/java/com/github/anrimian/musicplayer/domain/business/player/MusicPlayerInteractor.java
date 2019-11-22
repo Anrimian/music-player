@@ -21,6 +21,8 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -59,6 +61,7 @@ public class MusicPlayerInteractor {
     private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
+    @Nullable
     private PlayQueueItem currentItem;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
@@ -277,7 +280,7 @@ public class MusicPlayerInteractor {
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
             if (compositionEvent.takePositionFromCurrent()) {
-                if (!hasSourceChanges(previousItem, currentItem)) {
+                if (previousItem != null && !hasSourceChanges(previousItem, currentItem)) {
                     return;
                 }
                 trackPosition = musicPlayerController.getTrackPosition();
@@ -293,7 +296,7 @@ public class MusicPlayerInteractor {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;
-            handleErrorWithComposition(errorEvent.getErrorType());
+            handleErrorWithComposition(errorEvent.getErrorType(), errorEvent.getComposition());
         }
     }
 
@@ -309,25 +312,21 @@ public class MusicPlayerInteractor {
         }
     }
 
-    private void handleErrorWithComposition(ErrorType errorType) {
-        if (currentItem == null) {
-            return;
-        }
-
+    private void handleErrorWithComposition(ErrorType errorType, Composition composition) {
         switch (errorType) {
             case DELETED: {
-                musicProviderRepository.deleteComposition(currentItem.getComposition())
+                musicProviderRepository.deleteComposition(composition)
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
                         .subscribe();
                 break;
             }
             default: {
-                musicProviderRepository.writeErrorAboutComposition(errorType, currentItem.getComposition())
+                musicProviderRepository.writeErrorAboutComposition(errorType, composition)
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
                         .doOnComplete(() -> {
-                            if (playQueueRepository.getCurrentPosition() == 0) {//mm, no!
+                            if (playQueueRepository.getCurrentPosition() >= playQueueRepository.getQueueSize() - 1) {//mm, no!
                                 stop();
                             } else {
                                 playQueueRepository.skipToNext().subscribe();

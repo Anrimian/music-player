@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.data.controllers.music;
 
 import android.content.Context;
 
-import com.github.anrimian.musicplayer.data.controllers.music.players.AndroidMediaPlayer;
-import com.github.anrimian.musicplayer.data.controllers.music.players.CompositeMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.ExoMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.MediaPlayer;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
@@ -11,7 +9,6 @@ import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
-import com.github.anrimian.musicplayer.domain.utils.java.Function;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
@@ -30,9 +27,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                                      Scheduler scheduler,
                                      PlayerErrorParser playerErrorParser) {
         this.uiStatePreferences = uiStatePreferences;
-        Function<ExoMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, scheduler, playerErrorParser);
-        Function<MediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, playerErrorParser);
-        mediaPlayer = new CompositeMediaPlayer(androidMediaPlayer);
+//        Function<ExoMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, scheduler, playerErrorParser);
+//        Function<MediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, playerErrorParser);
+//        mediaPlayer = new CompositeMediaPlayer(androidMediaPlayer);
+
+        mediaPlayer = new ExoMediaPlayer(context, scheduler, playerErrorParser);
     }
 
     @Override

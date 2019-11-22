@@ -4,7 +4,6 @@ import android.media.AudioManager;
 
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
@@ -33,12 +32,14 @@ public class AndroidMediaPlayer implements MediaPlayer {
     @Nullable
     private Disposable trackPositionDisposable;
 
+    private Composition currentComposition;
+
     public AndroidMediaPlayer(Scheduler scheduler, PlayerErrorParser playerErrorParser) {
         this.scheduler = scheduler;
         this.playerErrorParser = playerErrorParser;
         mediaPlayer = new android.media.MediaPlayer();
         mediaPlayer.setOnErrorListener((mediaPlayer, i, i1) -> {
-            playerEventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN));
+            sendErrorEvent(new Exception());
             mediaPlayer.reset();
             return true;
         });
@@ -52,6 +53,7 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
+        this.currentComposition = composition;
         //check if file exists
         prepareMediaSource(composition)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
@@ -128,7 +130,16 @@ public class AndroidMediaPlayer implements MediaPlayer {
         } else {
             seekTo(0);
             mediaPlayer.pause();
-            playerEventSubject.onNext(new ErrorEvent(playerErrorParser.getErrorType(throwable)));
+            sendErrorEvent(throwable);
+        }
+    }
+
+    private void sendErrorEvent(Throwable throwable) {
+        if (currentComposition != null) {
+            playerEventSubject.onNext(new ErrorEvent(
+                    playerErrorParser.getErrorType(throwable),
+                    currentComposition)
+            );
         }
     }
 
