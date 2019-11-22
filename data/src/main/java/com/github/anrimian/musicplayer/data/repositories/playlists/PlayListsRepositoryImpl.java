@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -15,8 +14,6 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
@@ -82,13 +79,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 //                                playListId,
 //                                position);
 //                    }
-                    playListsDao.insertPlayListItems(
-                            mapList(compositions, composition -> new RawPlayListItem(
-                                    null,//composition.getStorageId(),//get inserted id in storage
-                                    composition.getId()
-                            )),
-                            playList.getId(),
-                            position);
+                    playListsDao.addCompositions(compositions, playList.getId(), position);
                 }
         ).subscribeOn(scheduler);
     }
