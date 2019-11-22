@@ -64,8 +64,7 @@ class MusicModule {
                 systemServiceController,
                 playQueueRepository,
                 musicProviderRepository,
-                analytics,
-                playerErrorParser);
+                analytics);
     }
 
     @Provides
@@ -93,8 +92,9 @@ class MusicModule {
     @Singleton
     MusicPlayerController provideMusicPlayerController(UiStatePreferences uiStatePreferences,
                                                        Context context,
-                                                       @Named(UI_SCHEDULER) Scheduler scheduler) {
-        return new MusicPlayerControllerImpl(uiStatePreferences, context, scheduler);
+                                                       @Named(UI_SCHEDULER) Scheduler scheduler,
+                                                       PlayerErrorParser playerErrorParser) {
+        return new MusicPlayerControllerImpl(uiStatePreferences, context, scheduler, playerErrorParser);
     }
 
     @Provides

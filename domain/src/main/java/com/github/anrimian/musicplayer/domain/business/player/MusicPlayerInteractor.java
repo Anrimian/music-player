@@ -21,6 +21,8 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -52,7 +54,6 @@ public class MusicPlayerInteractor {
     private final PlayQueueRepository playQueueRepository;
     private final MusicProviderRepository musicProviderRepository;
     private final Analytics analytics;
-    private final PlayerErrorParser playerErrorParser;
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
@@ -60,6 +61,7 @@ public class MusicPlayerInteractor {
     private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
+    @Nullable
     private PlayQueueItem currentItem;
 
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
@@ -68,8 +70,7 @@ public class MusicPlayerInteractor {
                                  SystemServiceController systemServiceController,
                                  PlayQueueRepository playQueueRepository,
                                  MusicProviderRepository musicProviderRepository,
-                                 Analytics analytics,
-                                 PlayerErrorParser playerErrorParser) {
+                                 Analytics analytics) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
@@ -77,7 +78,6 @@ public class MusicPlayerInteractor {
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
         this.analytics = analytics;
-        this.playerErrorParser = playerErrorParser;
 
         playerDisposable.add(playQueueRepository.getCurrentQueueItemObservable()
                 .subscribe(this::onQueueItemChanged));
@@ -280,7 +280,7 @@ public class MusicPlayerInteractor {
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
             if (compositionEvent.takePositionFromCurrent()) {
-                if (!hasSourceChanges(previousItem, currentItem)) {
+                if (previousItem != null && !hasSourceChanges(previousItem, currentItem)) {
                     return;
                 }
                 trackPosition = musicPlayerController.getTrackPosition();
@@ -296,7 +296,7 @@ public class MusicPlayerInteractor {
             onCompositionPlayFinished();
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;
-            handleErrorWithComposition(playerErrorParser.getErrorType(errorEvent.getThrowable()));
+            handleErrorWithComposition(errorEvent.getErrorType(), errorEvent.getComposition());
         }
     }
 
@@ -312,23 +312,24 @@ public class MusicPlayerInteractor {
         }
     }
 
-    private void handleErrorWithComposition(ErrorType errorType) {
+    private void handleErrorWithComposition(ErrorType errorType, Composition composition) {
         switch (errorType) {
             case DELETED: {
-                musicProviderRepository.deleteComposition(currentItem.getComposition())
+                musicProviderRepository.deleteComposition(composition)
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
                         .subscribe();
                 break;
             }
             default: {
-                musicProviderRepository.writeErrorAboutComposition(errorType, currentItem.getComposition())
+                musicProviderRepository.writeErrorAboutComposition(errorType, composition)
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
-                        .andThen(playQueueRepository.skipToNext())
-                        .doOnSuccess(currentPosition -> {
-                            if (currentPosition == 0) {
+                        .doOnComplete(() -> {
+                            if (playQueueRepository.getCurrentPosition() >= playQueueRepository.getQueueSize() - 1) {//mm, no!
                                 stop();
+                            } else {
+                                playQueueRepository.skipToNext().subscribe();
                             }
                         })
                         .subscribe();

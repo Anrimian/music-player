@@ -86,6 +86,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
+    public int getCurrentPosition() {
+        return queueCache.getCurrentQueue().indexOf(getCurrentItem());
+    }
+
+    @Override
     public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
         return withDefaultValue(currentCompositionSubject, this::getSavedQueueEvent)
                 .subscribeOn(scheduler);
@@ -209,6 +214,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 setCurrentItem(list.get(0));
             }
         }).subscribeOn(scheduler);
+    }
+
+    @Override
+    public int getQueueSize() {
+        return queueCache.getCurrentQueue().size();
     }
 
     @Nonnull

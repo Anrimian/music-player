@@ -1,24 +1,21 @@
 package com.github.anrimian.musicplayer.data.utils.exo_player;
 
-import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
-import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
-import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
-import io.reactivex.subjects.PublishSubject;
-
 public class PlayerEventListener implements Player.EventListener {
 
-    private final PublishSubject<PlayerEvent> subject;
+    private final Runnable onEnded;
+    private final Callback<ExoPlaybackException> errorCallback;
 
-    public PlayerEventListener(PublishSubject<PlayerEvent> subject) {
-        this.subject = subject;
+    public PlayerEventListener(Runnable onEnded, Callback<ExoPlaybackException> errorCallback) {
+        this.onEnded = onEnded;
+        this.errorCallback = errorCallback;
     }
-
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
@@ -46,7 +43,7 @@ public class PlayerEventListener implements Player.EventListener {
                 break;
             }
             case Player.STATE_ENDED: {
-                subject.onNext(new FinishedEvent());
+                onEnded.run();
                 break;
             }
         }
@@ -59,7 +56,7 @@ public class PlayerEventListener implements Player.EventListener {
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        subject.onNext(new ErrorEvent(error));
+        errorCallback.call(error);
     }
 
     @Override
