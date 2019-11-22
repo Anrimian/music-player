@@ -140,7 +140,7 @@ public class PlayListsDaoWrapper {
                                     long playListId) {
         insertPlayListItems(items,
                 playListId,
-                playListDao.selectMaxOrder(playListId) + 1
+                playListDao.selectMaxOrder(playListId)
         );
     }
 

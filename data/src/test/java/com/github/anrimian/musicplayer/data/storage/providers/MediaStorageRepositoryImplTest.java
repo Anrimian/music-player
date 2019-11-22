@@ -5,7 +5,6 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.RawPlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
@@ -152,7 +151,7 @@ public class MediaStorageRepositoryImplTest {
         newPlayListItemsSubject.onNext(newItems);
 
         verify(playListsDao).insertPlayListItems(
-                eq(asList(new RawPlayListItem(1L, 0))),
+                eq(asList(new StoragePlayListItem(1L, 0))),
                 eq(1L)
         );
     }
