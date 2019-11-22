@@ -111,11 +111,15 @@ public class InputTextDialogFragment extends DialogFragment {
         setSoftInputVisible(dialog.getWindow());
         dialog.show();
 
+        boolean canBeEmpty = args.getBoolean(CAN_BE_EMPTY_ARG);
+
         editText.setHint(args.getInt(EDIT_TEXT_HINT));
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
         editText.setOnEditorActionListener((v, actionId, event) -> {
-            onCompleteButtonClicked();
+            if (!canBeEmpty && isEnterButtonEnabled(editText.getText().toString())) {
+                onCompleteButtonClicked();
+            }
             return true;
         });
         String startText = args.getString(EDIT_TEXT_VALUE);
@@ -126,9 +130,9 @@ public class InputTextDialogFragment extends DialogFragment {
         Button btnCreate = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         btnCreate.setOnClickListener(v -> onCompleteButtonClicked());
 
-        if (!args.getBoolean(CAN_BE_EMPTY_ARG)) {
-            btnCreate.setEnabled(!isEmpty(startText));
-            onTextChanged(editText, text -> btnCreate.setEnabled(!isEmpty(text)));
+        if (!canBeEmpty) {
+            btnCreate.setEnabled(isEnterButtonEnabled(startText));
+            onTextChanged(editText, text -> btnCreate.setEnabled(isEnterButtonEnabled(text)));
         }
 
         return dialog;
@@ -155,4 +159,7 @@ public class InputTextDialogFragment extends DialogFragment {
         dismiss();
     }
 
+    private boolean isEnterButtonEnabled(String text) {
+        return !isEmpty(text);
+    }
 }
