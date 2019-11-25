@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
+import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
@@ -139,7 +140,7 @@ public class PlayListsDaoWrapper {
                                     long playListId) {
         insertPlayListItems(items,
                 playListId,
-                playListDao.selectMaxOrder(playListId) + 1
+                playListDao.selectMaxOrder(playListId)
         );
     }
 
@@ -173,9 +174,14 @@ public class PlayListsDaoWrapper {
             List<PlayListEntryEntity> entities = new ArrayList<>(items.size());
             int orderPosition = position;
             for (StoragePlayListItem item : items) {
+                long compositionId = compositionsDao.selectIdByStorageId(item.getAudioId());
+                if (compositionId == 0) {
+                    continue;
+                }
+
                 PlayListEntryEntity entryEntity = new PlayListEntryEntity(
                         item.getItemId(),
-                        compositionsDao.selectIdByStorageId(item.getAudioId()),
+                        compositionId,
                         playListId,
                         orderPosition++
                 );
