@@ -22,6 +22,7 @@ public class CompositionSourceEditorTest {
         System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
         System.out.println("author: " + sourceEditor.getCompositionAuthor(filePath).blockingGet());
         System.out.println("album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());
+        System.out.println("genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
     }
 
     @Test
@@ -46,5 +47,17 @@ public class CompositionSourceEditorTest {
         String newTitle = sourceEditor.getCompositionAlbum(filePath).blockingGet();
         System.out.println("new album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());
         assertEquals(testAlbum, newTitle);
+    }
+
+    @Test
+    public void changeAlbumGenreTest() throws IOException {
+        String filePath = res.getFile().getPath();
+        System.out.println("genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
+
+        String testGenre = "Test genre";
+        sourceEditor.setCompositionGenre(filePath, testGenre).subscribe();
+        String newGenre = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("new genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
+        assertEquals(testGenre, newGenre);
     }
 }

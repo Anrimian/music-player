@@ -80,10 +80,12 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     @Override
     public void initialize() {
-        artistsDisposable = artistsProvider.getArtistsObservable()
-                .startWith(artistsProvider.getArtists())
-                .observeOn(scheduler)
-                .subscribe(this::onStorageArtistReceived);
+        if (artistsDisposable != null) {
+            artistsDisposable = artistsProvider.getArtistsObservable()
+                    .startWith(artistsProvider.getArtists())
+                    .observeOn(scheduler)
+                    .subscribe(this::onStorageArtistReceived);
+        }
     }
 
     @Override
