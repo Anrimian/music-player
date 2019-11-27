@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.repositories;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
@@ -24,7 +25,7 @@ public interface MusicProviderRepository {
 
     Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText);
 
-    Observable<Composition> getCompositionObservable(long id);
+    Observable<FullComposition> getCompositionObservable(long id);
 
     Observable<List<Artist>> getArtistsObservable();
 
@@ -47,6 +48,8 @@ public interface MusicProviderRepository {
     Single<String[]> getAuthorNames();
 
     Single<String[]> getAlbumNames();
+
+    Single<String[]> getGenreNames();
 
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 

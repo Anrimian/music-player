@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
@@ -78,7 +79,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Observable<Composition> getCompositionObservable(long id) {
+    public Observable<FullComposition> getCompositionObservable(long id) {
         return compositionsDao.getCompositionObservable(id);
     }
 
@@ -136,6 +137,12 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Single<String[]> getAlbumNames() {
         return Single.fromCallable(albumsDao::getAlbumNames)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<String[]> getGenreNames() {
+        return Single.fromCallable(genresDao::getGenreNames)
                 .subscribeOn(scheduler);
     }
 

@@ -156,6 +156,8 @@
     <string name="no_compositions">No compositions</string>
     <string name="change_album_name">Change album</string>
     <string name="album">Album</string>
+    <string name="genre">Genre</string>
+    <string name="change_composition_genre">Change composition genre</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

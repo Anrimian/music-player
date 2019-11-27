@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 
 import java.util.List;
 
@@ -9,13 +10,15 @@ import io.reactivex.Single;
 
 public interface EditorRepository {
 
-    Completable changeCompositionAuthor(Composition composition, String newAuthor);
+    Completable changeCompositionGenre(FullComposition composition, String newGenre);
 
-    Completable changeCompositionAlbum(Composition composition, String newAlbum);
+    Completable changeCompositionAuthor(FullComposition composition, String newAuthor);
 
-    Completable changeCompositionTitle(Composition composition, String title);
+    Completable changeCompositionAlbum(FullComposition composition, String newAlbum);
 
-    Completable changeCompositionFileName(Composition composition, String fileName);
+    Completable changeCompositionTitle(FullComposition composition, String title);
+
+    Completable changeCompositionFileName(FullComposition composition, String fileName);
 
     Completable changeCompositionsFilePath(List<Composition> compositions);
 

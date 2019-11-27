@@ -171,7 +171,8 @@
                 android:foreground="?selectableItemBackground"
                 app:layout_constraintTop_toBottomOf="@id/divider_title"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/divider_author"/>
 
             <View
                 android:id="@+id/divider_author"
@@ -200,11 +201,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/content_internal_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"
                 app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
                 app:layout_constraintTop_toBottomOf="@id/tv_album_hint"
                 app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
-                app:layout_constraintBottom_toBottomOf="parent"
                 tools:text="album"/>
 
             <ImageView
@@ -222,6 +221,58 @@
                 android:layout_height="0dp"
                 android:foreground="?selectableItemBackground"
                 app:layout_constraintTop_toBottomOf="@id/divider_author"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/divider_album"/>
+
+            <View
+                android:id="@+id/divider_album"
+                style="@style/Divider.Horizontal.Constraint"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginStart="@dimen/toolbar_content_start"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_album"/>
+
+            <TextView
+                android:id="@+id/tv_genre_hint"
+                style="@style/TextStyle.Subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/genre"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                app:layout_constraintTop_toBottomOf="@id/divider_album"
+                app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
+
+            <TextView
+                android:id="@+id/tv_genre"
+                style="@style/TextStyle.Medium"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/content_internal_margin"
+                android:layout_marginBottom="@dimen/content_vertical_margin"
+                app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
+                app:layout_constraintTop_toBottomOf="@id/tv_genre_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="genre"/>
+
+            <ImageView
+                android:id="@+id/iv_genre_edit"
+                style="@style/ButtonStyle"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@+id/tv_genre_hint"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_genre_hint"
+                app:srcCompat="@drawable/ic_circle_edit_outline" />
+
+            <FrameLayout
+                android:id="@+id/change_genre_clickable_area"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:foreground="?selectableItemBackground"
+                app:layout_constraintTop_toBottomOf="@id/divider_album"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>

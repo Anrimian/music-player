@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getAllObservable();
     }
 
-    public Observable<Composition> getCompositionObservable(long id) {
+    public Observable<FullComposition> getCompositionObservable(long id) {
         return compositionsDao.getCompositionObservable(id)
                 .takeWhile(list -> !list.isEmpty())
                 .map(list -> list.get(0));

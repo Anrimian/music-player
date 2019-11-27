@@ -13,7 +13,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
@@ -31,9 +31,10 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setStatusBarColor;
@@ -60,6 +61,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.tv_filename)
     TextView tvFileName;
 
+    @BindView(R.id.tv_genre)
+    TextView tvGenre;
+
     @BindView(R.id.tv_author_hint)
     TextView tvAuthorHint;
 
@@ -71,6 +75,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @BindView(R.id.tv_filename_hint)
     TextView tvFileNameHint;
+
+    @BindView(R.id.tv_genre_hint)
+    TextView tvGenreHint;
 
     @BindView(R.id.change_author_clickable_area)
     View changeAuthorClickableArea;
@@ -84,6 +91,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.change_album_clickable_area)
     View changeAlbumClickableArea;
 
+    @BindView(R.id.change_genre_clickable_area)
+    View changeGenreClickableArea;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -91,6 +101,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     private DialogFragmentRunner<InputTextDialogFragment> titleDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> albumDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> genreDialogFragmentRunner;
 
     public static Intent newIntent(Context context, long compositionId) {
         Intent intent = new Intent(context, CompositionEditorActivity.class);
@@ -122,10 +133,12 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         changeTitleClickableArea.setOnClickListener(v -> presenter.onChangeTitleClicked());
         changeFilenameClickableArea.setOnClickListener(v -> presenter.onChangeFileNameClicked());
         changeAlbumClickableArea.setOnClickListener(v -> presenter.onChangeAlbumClicked());
+        changeGenreClickableArea.setOnClickListener(v -> presenter.onChangeGenreClicked());
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeTitleClickableArea, () -> copyText(tvTitle, tvTitleHint));
         onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
         onLongClick(changeAlbumClickableArea, () -> copyText(tvAlbum, tvAlbumHint));
+        onLongClick(changeGenreClickableArea, () -> copyText(tvGenre, tvGenreHint));
 
         @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
         Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
@@ -147,6 +160,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         albumDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 ALBUM_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewAlbumEntered));
+
+        genreDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                GENRE_TAG,
+                fragment -> fragment.setOnCompleteListener(presenter::onNewGenreEntered));
     }
 
     @Override
@@ -166,15 +183,16 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
-    public void showComposition(Composition composition) {
+    public void showComposition(FullComposition composition) {
         tvTitle.setText(composition.getTitle());
         tvAlbum.setText(composition.getAlbum());
-        tvAuthor.setText(formatCompositionAuthor(composition, this));
+        tvGenre.setText(composition.getGenre());
+        tvAuthor.setText(formatAuthor(composition.getArtist(), this));
         tvFileName.setText(formatFileName(composition.getFilePath(), true));
     }
 
     @Override
-    public void showEnterAuthorDialog(Composition composition, String[] hints) {
+    public void showEnterAuthorDialog(FullComposition composition, String[] hints) {
         InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
                 R.string.change_author_name,
                 R.string.change,
@@ -187,7 +205,20 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
-    public void showEnterTitleDialog(Composition composition) {
+    public void showEnterGenreDialog(FullComposition composition, String[] genres) {
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
+                R.string.change_composition_genre,
+                R.string.change,
+                R.string.cancel,
+                R.string.genre,
+                composition.getGenre())
+                .hints(genres)
+                .build();
+        genreDialogFragmentRunner.show(fragment);
+    }
+
+    @Override
+    public void showEnterTitleDialog(FullComposition composition) {
         InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.change_title,
                 R.string.change,
                 R.string.cancel,
@@ -197,7 +228,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
-    public void showEnterFileNameDialog(Composition composition) {
+    public void showEnterFileNameDialog(FullComposition composition) {
         InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.change_file_name,
                 R.string.change,
                 R.string.cancel,
@@ -208,7 +239,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
-    public void showEnterAlbumDialog(Composition composition, String[] hints) {
+    public void showEnterAlbumDialog(FullComposition composition, String[] hints) {
         InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(R.string.change_album_name,
                 R.string.change,
                 R.string.cancel,

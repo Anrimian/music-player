@@ -93,6 +93,10 @@ public class GenresDaoWrapper {
         });
     }
 
+    public String[] getGenreNames() {
+        return genreDao.getGenreNames();
+    }
+
     private GenreEntity toEntity(StorageGenre genre) {
         return new GenreEntity(genre.getId(), genre.getName());
     }

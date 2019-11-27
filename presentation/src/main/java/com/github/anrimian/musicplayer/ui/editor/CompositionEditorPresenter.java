@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.editor;
 
 import com.github.anrimian.musicplayer.domain.business.editor.CompositionEditorInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -24,7 +24,7 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable changeDisposable;
 
-    private Composition composition;
+    private FullComposition composition;
 
     public CompositionEditorPresenter(long compositionId,
                                       CompositionEditorInteractor editorInteractor,
@@ -80,14 +80,41 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         if (composition == null) {
             return;
         }
-        editorInteractor.getAuthorNames()
+        editorInteractor.getAlbumNames()
                 .observeOn(uiScheduler)
                 .doOnSuccess(albums -> getViewState().showEnterAlbumDialog(composition, albums))
                 .doOnError(throwable -> {
                     getViewState().showEnterAlbumDialog(composition, null);
                     onDefaultError(throwable);
                 })
-                .subscribe();    }
+                .subscribe();
+    }
+
+    void onChangeGenreClicked() {
+        if (composition == null) {
+            return;
+        }
+        editorInteractor.getGenreNames()
+                .observeOn(uiScheduler)
+                .doOnSuccess(genres -> getViewState().showEnterGenreDialog(composition, genres))
+                .doOnError(throwable -> {
+                    getViewState().showEnterGenreDialog(composition, null);
+                    onDefaultError(throwable);
+                })
+                .subscribe();
+    }
+
+    void onNewGenreEntered(String genre) {
+        if (composition == null) {
+            return;
+        }
+
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.editCompositionGenre(composition, genre)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
 
     void onNewAuthorEntered(String author) {
         if (composition == null) {
@@ -157,7 +184,7 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
                         getViewState()::closeScreen));
     }
 
-    private void onCompositionReceived(Composition composition) {
+    private void onCompositionReceived(FullComposition composition) {
         this.composition = composition;
         getViewState().showComposition(composition);
     }

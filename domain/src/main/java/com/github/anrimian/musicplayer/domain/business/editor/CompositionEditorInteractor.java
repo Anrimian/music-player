@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.business.editor;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 
@@ -19,23 +19,27 @@ public class CompositionEditorInteractor {
         this.musicProviderRepository = musicProviderRepository;
     }
 
-    public Completable editCompositionAuthor(Composition composition, String newAuthor) {
+    public Completable editCompositionGenre(FullComposition composition, String newGenre) {
+        return editorRepository.changeCompositionGenre(composition, newGenre);
+    }
+
+    public Completable editCompositionAuthor(FullComposition composition, String newAuthor) {
         return editorRepository.changeCompositionAuthor(composition, newAuthor);
     }
 
-    public Completable editCompositionAlbum(Composition composition, String newAlbum) {
+    public Completable editCompositionAlbum(FullComposition composition, String newAlbum) {
         return editorRepository.changeCompositionAlbum(composition, newAlbum);
     }
 
-    public Completable editCompositionTitle(Composition composition, String newTitle) {
+    public Completable editCompositionTitle(FullComposition composition, String newTitle) {
         return editorRepository.changeCompositionTitle(composition, newTitle);
     }
 
-    public Completable editCompositionFileName(Composition composition, String newFileName) {
+    public Completable editCompositionFileName(FullComposition composition, String newFileName) {
         return editorRepository.changeCompositionFileName(composition, newFileName);
     }
 
-    public Observable<Composition> getCompositionObservable(long id) {
+    public Observable<FullComposition> getCompositionObservable(long id) {
         return musicProviderRepository.getCompositionObservable(id);
     }
 
@@ -45,5 +49,9 @@ public class CompositionEditorInteractor {
 
     public Single<String[]> getAlbumNames() {
         return musicProviderRepository.getAlbumNames();
+    }
+
+    public Single<String[]> getGenreNames() {
+        return musicProviderRepository.getGenreNames();
     }
 }

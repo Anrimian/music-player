@@ -1,14 +1,15 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 
 import java.io.File;
 import java.util.List;
 
 import io.reactivex.Completable;
-import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
@@ -18,21 +19,20 @@ public class StorageMusicDataSource {
 
     private final StorageMusicProvider musicProvider;
     private final CompositionsDaoWrapper compositionsDao;
+    private final GenresDaoWrapper genreDao;
     private final FileManager fileManager;
     private final Scheduler scheduler;
 
     public StorageMusicDataSource(StorageMusicProvider musicProvider,
                                   CompositionsDaoWrapper compositionsDao,
+                                  GenresDaoWrapper genreDao,
                                   FileManager fileManager,
                                   Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.compositionsDao = compositionsDao;
+        this.genreDao = genreDao;
         this.fileManager = fileManager;
         this.scheduler = scheduler;
-    }
-
-    public Observable<Composition> getCompositionObservable(long id) {
-        return compositionsDao.getCompositionObservable(id);
     }
 
     public Completable deleteCompositions(List<Composition> compositionsToDelete) {
@@ -59,7 +59,7 @@ public class StorageMusicDataSource {
         });
     }
 
-    public Completable updateCompositionAuthor(Composition composition, String authorName) {
+    public Completable updateCompositionAuthor(FullComposition composition, String authorName) {
         return Completable.fromAction(() -> {
             compositionsDao.updateArtist(composition.getId(), authorName);
             Long storageId = composition.getStorageId();
@@ -69,7 +69,17 @@ public class StorageMusicDataSource {
         });
     }
 
-    public Completable updateCompositionAlbum(Composition composition, String albumName) {
+    public Completable updateCompositionGenre(FullComposition composition, String genre) {
+        return Completable.fromAction(() -> {
+            genreDao.updateCompositionGenre(composition.getId(), genre);
+//            Long storageId = composition.getStorageId();
+//            if (storageId != null) {
+//                storageGenresProvider.updateCompositionGenre(storageId, genre);
+//            }
+        });
+    }
+
+    public Completable updateCompositionAlbum(FullComposition composition, String albumName) {
         return Completable.fromAction(() -> {
             compositionsDao.updateAlbum(composition.getId(), albumName);
             Long storageId = composition.getStorageId();
@@ -79,7 +89,7 @@ public class StorageMusicDataSource {
         });
     }
 
-    public Completable updateCompositionTitle(Composition composition, String title) {
+    public Completable updateCompositionTitle(FullComposition composition, String title) {
         return Completable.fromAction(() -> {
             compositionsDao.updateTitle(composition.getId(), title);
             Long storageId = composition.getStorageId();
@@ -89,7 +99,7 @@ public class StorageMusicDataSource {
         });
     }
 
-    public Completable updateCompositionFilePath(Composition composition, String filePath) {
+    public Completable updateCompositionFilePath(FullComposition composition, String filePath) {
         return Completable.fromAction(() -> {
             compositionsDao.updateFilePath(composition.getId(), filePath);
             Long storageId = composition.getStorageId();

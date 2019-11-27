@@ -148,6 +148,8 @@
     <string name="no_compositions">Нет композиций</string>
     <string name="change_album_name">Изменить альбом</string>
     <string name="album">Альбом</string>
+    <string name="genre">Жарн</string>
+    <string name="change_composition_genre">Изменить жанр композиции</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

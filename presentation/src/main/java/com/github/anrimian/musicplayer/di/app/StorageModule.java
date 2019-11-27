@@ -78,8 +78,9 @@ public class StorageModule {
     StorageMusicDataSource storageMusicDataSource(StorageMusicProvider musicProvider,
                                                   FileManager fileManager,
                                                   CompositionsDaoWrapper compositionsDao,
+                                                  GenresDaoWrapper genreDao,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new StorageMusicDataSource(musicProvider, compositionsDao, fileManager, scheduler);
+        return new StorageMusicDataSource(musicProvider, compositionsDao, genreDao, fileManager, scheduler);
     }
 
     @Provides

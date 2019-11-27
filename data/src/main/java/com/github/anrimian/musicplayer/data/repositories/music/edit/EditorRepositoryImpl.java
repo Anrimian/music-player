@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.music.edit;
 
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
@@ -26,28 +27,35 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
-    public Completable changeCompositionAuthor(Composition composition, String newAuthor) {
+    public Completable changeCompositionGenre(FullComposition composition, String newGenre) {
+        return sourceEditor.setCompositionGenre(composition.getFilePath(), newGenre)
+                .andThen(storageMusicDataSource.updateCompositionGenre(composition, newGenre))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable changeCompositionAuthor(FullComposition composition, String newAuthor) {
         return sourceEditor.setCompositionAuthor(composition.getFilePath(), newAuthor)
                 .andThen(storageMusicDataSource.updateCompositionAuthor(composition, newAuthor))
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Completable changeCompositionAlbum(Composition composition, String newAlbum) {
+    public Completable changeCompositionAlbum(FullComposition composition, String newAlbum) {
         return sourceEditor.setCompositionAlbum(composition.getFilePath(), newAlbum)
                 .andThen(storageMusicDataSource.updateCompositionAlbum(composition, newAlbum))
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Completable changeCompositionTitle(Composition composition, String title) {
+    public Completable changeCompositionTitle(FullComposition composition, String title) {
         return sourceEditor.setCompositionTitle(composition.getFilePath(), title)
                 .andThen(storageMusicDataSource.updateCompositionTitle(composition, title))
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Completable changeCompositionFileName(Composition composition, String fileName) {
+    public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Single.fromCallable(() -> FileUtils.getChangedFilePath(composition.getFilePath(), fileName))
                 .flatMap(newPath -> renameFile(composition.getFilePath(), newPath))
                 .flatMapCompletable(newPath -> storageMusicDataSource.updateCompositionFilePath(composition, newPath))

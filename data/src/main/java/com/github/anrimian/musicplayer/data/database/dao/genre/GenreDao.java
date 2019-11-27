@@ -94,4 +94,7 @@ public interface GenreDao {
 
     @Query("DELETE FROM genre_entries WHERE audioId = :compositionId AND genreId IN(:genreIds)")
     void removeGenreEntry(long compositionId, Long[] genreIds);
+
+    @Query("SELECT name FROM genres")
+    String[] getGenreNames();
 }

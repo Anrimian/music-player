@@ -40,7 +40,10 @@ public class FormatUtils {
 
     public static StringBuilder formatCompositionAuthor(Composition composition, Context context) {
         String author = composition.getArtist();
+        return formatAuthor(author, context);
+    }
 
+    public static StringBuilder formatAuthor(String author, Context context) {
         StringBuilder sb = new StringBuilder();
         if (!isEmpty(author)) {
             sb.append(author);

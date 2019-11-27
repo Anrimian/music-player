@@ -10,6 +10,7 @@ import androidx.sqlite.db.SupportSQLiteQuery;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,7 @@ public interface CompositionsDao {
             "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM genres WHERE id IN(SELECT genreId FROM genre_entries WHERE audioId = :id)) as genre, " +
             "filePath as filePath, " +
             "duration as duration, " +
             "size as size, " +
@@ -49,7 +51,7 @@ public interface CompositionsDao {
             "FROM compositions " +
             "WHERE id = :id " +
             "LIMIT 1")
-    Observable<List<Composition>> getCompositionObservable(long id);
+    Observable<List<FullComposition>> getCompositionObservable(long id);
 
     @RawQuery(observedEntities = CompositionEntity.class)
     Observable<List<Composition>> getAllObservable(SupportSQLiteQuery query);
