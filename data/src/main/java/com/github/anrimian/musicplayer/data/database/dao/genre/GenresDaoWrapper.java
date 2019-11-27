@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.dao.genre;
 
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
@@ -20,10 +21,14 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class GenresDaoWrapper {
 
+    private final AppDatabase appDatabase;
     private final GenreDao genreDao;
     private final CompositionsDao compositionsDao;
 
-    public GenresDaoWrapper(GenreDao genreDao, CompositionsDao compositionsDao) {
+    public GenresDaoWrapper(AppDatabase appDatabase,
+                            GenreDao genreDao,
+                            CompositionsDao compositionsDao) {
+        this.appDatabase = appDatabase;
         this.genreDao = genreDao;
         this.compositionsDao = compositionsDao;
     }
@@ -64,6 +69,28 @@ public class GenresDaoWrapper {
 
     public List<IdPair> getGenresIds() {
         return genreDao.getGenresIds();
+    }
+
+    public void updateCompositionGenre(long compositionId, String genreName) {
+        appDatabase.runInTransaction(() -> {
+
+            // 1) find new genre by name
+            Long genreId = genreDao.findGenre(genreName);
+
+            // 2) if album not exists - create album
+            if (genreId == null) {
+                genreId = genreDao.insert(new GenreEntity(null, genreName));//hmm, storage?
+            }
+
+            // 3) add composition to new genre
+            Long[] oldGenreIds = genreDao.getGenresByCompositionId(compositionId);
+            genreDao.insertGenreEntry(new GenreEntryEntity(compositionId, genreId, null));
+
+            if (oldGenreIds != null && oldGenreIds.length > 0) {
+                genreDao.removeGenreEntry(compositionId, oldGenreIds);
+                genreDao.deleteEmptyGenre(oldGenreIds);
+            }
+        });
     }
 
     private GenreEntity toEntity(StorageGenre genre) {

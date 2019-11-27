@@ -37,7 +37,13 @@ public interface GenreDao {
     void insertAll(List<GenreEntity> entities);
 
     @Insert
+    long insert(GenreEntity entity);
+
+    @Insert
     void insertGenreEntities(List<GenreEntryEntity> entities);
+
+    @Insert
+    void insertGenreEntry(GenreEntryEntity entity);
 
     @Query("SELECT id as id," +
             "name as name, " +
@@ -75,4 +81,17 @@ public interface GenreDao {
             "FROM genres " +
             "WHERE id = :genreId LIMIT 1")
     Observable<List<Genre>> getGenreObservable(long genreId);
+
+    @Query("SELECT id FROM genres WHERE name = :name")
+    Long findGenre(String name);
+
+    @Query("SELECT genreId FROM genre_entries WHERE audioId = :compositionId")
+    Long[] getGenresByCompositionId(long compositionId);
+
+    @Query("DELETE FROM genres " +
+            "WHERE id IN(:ids) AND (SELECT count() FROM genre_entries WHERE genreId IN(:ids)) = 0")
+    void deleteEmptyGenre(Long[] ids);
+
+    @Query("DELETE FROM genre_entries WHERE audioId = :compositionId AND genreId IN(:genreIds)")
+    void removeGenreEntry(long compositionId, Long[] genreIds);
 }

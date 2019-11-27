@@ -103,8 +103,10 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
-    GenresDaoWrapper genresDaoWrapper(GenreDao genreDao, CompositionsDao compositionsDao) {
-        return new GenresDaoWrapper(genreDao, compositionsDao);
+    GenresDaoWrapper genresDaoWrapper(AppDatabase appDatabase,
+                                      GenreDao genreDao,
+                                      CompositionsDao compositionsDao) {
+        return new GenresDaoWrapper(appDatabase, genreDao, compositionsDao);
     }
 
     @Provides

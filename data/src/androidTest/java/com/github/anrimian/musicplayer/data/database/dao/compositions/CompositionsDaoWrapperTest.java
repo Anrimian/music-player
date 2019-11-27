@@ -10,14 +10,12 @@ import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
-import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
-
+import static com.github.anrimian.musicplayer.data.database.DataProvider.composition;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -216,19 +214,5 @@ public class CompositionsDaoWrapperTest {
         assertNull(albumsDao.findAlbum(null, "test artist"));
         assertEquals(secondAlbumId, newAlbumId);
         assertEquals(newAlbumId, compositionsDao.getAlbumId(compositionId));
-    }
-
-    private static CompositionEntity composition(Long artistId, Long albumId, String title) {
-        return new CompositionEntity(
-                artistId,
-                albumId,
-                title,
-                "test file path",
-                100L,
-                100L,
-                null,
-                new Date(),
-                new Date(),
-                null);
     }
 }

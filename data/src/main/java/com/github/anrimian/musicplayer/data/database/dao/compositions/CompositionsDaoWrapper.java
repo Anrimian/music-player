@@ -106,9 +106,9 @@ public class CompositionsDaoWrapper {
 
     public void updateAlbum(long compositionId, String albumName) {
         appDatabase.runInTransaction(() -> {
-            // 1) find new album by artist and name from albums
             Long artistId = compositionsDao.getArtistId(compositionId);
 
+            // 1) find new album by artist and name from albums
             Long albumId = albumsDao.findAlbum(artistId, albumName);
 
             // 2) if album not exists - create album
