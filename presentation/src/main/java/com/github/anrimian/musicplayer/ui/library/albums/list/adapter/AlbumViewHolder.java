@@ -20,6 +20,7 @@ import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class AlbumViewHolder extends BaseViewHolder {
 
@@ -35,10 +36,12 @@ public class AlbumViewHolder extends BaseViewHolder {
     private Album album;
 
     AlbumViewHolder(@NonNull ViewGroup parent,
-                    Callback<Album> itemClickListener) {
+                    Callback<Album> itemClickListener,
+                    Callback<Album> longClickListener) {
         super(parent, R.layout.item_album);
         ButterKnife.bind(this, itemView);
         itemView.setOnClickListener(v -> itemClickListener.call(album));
+        onLongClick(itemView, () -> longClickListener.call(album));
     }
 
     public void bind(Album album) {

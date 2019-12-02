@@ -23,7 +23,7 @@ public interface CompositionsDao {
     @Query("SELECT " +
             "(SELECT artistName FROM artists WHERE id = compositions.artistId) as artist, " +
             "compositions.title as title, " +
-            "(SELECT albumName FROM albums WHERE id = compositions.albumId) as album, " +
+            "(SELECT name FROM albums WHERE id = compositions.albumId) as album, " +
             "compositions.filePath as filePath, " +
             "compositions.duration as duration, " +
             "compositions.size as size, " +
@@ -38,7 +38,7 @@ public interface CompositionsDao {
     @Query("SELECT " +
             "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
-            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM genres WHERE id IN(SELECT genreId FROM genre_entries WHERE audioId = :id)) as genre, " +
             "filePath as filePath, " +
             "duration as duration, " +
@@ -59,7 +59,7 @@ public interface CompositionsDao {
     @Query("SELECT " +
             "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
-            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
             "duration as duration, " +
             "size as size, " +
@@ -74,7 +74,7 @@ public interface CompositionsDao {
     @Query("SELECT " +
             "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
-            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.filePath as filePath, " +
             "compositions.duration as duration, " +
             "compositions.size as size, " +

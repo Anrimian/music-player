@@ -88,7 +88,7 @@ public interface PlayListDao {
             "play_lists_entries.storageItemId as storageItemId, " +
             "compositions.id AS id, " +
             "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
-            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.storageId AS storageId, " +
             "compositions.title AS title, " +
             "compositions.filePath AS filePath, " +

@@ -8,7 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import java.util.Date;
 import java.util.Objects;
 
-public interface CompositionSerialaser {
+public interface CompositionSerializer {
 
     String ARTIST = "artist";
     String TITLE = "title";
@@ -17,7 +17,7 @@ public interface CompositionSerialaser {
     String DURATION = "duration";
     String SIZE = "size";
     String ID = "id";
-    String STORAGRE_ID = "storage_id";
+    String STORAGE_ID = "storage_id";
     String DATE_ADDED = "date_added";
     String DATE_MODIFIED = "date_modified";
     String CORRUPTION_TYPE = "corruption_type";
@@ -31,7 +31,7 @@ public interface CompositionSerialaser {
         bundle.putLong(SIZE, composition.getSize());
         bundle.putLong(ID, composition.getId());
         Long storageId = composition.getStorageId();
-        bundle.putLong(STORAGRE_ID, storageId == null? -1: storageId);
+        bundle.putLong(STORAGE_ID, storageId == null? -1: storageId);
         bundle.putLong(DATE_ADDED, composition.getDateAdded().getTime());
         bundle.putLong(DATE_MODIFIED, composition.getDateModified().getTime());
         bundle.putSerializable(CORRUPTION_TYPE, composition.getCorruptionType());
@@ -39,7 +39,7 @@ public interface CompositionSerialaser {
     }
 
     static Composition deserialize(Bundle bundle) {
-        long storageId = bundle.getLong(STORAGRE_ID);
+        long storageId = bundle.getLong(STORAGE_ID);
         return new Composition(
                 bundle.getString(ARTIST),
                 bundle.getString(TITLE),

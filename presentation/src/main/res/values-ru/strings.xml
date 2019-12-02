@@ -150,6 +150,8 @@
     <string name="album">Альбом</string>
     <string name="genre">Жарн</string>
     <string name="change_composition_genre">Изменить жанр композиции</string>
+    <string name="change_name">Изменить имя</string>
+    <string name="rename_progress">Переименование…</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

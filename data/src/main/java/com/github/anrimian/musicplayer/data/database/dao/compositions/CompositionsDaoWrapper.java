@@ -59,7 +59,7 @@ public class CompositionsDaoWrapper {
                                                           @Nullable String searchText) {
         String query = "SELECT " +
                 "(SELECT artistName FROM artists WHERE id = artistId) as artist,  " +
-                "(SELECT albumName FROM albums WHERE id = albumId) as album,  " +
+                "(SELECT name FROM albums WHERE id = albumId) as album,  " +
                 "title as title,  " +
                 "filePath as filePath,  " +
                 "duration as duration,  " +
@@ -146,13 +146,13 @@ public class CompositionsDaoWrapper {
                 AlbumEntity albumEntity = albumsDao.getAlbumEntity(albumId);
 
                 //find new album with author id and name
-                Long newAlbumId = albumsDao.findAlbum(artistId, albumEntity.getAlbumName());
+                Long newAlbumId = albumsDao.findAlbum(artistId, albumEntity.getName());
                 //if not exists, create
                 if (newAlbumId == null) {
                     newAlbumId = albumsDao.insert(new AlbumEntity(
                             artistId,
                             null,
-                            albumEntity.getAlbumName(),
+                            albumEntity.getName(),
                             albumEntity.getFirstYear(),
                             albumEntity.getLastYear()
                     ));

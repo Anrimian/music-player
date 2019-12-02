@@ -27,4 +27,6 @@ public interface EditorRepository {
     Single<String> moveFile(String filePath, String oldPath, String newPath);
 
     Completable createFile(String path);
+
+    Completable updateAlbumName(String name, long id);
 }

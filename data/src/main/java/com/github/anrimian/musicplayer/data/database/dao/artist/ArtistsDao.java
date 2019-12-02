@@ -44,7 +44,7 @@ public interface ArtistsDao {
     @Query("SELECT " +
             "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
-            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
             "duration as duration, " +
             "size as size, " +

@@ -158,6 +158,8 @@
     <string name="album">Album</string>
     <string name="genre">Genre</string>
     <string name="change_composition_genre">Change composition genre</string>
+    <string name="change_name">Change name</string>
+    <string name="rename_progress">Renaming…</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

@@ -8,11 +8,13 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import java.util.List;
 
 import moxy.MvpView;
+import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
 
 public interface AlbumsListView extends MvpView {
 
     String LIST_STATE = "list_state";
+    String RENAME_STATE = "rename_state";
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
@@ -29,6 +31,15 @@ public interface AlbumsListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoadingError(ErrorCommand errorCommand);
 
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
+    void showRenameProgress();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
+    void hideRenameProgress();
+
     @StateStrategyType(ListStateStrategy.class)
     void submitList(List<Album> albums);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showErrorMessage(ErrorCommand errorCommand);
 }

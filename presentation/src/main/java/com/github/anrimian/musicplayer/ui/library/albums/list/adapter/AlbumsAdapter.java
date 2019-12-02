@@ -16,19 +16,23 @@ import java.util.List;
 public class AlbumsAdapter extends DiffListAdapter<Album, AlbumViewHolder> {
 
     private final Callback<Album> onClickListener;
+    private final Callback<Album> longClickListener;
 
-    public AlbumsAdapter(RecyclerView recyclerView, Callback<Album> onClickListener) {
+    public AlbumsAdapter(RecyclerView recyclerView,
+                         Callback<Album> onClickListener,
+                         Callback<Album> longClickListener) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 AlbumHelper::areSourcesTheSame,
                 AlbumHelper::getChangePayload)
         );
         this.onClickListener = onClickListener;
+        this.longClickListener = longClickListener;
     }
 
     @NonNull
     @Override
     public AlbumViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new AlbumViewHolder(parent, onClickListener);
+        return new AlbumViewHolder(parent, onClickListener, longClickListener);
     }
 
     @Override

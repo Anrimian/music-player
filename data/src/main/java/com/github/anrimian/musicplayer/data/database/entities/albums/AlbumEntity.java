@@ -31,19 +31,19 @@ public class AlbumEntity {
     @Nullable
     private Long storageId;
 
-    private String albumName;
+    private String name;
 
     private int firstYear;
     private int lastYear;
 
     public AlbumEntity(@Nullable Long artistId,
                        @Nullable Long storageId,
-                       String albumName,
+                       String name,
                        int firstYear,
                        int lastYear) {
         this.artistId = artistId;
         this.storageId = storageId;
-        this.albumName = albumName;
+        this.name = name;
         this.firstYear = firstYear;
         this.lastYear = lastYear;
     }
@@ -74,12 +74,12 @@ public class AlbumEntity {
         this.storageId = storageId;
     }
 
-    public String getAlbumName() {
-        return albumName;
+    public String getName() {
+        return name;
     }
 
-    public void setAlbumName(String albumName) {
-        this.albumName = albumName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getFirstYear() {

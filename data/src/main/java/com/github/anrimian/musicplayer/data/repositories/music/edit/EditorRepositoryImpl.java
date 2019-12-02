@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.music.edit;
 
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
@@ -18,11 +20,14 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor();
 
     private final StorageMusicDataSource storageMusicDataSource;
+    private final AlbumsDaoWrapper albumsDao;
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
+                                AlbumsDaoWrapper albumsDao,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
+        this.albumsDao = albumsDao;
         this.scheduler = scheduler;
     }
 
@@ -96,6 +101,15 @@ public class EditorRepositoryImpl implements EditorRepository {
                 throw new Exception("file not created");
             }
         }).subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable updateAlbumName(String name, long albumId) {
+        return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition.getFilePath(), name))
+                .doOnComplete(() -> albumsDao.updateAlbumName(name, albumId))
+                .subscribeOn(scheduler);
     }
 
     private Single<String> renameFile(String oldPath, String newPath) {

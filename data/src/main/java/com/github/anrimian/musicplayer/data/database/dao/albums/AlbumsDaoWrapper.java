@@ -43,7 +43,11 @@ public class AlbumsDaoWrapper {
         return albumsDao.getAllAlbumsForArtist(artistId);
     }
 
-    public Observable<List<Composition>> getCompositionsInAlbum(long albumId) {
+    public Observable<List<Composition>> getCompositionsInAlbumObservable(long albumId) {
+        return albumsDao.getCompositionsInAlbumObservable(albumId);
+    }
+
+    public List<Composition> getCompositionsInAlbum(long albumId) {
         return albumsDao.getCompositionsInAlbum(albumId);
     }
 
@@ -55,6 +59,10 @@ public class AlbumsDaoWrapper {
 
     public String[] getAlbumNames() {
         return albumsDao.getAlbumNames();
+    }
+
+    public void updateAlbumName(String name, long id) {
+        albumsDao.updateAlbumName(name, id);
     }
 
     private AlbumEntity toEntity(StorageAlbum album) {

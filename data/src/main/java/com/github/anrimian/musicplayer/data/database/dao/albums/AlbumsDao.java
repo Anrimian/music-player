@@ -21,7 +21,7 @@ public interface AlbumsDao {
     Long selectIdByStorageId(long storageId);
 
     @Query("SELECT storageId as id," +
-            "albumName as album," +
+            "name as album," +
             "(SELECT artistName FROM artists WHERE artists.id = artistId) as artist," +
             "(SELECT storageId FROM artists WHERE artists.id = artistId) as artistId," +
             "firstYear as firstYear," +
@@ -37,7 +37,7 @@ public interface AlbumsDao {
 
     @Query("SELECT id as id," +
             "storageId as storageId, " +
-            "albumName as name, " +
+            "name as name, " +
             "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums")
@@ -46,7 +46,7 @@ public interface AlbumsDao {
     @Query("SELECT " +
             "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
-            "(SELECT albumName FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
             "duration as duration, " +
             "size as size, " +
@@ -57,11 +57,27 @@ public interface AlbumsDao {
             "corruptionType as corruptionType " +
             "FROM compositions " +
             "WHERE albumId = :albumId")
-    Observable<List<Composition>> getCompositionsInAlbum(long albumId);
+    Observable<List<Composition>> getCompositionsInAlbumObservable(long albumId);
+
+    @Query("SELECT " +
+            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "title as title, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
+            "filePath as filePath, " +
+            "duration as duration, " +
+            "size as size, " +
+            "id as id, " +
+            "storageId as storageId, " +
+            "dateAdded as dateAdded, " +
+            "dateModified as dateModified, " +
+            "corruptionType as corruptionType " +
+            "FROM compositions " +
+            "WHERE albumId = :albumId")
+    List<Composition> getCompositionsInAlbum(long albumId);
 
     @Query("SELECT id as id," +
             "storageId as storageId, " +
-            "albumName as name, " +
+            "name as name, " +
             "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums " +
@@ -70,7 +86,7 @@ public interface AlbumsDao {
 
     @Query("SELECT id as id," +
             "storageId as storageId, " +
-            "albumName as name, " +
+            "name as name, " +
             "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums " +
@@ -79,7 +95,7 @@ public interface AlbumsDao {
 
     @Query("SELECT id as id," +
             "storageId as storageId, " +
-            "albumName as name, " +
+            "name as name, " +
             "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums " +
@@ -88,7 +104,7 @@ public interface AlbumsDao {
 
     @Query("SELECT id FROM albums " +
             "WHERE (artistId = :artistId OR (artistId IS NULL AND :artistId IS NULL)) " +
-            "AND albumName = :name")
+            "AND name = :name")
     Long findAlbum(Long artistId, String name);
 
     @Query("UPDATE albums SET artistId = :artistId WHERE id = :albumId")
@@ -101,6 +117,9 @@ public interface AlbumsDao {
             "WHERE id = :id AND (SELECT count() FROM compositions WHERE albumId = albums.id) = 0")
     void deleteEmptyAlbum(long id);
 
-    @Query("SELECT albumName FROM albums")
+    @Query("SELECT name FROM albums")
     String[] getAlbumNames();
+
+    @Query("UPDATE albums SET name = :name WHERE id = :id")
+    void updateAlbumName(String name, long id);
 }

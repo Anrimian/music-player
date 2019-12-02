@@ -20,7 +20,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.java.TripleCallback;
-import com.github.anrimian.musicplayer.ui.common.serealization.CompositionSerialaser;
+import com.github.anrimian.musicplayer.ui.common.serealization.CompositionSerializer;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuAdapter;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
@@ -95,7 +95,7 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
                                                               @AttrRes int statusBarColorAttr,
                                                               Bundle extra) {
         Bundle args = new Bundle();
-        args.putBundle(COMPOSITION_ARG, CompositionSerialaser.serialize(composition));
+        args.putBundle(COMPOSITION_ARG, CompositionSerializer.serialize(composition));
         args.putInt(MENU_ARG, menu);
         args.putInt(STATUS_BAR_COLOR_ATTR_ARG, statusBarColorAttr);
         args.putBundle(EXTRA_DATA_ARG, extra);
@@ -134,7 +134,7 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         //noinspection ConstantConditions
         @Nonnull Bundle args = getArguments();
         //noinspection ConstantConditions
-        composition = CompositionSerialaser.deserialize(args.getBundle(COMPOSITION_ARG));
+        composition = CompositionSerializer.deserialize(args.getBundle(COMPOSITION_ARG));
 
         Menu menu = createMenu(requireContext(), getArguments().getInt(MENU_ARG));
         MenuAdapter menuAdapter = new MenuAdapter(menu);

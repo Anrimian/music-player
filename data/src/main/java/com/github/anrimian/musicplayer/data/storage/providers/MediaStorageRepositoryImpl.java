@@ -80,7 +80,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     @Override
     public void initialize() {
-        if (artistsDisposable != null) {
+        if (artistsDisposable == null) {
             artistsDisposable = artistsProvider.getArtistsObservable()
                     .startWith(artistsProvider.getArtists())
                     .observeOn(scheduler)
