@@ -93,7 +93,7 @@
     </string>
     <string name="select_all">Select all</string>
     <string name="file_uri_extract_error">
-        Can\'t get path for file to send.
+        Can\'t get system path for file \"%s\" to send.
         Possible he is in private system folder or so.
     </string>
     <string name="loading_progress">Loading…</string>
