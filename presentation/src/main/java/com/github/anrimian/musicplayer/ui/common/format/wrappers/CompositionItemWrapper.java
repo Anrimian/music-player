@@ -28,7 +28,6 @@ import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
@@ -53,6 +52,10 @@ public class CompositionItemWrapper {
 
     @BindView(R.id.divider)
     View divider;
+
+    @Nullable
+    @BindView(R.id.btn_actions_menu)
+    View btnActionsMenu;
 
     private Composition composition;
 
@@ -152,11 +155,19 @@ public class CompositionItemWrapper {
     }
 
     private void showCorrupted() {
-        int textColorAttr = composition.getCorruptionType() != null? android.R.attr.textColorSecondary:
-                android.R.attr.textColorPrimary;
-        tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
+        float alpha = composition.getCorruptionType() == null? 1f: 0.5f;
+        tvMusicName.setAlpha(alpha);
+        tvAdditionalInfo.setAlpha(alpha);
+        if (ivMusicIcon != null) {
+            ivMusicIcon.setAlpha(alpha);
+        }
+        if (ivPlay != null) {
+            ivPlay.setAlpha(alpha);
+        }
+        if (btnActionsMenu != null) {
+            btnActionsMenu.setAlpha(alpha);
+        }
     }
-
 
     private void showAsDragging(boolean dragging) {
         int endColor = getItemDragColor(getContext(), dragging? 20: 0);

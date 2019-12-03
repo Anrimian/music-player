@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
@@ -293,7 +294,15 @@ public class MusicPlayerInteractor {
         if (playerEvent instanceof PreparedEvent) {
             onCompositionPrepared();
         } else if (playerEvent instanceof FinishedEvent) {
+            FinishedEvent finishedEvent = (FinishedEvent) playerEvent;
             onCompositionPlayFinished();
+            Composition composition = finishedEvent.getComposition();
+            if (composition.getCorruptionType() != null) {
+                musicProviderRepository.writeErrorAboutComposition(null, composition)
+                        .doOnError(analytics::processNonFatalError)
+                        .onErrorComplete()
+                        .subscribe();
+            }
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;
             handleErrorWithComposition(errorEvent.getErrorType(), errorEvent.getComposition());
@@ -322,7 +331,8 @@ public class MusicPlayerInteractor {
                 break;
             }
             default: {
-                musicProviderRepository.writeErrorAboutComposition(errorType, composition)
+                CorruptionType corruptionType = toCorruptionType(errorType);
+                musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
                         .doOnError(analytics::processNonFatalError)
                         .onErrorComplete()
                         .doOnComplete(() -> {
@@ -334,6 +344,13 @@ public class MusicPlayerInteractor {
                         })
                         .subscribe();
             }
+        }
+    }
+
+    private CorruptionType toCorruptionType(ErrorType errorType) {
+        switch (errorType) {
+            case UNKNOWN: return CorruptionType.UNKNOWN;
+            default: return null;
         }
     }
 

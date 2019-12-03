@@ -1,9 +1,9 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
-import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public interface MusicProviderRepository {
 
     Single<List<String>> getAvailablePathsForPath(@Nullable String path);
 
-    Completable writeErrorAboutComposition(ErrorType errorType, Composition composition);
+    Completable writeErrorAboutComposition(CorruptionType errorType, Composition composition);
 
     Completable deleteComposition(Composition composition);
 

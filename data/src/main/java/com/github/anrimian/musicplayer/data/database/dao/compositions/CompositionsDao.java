@@ -9,6 +9,7 @@ import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 
 import java.util.Date;
 import java.util.List;
@@ -100,4 +101,7 @@ public interface CompositionsDao {
 
     @Query("SELECT id FROM compositions WHERE storageId = :storageId")
     long selectIdByStorageId(long storageId);
+
+    @Query("UPDATE compositions SET corruptionType = :corruptionType WHERE id = :id")
+    void setCorruptionType(CorruptionType corruptionType, long id);
 }

@@ -7,5 +7,13 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
  */
 public class PreparedEvent implements PlayerEvent {
 
+    private final Composition composition;
 
+    public PreparedEvent(Composition composition) {
+        this.composition = composition;
+    }
+
+    public Composition getComposition() {
+        return composition;
+    }
 }
