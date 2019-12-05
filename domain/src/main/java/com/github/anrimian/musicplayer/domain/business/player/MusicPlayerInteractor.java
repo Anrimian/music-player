@@ -349,6 +349,7 @@ public class MusicPlayerInteractor {
 
     private CorruptionType toCorruptionType(ErrorType errorType) {
         switch (errorType) {
+            case UNSUPPORTED: return CorruptionType.UNSUPPORTED;
             case UNKNOWN: return CorruptionType.UNKNOWN;
             default: return null;
         }

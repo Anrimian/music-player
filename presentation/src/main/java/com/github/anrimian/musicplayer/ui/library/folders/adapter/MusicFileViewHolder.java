@@ -49,14 +49,10 @@ public class MusicFileViewHolder extends FileViewHolder {
         super(parent, R.layout.item_storage_music);
         ButterKnife.bind(this, itemView);
         compositionItemWrapper = new CompositionItemWrapper(itemView,
-                composition -> iconClickListener.onItemClick(getAdapterPosition(), composition)
+                composition -> iconClickListener.onItemClick(getAdapterPosition(), composition),
+                composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), fileSource)
         );
 
-        if (onCompositionClickListener != null) {
-            clickableItem.setOnClickListener(v ->
-                    onCompositionClickListener.onItemClick(getAdapterPosition(), fileSource)
-            );
-        }
         if (onLongClickListener != null) {
             clickableItem.setOnLongClickListener(v -> {
                 if (selected) {
