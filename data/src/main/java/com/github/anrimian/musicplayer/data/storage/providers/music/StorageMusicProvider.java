@@ -176,12 +176,12 @@ public class StorageMusicProvider {
 
     private StorageComposition getCompositionFromCursor(CursorWrapper cursorWrapper) {
 
-        String artist = cursorWrapper.getString(Media.ARTIST);
-        String title = cursorWrapper.getString(Media.TITLE);
-        String album = cursorWrapper.getString(Media.ALBUM);
-        String filePath = cursorWrapper.getString(Media.DATA);
-//        String albumKey = cursorWrapper.getString(Media.ALBUM_KEY);
-//        String composer = cursorWrapper.getString(Media.COMPOSER);
+        @Nullable String artist = cursorWrapper.getString(Media.ARTIST);
+        @Nullable String title = cursorWrapper.getString(Media.TITLE);
+        @Nullable String album = cursorWrapper.getString(Media.ALBUM);
+        @Nullable String filePath = cursorWrapper.getString(Media.DATA);
+//        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
+//        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
 //        String displayName = cursorWrapper.getString(DISPLAY_NAME);
 //        String mimeType = cursorWrapper.getString(Media.MIME_TYPE);
 
@@ -218,7 +218,7 @@ public class StorageMusicProvider {
             dateModified  = new Date(dateModifiedMillis * 1000L);
         }
 
-        if (artist.equals("<unknown>")) {
+        if (artist != null && artist.equals("<unknown>")) {
             artist = null;
         }
 

@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
@@ -175,8 +176,8 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Completable writeErrorAboutComposition(ErrorType errorType, Composition composition) {
-        return Completable.complete()//TODO write error about composition
+    public Completable writeErrorAboutComposition(CorruptionType corruptionType, Composition composition) {
+        return Completable.fromAction(() -> compositionsDao.setCorruptionType(corruptionType, composition.getId()))
                 .subscribeOn(scheduler);
     }
 

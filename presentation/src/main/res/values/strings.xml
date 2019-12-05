@@ -146,6 +146,7 @@
     <string name="headset">Headset</string>
     <string name="scan_storage">Rescan media storage</string>
     <string name="auto_night_mode">Auto night mode</string>
+    <string name="unsupported_format_hint">Unsupported format</string>
     <string name="artists">Artists</string>
     <string name="no_artists_in_library">No artists in library</string>
     <string name="albums">Albums</string>

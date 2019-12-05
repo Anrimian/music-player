@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.repositories;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
@@ -59,7 +60,7 @@ public interface MusicProviderRepository {
 
     Single<List<String>> getAvailablePathsForPath(@Nullable String path);
 
-    Completable writeErrorAboutComposition(ErrorType errorType, Composition composition);
+    Completable writeErrorAboutComposition(CorruptionType errorType, Composition composition);
 
     Completable deleteComposition(Composition composition);
 

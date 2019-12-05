@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.StringRes;
@@ -18,7 +17,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper
 
 import javax.annotation.Nonnull;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -26,9 +24,6 @@ import butterknife.ButterKnife;
  */
 
 public class PlayListItemViewHolder extends RecyclerView.ViewHolder implements DragListener {
-
-    @BindView(R.id.clickable_item)
-    View clickableItem;
 
     private CompositionItemWrapper compositionItemWrapper;
 
@@ -41,14 +36,9 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder implements D
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
         ButterKnife.bind(this, itemView);
         compositionItemWrapper = new CompositionItemWrapper(itemView,
-                o -> onIconClickListener.onItemClick(getAdapterPosition())
+                o -> onIconClickListener.onItemClick(getAdapterPosition()),
+                composition -> onCompositionClickListener.call(item, getAdapterPosition())
         );
-
-        if (onCompositionClickListener != null) {
-            clickableItem.setOnClickListener(v ->
-                    onCompositionClickListener.call(item, getAdapterPosition())
-            );
-        }
     }
 
     public void bind(@Nonnull PlayListItem item, boolean coversEnabled) {

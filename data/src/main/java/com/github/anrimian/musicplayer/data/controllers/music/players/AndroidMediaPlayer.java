@@ -126,7 +126,7 @@ public class AndroidMediaPlayer implements MediaPlayer {
     private void onCompositionPrepared(Throwable throwable, long startPosition) {
         if (throwable == null) {
             seekTo(startPosition);
-            playerEventSubject.onNext(new PreparedEvent());
+            playerEventSubject.onNext(new PreparedEvent(currentComposition));
         } else {
             seekTo(0);
             mediaPlayer.pause();
