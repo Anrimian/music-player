@@ -11,12 +11,12 @@ import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFold
 import com.github.anrimian.musicplayer.data.repositories.music.search.FileSourceSearchFilter;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -96,8 +96,8 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Completable writeErrorAboutComposition(ErrorType errorType, Composition composition) {
-        return Completable.complete()//TODO write error about composition
+    public Completable writeErrorAboutComposition(CorruptionType corruptionType, Composition composition) {
+        return Completable.fromAction(() -> compositionsDao.setCorruptionType(corruptionType, composition.getId()))
                 .subscribeOn(scheduler);
     }
 
