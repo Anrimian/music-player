@@ -63,7 +63,7 @@ public class ExoMediaPlayer implements MediaPlayer {
         this.playerErrorParser = playerErrorParser;
 
         PlayerEventListener playerEventListener = new PlayerEventListener(
-                () -> playerEventSubject.onNext(new FinishedEvent()),
+                () -> playerEventSubject.onNext(new FinishedEvent(currentComposition)),
                 this::sendErrorEvent
         );
         player.addListener(playerEventListener);
@@ -144,7 +144,7 @@ public class ExoMediaPlayer implements MediaPlayer {
     private void onCompositionPrepared(Throwable throwable, long startPosition) {
         if (throwable == null) {
             seekTo(startPosition);
-            playerEventSubject.onNext(new PreparedEvent());
+            playerEventSubject.onNext(new PreparedEvent(currentComposition));
         } else {
             seekTo(0);
             player.setPlayWhenReady(false);

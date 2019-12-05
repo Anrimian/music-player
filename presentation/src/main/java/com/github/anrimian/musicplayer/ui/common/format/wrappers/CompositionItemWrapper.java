@@ -1,6 +1,9 @@
 package com.github.anrimian.musicplayer.ui.common.format.wrappers;
 
 import android.content.Context;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -10,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
@@ -54,16 +58,23 @@ public class CompositionItemWrapper {
     @BindView(R.id.divider)
     View divider;
 
+    @Nullable
+    @BindView(R.id.btn_actions_menu)
+    View btnActionsMenu;
+
     private Composition composition;
 
     private boolean isCurrent;
     private boolean isDragging;
 
-    public CompositionItemWrapper(View itemView, Callback<Composition> onIconClickListener) {
+    public CompositionItemWrapper(View itemView,
+                                  Callback<Composition> onIconClickListener,
+                                  Callback<Composition> onClickListener) {
         ButterKnife.bind(this, itemView);
         if (ivMusicIcon != null) {
             ivMusicIcon.setOnClickListener(v -> onIconClickListener.call(composition));
         }
+        clickableItem.setOnClickListener(v -> onClickListener.call(composition));
     }
 
     public void bind(Composition composition, boolean showCovers) {
@@ -91,6 +102,7 @@ public class CompositionItemWrapper {
             }
             if (payload == CORRUPTED) {
                 showCorrupted();
+                showAdditionalInfo();
             }
         }
     }
@@ -152,11 +164,19 @@ public class CompositionItemWrapper {
     }
 
     private void showCorrupted() {
-        int textColorAttr = composition.getCorruptionType() != null? android.R.attr.textColorSecondary:
-                android.R.attr.textColorPrimary;
-        tvMusicName.setTextColor(getColorFromAttr(getContext(), textColorAttr));
+        float alpha = composition.getCorruptionType() == null? 1f: 0.5f;
+        tvMusicName.setAlpha(alpha);
+        tvAdditionalInfo.setAlpha(alpha);
+        if (ivMusicIcon != null) {
+            ivMusicIcon.setAlpha(alpha);
+        }
+        if (ivPlay != null) {
+            ivPlay.setAlpha(alpha);
+        }
+        if (btnActionsMenu != null) {
+            btnActionsMenu.setAlpha(alpha);
+        }
     }
-
 
     private void showAsDragging(boolean dragging) {
         int endColor = getItemDragColor(getContext(), dragging? 20: 0);
@@ -164,10 +184,33 @@ public class CompositionItemWrapper {
     }
 
     private void showAdditionalInfo() {
-        StringBuilder sb = formatCompositionAuthor(composition, getContext());
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        sb.append(formatCompositionAuthor(composition, getContext()));
         sb.append(" ● ");//TODO split problem • ●
         sb.append(formatMilliseconds(composition.getDuration()));
-        tvAdditionalInfo.setText(sb.toString());
+        String corruptionHint = getCorruptionTypeHint();
+        if (corruptionHint != null) {
+            sb.append(" ● ");
+            int start = sb.length();
+            int end = start + corruptionHint.length();
+
+            sb.append(corruptionHint);
+
+            ForegroundColorSpan fcs = new ForegroundColorSpan(getColorFromAttr(getContext(), R.attr.colorError));
+            sb.setSpan(fcs, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        }
+        tvAdditionalInfo.setText(sb);
+    }
+
+    private String getCorruptionTypeHint() {
+        CorruptionType corruptionType = composition.getCorruptionType();
+        if (corruptionType == null) {
+            return null;
+        }
+        switch (composition.getCorruptionType()) {
+            case UNSUPPORTED: return getContext().getString(R.string.unsupported_format_hint);
+            default: return null;
+        }
     }
 
     private Context getContext() {

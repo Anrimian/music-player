@@ -68,13 +68,8 @@ public class DialogUtils {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("audio/*");
 
-        Uri fileUri;
-        try {
-            fileUri = FileProvider.getUriForFile(context,
-                    context.getString(R.string.file_provider_authorities),
-                    new File(filePath));
-        } catch (Exception e) {
-            Toast.makeText(context, R.string.file_uri_extract_error, Toast.LENGTH_SHORT).show();
+        Uri fileUri = createUri(context, filePath);
+        if (fileUri == null) {
             return;
         }
         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
@@ -86,9 +81,11 @@ public class DialogUtils {
     public static void shareCompositions(Context context, Collection<Composition> filePaths) {
         ArrayList<Uri> uris = new ArrayList<>();
         for (Composition composition : filePaths) {
-            uris.add(FileProvider.getUriForFile(context,
-                    context.getString(R.string.file_provider_authorities),
-                    new File(composition.getFilePath())));
+            Uri fileUri = createUri(context, composition.getFilePath());
+            if (fileUri == null) {
+                return;
+            }
+            uris.add(fileUri);
         }
         shareFiles(context, uris);
     }
@@ -96,9 +93,11 @@ public class DialogUtils {
     public static void shareFiles(Context context, Collection<String> filePaths) {
         ArrayList<Uri> uris = new ArrayList<>();
         for (String path : filePaths) {
-            uris.add(FileProvider.getUriForFile(context,
-                    context.getString(R.string.file_provider_authorities),
-                    new File(path)));
+            Uri fileUri = createUri(context, path);
+            if (fileUri == null) {
+                return;
+            }
+            uris.add(fileUri);
         }
         shareFiles(context, uris);
     }
@@ -131,6 +130,19 @@ public class DialogUtils {
             if (window != null) {
                 window.setLayout(width > 0 ? width : MATCH_PARENT, MATCH_PARENT);
             }
+        }
+    }
+
+    private static Uri createUri(Context context, String filePath) {
+        try {
+            return FileProvider.getUriForFile(context,
+                    context.getString(R.string.file_provider_authorities),
+                    new File(filePath));
+        } catch (Exception e) {
+            Toast.makeText(context,
+                    context.getString(R.string.file_uri_extract_error, filePath),
+                    Toast.LENGTH_LONG).show();
+            return null;
         }
     }
 

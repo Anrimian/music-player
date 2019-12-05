@@ -87,7 +87,7 @@
     <string name="delete_playlist">Удалить плейлист</string>
     <string name="storage_timeout_error_message">Медиа хранилище устройства не отвечает. Это очень странная и редкая ошибка. Попробуйте перезагрузить устройство, возможно, это решит эту проблему.</string>
     <string name="select_all">Выделить всё</string>
-    <string name="file_uri_extract_error">Не удалось получить путь к файлу для отправки. Возможно, он в закрытой системной папке.</string>
+    <string name="file_uri_extract_error">Не удалось получить системный путь к файлу \"%s\" для отправки. Возможно, он в закрытой системной папке.</string>
     <string name="loading_progress">Загрузка…</string>
     <string name="alphabetical_order_desc_title">Я - А</string>
     <string name="add_date_order_desc_title">Сначала поздние</string>
@@ -138,6 +138,7 @@
     <string name="headset">Гарнитура</string>
     <string name="scan_storage">Пересканировать системную библиотеку</string>
     <string name="auto_night_mode">Автоматическая тёмная тема</string>
+    <string name="unsupported_format_hint">Неподдерживаемый формат</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

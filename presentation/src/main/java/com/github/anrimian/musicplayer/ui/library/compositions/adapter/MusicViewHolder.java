@@ -45,14 +45,10 @@ public class MusicViewHolder extends SelectableViewHolder {
         super(parent, R.layout.item_storage_music);
         ButterKnife.bind(this, itemView);
         compositionItemWrapper = new CompositionItemWrapper(itemView,
-                o -> iconClickListener.onItemClick(getAdapterPosition(), composition)
+                o -> iconClickListener.onItemClick(getAdapterPosition(), composition),
+                composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), composition)
         );
 
-        if (onCompositionClickListener != null) {
-            clickableItem.setOnClickListener(v ->
-                    onCompositionClickListener.onItemClick(getAdapterPosition(), composition)
-            );
-        }
         if (onLongClickListener != null) {
             clickableItem.setOnLongClickListener(v -> {
                 if (selected) {

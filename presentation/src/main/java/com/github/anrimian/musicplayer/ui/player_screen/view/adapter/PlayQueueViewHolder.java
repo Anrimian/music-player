@@ -27,9 +27,6 @@ import butterknife.ButterKnife;
 
 class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListener {
 
-    @BindView(R.id.clickable_item)
-    View clickableItem;
-
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
@@ -45,13 +42,10 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
         super(inflater.inflate(R.layout.item_play_queue, parent, false));
         ButterKnife.bind(this, itemView);
         compositionItemWrapper = new CompositionItemWrapper(itemView,
-                o -> iconClickListener.onItemClick(getAdapterPosition(), playQueueItem)
+                o -> iconClickListener.onItemClick(getAdapterPosition(), playQueueItem),
+                composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), playQueueItem)
         );
 
-        if (onCompositionClickListener != null) {
-            clickableItem.setOnClickListener(v ->
-                    onCompositionClickListener.onItemClick(getAdapterPosition(), playQueueItem));
-        }
         btnActionsMenu.setOnClickListener(v -> menuClickListener.onItemClick(v, playQueueItem));
     }
 

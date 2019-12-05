@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
 import java.util.HashMap;
@@ -113,6 +114,10 @@ public class CompositionsDaoWrapper {
                 );
             }
         });
+    }
+
+    public void setCorruptionType(CorruptionType corruptionType, long id) {
+        compositionsDao.setCorruptionType(corruptionType, id);
     }
 
     public long selectIdByStorageId(long compositionId) {
