@@ -65,7 +65,7 @@ dependencies {
     implementation deps.constraintLayout
     implementation deps.supportMedia
     implementation deps.palette
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation deps.circleImageView
 
     implementation deps.recyclerViewAnimation
 
