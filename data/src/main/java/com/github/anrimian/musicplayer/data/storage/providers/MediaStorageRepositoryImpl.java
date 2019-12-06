@@ -88,36 +88,23 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     }
 
     private void subscribeOnMediaStoreChanges() {
+        mediaStoreDisposable.add(artistsProvider.getArtistsObservable()
+                .subscribeOn(scheduler)
+                .subscribe(this::applyArtistsChanges));
+        mediaStoreDisposable.add(albumsProvider.getAlbumsObservable()
+                .subscribeOn(scheduler)
+                .subscribe(this::applyAlbumsChanges));
         mediaStoreDisposable.add(musicProvider.getCompositionsObservable()
                 .subscribeOn(scheduler)
                 .subscribe(this::applyCompositionsData));
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)
                 .subscribe(this::onStoragePlayListReceived));
-
         subscribeOnPlaylistData();
-    }
-
-    private Completable runRescanStorage() {
-        return Completable.fromAction(() -> {
-            applyCompositionsData(musicProvider.getCompositions());
-            applyPlayListData(playListsProvider.getPlayLists());
-
-            List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
-            for (IdPair playListIds: allPlayLists) {
-                long storageId = playListIds.getStorageId();
-                long dbId = playListIds.getDbId();
-                applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
-            }
-
-            applyGenresData(genresProvider.getGenres());
-            List<IdPair> genresIds = genresDao.getGenresIds();
-            for (IdPair genreId: genresIds) {
-                long storageId = genreId.getStorageId();
-                long dbId = genreId.getDbId();
-                applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
-            }
-        }).subscribeOn(scheduler).subscribe();
+        mediaStoreDisposable.add(genresProvider.getGenresObservable()
+                .subscribeOn(scheduler)
+                .subscribe(this::onStorageGenresReceived));
+        subscribeOnGenresData();
     }
 
     private Completable runRescanStorage() {
@@ -133,6 +120,13 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 long dbId = playListIds.getDbId();
                 applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
             }
+            applyGenresData(genresProvider.getGenres());
+            List<IdPair> genresIds = genresDao.getGenresIds();
+            for (IdPair genreId: genresIds) {
+                long storageId = genreId.getStorageId();
+                long dbId = genreId.getDbId();
+                applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
+            }
         }).subscribeOn(scheduler);
     }
 
@@ -143,7 +137,10 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     private void onStorageGenresReceived(LongSparseArray<StorageGenre> newGenres) {
         applyGenresData(newGenres);
+        subscribeOnGenresData();
+    }
 
+    private void subscribeOnGenresData() {
         List<IdPair> genresIds = genresDao.getGenresIds();
         for (IdPair genreId: genresIds) {
             long storageId = genreId.getStorageId();
