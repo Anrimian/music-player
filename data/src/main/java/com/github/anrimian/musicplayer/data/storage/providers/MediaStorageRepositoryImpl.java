@@ -30,6 +30,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 public class MediaStorageRepositoryImpl implements MediaStorageRepository {
@@ -46,11 +47,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     private final GenresDaoWrapper genresDao;
     private final Scheduler scheduler;
 
-    private Disposable albumsDisposable;
-    private Disposable artistsDisposable;
-    private Disposable compositionsDisposable;
-    private Disposable playListsDisposable;
-    private Disposable genresDisposable;
+    private CompositeDisposable mediaStoreDisposable = new CompositeDisposable();
     private LongSparseArray<Disposable> playListEntriesDisposable = new LongSparseArray<>();
     private LongSparseArray<Disposable> genreEntriesDisposable = new LongSparseArray<>();
 
@@ -80,19 +77,29 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     @Override
     public void initialize() {
-        if (artistsDisposable == null) {
-            artistsDisposable = artistsProvider.getArtistsObservable()
-                    .startWith(artistsProvider.getArtists())
-                    .observeOn(scheduler)
-                    .subscribe(this::onStorageArtistReceived);
-        }
+        runRescanStorage()
+                .doOnComplete(this::subscribeOnMediaStoreChanges)
+                .subscribe();
     }
 
     @Override
     public synchronized void rescanStorage() {
-        Completable.fromAction(() -> {
-            applyArtistsChanges(artistsProvider.getArtists());
-            applyAlbumsChanges(albumsProvider.getAlbums());
+        runRescanStorage().subscribe();
+    }
+
+    private void subscribeOnMediaStoreChanges() {
+        mediaStoreDisposable.add(musicProvider.getCompositionsObservable()
+                .subscribeOn(scheduler)
+                .subscribe(this::applyCompositionsData));
+        mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
+                .subscribeOn(scheduler)
+                .subscribe(this::onStoragePlayListReceived));
+
+        subscribeOnPlaylistData();
+    }
+
+    private Completable runRescanStorage() {
+        return Completable.fromAction(() -> {
             applyCompositionsData(musicProvider.getCompositions());
             applyPlayListData(playListsProvider.getPlayLists());
 
@@ -110,65 +117,28 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 long dbId = genreId.getDbId();
                 applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
             }
-
         }).subscribeOn(scheduler).subscribe();
     }
 
-    private void onStorageAlbumsReceived(LongSparseArray<StorageAlbum> albums) {
-        applyAlbumsChanges(albums);
+    private Completable runRescanStorage() {
+        return Completable.fromAction(() -> {
+            applyArtistsChanges(artistsProvider.getArtists());
+            applyAlbumsChanges(albumsProvider.getAlbums());
+            applyCompositionsData(musicProvider.getCompositions());
+            applyPlayListData(playListsProvider.getPlayLists());
 
-        if (compositionsDisposable == null) {
-            compositionsDisposable = musicProvider.getCompositionsObservable()
-                    .startWith(musicProvider.getCompositions())
-                    .subscribeOn(scheduler)
-                    .subscribe(this::onNewCompositionsFromMediaStorageReceived);
-        }
-    }
-
-    private void onStorageArtistReceived(LongSparseArray<StorageArtist> artists) {
-        applyArtistsChanges(artists);
-
-        if (albumsDisposable == null) {
-            albumsDisposable = albumsProvider.getAlbumsObservable()
-                    .startWith(albumsProvider.getAlbums())
-                    .observeOn(scheduler)
-                    .subscribe(this::onStorageAlbumsReceived);
-        }
-    }
-
-    private void onNewCompositionsFromMediaStorageReceived(LongSparseArray<StorageComposition> newCompositions) {
-        applyCompositionsData(newCompositions);
-
-        if (playListsDisposable == null) {
-            playListsDisposable = playListsProvider.getPlayListsObservable()
-                    .startWith(playListsProvider.getPlayLists())
-                    .subscribeOn(scheduler)
-                    .subscribe(this::onStoragePlayListReceived);
-        }
+            List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
+            for (IdPair playListIds: allPlayLists) {
+                long storageId = playListIds.getStorageId();
+                long dbId = playListIds.getDbId();
+                applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
+            }
+        }).subscribeOn(scheduler);
     }
 
     private void onStoragePlayListReceived(LongSparseArray<StoragePlayList> newPlayLists) {
         applyPlayListData(newPlayLists);
-
-        List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
-        for (IdPair playListids: allPlayLists) {
-            long storageId = playListids.getStorageId();
-            long dbId = playListids.getDbId();
-            if (!playListEntriesDisposable.containsKey(dbId)) {
-                Disposable disposable = playListsProvider.getPlayListEntriesObservable(storageId)
-                        .startWith(playListsProvider.getPlayListItems(storageId))
-                        .subscribeOn(scheduler)
-                        .subscribe(entries -> applyPlayListItemsData(dbId, entries));
-                playListEntriesDisposable.put(dbId, disposable);
-            }
-        }
-
-        if (genresDisposable == null) {
-            genresDisposable = genresProvider.getGenresObservable()
-                    .startWith(genresProvider.getGenres())
-                    .subscribeOn(scheduler)
-                    .subscribe(this::onStorageGenresReceived);
-        }
+        subscribeOnPlaylistData();
     }
 
     private void onStorageGenresReceived(LongSparseArray<StorageGenre> newGenres) {
@@ -244,6 +214,21 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
         if (hasChanges) {
             playListsDao.applyChanges(addedPlayLists, changedPlayLists);
+        }
+    }
+
+    private void subscribeOnPlaylistData() {
+        List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
+        for (IdPair playListIds: allPlayLists) {
+            long storageId = playListIds.getStorageId();
+            long dbId = playListIds.getDbId();
+            if (!playListEntriesDisposable.containsKey(dbId)) {
+                Disposable disposable = playListsProvider.getPlayListEntriesObservable(storageId)
+                        .startWith(playListsProvider.getPlayListItems(storageId))
+                        .subscribeOn(scheduler)
+                        .subscribe(entries -> applyPlayListItemsData(dbId, entries));
+                playListEntriesDisposable.put(dbId, disposable);
+            }
         }
     }
 

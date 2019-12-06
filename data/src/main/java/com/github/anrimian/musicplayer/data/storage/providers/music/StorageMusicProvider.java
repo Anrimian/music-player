@@ -176,10 +176,10 @@ public class StorageMusicProvider {
 
     private StorageComposition getCompositionFromCursor(CursorWrapper cursorWrapper) {
 
-        @Nullable String artist = cursorWrapper.getString(Media.ARTIST);
-        @Nullable String title = cursorWrapper.getString(Media.TITLE);
-        @Nullable String album = cursorWrapper.getString(Media.ALBUM);
-        @Nullable String filePath = cursorWrapper.getString(Media.DATA);
+        String artist = cursorWrapper.getString(Media.ARTIST);
+        String title = cursorWrapper.getString(Media.TITLE);
+        String album = cursorWrapper.getString(Media.ALBUM);
+        String filePath = cursorWrapper.getString(Media.DATA);
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
 //        String displayName = cursorWrapper.getString(DISPLAY_NAME);

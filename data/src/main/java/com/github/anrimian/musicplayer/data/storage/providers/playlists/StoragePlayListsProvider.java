@@ -264,7 +264,7 @@ public class StoragePlayListsProvider {
     @Nullable
     private StoragePlayList getPlayListFromCursor(CursorWrapper cursorWrapper) {
         long id = cursorWrapper.getLong(Playlists._ID);
-        @Nullable String name = cursorWrapper.getString(Playlists.NAME);
+        String name = cursorWrapper.getString(Playlists.NAME);
         if (name == null) {
             return null;
         }
