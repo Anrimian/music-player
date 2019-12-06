@@ -36,7 +36,11 @@ public class ArtistsDaoWrapper {
         return artistsDao.getAllObservable();
     }
 
-    public Observable<List<Composition>> getCompositionsByArtist(long artistId) {
+    public Observable<List<Composition>> getCompositionsByArtistObservable(long artistId) {
+        return artistsDao.getCompositionsByArtistObservable(artistId);
+    }
+
+    public List<Composition> getCompositionsByArtist(long artistId) {
         return artistsDao.getCompositionsByArtist(artistId);
     }
 
@@ -48,6 +52,10 @@ public class ArtistsDaoWrapper {
 
     public String[] getAuthorNames() {
         return artistsDao.getAuthorNames();
+    }
+
+    public void updateArtistName(String name, long id) {
+        artistsDao.updateArtistName(name, id);
     }
 
     private ArtistEntity toEntity(StorageArtist artist) {

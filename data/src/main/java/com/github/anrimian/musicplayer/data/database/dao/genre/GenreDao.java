@@ -53,7 +53,7 @@ public interface GenreDao {
     Observable<List<Genre>> getAllObservable();
 
     @Query("SELECT " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +

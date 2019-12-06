@@ -59,7 +59,7 @@ public class CompositionsDaoWrapper {
     public Observable<List<Composition>> getAllObservable(Order order,
                                                           @Nullable String searchText) {
         String query = "SELECT " +
-                "(SELECT artistName FROM artists WHERE id = artistId) as artist,  " +
+                "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
                 "(SELECT name FROM albums WHERE id = albumId) as album,  " +
                 "title as title,  " +
                 "filePath as filePath,  " +

@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.music.edit;
 
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -21,13 +22,16 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     private final StorageMusicDataSource storageMusicDataSource;
     private final AlbumsDaoWrapper albumsDao;
+    private final ArtistsDaoWrapper artistsDao;
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
                                 AlbumsDaoWrapper albumsDao,
+                                ArtistsDaoWrapper artistsDao,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
         this.albumsDao = albumsDao;
+        this.artistsDao = artistsDao;
         this.scheduler = scheduler;
     }
 
@@ -109,6 +113,15 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition.getFilePath(), name))
                 .doOnComplete(() -> albumsDao.updateAlbumName(name, albumId))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable updateArtistName(String name, long artistId) {
+        return Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId))
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name))
+                .doOnComplete(() -> artistsDao.updateArtistName(name, artistId))
                 .subscribeOn(scheduler);
     }
 

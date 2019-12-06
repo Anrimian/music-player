@@ -9,8 +9,8 @@ import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 
 import java.util.Date;
@@ -22,7 +22,7 @@ import io.reactivex.Observable;
 public interface CompositionsDao {
 
     @Query("SELECT " +
-            "(SELECT artistName FROM artists WHERE id = compositions.artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = compositions.artistId) as artist, " +
             "compositions.title as title, " +
             "(SELECT name FROM albums WHERE id = compositions.albumId) as album, " +
             "compositions.filePath as filePath, " +
@@ -37,7 +37,7 @@ public interface CompositionsDao {
     Observable<List<Composition>> getAllObservable();
 
     @Query("SELECT " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM genres WHERE id IN(SELECT genreId FROM genre_entries WHERE audioId = :id)) as genre, " +
@@ -58,7 +58,7 @@ public interface CompositionsDao {
     Observable<List<Composition>> getAllObservable(SupportSQLiteQuery query);
 
     @Query("SELECT " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
@@ -73,7 +73,7 @@ public interface CompositionsDao {
     List<Composition> getAll();
 
     @Query("SELECT " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.filePath as filePath, " +

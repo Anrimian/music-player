@@ -24,7 +24,7 @@ public interface PlayQueueDao {
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
             "compositions.storageId AS storageId, " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.title AS title, " +
             "compositions.filePath AS filePath, " +
@@ -43,7 +43,7 @@ public interface PlayQueueDao {
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
             "compositions.storageId AS storageId, " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.title AS title, " +
             "compositions.filePath AS filePath, " +
@@ -60,7 +60,7 @@ public interface PlayQueueDao {
             "play_queue.position AS position," +
             "play_queue.shuffledPosition AS shuffledPosition," +
             "compositions.id AS id, " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.storageId AS storageId, " +
             "compositions.title AS title, " +

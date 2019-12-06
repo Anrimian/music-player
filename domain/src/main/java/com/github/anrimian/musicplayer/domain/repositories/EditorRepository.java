@@ -29,4 +29,6 @@ public interface EditorRepository {
     Completable createFile(String path);
 
     Completable updateAlbumName(String name, long id);
+
+    Completable updateArtistName(String name, long artistId);
 }

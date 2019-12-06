@@ -20,7 +20,7 @@ public interface ArtistsDao {
     Long selectIdByStorageId(long storageId);
 
     @Query("SELECT storageId as id," +
-            "artistName as artist " +
+            "name as artist " +
             "FROM artists")
     List<StorageArtist> selectAllAsStorageArtists();
 
@@ -28,21 +28,21 @@ public interface ArtistsDao {
     void insertAll(List<ArtistEntity> artists);
 
     @Query("SELECT id as id," +
-            "artistName as name, " +
+            "name as name, " +
             "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount " +
             "FROM artists " +
             "ORDER BY id DESC")
     Observable<List<Artist>> getAllObservable();
 
     @Query("SELECT id as id," +
-            "artistName as name, " +
+            "name as name, " +
             "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount " +
             "FROM artists " +
             "WHERE id = :artistId LIMIT 1")
     Observable<List<Artist>> getArtistObservable(long artistId);
 
     @Query("SELECT " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
@@ -54,13 +54,29 @@ public interface ArtistsDao {
             "dateModified as dateModified, " +
             "corruptionType as corruptionType " +
             "FROM compositions " +
-            "WHERE artistId = :artist")
-    Observable<List<Composition>> getCompositionsByArtist(long artist);
+            "WHERE artistId = :artistId")
+    Observable<List<Composition>> getCompositionsByArtistObservable(long artistId);
 
-    @Query("SELECT artistName FROM artists")
+    @Query("SELECT " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
+            "title as title, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
+            "filePath as filePath, " +
+            "duration as duration, " +
+            "size as size, " +
+            "id as id, " +
+            "storageId as storageId, " +
+            "dateAdded as dateAdded, " +
+            "dateModified as dateModified, " +
+            "corruptionType as corruptionType " +
+            "FROM compositions " +
+            "WHERE artistId = :artistId")
+    List<Composition> getCompositionsByArtist(long artistId);
+
+    @Query("SELECT name FROM artists")
     String[] getAuthorNames();
 
-    @Query("SELECT id FROM artists WHERE artistName = :author")
+    @Query("SELECT id FROM artists WHERE name = :author")
     Long findArtistIdByName(String author);
 
     @Insert
@@ -69,4 +85,7 @@ public interface ArtistsDao {
     @Query("DELETE FROM artists " +
             "WHERE id = :id AND (SELECT count() FROM compositions WHERE artistId = artists.id) = 0")
     void deleteEmptyArtist(long id);
+
+    @Query("UPDATE artists SET name = :name WHERE id = :id")
+    void updateArtistName(String name, long id);
 }

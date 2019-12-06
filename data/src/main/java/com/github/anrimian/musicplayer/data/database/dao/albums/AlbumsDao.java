@@ -22,7 +22,7 @@ public interface AlbumsDao {
 
     @Query("SELECT storageId as id," +
             "name as album," +
-            "(SELECT artistName FROM artists WHERE artists.id = artistId) as artist," +
+            "(SELECT name FROM artists WHERE artists.id = artistId) as artist," +
             "(SELECT storageId FROM artists WHERE artists.id = artistId) as artistId," +
             "firstYear as firstYear," +
             "lastYear as lastYear " +
@@ -38,13 +38,13 @@ public interface AlbumsDao {
     @Query("SELECT id as id," +
             "storageId as storageId, " +
             "name as name, " +
-            "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
+            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums")
     Observable<List<Album>> getAllObservable();
 
     @Query("SELECT " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
@@ -60,7 +60,7 @@ public interface AlbumsDao {
     Observable<List<Composition>> getCompositionsInAlbumObservable(long albumId);
 
     @Query("SELECT " +
-            "(SELECT artistName FROM artists WHERE id = artistId) as artist, " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
@@ -78,7 +78,7 @@ public interface AlbumsDao {
     @Query("SELECT id as id," +
             "storageId as storageId, " +
             "name as name, " +
-            "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
+            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums " +
             "WHERE albums.artistId = :artistId")
@@ -87,7 +87,7 @@ public interface AlbumsDao {
     @Query("SELECT id as id," +
             "storageId as storageId, " +
             "name as name, " +
-            "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
+            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums " +
             "WHERE id = :albumId LIMIT 1")
@@ -96,7 +96,7 @@ public interface AlbumsDao {
     @Query("SELECT id as id," +
             "storageId as storageId, " +
             "name as name, " +
-            "(SELECT artistName FROM artists WHERE artists.id = albums.artistId) as artist, " +
+            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
             "FROM albums " +
             "WHERE id = :albumId LIMIT 1")

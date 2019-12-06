@@ -16,12 +16,12 @@ public class ArtistEntity {
     private Long storageId;
 
     @Nonnull
-    private String artistName;
+    private String name;
 
     public ArtistEntity(@Nullable Long storageId,
-                        @Nonnull String artistName) {
+                        @Nonnull String name) {
         this.storageId = storageId;
-        this.artistName = artistName;
+        this.name = name;
     }
 
     public long getId() {
@@ -34,8 +34,8 @@ public class ArtistEntity {
     }
 
     @Nonnull
-    public String getArtistName() {
-        return artistName;
+    public String getName() {
+        return name;
     }
 
     public void setId(long id) {
@@ -46,8 +46,8 @@ public class ArtistEntity {
         this.storageId = storageId;
     }
 
-    public void setArtistName(@Nonnull String artistName) {
-        this.artistName = artistName;
+    public void setName(@Nonnull String name) {
+        this.name = name;
     }
 
 }

@@ -24,7 +24,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderF
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -116,7 +115,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Observable<List<Composition>> getCompositionsByArtist(long artistId) {
-        return artistsDao.getCompositionsByArtist(artistId);
+        return artistsDao.getCompositionsByArtistObservable(artistId);
     }
 
     @Override
