@@ -20,6 +20,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 public class MediaStorageRepositoryImpl implements MediaStorageRepository {
@@ -30,8 +31,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     private final PlayListsDaoWrapper playListsDao;
     private final Scheduler scheduler;
 
-    private Disposable compositionsDisposable;
-    private Disposable playListsDisposable;
+    private CompositeDisposable mediaStoreDisposable = new CompositeDisposable();
     private LongSparseArray<Disposable> playListEntriesDisposable = new LongSparseArray<>();
 
     public MediaStorageRepositoryImpl(StorageMusicProvider musicProvider,
@@ -48,15 +48,29 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     @Override
     public void initialize() {
-        compositionsDisposable = musicProvider.getCompositionsObservable()
-                .startWith(musicProvider.getCompositions())
-                .subscribeOn(scheduler)
-                .subscribe(this::onNewCompositionsFromMediaStorageReceived);
+        runRescanStorage()
+                .doOnComplete(this::subscribeOnMediaStoreChanges)
+                .subscribe();
     }
 
     @Override
     public synchronized void rescanStorage() {
-        Completable.fromAction(() -> {
+        runRescanStorage().subscribe();
+    }
+
+    private void subscribeOnMediaStoreChanges() {
+        mediaStoreDisposable.add(musicProvider.getCompositionsObservable()
+                .subscribeOn(scheduler)
+                .subscribe(this::applyCompositionsData));
+        mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
+                .subscribeOn(scheduler)
+                .subscribe(this::onStoragePlayListReceived));
+
+        subscribeOnPlaylistData();
+    }
+
+    private Completable runRescanStorage() {
+        return Completable.fromAction(() -> {
             applyCompositionsData(musicProvider.getCompositions());
             applyPlayListData(playListsProvider.getPlayLists());
 
@@ -66,35 +80,12 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 long dbId = playListIds.getDbId();
                 applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
             }
-        }).subscribeOn(scheduler).subscribe();
-    }
-
-    private void onNewCompositionsFromMediaStorageReceived(LongSparseArray<StorageComposition> newCompositions) {
-        applyCompositionsData(newCompositions);
-
-        if (playListsDisposable == null) {
-            playListsDisposable = playListsProvider.getPlayListsObservable()
-                    .startWith(playListsProvider.getPlayLists())
-                    .subscribeOn(scheduler)
-                    .subscribe(this::onStoragePlayListReceived);
-        }
+        }).subscribeOn(scheduler);
     }
 
     private void onStoragePlayListReceived(LongSparseArray<StoragePlayList> newPlayLists) {
         applyPlayListData(newPlayLists);
-
-        List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
-        for (IdPair playListids: allPlayLists) {
-            long storageId = playListids.getStorageId();
-            long dbId = playListids.getDbId();
-            if (!playListEntriesDisposable.containsKey(dbId)) {
-                Disposable disposable = playListsProvider.getPlayListEntriesObservable(storageId)
-                        .startWith(playListsProvider.getPlayListItems(storageId))
-                        .subscribeOn(scheduler)
-                        .subscribe(entries -> applyPlayListItemsData(dbId, entries));
-                playListEntriesDisposable.put(dbId, disposable);
-            }
-        }
+        subscribeOnPlaylistData();
     }
 
     private synchronized void applyPlayListItemsData(long playListId,
@@ -137,6 +128,21 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
         if (hasChanges) {
             playListsDao.applyChanges(addedPlayLists, changedPlayLists);
+        }
+    }
+
+    private void subscribeOnPlaylistData() {
+        List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
+        for (IdPair playListIds: allPlayLists) {
+            long storageId = playListIds.getStorageId();
+            long dbId = playListIds.getDbId();
+            if (!playListEntriesDisposable.containsKey(dbId)) {
+                Disposable disposable = playListsProvider.getPlayListEntriesObservable(storageId)
+                        .startWith(playListsProvider.getPlayListItems(storageId))
+                        .subscribeOn(scheduler)
+                        .subscribe(entries -> applyPlayListItemsData(dbId, entries));
+                playListEntriesDisposable.put(dbId, disposable);
+            }
         }
     }
 
