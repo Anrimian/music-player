@@ -59,7 +59,7 @@ public class StorageArtistsProvider {
     @Nullable
     private StorageArtist getArtistFromCursor(CursorWrapper cursorWrapper) {
         String artistName = cursorWrapper.getString(Artists.ARTIST);
-        if (artistName.equals("<unknown>")) {
+        if (artistName == null || artistName.equals("<unknown>")) {
             return null;
         }
         return new StorageArtist(

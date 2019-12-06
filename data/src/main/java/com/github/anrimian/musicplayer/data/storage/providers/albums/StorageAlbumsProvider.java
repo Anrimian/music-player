@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Albums;
 
+import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
@@ -34,7 +35,7 @@ public class StorageAlbumsProvider {
 //                        Albums.ALBUM_KEY,
                         Albums.FIRST_YEAR,
                         Albums.LAST_YEAR,
-                        Albums.ARTIST,
+//                        Albums.ARTIST,
                         Albums.ARTIST_ID
                 },
                 null,
@@ -49,17 +50,24 @@ public class StorageAlbumsProvider {
                 cursor.moveToPosition(i);
 
                 StorageAlbum item = getAlbumFromCursor(cursorWrapper);
-                artists.put(item.getId(), item);
+                if (item != null) {
+                    artists.put(item.getId(), item);
+                }
             }
             return artists;
         }
     }
 
+    @Nullable
     private StorageAlbum getAlbumFromCursor(CursorWrapper cursorWrapper) {
+        String name = cursorWrapper.getString(Albums.ALBUM);
+        if (name == null) {
+            return null;
+        }
+
         return new StorageAlbum(
                 cursorWrapper.getLong(Albums._ID),
-                cursorWrapper.getString(Albums.ALBUM),
-                cursorWrapper.getString(Albums.ARTIST),
+                name,
                 cursorWrapper.getLong(Albums.ARTIST_ID),
                 cursorWrapper.getInt(Albums.FIRST_YEAR),
                 cursorWrapper.getInt(Albums.LAST_YEAR)

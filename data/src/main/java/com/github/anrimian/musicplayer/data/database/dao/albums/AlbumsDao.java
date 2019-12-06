@@ -22,7 +22,6 @@ public interface AlbumsDao {
 
     @Query("SELECT storageId as id," +
             "name as album," +
-            "(SELECT name FROM artists WHERE artists.id = artistId) as artist," +
             "(SELECT storageId FROM artists WHERE artists.id = artistId) as artistId," +
             "firstYear as firstYear," +
             "lastYear as lastYear " +

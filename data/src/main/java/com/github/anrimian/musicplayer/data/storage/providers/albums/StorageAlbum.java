@@ -7,9 +7,6 @@ public class StorageAlbum {
     private final long id;
     private final String album;
 
-    @Deprecated
-    private final String artist;
-
     private final long artistId;
 
     private final int firstYear;
@@ -17,13 +14,11 @@ public class StorageAlbum {
 
     public StorageAlbum(long id,
                         String album,
-                        String artist,
                         long artistId,
                         int firstYear,
                         int lastYear) {
         this.id = id;
         this.album = album;
-        this.artist = artist;
         this.artistId = artistId;
         this.firstYear = firstYear;
         this.lastYear = lastYear;
@@ -35,10 +30,6 @@ public class StorageAlbum {
 
     public String getAlbum() {
         return album;
-    }
-
-    public String getArtist() {
-        return artist;
     }
 
     public long getArtistId() {
@@ -74,7 +65,6 @@ public class StorageAlbum {
         return "StorageAlbum{" +
                 "id=" + id +
                 ", album='" + album + '\'' +
-                ", artist='" + artist + '\'' +
                 ", artistId=" + artistId +
                 ", firstYear=" + firstYear +
                 ", lastYear=" + lastYear +

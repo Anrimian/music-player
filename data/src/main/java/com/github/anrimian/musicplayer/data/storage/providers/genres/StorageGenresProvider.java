@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Genres;
 
+import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
@@ -43,7 +44,9 @@ public class StorageGenresProvider {
                 cursor.moveToPosition(i);
 
                 StorageGenre item = getGenreFromCursor(cursorWrapper);
-                artists.put(item.getId(), item);
+                if (item != null) {
+                    artists.put(item.getId(), item);
+                }
             }
             return artists;
         }
@@ -86,10 +89,15 @@ public class StorageGenresProvider {
         );
     }
 
+    @Nullable
     private StorageGenre getGenreFromCursor(CursorWrapper cursorWrapper) {
+        String name = cursorWrapper.getString(Genres.NAME);
+        if (name == null) {
+            return null;
+        }
         return new StorageGenre(
                 cursorWrapper.getLong(Genres._ID),
-                cursorWrapper.getString(Genres.NAME)
+                name
         );
     }
 }
