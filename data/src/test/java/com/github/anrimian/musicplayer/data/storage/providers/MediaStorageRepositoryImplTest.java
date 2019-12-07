@@ -23,7 +23,6 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeStorageCompositionsMap;
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayList;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayLists;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayListsAsList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
@@ -64,13 +63,14 @@ public class MediaStorageRepositoryImplTest {
                 compositionsDao,
                 playListsDao,
                 Schedulers.trampoline());
-        mediaStorageRepository.initialize();
     }
 
     @Test
     public void changeDatabaseTest() {
         LongSparseArray<StorageComposition> currentCompositions = getFakeStorageCompositionsMap();
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
+
+        mediaStorageRepository.initialize();
 
         LongSparseArray<StorageComposition> newCompositions = getFakeStorageCompositionsMap();
         StorageComposition removedComposition = newCompositions.get(100L);
@@ -98,6 +98,8 @@ public class MediaStorageRepositoryImplTest {
 
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(map);
 
+        mediaStorageRepository.initialize();
+
         LongSparseArray<StorageComposition> newCompositions = new LongSparseArray<>();
         StorageComposition changedComposition = fakeStorageComposition(1, "new path", 1, 1000);
         newCompositions.put(1L, changedComposition);
@@ -114,6 +116,8 @@ public class MediaStorageRepositoryImplTest {
     @Test
     public void changePlayListTest() {
         when(playListsDao.getAllAsStoragePlayLists()).thenReturn(storagePlayListsAsList(10));
+
+        mediaStorageRepository.initialize();
 
         LongSparseArray<StoragePlayList> newPlayLists = storagePlayLists(10);
 
@@ -141,8 +145,10 @@ public class MediaStorageRepositoryImplTest {
 
     @Test
     public void changePlayListItemsTest() {
-        when(playListsDao.getAllAsStoragePlayLists()).thenReturn(asList(storagePlayList(1L)));
+        when(playListsProvider.getPlayLists()).thenReturn(storagePlayLists(1));
         when(playListsDao.getPlayListItemsAsStorageItems(1L)).thenReturn(Collections.emptyList());
+
+        mediaStorageRepository.initialize();
 
         List<StoragePlayListItem> newItems = asList(
                 new StoragePlayListItem(1L, 1L)
