@@ -112,7 +112,7 @@ public class CompositionItemWrapper {
             if (showCovers) {
                 CoverImageLoader.getInstance().displayImage(ivMusicIcon, composition);
             } else {
-                ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
+                ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder_simple);
             }
         }
     }

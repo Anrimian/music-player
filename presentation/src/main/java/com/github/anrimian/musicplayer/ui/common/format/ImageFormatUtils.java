@@ -8,14 +8,22 @@ import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 public class ImageFormatUtils {
 
+    private static Bitmap defaultNotificationBitmap;
+
     public static Bitmap getNotificationImage(Composition composition) {
         Bitmap bitmap = CoverImageLoader.getInstance().getImage(composition);
         if (bitmap == null) {
-            bitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
-
+            bitmap = getDefaultNotificationBitmap();
             int color = Components.getAppComponent().themeController().getPrimaryThemeColor();
             bitmap.eraseColor(color);
         }
         return bitmap;
+    }
+
+    private synchronized static Bitmap getDefaultNotificationBitmap() {
+        if (defaultNotificationBitmap == null) {
+            defaultNotificationBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.RGB_565);
+        }
+        return defaultNotificationBitmap;
     }
 }
