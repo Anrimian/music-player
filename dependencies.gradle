@@ -26,14 +26,14 @@ ext {
     rxJavaVersion = "2.2.11"
     rxAndroidVersion = "2.0.1"
     rxPermissionsVersion = "0.9.4"
-    acraVersion = "4.9.0"
+    acraVersion = "4.9.2"
     moxyVersion = "2.0.2"
-    butterKnifeVersion = "10.1.0"
-    daggerVersion = "2.24"
+    butterKnifeVersion = "10.2.0"
+    daggerVersion = "2.25.2"
     exoPlayerVersion = "2.9.6"
     roomVersion = "2.1.0-rc01"
     jTaggerVersion = '2.0.3'
-    circleImageViewVersion = "2.2.0"
+    circleImageViewVersion = "3.0.1"
 
     //Testing
     jUnitVersion = '4.12'
@@ -53,9 +53,6 @@ ext {
     supportMedia = "androidx.media:media:$mediaCompatVersion"
     palette = "androidx.palette:palette:$paletteVersion"
     constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-
-    //unused?
-    recyclerViewAnimation = 'jp.wasabeef:recyclerview-animators:2.3.0'
 
     rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
     rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:0.20.10"
@@ -78,7 +75,7 @@ ext {
     dagger = "com.google.dagger:dagger:$daggerVersion"
     daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    slidr = "com.r0adkll:slidableactivity:2.0.6"
+    slidr = "com.r0adkll:slidableactivity:2.1.0"
 
     circleImageView = "de.hdodenhof:circleimageview:$circleImageViewVersion"
 
