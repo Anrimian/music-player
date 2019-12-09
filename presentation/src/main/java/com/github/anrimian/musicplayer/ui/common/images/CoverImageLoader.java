@@ -52,13 +52,10 @@ public class CoverImageLoader extends SimpleImageLoader<Long, Composition> {
             if (imageBytes == null) {
                 return null;
             }
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-            if (bitmap == null) {
-                return null;
-            }
-            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
-            bitmap.recycle();
-            return scaledBitmap;
+            BitmapFactory.Options opt = new BitmapFactory.Options();
+            opt.outWidth = 300;
+            opt.outHeight = 300;
+            return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
         } catch (Exception ignored) {
             return null;
         } finally {
