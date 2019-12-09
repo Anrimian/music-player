@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.io.File;
 import java.util.List;
@@ -90,7 +91,7 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Single<String> moveFile(String filePath, String oldPath, String newPath) {
-        if (oldPath.equals(newPath)) {
+        if (Objects.equals(oldPath, newPath)) {
             return Single.error(new MoveInTheSameFolderException("move in the same folder"));
         }
         return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, oldPath, newPath))

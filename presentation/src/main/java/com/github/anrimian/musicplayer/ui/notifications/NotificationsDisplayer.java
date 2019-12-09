@@ -60,6 +60,7 @@ public class NotificationsDisplayer {
             NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
                     getString(R.string.foreground_channel_description),
                     NotificationManager.IMPORTANCE_LOW);
+            assert notificationManager != null;
             notificationManager.createNotificationChannel(channel);
 
             NotificationChannel errorChannel = new NotificationChannel(ERROR_CHANNEL_ID,
@@ -100,7 +101,7 @@ public class NotificationsDisplayer {
     public Notification getForegroundNotification(boolean play,
                                                   @Nullable PlayQueueItem composition,
                                                   MediaSessionCompat mediaSession,
-                                                  MusicNotificationSetting notificationSetting) {
+                                                  @Nullable MusicNotificationSetting notificationSetting) {
         return getDefaultMusicNotification(play, composition, mediaSession, notificationSetting)
                 .build();
     }
@@ -117,14 +118,10 @@ public class NotificationsDisplayer {
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
     }
 
-    public void removePlayerNotification() {
-        notificationManager.cancel(FOREGROUND_NOTIFICATION_ID);
-    }
-
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,
                                                                    @Nullable PlayQueueItem queueItem,
                                                                    MediaSessionCompat mediaSession,
-                                                                   MusicNotificationSetting notificationSetting) {
+                                                                   @Nullable MusicNotificationSetting notificationSetting) {
         int requestCode = play? PAUSE : PLAY;
         Intent intentPlayPause = new Intent(context, MusicService.class);
         intentPlayPause.putExtra(REQUEST_CODE, requestCode);
@@ -160,8 +157,15 @@ public class NotificationsDisplayer {
         style.setShowActionsInCompactView(0, 1, 2);
         style.setMediaSession(mediaSession.getSessionToken());
 
+        boolean coloredNotification = false;
+        boolean showCovers = false;
+        if (notificationSetting != null) {
+            coloredNotification = notificationSetting.isColoredNotification();
+            showCovers = notificationSetting.isShowCovers();
+        }
+
         NotificationCompat.Builder builder = notificationBuilder.buildMusicNotification(context)
-                .setColorized(notificationSetting.isColoredNotification())
+                .setColorized(coloredNotification)
                 .setColor(getColor(context, R.color.default_notification_color))
                 .setSmallIcon(R.drawable.ic_music_box)
                 .setContentIntent(pIntent)
@@ -176,7 +180,7 @@ public class NotificationsDisplayer {
         if (queueItem != null) {
             Composition composition = queueItem.getComposition();
 
-            if (notificationSetting.isShowCovers()) {
+            if (showCovers) {
                 Bitmap bitmap = ImageFormatUtils.getNotificationImage(composition);
                 builder.setLargeIcon(bitmap);
             }

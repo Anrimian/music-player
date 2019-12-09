@@ -25,7 +25,7 @@ ext {
     constraintLayoutVersion = "2.0.0-alpha2"
     rxJavaVersion = "2.2.11"
     rxAndroidVersion = "2.0.1"
-    rxPermissionsVersion = "0.9.4@aar"
+    rxPermissionsVersion = "0.9.4"
     acraVersion = "4.9.0"
     moxyVersion = "2.0.2"
     butterKnifeVersion = "10.1.0"
@@ -33,15 +33,16 @@ ext {
     exoPlayerVersion = "2.9.6"
     roomVersion = "2.1.0-rc01"
     jTaggerVersion = '2.0.3'
+    circleImageViewVersion = "2.2.0"
 
     //Testing
     jUnitVersion = '4.12'
     espressoVersion = '3.1.0'
     mockitoVersion = '1.9.5'
-    dexmakerVersion = '1.0'
+    dexmakerVersion = '1.2'
 
     //developing
-    javaxAnnotationVersion = "2.0.1"
+    javaxAnnotationVersion = "3.0.2"
 }
 
 ext {
@@ -57,7 +58,7 @@ ext {
     recyclerViewAnimation = 'jp.wasabeef:recyclerview-animators:2.3.0'
 
     rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:0.20.4"
+    rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:0.20.10"
     rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     rxPermissions = "com.tbruyelle.rxpermissions2:rxpermissions:$rxPermissionsVersion"
 
@@ -78,6 +79,8 @@ ext {
     daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
 
     slidr = "com.r0adkll:slidableactivity:2.0.6"
+
+    circleImageView = "de.hdodenhof:circleimageview:$circleImageViewVersion"
 
     exoPlayerCore = "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
 

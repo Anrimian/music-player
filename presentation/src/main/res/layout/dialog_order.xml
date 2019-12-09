@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:overScrollMode="never"
             android:layout_marginTop="@dimen/dialog_margin_content_vertical"
-            android:layout_marginBottom="@dimen/content_margin"
+            android:layout_marginBottom="@dimen/content_internal_margin"
             tools:listitem="@layout/item_order"/>
 
         <CheckBox
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/content_horizontal_margin"
             android:layout_marginRight="@dimen/content_horizontal_margin"
-            android:layout_marginBottom="@dimen/dialog_margin_content_vertical"
+            android:layout_marginBottom="@dimen/content_internal_margin"
             tools:text="reverse order"/>
 
     </LinearLayout>

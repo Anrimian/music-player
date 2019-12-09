@@ -219,6 +219,15 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayerChanges() {
+        //check how it works
+        startForeground(FOREGROUND_NOTIFICATION_ID,
+                notificationsDisplayer.getForegroundNotification(
+                        true,
+                        currentItem,
+                        mediaSession,
+                        notificationSetting));
+        //test it
+
         Log.d("KEK", "subscribeOnPlayerChanges");
         serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
                 .observeOn(uiScheduler)

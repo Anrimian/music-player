@@ -112,9 +112,10 @@ public class InputTextDialogFragment extends DialogFragment {
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
         editText.setOnEditorActionListener((v, actionId, event) -> {
-            if (!canBeEmpty && isEnterButtonEnabled(editText.getText().toString().trim())) {
-                onCompleteButtonClicked();
+            if (!canBeEmpty && !isEnterButtonEnabled(editText.getText().toString().trim())) {
+                return true;
             }
+            onCompleteButtonClicked();
             return true;
         });
         String startText = args.getString(EDIT_TEXT_VALUE);
