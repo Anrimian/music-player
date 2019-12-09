@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.music.edit;
 
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -23,15 +24,18 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final StorageMusicDataSource storageMusicDataSource;
     private final AlbumsDaoWrapper albumsDao;
     private final ArtistsDaoWrapper artistsDao;
+    private final GenresDaoWrapper genresDao;
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
+                                GenresDaoWrapper genresDao,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
+        this.genresDao = genresDao;
         this.scheduler = scheduler;
     }
 
@@ -122,6 +126,15 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name))
                 .doOnComplete(() -> artistsDao.updateArtistName(name, artistId))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable updateGenreName(String name, long genreId) {
+        return Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId))
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapCompletable(composition -> sourceEditor.setCompositionGenre(composition.getFilePath(), name))
+                .doOnComplete(() -> genresDao.updateGenreName(name, genreId))
                 .subscribeOn(scheduler);
     }
 

@@ -102,8 +102,13 @@ public class StorageModule {
     EditorRepository compositionEditorRepository(StorageMusicDataSource storageMusicDataSource,
                                                  AlbumsDaoWrapper albumsDao,
                                                  ArtistsDaoWrapper artistsDao,
+                                                 GenresDaoWrapper genresDao,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new EditorRepositoryImpl(storageMusicDataSource, albumsDao, artistsDao, scheduler);
+        return new EditorRepositoryImpl(storageMusicDataSource,
+                albumsDao,
+                artistsDao,
+                genresDao,
+                scheduler);
     }
 
     @Provides

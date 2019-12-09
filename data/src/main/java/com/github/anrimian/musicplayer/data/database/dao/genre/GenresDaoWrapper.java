@@ -63,7 +63,11 @@ public class GenresDaoWrapper {
                 .map(list -> list.get(0));
     }
 
-    public Observable<List<Composition>> getCompositionsInGenre(long genreId) {
+    public Observable<List<Composition>> getCompositionsInGenreObservable(long genreId) {
+        return genreDao.getCompositionsInGenreObservable(genreId);
+    }
+
+    public List<Composition> getCompositionsInGenre(long genreId) {
         return genreDao.getCompositionsInGenre(genreId);
     }
 
@@ -97,6 +101,10 @@ public class GenresDaoWrapper {
         return genreDao.getGenreNames();
     }
 
+    public void updateGenreName(String name, long genreId) {
+        genreDao.updateGenreName(name, genreId);
+    }
+
     private GenreEntity toEntity(StorageGenre genre) {
         return new GenreEntity(genre.getId(), genre.getName());
     }
@@ -105,4 +113,6 @@ public class GenresDaoWrapper {
         long audioId = compositionsDao.selectIdByStorageId(genre.getAudioId());
         return new GenreEntryEntity(audioId, genreId, genre.getId());
     }
+
+
 }

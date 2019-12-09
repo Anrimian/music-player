@@ -100,7 +100,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Observable<List<Composition>> getGenreItemsObservable(long genreId) {
-        return genresDao.getCompositionsInGenre(genreId);
+        return genresDao.getCompositionsInGenreObservable(genreId);
     }
 
     @Override

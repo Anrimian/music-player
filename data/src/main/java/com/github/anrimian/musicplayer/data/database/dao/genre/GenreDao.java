@@ -66,7 +66,23 @@ public interface GenreDao {
             "corruptionType as corruptionType " +
             "FROM compositions " +
             "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
-    Observable<List<Composition>> getCompositionsInGenre(long genreId);
+    Observable<List<Composition>> getCompositionsInGenreObservable(long genreId);
+
+    @Query("SELECT " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
+            "title as title, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
+            "filePath as filePath, " +
+            "duration as duration, " +
+            "size as size, " +
+            "id as id, " +
+            "storageId as storageId, " +
+            "dateAdded as dateAdded, " +
+            "dateModified as dateModified, " +
+            "corruptionType as corruptionType " +
+            "FROM compositions " +
+            "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
+    List<Composition> getCompositionsInGenre(long genreId);
 
     @Query("SELECT " +
             "id as dbId, " +
@@ -97,4 +113,7 @@ public interface GenreDao {
 
     @Query("SELECT name FROM genres")
     String[] getGenreNames();
+
+    @Query("UPDATE genres SET name = :name WHERE id = :genreId")
+    void updateGenreName(String name, long genreId);
 }
