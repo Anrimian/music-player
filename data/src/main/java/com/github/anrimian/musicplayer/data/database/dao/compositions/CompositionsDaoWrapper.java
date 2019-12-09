@@ -141,14 +141,33 @@ public class CompositionsDaoWrapper {
             long oldArtistId = compositionsDao.getArtistId(id);
             compositionsDao.updateArtist(id, artistId);
 
+            // 4) if OLD artist exists and has no references - delete him
+            if (oldArtistId != 0) {
+                artistsDao.deleteEmptyArtist(oldArtistId);
+            }
+        });
+    }
+
+    public void updateAlbumArtist(long id, String artistName) {
+        appDatabase.runInTransaction(() -> {
             //find album
             Long albumId = compositionsDao.getAlbumId(id);
             if (albumId != null) {
+                // 1) find new artist by name from artists
+                Long artistId = artistsDao.findArtistIdByName(artistName);
+
+                // 2) if artist not exists - create artist
+                if (artistId == null) {
+                    artistId = artistsDao.insertArtist(new ArtistEntity(null, artistName));//hmm, storage?
+                }
+
                 AlbumEntity albumEntity = albumsDao.getAlbumEntity(albumId);
+                Long oldArtistId = albumEntity.getArtistId();
 
                 //find new album with author id and name
                 Long newAlbumId = albumsDao.findAlbum(artistId, albumEntity.getName());
                 //if not exists, create
+
                 if (newAlbumId == null) {
                     newAlbumId = albumsDao.insert(new AlbumEntity(
                             artistId,
@@ -163,11 +182,11 @@ public class CompositionsDaoWrapper {
 
                 //if album is empty, delete
                 albumsDao.deleteEmptyAlbum(albumId);
-            }
 
-            // 4) if OLD artist exists and has no references - delete him
-            if (oldArtistId != 0) {
-                artistsDao.deleteEmptyArtist(oldArtistId);
+                // 4) if OLD artist exists and has no references - delete him
+                if (oldArtistId != null) {
+                    artistsDao.deleteEmptyArtist(oldArtistId);
+                }
             }
         });
     }

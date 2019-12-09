@@ -50,7 +50,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void changeAlbumGenreTest() throws IOException {
+    public void changeGenreTest() throws IOException {
         String filePath = res.getFile().getPath();
         System.out.println("genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
 
@@ -59,5 +59,17 @@ public class CompositionSourceEditorTest {
         String newGenre = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("new genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
         assertEquals(testGenre, newGenre);
+    }
+
+    @Test
+    public void changeAlbumArtistTest() throws IOException {
+        String filePath = res.getFile().getPath();
+        System.out.println("album artist: " + sourceEditor.getCompositionAlbumArtist(filePath).blockingGet());
+
+        String testName = "Test album artist";
+        sourceEditor.setCompositionAlbumArtist(filePath, testName).subscribe();
+        String newGenre = sourceEditor.getCompositionAlbumArtist(filePath).blockingGet();
+        System.out.println("new album artist: " + sourceEditor.getCompositionAlbumArtist(filePath).blockingGet());
+        assertEquals(testName, newGenre);
     }
 }

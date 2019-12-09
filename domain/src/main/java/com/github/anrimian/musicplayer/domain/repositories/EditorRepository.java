@@ -14,6 +14,8 @@ public interface EditorRepository {
 
     Completable changeCompositionAuthor(FullComposition composition, String newAuthor);
 
+    Completable changeCompositionAlbumArtist(FullComposition composition, String newAuthor);
+
     Completable changeCompositionAlbum(FullComposition composition, String newAlbum);
 
     Completable changeCompositionTitle(FullComposition composition, String title);

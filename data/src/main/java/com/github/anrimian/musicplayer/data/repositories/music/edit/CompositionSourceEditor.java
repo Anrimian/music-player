@@ -36,6 +36,10 @@ public class CompositionSourceEditor {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.ALBUM, author));
     }
 
+    public Completable setCompositionAlbumArtist(String filePath, String artist) {
+        return Completable.fromAction(() -> editFile(filePath, FieldKey.ALBUM_ARTIST, artist));
+    }
+
     public Completable setCompositionGenre(String filePath, String genre) {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.GENRE, genre));
     }
@@ -50,6 +54,10 @@ public class CompositionSourceEditor {
 
     public Maybe<String> getCompositionAlbum(String filePath) {
         return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.ALBUM));
+    }
+
+    public Maybe<String> getCompositionAlbumArtist(String filePath) {
+        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.ALBUM_ARTIST));
     }
 
     public Maybe<String> getCompositionGenre(String filePath) {

@@ -121,4 +121,7 @@ public interface AlbumsDao {
 
     @Query("UPDATE albums SET name = :name WHERE id = :id")
     void updateAlbumName(String name, long id);
+
+    @Query("SELECT artistId FROM albums WHERE id = :albumId")
+    Long getArtistId(long albumId);
 }

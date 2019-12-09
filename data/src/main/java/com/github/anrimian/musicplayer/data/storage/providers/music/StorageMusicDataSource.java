@@ -69,6 +69,12 @@ public class StorageMusicDataSource {
         });
     }
 
+    public Completable updateCompositionAlbumArtist(FullComposition composition, String authorName) {
+        return Completable.fromAction(() ->
+                compositionsDao.updateAlbumArtist(composition.getId(), authorName)
+        );
+    }
+
     public Completable updateCompositionGenre(FullComposition composition, String genre) {
         return Completable.fromAction(() -> {
             genreDao.updateCompositionGenre(composition.getId(), genre);

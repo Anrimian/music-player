@@ -18,6 +18,8 @@ public class FullComposition {
     @Nullable
     private final String album;
     @Nullable
+    private final String albumArtist;
+    @Nullable
     private final String genre;
 
     @Nonnull
@@ -42,6 +44,7 @@ public class FullComposition {
     public FullComposition(String artist,
                            String title,
                            String album,
+                           String albumArtist,
                            String genre,
                            String filePath,
                            long duration,
@@ -54,6 +57,7 @@ public class FullComposition {
         this.artist = artist;
         this.title = title;
         this.album = album;
+        this.albumArtist = albumArtist;
         this.genre = genre;
         this.filePath = filePath;
         this.duration = duration;
@@ -65,18 +69,9 @@ public class FullComposition {
         this.corruptionType = corruptionType;
     }
 
-    public FullComposition copy(String newPath) {
-        return new FullComposition(artist,
-                title,
-                album,
-                genre, newPath,
-                duration,
-                size,
-                id,
-                storageId,
-                dateAdded,
-                dateModified,
-                corruptionType);
+    @Nullable
+    public String getAlbumArtist() {
+        return albumArtist;
     }
 
     @Nullable
