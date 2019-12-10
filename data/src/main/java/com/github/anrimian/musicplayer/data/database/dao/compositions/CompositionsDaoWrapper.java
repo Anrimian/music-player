@@ -29,6 +29,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToMap;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
+//TODO delete empty authors, albums, genres after delete?
 public class CompositionsDaoWrapper {
 
     private final AppDatabase appDatabase;
@@ -114,7 +115,7 @@ public class CompositionsDaoWrapper {
             Long albumId = albumsDao.findAlbum(artistId, albumName);
 
             // 2) if album not exists - create album
-            if (albumId == null) {
+            if (albumId == null && albumName != null) {
                 albumId = albumsDao.insert(new AlbumEntity(artistId, null, albumName, 0, 0));//hmm, storage?
             }
 
@@ -134,7 +135,7 @@ public class CompositionsDaoWrapper {
             Long artistId = artistsDao.findArtistIdByName(authorName);
 
             // 2) if artist not exists - create artist
-            if (artistId == null) {
+            if (artistId == null && authorName != null) {
                 artistId = artistsDao.insertArtist(new ArtistEntity(null, authorName));//hmm, storage?
             }
             // 3) set new artistId
@@ -157,7 +158,7 @@ public class CompositionsDaoWrapper {
                 Long artistId = artistsDao.findArtistIdByName(artistName);
 
                 // 2) if artist not exists - create artist
-                if (artistId == null) {
+                if (artistId == null && artistName != null) {
                     artistId = artistsDao.insertArtist(new ArtistEntity(null, artistName));//hmm, storage?
                 }
 

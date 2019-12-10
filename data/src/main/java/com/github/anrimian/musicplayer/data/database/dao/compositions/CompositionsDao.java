@@ -129,10 +129,10 @@ public interface CompositionsDao {
     void updateFilePath(long id, String filePath);
 
     @Query("UPDATE compositions SET artistId = :artistId WHERE id = :id")
-    void updateArtist(long id, long artistId);
+    void updateArtist(long id, Long artistId);
 
     @Query("UPDATE compositions SET albumId = :albumId WHERE id = :id")
-    void updateAlbum(long id, long albumId);
+    void updateAlbum(long id, Long albumId);
 
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
