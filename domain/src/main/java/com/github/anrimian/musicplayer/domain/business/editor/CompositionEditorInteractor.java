@@ -8,6 +8,8 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.nullIfEmpty;
+
 public class CompositionEditorInteractor {
 
     private final EditorRepository editorRepository;
@@ -24,11 +26,15 @@ public class CompositionEditorInteractor {
     }
 
     public Completable editCompositionAuthor(FullComposition composition, String newAuthor) {
-        return editorRepository.changeCompositionAuthor(composition, newAuthor);
+        return editorRepository.changeCompositionAuthor(composition, nullIfEmpty(newAuthor));
     }
 
     public Completable editCompositionAlbum(FullComposition composition, String newAlbum) {
-        return editorRepository.changeCompositionAlbum(composition, newAlbum);
+        return editorRepository.changeCompositionAlbum(composition, nullIfEmpty(newAlbum));
+    }
+
+    public Completable editCompositionAlbumArtist(FullComposition composition, String newArtist) {
+        return editorRepository.changeCompositionAlbumArtist(composition, nullIfEmpty(newArtist));
     }
 
     public Completable editCompositionTitle(FullComposition composition, String newTitle) {

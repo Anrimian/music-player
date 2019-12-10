@@ -50,6 +50,7 @@ public interface Constants {
         String TITLE_TAG = "title_tag";
         String FILE_NAME_TAG = "file_name_tag";
         String ALBUM_TAG = "album_tag";
+        String ALBUM_ARTIST_TAG = "album_artist_tag";
         String GENRE_TAG = "genre_tag";
         String NEW_FOLDER_NAME_TAG = "new_folder_name_tag";
         String ALBUM_MENU_TAG = "album_menu_tag";

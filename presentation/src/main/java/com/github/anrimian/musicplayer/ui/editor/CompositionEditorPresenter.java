@@ -59,6 +59,8 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
                     getViewState().showEnterAuthorDialog(composition, null);
                     onDefaultError(throwable);
                 })
+                .ignoreElement()
+                .onErrorComplete()
                 .subscribe();
     }
 
@@ -87,6 +89,24 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
                     getViewState().showEnterAlbumDialog(composition, null);
                     onDefaultError(throwable);
                 })
+                .ignoreElement()
+                .onErrorComplete()
+                .subscribe();
+    }
+
+    void onChangeAlbumArtistClicked() {
+        if (composition == null) {
+            return;
+        }
+        editorInteractor.getAlbumNames()
+                .observeOn(uiScheduler)
+                .doOnSuccess(albums -> getViewState().showEnterAlbumArtistDialog(composition, albums))
+                .doOnError(throwable -> {
+                    getViewState().showEnterAlbumArtistDialog(composition, null);
+                    onDefaultError(throwable);
+                })
+                .ignoreElement()
+                .onErrorComplete()
                 .subscribe();
     }
 
@@ -101,6 +121,8 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
                     getViewState().showEnterGenreDialog(composition, null);
                     onDefaultError(throwable);
                 })
+                .ignoreElement()
+                .onErrorComplete()
                 .subscribe();
     }
 
@@ -135,6 +157,18 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
 
         dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.editCompositionAlbum(composition, album)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
+
+    void onNewAlbumArtistEntered(String artist) {
+        if (composition == null) {
+            return;
+        }
+
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.editCompositionAlbumArtist(composition, artist)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);

@@ -27,7 +27,10 @@ import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_ARTIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
@@ -58,6 +61,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.tv_album)
     TextView tvAlbum;
 
+    @BindView(R.id.tv_album_artist)
+    TextView tvAlbumArtist;
+
     @BindView(R.id.tv_filename)
     TextView tvFileName;
 
@@ -72,6 +78,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @BindView(R.id.tv_album_hint)
     TextView tvAlbumHint;
+
+    @BindView(R.id.tv_album_author_hint)
+    TextView tvAlbumArtistHint;
 
     @BindView(R.id.tv_filename_hint)
     TextView tvFileNameHint;
@@ -91,8 +100,17 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.change_album_clickable_area)
     View changeAlbumClickableArea;
 
+    @BindView(R.id.change_album_artist_clickable_area)
+    View changeAlbumArtistClickableArea;
+
     @BindView(R.id.change_genre_clickable_area)
     View changeGenreClickableArea;
+
+    @BindView(R.id.iv_album_artist)
+    View ivAlbumArtist;
+
+    @BindView(R.id.divider_album_artist)
+    View dividerAlbumArtist;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -101,6 +119,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     private DialogFragmentRunner<InputTextDialogFragment> titleDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> albumDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> albumArtistDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> genreDialogFragmentRunner;
 
     public static Intent newIntent(Context context, long compositionId) {
@@ -133,11 +152,13 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         changeTitleClickableArea.setOnClickListener(v -> presenter.onChangeTitleClicked());
         changeFilenameClickableArea.setOnClickListener(v -> presenter.onChangeFileNameClicked());
         changeAlbumClickableArea.setOnClickListener(v -> presenter.onChangeAlbumClicked());
+        changeAlbumArtistClickableArea.setOnClickListener(v -> presenter.onChangeAlbumArtistClicked());
         changeGenreClickableArea.setOnClickListener(v -> presenter.onChangeGenreClicked());
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeTitleClickableArea, () -> copyText(tvTitle, tvTitleHint));
         onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
         onLongClick(changeAlbumClickableArea, () -> copyText(tvAlbum, tvAlbumHint));
+        onLongClick(changeAlbumArtistClickableArea, () -> copyText(tvAlbumArtist, tvAlbumArtistHint));
         onLongClick(changeGenreClickableArea, () -> copyText(tvGenre, tvGenreHint));
 
         @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
@@ -160,6 +181,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         albumDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 ALBUM_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewAlbumEntered));
+
+        albumArtistDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                ALBUM_ARTIST_TAG,
+                fragment -> fragment.setOnCompleteListener(presenter::onNewAlbumArtistEntered));
 
         genreDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 GENRE_TAG,
@@ -185,7 +210,16 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @Override
     public void showComposition(FullComposition composition) {
         tvTitle.setText(composition.getTitle());
-        tvAlbum.setText(composition.getAlbum());
+
+        String album = composition.getAlbum();
+        tvAlbum.setText(album);
+        int albumArtistVisibility = album == null? GONE : VISIBLE;
+        tvAlbumArtist.setVisibility(albumArtistVisibility);
+        tvAlbumArtistHint.setVisibility(albumArtistVisibility);
+        ivAlbumArtist.setVisibility(albumArtistVisibility);
+        dividerAlbumArtist.setVisibility(albumArtistVisibility);
+        tvAlbumArtist.setText(composition.getAlbumArtist());
+
         tvGenre.setText(composition.getGenre());
         tvAuthor.setText(formatAuthor(composition.getArtist(), this));
         tvFileName.setText(formatFileName(composition.getFilePath(), true));
@@ -202,6 +236,19 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 .hints(hints)
                 .build();
         authorDialogFragmentRunner.show(fragment);
+    }
+
+    @Override
+    public void showEnterAlbumArtistDialog(FullComposition composition, String[] hints) {
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
+                R.string.change_album_artist,
+                R.string.change,
+                R.string.cancel,
+                R.string.artist,
+                composition.getAlbumArtist())
+                .hints(hints)
+                .build();
+        albumArtistDialogFragmentRunner.show(fragment);
     }
 
     @Override
