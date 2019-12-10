@@ -67,8 +67,6 @@ dependencies {
     implementation deps.palette
     implementation deps.circleImageView
 
-    implementation deps.recyclerViewAnimation
-
     implementation deps.rxAndroid
     implementation deps.rxPermissions
 
