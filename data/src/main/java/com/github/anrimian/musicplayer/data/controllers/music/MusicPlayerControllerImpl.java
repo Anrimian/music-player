@@ -2,9 +2,10 @@ package com.github.anrimian.musicplayer.data.controllers.music;
 
 import android.content.Context;
 
-import com.github.anrimian.musicplayer.data.controllers.music.players.ExoMediaPlayer;
+import com.github.anrimian.musicplayer.data.controllers.music.players.AndroidMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.MediaPlayer;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
+import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -25,13 +26,15 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public MusicPlayerControllerImpl(UiStatePreferences uiStatePreferences,
                                      Context context,
                                      Scheduler scheduler,
-                                     PlayerErrorParser playerErrorParser) {
+                                     PlayerErrorParser playerErrorParser,
+                                     Analytics analytics) {
         this.uiStatePreferences = uiStatePreferences;
 //        Function<ExoMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, scheduler, playerErrorParser);
 //        Function<MediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, playerErrorParser);
 //        mediaPlayer = new CompositeMediaPlayer(androidMediaPlayer);
 
-        mediaPlayer = new ExoMediaPlayer(context, scheduler, playerErrorParser);
+//        mediaPlayer = new ExoMediaPlayer(context, scheduler, playerErrorParser);
+        mediaPlayer = new AndroidMediaPlayer(scheduler, playerErrorParser, analytics);
     }
 
     @Override

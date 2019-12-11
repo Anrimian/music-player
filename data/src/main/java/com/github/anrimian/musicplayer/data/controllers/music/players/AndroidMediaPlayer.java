@@ -1,10 +1,14 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import android.media.AudioManager;
+import android.util.Log;
 
+import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
+import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 
@@ -19,6 +23,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
+import static android.media.MediaPlayer.MEDIA_ERROR_UNSUPPORTED;
+
 public class AndroidMediaPlayer implements MediaPlayer {
 
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
@@ -26,6 +32,7 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     private final Scheduler scheduler;
     private final PlayerErrorParser playerErrorParser;
+    private final Analytics analytics;
 
     private android.media.MediaPlayer mediaPlayer;
 
@@ -34,21 +41,29 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     private Composition currentComposition;
 
-    public AndroidMediaPlayer(Scheduler scheduler, PlayerErrorParser playerErrorParser) {
+    public AndroidMediaPlayer(Scheduler scheduler,
+                              PlayerErrorParser playerErrorParser,
+                              Analytics analytics) {
         this.scheduler = scheduler;
         this.playerErrorParser = playerErrorParser;
+        this.analytics = analytics;
         mediaPlayer = new android.media.MediaPlayer();
-        mediaPlayer.setOnErrorListener((mediaPlayer, i, i1) -> {
-            sendErrorEvent(new Exception());
-            mediaPlayer.reset();
-            return true;
+        mediaPlayer.setOnCompletionListener(mediaPlayer ->
+                playerEventSubject.onNext(new FinishedEvent(currentComposition))
+        );
+        mediaPlayer.setOnErrorListener((mediaPlayer, what, extra) -> {
+            sendErrorEvent(what, extra);
+            return false;
         });
-
+        //prepared event duplication
+        //new queue - prepare - error
     }
 
     @Override
     public Observable<PlayerEvent> getEventsObservable() {
-        return playerEventSubject;
+        return playerEventSubject.doOnNext(event -> {
+            Log.d("KEK1", "getEventsObservable, event: " + event);
+        });
     }
 
     @Override
@@ -67,7 +82,6 @@ public class AndroidMediaPlayer implements MediaPlayer {
         seekTo(0);
         stopTracingTrackPosition();
         mediaPlayer.stop();
-//        mediaPlayer.reset();
     }
 
     @Override
@@ -134,6 +148,27 @@ public class AndroidMediaPlayer implements MediaPlayer {
         }
     }
 
+    private void sendErrorEvent(int what, int playerError) {
+        if (currentComposition != null) {
+            playerEventSubject.onNext(new ErrorEvent(
+                    getErrorTypeFromPlayerError(what, playerError),
+                    currentComposition)
+            );
+        }
+    }
+
+    private ErrorType getErrorTypeFromPlayerError(int what, int playerError) {
+        switch (playerError) {
+            case MEDIA_ERROR_UNSUPPORTED: {
+                return ErrorType.UNSUPPORTED;
+            }
+            default: {
+                analytics.logMessage("unknown player error, what: " + what + ", extra: " + playerError);
+                return ErrorType.UNKNOWN;
+            }
+        }
+    }
+
     private void sendErrorEvent(Throwable throwable) {
         if (currentComposition != null) {
             playerEventSubject.onNext(new ErrorEvent(
@@ -145,6 +180,7 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     private Completable prepareMediaSource(Composition composition) {
         return Completable.fromAction(() -> {
+            mediaPlayer.reset();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setDataSource(composition.getFilePath());
             mediaPlayer.prepare();

@@ -90,8 +90,13 @@ class MusicModule {
     MusicPlayerController provideMusicPlayerController(UiStatePreferences uiStatePreferences,
                                                        Context context,
                                                        @Named(UI_SCHEDULER) Scheduler scheduler,
-                                                       PlayerErrorParser playerErrorParser) {
-        return new MusicPlayerControllerImpl(uiStatePreferences, context, scheduler, playerErrorParser);
+                                                       PlayerErrorParser playerErrorParser,
+                                                       Analytics analytics) {
+        return new MusicPlayerControllerImpl(uiStatePreferences,
+                context,
+                scheduler,
+                playerErrorParser,
+                analytics);
     }
 
     @Provides

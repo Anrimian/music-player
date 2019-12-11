@@ -13,4 +13,11 @@ public class FinishedEvent implements PlayerEvent {
     public Composition getComposition() {
         return composition;
     }
+
+    @Override
+    public String toString() {
+        return "FinishedEvent{" +
+                "composition=" + composition +
+                '}';
+    }
 }
