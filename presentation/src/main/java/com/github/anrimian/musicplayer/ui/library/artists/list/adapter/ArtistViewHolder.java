@@ -18,6 +18,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class ArtistViewHolder extends BaseViewHolder {
 
@@ -30,10 +31,12 @@ public class ArtistViewHolder extends BaseViewHolder {
     private Artist artist;
 
     ArtistViewHolder(@NonNull ViewGroup parent,
-                     Callback<Artist> itemClickListener) {
+                     Callback<Artist> itemClickListener,
+                     Callback<Artist> longClickListener) {
         super(parent, R.layout.item_artist);
         ButterKnife.bind(this, itemView);
         itemView.setOnClickListener(v -> itemClickListener.call(artist));
+        onLongClick(itemView, () -> longClickListener.call(artist));
     }
 
     public void bind(Artist artist) {

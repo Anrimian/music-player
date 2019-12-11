@@ -55,6 +55,8 @@ public interface Constants {
         String NEW_FOLDER_NAME_TAG = "new_folder_name_tag";
         String ALBUM_MENU_TAG = "album_menu_tag";
         String ALBUM_NAME_TAG = "album_name_tag";
+        String ARTIST_MENU_TAG = "artist_menu_tag";
+        String ARTIST_NAME_TAG = "artist_name_tag";
         String MESSAGE_ARG = "message_arg";
         String PROGRESS_DIALOG_TAG = "progress_dialog_arg";
     }

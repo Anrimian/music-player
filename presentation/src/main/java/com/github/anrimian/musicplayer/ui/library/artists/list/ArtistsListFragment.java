@@ -2,26 +2,35 @@ package com.github.anrimian.musicplayer.ui.library.artists.list;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.serealization.ArtistSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.list.adapter.ArtistsAdapter;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -29,6 +38,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
+
+import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_MENU_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 
 public class ArtistsListFragment extends LibraryFragment implements
         ArtistsListView, FragmentLayerListener {
@@ -45,6 +59,9 @@ public class ArtistsListFragment extends LibraryFragment implements
     private AdvancedToolbar toolbar;
     private ArtistsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
+
+    private DialogFragmentRunner<MenuDialogFragment> artistMenuDialogRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> editArtistNameDialogRunner;
 
     @ProvidePresenter
     ArtistsListPresenter providePresenter() {
@@ -74,11 +91,25 @@ public class ArtistsListFragment extends LibraryFragment implements
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
         progressViewWrapper.hideAll();
 
-        adapter = new ArtistsAdapter(recyclerView, this::goToArtistScreen);
+        adapter = new ArtistsAdapter(recyclerView,
+                this::goToArtistScreen,
+                this::onArtistLongClick);
         recyclerView.setAdapter(adapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        FragmentManager fm = getChildFragmentManager();
+        artistMenuDialogRunner = new DialogFragmentRunner<>(fm,
+                ARTIST_MENU_TAG,
+                fragment -> fragment.setComplexCompleteListener(this::onArtistMenuClicked)
+        );
+        editArtistNameDialogRunner = new DialogFragmentRunner<>(fm,
+                ARTIST_NAME_TAG,
+                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
+                    presenter.onNewArtistNameEntered(name, extra.getLong(ID_ARG));
+                })
+        );
     }
 
     @Override
@@ -118,8 +149,64 @@ public class ArtistsListFragment extends LibraryFragment implements
         adapter.submitList(artists);
     }
 
+    @Override
+    public void showRenameProgress() {
+        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(
+                getString(R.string.rename_progress)
+        );
+        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
+    }
+
+    @Override
+    public void hideRenameProgress() {
+        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(PROGRESS_DIALOG_TAG);
+        if (fragment != null) {
+            fragment.dismissAllowingStateLoss();
+        }
+    }
+
+    @Override
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onArtistMenuClicked(MenuItem menuItem, Bundle extra) {
+        Artist artist = ArtistSerializer.deserialize(extra);
+        switch (menuItem.getItemId()) {
+            case R.id.menu_rename: {
+                showEditArtistNameDialog(artist);
+                break;
+            }
+        }
+    }
+
+    private void showEditArtistNameDialog(Artist artist) {
+        Bundle bundle = new Bundle();
+        bundle.putLong(ID_ARG, artist.getId());
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(R.string.change_name,
+                R.string.change,
+                R.string.cancel,
+                R.string.name,
+                artist.getName())
+                .canBeEmpty(false)
+                .extra(bundle)
+                .build();
+        editArtistNameDialogRunner.show(fragment);
+    }
+
     private void goToArtistScreen(Artist artist) {
         FragmentNavigation.from(requireFragmentManager())
                 .addNewFragment(ArtistItemsFragment.newInstance(artist.getId()));
+    }
+
+    private void onArtistLongClick(Artist artist) {
+        Bundle extra = ArtistSerializer.serialize(artist);
+        MenuDialogFragment fragment = MenuDialogFragment.newInstance(
+                R.menu.artist_menu,
+                artist.getName(),
+                extra
+        );
+        artistMenuDialogRunner.show(fragment);
     }
 }

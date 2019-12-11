@@ -16,19 +16,23 @@ import java.util.List;
 public class ArtistsAdapter extends DiffListAdapter<Artist, ArtistViewHolder> {
 
     private final Callback<Artist> onClickListener;
+    private final Callback<Artist> longClickListener;
 
-    public ArtistsAdapter(RecyclerView recyclerView, Callback<Artist> onClickListener) {
+    public ArtistsAdapter(RecyclerView recyclerView,
+                          Callback<Artist> onClickListener,
+                          Callback<Artist> longClickListener) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 ArtistHelper::areSourcesTheSame,
                 ArtistHelper::getChangePayload)
         );
         this.onClickListener = onClickListener;
+        this.longClickListener = longClickListener;
     }
 
     @NonNull
     @Override
     public ArtistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ArtistViewHolder(parent, onClickListener);
+        return new ArtistViewHolder(parent, onClickListener, longClickListener);
     }
 
     @Override

@@ -25,6 +25,7 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable artistsDisposable;
+    private Disposable changeDisposable;
 
     private List<Artist> artists = new ArrayList<>();
 
@@ -50,6 +51,15 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
 
     void onTryAgainLoadCompositionsClicked() {
         subscribeOnArtistsList();
+    }
+
+    void onNewArtistNameEntered(String name, long artistId) {
+        dispose(changeDisposable);
+        changeDisposable = interactor.updateArtistName(name, artistId)
+                .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showRenameProgress())
+                .doFinally(() -> getViewState().hideRenameProgress())
+                .subscribe(() -> {}, this::onDefaultError);
     }
 
     private void subscribeOnArtistsList() {
@@ -82,4 +92,8 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
         }
     }
 
+    private void onDefaultError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showErrorMessage(errorCommand);
+    }
 }
