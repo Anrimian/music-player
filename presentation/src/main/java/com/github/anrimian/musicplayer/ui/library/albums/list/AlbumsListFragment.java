@@ -21,6 +21,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serealization.AlbumSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter;
@@ -172,8 +173,8 @@ public class AlbumsListFragment extends LibraryFragment implements
     private void onAlbumMenuClicked(MenuItem menuItem, Bundle extra) {
         Album album = AlbumSerializer.deserialize(extra);
         switch (menuItem.getItemId()) {
-            case R.id.menu_rename: {
-                showEditAlbumNameDialog(album);
+            case R.id.menu_edit: {
+                startActivity(AlbumEditorActivity.newIntent(requireContext(), album.getId()));
                 break;
             }
         }

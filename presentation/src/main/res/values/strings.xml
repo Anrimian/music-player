@@ -163,6 +163,7 @@
     <string name="rename_progress">Renaming…</string>
     <string name="album_artist">Album artist</string>
     <string name="change_album_artist">Change album artist</string>
+    <string name="edit_album_tags">Edit album tags</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

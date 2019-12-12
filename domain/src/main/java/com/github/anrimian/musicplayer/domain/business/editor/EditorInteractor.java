@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.business.editor;
 
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
@@ -10,13 +11,13 @@ import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.nullIfEmpty;
 
-public class CompositionEditorInteractor {
+public class EditorInteractor {
 
     private final EditorRepository editorRepository;
     private final MusicProviderRepository musicProviderRepository;
 
-    public CompositionEditorInteractor(EditorRepository editorRepository,
-                                       MusicProviderRepository musicProviderRepository) {
+    public EditorInteractor(EditorRepository editorRepository,
+                            MusicProviderRepository musicProviderRepository) {
         this.editorRepository = editorRepository;
         this.musicProviderRepository = musicProviderRepository;
     }
@@ -47,6 +48,18 @@ public class CompositionEditorInteractor {
 
     public Observable<FullComposition> getCompositionObservable(long id) {
         return musicProviderRepository.getCompositionObservable(id);
+    }
+
+    public Observable<Album> getAlbumObservable(long albumId) {
+        return musicProviderRepository.getAlbumObservable(albumId);
+    }
+
+    public Completable updateAlbumName(String name, long albumId) {
+        return editorRepository.updateAlbumName(name, albumId);
+    }
+
+    public Completable updateAlbumArtist(String name, long albumId) {
+        return editorRepository.updateAlbumArtist(name, albumId);
     }
 
     public Single<String[]> getAuthorNames() {

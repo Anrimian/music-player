@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.editor;
+package com.github.anrimian.musicplayer.ui.editor.composition;
 
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;

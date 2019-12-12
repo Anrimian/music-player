@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.editor;
+package com.github.anrimian.musicplayer.ui.editor.composition;
 
 import android.content.Context;
 import android.content.Intent;

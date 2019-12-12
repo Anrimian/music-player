@@ -1,8 +1,8 @@
-package com.github.anrimian.musicplayer.di.app.editor;
+package com.github.anrimian.musicplayer.di.app.editor.composition;
 
-import com.github.anrimian.musicplayer.domain.business.editor.CompositionEditorInteractor;
+import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.editor.CompositionEditorPresenter;
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -24,7 +24,7 @@ public class CompositionEditorModule {
 
     @Provides
     @Nonnull
-    CompositionEditorPresenter compositionEditorPresenter(CompositionEditorInteractor interactor,
+    CompositionEditorPresenter compositionEditorPresenter(EditorInteractor interactor,
                                                           @Named(UI_SCHEDULER) Scheduler uiScheduler,
                                                           ErrorParser errorParser) {
         return new CompositionEditorPresenter(compositionId, interactor, uiScheduler, errorParser);

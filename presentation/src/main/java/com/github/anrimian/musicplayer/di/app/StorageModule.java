@@ -18,7 +18,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenr
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.domain.business.editor.CompositionEditorInteractor;
+import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
@@ -113,9 +113,9 @@ public class StorageModule {
 
     @Provides
     @Nonnull
-    CompositionEditorInteractor compositionEditorInteractor(EditorRepository editorRepository,
-                                                            MusicProviderRepository musicProviderRepository) {
-        return new CompositionEditorInteractor(editorRepository, musicProviderRepository);
+    EditorInteractor compositionEditorInteractor(EditorRepository editorRepository,
+                                                 MusicProviderRepository musicProviderRepository) {
+        return new EditorInteractor(editorRepository, musicProviderRepository);
     }
 
     @Provides

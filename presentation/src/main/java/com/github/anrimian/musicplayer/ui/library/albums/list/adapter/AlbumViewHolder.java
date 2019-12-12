@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
@@ -47,7 +48,7 @@ public class AlbumViewHolder extends BaseViewHolder {
     public void bind(Album album) {
         this.album = album;
         showAlbumName();
-        showCompositionsCount();
+        showAdditionalInfo();
         showCover();
     }
 
@@ -62,8 +63,12 @@ public class AlbumViewHolder extends BaseViewHolder {
                 showAlbumName();
                 continue;
             }
+            if (payload == ARTIST) {
+                showAdditionalInfo();
+                continue;
+            }
             if (payload == COMPOSITIONS_COUNT) {
-                showCompositionsCount();
+                showAdditionalInfo();
             }
         }
     }
@@ -72,7 +77,7 @@ public class AlbumViewHolder extends BaseViewHolder {
         tvAlbumName.setText(album.getName());
     }
 
-    private void showCompositionsCount() {
+    private void showAdditionalInfo() {
         StringBuilder sb = new StringBuilder();
         String artist = album.getArtist();
         if (!isEmpty(artist)) {

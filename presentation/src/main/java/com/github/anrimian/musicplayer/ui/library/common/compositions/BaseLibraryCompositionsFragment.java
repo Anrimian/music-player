@@ -7,7 +7,7 @@ import androidx.annotation.MenuRes;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;

@@ -2,8 +2,10 @@ package com.github.anrimian.musicplayer.di.app;
 
 
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
-import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorComponent;
-import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
@@ -45,6 +47,7 @@ public interface AppComponent {
     PlayListComponent playListComponent(PlayListModule module);
     SettingsComponent settingsComponent();
     CompositionEditorComponent compositionEditorComponent(CompositionEditorModule module);
+    AlbumEditorComponent albumEditorComponent(AlbumEditorModule module);
 
     MusicPlayerInteractor musicPlayerInteractor();
     DisplaySettingsInteractor displaySettingsInteractor();

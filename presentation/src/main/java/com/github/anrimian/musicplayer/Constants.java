@@ -24,6 +24,7 @@ public interface Constants {
         String COMPOSITION_AUTHOR_ARG = "composition_author_arg";
         String COMPOSITION_FILE_ARG = "composition_file_arg";
         String COMPOSITION_ID_ARG = "composition_id_arg";
+        String ALBUM_ID_ARG = "album_id_arg";
         String PLAY_ARG = "play_arg";
         String QUEUE_SIZE_ARG = "queue_size_arg";
         String TITLE_ARG = "title_arg";
@@ -47,6 +48,7 @@ public interface Constants {
         String PLAY_LIST_MENU = "play_list_menu";
         String COMPOSITION_ACTION_TAG = "composition_action_tag";
         String AUTHOR_TAG = "author_tag";
+        String NAME_TAG = "name_tag";
         String TITLE_TAG = "title_tag";
         String FILE_NAME_TAG = "file_name_tag";
         String ALBUM_TAG = "album_tag";

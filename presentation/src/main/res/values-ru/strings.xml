@@ -155,6 +155,7 @@
     <string name="rename_progress">Переименование…</string>
     <string name="album_artist">Автор альбома</string>
     <string name="change_album_artist">Изменить автора альбома</string>
+    <string name="edit_album_tags">Редактировать теги альбома</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

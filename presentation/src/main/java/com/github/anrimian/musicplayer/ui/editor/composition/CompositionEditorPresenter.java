@@ -1,6 +1,6 @@
-package com.github.anrimian.musicplayer.ui.editor;
+package com.github.anrimian.musicplayer.ui.editor.composition;
 
-import com.github.anrimian.musicplayer.domain.business.editor.CompositionEditorInteractor;
+import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -17,7 +17,7 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorView> {
 
     private final long compositionId;
-    private final CompositionEditorInteractor editorInteractor;
+    private final EditorInteractor editorInteractor;
     private final Scheduler uiScheduler;
     private final ErrorParser errorParser;
 
@@ -27,7 +27,7 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     private FullComposition composition;
 
     public CompositionEditorPresenter(long compositionId,
-                                      CompositionEditorInteractor editorInteractor,
+                                      EditorInteractor editorInteractor,
                                       Scheduler uiScheduler,
                                       ErrorParser errorParser) {
         this.compositionId = compositionId;
