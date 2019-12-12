@@ -129,6 +129,15 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
+    public Completable updateAlbumArtist(String name, long albumId) {
+        return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name))
+                .doOnComplete(() -> albumsDao.updateAlbumArtist(albumId, name))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Completable updateArtistName(String name, long artistId) {
         return Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId))
                 .flatMapObservable(Observable::fromIterable)

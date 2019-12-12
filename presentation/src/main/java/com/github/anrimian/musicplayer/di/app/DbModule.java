@@ -89,8 +89,10 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
-    AlbumsDaoWrapper albumsDaoWrapper(AlbumsDao albumsDao, ArtistsDao artistsDao) {
-        return new AlbumsDaoWrapper(albumsDao, artistsDao);
+    AlbumsDaoWrapper albumsDaoWrapper(AppDatabase appDatabase,
+                                      AlbumsDao albumsDao,
+                                      ArtistsDao artistsDao) {
+        return new AlbumsDaoWrapper(appDatabase, albumsDao, artistsDao);
     }
 
     @Provides

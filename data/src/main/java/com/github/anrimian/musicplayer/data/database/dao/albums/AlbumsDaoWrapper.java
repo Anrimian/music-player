@@ -2,8 +2,10 @@ package com.github.anrimian.musicplayer.data.database.dao.albums;
 
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
@@ -17,10 +19,12 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class AlbumsDaoWrapper {
 
+    private final AppDatabase appDatabase;
     private final AlbumsDao albumsDao;
     private final ArtistsDao artistsDao;
 
-    public AlbumsDaoWrapper(AlbumsDao albumsDao, ArtistsDao artistsDao) {
+    public AlbumsDaoWrapper(AppDatabase appDatabase, AlbumsDao albumsDao, ArtistsDao artistsDao) {
+        this.appDatabase = appDatabase;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
     }
@@ -63,6 +67,24 @@ public class AlbumsDaoWrapper {
 
     public void updateAlbumName(String name, long id) {
         albumsDao.updateAlbumName(name, id);
+    }
+
+    public void updateAlbumArtist(long albumId, String artistName) {
+        appDatabase.runInTransaction(() -> {
+            Long artistId = artistsDao.findArtistIdByName(artistName);
+
+            if (artistId == null && artistName != null) {
+                artistId = artistsDao.insertArtist(new ArtistEntity(null, artistName));//hmm, storage?
+            }
+
+            Long oldArtistId = albumsDao.getArtistId(albumId);
+
+            albumsDao.setAuthorId(albumId, artistId);
+
+            if (oldArtistId != null) {
+                artistsDao.deleteEmptyArtist(oldArtistId);
+            }
+        });
     }
 
     private AlbumEntity toEntity(StorageAlbum album) {

@@ -32,6 +32,8 @@ public interface EditorRepository {
 
     Completable updateAlbumName(String name, long id);
 
+    Completable updateAlbumArtist(String name, long albumId);
+
     Completable updateArtistName(String name, long artistId);
 
     Completable updateGenreName(String name, long genreId);

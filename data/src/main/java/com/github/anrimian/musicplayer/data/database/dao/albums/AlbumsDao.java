@@ -107,7 +107,7 @@ public interface AlbumsDao {
     Long findAlbum(Long artistId, String name);
 
     @Query("UPDATE albums SET artistId = :artistId WHERE id = :albumId")
-    void setAuthorId(long albumId, long artistId);
+    void setAuthorId(long albumId, Long artistId);
 
     @Query("SELECT * FROM albums WHERE id = :id")
     AlbumEntity getAlbumEntity(long id);
