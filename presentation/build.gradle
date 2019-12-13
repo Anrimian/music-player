@@ -72,7 +72,7 @@ dependencies {
     implementation deps.rxAndroid
     implementation deps.rxPermissions
 
-    implementation deps.acra
+    implementation deps.acraReportDialog
 
     implementation deps.moxy
     implementation deps.moxyAppcompat

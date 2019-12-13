@@ -4,15 +4,11 @@ import android.app.Application;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.github.anrimian.acrareportdialog.AcraReportDialog;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer;
 import com.github.anrimian.musicplayer.utils.Permissions;
-import com.github.anrimian.musicplayer.utils.acra.AcraReportDialog;
-
-import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
-import org.acra.config.ConfigurationBuilder;
 
 import io.reactivex.plugins.RxJavaPlugins;
 
@@ -31,7 +27,7 @@ public class App extends Application {
         Components.init(getApplicationContext());
 
         if (BuildConfig.DEBUG) {
-            initAcra();
+            AcraReportDialog.setupCrashDialog(this);
         }
 
         AppComponent appComponent = Components.getAppComponent();
@@ -39,15 +35,5 @@ public class App extends Application {
             appComponent.widgetUpdater().start();
             appComponent.mediaStorageRepository().initialize();
         }
-    }
-
-    private void initAcra() {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder(this);
-//        if (BuildConfig.DEBUG) {
-            configurationBuilder
-                    .setReportDialogClass(AcraReportDialog.class)
-                    .setReportingInteractionMode(ReportingInteractionMode.DIALOG);
-//        }
-        ACRA.init(this, configurationBuilder);
     }
 }
