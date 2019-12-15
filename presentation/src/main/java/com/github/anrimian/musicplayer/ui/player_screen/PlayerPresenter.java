@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
@@ -336,9 +338,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void scrollToItemPosition(PlayQueueItem newItem) {
         playerInteractor.getQueuePosition(newItem)
                 .observeOn(uiScheduler)
-                .doOnSuccess(this::scrollToItemPosition)
-                .onErrorComplete()
-                .subscribe();
+                .subscribe(this::scrollToItemPosition, errorParser::logError);
     }
 
     private void subscribeOnPlayerStateChanges() {
@@ -366,17 +366,19 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onPlayQueueChanged(List<PlayQueueItem> list) {
+        Log.d("KEK2", "onPlayQueueChanged");
         playQueue = list;
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setMusicControlsEnabled(!playQueue.isEmpty());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
         getViewState().updatePlayQueue(list);
-        if (scrollToPositionAfterUpdate) {
-            scrollToPositionAfterUpdate = false;
+//        if (scrollToPositionAfterUpdate) {
+//            Log.d("KEK2", "onPlayQueueChanged, scroll to position");
+//            scrollToPositionAfterUpdate = false;
             if (currentItem != null) {
                 scrollToItemPosition(currentItem);
             }
-        }
+//        }
     }
 
     private void scrollToItemPosition(int position) {

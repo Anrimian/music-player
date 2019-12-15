@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Random;
 
 import io.reactivex.Observable;
+
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
  * Created on 02.07.2018.
@@ -33,6 +36,32 @@ public class PlayQueueDaoWrapper {
 
     public List<PlayQueueCompositionDto> getFullPlayQueue() {
         return playQueueDao.getFullPlayQueue();
+    }
+
+    public List<PlayQueueItem> getPlayQueue(boolean isRandom) {
+        return isRandom? getPlayQueueInShuffledOrder(): getPlayQueueInNormalOrder();
+    }
+
+    public List<PlayQueueItem> getPlayQueueInNormalOrder() {
+        return mapList(playQueueDao.getPlayQueueInNormalOrder(), this::toQueueItem);
+    }
+
+    public List<PlayQueueItem> getPlayQueueInShuffledOrder() {
+        return mapList(playQueueDao.getPlayQueueInShuffledOrder(), this::toQueueItem);
+    }
+
+    public Observable<List<PlayQueueItem>> getPlayQueueObservable(boolean isRandom) {
+        return isRandom? getPlayQueueInShuffledOrderObservable(): getPlayQueueInNormalOrderObservable();
+    }
+
+    public Observable<List<PlayQueueItem>> getPlayQueueInNormalOrderObservable() {
+        return playQueueDao.getPlayQueueInNormalOrderObservable()
+                .map(list -> mapList(list, this::toQueueItem));
+    }
+
+    public Observable<List<PlayQueueItem>> getPlayQueueInShuffledOrderObservable() {
+        return playQueueDao.getPlayQueueInShuffledOrderObservable()
+                .map(list -> mapList(list, this::toQueueItem));
     }
 
     public PlayQueueCompositionDto getPlayQueueItem(long id) {
@@ -190,5 +219,9 @@ public class PlayQueueDaoWrapper {
             items.add(playQueueItem);
         }
         return items;
+    }
+
+    private PlayQueueItem toQueueItem(PlayQueueItemDto dto) {
+        return new PlayQueueItem(dto.getItemId(), dto.getComposition());
     }
 }

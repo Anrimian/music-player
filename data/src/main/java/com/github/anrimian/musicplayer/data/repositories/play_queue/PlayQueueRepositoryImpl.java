@@ -26,7 +26,6 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.processors.PublishProcessor;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
@@ -43,9 +42,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final Scheduler scheduler;
 
     private final BehaviorSubject<PlayQueueEvent> currentCompositionSubject = create();
-    private final PublishProcessor<List<PlayQueueItem>> fastUpdateQueueSubject = PublishProcessor.create();
 
-    private final PlayQueueCache queueCache;
+    private final PlayQueueCache queueCache;//we really need this? can be moved in db
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
                                    SettingsRepository settingsPreferences,
@@ -57,9 +55,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         this.scheduler = scheduler;
 
         queueCache = new PlayQueueCache(() -> {
-            List<PlayQueueCompositionDto> entities = playQueueDao.getFullPlayQueue();
-            List<PlayQueueItem> item = toSortedQueue(settingsPreferences.isRandomPlayingEnabled(), entities);
-            return new IndexedList<>(item);
+            boolean isRandom = settingsPreferences.isRandomPlayingEnabled();
+            List<PlayQueueItem> items = playQueueDao.getPlayQueue(isRandom);
+            return new IndexedList<>(items);
         });
     }
 
@@ -99,15 +97,14 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
-        return Observable.combineLatest(settingsPreferences.getRandomPlayingObservable(),
-                playQueueDao.getPlayQueueObservable(),
-                this::toSortedQueue)
+        return settingsPreferences.getRandomPlayingObservable()
+                .flatMap(playQueueDao::getPlayQueueObservable)
                 .toFlowable(BackpressureStrategy.BUFFER)
                 .doOnNext(list -> {
                     IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
                     checkForCurrentItemInNewQueue(newQueue);
                     queueCache.updateQueue(newQueue);
-                }).mergeWith(fastUpdateQueueSubject);
+                });
     }
 
     @Override
@@ -311,7 +308,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 currentCompositionSubject.onNext(new PlayQueueEvent(newItem, true));
             }
         } else {
-            //select new item
+            //item not found, select new item on this position
             Integer currentPosition = currentQueue.indexOf(currentItem);
             if (currentPosition != null) {
                 selectItemAt(newQueue, currentPosition);

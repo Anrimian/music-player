@@ -5,6 +5,7 @@ import androidx.room.Embedded;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 
+@Deprecated
 public class PlayQueueCompositionDto {
 
     private final long itemId;
