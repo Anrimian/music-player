@@ -68,7 +68,7 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
             getViewState().showLoading();
         }
         dispose(albumsDisposable, presenterDisposable);
-        albumsDisposable = interactor.getAlbumsObservable()
+        albumsDisposable = interactor.getAlbumsObservable(null)
                 .observeOn(uiScheduler)
                 .subscribe(this::onAlbumsReceived, this::onAlbumsReceivingError);
         presenterDisposable.add(albumsDisposable);

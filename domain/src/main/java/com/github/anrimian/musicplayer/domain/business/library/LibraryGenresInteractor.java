@@ -6,6 +6,8 @@ import com.github.anrimian.musicplayer.domain.repositories.MusicProviderReposito
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 
 public class LibraryGenresInteractor {
@@ -16,8 +18,8 @@ public class LibraryGenresInteractor {
         this.musicProviderRepository = musicProviderRepository;
     }
 
-    public Observable<List<Genre>> getGenresObservable() {
-        return musicProviderRepository.getGenresObservable();
+    public Observable<List<Genre>> getGenresObservable(@Nullable String searchText) {
+        return musicProviderRepository.getGenresObservable(searchText);
     }
 
     public Observable<List<Composition>> getGenreItemsObservable(long genreId) {

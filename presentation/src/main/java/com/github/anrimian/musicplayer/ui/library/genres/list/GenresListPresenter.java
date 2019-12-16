@@ -58,7 +58,7 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
             getViewState().showLoading();
         }
         dispose(listDisposable, presenterDisposable);
-        listDisposable = interactor.getGenresObservable()
+        listDisposable = interactor.getGenresObservable(null)
                 .observeOn(uiScheduler)
                 .subscribe(this::onGenresReceived, this::onGenresReceivingError);
         presenterDisposable.add(listDisposable);

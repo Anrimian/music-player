@@ -29,9 +29,9 @@ public interface MusicProviderRepository {
 
     Observable<List<Artist>> getArtistsObservable(@Nullable String searchText);
 
-    Observable<List<Album>> getAlbumsObservable();
+    Observable<List<Album>> getAlbumsObservable(@Nullable String searchText);
 
-    Observable<List<Genre>> getGenresObservable();
+    Observable<List<Genre>> getGenresObservable(@Nullable String searchText);
 
     Observable<List<Composition>> getGenreItemsObservable(long genreId);
 

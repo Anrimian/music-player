@@ -7,6 +7,8 @@ import com.github.anrimian.musicplayer.domain.repositories.MusicProviderReposito
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 
@@ -21,8 +23,8 @@ public class LibraryAlbumsInteractor {
         this.editorRepository = editorRepository;
     }
 
-    public Observable<List<Album>> getAlbumsObservable() {
-        return musicProviderRepository.getAlbumsObservable();
+    public Observable<List<Album>> getAlbumsObservable(@Nullable String searchText) {
+        return musicProviderRepository.getAlbumsObservable(searchText);
     }
 
     public Observable<List<Composition>> getAlbumItemsObservable(long albumId) {

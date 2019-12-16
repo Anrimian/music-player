@@ -3,8 +3,11 @@ package com.github.anrimian.musicplayer.data.database.dao.genre;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.RawQuery;
+import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
@@ -45,12 +48,12 @@ public interface GenreDao {
     @Insert
     void insertGenreEntry(GenreEntryEntity entity);
 
-    @Query("SELECT id as id," +
-            "name as name, " +
-            "(SELECT count() FROM genre_entries WHERE genreId = genres.id) as compositionsCount, " +
-            "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM genre_entries WHERE genreId = genres.id)) as totalDuration " +
-            "FROM genres")
-    Observable<List<Genre>> getAllObservable();
+    @RawQuery(observedEntities = {
+            GenreEntity.class,
+            GenreEntryEntity.class,
+            CompositionEntity.class
+    })
+    Observable<List<Genre>> getAllObservable(SupportSQLiteQuery query);
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +

@@ -90,13 +90,15 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     }
 
     @Override
-    public Observable<List<Album>> getAlbumsObservable() {
-        return albumsDao.getAllObservable();
+    public Observable<List<Album>> getAlbumsObservable(@Nullable String searchText) {
+        return settingsPreferences.getAlbumsOrderObservable()
+                .flatMap(order -> albumsDao.getAllObservable(order, searchText));
     }
 
     @Override
-    public Observable<List<Genre>> getGenresObservable() {
-        return genresDao.getAllObservable();
+    public Observable<List<Genre>> getGenresObservable(@Nullable String searchText) {
+        return settingsPreferences.getGenresOrderObservable()
+                .flatMap(order -> genresDao.getAllObservable(order, searchText));
     }
 
     @Override

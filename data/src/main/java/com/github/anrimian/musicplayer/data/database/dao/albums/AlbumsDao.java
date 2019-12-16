@@ -4,8 +4,12 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RawQuery;
+import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -34,13 +38,8 @@ public interface AlbumsDao {
     @Insert
     long insert(AlbumEntity entity);
 
-    @Query("SELECT id as id," +
-            "storageId as storageId, " +
-            "name as name, " +
-            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
-            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
-            "FROM albums")
-    Observable<List<Album>> getAllObservable();
+    @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
+    Observable<List<Album>> getAllObservable(SupportSQLiteQuery query);
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +

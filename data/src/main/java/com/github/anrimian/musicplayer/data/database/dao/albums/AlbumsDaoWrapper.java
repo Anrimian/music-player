@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.albums;
 
 import androidx.collection.LongSparseArray;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
@@ -10,12 +11,14 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
 import java.util.List;
 
 import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class AlbumsDaoWrapper {
 
@@ -39,8 +42,17 @@ public class AlbumsDaoWrapper {
                 StorageAlbum::getId);
     }
 
-    public Observable<List<Album>> getAllObservable() {
-        return albumsDao.getAllObservable();
+    public Observable<List<Album>> getAllObservable(Order order, String searchText) {
+        String query = "SELECT id as id," +
+                "storageId as storageId, " +
+                "name as name, " +
+                "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
+                "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
+                "FROM albums";
+        query += getSearchQuery(searchText);
+        query += getOrderQuery(order);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        return albumsDao.getAllObservable(sqlQuery);
     }
 
     public Observable<List<Album>> getAllAlbumsForArtist(long artistId) {
@@ -96,5 +108,38 @@ public class AlbumsDaoWrapper {
                 album.getFirstYear(),
                 album.getLastYear()
         );
+    }
+
+    private String getOrderQuery(Order order) {
+        StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
+        switch (order.getOrderType()) {
+            case ALPHABETICAL: {
+                orderQuery.append("name");
+                break;
+            }
+            case COMPOSITION_COUNT: {
+                orderQuery.append("compositionsCount");
+                break;
+            }
+            default: throw new IllegalStateException("unknown order type" + order);
+        }
+        orderQuery.append(" ");
+        orderQuery.append(order.isReversed()? "DESC" : "ASC");
+        return orderQuery.toString();
+    }
+
+    private String getSearchQuery(String searchText) {
+        if (isEmpty(searchText)) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(" WHERE ");
+        sb.append("name LIKE '%");
+        sb.append(searchText);
+        sb.append("%'");
+        sb.append(" OR artist NOTNULL AND artist LIKE '%");
+        sb.append(searchText);
+        sb.append("%'");
+
+        return sb.toString();
     }
 }

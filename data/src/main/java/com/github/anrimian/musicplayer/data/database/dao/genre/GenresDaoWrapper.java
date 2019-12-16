@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.genre;
 
 import androidx.collection.LongSparseArray;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
@@ -11,6 +12,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenr
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class GenresDaoWrapper {
 
@@ -53,8 +56,16 @@ public class GenresDaoWrapper {
                 StorageGenreItem::getId);
     }
 
-    public Observable<List<Genre>> getAllObservable() {
-        return genreDao.getAllObservable();
+    public Observable<List<Genre>> getAllObservable(Order order, String searchText) {
+        String query = "SELECT id as id," +
+                "name as name, " +
+                "(SELECT count() FROM genre_entries WHERE genreId = genres.id) as compositionsCount, " +
+                "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM genre_entries WHERE genreId = genres.id)) as totalDuration " +
+                "FROM genres";
+        query += getSearchQuery(searchText);
+        query += getOrderQuery(order);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        return genreDao.getAllObservable(sqlQuery);
     }
 
     public Observable<Genre> getGenreObservable(long genreId) {
@@ -114,5 +125,34 @@ public class GenresDaoWrapper {
         return new GenreEntryEntity(audioId, genreId, genre.getId());
     }
 
+    private String getOrderQuery(Order order) {
+        StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
+        switch (order.getOrderType()) {
+            case ALPHABETICAL: {
+                orderQuery.append("name");
+                break;
+            }
+            case COMPOSITION_COUNT: {
+                orderQuery.append("compositionsCount");
+                break;
+            }
+            default: throw new IllegalStateException("unknown order type" + order);
+        }
+        orderQuery.append(" ");
+        orderQuery.append(order.isReversed()? "DESC" : "ASC");
+        return orderQuery.toString();
+    }
+
+    private String getSearchQuery(String searchText) {
+        if (isEmpty(searchText)) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(" WHERE ");
+        sb.append("name LIKE '%");
+        sb.append(searchText);
+        sb.append("%'");
+
+        return sb.toString();
+    }
 
 }
