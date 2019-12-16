@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.di.app.library.artists;
 import com.github.anrimian.musicplayer.domain.business.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListPresenter;
 
@@ -21,8 +22,9 @@ public class ArtistsModule {
     @Provides
     @Nonnull
     LibraryArtistsInteractor libraryArtistsInteractor(MusicProviderRepository repository,
-                                                      EditorRepository editorRepository) {
-        return new LibraryArtistsInteractor(repository, editorRepository);
+                                                      EditorRepository editorRepository,
+                                                      SettingsRepository settingsRepository) {
+        return new LibraryArtistsInteractor(repository, editorRepository, settingsRepository);
     }
 
     @Provides

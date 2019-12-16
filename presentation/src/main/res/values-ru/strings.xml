@@ -156,6 +156,10 @@
     <string name="album_artist">Автор альбома</string>
     <string name="change_album_artist">Изменить автора альбома</string>
     <string name="edit_album_tags">Редактировать теги альбома</string>
+    <string name="by_composition_count">По количеству композиций</string>
+    <string name="by_duration">По длительности</string>
+    <string name="longest_first">Сперва долгие</string>
+    <string name="more_first">Сперва больше</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

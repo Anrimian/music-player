@@ -15,6 +15,7 @@ public interface Constants {
 
     interface Arguments {
         String ORDER_ARG = "order_arg";
+        String ORDERS_ARG = "orders_arg";
         String PLAY_LIST_ID_ARG = "play_list_id_arg";
         String ID_ARG = "id_arg";//we can replace other `id_arg`
         String PATH_ARG = "path_arg";

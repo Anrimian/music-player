@@ -86,7 +86,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Observable<List<Artist>> getArtistsObservable(@Nullable String searchText) {
         return settingsPreferences.getArtistsOrderObservable()
-                .flatMap(order -> artistsDao.getAllObservable(order, null));
+                .flatMap(order -> artistsDao.getAllObservable(order, searchText));
     }
 
     @Override

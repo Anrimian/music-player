@@ -2,11 +2,15 @@ package com.github.anrimian.musicplayer.ui.library.artists.list;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -28,6 +32,9 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
     private Disposable changeDisposable;
 
     private List<Artist> artists = new ArrayList<>();
+
+    @Nullable
+    private String searchText;
 
     public ArtistsListPresenter(LibraryArtistsInteractor interactor,
                                 ErrorParser errorParser,
@@ -53,6 +60,21 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
         subscribeOnArtistsList();
     }
 
+    void onOrderMenuItemClicked() {
+        getViewState().showSelectOrderScreen(interactor.getOrder());
+    }
+
+    void onOrderSelected(Order order) {
+        interactor.setOrder(order);
+    }
+
+    void onSearchTextChanged(String text) {
+        if (!TextUtils.equals(searchText, text)) {
+            searchText = text;
+            subscribeOnArtistsList();
+        }
+    }
+
     void onNewArtistNameEntered(String name, long artistId) {
         dispose(changeDisposable);
         changeDisposable = interactor.updateArtistName(name, artistId)
@@ -67,7 +89,7 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
             getViewState().showLoading();
         }
         dispose(artistsDisposable, presenterDisposable);
-        artistsDisposable = interactor.getArtistsObservable(null)
+        artistsDisposable = interactor.getArtistsObservable(searchText)
                 .observeOn(uiScheduler)
                 .subscribe(this::onArtistsReceived, this::onArtistsReceivingError);
         presenterDisposable.add(artistsDisposable);
@@ -82,11 +104,11 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
         this.artists = artists;
         getViewState().submitList(artists);
         if (artists.isEmpty()) {
-//            if (TextUtils.isEmpty(searchText)) {
+            if (TextUtils.isEmpty(searchText)) {
                 getViewState().showEmptyList();
-//            } else {
-//                getViewState().showEmptySearchResult();
-//            }
+            } else {
+                getViewState().showEmptySearchResult();
+            }
         } else {
             getViewState().showList();
         }

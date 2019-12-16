@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.artists.list.adapter;
 
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -28,6 +29,9 @@ public class ArtistViewHolder extends BaseViewHolder {
     @BindView(R.id.tv_compositions_count)
     TextView tvCompositionsCount;
 
+    @BindView(R.id.clickable_item)
+    View clickableItem;
+
     private Artist artist;
 
     ArtistViewHolder(@NonNull ViewGroup parent,
@@ -35,8 +39,8 @@ public class ArtistViewHolder extends BaseViewHolder {
                      Callback<Artist> longClickListener) {
         super(parent, R.layout.item_artist);
         ButterKnife.bind(this, itemView);
-        itemView.setOnClickListener(v -> itemClickListener.call(artist));
-        onLongClick(itemView, () -> longClickListener.call(artist));
+        clickableItem.setOnClickListener(v -> itemClickListener.call(artist));
+        onLongClick(clickableItem, () -> longClickListener.call(artist));
     }
 
     public void bind(Artist artist) {

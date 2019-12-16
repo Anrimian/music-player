@@ -3,8 +3,10 @@ package com.github.anrimian.musicplayer.domain.business.library;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.List;
 
@@ -17,11 +19,14 @@ public class LibraryArtistsInteractor {
 
     private final MusicProviderRepository musicProviderRepository;
     private final EditorRepository editorRepository;
+    private final SettingsRepository settingsRepository;
 
     public LibraryArtistsInteractor(MusicProviderRepository musicProviderRepository,
-                                    EditorRepository editorRepository) {
+                                    EditorRepository editorRepository,
+                                    SettingsRepository settingsRepository) {
         this.musicProviderRepository = musicProviderRepository;
         this.editorRepository = editorRepository;
+        this.settingsRepository = settingsRepository;
     }
 
     public Observable<List<Artist>> getArtistsObservable(@Nullable String searchText) {
@@ -42,5 +47,13 @@ public class LibraryArtistsInteractor {
 
     public Completable updateArtistName(String name, long artistId) {
         return editorRepository.updateArtistName(name, artistId);
+    }
+
+    public Order getOrder() {
+        return settingsRepository.getArtistsOrder();
+    }
+
+    public void setOrder(Order order) {
+        settingsRepository.setArtistsOrder(order);
     }
 }

@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
@@ -293,7 +294,9 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 
     @Override
     public void showSelectOrderScreen(Order order) {
-        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order);
+        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
+                OrderType.ALPHABETICAL,
+                OrderType.ADD_TIME);
         selectOrderDialogRunner.show(fragment);
     }
 

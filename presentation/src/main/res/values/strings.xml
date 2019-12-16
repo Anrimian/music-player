@@ -164,6 +164,10 @@
     <string name="album_artist">Album artist</string>
     <string name="change_album_artist">Change album artist</string>
     <string name="edit_album_tags">Edit album tags</string>
+    <string name="by_composition_count">By composition count</string>
+    <string name="by_duration">By duration</string>
+    <string name="longest_first">Longest first</string>
+    <string name="more_first">More first</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

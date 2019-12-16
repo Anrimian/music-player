@@ -80,6 +80,8 @@ public class FormatUtils {
         switch (orderType) {
             case ALPHABETICAL: return R.string.alphabetical_order;
             case ADD_TIME: return R.string.add_date_order;
+            case COMPOSITION_COUNT: return R.string.by_composition_count;
+            case DURATION: return R.string.by_duration;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }
@@ -88,6 +90,8 @@ public class FormatUtils {
         switch (orderType) {
             case ALPHABETICAL: return R.string.alphabetical_order_desc_title;
             case ADD_TIME: return R.string.add_date_order_desc_title;
+            case COMPOSITION_COUNT: return R.string.more_first;
+            case DURATION: return R.string.longest_first;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }
