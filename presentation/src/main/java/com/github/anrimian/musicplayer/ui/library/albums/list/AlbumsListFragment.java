@@ -2,6 +2,8 @@ package com.github.anrimian.musicplayer.ui.library.albums.list;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
@@ -25,8 +29,10 @@ import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter;
+import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -43,10 +49,11 @@ import moxy.presenter.ProvidePresenter;
 import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_MENU_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 
 public class AlbumsListFragment extends LibraryFragment implements
-        AlbumsListView, FragmentLayerListener {
+        AlbumsListView, FragmentLayerListener, BackButtonListener {
 
     @InjectPresenter
     AlbumsListPresenter presenter;
@@ -63,10 +70,18 @@ public class AlbumsListFragment extends LibraryFragment implements
 
     private DialogFragmentRunner<MenuDialogFragment> albumMenuDialogRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editAlbumNameDialogRunner;
+    private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
+
 
     @ProvidePresenter
     AlbumsListPresenter providePresenter() {
         return Components.albumsComponent().albumsListPresenter();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -83,10 +98,8 @@ public class AlbumsListFragment extends LibraryFragment implements
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-//        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
-//        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
-//        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
-//                this::onActionModeItemClicked);
+        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
+        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
@@ -109,6 +122,9 @@ public class AlbumsListFragment extends LibraryFragment implements
                     presenter.onNewAlbumNameEntered(name, extra.getLong(ID_ARG));
                 })
         );
+        selectOrderDialogRunner = new DialogFragmentRunner<>(fm,
+                ORDER_TAG,
+                f -> f.setOnCompleteListener(presenter::onOrderSelected));
     }
 
     @Override
@@ -116,6 +132,41 @@ public class AlbumsListFragment extends LibraryFragment implements
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.albums);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.library_albums_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                return true;
+            }
+            case R.id.menu_search: {
+                toolbar.setSearchModeEnabled(true);
+                return true;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaStorageRepository().rescanStorage();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (toolbar.isInSearchMode()) {
+            toolbar.setSearchModeEnabled(false);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -168,6 +219,14 @@ public class AlbumsListFragment extends LibraryFragment implements
         if (fragment != null) {
             fragment.dismissAllowingStateLoss();
         }
+    }
+
+    @Override
+    public void showSelectOrderScreen(Order order) {
+        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
+                OrderType.ALPHABETICAL,
+                OrderType.COMPOSITION_COUNT);
+        selectOrderDialogRunner.show(fragment);
     }
 
     private void onAlbumMenuClicked(MenuItem menuItem, Bundle extra) {
