@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.genres.list.adapter;
 
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -29,13 +30,16 @@ public class GenreViewHolder extends BaseViewHolder {
     @BindView(R.id.tv_additional_info)
     TextView tvAdditionalInfo;
 
+    @BindView(R.id.clickable_item)
+    View clickableItem;
+
     private Genre genre;
 
     GenreViewHolder(@NonNull ViewGroup parent,
                     Callback<Genre> itemClickListener) {
         super(parent, R.layout.item_genre);
         ButterKnife.bind(this, itemView);
-        itemView.setOnClickListener(v -> itemClickListener.call(genre));
+        clickableItem.setOnClickListener(v -> itemClickListener.call(genre));
     }
 
     public void bind(Genre genre) {

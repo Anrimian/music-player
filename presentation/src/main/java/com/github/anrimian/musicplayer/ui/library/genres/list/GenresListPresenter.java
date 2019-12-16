@@ -1,12 +1,16 @@
 package com.github.anrimian.musicplayer.ui.library.genres.list;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryGenresInteractor;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -27,6 +31,9 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
     private Disposable listDisposable;
 
     private List<Genre> genres = new ArrayList<>();
+
+    @Nullable
+    private String searchText;
 
     public GenresListPresenter(LibraryGenresInteractor interactor,
                                ErrorParser errorParser,
@@ -53,12 +60,27 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
         subscribeOnGenresList();
     }
 
+    void onOrderMenuItemClicked() {
+        getViewState().showSelectOrderScreen(interactor.getOrder());
+    }
+
+    void onOrderSelected(Order order) {
+        interactor.setOrder(order);
+    }
+
+    void onSearchTextChanged(String text) {
+        if (!TextUtils.equals(searchText, text)) {
+            searchText = text;
+            subscribeOnGenresList();
+        }
+    }
+
     private void subscribeOnGenresList() {
         if (genres.isEmpty()) {
             getViewState().showLoading();
         }
         dispose(listDisposable, presenterDisposable);
-        listDisposable = interactor.getGenresObservable(null)
+        listDisposable = interactor.getGenresObservable(searchText)
                 .observeOn(uiScheduler)
                 .subscribe(this::onGenresReceived, this::onGenresReceivingError);
         presenterDisposable.add(listDisposable);
@@ -73,11 +95,11 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
         this.genres = genres;
         getViewState().submitList(genres);
         if (genres.isEmpty()) {
-//            if (TextUtils.isEmpty(searchText)) {
+            if (TextUtils.isEmpty(searchText)) {
                 getViewState().showEmptyList();
-//            } else {
-//                getViewState().showEmptySearchResult();
-//            }
+            } else {
+                getViewState().showEmptySearchResult();
+            }
         } else {
             getViewState().showList();
         }

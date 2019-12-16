@@ -2,23 +2,32 @@ package com.github.anrimian.musicplayer.ui.library.genres.list;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
+import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.genres.items.GenreItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.genres.list.adapter.GenresAdapter;
+import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
@@ -30,8 +39,10 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
+import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+
 public class GenresListFragment extends LibraryFragment implements
-        GenresListView, FragmentLayerListener {
+        GenresListView, FragmentLayerListener, BackButtonListener {
 
     @InjectPresenter
     GenresListPresenter presenter;
@@ -46,9 +57,17 @@ public class GenresListFragment extends LibraryFragment implements
     private GenresAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
 
+    private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
+
     @ProvidePresenter
     GenresListPresenter providePresenter() {
         return Components.genresComponent().genresListPresenter();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -65,10 +84,8 @@ public class GenresListFragment extends LibraryFragment implements
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-//        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
-//        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
-//        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
-//                this::onActionModeItemClicked);
+        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
+        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
@@ -79,6 +96,11 @@ public class GenresListFragment extends LibraryFragment implements
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        FragmentManager fm = getChildFragmentManager();
+        selectOrderDialogRunner = new DialogFragmentRunner<>(fm,
+                ORDER_TAG,
+                f -> f.setOnCompleteListener(presenter::onOrderSelected));
     }
 
     @Override
@@ -86,6 +108,41 @@ public class GenresListFragment extends LibraryFragment implements
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.genres);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.library_genres_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                return true;
+            }
+            case R.id.menu_search: {
+                toolbar.setSearchModeEnabled(true);
+                return true;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaStorageRepository().rescanStorage();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (toolbar.isInSearchMode()) {
+            toolbar.setSearchModeEnabled(false);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -117,6 +174,15 @@ public class GenresListFragment extends LibraryFragment implements
     public void submitList(List<Genre> genres) {
         adapter.submitList(genres);
     }
+
+    @Override
+    public void showSelectOrderScreen(Order order) {
+        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
+                OrderType.ALPHABETICAL,
+                OrderType.COMPOSITION_COUNT);
+        selectOrderDialogRunner.show(fragment);
+    }
+
 
     private void goToGenreScreen(Genre genre) {
         FragmentNavigation.from(requireFragmentManager())
