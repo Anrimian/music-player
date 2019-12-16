@@ -67,7 +67,7 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
             getViewState().showLoading();
         }
         dispose(artistsDisposable, presenterDisposable);
-        artistsDisposable = interactor.getArtistsObservable()
+        artistsDisposable = interactor.getArtistsObservable(null)
                 .observeOn(uiScheduler)
                 .subscribe(this::onArtistsReceived, this::onArtistsReceivingError);
         presenterDisposable.add(artistsDisposable);

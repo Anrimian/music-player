@@ -8,7 +8,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ public interface MusicProviderRepository {
 
     Observable<FullComposition> getCompositionObservable(long id);
 
-    Observable<List<Artist>> getArtistsObservable();
+    Observable<List<Artist>> getArtistsObservable(@Nullable String searchText);
 
     Observable<List<Album>> getAlbumsObservable();
 

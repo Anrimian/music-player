@@ -8,6 +8,8 @@ import com.github.anrimian.musicplayer.domain.repositories.MusicProviderReposito
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 
@@ -22,8 +24,8 @@ public class LibraryArtistsInteractor {
         this.editorRepository = editorRepository;
     }
 
-    public Observable<List<Artist>> getArtistsObservable() {
-        return musicProviderRepository.getArtistsObservable();
+    public Observable<List<Artist>> getArtistsObservable(@Nullable String searchText) {
+        return musicProviderRepository.getArtistsObservable(searchText);
     }
 
     public Observable<List<Composition>> getCompositionsByArtist(long artistId) {

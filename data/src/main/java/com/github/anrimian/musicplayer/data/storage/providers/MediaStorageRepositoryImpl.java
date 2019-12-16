@@ -75,6 +75,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         this.scheduler = scheduler;
     }
 
+    //TODO also delete authors, albums, genres without references
     @Override
     public void initialize() {
         runRescanStorage()

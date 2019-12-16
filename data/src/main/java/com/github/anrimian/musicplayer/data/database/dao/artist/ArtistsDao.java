@@ -3,8 +3,11 @@ package com.github.anrimian.musicplayer.data.database.dao.artist;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.RawQuery;
+import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -27,12 +30,8 @@ public interface ArtistsDao {
     @Insert
     void insertAll(List<ArtistEntity> artists);
 
-    @Query("SELECT id as id," +
-            "name as name, " +
-            "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount " +
-            "FROM artists " +
-            "ORDER BY id DESC")
-    Observable<List<Artist>> getAllObservable();
+    @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class })
+    Observable<List<Artist>> getAllObservable(SupportSQLiteQuery query);
 
     @Query("SELECT id as id," +
             "name as name, " +
