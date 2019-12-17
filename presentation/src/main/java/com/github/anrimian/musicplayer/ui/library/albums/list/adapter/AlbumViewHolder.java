@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.albums.list.adapter;
 
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -7,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
@@ -34,6 +36,9 @@ public class AlbumViewHolder extends BaseViewHolder {
     @BindView(R.id.iv_music_icon)
     ImageView ivMusicIcon;
 
+    @BindView(R.id.clickable_item)
+    View clickableItem;
+
     private Album album;
 
     AlbumViewHolder(@NonNull ViewGroup parent,
@@ -41,8 +46,8 @@ public class AlbumViewHolder extends BaseViewHolder {
                     Callback<Album> longClickListener) {
         super(parent, R.layout.item_album);
         ButterKnife.bind(this, itemView);
-        itemView.setOnClickListener(v -> itemClickListener.call(album));
-        onLongClick(itemView, () -> longClickListener.call(album));
+        clickableItem.setOnClickListener(v -> itemClickListener.call(album));
+        onLongClick(clickableItem, () -> longClickListener.call(album));
     }
 
     public void bind(Album album) {
@@ -92,6 +97,9 @@ public class AlbumViewHolder extends BaseViewHolder {
     }
 
     private void showCover() {
+        Components.getAppComponent().imageLoader().displayImage(ivMusicIcon,
+                album,
+                R.drawable.ic_album_placeholder);
 //        CoverImageLoader.getInstance().displayImage();
 //        Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
 //        Uri uri = ContentUris.withAppendedId(sArtworkUri, album.getStorageId());

@@ -27,6 +27,7 @@ import com.github.anrimian.musicplayer.domain.controllers.SystemServiceControlle
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -123,5 +124,12 @@ class MusicModule {
     @Singleton
     MusicServiceInteractor musicServiceInteractor(SettingsRepository settingsRepository) {
         return new MusicServiceInteractor(settingsRepository);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    CoverImageLoader coverImageLoader(Context context) {
+        return new CoverImageLoader(context);
     }
 }

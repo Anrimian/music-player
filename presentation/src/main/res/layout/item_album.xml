@@ -42,7 +42,18 @@
         app:layout_constraintStart_toStartOf="@+id/tv_album_name"
         app:layout_constraintTop_toBottomOf="@+id/tv_album_name"/>
 
+    <FrameLayout
+        android:id="@+id/clickable_item"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foreground="?selectableItemBackground"
+        app:layout_constraintBottom_toTopOf="@id/divider"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <View style="@style/Divider.Horizontal.Constraint"
+        android:id="@+id/divider"
         android:layout_marginTop="@dimen/list_vertical_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tv_album_name"

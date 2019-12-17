@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
@@ -60,6 +61,7 @@ public interface AppComponent {
 
     MediaStorageRepository mediaStorageRepository();
 
+    CoverImageLoader imageLoader();
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();
 
