@@ -84,8 +84,6 @@ public class GenresListFragment extends LibraryFragment implements
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
-        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
@@ -108,6 +106,7 @@ public class GenresListFragment extends LibraryFragment implements
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.genres);
+        toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
     }
 
     @Override

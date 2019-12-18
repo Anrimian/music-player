@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
@@ -84,6 +85,9 @@ public class AlbumViewHolder extends BaseViewHolder {
     }
 
     private void showCover() {
+        Components.getAppComponent().imageLoader().displayImage(ivMusicIcon,
+                album,
+                R.drawable.ic_album_placeholder);
 //        CoverImageLoader.getInstance().displayImage();
 //        Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
 //        Uri uri = ContentUris.withAppendedId(sArtworkUri, album.getStorageId());

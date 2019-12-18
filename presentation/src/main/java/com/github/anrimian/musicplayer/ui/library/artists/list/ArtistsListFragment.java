@@ -96,8 +96,6 @@ public class ArtistsListFragment extends LibraryFragment implements
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
-        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
@@ -132,6 +130,7 @@ public class ArtistsListFragment extends LibraryFragment implements
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.artists);
+        toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
     }
 
     @Override

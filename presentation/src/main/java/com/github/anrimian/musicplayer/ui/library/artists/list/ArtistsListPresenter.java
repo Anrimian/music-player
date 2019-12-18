@@ -84,6 +84,11 @@ public class ArtistsListPresenter extends MvpPresenter<ArtistsListView> {
                 .subscribe(() -> {}, this::onDefaultError);
     }
 
+    @Nullable
+    String getSearchText() {
+        return searchText;
+    }
+
     private void subscribeOnArtistsList() {
         if (artists.isEmpty()) {
             getViewState().showLoading();

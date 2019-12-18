@@ -75,6 +75,11 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
         }
     }
 
+    @Nullable
+    String getSearchText() {
+        return searchText;
+    }
+
     private void subscribeOnGenresList() {
         if (genres.isEmpty()) {
             getViewState().showLoading();
@@ -104,5 +109,4 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
             getViewState().showList();
         }
     }
-
 }

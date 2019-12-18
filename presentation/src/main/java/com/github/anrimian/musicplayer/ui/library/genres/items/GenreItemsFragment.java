@@ -106,8 +106,6 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitleClickListener(null);
-        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
-        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
 
@@ -142,6 +140,8 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     public void onFragmentMovedOnTop() {
 //        super.onFragmentMovedOnTop();
         presenter.onFragmentMovedToTop();
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setupSearch(null, null);
     }
 
     @Override

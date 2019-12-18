@@ -85,6 +85,11 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
                 .subscribe(() -> {}, this::onDefaultError);
     }
 
+    @Nullable
+    String getSearchText() {
+        return searchText;
+    }
+
     private void subscribeOnAlbumsList() {
         if (albums.isEmpty()) {
             getViewState().showLoading();

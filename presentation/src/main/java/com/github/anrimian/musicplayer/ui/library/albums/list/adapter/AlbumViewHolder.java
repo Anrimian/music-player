@@ -100,17 +100,5 @@ public class AlbumViewHolder extends BaseViewHolder {
         Components.getAppComponent().imageLoader().displayImage(ivMusicIcon,
                 album,
                 R.drawable.ic_album_placeholder);
-//        CoverImageLoader.getInstance().displayImage();
-//        Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-//        Uri uri = ContentUris.withAppendedId(sArtworkUri, album.getStorageId());
-//        ContentResolver res = getContext().getContentResolver();
-//        InputStream in = null;
-//        try {
-//            in = res.openInputStream(uri);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        Bitmap artwork = BitmapFactory.decodeStream(in);
-//        ivMusicIcon.setImageBitmap(artwork);
     }
 }

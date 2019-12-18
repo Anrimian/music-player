@@ -115,8 +115,6 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitleClickListener(null);
-        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
-        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
 
@@ -155,6 +153,8 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     public void onFragmentMovedOnTop() {
 //        super.onFragmentMovedOnTop();
         presenter.onFragmentMovedToTop();
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setupSearch(null, null);
     }
 
     @Override

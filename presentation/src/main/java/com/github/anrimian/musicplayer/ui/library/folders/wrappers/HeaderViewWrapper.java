@@ -1,8 +1,9 @@
 package com.github.anrimian.musicplayer.ui.library.folders.wrappers;
 
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
 
@@ -23,7 +24,7 @@ public class HeaderViewWrapper {
     @BindView(R.id.tv_parent_path)
     TextView tvParentPath;
 
-    @BindView(R.id.clickable_item)
+    @BindView(R.id.header_clickable_item)
     View clickableItem;
 
     private View view;
