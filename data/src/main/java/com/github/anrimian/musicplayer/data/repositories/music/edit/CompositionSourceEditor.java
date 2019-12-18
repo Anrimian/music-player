@@ -79,7 +79,7 @@ public class CompositionSourceEditor {
             tag = new ID3v23Tag();
             file.setTag(tag);
         }
-        tag.addField(genericKey, value);
+        tag.addField(genericKey, value == null? "" : value);
         AudioFileIO.write(file);
     }
 }
