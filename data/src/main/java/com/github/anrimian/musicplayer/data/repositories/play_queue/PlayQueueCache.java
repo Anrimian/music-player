@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
-import android.util.Log;
-
 import com.github.anrimian.musicplayer.data.utils.collections.IndexedList;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.utils.java.Function;
@@ -23,7 +21,6 @@ class PlayQueueCache {
 
     @Nonnull
     IndexedList<PlayQueueItem> getCurrentQueue() {
-        Log.d("KEK2", "getCurrentQueue");
         if (currentQueue == null) {
             synchronized (this) {
                 if (currentQueue == null) {
@@ -35,7 +32,6 @@ class PlayQueueCache {
     }
 
     void updateQueue(IndexedList<PlayQueueItem> currentQueue) {
-        Log.d("KEK2", "updateQueue");
         this.currentQueue = currentQueue;
     }
 

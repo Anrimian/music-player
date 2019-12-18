@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
@@ -56,11 +58,13 @@ public class PlayQueueDaoWrapper {
 
     public Observable<List<PlayQueueItem>> getPlayQueueInNormalOrderObservable() {
         return playQueueDao.getPlayQueueInNormalOrderObservable()
+                .doOnNext(o -> Log.d("KEK2", "new normal order queue: "))
                 .map(list -> mapList(list, this::toQueueItem));
     }
 
     public Observable<List<PlayQueueItem>> getPlayQueueInShuffledOrderObservable() {
         return playQueueDao.getPlayQueueInShuffledOrderObservable()
+                .doOnNext(o -> Log.d("KEK2", "new shuffled order queue: "))
                 .map(list -> mapList(list, this::toQueueItem));
     }
 

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
@@ -98,8 +100,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
         return settingsPreferences.getRandomPlayingObservable()
+                .doOnNext(shuffled -> Log.d("KEK2", "new shuffled mode: " + shuffled))
                 .flatMap(playQueueDao::getPlayQueueObservable)
-                .toFlowable(BackpressureStrategy.BUFFER)
+                .toFlowable(BackpressureStrategy.LATEST)
                 .doOnNext(list -> {
                     IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
                     checkForCurrentItemInNewQueue(newQueue);
@@ -113,6 +116,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             if (enabled) {
                 PlayQueueItem item = getCurrentItem();
                 playQueueDao.reshuffleQueue(item);
+                Log.d("KEK2", "reshuffleQueue");
             }
             settingsPreferences.setRandomPlayingEnabled(enabled);
         }).subscribeOn(scheduler)
