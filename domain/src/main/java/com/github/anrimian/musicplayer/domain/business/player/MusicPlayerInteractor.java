@@ -322,34 +322,24 @@ public class MusicPlayerInteractor {
     }
 
     private void handleErrorWithComposition(ErrorType errorType, Composition composition) {
-        switch (errorType) {
-            case DELETED: {
-                musicProviderRepository.deleteComposition(composition)
-                        .doOnError(analytics::processNonFatalError)
-                        .onErrorComplete()
-                        .subscribe();
-                break;
-            }
-            default: {
-                CorruptionType corruptionType = toCorruptionType(errorType);
-                musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
-                        .doOnError(analytics::processNonFatalError)
-                        .onErrorComplete()
-                        .doOnComplete(() -> {
-                            if (playQueueRepository.getCurrentPosition() >= playQueueRepository.getQueueSize() - 1) {//mm, no!
-                                stop();
-                            } else {
-                                playQueueRepository.skipToNext().subscribe();
-                            }
-                        })
-                        .subscribe();
-            }
-        }
+        CorruptionType corruptionType = toCorruptionType(errorType);
+        musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
+                .doOnError(analytics::processNonFatalError)
+                .onErrorComplete()
+                .doOnComplete(() -> {
+                    if (playQueueRepository.getCurrentPosition() >= playQueueRepository.getQueueSize() - 1) {//mm, no!
+                        stop();
+                    } else {
+                        playQueueRepository.skipToNext().subscribe();
+                    }
+                })
+                .subscribe();
     }
 
     private CorruptionType toCorruptionType(ErrorType errorType) {
         switch (errorType) {
             case UNSUPPORTED: return CorruptionType.UNSUPPORTED;
+            case NOT_FOUND: return CorruptionType.NOT_FOUND;
             case UNKNOWN: return CorruptionType.UNKNOWN;
             default: return null;
         }

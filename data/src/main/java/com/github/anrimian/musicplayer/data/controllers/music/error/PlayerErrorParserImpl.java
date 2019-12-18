@@ -22,11 +22,11 @@ public class PlayerErrorParserImpl implements PlayerErrorParser {
         if (throwable instanceof FileDataSource.FileDataSourceException) {
             throwable = throwable.getCause();
             if (throwable instanceof FileNotFoundException) {
-                return ErrorType.DELETED;
+                return ErrorType.NOT_FOUND;
             }
         }
         if (throwable instanceof FileNotFoundException) {
-            return ErrorType.DELETED;
+            return ErrorType.NOT_FOUND;
         }
         if (throwable instanceof ExoPlaybackException) {
             Throwable cause = throwable.getCause();
