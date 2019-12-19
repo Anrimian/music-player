@@ -17,4 +17,7 @@ public class ArtistAlbumsPresenter {
         this.view.setObject(view);
     }
 
+    public void setCompositionsTitleVisible(boolean visible) {
+        view.call(view -> view.setCompositionsTitleVisible(visible));
+    }
 }

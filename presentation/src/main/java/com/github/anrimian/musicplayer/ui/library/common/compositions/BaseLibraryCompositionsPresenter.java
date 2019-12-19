@@ -221,7 +221,7 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
         return selectedCompositions;
     }
 
-    private void onDefaultError(Throwable throwable) {
+    protected void onDefaultError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showErrorMessage(errorCommand);
     }

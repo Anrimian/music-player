@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
@@ -18,7 +19,6 @@ import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class ArtistViewHolder extends BaseViewHolder {
@@ -71,8 +71,6 @@ public class ArtistViewHolder extends BaseViewHolder {
     }
 
     private void showCompositionsCount() {
-        tvCompositionsCount.setText(formatCompositionsCount(
-                getContext(),
-                artist.getCompositionsCount()));
+        tvCompositionsCount.setText(FormatUtils.formatArtistAdditionalInfo(getContext(), artist));
     }
 }

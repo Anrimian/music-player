@@ -10,6 +10,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
@@ -36,6 +37,13 @@ public class FormatUtils {
                 R.plurals.compositions_count,
                 compositionsCount,
                 compositionsCount);
+    }
+
+    public static String formatAlbumsCount(Context context, int albumsCount) {
+        return context.getResources().getQuantityString(
+                R.plurals.albums_count,
+                albumsCount,
+                albumsCount);
     }
 
     public static StringBuilder formatCompositionAuthor(Composition composition, Context context) {
@@ -73,6 +81,17 @@ public class FormatUtils {
 
         long seconds = MILLISECONDS.toSeconds(millis) - MINUTES.toSeconds(MILLISECONDS.toMinutes(millis));
         sb.append(format(Locale.getDefault(), "%02d", seconds));
+        return sb.toString();
+    }
+
+    public static String formatArtistAdditionalInfo(Context context, Artist artist) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(formatCompositionsCount(context, artist.getCompositionsCount()));
+        int albumsCount = artist.getAlbumsCount();
+        if (albumsCount > 0) {
+            sb.append(" ● ");//TODO split problem • ●
+            sb.append(formatAlbumsCount(context, albumsCount));
+        }
         return sb.toString();
     }
 

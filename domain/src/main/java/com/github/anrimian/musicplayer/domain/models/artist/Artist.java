@@ -5,11 +5,13 @@ public class Artist {
     private final long id;
     private final String name;
     private final int compositionsCount;
+    private final int albumsCount;
 
-    public Artist(long id, String name, int compositionsCount) {
+    public Artist(long id, String name, int compositionsCount, int albumsCount) {
         this.id = id;
         this.name = name;
         this.compositionsCount = compositionsCount;
+        this.albumsCount = albumsCount;
     }
 
     public long getId() {
@@ -22,6 +24,10 @@ public class Artist {
 
     public int getCompositionsCount() {
         return compositionsCount;
+    }
+
+    public int getAlbumsCount() {
+        return albumsCount;
     }
 
     @Override

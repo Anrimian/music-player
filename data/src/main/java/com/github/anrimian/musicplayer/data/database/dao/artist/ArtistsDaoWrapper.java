@@ -38,7 +38,8 @@ public class ArtistsDaoWrapper {
     public Observable<List<Artist>> getAllObservable(Order order, String searchText) {
         String query = "SELECT id as id," +
                 "name as name, " +
-                "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount " +
+                "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount, " +
+                "(SELECT count() FROM albums WHERE artistId = artists.id) as albumsCount " +
                 "FROM artists";
         query += getSearchQuery(searchText);
         query += getOrderQuery(order);

@@ -2,6 +2,9 @@ package com.github.anrimian.musicplayer.ui.library.artists.items;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,9 +22,12 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.utils.java.BooleanConditionRunner;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
@@ -30,6 +36,7 @@ import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistIt
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
@@ -51,7 +58,9 @@ import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
@@ -75,10 +84,14 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     private ArtistItemsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
 
+    private final BooleanConditionRunner showNoCompositionsRunner = new BooleanConditionRunner(2,
+            () -> progressViewWrapper.showMessage(R.string.no_compositions));
+
     private final ArtistAlbumsPresenter artistAlbumsPresenter = new ArtistAlbumsPresenter();
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> editArtistNameDialogRunner;
 
     private SlidrInterface slidrInterface;
 
@@ -98,6 +111,12 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     @Override
     protected BaseLibraryCompositionsPresenter getBasePresenter() {
         return presenter;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -147,6 +166,13 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         compositionActionDialogRunner = new DialogFragmentRunner<>(fm,
                 COMPOSITION_ACTION_TAG,
                 f -> f.setOnTripleCompleteListener(this::onCompositionActionSelected));
+
+        editArtistNameDialogRunner = new DialogFragmentRunner<>(fm,
+                ARTIST_NAME_TAG,
+                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
+                    presenter.onNewArtistNameEntered(name, extra.getLong(ID_ARG));
+                })
+        );
     }
 
     @Override
@@ -155,6 +181,23 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         presenter.onFragmentMovedToTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setupSearch(null, null);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.artist_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_rename: {
+                presenter.onRenameArtistClicked();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -173,16 +216,13 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     @Override
     public void showArtistInfo(Artist artist) {
         toolbar.setTitle(artist.getName());
-        toolbar.setSubtitle(getResources().getQuantityString(
-                R.plurals.compositions_count,
-                artist.getCompositionsCount(),
-                artist.getCompositionsCount()));
+        toolbar.setSubtitle(FormatUtils.formatArtistAdditionalInfo(getContext(), artist));
     }
 
     @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.no_compositions);
+        progressViewWrapper.hideAll();
     }
 
     @Override
@@ -213,11 +253,15 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         list.add(artistAlbumsPresenter);
         list.addAll(compositions);
         adapter.submitList(list);
+
+        showNoCompositionsRunner.setCondition(compositions.isEmpty());
+        artistAlbumsPresenter.setCompositionsTitleVisible(!compositions.isEmpty());
     }
 
     @Override
     public void showArtistAlbums(List<Album> albums) {
         artistAlbumsPresenter.submitAlbums(albums);
+        showNoCompositionsRunner.setCondition(albums.isEmpty());
     }
 
     @Override
@@ -326,6 +370,38 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     @Override
     public void closeScreen() {
         FragmentNavigation.from(requireFragmentManager()).goBack();
+    }
+
+    @Override
+    public void showRenameArtistDialog(Artist artist) {
+        Bundle bundle = new Bundle();
+        bundle.putLong(ID_ARG, artist.getId());
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(R.string.change_name,
+                R.string.change,
+                R.string.cancel,
+                R.string.name,
+                artist.getName())
+                .canBeEmpty(false)
+                .extra(bundle)
+                .build();
+        editArtistNameDialogRunner.show(fragment);
+    }
+
+    @Override
+    public void showRenameProgress() {
+        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(
+                getString(R.string.rename_progress)
+        );
+        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
+    }
+
+    @Override
+    public void hideRenameProgress() {
+        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(PROGRESS_DIALOG_TAG);
+        if (fragment != null) {
+            fragment.dismissAllowingStateLoss();
+        }
     }
 
     //scroll horizontally then scroll to bottom issue

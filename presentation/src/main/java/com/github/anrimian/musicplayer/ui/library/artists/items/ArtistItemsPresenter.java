@@ -14,13 +14,18 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
 import moxy.InjectViewState;
+
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
 @InjectViewState
 public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<ArtistItemsView> {
 
     private final long artistId;
     private final LibraryArtistsInteractor interactor;
+
+    private Disposable changeDisposable;
 
     private Artist artist;
 
@@ -57,6 +62,21 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
         if (artist != null) {
             getViewState().showArtistInfo(artist);
         }
+    }
+
+    void onRenameArtistClicked() {
+        if (artist != null) {
+            getViewState().showRenameArtistDialog(artist);
+        }
+    }
+
+    void onNewArtistNameEntered(String name, long artistId) {
+        dispose(changeDisposable);
+        changeDisposable = interactor.updateArtistName(name, artistId)
+                .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showRenameProgress())
+                .doFinally(() -> getViewState().hideRenameProgress())
+                .subscribe(() -> {}, this::onDefaultError);
     }
 
     private void subscribeOnArtistInfo() {

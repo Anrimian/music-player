@@ -35,7 +35,8 @@ public interface ArtistsDao {
 
     @Query("SELECT id as id," +
             "name as name, " +
-            "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount " +
+            "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount, " +
+            "(SELECT count() FROM albums WHERE artistId = artists.id) as albumsCount " +
             "FROM artists " +
             "WHERE id = :artistId LIMIT 1")
     Observable<List<Artist>> getArtistObservable(long artistId);

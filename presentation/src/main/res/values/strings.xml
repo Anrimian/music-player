@@ -189,4 +189,11 @@
         <item quantity="many">%1$s files</item>
         <item quantity="other">%1$s files</item>
     </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s album</item>
+        <item quantity="few">%1$s albums</item>
+        <item quantity="many">%1$s albums</item>
+        <item quantity="other">%1$s albums</item>
+    </plurals>
 </resources>

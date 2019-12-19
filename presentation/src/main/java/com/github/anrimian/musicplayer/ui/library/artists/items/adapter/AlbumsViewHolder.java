@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.library.artists.items.adapter;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +23,9 @@ public class AlbumsViewHolder extends BaseViewHolder {
 
     @BindView(R.id.rv_albums)
     RecyclerView rvAlbums;
+
+    @BindView(R.id.tv_songs_title)
+    TextView tvSongsTitle;
 
     private AlbumsAdapter albumsAdapter;
 
@@ -60,4 +64,7 @@ public class AlbumsViewHolder extends BaseViewHolder {
         itemView.setLayoutParams(params);
     }
 
+    void setCompositionsTitleVisible(boolean visible) {
+        tvSongsTitle.setVisibility(visible? View.VISIBLE : View.GONE);
+    }
 }
