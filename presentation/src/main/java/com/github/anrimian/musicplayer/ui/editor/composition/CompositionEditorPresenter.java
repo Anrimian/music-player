@@ -98,7 +98,7 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         if (composition == null) {
             return;
         }
-        editorInteractor.getAlbumNames()
+        editorInteractor.getAuthorNames()
                 .observeOn(uiScheduler)
                 .doOnSuccess(albums -> getViewState().showEnterAlbumArtistDialog(composition, albums))
                 .doOnError(throwable -> {

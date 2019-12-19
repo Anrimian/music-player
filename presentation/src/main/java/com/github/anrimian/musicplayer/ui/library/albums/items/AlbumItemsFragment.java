@@ -2,6 +2,9 @@ package com.github.anrimian.musicplayer.ui.library.albums.items;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,8 +24,10 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
@@ -91,6 +96,12 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         return presenter;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -145,6 +156,23 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.album_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_edit: {
+                presenter.onEditAlbumClicked();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public boolean onBackPressed() {
         if (toolbar.isInActionMode()) {
             presenter.onSelectionModeBackPressed();
@@ -160,10 +188,7 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void showAlbumInfo(Album album) {
         toolbar.setTitle(album.getName());
-        toolbar.setSubtitle(getResources().getQuantityString(
-                R.plurals.compositions_count,
-                album.getCompositionsCount(),
-                album.getCompositionsCount()));
+        toolbar.setSubtitle(FormatUtils.formatAlbumAdditionalInfo(getContext(), album));
     }
 
     @Override
@@ -299,6 +324,11 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void showPlayState(boolean play) {
         adapter.showPlaying(play);
+    }
+
+    @Override
+    public void showEditAlbumScreen(Album album) {
+        startActivity(AlbumEditorActivity.newIntent(requireContext(), album.getId()));
     }
 
     @Override

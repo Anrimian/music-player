@@ -238,20 +238,6 @@ public class AlbumsListFragment extends LibraryFragment implements
         }
     }
 
-    private void showEditAlbumNameDialog(Album album) {
-        Bundle bundle = new Bundle();
-        bundle.putLong(ID_ARG, album.getId());
-        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(R.string.change_name,
-                R.string.change,
-                R.string.cancel,
-                R.string.name,
-                album.getName())
-                .canBeEmpty(false)
-                .extra(bundle)
-                .build();
-        editAlbumNameDialogRunner.show(fragment);
-    }
-
     private void goToAlbumScreen(Album album) {
         FragmentNavigation.from(requireFragmentManager())
                 .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));

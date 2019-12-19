@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 
 import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
+import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
 
 public interface AlbumItemsView extends BaseLibraryCompositionsView {
@@ -14,4 +15,7 @@ public interface AlbumItemsView extends BaseLibraryCompositionsView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void closeScreen();
+
+    @StateStrategyType(SkipStrategy.class)
+    void showEditAlbumScreen(Album album);
 }

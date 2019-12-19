@@ -10,6 +10,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
@@ -92,6 +93,20 @@ public class FormatUtils {
             sb.append(" ● ");//TODO split problem • ●
             sb.append(formatAlbumsCount(context, albumsCount));
         }
+        return sb.toString();
+    }
+
+    public static String formatAlbumAdditionalInfo(Context context, Album album) {
+        StringBuilder sb = new StringBuilder();
+        String artist = album.getArtist();
+        if (!isEmpty(artist)) {
+            sb.append(artist);
+            sb.append(" ● ");//TODO split problem • ●
+        }
+        sb.append(formatCompositionsCount(
+                context,
+                album.getCompositionsCount())
+        );
         return sb.toString();
     }
 

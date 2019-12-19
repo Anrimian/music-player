@@ -26,8 +26,8 @@ public class ArtistViewHolder extends BaseViewHolder {
     @BindView(R.id.tv_artist_name)
     TextView tvAuthorName;
 
-    @BindView(R.id.tv_compositions_count)
-    TextView tvCompositionsCount;
+    @BindView(R.id.tv_additional_info)
+    TextView tvAdditionalInfo;
 
     @BindView(R.id.clickable_item)
     View clickableItem;
@@ -71,6 +71,6 @@ public class ArtistViewHolder extends BaseViewHolder {
     }
 
     private void showCompositionsCount() {
-        tvCompositionsCount.setText(FormatUtils.formatArtistAdditionalInfo(getContext(), artist));
+        tvAdditionalInfo.setText(FormatUtils.formatArtistAdditionalInfo(getContext(), artist));
     }
 }

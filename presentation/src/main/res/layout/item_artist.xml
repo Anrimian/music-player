@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/tv_compositions_count"
+        android:id="@+id/tv_additional_info"
         style="@style/TextStyleContentSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -45,6 +45,6 @@
         android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_compositions_count"/>
+        app:layout_constraintTop_toBottomOf="@id/tv_additional_info"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

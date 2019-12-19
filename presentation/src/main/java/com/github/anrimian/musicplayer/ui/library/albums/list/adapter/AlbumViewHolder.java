@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
@@ -18,11 +19,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class AlbumViewHolder extends BaseViewHolder {
@@ -83,17 +82,7 @@ public class AlbumViewHolder extends BaseViewHolder {
     }
 
     private void showAdditionalInfo() {
-        StringBuilder sb = new StringBuilder();
-        String artist = album.getArtist();
-        if (!isEmpty(artist)) {
-            sb.append(artist);
-            sb.append(" ● ");//TODO split problem • ●
-        }
-        sb.append(formatCompositionsCount(
-                getContext(),
-                album.getCompositionsCount())
-        );
-        tvCompositionsCount.setText(sb.toString());
+        tvCompositionsCount.setText(FormatUtils.formatAlbumAdditionalInfo(getContext(), album));
     }
 
     private void showCover() {

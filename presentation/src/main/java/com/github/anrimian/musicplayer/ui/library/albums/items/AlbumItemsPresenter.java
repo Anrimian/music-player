@@ -11,6 +11,8 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import moxy.InjectViewState;
@@ -20,6 +22,9 @@ public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumI
 
     private final long albumId;
     private final LibraryAlbumsInteractor interactor;
+
+    @Nullable
+    private Album album;
 
     public AlbumItemsPresenter(long albumId,
                                LibraryAlbumsInteractor interactor,
@@ -52,15 +57,23 @@ public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumI
         //save selected screen. Wait a little for all screens
     }
 
+    void onEditAlbumClicked() {
+        if (album != null) {
+            getViewState().showEditAlbumScreen(album);
+        }
+    }
+
     private void subscribeOnAlbumInfo() {
         presenterDisposable.add(interactor.getAlbumObservable(albumId)
                 .observeOn(uiScheduler)
-                .subscribe(this::onGenreInfoReceived,
+                .subscribe(this::onAlbumInfoReceived,
                         t -> getViewState().closeScreen(),
                         getViewState()::closeScreen));
     }
 
-    private void onGenreInfoReceived(Album album) {
+    private void onAlbumInfoReceived(Album album) {
+        this.album = album;
         getViewState().showAlbumInfo(album);
     }
+
 }
