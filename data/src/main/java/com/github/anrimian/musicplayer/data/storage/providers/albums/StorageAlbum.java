@@ -7,19 +7,19 @@ public class StorageAlbum {
     private final long id;
     private final String album;
 
-    private final long artistId;
+    private final String artist;
 
     private final int firstYear;
     private final int lastYear;
 
     public StorageAlbum(long id,
                         String album,
-                        long artistId,
+                        String artist,
                         int firstYear,
                         int lastYear) {
         this.id = id;
         this.album = album;
-        this.artistId = artistId;
+        this.artist = artist;
         this.firstYear = firstYear;
         this.lastYear = lastYear;
     }
@@ -32,8 +32,8 @@ public class StorageAlbum {
         return album;
     }
 
-    public long getArtistId() {
-        return artistId;
+    public String getArtist() {
+        return artist;
     }
 
     public int getFirstYear() {
@@ -51,12 +51,15 @@ public class StorageAlbum {
 
         StorageAlbum that = (StorageAlbum) o;
 
-        return id == that.id;
+        if (!album.equals(that.album)) return false;
+        return artist != null ? artist.equals(that.artist) : that.artist == null;
     }
 
     @Override
     public int hashCode() {
-        return (int) (id ^ (id >>> 32));
+        int result = album.hashCode();
+        result = 31 * result + (artist != null ? artist.hashCode() : 0);
+        return result;
     }
 
     @NonNull
@@ -65,7 +68,7 @@ public class StorageAlbum {
         return "StorageAlbum{" +
                 "id=" + id +
                 ", album='" + album + '\'' +
-                ", artistId=" + artistId +
+                ", artist=" + artist +
                 ", firstYear=" + firstYear +
                 ", lastYear=" + lastYear +
                 '}';

@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
@@ -77,7 +78,6 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         this.scheduler = scheduler;
     }
 
-    //TODO also delete authors, albums, genres without references
     @Override
     public void initialize() {
         runRescanStorage()
@@ -266,16 +266,18 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
-    private synchronized void applyAlbumsChanges(LongSparseArray<StorageAlbum> newAlbums) {
-        LongSparseArray<StorageAlbum> currentAlbums = albumsDao.selectAllAsStorageAlbums();
+    private synchronized void applyAlbumsChanges(Map<ShortAlbum, StorageAlbum> newAlbums) {
+        Set<ShortAlbum> currentAlbums = albumsDao.selectShortAlbumsSet();
 
         List<StorageAlbum> addedAlbums = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processChanges(currentAlbums,
                 newAlbums,
+                shortAlbum -> shortAlbum,
+                newAlbum -> new ShortAlbum(newAlbum.getAlbum(), newAlbum.getArtist()),
                 (o1, o2) -> false,
                 item -> {},
                 addedAlbums::add,
-                item -> {});
+                (oldItem, newItem) -> {});
 
         if (hasChanges) {
             albumsDao.insertAll(addedAlbums);

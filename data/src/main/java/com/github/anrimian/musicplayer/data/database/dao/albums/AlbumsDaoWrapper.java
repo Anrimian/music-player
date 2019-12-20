@@ -1,19 +1,20 @@
 package com.github.anrimian.musicplayer.data.database.dao.albums;
 
-import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
-import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Observable;
 
@@ -36,10 +37,8 @@ public class AlbumsDaoWrapper {
         albumsDao.insertAll(mapList(albums, this::toEntity));
     }
 
-    public LongSparseArray<StorageAlbum> selectAllAsStorageAlbums() {
-        return AndroidCollectionUtils.mapToSparseArray(
-                albumsDao.selectAllAsStorageAlbums(),
-                StorageAlbum::getId);
+    public Set<ShortAlbum> selectShortAlbumsSet() {
+        return ListUtils.mapToSet(albumsDao.selectShortAlbumsList(), album -> album);
     }
 
     public Observable<List<Album>> getAllObservable(Order order, String searchText) {
@@ -100,7 +99,7 @@ public class AlbumsDaoWrapper {
     }
 
     private AlbumEntity toEntity(StorageAlbum album) {
-        Long artistId = artistsDao.selectIdByStorageId(album.getArtistId());
+        Long artistId = artistsDao.findArtistIdByName(album.getArtist());
         return new AlbumEntity(
                 artistId,
                 album.getId(),

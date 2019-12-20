@@ -97,4 +97,36 @@ public class AndroidCollectionUtils {
         }
         return hasChanges;
     }
+
+    public static <Old, New> boolean processChanges(Set<Old> currentSet,
+                                                    Set<New> newSet,
+                                                    Mapper<Old, New> newValueFetcher,
+                                                    Mapper<New, Old> oldValueFetcher,
+                                                    EqualComparator<Old, New> equalComparator,
+                                                    Callback<Old> onDeleteCallback,
+                                                    Callback<New> onAddedCallback,
+                                                    BiCallback<Old, New> onModifyCallback) {
+        boolean hasChanges = false;
+
+        for(Old existValue: currentSet ) {
+            New newValue = newValueFetcher.map(existValue);
+
+            if (!newSet.contains(newValue)) {
+                onDeleteCallback.call(existValue);
+                hasChanges = true;
+            }
+        }
+
+        for (New newValue: newSet) {
+            Old existValue = oldValueFetcher.map(newValue);
+            if (!currentSet.contains(existValue)) {
+                onAddedCallback.call(newValue);
+                hasChanges = true;
+            } else if (equalComparator.areItemsTheSame(existValue, newValue)) {
+                onModifyCallback.call(existValue, newValue);
+                hasChanges = true;
+            }
+        }
+        return hasChanges;
+    }
 }

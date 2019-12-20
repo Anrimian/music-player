@@ -8,9 +8,9 @@ import androidx.room.RawQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
@@ -24,13 +24,10 @@ public interface AlbumsDao {
     @Query("SELECT id FROM albums WHERE storageId = :storageId")
     Long selectIdByStorageId(long storageId);
 
-    @Query("SELECT storageId as id," +
-            "name as album," +
-            "(SELECT storageId FROM artists WHERE artists.id = artistId) as artistId," +
-            "firstYear as firstYear," +
-            "lastYear as lastYear " +
+    @Query("SELECT name as name," +
+            "(SELECT name FROM artists WHERE artists.id = artistId) as artist " +
             "FROM albums")
-    List<StorageAlbum> selectAllAsStorageAlbums();
+    List<ShortAlbum> selectShortAlbumsList();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<AlbumEntity> artists);

@@ -224,6 +224,7 @@ public class CompositionsDaoWrapper {
                         composition.getId()
                 );
             }
+            //TODO also delete authors, albums, genres without references
         });
     }
 
