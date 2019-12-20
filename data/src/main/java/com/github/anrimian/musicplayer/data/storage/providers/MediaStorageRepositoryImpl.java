@@ -114,8 +114,8 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         return Completable.fromAction(() -> {
             applyArtistsChanges(artistsProvider.getArtists());
             applyAlbumsChanges(albumsProvider.getAlbums());
-            applyCompositionsData(musicProvider.getCompositions());
-            applyPlayListData(playListsProvider.getPlayLists());
+            applyCompositionsData(musicProvider.getCompositions());//hmm, not sure
+            applyPlayListData(playListsProvider.getPlayLists());//finish
 
             List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
             for (IdPair playListIds: allPlayLists) {

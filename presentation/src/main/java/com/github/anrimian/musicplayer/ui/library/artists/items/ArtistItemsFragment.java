@@ -153,6 +153,8 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
+
         slidrInterface = SlidrPanel.simpleSwipeBack(clListContainer,
                 this,
                 toolbar::onStackFragmentSlided);

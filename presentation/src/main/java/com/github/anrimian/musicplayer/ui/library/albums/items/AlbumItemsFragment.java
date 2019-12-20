@@ -131,6 +131,8 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
                 presenter::onCompositionIconClicked);
         recyclerView.setAdapter(adapter);
 
+        fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 

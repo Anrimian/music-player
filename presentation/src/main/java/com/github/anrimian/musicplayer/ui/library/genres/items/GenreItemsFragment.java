@@ -123,6 +123,8 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
+
         SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
