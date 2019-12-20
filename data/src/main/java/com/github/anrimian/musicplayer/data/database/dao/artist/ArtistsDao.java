@@ -8,7 +8,6 @@ import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
@@ -22,10 +21,8 @@ public interface ArtistsDao {
     @Query("SELECT id FROM artists WHERE storageId = :storageId")
     Long selectIdByStorageId(long storageId);
 
-    @Query("SELECT storageId as id," +
-            "name as artist " +
-            "FROM artists")
-    List<StorageArtist> selectAllAsStorageArtists();
+    @Query("SELECT name FROM artists")
+    List<String> getAllArtistNames();
 
     @Insert
     void insertAll(List<ArtistEntity> artists);

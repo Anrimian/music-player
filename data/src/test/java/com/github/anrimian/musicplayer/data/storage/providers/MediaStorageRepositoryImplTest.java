@@ -25,7 +25,10 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -55,8 +58,8 @@ public class MediaStorageRepositoryImplTest {
     private GenresDaoWrapper genresDao = mock(GenresDaoWrapper.class);
 
     private PublishSubject<LongSparseArray<StorageComposition>> newCompositionsSubject = PublishSubject.create();
-    private PublishSubject<LongSparseArray<StorageAlbum>> newAlbumssSubject = PublishSubject.create();
-    private PublishSubject<LongSparseArray<StorageArtist>> newArtistsSubject = PublishSubject.create();
+    private PublishSubject<LongSparseArray<StorageAlbum>> newAlbumsSubject = PublishSubject.create();
+    private PublishSubject<Map<String, StorageArtist>> newArtistsSubject = PublishSubject.create();
     private PublishSubject<LongSparseArray<StoragePlayList>> newPlayListsSubject = PublishSubject.create();
     private PublishSubject<List<StoragePlayListItem>> newPlayListItemsSubject = PublishSubject.create();
     private PublishSubject<LongSparseArray<StorageGenre>> newGenreSubject = PublishSubject.create();
@@ -65,14 +68,14 @@ public class MediaStorageRepositoryImplTest {
 
     @Before
     public void setUp() {
-        when(albumsProvider.getAlbumsObservable()).thenReturn(newAlbumssSubject);
+        when(albumsProvider.getAlbumsObservable()).thenReturn(newAlbumsSubject);
         when(albumsProvider.getAlbums()).thenReturn(new LongSparseArray<>());
 
         when(genresProvider.getGenresObservable()).thenReturn(newGenreSubject);
         when(genresProvider.getGenres()).thenReturn(new LongSparseArray<>());
 
         when(artistsProvider.getArtistsObservable()).thenReturn(newArtistsSubject);
-        when(artistsProvider.getArtists()).thenReturn(new LongSparseArray<>());
+        when(artistsProvider.getArtists()).thenReturn(new HashMap<>());
 
         when(musicProvider.getCompositionsObservable()).thenReturn(newCompositionsSubject);
         when(musicProvider.getCompositions()).thenReturn(new LongSparseArray<>());
@@ -83,7 +86,7 @@ public class MediaStorageRepositoryImplTest {
 
         when(albumsDao.selectAllAsStorageAlbums()).thenReturn(new LongSparseArray<>());
 
-        when(artistsDao.selectAllAsStorageArtists()).thenReturn(new LongSparseArray<>());
+        when(artistsDao.selectAllArtistNames()).thenReturn(new HashSet<>());
 
         when(genresDao.selectAllAsStorageGenre()).thenReturn(new LongSparseArray<>());
 

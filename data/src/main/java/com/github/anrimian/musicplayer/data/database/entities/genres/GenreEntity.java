@@ -1,12 +1,16 @@
 package com.github.anrimian.musicplayer.data.database.entities.genres;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Entity(tableName = "genres")
+@Entity(tableName = "genres",
+        indices = {
+                @Index(value = "name", unique = true)
+        })
 public class GenreEntity {
 
     @PrimaryKey(autoGenerate = true)

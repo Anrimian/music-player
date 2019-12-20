@@ -27,6 +27,8 @@ import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -280,16 +282,18 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
-    private synchronized void applyArtistsChanges(LongSparseArray<StorageArtist> newArtists) {
-        LongSparseArray<StorageArtist> currentArtists = artistsDao.selectAllAsStorageArtists();
+    private synchronized void applyArtistsChanges(Map<String, StorageArtist> newArtists) {
+        Set<String> artistNames = artistsDao.selectAllArtistNames();
 
         List<StorageArtist> addedArtists = new ArrayList<>();
-        boolean hasChanges = AndroidCollectionUtils.processChanges(currentArtists,
+        boolean hasChanges = AndroidCollectionUtils.processChanges(artistNames,
                 newArtists,
+                name -> name,
+                StorageArtist::getArtist,
                 (o1, o2) -> false,
                 item -> {},
                 addedArtists::add,
-                item -> {});
+                (artistName, item) -> {});
 
         if (hasChanges) {
             artistsDao.insertArtists(addedArtists);

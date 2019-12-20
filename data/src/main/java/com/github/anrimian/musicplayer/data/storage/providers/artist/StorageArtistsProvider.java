@@ -5,10 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Artists;
 
-import androidx.collection.LongSparseArray;
-
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -22,12 +23,12 @@ public class StorageArtistsProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<LongSparseArray<StorageArtist>> getArtistsObservable() {
+    public Observable<Map<String, StorageArtist>> getArtistsObservable() {
         return RxContentObserver.getObservable(contentResolver, Artists.EXTERNAL_CONTENT_URI)
                 .map(o -> getArtists());
     }
 
-    public LongSparseArray<StorageArtist> getArtists() {
+    public Map<String, StorageArtist> getArtists() {
         try(Cursor cursor = contentResolver.query(Artists.EXTERNAL_CONTENT_URI,
                 new String[] {
                         Artists._ID,
@@ -40,16 +41,16 @@ public class StorageArtistsProvider {
                 null,
                 null)) {
             if (cursor == null) {
-                return new LongSparseArray<>();
+                return new HashMap<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            LongSparseArray<StorageArtist> artists = new LongSparseArray<>(cursor.getCount());
+            Map<String, StorageArtist> artists = new HashMap<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
                 StorageArtist artist = getArtistFromCursor(cursorWrapper);
                 if (artist != null) {
-                    artists.put(artist.getId(), artist);
+                    artists.put(artist.getArtist(), artist);
                 }
             }
             return artists;

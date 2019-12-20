@@ -1,16 +1,16 @@
 package com.github.anrimian.musicplayer.data.database.dao.artist;
 
-import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
-import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Observable;
 
@@ -29,10 +29,8 @@ public class ArtistsDaoWrapper {
         artistsDao.insertAll(mapList(artists, this::toEntity));
     }
 
-    public LongSparseArray<StorageArtist> selectAllAsStorageArtists() {
-        return AndroidCollectionUtils.mapToSparseArray(
-                artistsDao.selectAllAsStorageArtists(),
-                StorageArtist::getId);
+    public Set<String> selectAllArtistNames() {
+        return ListUtils.mapToSet(artistsDao.getAllArtistNames(), name -> name);
     }
 
     public Observable<List<Artist>> getAllObservable(Order order, String searchText) {
