@@ -25,8 +25,6 @@ public class StorageComposition {
     private final long duration;
     private final long size;
     private final long id;
-    private final long artistId;
-    private final long albumId;
 
     @Nonnull
     private final Date dateAdded;
@@ -40,8 +38,6 @@ public class StorageComposition {
                               long duration,
                               long size,
                               long id,
-                              long artistId,
-                              long albumId,
                               @Nonnull Date dateAdded,
                               @Nonnull Date dateModified) {
         this.artist = artist;
@@ -51,18 +47,8 @@ public class StorageComposition {
         this.duration = duration;
         this.size = size;
         this.id = id;
-        this.artistId = artistId;
-        this.albumId = albumId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-    }
-
-    public long getAlbumId() {
-        return albumId;
-    }
-
-    public long getArtistId() {
-        return artistId;
     }
 
     @Nullable

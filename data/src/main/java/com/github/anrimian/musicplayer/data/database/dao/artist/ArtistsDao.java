@@ -85,6 +85,11 @@ public interface ArtistsDao {
             "AND (SELECT count() FROM albums WHERE artistId = artists.id) = 0")
     void deleteEmptyArtist(long id);
 
+    @Query("DELETE FROM artists " +
+            "WHERE (SELECT count() FROM compositions WHERE artistId = artists.id) = 0 " +
+            "AND (SELECT count() FROM albums WHERE artistId = artists.id) = 0")
+    void deleteEmptyArtists();
+
     @Query("UPDATE artists SET name = :name WHERE id = :id")
     void updateArtistName(String name, long id);
 }

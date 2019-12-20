@@ -6,6 +6,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
@@ -36,15 +37,18 @@ public class CompositionsDaoWrapper {
     private final CompositionsDao compositionsDao;
     private final ArtistsDao artistsDao;
     private final AlbumsDao albumsDao;
+    private final GenreDao genresDao;
 
     public CompositionsDaoWrapper(AppDatabase appDatabase,
                                   ArtistsDao artistsDao,
                                   CompositionsDao compositionsDao,
-                                  AlbumsDao albumsDao) {
+                                  AlbumsDao albumsDao,
+                                  GenreDao genresDao) {
         this.appDatabase = appDatabase;
         this.artistsDao = artistsDao;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
+        this.genresDao = genresDao;
     }
 
     public Observable<List<Composition>> getAllObservable() {
@@ -224,7 +228,9 @@ public class CompositionsDaoWrapper {
                         composition.getId()
                 );
             }
-            //TODO also delete authors, albums, genres without references
+            albumsDao.deleteEmptyAlbums();
+            artistsDao.deleteEmptyArtists();
+            genresDao.deleteEmptyGenres();//not working properly here. Or just not working. Check
         });
     }
 
@@ -233,8 +239,8 @@ public class CompositionsDaoWrapper {
     }
 
     private CompositionEntity toCompositionEntity(StorageComposition composition) {
-        Long artistId = artistsDao.selectIdByStorageId(composition.getArtistId());
-        Long albumId = albumsDao.selectIdByStorageId(composition.getAlbumId());
+        Long artistId = artistsDao.findArtistIdByName(composition.getArtist());
+        Long albumId = albumsDao.findAlbum(artistId, composition.getAlbum());
         return CompositionMapper.toEntity(composition, artistId, albumId);
     }
 

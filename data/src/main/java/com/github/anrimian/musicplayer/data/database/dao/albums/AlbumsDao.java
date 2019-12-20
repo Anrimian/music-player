@@ -112,6 +112,10 @@ public interface AlbumsDao {
             "WHERE id = :id AND (SELECT count() FROM compositions WHERE albumId = albums.id) = 0")
     void deleteEmptyAlbum(long id);
 
+    @Query("DELETE FROM albums " +
+            "WHERE (SELECT count() FROM compositions WHERE albumId = albums.id) = 0")
+    void deleteEmptyAlbums();
+
     @Query("SELECT name FROM albums")
     String[] getAlbumNames();
 

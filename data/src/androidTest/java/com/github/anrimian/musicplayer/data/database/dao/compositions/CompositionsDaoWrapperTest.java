@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 
@@ -27,6 +28,7 @@ public class CompositionsDaoWrapperTest {
     private CompositionsDao compositionsDao;
     private ArtistsDao artistsDao;
     private AlbumsDao albumsDao;
+    private GenreDao genresDao;
 
     private CompositionsDaoWrapper daoWrapper;
 
@@ -37,8 +39,9 @@ public class CompositionsDaoWrapperTest {
         compositionsDao = db.compositionsDao();
         artistsDao = db.artistsDao();
         albumsDao = db.albumsDao();
+        genresDao = db.genreDao();
 
-        daoWrapper = new CompositionsDaoWrapper(db, artistsDao, compositionsDao, albumsDao);
+        daoWrapper = new CompositionsDaoWrapper(db, artistsDao, compositionsDao, albumsDao, genresDao);
     }
 
     @After

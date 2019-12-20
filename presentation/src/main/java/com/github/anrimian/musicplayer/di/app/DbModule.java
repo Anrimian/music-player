@@ -117,8 +117,13 @@ public class DbModule {
     CompositionsDaoWrapper compositionsDaoWrapper(AppDatabase appDatabase,
                                                   ArtistsDao artistsDao,
                                                   CompositionsDao compositionsDao,
-                                                  AlbumsDao albumsDao) {
-        return new CompositionsDaoWrapper(appDatabase, artistsDao, compositionsDao, albumsDao);
+                                                  AlbumsDao albumsDao,
+                                                  GenreDao genresDao) {
+        return new CompositionsDaoWrapper(appDatabase,
+                artistsDao,
+                compositionsDao,
+                albumsDao,
+                genresDao);
     }
 
     @Provides

@@ -111,6 +111,10 @@ public interface GenreDao {
             "WHERE id IN(:ids) AND (SELECT count() FROM genre_entries WHERE genreId IN(:ids)) = 0")
     void deleteEmptyGenre(Long[] ids);
 
+    @Query("DELETE FROM genres " +
+            "WHERE (SELECT count() FROM genre_entries WHERE genreId = genres.id) = 0")
+    void deleteEmptyGenres();
+
     @Query("DELETE FROM genre_entries WHERE audioId = :compositionId AND genreId IN(:genreIds)")
     void removeGenreEntry(long compositionId, Long[] genreIds);
 

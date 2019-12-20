@@ -82,9 +82,7 @@ public interface CompositionsDao {
             "compositions.size as size, " +
             "compositions.storageId as id, " +
             "compositions.dateAdded as dateAdded, " +
-            "compositions.dateModified as dateModified, " +
-            "(SELECT storageId FROM artists WHERE id = compositions.artistId) as artistId, " +
-            "(SELECT storageId FROM albums WHERE id = compositions.albumId) as albumId " +
+            "compositions.dateModified as dateModified " +
             "FROM compositions WHERE storageId NOTNULL")
     List<StorageComposition> selectAllAsStorageCompositions();
 
