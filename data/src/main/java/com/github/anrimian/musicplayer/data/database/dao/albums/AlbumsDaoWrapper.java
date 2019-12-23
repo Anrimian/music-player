@@ -99,7 +99,11 @@ public class AlbumsDaoWrapper {
     }
 
     private AlbumEntity toEntity(StorageAlbum album) {
-        Long artistId = artistsDao.findArtistIdByName(album.getArtist());
+        String artist = album.getArtist();
+        Long artistId = null;
+        if (artist != null) {
+            artistId = artistsDao.findArtistIdByName(album.getArtist());
+        }
         return new AlbumEntity(
                 artistId,
                 album.getId(),

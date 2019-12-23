@@ -239,8 +239,17 @@ public class CompositionsDaoWrapper {
     }
 
     private CompositionEntity toCompositionEntity(StorageComposition composition) {
-        Long artistId = artistsDao.findArtistIdByName(composition.getArtist());
-        Long albumId = albumsDao.findAlbum(artistId, composition.getAlbum());
+
+        String artist = composition.getArtist();
+        Long artistId = null;
+        if (artist != null) {
+            artistId = artistsDao.findArtistIdByName(artist);
+        }
+        String album = composition.getAlbum();
+        Long albumId = null;
+        if (album != null) {
+            albumsDao.findAlbum(artistId, album);
+        }
         return CompositionMapper.toEntity(composition, artistId, albumId);
     }
 
