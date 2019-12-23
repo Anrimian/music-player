@@ -50,7 +50,7 @@ public class StorageArtistsProvider {
 
                 StorageArtist artist = getArtistFromCursor(cursorWrapper);
                 if (artist != null) {
-                    artists.put(artist.getArtist(), artist);
+                    artists.put(artist.getName(), artist);
                 }
             }
             return artists;

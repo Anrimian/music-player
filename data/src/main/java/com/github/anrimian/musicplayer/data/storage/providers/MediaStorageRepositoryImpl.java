@@ -114,8 +114,8 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         return Completable.fromAction(() -> {
             applyArtistsChanges(artistsProvider.getArtists());
             applyAlbumsChanges(albumsProvider.getAlbums());
-            applyCompositionsData(musicProvider.getCompositions());//hmm, not sure
-            applyPlayListData(playListsProvider.getPlayLists());//finish
+            applyCompositionsData(musicProvider.getCompositions());
+            applyPlayListData(playListsProvider.getPlayLists());
 
             List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
             for (IdPair playListIds: allPlayLists) {
@@ -138,7 +138,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         subscribeOnPlaylistData();
     }
 
-    private void onStorageGenresReceived(LongSparseArray<StorageGenre> newGenres) {
+    private void onStorageGenresReceived(Map<String, StorageGenre> newGenres) {
         applyGenresData(newGenres);
         subscribeOnGenresData();
     }
@@ -158,6 +158,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
+    //can items change order on merge?
     private synchronized void applyPlayListItemsData(long playListId,
                                                      List<StoragePlayListItem> newItems) {
         List<StoragePlayListItem> currentItems = playListsDao.getPlayListItemsAsStorageItems(playListId);
@@ -184,6 +185,12 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     private synchronized void applyGenreItemsData(long genreId,
                                                   LongSparseArray<StorageGenreItem> newGenreItems) {
+        if (newGenreItems.isEmpty()) {
+            genresDao.deleteGenre(genreId);
+            genreEntriesDisposable.remove(genreId);
+            return;
+        }
+
         LongSparseArray<StorageGenreItem> currentItems = genresDao.selectAllAsStorageGenreItems(genreId);
         List<StorageGenreItem> addedItems = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processChanges(currentItems,
@@ -232,22 +239,25 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
-    private synchronized void applyGenresData(LongSparseArray<StorageGenre> newGenres) {
-        LongSparseArray<StorageGenre> currentGenres = genresDao.selectAllAsStorageGenre();
+    private synchronized void applyGenresData(Map<String, StorageGenre> newGenres) {
+        Set<String> currentGenres = genresDao.selectAllGenreNames();
 
         List<StorageGenre> addedGenres = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processChanges(currentGenres,
                 newGenres,
+                name -> name,
+                StorageGenre::getName,
                 (o1, o2) -> false,
-                o -> {},
+                item -> {},
                 addedGenres::add,
-                o -> {});
+                (name, item) -> {});
 
         if (hasChanges) {
             genresDao.applyChanges(addedGenres);
         }
     }
 
+    //TODO we can't merge data by storageId in future, merge by path+filename?
     private synchronized void applyCompositionsData(LongSparseArray<StorageComposition> newCompositions) {
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
@@ -291,7 +301,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         boolean hasChanges = AndroidCollectionUtils.processChanges(artistNames,
                 newArtists,
                 name -> name,
-                StorageArtist::getArtist,
+                StorageArtist::getName,
                 (o1, o2) -> false,
                 item -> {},
                 addedArtists::add,

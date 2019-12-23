@@ -5,19 +5,19 @@ import androidx.annotation.NonNull;
 public class StorageArtist {
 
     private final long id;
-    private final String artist;
+    private final String name;
 
-    public StorageArtist(long id, String artist) {
+    public StorageArtist(long id, String name) {
         this.id = id;
-        this.artist = artist;
+        this.name = name;
     }
 
     public long getId() {
         return id;
     }
 
-    public String getArtist() {
-        return artist;
+    public String getName() {
+        return name;
     }
 
 
@@ -41,7 +41,7 @@ public class StorageArtist {
     public String toString() {
         return "StorageArtist{" +
                 "id=" + id +
-                ", artist='" + artist + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

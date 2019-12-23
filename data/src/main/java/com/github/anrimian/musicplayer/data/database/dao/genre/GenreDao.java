@@ -10,7 +10,6 @@ import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
-import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
@@ -25,10 +24,8 @@ public interface GenreDao {
     @Query("SELECT id FROM genres WHERE storageId = :storageId")
     Long selectIdByStorageId(long storageId);
 
-    @Query("SELECT storageId as id," +
-            "name as name " +
-            "FROM genres")
-    List<StorageGenre> selectAllAsStorageGenres();
+    @Query("SELECT name FROM genres")
+    List<String> selectAllGenreNames();
 
     @Query("SELECT storageId as id," +
             "audioId as audioId " + //wrong id
@@ -123,4 +120,7 @@ public interface GenreDao {
 
     @Query("UPDATE genres SET name = :name WHERE id = :genreId")
     void updateGenreName(String name, long genreId);
+
+    @Query("DELETE FROM genres WHERE id = :genreId")
+    void deleteGenre(long genreId);
 }

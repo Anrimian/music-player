@@ -14,8 +14,10 @@ import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionU
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Observable;
 
@@ -44,10 +46,8 @@ public class GenresDaoWrapper {
         genreDao.insertGenreEntities(mapList(addedGenres, genre -> toEntity(genre, genreId)));
     }
 
-    public LongSparseArray<StorageGenre> selectAllAsStorageGenre() {
-        return AndroidCollectionUtils.mapToSparseArray(
-                genreDao.selectAllAsStorageGenres(),
-                StorageGenre::getId);
+    public Set<String> selectAllGenreNames() {
+        return ListUtils.mapToSet(genreDao.selectAllGenreNames(), name -> name);
     }
 
     public LongSparseArray<StorageGenreItem> selectAllAsStorageGenreItems(long genreId) {
@@ -116,6 +116,10 @@ public class GenresDaoWrapper {
         genreDao.updateGenreName(name, genreId);
     }
 
+    public void deleteGenre(long genreId) {
+        genreDao.deleteGenre(genreId);
+    }
+
     private GenreEntity toEntity(StorageGenre genre) {
         return new GenreEntity(genre.getId(), genre.getName());
     }
@@ -154,5 +158,4 @@ public class GenresDaoWrapper {
 
         return sb.toString();
     }
-
 }

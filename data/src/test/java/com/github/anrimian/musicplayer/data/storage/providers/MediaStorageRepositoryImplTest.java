@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
@@ -58,21 +59,21 @@ public class MediaStorageRepositoryImplTest {
     private GenresDaoWrapper genresDao = mock(GenresDaoWrapper.class);
 
     private PublishSubject<LongSparseArray<StorageComposition>> newCompositionsSubject = PublishSubject.create();
-    private PublishSubject<LongSparseArray<StorageAlbum>> newAlbumsSubject = PublishSubject.create();
+    private PublishSubject<Map<ShortAlbum, StorageAlbum>> newAlbumsSubject = PublishSubject.create();
     private PublishSubject<Map<String, StorageArtist>> newArtistsSubject = PublishSubject.create();
     private PublishSubject<LongSparseArray<StoragePlayList>> newPlayListsSubject = PublishSubject.create();
     private PublishSubject<List<StoragePlayListItem>> newPlayListItemsSubject = PublishSubject.create();
-    private PublishSubject<LongSparseArray<StorageGenre>> newGenreSubject = PublishSubject.create();
+    private PublishSubject<Map<String, StorageGenre>> newGenreSubject = PublishSubject.create();
 
     private MediaStorageRepositoryImpl mediaStorageRepository;
 
     @Before
     public void setUp() {
         when(albumsProvider.getAlbumsObservable()).thenReturn(newAlbumsSubject);
-        when(albumsProvider.getAlbums()).thenReturn(new LongSparseArray<>());
+        when(albumsProvider.getAlbums()).thenReturn(new HashMap<>());
 
         when(genresProvider.getGenresObservable()).thenReturn(newGenreSubject);
-        when(genresProvider.getGenres()).thenReturn(new LongSparseArray<>());
+        when(genresProvider.getGenres()).thenReturn(new HashMap<>());
 
         when(artistsProvider.getArtistsObservable()).thenReturn(newArtistsSubject);
         when(artistsProvider.getArtists()).thenReturn(new HashMap<>());
@@ -84,11 +85,11 @@ public class MediaStorageRepositoryImplTest {
         when(playListsProvider.getPlayListsObservable()).thenReturn(newPlayListsSubject);
         when(playListsProvider.getPlayListEntriesObservable(1L)).thenReturn(newPlayListItemsSubject);
 
-        when(albumsDao.selectAllAsStorageAlbums()).thenReturn(new LongSparseArray<>());
+        when(albumsDao.selectShortAlbumsSet()).thenReturn(Collections.emptySet());
 
         when(artistsDao.selectAllArtistNames()).thenReturn(new HashSet<>());
 
-        when(genresDao.selectAllAsStorageGenre()).thenReturn(new LongSparseArray<>());
+        when(genresDao.selectAllGenreNames()).thenReturn(new HashSet<>());
 
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());
 

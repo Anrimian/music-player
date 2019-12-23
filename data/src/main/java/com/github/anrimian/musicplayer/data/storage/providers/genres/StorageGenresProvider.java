@@ -11,6 +11,9 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.reactivex.Observable;
 
 public class StorageGenresProvider {
@@ -21,12 +24,12 @@ public class StorageGenresProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<LongSparseArray<StorageGenre>> getGenresObservable() {
+    public Observable<Map<String, StorageGenre>> getGenresObservable() {
         return RxContentObserver.getObservable(contentResolver, Genres.EXTERNAL_CONTENT_URI)
                 .map(o -> getGenres());
     }
 
-    public LongSparseArray<StorageGenre> getGenres() {
+    public Map<String, StorageGenre> getGenres() {
         try(Cursor cursor = contentResolver.query(Genres.EXTERNAL_CONTENT_URI,
                 new String[] {
                         Genres._ID,
@@ -36,19 +39,19 @@ public class StorageGenresProvider {
                 null,
                 null)) {
             if (cursor == null) {
-                return new LongSparseArray<>();
+                return new HashMap<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            LongSparseArray<StorageGenre> artists = new LongSparseArray<>(cursor.getCount());
+            Map<String, StorageGenre> genres = new HashMap<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
                 StorageGenre item = getGenreFromCursor(cursorWrapper);
                 if (item != null) {
-                    artists.put(item.getId(), item);
+                    genres.put(item.getName(), item);
                 }
             }
-            return artists;
+            return genres;
         }
     }
 
