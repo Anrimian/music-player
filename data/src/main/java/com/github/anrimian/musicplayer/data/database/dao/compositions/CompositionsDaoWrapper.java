@@ -248,7 +248,7 @@ public class CompositionsDaoWrapper {
         String album = composition.getAlbum();
         Long albumId = null;
         if (album != null) {
-            albumsDao.findAlbum(artistId, album);
+            albumId = albumsDao.findAlbum(artistId, album);
         }
         return CompositionMapper.toEntity(composition, artistId, albumId);
     }
