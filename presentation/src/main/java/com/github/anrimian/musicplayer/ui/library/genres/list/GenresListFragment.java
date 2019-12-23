@@ -20,17 +20,23 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.serealization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.genres.items.GenreItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.genres.list.adapter.GenresAdapter;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -39,7 +45,11 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_MENU_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 
 public class GenresListFragment extends LibraryFragment implements
         GenresListView, FragmentLayerListener, BackButtonListener {
@@ -57,6 +67,8 @@ public class GenresListFragment extends LibraryFragment implements
     private GenresAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
 
+    private DialogFragmentRunner<MenuDialogFragment> genreMenuDialogRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> editGenreNameDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
 
     @ProvidePresenter
@@ -89,7 +101,9 @@ public class GenresListFragment extends LibraryFragment implements
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
         progressViewWrapper.hideAll();
 
-        adapter = new GenresAdapter(recyclerView, this::goToGenreScreen);
+        adapter = new GenresAdapter(recyclerView,
+                this::goToGenreScreen,
+                this::onGenreLongClick);
         recyclerView.setAdapter(adapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -99,6 +113,16 @@ public class GenresListFragment extends LibraryFragment implements
         selectOrderDialogRunner = new DialogFragmentRunner<>(fm,
                 ORDER_TAG,
                 f -> f.setOnCompleteListener(presenter::onOrderSelected));
+        genreMenuDialogRunner = new DialogFragmentRunner<>(fm,
+                ARTIST_MENU_TAG,
+                fragment -> fragment.setComplexCompleteListener(this::onGenreMenuClicked)
+        );
+        editGenreNameDialogRunner = new DialogFragmentRunner<>(fm,
+                ARTIST_NAME_TAG,
+                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
+                    presenter.onNewGenreNameEntered(name, extra.getLong(ID_ARG));
+                })
+        );
     }
 
     @Override
@@ -175,6 +199,28 @@ public class GenresListFragment extends LibraryFragment implements
     }
 
     @Override
+    public void showRenameProgress() {
+        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(
+                getString(R.string.rename_progress)
+        );
+        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
+    }
+
+    @Override
+    public void hideRenameProgress() {
+        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(PROGRESS_DIALOG_TAG);
+        if (fragment != null) {
+            fragment.dismissAllowingStateLoss();
+        }
+    }
+
+    @Override
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
                 OrderType.ALPHABETICAL,
@@ -182,6 +228,39 @@ public class GenresListFragment extends LibraryFragment implements
         selectOrderDialogRunner.show(fragment);
     }
 
+    private void onGenreLongClick(Genre genre) {
+        Bundle extra = GenreSerializer.serialize(genre);
+        MenuDialogFragment fragment = MenuDialogFragment.newInstance(
+                R.menu.genre_menu,
+                genre.getName(),
+                extra
+        );
+        genreMenuDialogRunner.show(fragment);
+    }
+
+    private void onGenreMenuClicked(MenuItem menuItem, Bundle extra) {
+        Genre genre = GenreSerializer.deserialize(extra);
+        switch (menuItem.getItemId()) {
+            case R.id.menu_rename: {
+                showEditGenreNameDialog(genre);
+                break;
+            }
+        }
+    }
+
+    private void showEditGenreNameDialog(Genre genre) {
+        Bundle bundle = new Bundle();
+        bundle.putLong(ID_ARG, genre.getId());
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(R.string.change_name,
+                R.string.change,
+                R.string.cancel,
+                R.string.name,
+                genre.getName())
+                .canBeEmpty(false)
+                .extra(bundle)
+                .build();
+        editGenreNameDialogRunner.show(fragment);
+    }
 
     private void goToGenreScreen(Genre genre) {
         FragmentNavigation.from(requireFragmentManager())

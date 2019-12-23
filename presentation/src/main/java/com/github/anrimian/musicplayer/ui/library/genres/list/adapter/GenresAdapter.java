@@ -16,19 +16,23 @@ import java.util.List;
 public class GenresAdapter extends DiffListAdapter<Genre, GenreViewHolder> {
 
     private final Callback<Genre> onClickListener;
+    private final Callback<Genre> longClickListener;
 
-    public GenresAdapter(RecyclerView recyclerView, Callback<Genre> onClickListener) {
+    public GenresAdapter(RecyclerView recyclerView,
+                         Callback<Genre> onClickListener,
+                         Callback<Genre> longClickListener) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 GenreHelper::areSourcesTheSame,
                 GenreHelper::getChangePayload)
         );
         this.onClickListener = onClickListener;
+        this.longClickListener = longClickListener;
     }
 
     @NonNull
     @Override
     public GenreViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new GenreViewHolder(parent, onClickListener);
+        return new GenreViewHolder(parent, onClickListener, longClickListener);
     }
 
     @Override

@@ -15,6 +15,7 @@ import moxy.viewstate.strategy.StateStrategyType;
 public interface GenresListView extends MvpView {
 
     String LIST_STATE = "list_state";
+    String RENAME_STATE = "rename_state";
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
@@ -31,9 +32,18 @@ public interface GenresListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoadingError(ErrorCommand errorCommand);
 
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
+    void showRenameProgress();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
+    void hideRenameProgress();
+
     @StateStrategyType(ListStateStrategy.class)
     void submitList(List<Genre> genres);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order order);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showErrorMessage(ErrorCommand errorCommand);
 }

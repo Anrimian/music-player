@@ -2,6 +2,9 @@ package com.github.anrimian.musicplayer.ui.library.genres.items;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -20,6 +23,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -27,6 +31,7 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
@@ -47,6 +52,8 @@ import moxy.presenter.ProvidePresenter;
 import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
@@ -72,6 +79,7 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> editGenreNameDialogRunner;
 
     public static GenreItemsFragment newInstance(long genreId) {
         Bundle args = new Bundle();
@@ -89,6 +97,12 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     protected BaseLibraryCompositionsPresenter getBasePresenter() {
         return presenter;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -136,6 +150,13 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         compositionActionDialogRunner = new DialogFragmentRunner<>(fm,
                 COMPOSITION_ACTION_TAG,
                 f -> f.setOnTripleCompleteListener(this::onCompositionActionSelected));
+
+        editGenreNameDialogRunner = new DialogFragmentRunner<>(fm,
+                GENRE_NAME_TAG,
+                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
+                    presenter.onNewGenreNameEntered(name, extra.getLong(ID_ARG));
+                })
+        );
     }
 
     @Override
@@ -144,6 +165,23 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         presenter.onFragmentMovedToTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setupSearch(null, null);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.genre_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_rename: {
+                presenter.onRenameGenreClicked();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -296,6 +334,38 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
         MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showRenameGenreDialog(Genre genre) {
+        Bundle bundle = new Bundle();
+        bundle.putLong(ID_ARG, genre.getId());
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(R.string.change_name,
+                R.string.change,
+                R.string.cancel,
+                R.string.name,
+                genre.getName())
+                .canBeEmpty(false)
+                .extra(bundle)
+                .build();
+        editGenreNameDialogRunner.show(fragment);
+    }
+
+    @Override
+    public void showRenameProgress() {
+        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(
+                getString(R.string.rename_progress)
+        );
+        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
+    }
+
+    @Override
+    public void hideRenameProgress() {
+        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
+                .findFragmentByTag(PROGRESS_DIALOG_TAG);
+        if (fragment != null) {
+            fragment.dismissAllowingStateLoss();
+        }
     }
 
     @Override

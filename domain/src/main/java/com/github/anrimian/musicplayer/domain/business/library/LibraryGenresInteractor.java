@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.business.library;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -10,15 +11,19 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class LibraryGenresInteractor {
 
+    private final EditorRepository editorRepository;
     private final MusicProviderRepository musicProviderRepository;
     private final SettingsRepository settingsRepository;
 
-    public LibraryGenresInteractor(MusicProviderRepository musicProviderRepository,
+    public LibraryGenresInteractor(EditorRepository editorRepository,
+                                   MusicProviderRepository musicProviderRepository,
                                    SettingsRepository settingsRepository) {
+        this.editorRepository = editorRepository;
         this.musicProviderRepository = musicProviderRepository;
         this.settingsRepository = settingsRepository;
     }
@@ -41,5 +46,9 @@ public class LibraryGenresInteractor {
 
     public Order getOrder() {
         return settingsRepository.getGenresOrder();
+    }
+
+    public Completable updateGenreName(String name, long genreId) {
+        return editorRepository.updateGenreName(name, genreId);
     }
 }

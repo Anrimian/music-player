@@ -21,6 +21,7 @@ import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class GenreViewHolder extends BaseViewHolder {
 
@@ -36,10 +37,12 @@ public class GenreViewHolder extends BaseViewHolder {
     private Genre genre;
 
     GenreViewHolder(@NonNull ViewGroup parent,
-                    Callback<Genre> itemClickListener) {
+                    Callback<Genre> itemClickListener,
+                    Callback<Genre> longClickListener) {
         super(parent, R.layout.item_genre);
         ButterKnife.bind(this, itemView);
         clickableItem.setOnClickListener(v -> itemClickListener.call(genre));
+        onLongClick(clickableItem, () -> longClickListener.call(genre));
     }
 
     public void bind(Genre genre) {

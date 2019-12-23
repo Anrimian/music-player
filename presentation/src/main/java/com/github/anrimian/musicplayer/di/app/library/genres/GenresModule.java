@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app.library.genres;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryGenresInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -20,16 +21,17 @@ public class GenresModule {
 
     @Provides
     @Nonnull
-    LibraryGenresInteractor libraryGenresInteractor(MusicProviderRepository repository,
+    LibraryGenresInteractor libraryGenresInteractor(EditorRepository editorRepository,
+                                                    MusicProviderRepository repository,
                                                     SettingsRepository settingsRepository) {
-        return new LibraryGenresInteractor(repository, settingsRepository);
+        return new LibraryGenresInteractor(editorRepository, repository, settingsRepository);
     }
 
     @Provides
     @Nonnull
     GenresListPresenter genreListPresenter(LibraryGenresInteractor interactor,
-                                             ErrorParser errorParser,
-                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+                                           ErrorParser errorParser,
+                                           @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new GenresListPresenter(interactor, errorParser, uiScheduler);
     }
 }

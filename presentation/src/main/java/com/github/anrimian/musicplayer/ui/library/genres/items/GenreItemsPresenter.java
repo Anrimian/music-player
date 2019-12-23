@@ -13,13 +13,20 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
 import moxy.InjectViewState;
+
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
 @InjectViewState
 public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreItemsView> {
 
     private final long genreId;
     private final LibraryGenresInteractor interactor;
+
+    private Disposable changeDisposable;
+
+    private Genre genre;
 
     public GenreItemsPresenter(long genreId,
                                LibraryGenresInteractor interactor,
@@ -52,6 +59,21 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
         //save selected genre screen. Wait a little for all screens
     }
 
+    void onRenameGenreClicked() {
+        if (genre != null) {
+            getViewState().showRenameGenreDialog(genre);
+        }
+    }
+
+    void onNewGenreNameEntered(String name, long artistId) {
+        dispose(changeDisposable);
+        changeDisposable = interactor.updateGenreName(name, artistId)
+                .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showRenameProgress())
+                .doFinally(() -> getViewState().hideRenameProgress())
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
     private void subscribeOnGenreInfo() {
         presenterDisposable.add(interactor.getGenreObservable(genreId)
                 .observeOn(uiScheduler)
@@ -61,6 +83,7 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
     }
 
     private void onGenreInfoReceived(Genre genre) {
+        this.genre = genre;
         getViewState().showGenreInfo(genre);
     }
 }

@@ -29,6 +29,7 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable listDisposable;
+    private Disposable changeDisposable;
 
     private List<Genre> genres = new ArrayList<>();
 
@@ -66,6 +67,15 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
 
     void onOrderSelected(Order order) {
         interactor.setOrder(order);
+    }
+
+    void onNewGenreNameEntered(String name, long genreId) {
+        dispose(changeDisposable);
+        changeDisposable = interactor.updateGenreName(name, genreId)
+                .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showRenameProgress())
+                .doFinally(() -> getViewState().hideRenameProgress())
+                .subscribe(() -> {}, this::onDefaultError);
     }
 
     void onSearchTextChanged(String text) {
@@ -108,5 +118,10 @@ public class GenresListPresenter extends MvpPresenter<GenresListView> {
         } else {
             getViewState().showList();
         }
+    }
+
+    private void onDefaultError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showErrorMessage(errorCommand);
     }
 }
