@@ -117,8 +117,6 @@ public class SimpleImageLoader<K, T> {
         }
         Maybe.fromCallable(() -> getDataOrThrow(data))
                 .timeout(timeoutSeconds, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())//check
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(bitmapTransformer::transform)
                 .doOnSuccess(bitmap -> widgetView.setImageViewBitmap(viewId, bitmap))
                 .doOnError(t -> widgetView.setImageViewResource(viewId, placeholder))
