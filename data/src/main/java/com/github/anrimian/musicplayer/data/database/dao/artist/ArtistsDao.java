@@ -92,4 +92,7 @@ public interface ArtistsDao {
 
     @Query("UPDATE artists SET name = :name WHERE id = :id")
     void updateArtistName(String name, long id);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM artists WHERE name = :name)")
+    boolean isArtistExists(String name);
 }

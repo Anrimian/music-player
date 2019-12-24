@@ -123,4 +123,7 @@ public interface GenreDao {
 
     @Query("DELETE FROM genres WHERE id = :genreId")
     void deleteGenre(long genreId);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM genres WHERE name = :name)")
+    boolean isGenreExists(String name);
 }

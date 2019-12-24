@@ -67,6 +67,10 @@ public class ArtistsDaoWrapper {
         artistsDao.updateArtistName(name, id);
     }
 
+    public boolean isArtistExists(String name) {
+        return artistsDao.isArtistExists(name);
+    }
+
     private ArtistEntity toEntity(StorageArtist artist) {
         return new ArtistEntity(
                 artist.getId(),
@@ -103,4 +107,5 @@ public class ArtistsDaoWrapper {
 
         return sb.toString();
     }
+
 }

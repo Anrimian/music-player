@@ -120,6 +120,10 @@ public class GenresDaoWrapper {
         genreDao.deleteGenre(genreId);
     }
 
+    public boolean isGenreExists(String name) {
+        return genreDao.isGenreExists(name);
+    }
+
     private GenreEntity toEntity(StorageGenre genre) {
         return new GenreEntity(genre.getId(), genre.getName());
     }

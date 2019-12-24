@@ -124,4 +124,7 @@ public interface AlbumsDao {
 
     @Query("SELECT artistId FROM albums WHERE id = :albumId")
     Long getArtistId(long albumId);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM albums WHERE name = :name)")
+    boolean isAlbumExists(String name);
 }
