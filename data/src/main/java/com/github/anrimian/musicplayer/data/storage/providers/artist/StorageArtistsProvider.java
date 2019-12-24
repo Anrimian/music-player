@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.data.storage.providers.artist;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Artists;
 
+import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
@@ -57,6 +59,48 @@ public class StorageArtistsProvider {
         }
     }
 
+    public void updateArtistName(String oldName, String name) {
+
+        Cursor cursor = null;
+        try {
+            cursor = contentResolver.query(
+                    Artists.EXTERNAL_CONTENT_URI,
+                    null,
+                    Artists.ARTIST + " = ?",
+                    new String[] { oldName },
+                    null);
+            if (cursor == null || cursor.getCount() == 0) {
+                return;
+            }
+
+            cursor.moveToPosition(0);
+            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+
+            ContentValues cv = new ContentValues();
+            long id = cursorWrapper.getLong(Artists._ID);
+            cv.put(Artists._ID, id);
+            cv.put(Artists.ARTIST, name);
+            cv.put(Artists.ARTIST_KEY, cursorWrapper.getString(Artists.ARTIST_KEY));
+            cv.put(Artists.NUMBER_OF_ALBUMS, cursorWrapper.getInt(Artists.NUMBER_OF_ALBUMS));
+            cv.put(Artists.NUMBER_OF_TRACKS, cursorWrapper.getInt(Artists.NUMBER_OF_TRACKS));
+
+//            contentResolver.delete(Artists.EXTERNAL_CONTENT_URI,
+//                    Artists._ID + " = ?",
+//                    new String[] { String.valueOf(id) });
+            contentResolver.insert(Artists.EXTERNAL_CONTENT_URI, cv);
+        } finally {
+            IOUtils.closeSilently(cursor);
+        }
+
+/*        ContentValues cv = new ContentValues();
+        cv.put(Artists.ARTIST, name);
+        contentResolver.update(Artists.EXTERNAL_CONTENT_URI,
+                cv,
+                Artists.ARTIST + " = ?",
+                new String[] { oldName });*/
+    }
+
+
     @Nullable
     private StorageArtist getArtistFromCursor(CursorWrapper cursorWrapper) {
         String artistName = cursorWrapper.getString(Artists.ARTIST);
@@ -68,4 +112,5 @@ public class StorageArtistsProvider {
                 artistName
         );
     }
+
 }

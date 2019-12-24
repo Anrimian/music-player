@@ -54,7 +54,11 @@ public class AlbumsDaoWrapper {
         return albumsDao.getAllObservable(sqlQuery);
     }
 
-    public Observable<List<Album>> getAllAlbumsForArtist(long artistId) {
+    public Observable<List<Album>> getAllAlbumsForArtistObservable(long artistId) {
+        return albumsDao.getAllAlbumsForArtistObservable(artistId);
+    }
+
+    public List<Album> getAllAlbumsForArtist(long artistId) {
         return albumsDao.getAllAlbumsForArtist(artistId);
     }
 
@@ -96,6 +100,14 @@ public class AlbumsDaoWrapper {
                 artistsDao.deleteEmptyArtist(oldArtistId);
             }
         });
+    }
+
+    public String getAlbumName(long albumId) {
+        return albumsDao.getAlbumName(albumId);
+    }
+
+    public String getAlbumArtist(long albumId) {
+        return albumsDao.getAlbumArtist(albumId);
     }
 
     private AlbumEntity toEntity(StorageAlbum album) {
@@ -145,4 +157,5 @@ public class AlbumsDaoWrapper {
 
         return sb.toString();
     }
+
 }

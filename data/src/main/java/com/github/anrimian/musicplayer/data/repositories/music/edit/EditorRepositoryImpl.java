@@ -3,7 +3,11 @@ package com.github.anrimian.musicplayer.data.repositories.music.edit;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
@@ -26,17 +30,29 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final AlbumsDaoWrapper albumsDao;
     private final ArtistsDaoWrapper artistsDao;
     private final GenresDaoWrapper genresDao;
+    private final StorageMusicProvider storageMusicProvider;
+    private final StorageGenresProvider storageGenresProvider;
+    private final StorageArtistsProvider storageArtistsProvider;
+    private final StorageAlbumsProvider storageAlbumsProvider;
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
                                 GenresDaoWrapper genresDao,
+                                StorageMusicProvider storageMusicProvider,
+                                StorageGenresProvider storageGenresProvider,
+                                StorageArtistsProvider storageArtistsProvider,
+                                StorageAlbumsProvider storageAlbumsProvider,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
         this.genresDao = genresDao;
+        this.storageMusicProvider = storageMusicProvider;
+        this.storageGenresProvider = storageGenresProvider;
+        this.storageArtistsProvider = storageArtistsProvider;
+        this.storageAlbumsProvider = storageAlbumsProvider;
         this.scheduler = scheduler;
     }
 
@@ -124,16 +140,26 @@ public class EditorRepositoryImpl implements EditorRepository {
         return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition.getFilePath(), name))
-                .doOnComplete(() -> albumsDao.updateAlbumName(name, albumId))
+                .doOnComplete(() -> {
+                    String oldName = albumsDao.getAlbumName(albumId);
+                    String artist = albumsDao.getAlbumArtist(albumId);
+                    albumsDao.updateAlbumName(name, albumId);
+                    storageAlbumsProvider.updateAlbumName(oldName, artist, name);//not working
+                })
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Completable updateAlbumArtist(String name, long albumId) {
+    public Completable updateAlbumArtist(String newArtistName, long albumId) {
         return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
                 .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name))
-                .doOnComplete(() -> albumsDao.updateAlbumArtist(albumId, name))
+                .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), newArtistName))
+                .doOnComplete(() -> {
+                    String albumName = albumsDao.getAlbumName(albumId);
+                    String oldArtist = albumsDao.getAlbumArtist(albumId);
+                    albumsDao.updateAlbumArtist(albumId, newArtistName);
+                    storageAlbumsProvider.updateAlbumArtist(albumName, oldArtist, newArtistName);//not working
+                })
                 .subscribeOn(scheduler);
     }
 
@@ -141,8 +167,31 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable updateArtistName(String name, long artistId) {
         return Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId))
                 .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name))
-                .doOnComplete(() -> artistsDao.updateArtistName(name, artistId))
+                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name)
+                        .doOnComplete(() -> {
+                            Long storageId = composition.getStorageId();
+                            if (storageId != null) {
+                                storageMusicProvider.updateCompositionArtist(composition.getStorageId(), name);
+                            }
+                        }))
+                //edit all composition album artist
+                .andThen(Single.fromCallable(() -> albumsDao.getAllAlbumsForArtist(artistId)))
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapCompletable(album -> Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(album.getId()))
+                        .flatMapObservable(Observable::fromIterable)
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name)
+                                .doOnComplete(() -> {
+                                    Long storageId = composition.getStorageId();
+                                    if (storageId != null) {
+                                        storageMusicProvider.updateCompositionAlbumArtist(composition.getStorageId(), name);
+                                    }
+                                }))
+                )
+                .doOnComplete(() -> {
+//                    String oldName = artistsDao.getArtistName(artistId);
+                    artistsDao.updateArtistName(name, artistId);
+//                    storageArtistsProvider.updateArtistName(oldName, name);
+                })
                 .subscribeOn(scheduler);
     }
 
@@ -151,7 +200,11 @@ public class EditorRepositoryImpl implements EditorRepository {
         return Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId))
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(composition -> sourceEditor.setCompositionGenre(composition.getFilePath(), name))
-                .doOnComplete(() -> genresDao.updateGenreName(name, genreId))
+                .doOnComplete(() -> {
+                    String oldName = genresDao.getGenreName(genreId);
+                    genresDao.updateGenreName(name, genreId);
+                    storageGenresProvider.updateGenreName(oldName, name);
+                })
                 .subscribeOn(scheduler);
     }
 

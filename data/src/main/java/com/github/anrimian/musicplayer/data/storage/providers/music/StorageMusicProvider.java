@@ -8,6 +8,7 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.os.RemoteException;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.collection.LongSparseArray;
 
@@ -126,8 +127,12 @@ public class StorageMusicProvider {
         }
     }
 
-    public void updateCompositionAuthor(long id, String author) {
+    public void updateCompositionArtist(long id, String author) {
         updateComposition(id, MediaStore.Audio.AudioColumns.ARTIST, author);
+    }
+
+    public void updateCompositionAlbumArtist(long id, String author) {
+        updateComposition(id, /*MediaStore.Audio.AudioColumns.ALBUM_ARTIST*/ "album_artist", author);
     }
 
     public void updateCompositionAlbum(long id, String album) {
@@ -168,10 +173,11 @@ public class StorageMusicProvider {
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
         cv.put(key, value);
-        contentResolver.update(Media.EXTERNAL_CONTENT_URI,
+        int updated = contentResolver.update(Media.EXTERNAL_CONTENT_URI,
                 cv,
                 Media._ID + " = ?",
                 new String[] { String.valueOf(id) });
+        Log.d("KEK2", "updateComposition, key: " + key + ", value: " + value + ", updated: " + updated);
     }
 
     private StorageComposition getCompositionFromCursor(CursorWrapper cursorWrapper) {

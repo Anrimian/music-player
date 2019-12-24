@@ -64,7 +64,7 @@ public class StorageMusicDataSource {
             compositionsDao.updateArtist(composition.getId(), authorName);
             Long storageId = composition.getStorageId();
             if (storageId != null) {
-                musicProvider.updateCompositionAuthor(storageId, authorName);
+                musicProvider.updateCompositionArtist(storageId, authorName);
             }
         });
     }

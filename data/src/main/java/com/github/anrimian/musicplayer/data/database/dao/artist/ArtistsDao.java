@@ -92,4 +92,7 @@ public interface ArtistsDao {
 
     @Query("UPDATE artists SET name = :name WHERE id = :id")
     void updateArtistName(String name, long id);
+
+    @Query("SELECT name FROM artists WHERE id = :artistId")
+    String getArtistName(long artistId);
 }

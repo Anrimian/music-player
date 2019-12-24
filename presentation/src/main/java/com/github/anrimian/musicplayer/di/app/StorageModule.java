@@ -103,11 +103,19 @@ public class StorageModule {
                                                  AlbumsDaoWrapper albumsDao,
                                                  ArtistsDaoWrapper artistsDao,
                                                  GenresDaoWrapper genresDao,
+                                                 StorageMusicProvider storageMusicProvider,
+                                                 StorageGenresProvider storageGenresProvider,
+                                                 StorageArtistsProvider storageArtistsProvider,
+                                                 StorageAlbumsProvider storageAlbumsProvider,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new EditorRepositoryImpl(storageMusicDataSource,
                 albumsDao,
                 artistsDao,
                 genresDao,
+                storageMusicProvider,
+                storageGenresProvider,
+                storageArtistsProvider,
+                storageAlbumsProvider,
                 scheduler);
     }
 

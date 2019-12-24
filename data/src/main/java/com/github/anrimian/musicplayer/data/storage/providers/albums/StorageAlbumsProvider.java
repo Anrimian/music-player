@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.providers.albums;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Albums;
@@ -61,6 +62,24 @@ public class StorageAlbumsProvider {
         }
     }
 
+    public void updateAlbumName(String oldName, String artist, String name) {
+        ContentValues cv = new ContentValues();
+        cv.put(Albums.ALBUM, name);
+        contentResolver.update(Albums.EXTERNAL_CONTENT_URI,
+                cv,
+                Albums.ALBUM + " = ? AND " + Albums.ARTIST + " = ?",
+                new String[] { oldName, artist });
+    }
+
+    public void updateAlbumArtist(String albumName, String oldArtist, String newArtistName) {
+        ContentValues cv = new ContentValues();
+        cv.put(Albums.ARTIST, newArtistName);
+        contentResolver.update(Albums.EXTERNAL_CONTENT_URI,
+                cv,
+                Albums.ALBUM + " = ? AND " + Albums.ARTIST + " = ?",
+                new String[] { albumName, oldArtist });
+    }
+
     @Nullable
     private StorageAlbum getAlbumFromCursor(CursorWrapper cursorWrapper) {
         String name = cursorWrapper.getString(Albums.ALBUM);
@@ -76,4 +95,5 @@ public class StorageAlbumsProvider {
                 cursorWrapper.getInt(Albums.LAST_YEAR)
         );
     }
+
 }

@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.providers.genres;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Genres;
@@ -83,6 +84,15 @@ public class StorageGenresProvider {
             }
             return artists;
         }
+    }
+
+    public void updateGenreName(String oldName, String newName) {
+        ContentValues cv = new ContentValues();
+        cv.put(Genres.NAME, newName);
+        contentResolver.update(Genres.EXTERNAL_CONTENT_URI,
+                cv,
+                Genres.NAME + " = ?",
+                new String[] { oldName });
     }
 
     private StorageGenreItem getGenreItemFromCursor(CursorWrapper cursorWrapper) {

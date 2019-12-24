@@ -128,7 +128,7 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
 
     @Override
     public Observable<List<Album>> getAllAlbumsForArtist(long artistId) {
-        return albumsDao.getAllAlbumsForArtist(artistId);
+        return albumsDao.getAllAlbumsForArtistObservable(artistId);
     }
 
     @Override
