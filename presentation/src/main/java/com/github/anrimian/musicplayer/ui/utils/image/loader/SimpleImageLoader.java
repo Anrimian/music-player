@@ -9,6 +9,8 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -81,8 +83,20 @@ public class SimpleImageLoader<K, T> {
     }
 
     @Nullable
-    public Bitmap getImage(@Nonnull T data) {
-        return getData(data);
+    public Bitmap getImage(@Nonnull T data, long timeoutSeconds) {
+        return Maybe.fromCallable(() -> getDataOrThrow(data))
+                .timeout(timeoutSeconds, TimeUnit.SECONDS)
+                .onErrorComplete()
+                .blockingGet();
+    }
+
+    public void loadImage(@Nonnull T data, Callback<Bitmap> onCompleted) {
+        Maybe.fromCallable(() -> getDataOrThrow(data))
+                .timeout(timeoutSeconds, TimeUnit.SECONDS)
+                .doOnSuccess(onCompleted::call)
+                .doOnError(t -> onCompleted.call(null))
+                .onErrorComplete()
+                .subscribe();
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
@@ -103,6 +117,8 @@ public class SimpleImageLoader<K, T> {
         }
         Maybe.fromCallable(() -> getDataOrThrow(data))
                 .timeout(timeoutSeconds, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())//check
+                .observeOn(AndroidSchedulers.mainThread())
                 .map(bitmapTransformer::transform)
                 .doOnSuccess(bitmap -> widgetView.setImageViewBitmap(viewId, bitmap))
                 .doOnError(t -> widgetView.setImageViewResource(viewId, placeholder))

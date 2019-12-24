@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.infrastructure.service.music;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -29,7 +28,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
-import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
@@ -340,11 +339,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 .putString(METADATA_KEY_ALBUM, composition.getAlbum())
                 .putString(METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
                 .putLong(METADATA_KEY_DURATION, composition.getDuration());
-        Bitmap bitmap = null;
         if (setting.isCoversOnLockScreen()) {
-            bitmap = ImageFormatUtils.getNotificationImage(composition);
+            CoverImageLoader.getInstance().loadImage(composition, bitmap -> {
+                builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
+                mediaSession.setMetadata(builder.build());
+            });
         }
-        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
         mediaSession.setMetadata(builder.build());
     }
 
