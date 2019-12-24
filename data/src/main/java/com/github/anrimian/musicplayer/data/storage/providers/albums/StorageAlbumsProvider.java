@@ -67,11 +67,15 @@ public class StorageAlbumsProvider {
         if (name == null) {
             return null;
         }
+        String artist = cursorWrapper.getString(Albums.ARTIST);
+        if (artist != null && artist.equals("<unknown>")) {
+            artist = null;
+        }
 
         return new StorageAlbum(
                 cursorWrapper.getLong(Albums._ID),
                 name,
-                cursorWrapper.getString(Albums.ARTIST),
+                artist,
                 cursorWrapper.getInt(Albums.FIRST_YEAR),
                 cursorWrapper.getInt(Albums.LAST_YEAR)
         );
