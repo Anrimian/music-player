@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "dc9c7529aaca560caaf13cc26a931c34",
+    "identityHash": "c1223176eae3dc443ca17ad26025a1c2",
     "entities": [
       {
         "tableName": "play_queue",
@@ -47,6 +47,22 @@
               "audioId"
             ],
             "createSql": "CREATE  INDEX `index_play_queue_audioId` ON `${TABLE_NAME}` (`audioId`)"
+          },
+          {
+            "name": "index_play_queue_position",
+            "unique": true,
+            "columnNames": [
+              "position"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_play_queue_position` ON `${TABLE_NAME}` (`position`)"
+          },
+          {
+            "name": "index_play_queue_shuffledPosition",
+            "unique": true,
+            "columnNames": [
+              "shuffledPosition"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_play_queue_shuffledPosition` ON `${TABLE_NAME}` (`shuffledPosition`)"
           }
         ],
         "foreignKeys": [
@@ -284,7 +300,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dc9c7529aaca560caaf13cc26a931c34')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c1223176eae3dc443ca17ad26025a1c2')"
     ]
   }
 }

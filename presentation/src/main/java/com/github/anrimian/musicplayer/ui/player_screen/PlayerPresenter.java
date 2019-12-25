@@ -366,7 +366,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onPlayQueueChanged(List<PlayQueueItem> list) {
-        Log.d("KEK2", "onPlayQueueChanged");
+        Log.d("KEK2", "on play queue received");
         playQueue = list;
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setMusicControlsEnabled(!playQueue.isEmpty());

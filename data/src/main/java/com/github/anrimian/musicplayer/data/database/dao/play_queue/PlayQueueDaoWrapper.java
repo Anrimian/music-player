@@ -76,7 +76,6 @@ public class PlayQueueDaoWrapper {
         appDatabase.runInTransaction(() -> {
             List<PlayQueueEntity> list = playQueueDao.getPlayQueue();
 
-//            long[] ids = playQueueDao.getQueueIdsInRandomOrder();
             Collections.shuffle(list);
 
             long firstItemId = list.get(0).getId();
@@ -85,22 +84,22 @@ public class PlayQueueDaoWrapper {
             for (int i = 0; i < list.size(); i++) {
                 PlayQueueEntity entity = list.get(i);
 
-//                long id = ids[i];
                 if (entity.getId() == currentItemId) {
                     currentItemPosition = i;
                 }
                 entity.setShuffledPosition(i);
-//                playQueueDao.updateShuffledPosition(ids[i], i);
             }
-            playQueueDao.update(list);
-
             if (currentItemPosition != -1 && firstItemId != currentItemId) {
-                playQueueDao.updateShuffledPosition(currentItemId, 0);
-                playQueueDao.updateShuffledPosition(firstItemId, currentItemPosition);
+                list.get(currentItemPosition).setShuffledPosition(0);
+                list.get(0).setShuffledPosition(currentItemPosition);
             }
+
+            playQueueDao.deletePlayQueue();
+            playQueueDao.insertItems(list);
         });
     }
 
+    //seems not working properly?
     public PlayQueueLists insertNewPlayQueue(List<Composition> compositions) {
         return appDatabase.runInTransaction(() -> {
             List<Composition> shuffledList = new ArrayList<>(compositions);

@@ -45,6 +45,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private final BehaviorSubject<PlayQueueEvent> currentCompositionSubject = create();
 
+    private final Flowable<List<PlayQueueItem>> playQueueObservable;
     private final PlayQueueCache queueCache;//we really need this? can be moved in db
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
@@ -61,6 +62,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             List<PlayQueueItem> items = playQueueDao.getPlayQueue(isRandom);
             return new IndexedList<>(items);
         });
+
+        playQueueObservable = settingsPreferences.getRandomPlayingObservable()
+                .doOnNext(shuffled -> Log.d("KEK2", "new shuffled mode: " + shuffled))
+                .switchMap(playQueueDao::getPlayQueueObservable)
+                .toFlowable(BackpressureStrategy.LATEST)
+                .doOnNext(list -> {
+                    IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
+                    checkForCurrentItemInNewQueue(newQueue);
+                    queueCache.updateQueue(newQueue);
+                }).replay(1)
+                .refCount();
     }
 
     @Override
@@ -100,15 +112,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
-        return settingsPreferences.getRandomPlayingObservable()
-                .doOnNext(shuffled -> Log.d("KEK2", "new shuffled mode: " + shuffled))
-                .flatMap(playQueueDao::getPlayQueueObservable)
-                .toFlowable(BackpressureStrategy.LATEST)
-                .doOnNext(list -> {
-                    IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
-                    checkForCurrentItemInNewQueue(newQueue);
-                    queueCache.updateQueue(newQueue);
-                });
+        return playQueueObservable;
     }
 
     @Override
@@ -170,17 +174,17 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable removeQueueItem(PlayQueueItem item) {
         return Completable.fromAction(() -> {
-            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
-            Integer currentPosition = null;
-            PlayQueueItem currentItem = getCurrentItem();
-            if (item.equals(currentItem)) {
-                currentPosition = currentQueue.indexOf(currentItem);
-            }
+//            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
+//            Integer currentPosition = null;
+//            PlayQueueItem currentItem = getCurrentItem();
+//            if (item.equals(currentItem)) {
+//                currentPosition = currentQueue.indexOf(currentItem);
+//            }
             playQueueDao.deleteItem(item.getId());
 
-            if (currentPosition != null) {
-                selectItemAt(currentQueue, currentPosition + 1);
-            }
+//            if (currentPosition != null) {
+//                selectItemAt(currentQueue, currentPosition + 1);
+//            }
         }).subscribeOn(scheduler);
     }
 
