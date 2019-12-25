@@ -83,6 +83,14 @@ public class CompositionsDaoWrapper {
         compositionsDao.updateFilePath(id, filePath);
     }
 
+    public void updateFilesPath(List<Composition> compositions) {
+        appDatabase.runInTransaction(() -> {
+            for (Composition composition: compositions) {
+                compositionsDao.updateFilePath(composition.getId(), composition.getFilePath());
+            }
+        });
+    }
+
     public void updateArtist(long id, String artist) {
         compositionsDao.updateArtist(id, artist);
     }

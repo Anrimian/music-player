@@ -209,6 +209,7 @@ public class CompositionItemWrapper {
         }
         switch (composition.getCorruptionType()) {
             case UNSUPPORTED: return getContext().getString(R.string.unsupported_format_hint);
+            case NOT_FOUND: return getContext().getString(R.string.file_not_found);
             default: return null;
         }
     }

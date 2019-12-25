@@ -18,6 +18,7 @@ public class Composition {
     @Nullable
     private final String album;
     @Nonnull
+    @Deprecated
     private final String filePath;
 
     private final long duration;
@@ -94,6 +95,7 @@ public class Composition {
     }
 
     @Nonnull
+    @Deprecated
     public String getFilePath() {
         return filePath;
     }
