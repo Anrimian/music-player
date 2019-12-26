@@ -2,8 +2,11 @@ package com.github.anrimian.musicplayer.ui.editor.composition;
 
 import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+
+import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -40,6 +43,7 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         loadComposition();
+        loadGenres();
     }
 
     @Override
@@ -216,6 +220,16 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
                 .subscribe(this::onCompositionReceived,
                         this::onCompositionLoadingError,
                         getViewState()::closeScreen));
+    }
+
+    private void loadGenres() {
+        presenterDisposable.add(editorInteractor.getShortGenresInComposition(compositionId)
+                .observeOn(uiScheduler)
+                .subscribe(this::onGenresReceived, this::onDefaultError));
+    }
+
+    private void onGenresReceived(List<ShortGenre> shortGenres) {
+        getViewState().showGenres(shortGenres);
     }
 
     private void onCompositionReceived(FullComposition composition) {

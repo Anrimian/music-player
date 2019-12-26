@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryE
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 import java.util.List;
 
@@ -97,6 +98,11 @@ public interface GenreDao {
             "FROM genres " +
             "WHERE id = :genreId LIMIT 1")
     Observable<List<Genre>> getGenreObservable(long genreId);
+
+    @Query("SELECT id, name " +
+            "FROM genres " +
+            "WHERE id IN(SELECT genreId FROM genre_entries WHERE audioId = :compositionId)")
+    Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId);
 
     @Query("SELECT id FROM genres WHERE name = :name")
     Long findGenre(String name);

@@ -1,10 +1,14 @@
 package com.github.anrimian.musicplayer.ui.editor.composition;
 
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
+import java.util.List;
+
 import moxy.MvpView;
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
@@ -45,4 +49,7 @@ public interface CompositionEditorView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void showEnterGenreDialog(FullComposition composition, String[] genres);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showGenres(List<ShortGenre> shortGenres);
 }

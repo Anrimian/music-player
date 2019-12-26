@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionU
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
@@ -80,6 +81,10 @@ public class GenresDaoWrapper {
 
     public List<Composition> getCompositionsInGenre(long genreId) {
         return genreDao.getCompositionsInGenre(genreId);
+    }
+
+    public Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId) {
+        return genreDao.getShortGenresInComposition(compositionId);
     }
 
     public List<IdPair> getGenresIds() {

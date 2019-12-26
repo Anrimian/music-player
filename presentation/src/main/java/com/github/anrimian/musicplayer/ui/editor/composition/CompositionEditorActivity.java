@@ -14,12 +14,15 @@ import androidx.fragment.app.FragmentManager;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.Slidr;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -220,9 +223,18 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         dividerAlbumArtist.setVisibility(albumArtistVisibility);
         tvAlbumArtist.setText(composition.getAlbumArtist());
 
-        tvGenre.setText(composition.getGenre());
         tvAuthor.setText(formatAuthor(composition.getArtist(), this));
         tvFileName.setText(formatFileName(composition.getFilePath(), true));
+    }
+
+    @Override
+    public void showGenres(List<ShortGenre> shortGenres) {
+        StringBuilder sb = new StringBuilder();
+        for (ShortGenre genre: shortGenres) {
+            sb.append(genre.getName());
+            sb.append("; ");
+        }
+        tvGenre.setText(sb.toString());
     }
 
     @Override
@@ -253,15 +265,15 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showEnterGenreDialog(FullComposition composition, String[] genres) {
-        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
-                R.string.change_composition_genre,
-                R.string.change,
-                R.string.cancel,
-                R.string.genre,
-                composition.getGenre())
-                .hints(genres)
-                .build();
-        genreDialogFragmentRunner.show(fragment);
+//        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
+//                R.string.change_composition_genre,
+//                R.string.change,
+//                R.string.cancel,
+//                R.string.genre,
+//                composition.getGenre())
+//                .hints(genres)
+//                .build();
+//        genreDialogFragmentRunner.show(fragment);
     }
 
     @Override
