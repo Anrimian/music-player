@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.image.loader.SimpleImageLoader;
 
 import java.io.IOException;
@@ -59,8 +60,12 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
     }
 
     @Nullable
-    public Bitmap getImage(@Nonnull Composition data) {
-        return getImage(new CompositionImage(data));
+    public Bitmap getImage(@Nonnull Composition data, long timeoutSeconds) {
+        return getImage(new CompositionImage(data), timeoutSeconds);
+    }
+
+    public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
+        loadImage(new CompositionImage(data), onCompleted);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
