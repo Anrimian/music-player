@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.data.repositories.music.edit.exceptions.M
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
@@ -46,9 +47,31 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
+    @Deprecated
     public Completable changeCompositionGenre(FullComposition composition, String newGenre) {
         return sourceEditor.setCompositionGenre(composition.getFilePath(), newGenre)
                 .andThen(storageMusicDataSource.updateCompositionGenre(composition, newGenre))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable changeCompositionGenre(FullComposition composition,
+                                              ShortGenre oldGenre,
+                                              String newGenre) {
+        return sourceEditor.changeCompositionGenre(composition.getFilePath(), oldGenre.getName(), newGenre)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable addCompositionGenre(FullComposition composition,
+                                           String newGenre) {
+        return sourceEditor.addCompositionGenre(composition.getFilePath(), newGenre)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
+        return sourceEditor.removeCompositionGenre(composition.getFilePath(), genre.getName())
                 .subscribeOn(scheduler);
     }
 
@@ -158,7 +181,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         return checkGenreExists(name)
                 .andThen(Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId)))
                 .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionGenre(composition.getFilePath(), name))
+                .flatMapCompletable(composition -> sourceEditor.setCompositionGenre(composition.getFilePath(), name))//TODO replace old genre
                 .doOnComplete(() -> genresDao.updateGenreName(name, genreId))
                 .subscribeOn(scheduler);
     }
