@@ -29,6 +29,21 @@ public class EditorInteractor {
         return editorRepository.changeCompositionGenre(composition, newGenre);
     }
 
+    public Completable changeCompositionGenre(FullComposition composition,
+                                              ShortGenre oldGenre,
+                                              String newGenre) {
+        return editorRepository.changeCompositionGenre(composition, oldGenre, newGenre);
+    }
+
+    public Completable addCompositionGenre(FullComposition composition,
+                                           String newGenre) {
+        return editorRepository.addCompositionGenre(composition, newGenre);
+    }
+
+    public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
+        return editorRepository.remoteCompositionGenre(composition, genre);
+    }
+
     public Completable editCompositionAuthor(FullComposition composition, String newAuthor) {
         return editorRepository.changeCompositionAuthor(composition, nullIfEmpty(newAuthor));
     }

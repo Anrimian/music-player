@@ -10,13 +10,16 @@ import androidx.annotation.ColorInt;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.google.android.material.snackbar.Snackbar;
@@ -70,8 +73,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.tv_filename)
     TextView tvFileName;
 
-    @BindView(R.id.tv_genre)
-    TextView tvGenre;
+    @BindView(R.id.rv_genres)
+    RecyclerView rvGenres;
 
     @BindView(R.id.tv_author_hint)
     TextView tvAuthorHint;
@@ -125,6 +128,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     private DialogFragmentRunner<InputTextDialogFragment> albumArtistDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> genreDialogFragmentRunner;
 
+    private ShortGenresAdapter genresAdapter;
+
     public static Intent newIntent(Context context, long compositionId) {
         Intent intent = new Intent(context, CompositionEditorActivity.class);
         intent.putExtra(COMPOSITION_ID_ARG, compositionId);
@@ -151,6 +156,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
             actionBar.setTitle(R.string.edit_tags);
         }
 
+        genresAdapter = new ShortGenresAdapter(rvGenres);
+        rvGenres.setAdapter(genresAdapter);
+        rvGenres.setLayoutManager(ChipsLayoutManager.newBuilder(this).build());
+
         changeAuthorClickableArea.setOnClickListener(v -> presenter.onChangeAuthorClicked());
         changeTitleClickableArea.setOnClickListener(v -> presenter.onChangeTitleClicked());
         changeFilenameClickableArea.setOnClickListener(v -> presenter.onChangeFileNameClicked());
@@ -162,7 +171,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
         onLongClick(changeAlbumClickableArea, () -> copyText(tvAlbum, tvAlbumHint));
         onLongClick(changeAlbumArtistClickableArea, () -> copyText(tvAlbumArtist, tvAlbumArtistHint));
-        onLongClick(changeGenreClickableArea, () -> copyText(tvGenre, tvGenreHint));
+//        onLongClick(changeGenreClickableArea, () -> copyText(tvGenre, tvGenreHint));
 
         @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
         Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
@@ -229,12 +238,15 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showGenres(List<ShortGenre> shortGenres) {
-        StringBuilder sb = new StringBuilder();
-        for (ShortGenre genre: shortGenres) {
-            sb.append(genre.getName());
-            sb.append("; ");
-        }
-        tvGenre.setText(sb.toString());
+//        FlowLa
+//        FlowLayout
+//        StringBuilder sb = new StringBuilder();
+//        for (ShortGenre genre: shortGenres) {
+//            sb.append(genre.getName());
+//            sb.append("; ");
+//        }
+        genresAdapter.submitList(shortGenres);
+//        tvGenre.setText(sb.toString());
     }
 
     @Override

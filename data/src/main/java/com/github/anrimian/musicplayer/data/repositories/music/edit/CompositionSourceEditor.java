@@ -47,6 +47,7 @@ public class CompositionSourceEditor {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.GENRE, genre));
     }
 
+    //TODO genre not found case
     public Completable changeCompositionGenre(String filePath,
                                               String oldGenre,
                                               String newGenre) {

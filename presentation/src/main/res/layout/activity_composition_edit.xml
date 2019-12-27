@@ -298,9 +298,8 @@
                 app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
                 app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
 
-            <TextView
-                android:id="@+id/tv_genre"
-                style="@style/TextStyle.Medium"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_genres"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/content_internal_margin"

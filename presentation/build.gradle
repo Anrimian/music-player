@@ -88,6 +88,8 @@ dependencies {
 
     implementation deps.slidr
 
+    implementation deps.chipsLayoutManager
+
     compileOnly deps.javaxAnnotation
 
     testImplementation deps.junit
