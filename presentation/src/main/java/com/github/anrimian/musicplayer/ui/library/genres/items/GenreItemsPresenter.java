@@ -65,9 +65,9 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
         }
     }
 
-    void onNewGenreNameEntered(String name, long artistId) {
+    void onNewGenreNameEntered(String name, long genreId) {
         dispose(changeDisposable);
-        changeDisposable = interactor.updateGenreName(name, artistId)
+        changeDisposable = interactor.updateGenreName(name, genreId)
                 .observeOn(uiScheduler)
                 .doOnSubscribe(d -> getViewState().showRenameProgress())
                 .doFinally(() -> getViewState().hideRenameProgress())

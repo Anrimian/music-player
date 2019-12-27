@@ -115,11 +115,18 @@ public interface GenreDao {
     void deleteEmptyGenre(Long[] ids);
 
     @Query("DELETE FROM genres " +
+            "WHERE id = :id AND (SELECT count() FROM genre_entries WHERE genreId = :id) = 0")
+    void deleteEmptyGenre(long id);
+
+    @Query("DELETE FROM genres " +
             "WHERE (SELECT count() FROM genre_entries WHERE genreId = genres.id) = 0")
     void deleteEmptyGenres();
 
     @Query("DELETE FROM genre_entries WHERE audioId = :compositionId AND genreId IN(:genreIds)")
     void removeGenreEntry(long compositionId, Long[] genreIds);
+
+    @Query("DELETE FROM genre_entries WHERE audioId = :compositionId AND genreId = :genreId")
+    void removeGenreEntry(long compositionId, long genreId);
 
     @Query("SELECT name FROM genres")
     String[] getGenreNames();
@@ -132,4 +139,7 @@ public interface GenreDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM genres WHERE name = :name)")
     boolean isGenreExists(String name);
+
+    @Query("SELECT name FROM genres WHERE id = :genreId")
+    String getGenreName(long genreId);
 }

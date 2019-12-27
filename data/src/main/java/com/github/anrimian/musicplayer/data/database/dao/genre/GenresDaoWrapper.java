@@ -113,6 +113,36 @@ public class GenresDaoWrapper {
         });
     }
 
+    public void addCompositionToGenre(long compositionId, String genreName) {
+        appDatabase.runInTransaction(() -> {
+            Long genreId = genreDao.findGenre(genreName);
+
+            if (genreId == null) {
+                genreId = genreDao.insert(new GenreEntity(null, genreName));//hmm, storage?
+            }
+            genreDao.insertGenreEntry(new GenreEntryEntity(compositionId, genreId, null));
+        });
+    }
+
+    public void remoteCompositionFromGenre(long compositionId, long genreId) {
+        appDatabase.runInTransaction(() -> {
+            genreDao.removeGenreEntry(compositionId, genreId);
+            genreDao.deleteEmptyGenre(genreId);
+        });
+    }
+
+    public void changeCompositionGenre(long compositionId, long oldGenreId, String newGenreName) {
+        appDatabase.runInTransaction(() -> {
+            Long genreId = genreDao.findGenre(newGenreName);
+
+            if (genreId == null) {
+                genreId = genreDao.insert(new GenreEntity(null, newGenreName));//hmm, storage?
+            }
+            genreDao.insertGenreEntry(new GenreEntryEntity(compositionId, genreId, null));
+            genreDao.removeGenreEntry(compositionId, oldGenreId);
+        });
+    }
+
     public String[] getGenreNames() {
         return genreDao.getGenreNames();
     }
@@ -127,6 +157,10 @@ public class GenresDaoWrapper {
 
     public boolean isGenreExists(String name) {
         return genreDao.isGenreExists(name);
+    }
+
+    public String getGenreName(long genreId) {
+        return genreDao.getGenreName(genreId);
     }
 
     private GenreEntity toEntity(StorageGenre genre) {
@@ -167,4 +201,5 @@ public class GenresDaoWrapper {
 
         return sb.toString();
     }
+
 }

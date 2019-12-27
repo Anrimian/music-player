@@ -59,6 +59,8 @@ public class EditorRepositoryImpl implements EditorRepository {
                                               ShortGenre oldGenre,
                                               String newGenre) {
         return sourceEditor.changeCompositionGenre(composition.getFilePath(), oldGenre.getName(), newGenre)
+                .doOnComplete(() -> genresDao.changeCompositionGenre(composition.getId(), oldGenre.getId(), newGenre))
+                //TODO update media storage
                 .subscribeOn(scheduler);
     }
 
@@ -66,12 +68,16 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable addCompositionGenre(FullComposition composition,
                                            String newGenre) {
         return sourceEditor.addCompositionGenre(composition.getFilePath(), newGenre)
+                .doOnComplete(() -> genresDao.addCompositionToGenre(composition.getId(), newGenre))
+                //TODO update media storage
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
         return sourceEditor.removeCompositionGenre(composition.getFilePath(), genre.getName())
+                .doOnComplete(() -> genresDao.remoteCompositionFromGenre(composition.getId(), genre.getId()))
+                //TODO update media storage
                 .subscribeOn(scheduler);
     }
 
@@ -179,9 +185,11 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable updateGenreName(String name, long genreId) {
         return checkGenreExists(name)
-                .andThen(Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId)))
-                .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionGenre(composition.getFilePath(), name))//TODO replace old genre
+                .andThen(Single.fromCallable(() -> genresDao.getGenreName(genreId)))
+                .flatMapCompletable(oldName -> Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId))
+                        .flatMapObservable(Observable::fromIterable)
+                        .flatMapCompletable(composition -> sourceEditor.changeCompositionGenre(composition.getFilePath(), oldName, name))
+                )
                 .doOnComplete(() -> genresDao.updateGenreName(name, genreId))
                 .subscribeOn(scheduler);
     }

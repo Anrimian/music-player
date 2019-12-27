@@ -42,6 +42,7 @@ public class CompositionSourceEditor {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.ALBUM_ARTIST, artist));
     }
 
+    @Deprecated
     public Completable setCompositionGenre(String filePath, String genre) {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.GENRE, genre));
     }
