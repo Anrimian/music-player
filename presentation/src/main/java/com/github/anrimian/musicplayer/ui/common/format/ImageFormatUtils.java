@@ -8,7 +8,7 @@ import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 public class ImageFormatUtils {
 
-    private static final long NOTIFICATION_IMAGE_TIMEOUT_SECONDS = 2;
+    private static final long NOTIFICATION_IMAGE_TIMEOUT_SECONDS = 1;
 
     private static Bitmap defaultNotificationBitmap;
 
