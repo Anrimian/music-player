@@ -23,7 +23,7 @@ public interface CompositionsDao {
     Observable<List<CompositionEntity>> getAllObservable();
 
     @Query("SELECT * FROM compositions WHERE id = :id")
-    Observable<CompositionEntity> getCompoisitionObservable(long id);
+    Observable<CompositionEntity> getCompositionObservable(long id);
 
 //    @Query("SELECT * FROM compositions " +
 //            "ORDER BY :orderField")
@@ -86,6 +86,9 @@ public interface CompositionsDao {
 
     @Query("DELETE FROM compositions WHERE storageId in (:ids)")
     void deleteByStorageId(List<Long> ids);
+
+    @Query("DELETE FROM compositions WHERE storageId = :id")
+    void deleteByStorageId(long id);
 
     @Query("DELETE FROM compositions")
     void deleteAll();
