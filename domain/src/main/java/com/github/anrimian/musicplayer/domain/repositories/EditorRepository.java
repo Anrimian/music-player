@@ -11,9 +11,6 @@ import io.reactivex.Single;
 
 public interface EditorRepository {
 
-    @Deprecated
-    Completable changeCompositionGenre(FullComposition composition, String newGenre);
-
     Completable changeCompositionGenre(FullComposition composition,
                                        ShortGenre oldGenre,
                                        String newGenre);

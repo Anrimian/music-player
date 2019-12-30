@@ -161,6 +161,10 @@ public class GenresDaoWrapper {
         return genreDao.isGenreExists(name);
     }
 
+    public boolean isGenreExists(long id) {
+        return genreDao.isGenreExists(id);
+    }
+
     public String getGenreName(long genreId) {
         return genreDao.getGenreName(genreId);
     }

@@ -4,8 +4,10 @@ import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -18,6 +20,7 @@ import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,9 +35,18 @@ import static android.text.TextUtils.isEmpty;
 public class StorageMusicProvider {
 
     private final ContentResolver contentResolver;
+    private final Context context;
 
     public StorageMusicProvider(Context context) {
         contentResolver = context.getContentResolver();
+        this.context = context;
+    }
+
+    public void scanMedia(String path) {
+        File file = new File(path);
+        Uri uri = Uri.fromFile(file);
+        Intent scanFileIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
+        context.sendBroadcast(scanFileIntent);
     }
 
     public Observable<LongSparseArray<StorageComposition>> getCompositionsObservable() {

@@ -161,6 +161,8 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     //can items change order on merge?
     private synchronized void applyPlayListItemsData(long playListId,
                                                      List<StoragePlayListItem> newItems) {
+        //check is exists?
+
         List<StoragePlayListItem> currentItems = playListsDao.getPlayListItemsAsStorageItems(playListId);
         LongSparseArray<StoragePlayListItem> currentItemsMap = AndroidCollectionUtils.mapToSparseArray(
                 currentItems,
@@ -185,7 +187,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     private synchronized void applyGenreItemsData(long genreId,
                                                   LongSparseArray<StorageGenreItem> newGenreItems) {
-        if (newGenreItems.isEmpty()) {
+        if (newGenreItems.isEmpty() || !genresDao.isGenreExists(genreId)) {
             genresDao.deleteGenre(genreId);
             genreEntriesDisposable.remove(genreId);
             return;

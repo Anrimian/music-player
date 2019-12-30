@@ -25,10 +25,6 @@ public class EditorInteractor {
         this.musicProviderRepository = musicProviderRepository;
     }
 
-    public Completable editCompositionGenre(FullComposition composition, String newGenre) {
-        return editorRepository.changeCompositionGenre(composition, newGenre);
-    }
-
     public Completable changeCompositionGenre(FullComposition composition,
                                               ShortGenre oldGenre,
                                               String newGenre) {

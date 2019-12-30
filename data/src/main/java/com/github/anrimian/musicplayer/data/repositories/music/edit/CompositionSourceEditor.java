@@ -20,7 +20,7 @@ import io.reactivex.Maybe;
 
 public class CompositionSourceEditor {
 
-    private static final String GENRE_DIVIDER = ";";
+    private static final String GENRE_DIVIDER = "\u0000";
 
     public CompositionSourceEditor() {
         TagOptionSingleton.getInstance().setAndroid(true);
@@ -42,11 +42,6 @@ public class CompositionSourceEditor {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.ALBUM_ARTIST, artist));
     }
 
-    @Deprecated
-    public Completable setCompositionGenre(String filePath, String genre) {
-        return Completable.fromAction(() -> editFile(filePath, FieldKey.GENRE, genre));
-    }
-
     //TODO genre not found case
     public Completable changeCompositionGenre(String filePath,
                                               String oldGenre,
@@ -61,11 +56,18 @@ public class CompositionSourceEditor {
     public Completable addCompositionGenre(String filePath,
                                            String newGenre) {
         return Completable.fromAction(() -> {
+//            AudioFile file = AudioFileIO.read(new File(filePath));
+//            Tag tag = file.getTag();
+//            if (tag == null) {
+//                tag = new ID3v23Tag();
+//                file.setTag(tag);
+//            }
+//            tag.addField(FieldKey.GENRE, newGenre);
+//            AudioFileIO.write(file);
             String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
             StringBuilder sb = new StringBuilder(genres);
             if (sb.length() != 0) {
                 sb.append(GENRE_DIVIDER);
-                sb.append(" ");
             }
             sb.append(newGenre);
             editFile(filePath, FieldKey.GENRE, sb.toString());
@@ -81,7 +83,7 @@ public class CompositionSourceEditor {
             }
             String textToDelete = genre;
             if (lastIndexOfGenre != genres.length()) {
-                textToDelete += GENRE_DIVIDER + " ";
+                textToDelete += GENRE_DIVIDER;
             }
             String newGenres = genres.replace(textToDelete, "");
             editFile(filePath, FieldKey.GENRE, newGenres);

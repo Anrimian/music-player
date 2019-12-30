@@ -62,20 +62,22 @@ public class EditorRepositoryImpl implements EditorRepository {
         this.scheduler = scheduler;
     }
 
-    @Override
-    @Deprecated
-    public Completable changeCompositionGenre(FullComposition composition, String newGenre) {
-        return sourceEditor.setCompositionGenre(composition.getFilePath(), newGenre)
-                .andThen(storageMusicDataSource.updateCompositionGenre(composition, newGenre))
-                .subscribeOn(scheduler);
-    }
+    /*
+    rename genre - working
+    add genre - working( no:( )
+    change genre
+    remove genre
+     */
 
     @Override
     public Completable changeCompositionGenre(FullComposition composition,
                                               ShortGenre oldGenre,
                                               String newGenre) {
         return sourceEditor.changeCompositionGenre(composition.getFilePath(), oldGenre.getName(), newGenre)
-                .doOnComplete(() -> genresDao.changeCompositionGenre(composition.getId(), oldGenre.getId(), newGenre))
+                .doOnComplete(() -> {
+                    genresDao.changeCompositionGenre(composition.getId(), oldGenre.getId(), newGenre);
+                    storageMusicProvider.scanMedia(composition.getFilePath());
+                })
                 //TODO update media storage
                 .subscribeOn(scheduler);
     }
@@ -84,15 +86,21 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable addCompositionGenre(FullComposition composition,
                                            String newGenre) {
         return sourceEditor.addCompositionGenre(composition.getFilePath(), newGenre)
-                .doOnComplete(() -> genresDao.addCompositionToGenre(composition.getId(), newGenre))
-                //TODO update media storage
+                .doOnComplete(() -> {
+                    genresDao.addCompositionToGenre(composition.getId(), newGenre);
+                    storageMusicProvider.scanMedia(composition.getFilePath());
+                    //TODO not working
+                })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
         return sourceEditor.removeCompositionGenre(composition.getFilePath(), genre.getName())
-                .doOnComplete(() -> genresDao.remoteCompositionFromGenre(composition.getId(), genre.getId()))
+                .doOnComplete(() -> {
+                    genresDao.remoteCompositionFromGenre(composition.getId(), genre.getId());
+                    storageMusicProvider.scanMedia(composition.getFilePath());
+                })
                 //TODO update media storage
                 .subscribeOn(scheduler);
     }

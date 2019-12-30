@@ -142,4 +142,7 @@ public interface GenreDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM genres WHERE name = :name)")
     boolean isGenreExists(String name);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM genres WHERE id = :id)")
+    boolean isGenreExists(long id);
 }

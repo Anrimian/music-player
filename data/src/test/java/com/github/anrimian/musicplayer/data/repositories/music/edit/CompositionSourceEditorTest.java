@@ -50,18 +50,6 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void setGenreTest() throws IOException {
-        String filePath = res.getFile().getPath();
-        System.out.println("genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
-
-        String testGenre = "Test genre";
-        sourceEditor.setCompositionGenre(filePath, testGenre).subscribe();
-        String newGenre = sourceEditor.getCompositionGenre(filePath).blockingGet();
-        System.out.println("new genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
-        assertEquals(testGenre, newGenre);
-    }
-
-    @Test
     public void addGenreTest() throws IOException {
         String filePath = res.getFile().getPath();
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
@@ -73,7 +61,7 @@ public class CompositionSourceEditorTest {
         sourceEditor.addCompositionGenre(filePath, testGenre2).subscribe();
         String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("new genres: " + newGenres);
-        assertEquals(testGenre1 + "; " + testGenre2, newGenres);
+        assertEquals(testGenre1 + "\u0000" + testGenre2, newGenres);
     }
 
     @Test
@@ -106,7 +94,7 @@ public class CompositionSourceEditorTest {
         sourceEditor.changeCompositionGenre(filePath, testGenre1, testGenre3).subscribe();
         String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("new genres: " + newGenres);
-        assertEquals(testGenre3 + "; " + testGenre2, newGenres);
+        assertEquals(testGenre3 + "\u0000" + testGenre2, newGenres);
     }
 
     @Test
