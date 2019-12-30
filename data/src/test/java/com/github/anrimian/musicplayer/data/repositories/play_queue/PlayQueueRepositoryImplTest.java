@@ -48,7 +48,7 @@ public class PlayQueueRepositoryImplTest {
         when(settingsPreferences.isRandomPlayingEnabled()).thenReturn(false);
         when(settingsPreferences.getRandomPlayingObservable()).thenReturn(randomModeObservable);
 
-        when(playQueueDao.insertNewPlayQueue(any())).thenReturn(
+        when(playQueueDao.insertNewPlayQueue(any(), settingsPreferences.isRandomPlayingEnabled(), startPosition)).thenReturn(
                 new PlayQueueLists(getFakeItems(), getReversedFakeItems()));
         when(playQueueDao.getPlayQueueObservable())
                 .thenReturn(playQueueDaoSubject);
@@ -62,7 +62,7 @@ public class PlayQueueRepositoryImplTest {
                 .test()
                 .assertComplete();
 
-        verify(playQueueDao).insertNewPlayQueue(getFakeCompositions());
+        verify(playQueueDao).insertNewPlayQueue(getFakeCompositions(), settingsPreferences.isRandomPlayingEnabled(), startPosition);
 
         verify(uiStatePreferences).setCurrentCompositionId(0L);
 
@@ -77,7 +77,7 @@ public class PlayQueueRepositoryImplTest {
                 .test()
                 .assertComplete();
 
-        verify(playQueueDao).insertNewPlayQueue(getFakeCompositions());
+        verify(playQueueDao).insertNewPlayQueue(getFakeCompositions(), settingsPreferences.isRandomPlayingEnabled(), startPosition);
 
         verify(uiStatePreferences).setCurrentCompositionId(1000L);
 

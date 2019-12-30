@@ -15,7 +15,6 @@ import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -33,7 +32,6 @@ import io.reactivex.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static io.reactivex.subjects.BehaviorSubject.create;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
@@ -85,8 +83,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         if (compositions.isEmpty()) {
             return Completable.complete();
         }
-        return Single.fromCallable(() -> playQueueDao.insertNewPlayQueue(compositions))
-                .doOnSuccess(playQueue -> selectCurrentItem(playQueue, startPosition))
+        return Single.fromCallable(() -> playQueueDao.insertNewPlayQueue(compositions,
+                settingsPreferences.isRandomPlayingEnabled(),
+                startPosition)
+        ).doOnSuccess(this::setCurrentItem)
                 .ignoreElement()
                 .subscribeOn(scheduler);
     }
@@ -109,7 +109,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
+    public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {//wrong emits...?
         return withDefaultValue(currentCompositionSubject, this::getSavedQueueEvent)
                 .subscribeOn(scheduler);
     }
@@ -282,17 +282,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         setCurrentItem(item);
     }
 
-    private List<PlayQueueItem> toSortedQueue(boolean isRandom, List<PlayQueueCompositionDto> items) {
-        Collections.sort(items, (first, second) -> {
-            if (isRandom) {
-                return Integer.compare(first.getShuffledPosition(), second.getShuffledPosition());
-            } else {
-                return Integer.compare(first.getPosition(), second.getPosition());
-            }
-        });
-        return mapList(items, this::toPlayQueueItem);
-    }
-
     private PlayQueueItem toPlayQueueItem(PlayQueueCompositionDto entity) {
         return new PlayQueueItem(entity.getItemId(),
                 CompositionMapper.toComposition(entity.getComposition())
@@ -323,9 +312,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         } else {
             //item not found, select new item on this position
             Integer currentPosition = currentQueue.indexOf(currentItem);
-            if (currentPosition != null) {
-                selectItemAt(newQueue, currentPosition);
+            if (currentPosition == null) {
+                currentPosition = 0;
             }
+            selectItemAt(newQueue, currentPosition);
         }
     }
 }

@@ -47,7 +47,7 @@ public class PlayListsDaoWrapperTest {
 
         when(playQueueDao.insertItems(any())).thenReturn(ids);
 
-        PlayQueueLists queueLists = daoWrapper.insertNewPlayQueue(list);
+        PlayQueueLists queueLists = daoWrapper.insertNewPlayQueue(list, settingsPreferences.isRandomPlayingEnabled(), startPosition);
 
         List<PlayQueueItem> items = queueLists.getQueue();
         assertEquals(list.get(0), items.get(0).getComposition());

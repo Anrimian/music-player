@@ -6,7 +6,6 @@ import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 
@@ -17,6 +16,7 @@ import java.util.Random;
 
 import io.reactivex.Observable;
 
+import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
@@ -99,23 +99,47 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    //seems not working properly?
-    public PlayQueueLists insertNewPlayQueue(List<Composition> compositions) {
+    public PlayQueueItem insertNewPlayQueue(List<Composition> compositions,
+                                            boolean randomPlayingEnabled,
+                                            int startPosition) {
         return appDatabase.runInTransaction(() -> {
             List<Composition> shuffledList = new ArrayList<>(compositions);
             long randomSeed = System.nanoTime();
             Collections.shuffle(shuffledList, new Random(randomSeed));
 
+            List<Integer> shuffledPositionList = new ArrayList<>(compositions.size());
+            for (int i = 0; i < compositions.size(); i++) {
+                shuffledPositionList.add(i);
+            }
+            Collections.shuffle(shuffledPositionList, new Random(randomSeed));
+
+            List<PlayQueueEntity> entities = new ArrayList<>(compositions.size());
+            int shuffledStartPosition = 0;
+            for (int i = 0; i < compositions.size(); i++) {
+                Composition composition = compositions.get(i);
+                PlayQueueEntity playQueueEntity = new PlayQueueEntity();
+                playQueueEntity.setAudioId(composition.getId());
+                playQueueEntity.setPosition(i);
+                int shuffledPosition =  shuffledPositionList.get(i);
+                playQueueEntity.setShuffledPosition(shuffledPosition);
+
+                if (startPosition != NO_POSITION && i == startPosition) {
+                    shuffledStartPosition = shuffledPosition;
+                }
+
+                entities.add(playQueueEntity);
+            }
+
             playQueueDao.deletePlayQueue();
-            List<PlayQueueEntity> entities = toEntityList(compositions, randomSeed);
-            List<Long> ids = playQueueDao.insertItems(entities);
+            playQueueDao.insertItems(entities);
 
-            List<PlayQueueItem> items = toPlayQueueItems(compositions, ids);
-            List<Long> shuffledIds = new ArrayList<>(ids);
-            Collections.shuffle(shuffledIds, new Random(randomSeed));
-            List<PlayQueueItem> shuffledItems = toPlayQueueItems(shuffledList, shuffledIds);
-
-            return new PlayQueueLists(items, shuffledItems);
+            PlayQueueItemDto item;
+            if (randomPlayingEnabled) {
+                item = playQueueDao.getItemAtShuffledPosition(shuffledStartPosition);
+            } else {
+                item = playQueueDao.getItemAtPosition(startPosition == NO_POSITION? 0: startPosition);
+            }
+            return toQueueItem(item);
         });
     }
 
