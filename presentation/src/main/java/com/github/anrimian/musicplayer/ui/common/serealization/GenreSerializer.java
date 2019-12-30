@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.common.serealization;
 import android.os.Bundle;
 
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 public interface GenreSerializer {
 
@@ -20,10 +21,21 @@ public interface GenreSerializer {
         return bundle;
     }
 
+    static Bundle serialize(ShortGenre genre) {
+        Bundle bundle = new Bundle();
+        bundle.putLong(ID, genre.getId());
+        bundle.putString(NAME, genre.getName());
+        return bundle;
+    }
+
     static Genre deserialize(Bundle bundle) {
         return new Genre(bundle.getLong(ID),
                 bundle.getString(NAME),
                 bundle.getInt(COMPOSITION_COUNT),
                 bundle.getLong(TOTAL_DURATION));
+    }
+
+    static ShortGenre deserializeShort(Bundle bundle) {
+        return new ShortGenre(bundle.getLong(ID), bundle.getString(NAME));
     }
 }

@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderF
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -86,19 +87,24 @@ public class MusicProviderRepositoryImpl implements MusicProviderRepository {
     @Override
     public Observable<List<Artist>> getArtistsObservable(@Nullable String searchText) {
         return settingsPreferences.getArtistsOrderObservable()
-                .flatMap(order -> artistsDao.getAllObservable(order, searchText));
+                .switchMap(order -> artistsDao.getAllObservable(order, searchText));
     }
 
     @Override
     public Observable<List<Album>> getAlbumsObservable(@Nullable String searchText) {
         return settingsPreferences.getAlbumsOrderObservable()
-                .flatMap(order -> albumsDao.getAllObservable(order, searchText));
+                .switchMap(order -> albumsDao.getAllObservable(order, searchText));
     }
 
     @Override
     public Observable<List<Genre>> getGenresObservable(@Nullable String searchText) {
         return settingsPreferences.getGenresOrderObservable()
-                .flatMap(order -> genresDao.getAllObservable(order, searchText));
+                .switchMap(order -> genresDao.getAllObservable(order, searchText));
+    }
+
+    @Override
+    public Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId) {
+        return genresDao.getShortGenresInComposition(compositionId);
     }
 
     @Override

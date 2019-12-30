@@ -50,7 +50,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void changeGenreTest() throws IOException {
+    public void setGenreTest() throws IOException {
         String filePath = res.getFile().getPath();
         System.out.println("genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
 
@@ -59,6 +59,54 @@ public class CompositionSourceEditorTest {
         String newGenre = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("new genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
         assertEquals(testGenre, newGenre);
+    }
+
+    @Test
+    public void addGenreTest() throws IOException {
+        String filePath = res.getFile().getPath();
+        String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("genres: " + genres);
+
+        String testGenre1 = "Test genre1";
+        String testGenre2 = "Test genre2";
+        sourceEditor.addCompositionGenre(filePath, testGenre1).subscribe();
+        sourceEditor.addCompositionGenre(filePath, testGenre2).subscribe();
+        String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("new genres: " + newGenres);
+        assertEquals(testGenre1 + "; " + testGenre2, newGenres);
+    }
+
+    @Test
+    public void removeGenreTest() throws IOException {
+        String filePath = res.getFile().getPath();
+        String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("genres: " + genres);
+
+        String testGenre1 = "Test genre1";
+        String testGenre2 = "Test genre2";
+        sourceEditor.addCompositionGenre(filePath, testGenre1).subscribe();
+        sourceEditor.addCompositionGenre(filePath, testGenre2).subscribe();
+        sourceEditor.removeCompositionGenre(filePath, testGenre1).subscribe();
+        String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("new genres: " + newGenres);
+        assertEquals(testGenre2, newGenres);
+    }
+
+    @Test
+    public void changeGenreTest() throws IOException {
+        String filePath = res.getFile().getPath();
+        String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("genres: " + genres);
+
+        String testGenre1 = "Test genre1";
+        String testGenre2 = "Test genre2";
+        String testGenre3 = "Test genre3";
+        sourceEditor.addCompositionGenre(filePath, testGenre1).subscribe();
+        sourceEditor.addCompositionGenre(filePath, testGenre2).subscribe();
+        sourceEditor.changeCompositionGenre(filePath, testGenre1, testGenre3).subscribe();
+        String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("new genres: " + newGenres);
+        assertEquals(testGenre3 + "; " + testGenre2, newGenres);
     }
 
     @Test

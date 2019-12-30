@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionU
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
@@ -82,6 +83,10 @@ public class GenresDaoWrapper {
         return genreDao.getCompositionsInGenre(genreId);
     }
 
+    public Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId) {
+        return genreDao.getShortGenresInComposition(compositionId);
+    }
+
     public List<IdPair> getGenresIds() {
         return genreDao.getGenresIds();
     }
@@ -108,6 +113,38 @@ public class GenresDaoWrapper {
         });
     }
 
+    public void addCompositionToGenre(long compositionId, String genreName) {
+        appDatabase.runInTransaction(() -> {
+            Long genreId = genreDao.findGenre(genreName);
+
+            if (genreId == null) {
+                genreId = genreDao.insert(new GenreEntity(null, genreName));//hmm, storage?
+            }
+            genreDao.insertGenreEntry(new GenreEntryEntity(compositionId, genreId, null));
+        });
+    }
+
+    public void remoteCompositionFromGenre(long compositionId, long genreId) {
+        appDatabase.runInTransaction(() -> {
+            genreDao.removeGenreEntry(compositionId, genreId);
+            genreDao.deleteEmptyGenre(genreId);
+        });
+    }
+
+    public void changeCompositionGenre(long compositionId, long oldGenreId, String newGenreName) {
+        appDatabase.runInTransaction(() -> {
+            Long genreId = genreDao.findGenre(newGenreName);
+
+            if (genreId == null) {
+                genreId = genreDao.insert(new GenreEntity(null, newGenreName));//hmm, storage?
+            }
+            genreDao.insertGenreEntry(new GenreEntryEntity(compositionId, genreId, null));
+            genreDao.removeGenreEntry(compositionId, oldGenreId);
+
+            genreDao.deleteEmptyGenre(oldGenreId);
+        });
+    }
+
     public String[] getGenreNames() {
         return genreDao.getGenreNames();
     }
@@ -118,6 +155,10 @@ public class GenresDaoWrapper {
 
     public void deleteGenre(long genreId) {
         genreDao.deleteGenre(genreId);
+    }
+
+    public boolean isGenreExists(String name) {
+        return genreDao.isGenreExists(name);
     }
 
     public String getGenreName(long genreId) {
@@ -162,4 +203,5 @@ public class GenresDaoWrapper {
 
         return sb.toString();
     }
+
 }

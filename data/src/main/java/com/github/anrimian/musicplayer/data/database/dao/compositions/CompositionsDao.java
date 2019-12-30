@@ -41,7 +41,6 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
-            "(SELECT name FROM genres WHERE id IN(SELECT genreId FROM genre_entries WHERE audioId = :id)) as genre, " +
             "filePath as filePath, " +
             "duration as duration, " +
             "size as size, " +

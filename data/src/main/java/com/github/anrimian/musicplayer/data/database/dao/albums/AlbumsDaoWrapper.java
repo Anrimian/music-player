@@ -110,6 +110,10 @@ public class AlbumsDaoWrapper {
         return albumsDao.getAlbumArtist(albumId);
     }
 
+    public boolean isAlbumExists(String name) {
+        return albumsDao.isAlbumExists(name);
+    }
+
     private AlbumEntity toEntity(StorageAlbum album) {
         String artist = album.getArtist();
         Long artistId = null;

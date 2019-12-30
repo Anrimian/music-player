@@ -3,6 +3,11 @@ package com.github.anrimian.musicplayer.data.repositories.music.edit;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
+import com.github.anrimian.musicplayer.data.repositories.music.edit.exceptions.AlbumAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.repositories.music.edit.exceptions.ArtistAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.repositories.music.edit.exceptions.FileExistsException;
+import com.github.anrimian.musicplayer.data.repositories.music.edit.exceptions.GenreAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.repositories.music.edit.exceptions.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
@@ -10,6 +15,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
@@ -57,9 +63,37 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
+    @Deprecated
     public Completable changeCompositionGenre(FullComposition composition, String newGenre) {
         return sourceEditor.setCompositionGenre(composition.getFilePath(), newGenre)
                 .andThen(storageMusicDataSource.updateCompositionGenre(composition, newGenre))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable changeCompositionGenre(FullComposition composition,
+                                              ShortGenre oldGenre,
+                                              String newGenre) {
+        return sourceEditor.changeCompositionGenre(composition.getFilePath(), oldGenre.getName(), newGenre)
+                .doOnComplete(() -> genresDao.changeCompositionGenre(composition.getId(), oldGenre.getId(), newGenre))
+                //TODO update media storage
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable addCompositionGenre(FullComposition composition,
+                                           String newGenre) {
+        return sourceEditor.addCompositionGenre(composition.getFilePath(), newGenre)
+                .doOnComplete(() -> genresDao.addCompositionToGenre(composition.getId(), newGenre))
+                //TODO update media storage
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
+        return sourceEditor.removeCompositionGenre(composition.getFilePath(), genre.getName())
+                .doOnComplete(() -> genresDao.remoteCompositionFromGenre(composition.getId(), genre.getId()))
+                //TODO update media storage
                 .subscribeOn(scheduler);
     }
 
@@ -137,7 +171,8 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable updateAlbumName(String name, long albumId) {
-        return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
+        return checkAlbumExists(name)
+                .andThen(Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId)))
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition.getFilePath(), name))
                 .doOnComplete(() -> {
@@ -165,7 +200,8 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable updateArtistName(String name, long artistId) {
-        return Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId))
+        return checkArtistExists(name)
+                .andThen(Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId)))
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name)
                         .doOnComplete(() -> {
@@ -197,15 +233,41 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable updateGenreName(String name, long genreId) {
-        return Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId))
-                .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionGenre(composition.getFilePath(), name))
-                .doOnComplete(() -> {
-                    String oldName = genresDao.getGenreName(genreId);
-                    genresDao.updateGenreName(name, genreId);
-                    storageGenresProvider.updateGenreName(oldName, name);
-                })
+        return checkGenreExists(name)
+                .andThen(Single.fromCallable(() -> genresDao.getGenreName(genreId)))
+                .flatMapCompletable(oldName -> Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId))
+                        .flatMapObservable(Observable::fromIterable)
+                        .flatMapCompletable(composition -> sourceEditor.changeCompositionGenre(composition.getFilePath(), oldName, name))
+                        .doOnComplete(() -> {
+                            genresDao.updateGenreName(name, genreId);
+                            storageGenresProvider.updateGenreName(oldName, name);
+                        })
+                )
                 .subscribeOn(scheduler);
+    }
+
+    private Completable checkAlbumExists(String name) {
+        return Completable.fromAction(() -> {
+            if (albumsDao.isAlbumExists(name)) {
+                throw new AlbumAlreadyExistsException();
+            }
+        });
+    }
+
+    private Completable checkArtistExists(String name) {
+        return Completable.fromAction(() -> {
+            if (artistsDao.isArtistExists(name)) {
+                throw new ArtistAlreadyExistsException();
+            }
+        });
+    }
+
+    private Completable checkGenreExists(String name) {
+        return Completable.fromAction(() -> {
+            if (genresDao.isGenreExists(name)) {
+                throw new GenreAlreadyExistsException();
+            }
+        });
     }
 
     private Single<String> renameFile(String oldPath, String newPath) {

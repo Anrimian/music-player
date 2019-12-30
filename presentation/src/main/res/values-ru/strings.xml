@@ -160,6 +160,14 @@
     <string name="by_duration">По длительности</string>
     <string name="longest_first">Сперва долгие</string>
     <string name="more_first">Сперва больше</string>
+    <string name="artist_already_exists">Исполнитель с таким именем уже существует</string>
+    <string name="album_already_exists">Альбом с таким именем уже существует</string>
+    <string name="genre_already_exists">Жанр с таким именем уже существует</string>
+    <string name="remove_genre">Удалить жанр</string>
+    <string name="add_composition_genre">Добавить жанр</string>
+    <string name="add">Добавить</string>
+    <string name="edit_genre">Изменить жанр</string>
+    <string name="genre_removed_message">Жанр \"%s\" убран</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

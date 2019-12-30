@@ -2,8 +2,11 @@ package com.github.anrimian.musicplayer.domain.business.editor;
 
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+
+import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -24,6 +27,21 @@ public class EditorInteractor {
 
     public Completable editCompositionGenre(FullComposition composition, String newGenre) {
         return editorRepository.changeCompositionGenre(composition, newGenre);
+    }
+
+    public Completable changeCompositionGenre(FullComposition composition,
+                                              ShortGenre oldGenre,
+                                              String newGenre) {
+        return editorRepository.changeCompositionGenre(composition, oldGenre, newGenre);
+    }
+
+    public Completable addCompositionGenre(FullComposition composition,
+                                           String newGenre) {
+        return editorRepository.addCompositionGenre(composition, newGenre);
+    }
+
+    public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
+        return editorRepository.remoteCompositionGenre(composition, genre);
     }
 
     public Completable editCompositionAuthor(FullComposition composition, String newAuthor) {
@@ -48,6 +66,10 @@ public class EditorInteractor {
 
     public Observable<FullComposition> getCompositionObservable(long id) {
         return musicProviderRepository.getCompositionObservable(id);
+    }
+
+    public Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId) {
+        return musicProviderRepository.getShortGenresInComposition(compositionId);
     }
 
     public Observable<Album> getAlbumObservable(long albumId) {

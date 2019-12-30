@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 import java.util.List;
 
@@ -10,7 +11,17 @@ import io.reactivex.Single;
 
 public interface EditorRepository {
 
+    @Deprecated
     Completable changeCompositionGenre(FullComposition composition, String newGenre);
+
+    Completable changeCompositionGenre(FullComposition composition,
+                                       ShortGenre oldGenre,
+                                       String newGenre);
+
+    Completable addCompositionGenre(FullComposition composition,
+                                    String newGenre);
+
+    Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre);
 
     Completable changeCompositionAuthor(FullComposition composition, String newAuthor);
 

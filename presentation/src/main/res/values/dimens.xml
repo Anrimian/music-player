@@ -94,4 +94,12 @@
     <dimen name="swipe_panel_text_top_padding">4dp</dimen>
     <dimen name="swipe_panel_icon_size">28dp</dimen>
     <dimen name="swipe_panel_text_size">11sp</dimen>
+
+    <!--chips-->
+    <dimen name="chip_corner_radius">22dp</dimen>
+    <dimen name="chip_horizontal_margin">8dp</dimen>
+    <dimen name="chip_height">32dp</dimen>
+    <dimen name="chip_button_width">34dp</dimen>
+    <dimen name="chip_spacing_margin">8dp</dimen>
+
 </resources>

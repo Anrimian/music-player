@@ -95,4 +95,7 @@ public interface ArtistsDao {
 
     @Query("SELECT name FROM artists WHERE id = :artistId")
     String getArtistName(long artistId);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM artists WHERE name = :name)")
+    boolean isArtistExists(String name);
 }

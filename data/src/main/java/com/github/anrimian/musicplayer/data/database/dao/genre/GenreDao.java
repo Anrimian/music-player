@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryE
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 import java.util.List;
 
@@ -98,6 +99,11 @@ public interface GenreDao {
             "WHERE id = :genreId LIMIT 1")
     Observable<List<Genre>> getGenreObservable(long genreId);
 
+    @Query("SELECT id, name " +
+            "FROM genres " +
+            "WHERE id IN(SELECT genreId FROM genre_entries WHERE audioId = :compositionId)")
+    Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId);
+
     @Query("SELECT id FROM genres WHERE name = :name")
     Long findGenre(String name);
 
@@ -109,11 +115,18 @@ public interface GenreDao {
     void deleteEmptyGenre(Long[] ids);
 
     @Query("DELETE FROM genres " +
+            "WHERE id = :id AND (SELECT count() FROM genre_entries WHERE genreId = :id) = 0")
+    void deleteEmptyGenre(long id);
+
+    @Query("DELETE FROM genres " +
             "WHERE (SELECT count() FROM genre_entries WHERE genreId = genres.id) = 0")
     void deleteEmptyGenres();
 
     @Query("DELETE FROM genre_entries WHERE audioId = :compositionId AND genreId IN(:genreIds)")
     void removeGenreEntry(long compositionId, Long[] genreIds);
+
+    @Query("DELETE FROM genre_entries WHERE audioId = :compositionId AND genreId = :genreId")
+    void removeGenreEntry(long compositionId, long genreId);
 
     @Query("SELECT name FROM genres")
     String[] getGenreNames();
@@ -126,4 +139,7 @@ public interface GenreDao {
 
     @Query("SELECT name FROM genres WHERE id = :genreId")
     String getGenreName(long genreId);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM genres WHERE name = :name)")
+    boolean isGenreExists(String name);
 }

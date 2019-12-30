@@ -20,6 +20,8 @@ import io.reactivex.Maybe;
 
 public class CompositionSourceEditor {
 
+    private static final String GENRE_DIVIDER = ";";
+
     public CompositionSourceEditor() {
         TagOptionSingleton.getInstance().setAndroid(true);
     }
@@ -40,8 +42,50 @@ public class CompositionSourceEditor {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.ALBUM_ARTIST, artist));
     }
 
+    @Deprecated
     public Completable setCompositionGenre(String filePath, String genre) {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.GENRE, genre));
+    }
+
+    //TODO genre not found case
+    public Completable changeCompositionGenre(String filePath,
+                                              String oldGenre,
+                                              String newGenre) {
+        return Completable.fromAction(() -> {
+            String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
+            genres = genres.replace(oldGenre, newGenre);
+            editFile(filePath, FieldKey.GENRE, genres);
+        });
+    }
+
+    public Completable addCompositionGenre(String filePath,
+                                           String newGenre) {
+        return Completable.fromAction(() -> {
+            String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
+            StringBuilder sb = new StringBuilder(genres);
+            if (sb.length() != 0) {
+                sb.append(GENRE_DIVIDER);
+                sb.append(" ");
+            }
+            sb.append(newGenre);
+            editFile(filePath, FieldKey.GENRE, sb.toString());
+        });
+    }
+
+    public Completable removeCompositionGenre(String filePath, String genre) {
+        return Completable.fromAction(() -> {
+            String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
+            int lastIndexOfGenre = genres.lastIndexOf(genre);
+            if (lastIndexOfGenre == -1) {
+                return;
+            }
+            String textToDelete = genre;
+            if (lastIndexOfGenre != genres.length()) {
+                textToDelete += GENRE_DIVIDER + " ";
+            }
+            String newGenres = genres.replace(textToDelete, "");
+            editFile(filePath, FieldKey.GENRE, newGenres);
+        });
     }
 
     public Maybe<String> getCompositionTitle(String filePath) {
@@ -79,7 +123,7 @@ public class CompositionSourceEditor {
             tag = new ID3v23Tag();
             file.setTag(tag);
         }
-        tag.addField(genericKey, value == null? "" : value);
+        tag.setField(genericKey, value == null? "" : value);
         AudioFileIO.write(file);
     }
 }
