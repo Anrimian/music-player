@@ -292,23 +292,11 @@
                 style="@style/TextStyle.Subtitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/genre"
+                android:text="@string/genres"
                 android:layout_marginTop="@dimen/content_vertical_margin"
                 app:layout_constraintTop_toBottomOf="@id/divider_album_artist"
                 app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
                 app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_genres"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_internal_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"
-                app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
-                app:layout_constraintTop_toBottomOf="@id/tv_genre_hint"
-                app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="genre"/>
 
             <ImageView
                 android:id="@+id/iv_genre_edit"
@@ -317,17 +305,32 @@
                 app:layout_constraintEnd_toStartOf="@+id/tv_genre_hint"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tv_genre_hint"
-                app:srcCompat="@drawable/ic_circle_edit_outline" />
+                app:srcCompat="@drawable/ic_shape_circle_plus" />
 
             <FrameLayout
                 android:id="@+id/change_genre_clickable_area"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:foreground="?selectableItemBackground"
+                android:background="?selectableItemBackground"
                 app:layout_constraintTop_toBottomOf="@id/divider_album_artist"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_genres"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/content_internal_margin"
+                android:layout_marginBottom="@dimen/content_vertical_margin"
+                app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
+                app:layout_constraintTop_toBottomOf="@id/tv_genre_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintHorizontal_bias="0.0"
+                tools:listitem="@layout/item_genre_chip"
+                tools:text="genre"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

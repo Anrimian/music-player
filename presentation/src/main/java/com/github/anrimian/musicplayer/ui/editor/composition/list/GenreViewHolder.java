@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.editor.composition.list;
 
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,11 +23,19 @@ class GenreViewHolder extends BaseViewHolder {
     @BindView(R.id.tv_genre)
     TextView tvGenre;
 
+    @BindView(R.id.iv_remove)
+    ImageView ivRemove;
+
+    @BindView(R.id.chip_container)
+    View chipContainer;
+
     private ShortGenre genre;
 
     GenreViewHolder(@NonNull ViewGroup parent) {
         super(parent, R.layout.item_genre_chip);
         ButterKnife.bind(this, itemView);
+        chipContainer.setOnClickListener(v -> {});
+        ivRemove.setOnClickListener(v -> {});
     }
 
     void bind(ShortGenre genre) {

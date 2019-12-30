@@ -171,7 +171,6 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
         onLongClick(changeAlbumClickableArea, () -> copyText(tvAlbum, tvAlbumHint));
         onLongClick(changeAlbumArtistClickableArea, () -> copyText(tvAlbumArtist, tvAlbumArtistHint));
-//        onLongClick(changeGenreClickableArea, () -> copyText(tvGenre, tvGenreHint));
 
         @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
         Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
@@ -277,15 +276,15 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showEnterGenreDialog(FullComposition composition, String[] genres) {
-//        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
-//                R.string.change_composition_genre,
-//                R.string.change,
-//                R.string.cancel,
-//                R.string.genre,
-//                composition.getGenre())
-//                .hints(genres)
-//                .build();
-//        genreDialogFragmentRunner.show(fragment);
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
+                R.string.change_composition_genre,
+                R.string.change,
+                R.string.cancel,
+                R.string.genre,
+                "testtesttest")
+                .hints(genres)
+                .build();
+        genreDialogFragmentRunner.show(fragment);
     }
 
     @Override

@@ -171,6 +171,7 @@
     <string name="artist_already_exists">Artist with this name already exists</string>
     <string name="album_already_exists">Album with this name already exists</string>
     <string name="genre_already_exists">Genre with this name already exists</string>
+    <string name="remove_genre">Remove genre</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

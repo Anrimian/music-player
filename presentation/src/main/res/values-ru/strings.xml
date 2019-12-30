@@ -163,6 +163,7 @@
     <string name="artist_already_exists">Исполнитель с таким именем уже существует</string>
     <string name="album_already_exists">Альбом с таким именем уже существует</string>
     <string name="genre_already_exists">Жанр с таким именем уже существует</string>
+    <string name="remove_genre">Удалить жанр</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
