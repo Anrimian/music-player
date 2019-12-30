@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.models.utils.ShortGenreHelper;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter.DiffListAdapter;
 
@@ -14,17 +15,30 @@ import java.util.List;
 
 public class ShortGenresAdapter extends DiffListAdapter<ShortGenre, GenreViewHolder> {
 
-    public ShortGenresAdapter(RecyclerView recyclerView) {
+    private final Callback<ShortGenre> onClickListener;
+    private final Callback<ShortGenre> onLongClickListener;
+    private final Callback<ShortGenre> onRemoveClickListene;
+
+    public ShortGenresAdapter(RecyclerView recyclerView,
+                              Callback<ShortGenre> onClickListener,
+                              Callback<ShortGenre> onLongClickListener,
+                              Callback<ShortGenre> onRemoveClickListene) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 ShortGenreHelper::areSourcesTheSame,
                 ShortGenreHelper::getChangePayload)
         );
+        this.onClickListener = onClickListener;
+        this.onLongClickListener = onLongClickListener;
+        this.onRemoveClickListene = onRemoveClickListene;
     }
 
     @NonNull
     @Override
     public GenreViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new GenreViewHolder(parent);
+        return new GenreViewHolder(parent,
+                onClickListener,
+                onLongClickListener,
+                onRemoveClickListene);
     }
 
     @Override

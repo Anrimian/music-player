@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 class GenreViewHolder extends BaseViewHolder {
 
@@ -31,11 +33,15 @@ class GenreViewHolder extends BaseViewHolder {
 
     private ShortGenre genre;
 
-    GenreViewHolder(@NonNull ViewGroup parent) {
+    GenreViewHolder(@NonNull ViewGroup parent,
+                    Callback<ShortGenre> onClickListener,
+                    Callback<ShortGenre> onLongClickListener,
+                    Callback<ShortGenre> onRemoveClickListener) {
         super(parent, R.layout.item_genre_chip);
         ButterKnife.bind(this, itemView);
-        chipContainer.setOnClickListener(v -> {});
-        ivRemove.setOnClickListener(v -> {});
+        chipContainer.setOnClickListener(v -> onClickListener.call(genre));
+        onLongClick(chipContainer, () -> onLongClickListener.call(genre));
+        ivRemove.setOnClickListener(v -> onRemoveClickListener.call(genre));
     }
 
     void bind(ShortGenre genre) {

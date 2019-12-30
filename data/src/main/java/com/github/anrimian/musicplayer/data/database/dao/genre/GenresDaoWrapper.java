@@ -140,6 +140,8 @@ public class GenresDaoWrapper {
             }
             genreDao.insertGenreEntry(new GenreEntryEntity(compositionId, genreId, null));
             genreDao.removeGenreEntry(compositionId, oldGenreId);
+
+            genreDao.deleteEmptyGenre(oldGenreId);
         });
     }
 

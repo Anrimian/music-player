@@ -19,6 +19,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.serealization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
@@ -36,11 +38,12 @@ import moxy.presenter.ProvidePresenter;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ADD_GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_ARTIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.EDIT_GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
@@ -126,7 +129,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> albumDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> albumArtistDialogFragmentRunner;
-    private DialogFragmentRunner<InputTextDialogFragment> genreDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> addGenreDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> editGenreDialogFragmentRunner;
 
     private ShortGenresAdapter genresAdapter;
 
@@ -156,7 +160,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
             actionBar.setTitle(R.string.edit_tags);
         }
 
-        genresAdapter = new ShortGenresAdapter(rvGenres);
+        genresAdapter = new ShortGenresAdapter(rvGenres,
+                presenter::onGenreItemClicked,
+                this::onGenreItemLongClicked,
+                presenter::onRemoveGenreClicked);
         rvGenres.setAdapter(genresAdapter);
         rvGenres.setLayoutManager(ChipsLayoutManager.newBuilder(this).build());
 
@@ -165,7 +172,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         changeFilenameClickableArea.setOnClickListener(v -> presenter.onChangeFileNameClicked());
         changeAlbumClickableArea.setOnClickListener(v -> presenter.onChangeAlbumClicked());
         changeAlbumArtistClickableArea.setOnClickListener(v -> presenter.onChangeAlbumArtistClicked());
-        changeGenreClickableArea.setOnClickListener(v -> presenter.onChangeGenreClicked());
+        changeGenreClickableArea.setOnClickListener(v -> presenter.onAddGenreItemClicked());
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeTitleClickableArea, () -> copyText(tvTitle, tvTitleHint));
         onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
@@ -197,9 +204,16 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 ALBUM_ARTIST_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewAlbumArtistEntered));
 
-        genreDialogFragmentRunner = new DialogFragmentRunner<>(fm,
-                GENRE_TAG,
+        addGenreDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                ADD_GENRE_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewGenreEntered));
+
+        editGenreDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                EDIT_GENRE_TAG,
+                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
+                    presenter.onNewGenreNameEntered(name, GenreSerializer.deserializeShort(extra));
+                })
+        );
     }
 
     @Override
@@ -237,15 +251,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showGenres(List<ShortGenre> shortGenres) {
-//        FlowLa
-//        FlowLayout
-//        StringBuilder sb = new StringBuilder();
-//        for (ShortGenre genre: shortGenres) {
-//            sb.append(genre.getName());
-//            sb.append("; ");
-//        }
         genresAdapter.submitList(shortGenres);
-//        tvGenre.setText(sb.toString());
     }
 
     @Override
@@ -275,16 +281,32 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
-    public void showEnterGenreDialog(FullComposition composition, String[] genres) {
+    public void showAddGenreDialog(String[] genres) {
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
+                R.string.add_composition_genre,
+                R.string.add,
+                R.string.cancel,
+                R.string.genre,
+                null)
+                .hints(genres)
+                .canBeEmpty(false)
+                .build();
+        addGenreDialogFragmentRunner.show(fragment);
+    }
+
+    @Override
+    public void showEditGenreDialog(ShortGenre shortGenre, String[] genres) {
         InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
                 R.string.change_composition_genre,
                 R.string.change,
                 R.string.cancel,
                 R.string.genre,
-                "testtesttest")
+                shortGenre.getName())
                 .hints(genres)
+                .extra(GenreSerializer.serialize(shortGenre))
+                .canBeEmpty(false)
                 .build();
-        genreDialogFragmentRunner.show(fragment);
+        editGenreDialogFragmentRunner.show(fragment);
     }
 
     @Override
@@ -327,9 +349,20 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void copyFileNameText(String filePath) {
-        AndroidUtils.copyText(this,
-                formatFileName(filePath),
-                getString(R.string.filename));
+        AndroidUtils.copyText(this, formatFileName(filePath), getString(R.string.filename));
+        onTextCopied();
+    }
+
+    @Override
+    public void showRemovedGenreMessage(ShortGenre genre) {
+        String text = getString(R.string.genre_removed_message, genre.getName());
+        MessagesUtils.makeSnackbar(container, text, Snackbar.LENGTH_LONG)
+                .setAction(R.string.cancel, v -> presenter.onRestoreRemovedGenreClicked())
+                .show();
+    }
+
+    private void onGenreItemLongClicked(ShortGenre genre) {
+        AndroidUtils.copyText(this, genre.getName(), getString(R.string.genre));
         onTextCopied();
     }
 

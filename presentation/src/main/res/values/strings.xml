@@ -172,6 +172,10 @@
     <string name="album_already_exists">Album with this name already exists</string>
     <string name="genre_already_exists">Genre with this name already exists</string>
     <string name="remove_genre">Remove genre</string>
+    <string name="add_composition_genre">Add genre</string>
+    <string name="add">Add</string>
+    <string name="edit_genre">Edit genre</string>
+    <string name="genre_removed_message">Genre \"%s\" was removed</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

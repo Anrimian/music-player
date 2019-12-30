@@ -29,6 +29,8 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
 
     private FullComposition composition;
 
+    private ShortGenre removedGenre;
+
     public CompositionEditorPresenter(long compositionId,
                                       EditorInteractor editorInteractor,
                                       Scheduler uiScheduler,
@@ -114,15 +116,25 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
                 .subscribe();
     }
 
-    void onChangeGenreClicked() {
-        if (composition == null) {
-            return;
-        }
+    void onAddGenreItemClicked() {
         editorInteractor.getGenreNames()
                 .observeOn(uiScheduler)
-                .doOnSuccess(genres -> getViewState().showEnterGenreDialog(composition, genres))
+                .doOnSuccess(genres -> getViewState().showAddGenreDialog(genres))
                 .doOnError(throwable -> {
-                    getViewState().showEnterGenreDialog(composition, null);
+                    getViewState().showAddGenreDialog(null);
+                    onDefaultError(throwable);
+                })
+                .ignoreElement()
+                .onErrorComplete()
+                .subscribe();
+    }
+
+    void onGenreItemClicked(ShortGenre genre) {
+        editorInteractor.getGenreNames()
+                .observeOn(uiScheduler)
+                .doOnSuccess(genres -> getViewState().showEditGenreDialog(genre, genres))
+                .doOnError(throwable -> {
+                    getViewState().showEditGenreDialog(genre, null);
                     onDefaultError(throwable);
                 })
                 .ignoreElement()
@@ -162,8 +174,15 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.remoteCompositionGenre(composition, genre)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(() -> onGenreRemoved(genre), this::onDefaultError);
         presenterDisposable.add(changeDisposable);
+    }
+
+    void onRestoreRemovedGenreClicked() {
+        if (removedGenre == null) {
+            return;
+        }
+        onNewGenreEntered(removedGenre.getName());
     }
 
     void onNewAuthorEntered(String author) {
@@ -264,5 +283,10 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     private void onCompositionLoadingError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showCompositionLoadingError(errorCommand);
+    }
+
+    private void onGenreRemoved(ShortGenre genre) {
+        removedGenre = genre;
+        getViewState().showRemovedGenreMessage(genre);
     }
 }
