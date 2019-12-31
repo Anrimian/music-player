@@ -10,7 +10,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.TagOptionSingleton;
-import org.jaudiotagger.tag.id3.ID3v23Tag;
+import org.jaudiotagger.tag.id3.ID3v24Tag;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,21 +56,22 @@ public class CompositionSourceEditor {
     public Completable addCompositionGenre(String filePath,
                                            String newGenre) {
         return Completable.fromAction(() -> {
-//            AudioFile file = AudioFileIO.read(new File(filePath));
-//            Tag tag = file.getTag();
-//            if (tag == null) {
-//                tag = new ID3v23Tag();
-//                file.setTag(tag);
-//            }
-//            tag.addField(FieldKey.GENRE, newGenre);
-//            AudioFileIO.write(file);
-            String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
-            StringBuilder sb = new StringBuilder(genres);
-            if (sb.length() != 0) {
-                sb.append(GENRE_DIVIDER);
+            AudioFile file = AudioFileIO.read(new File(filePath));
+            Tag tag = file.getTag();
+            if (tag == null) {
+                tag = new ID3v24Tag();
+                file.setTag(tag);
             }
-            sb.append(newGenre);
-            editFile(filePath, FieldKey.GENRE, sb.toString());
+            tag.addField(FieldKey.GENRE, newGenre);
+            AudioFileIO.write(file);
+//            String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
+//            StringBuilder sb = new StringBuilder(genres);
+//            if (sb.length() != 0) {
+//                sb.append(GENRE_DIVIDER);
+//            }
+//            sb.append(newGenre);
+//            sb.append(GENRE_DIVIDER);
+//            editFile(filePath, FieldKey.GENRE, sb.toString());
         });
     }
 
@@ -122,7 +123,7 @@ public class CompositionSourceEditor {
         AudioFile file = AudioFileIO.read(new File(filePath));
         Tag tag = file.getTag();
         if (tag == null) {
-            tag = new ID3v23Tag();
+            tag = new ID3v24Tag();
             file.setTag(tag);
         }
         tag.setField(genericKey, value == null? "" : value);

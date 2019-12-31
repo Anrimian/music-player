@@ -37,7 +37,7 @@ public class EditorInteractor {
     }
 
     public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
-        return editorRepository.remoteCompositionGenre(composition, genre);
+        return editorRepository.removeCompositionGenre(composition, genre);
     }
 
     public Completable editCompositionAuthor(FullComposition composition, String newAuthor) {

@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.music.edit;
 
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.music.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.music.edit.exceptions.ArtistAlreadyExistsException;
@@ -33,6 +34,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor();
 
     private final StorageMusicDataSource storageMusicDataSource;
+    private final CompositionsDaoWrapper compositionsDao;
     private final AlbumsDaoWrapper albumsDao;
     private final ArtistsDaoWrapper artistsDao;
     private final GenresDaoWrapper genresDao;
@@ -43,6 +45,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
+                                CompositionsDaoWrapper compositionsDao,
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
                                 GenresDaoWrapper genresDao,
@@ -52,6 +55,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                                 StorageAlbumsProvider storageAlbumsProvider,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
+        this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
         this.genresDao = genresDao;
@@ -95,7 +99,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
-    public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
+    public Completable removeCompositionGenre(FullComposition composition, ShortGenre genre) {
         return sourceEditor.removeCompositionGenre(composition.getFilePath(), genre.getName())
                 .doOnComplete(() -> {
                     genresDao.remoteCompositionFromGenre(composition.getId(), genre.getId());
@@ -108,21 +112,30 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionAuthor(FullComposition composition, String newAuthor) {
         return sourceEditor.setCompositionAuthor(composition.getFilePath(), newAuthor)
-                .andThen(storageMusicDataSource.updateCompositionAuthor(composition, newAuthor))
+                .doOnComplete(() -> {
+                    compositionsDao.updateArtist(composition.getId(), newAuthor);
+                    storageMusicProvider.scanMedia(composition.getFilePath());
+                })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable changeCompositionAlbumArtist(FullComposition composition, String newAuthor) {
         return sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), newAuthor)
-                .andThen(storageMusicDataSource.updateCompositionAlbumArtist(composition, newAuthor))
+                .doOnComplete(() -> {
+                    compositionsDao.updateAlbumArtist(composition.getId(), newAuthor);
+                    storageMusicProvider.scanMedia(composition.getFilePath());
+                })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable changeCompositionAlbum(FullComposition composition, String newAlbum) {
         return sourceEditor.setCompositionAlbum(composition.getFilePath(), newAlbum)
-                .andThen(storageMusicDataSource.updateCompositionAlbum(composition, newAlbum))
+                .doOnComplete(() -> {
+                    compositionsDao.updateAlbum(composition.getId(), newAlbum);
+                    storageMusicProvider.scanMedia(composition.getFilePath());
+                })
                 .subscribeOn(scheduler);
     }
 
@@ -130,6 +143,10 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeCompositionTitle(FullComposition composition, String title) {
         return sourceEditor.setCompositionTitle(composition.getFilePath(), title)
                 .andThen(storageMusicDataSource.updateCompositionTitle(composition, title))
+                .doOnComplete(() -> {
+                    compositionsDao.updateTitle(composition.getId(), title);
+                    storageMusicProvider.scanMedia(composition.getFilePath());
+                })
                 .subscribeOn(scheduler);
     }
 

@@ -18,7 +18,7 @@ public interface EditorRepository {
     Completable addCompositionGenre(FullComposition composition,
                                     String newGenre);
 
-    Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre);
+    Completable removeCompositionGenre(FullComposition composition, ShortGenre genre);
 
     Completable changeCompositionAuthor(FullComposition composition, String newAuthor);
 

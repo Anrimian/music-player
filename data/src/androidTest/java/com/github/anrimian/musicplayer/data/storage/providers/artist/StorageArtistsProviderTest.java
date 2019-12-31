@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.data.storage.providers.artist;
 import android.Manifest;
 import android.content.Context;
 
-import androidx.collection.LongSparseArray;
 import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Before;
@@ -27,10 +26,10 @@ public class StorageArtistsProviderTest {
 
     @Test
     public void testStorageReturnValues() {
-        LongSparseArray<StorageArtist> map = artistsProvider.getArtists();
-        for(int i = 0, size = map.size(); i < size; i++) {
-            StorageArtist item = map.valueAt(i);
-            System.out.println(item);
-        }
+//        LongSparseArray<StorageArtist> map = artistsProvider.getArtists();
+//        for(int i = 0, size = map.size(); i < size; i++) {
+//            StorageArtist item = map.valueAt(i);
+//            System.out.println(item);
+//        }
     }
 }

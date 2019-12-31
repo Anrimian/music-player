@@ -121,17 +121,25 @@ public class CompositionsDaoWrapper {
 
     public void updateAlbum(long compositionId, String albumName) {
         appDatabase.runInTransaction(() -> {
-            Long artistId = compositionsDao.getArtistId(compositionId);
 
-            // 1) find new album by artist and name from albums
+            Long artistId = null;
+            Long existsAlbumId = compositionsDao.getAlbumId(compositionId);
+            if (existsAlbumId != null) {
+                artistId = albumsDao.getArtistId(existsAlbumId);
+            }
+            if (artistId == null) {
+                artistId = compositionsDao.getArtistId(compositionId);
+            }
+
+            // find new album by artist and name from albums
             Long albumId = albumsDao.findAlbum(artistId, albumName);
 
-            // 2) if album not exists - create album
+            // if album not exists - create album
             if (albumId == null && albumName != null) {
                 albumId = albumsDao.insert(new AlbumEntity(artistId, null, albumName, 0, 0));//hmm, storage?
             }
 
-            // 3) set new albumId
+            // set new albumId
             Long oldAlbumId = compositionsDao.getAlbumId(compositionId);
             compositionsDao.updateAlbum(compositionId, albumId);
 
@@ -151,11 +159,11 @@ public class CompositionsDaoWrapper {
                 artistId = artistsDao.insertArtist(new ArtistEntity(null, authorName));//hmm, storage?
             }
             // 3) set new artistId
-            long oldArtistId = compositionsDao.getArtistId(id);
+            Long oldArtistId = compositionsDao.getArtistId(id);
             compositionsDao.updateArtist(id, artistId);
 
             // 4) if OLD artist exists and has no references - delete him
-            if (oldArtistId != 0) {
+            if (oldArtistId != null) {
                 artistsDao.deleteEmptyArtist(oldArtistId);
             }
         });
