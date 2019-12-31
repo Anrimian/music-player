@@ -22,7 +22,9 @@ import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.io.File;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -225,33 +227,27 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable updateArtistName(String name, long artistId) {
+        Set<Composition> compositionsToScan = new LinkedHashSet<>();
         return checkArtistExists(name)
+
                 .andThen(Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId)))
+                .doOnSuccess(compositionsToScan::addAll)
                 .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name)
-                        .doOnComplete(() -> {
-                            Long storageId = composition.getStorageId();
-                            if (storageId != null) {
-                                storageMusicProvider.updateCompositionArtist(composition.getStorageId(), name);
-                            }
-                        }))
-                //edit all composition album artist
+                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name))
+
                 .andThen(Single.fromCallable(() -> albumsDao.getAllAlbumsForArtist(artistId)))
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(album -> Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(album.getId()))
-                        .flatMapObservable(Observable::fromIterable)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name)
-                                .doOnComplete(() -> {
-                                    Long storageId = composition.getStorageId();
-                                    if (storageId != null) {
-                                        storageMusicProvider.updateCompositionAlbumArtist(composition.getStorageId(), name);
-                                    }
-                                }))
+                                .doOnSuccess(compositionsToScan::addAll)
+                                .flatMapObservable(Observable::fromIterable)
+                                .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name))
                 )
                 .doOnComplete(() -> {
-//                    String oldName = artistsDao.getArtistName(artistId);
                     artistsDao.updateArtistName(name, artistId);
-//                    storageArtistsProvider.updateArtistName(oldName, name);
+
+                    for (Composition composition: compositionsToScan) {
+                        storageMusicProvider.scanMedia(composition.getFilePath());
+                    }
                 })
                 .subscribeOn(scheduler);
     }
