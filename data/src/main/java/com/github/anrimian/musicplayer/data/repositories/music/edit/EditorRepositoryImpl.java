@@ -73,6 +73,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     add genre - working( no:( )
     change genre
     remove genre
+    update album artist
+    update genre name - not sure
      */
 
     @Override
@@ -184,7 +186,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
-    public Completable createFile(String path) {
+    public Completable createDirectory(String path) {
         return Completable.fromAction(() -> {
             File file = new File(path);
             if (file.exists()) {
@@ -196,32 +198,37 @@ public class EditorRepositoryImpl implements EditorRepository {
         }).subscribeOn(scheduler);
     }
 
+    //not working on large sets?
     @Override
     public Completable updateAlbumName(String name, long albumId) {
         return checkAlbumExists(name)
                 .andThen(Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId)))
-                .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition.getFilePath(), name))
-                .doOnComplete(() -> {
-                    String oldName = albumsDao.getAlbumName(albumId);
-                    String artist = albumsDao.getAlbumArtist(albumId);
+                .flatMap(compositions -> Observable.fromIterable(compositions)
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition.getFilePath(), name))
+                        .toSingleDefault(compositions))
+                .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumName(name, albumId);
-                    storageAlbumsProvider.updateAlbumName(oldName, artist, name);//not working
+                    for (Composition composition: compositions) {
+                        storageMusicProvider.scanMedia(composition.getFilePath());
+                    }
                 })
+                .ignoreElement()
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable updateAlbumArtist(String newArtistName, long albumId) {
         return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
-                .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), newArtistName))
-                .doOnComplete(() -> {
-                    String albumName = albumsDao.getAlbumName(albumId);
-                    String oldArtist = albumsDao.getAlbumArtist(albumId);
+                .flatMap(compositions -> Observable.fromIterable(compositions)
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), newArtistName))// not working, we can't edit album artist?
+                        .toSingleDefault(compositions))
+                .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumArtist(albumId, newArtistName);
-                    storageAlbumsProvider.updateAlbumArtist(albumName, oldArtist, newArtistName);//not working
+                    for (Composition composition: compositions) {
+                        storageMusicProvider.scanMedia(composition.getFilePath());
+                    }
                 })
+                .ignoreElement()
                 .subscribeOn(scheduler);
     }
 
@@ -238,9 +245,9 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .andThen(Single.fromCallable(() -> albumsDao.getAllAlbumsForArtist(artistId)))
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(album -> Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(album.getId()))
-                                .doOnSuccess(compositionsToScan::addAll)
-                                .flatMapObservable(Observable::fromIterable)
-                                .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name))
+                        .doOnSuccess(compositionsToScan::addAll)
+                        .flatMapObservable(Observable::fromIterable)
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name))
                 )
                 .doOnComplete(() -> {
                     artistsDao.updateArtistName(name, artistId);

@@ -186,7 +186,7 @@ public class LibraryFilesInteractor {
 
     public Completable moveFilesToNewFolder(String path, String folderName) {
         String newFolderPath = path + "/" + folderName;
-        Completable completable = editorRepository.createFile(newFolderPath);
+        Completable completable = editorRepository.createDirectory(newFolderPath);
         if (!filesToMove.isEmpty()) {
             completable = completable.andThen(Observable.fromIterable(filesToMove)
                     .flatMapCompletable(fileSource -> moveFiles(fileSource, newFolderPath))
