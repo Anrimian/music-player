@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.Screens;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
-import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.CURRENT_PLAY_QUEUE_ID;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.CURRENT_QUEUE_ITEM_ID;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.IS_PLAYER_PANEL_OPEN;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.PREFERENCES_NAME;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_DRAWER_SCREEN;
@@ -24,13 +24,13 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
  */
 public class UiStatePreferences {
 
-    public static final long NO_COMPOSITION = Long.MIN_VALUE;
+    public static final long NO_ITEM = Long.MIN_VALUE;
 
     interface Constants {
         String PREFERENCES_NAME = "ui_preferences";
 
         String TRACK_POSITION = "track_position";
-        String CURRENT_PLAY_QUEUE_ID = "current_play_queue_id";
+        String CURRENT_QUEUE_ITEM_ID = "current_play_queue_id";
         String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
         String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
         String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
@@ -80,18 +80,22 @@ public class UiStatePreferences {
         return preferences.getLong(TRACK_POSITION);
     }
 
-    public void setCurrentPlayQueueItemId(long id) {
-        preferences.putLong(CURRENT_PLAY_QUEUE_ID, id);
+    public void setCurrentQueueItemId(long id) {
+        preferences.putLong(CURRENT_QUEUE_ITEM_ID, id);
         currentItemSubject.onNext(id);
     }
 
     public Observable<Long> getCurrentItemIdObservable() {
-        return withDefaultValue(currentItemSubject, this::getCurrentPlayQueueId)
+        return withDefaultValue(currentItemSubject, this::getCurrentQueueItemId)
                 .distinctUntilChanged();
     }
 
-    public Long getCurrentPlayQueueId() {
-        return preferences.getLong(CURRENT_PLAY_QUEUE_ID, NO_COMPOSITION);
+    public long getCurrentQueueItemId() {
+        Long cachedValue = currentItemSubject.getValue();
+        if (cachedValue != null) {
+            return cachedValue;
+        }
+        return preferences.getLong(CURRENT_QUEUE_ITEM_ID, NO_ITEM);
     }
 
     public void setSelectedFolderScreen(String path) {

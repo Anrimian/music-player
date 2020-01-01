@@ -18,7 +18,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_ITEM;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeCompositions;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeItems;
@@ -53,7 +53,7 @@ public class PlayQueueRepositoryImplTest {
         when(playQueueDao.getPlayQueueObservable())
                 .thenReturn(playQueueDaoSubject);
 
-        when(uiStatePreferences.getCurrentPlayQueueId()).thenReturn(NO_COMPOSITION);
+        when(uiStatePreferences.getCurrentQueueItemId()).thenReturn(NO_ITEM);
     }
 
     @Test

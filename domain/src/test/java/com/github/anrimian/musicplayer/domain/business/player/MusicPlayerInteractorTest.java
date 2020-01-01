@@ -85,7 +85,6 @@ public class MusicPlayerInteractorTest {
         when(playQueueRepository.getCurrentQueueItemObservable())
                 .thenReturn(currentCompositionSubject);
         when(playQueueRepository.skipToNext()).thenReturn(Single.just(1));
-        when(playQueueRepository.skipToPrevious()).thenReturn(Single.just(1));
 
         when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
 

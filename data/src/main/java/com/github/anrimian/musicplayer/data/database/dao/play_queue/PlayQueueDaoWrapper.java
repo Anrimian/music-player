@@ -99,7 +99,7 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public PlayQueueItem insertNewPlayQueue(List<Composition> compositions,
+    public long insertNewPlayQueue(List<Composition> compositions,
                                             boolean randomPlayingEnabled,
                                             int startPosition) {
         return appDatabase.runInTransaction(() -> {
@@ -133,13 +133,11 @@ public class PlayQueueDaoWrapper {
             playQueueDao.deletePlayQueue();
             playQueueDao.insertItems(entities);
 
-            PlayQueueItemDto item;
             if (randomPlayingEnabled) {
-                item = playQueueDao.getItemAtShuffledPosition(shuffledStartPosition);
+                return playQueueDao.getItemIdAtShuffledPosition(shuffledStartPosition);
             } else {
-                item = playQueueDao.getItemAtPosition(startPosition == NO_POSITION? 0: startPosition);
+                return playQueueDao.getItemIdAtPosition(startPosition == NO_POSITION? 0: startPosition);
             }
-            return toQueueItem(item);
         });
     }
 
@@ -202,6 +200,46 @@ public class PlayQueueDaoWrapper {
             return playQueueDao.getShuffledPosition(id);
         } else {
             return playQueueDao.getPosition(id);
+        }
+    }
+
+    public long getNextQueueItemId(long currentItemId, boolean isShuffled) {
+        if (isShuffled) {
+            Long id = playQueueDao.getNextShuffledQueueItemId(currentItemId);
+            if (id == null) {
+                return playQueueDao.getFirstShuffledItem();
+            }
+            return id;
+        } else {
+            Long id = playQueueDao.getNextQueueItemId(currentItemId);
+            if (id == null) {
+                return playQueueDao.getFirstItem();
+            }
+            return id;
+        }
+    }
+
+    public long getPreviousQueueItemId(long currentItemId, boolean isShuffled) {
+        if (isShuffled) {
+            Long id = playQueueDao.getPreviousShuffledQueueItemId(currentItemId);
+            if (id == null) {
+                return playQueueDao.getLastShuffledItem();
+            }
+            return id;
+        } else {
+            Long id = playQueueDao.getPreviousQueueItemId(currentItemId);
+            if (id == null) {
+                return playQueueDao.getLastItem();
+            }
+            return id;
+        }
+    }
+
+    public long getItemAtPosition(int position, boolean isShuffled) {
+        if (isShuffled) {
+            return playQueueDao.getItemIdAtShuffledPosition(position);
+        } else {
+            return playQueueDao.getItemIdAtPosition(position);
         }
     }
 

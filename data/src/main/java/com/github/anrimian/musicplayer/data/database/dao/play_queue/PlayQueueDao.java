@@ -161,6 +161,12 @@ public interface PlayQueueDao {
             "LIMIT 1")
     PlayQueueItemDto getItemAtPosition(int position);
 
+    @Query("SELECT id " +
+            "FROM play_queue " +
+            "WHERE position = :position " +
+            "LIMIT 1")
+    long getItemIdAtPosition(int position);
+
     @Query("SELECT " +
             "play_queue.id AS itemId," +
             "compositions.id AS id, " +
@@ -178,6 +184,12 @@ public interface PlayQueueDao {
             "WHERE shuffledPosition = :position " +
             "LIMIT 1")
     PlayQueueItemDto getItemAtShuffledPosition(int position);
+
+    @Query("SELECT id " +
+            "FROM play_queue " +
+            "WHERE shuffledPosition = :position " +
+            "LIMIT 1")
+    long getItemIdAtShuffledPosition(int position);
 
     @Query("SELECT " +
             "play_queue.id AS itemId," +
@@ -232,6 +244,62 @@ public interface PlayQueueDao {
     @Query("SELECT MAX(position) FROM play_queue")
     int getLastPosition();
 
+    @Query("SELECT id " +
+            "FROM play_queue " +
+            "WHERE position = (SELECT MAX(position) FROM play_queue)")
+    long getLastItem();
+
+    @Query("SELECT id " +
+            "FROM play_queue " +
+            "WHERE shuffledPosition = (SELECT MAX(shuffledPosition) FROM play_queue)")
+    long getLastShuffledItem();
+
+    @Query("SELECT id " +
+            "FROM play_queue " +
+            "WHERE position = (SELECT MIN(position) FROM play_queue)")
+    long getFirstItem();
+
+    @Query("SELECT id " +
+            "FROM play_queue " +
+            "WHERE shuffledPosition = (SELECT MIN(shuffledPosition) FROM play_queue)")
+    long getFirstShuffledItem();
+
     @Update
     void update(List<PlayQueueEntity> list);
+
+    @Query("SELECT id " +
+            "FROM play_queue "+
+            "WHERE position = " +
+            "   (SELECT MIN(position) " +
+            "   FROM play_queue " +
+            "   WHERE position > " +
+            "       (SELECT position FROM play_queue WHERE id = :currentItemId))")
+    Long getNextQueueItemId(long currentItemId);
+
+    @Query("SELECT id " +
+            "FROM play_queue "+
+            "WHERE shuffledPosition = " +
+            "   (SELECT MIN(shuffledPosition) " +
+            "   FROM play_queue " +
+            "   WHERE shuffledPosition > " +
+            "       (SELECT shuffledPosition FROM play_queue WHERE id = :currentItemId))")
+    Long getNextShuffledQueueItemId(long currentItemId);
+
+    @Query("SELECT id " +
+            "FROM play_queue "+
+            "WHERE position = " +
+            "   (SELECT MAX(position) " +
+            "   FROM play_queue " +
+            "   WHERE position < " +
+            "       (SELECT position FROM play_queue WHERE id = :currentItemId))")
+    Long getPreviousQueueItemId(long currentItemId);
+
+    @Query("SELECT id " +
+            "FROM play_queue "+
+            "WHERE shuffledPosition = " +
+            "   (SELECT MAX(shuffledPosition) " +
+            "   FROM play_queue " +
+            "   WHERE shuffledPosition < " +
+            "       (SELECT shuffledPosition FROM play_queue WHERE id = :currentItemId))")
+    Long getPreviousShuffledQueueItemId(long currentItemId);
 }
