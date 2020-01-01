@@ -4,14 +4,12 @@ import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueLists;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.utils.collections.IndexedList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -27,12 +25,9 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_COMPOSITION;
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
-import static io.reactivex.subjects.BehaviorSubject.create;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
@@ -41,10 +36,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final UiStatePreferences uiStatePreferences;
     private final Scheduler scheduler;
 
-    private final BehaviorSubject<PlayQueueEvent> currentCompositionSubject = create();
-
     private final Flowable<List<PlayQueueItem>> playQueueObservable;
+    private final Observable<PlayQueueEvent> currentItemObservable;
+
     private final PlayQueueCache queueCache;//we really need this? can be moved in db
+
+    private boolean firstItemEmitted;
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
                                    SettingsRepository settingsPreferences,
@@ -70,6 +67,13 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     checkForCurrentItemInNewQueue(newQueue);
                     queueCache.updateQueue(newQueue);
                 }).replay(1)
+                .refCount();
+
+        currentItemObservable = uiStatePreferences.getCurrentItemIdObservable()
+                .switchMap(this::getPlayQueueEvent)
+                .doOnNext(item -> Log.d("KEK3", "new item: " + item.getPlayQueueItem()))
+                .subscribeOn(scheduler)
+                .replay(1)
                 .refCount();
     }
 
@@ -110,8 +114,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {//wrong emits...?
-        return withDefaultValue(currentCompositionSubject, this::getSavedQueueEvent)
-                .subscribeOn(scheduler);
+        return currentItemObservable;
     }
 
     @Override
@@ -232,14 +235,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return queueCache.getCurrentQueue().size();
     }
 
-    @Nonnull
-    private PlayQueueEvent getSavedQueueEvent() {
-        if (currentCompositionSubject.getValue() != null) {
-            return currentCompositionSubject.getValue();
-        }
-        return new PlayQueueEvent(getSavedQueueItem(), uiStatePreferences.getTrackPosition());
-    }
-
     @Nullable
     private PlayQueueItem getSavedQueueItem() {
         long id = uiStatePreferences.getCurrentPlayQueueId();
@@ -252,34 +247,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private void setCurrentItem(@Nullable PlayQueueItem item) {
         long itemId = NO_COMPOSITION;
-        long compositionId = NO_COMPOSITION;
         if (item != null) {
             itemId = item.getId();
-            compositionId = item.getComposition().getId();
         }
         uiStatePreferences.setCurrentPlayQueueItemId(itemId);
-        uiStatePreferences.setCurrentCompositionId(compositionId);
-        currentCompositionSubject.onNext(new PlayQueueEvent(item));
     }
 
     @Nullable
     private PlayQueueItem getCurrentItem() {
-        if (currentCompositionSubject.getValue() != null) {
-            return currentCompositionSubject.getValue().getPlayQueueItem();
-        }
         return getSavedQueueItem();
-    }
-
-    private void selectCurrentItem(PlayQueueLists queueLists, int startPosition) {
-        PlayQueueItem item;
-        if (startPosition == NO_POSITION) {
-            List<PlayQueueItem> currentQueue = settingsPreferences.isRandomPlayingEnabled()?
-                    queueLists.getShuffledQueue() : queueLists.getQueue();
-            item = currentQueue.get(0);
-        } else {
-            item = queueLists.getQueue().get(startPosition);
-        }
-        setCurrentItem(item);
     }
 
     private PlayQueueItem toPlayQueueItem(PlayQueueCompositionDto entity) {
@@ -304,11 +280,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         PlayQueueItem currentItem = getCurrentItem();
         if (currentItem != null && newQueue.contains(currentItem)) {
             //check for update
-            Integer currentPosition = newQueue.indexOf(currentItem);
-            PlayQueueItem newItem = newQueue.get(currentPosition);
-            if (!PlayQueueItemHelper.areSourcesTheSame(newItem, currentItem)) {
-                currentCompositionSubject.onNext(new PlayQueueEvent(newItem, true));
-            }
+//            Integer currentPosition = newQueue.indexOf(currentItem);
+//            PlayQueueItem newItem = newQueue.get(currentPosition);
+//            if (!PlayQueueItemHelper.areSourcesTheSame(newItem, currentItem)) {
+//                currentCompositionSubject.onNext(new PlayQueueEvent(newItem, true));
+//            }
         } else {
             //item not found, select new item on this position
             Integer currentPosition = currentQueue.indexOf(currentItem);
@@ -317,5 +293,19 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             }
             selectItemAt(newQueue, currentPosition);
         }
+    }
+
+    private Observable<PlayQueueEvent> getPlayQueueEvent(long id) {
+        if (id == NO_COMPOSITION) {
+            return Observable.just(new PlayQueueEvent(null));
+        }
+        return playQueueDao.getItemObservable(id)
+                .map(item -> {
+                    if (!firstItemEmitted) {
+                        firstItemEmitted = true;
+                        return new PlayQueueEvent(item, uiStatePreferences.getTrackPosition());
+                    }
+                    return new PlayQueueEvent(item);
+                });
     }
 }

@@ -143,6 +143,11 @@ public class PlayQueueDaoWrapper {
         });
     }
 
+    public Observable<PlayQueueItem> getItemObservable(long id) {
+        return playQueueDao.getItemObservable(id)
+                .map(this::toQueueItem);
+    }
+
     public void deleteItem(long itemId) {
         playQueueDao.deleteItem(itemId);
     }

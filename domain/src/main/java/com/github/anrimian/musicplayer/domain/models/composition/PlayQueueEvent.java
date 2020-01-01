@@ -11,26 +11,15 @@ public class PlayQueueEvent {
     private final PlayQueueItem playQueueItem;
 
     private final long trackPosition;
-    private final boolean takePositionFromCurrent;
 
     public PlayQueueEvent(PlayQueueItem playQueueItem) {
         this(playQueueItem, 0);
     }
 
-    public PlayQueueEvent(PlayQueueItem playQueueItem, boolean takePositionFromCurrent) {
-        this(playQueueItem, 0, takePositionFromCurrent);
-    }
-
-    public PlayQueueEvent(@Nullable PlayQueueItem playQueueItem, long trackPosition) {
-        this(playQueueItem, trackPosition, false);
-    }
-
     public PlayQueueEvent(@Nullable PlayQueueItem playQueueItem,
-                          long trackPosition,
-                          boolean takePositionFromCurrent) {
+                          long trackPosition) {
         this.playQueueItem = playQueueItem;
         this.trackPosition = trackPosition;
-        this.takePositionFromCurrent = takePositionFromCurrent;
     }
 
     @Nullable
@@ -40,10 +29,6 @@ public class PlayQueueEvent {
 
     public long getTrackPosition() {
         return trackPosition;
-    }
-
-    public boolean takePositionFromCurrent() {
-        return takePositionFromCurrent;
     }
 
     @Override

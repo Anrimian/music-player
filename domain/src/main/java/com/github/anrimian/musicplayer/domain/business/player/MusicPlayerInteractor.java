@@ -280,12 +280,15 @@ public class MusicPlayerInteractor {
             stop();
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
-            if (compositionEvent.takePositionFromCurrent()) {
-                if (previousItem != null && !hasSourceChanges(previousItem, currentItem)) {
+
+            //if items are equal and content changed -> restart play
+            if (previousItem != null && previousItem.equals(currentItem)) {
+                if (!hasSourceChanges(previousItem, currentItem)) {
                     return;
                 }
                 trackPosition = musicPlayerController.getTrackPosition();
             }
+
             musicPlayerController.prepareToPlay(currentItem.getComposition(), trackPosition);
         }
     }
