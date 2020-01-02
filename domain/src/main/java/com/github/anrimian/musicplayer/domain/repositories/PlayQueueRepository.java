@@ -37,7 +37,7 @@ public interface PlayQueueRepository {
 
     void skipToPrevious();
 
-    void skipToPosition(int position);
+    void skipToItem(PlayQueueItem item);
 
     Completable removeQueueItem(PlayQueueItem item);
 

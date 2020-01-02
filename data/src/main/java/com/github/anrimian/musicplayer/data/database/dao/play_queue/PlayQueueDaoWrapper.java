@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQue
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.utils.java.Optional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,9 +142,15 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public Observable<PlayQueueItem> getItemObservable(long id) {
+    public Observable<Optional<PlayQueueItem>> getItemObservable(long id) {
         return playQueueDao.getItemObservable(id)
-                .map(this::toQueueItem);
+                .map(dto -> {
+                    PlayQueueItem item = null;
+                    if (dto.length > 0) {
+                        item = toQueueItem(dto[0]);
+                    }
+                    return new Optional<>(item);
+                });
     }
 
     public void deleteItem(long itemId) {
@@ -203,6 +210,14 @@ public class PlayQueueDaoWrapper {
         }
     }
 
+    public Observable<Integer> getPositionObservable(long id, boolean isShuffle) {
+        if (isShuffle) {
+            return playQueueDao.getShuffledPositionObservable(id);
+        } else {
+            return playQueueDao.getPositionObservable(id);
+        }
+    }
+
     public long getNextQueueItemId(long currentItemId, boolean isShuffled) {
         if (isShuffled) {
             Long id = playQueueDao.getNextShuffledQueueItemId(currentItemId);
@@ -219,6 +234,7 @@ public class PlayQueueDaoWrapper {
         }
     }
 
+    //TODO don't select corrupted compositions
     public long getPreviousQueueItemId(long currentItemId, boolean isShuffled) {
         if (isShuffled) {
             Long id = playQueueDao.getPreviousShuffledQueueItemId(currentItemId);
@@ -235,7 +251,7 @@ public class PlayQueueDaoWrapper {
         }
     }
 
-    public long getItemAtPosition(int position, boolean isShuffled) {
+    public Long getItemAtPosition(int position, boolean isShuffled) {
         if (isShuffled) {
             return playQueueDao.getItemIdAtShuffledPosition(position);
         } else {

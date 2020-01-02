@@ -163,9 +163,9 @@ public interface PlayQueueDao {
 
     @Query("SELECT id " +
             "FROM play_queue " +
-            "WHERE position = :position " +
+            "WHERE position >= :position " +
             "LIMIT 1")
-    long getItemIdAtPosition(int position);
+    Long getItemIdAtPosition(int position);
 
     @Query("SELECT " +
             "play_queue.id AS itemId," +
@@ -187,9 +187,9 @@ public interface PlayQueueDao {
 
     @Query("SELECT id " +
             "FROM play_queue " +
-            "WHERE shuffledPosition = :position " +
+            "WHERE shuffledPosition >= :position " +
             "LIMIT 1")
-    long getItemIdAtShuffledPosition(int position);
+    Long getItemIdAtShuffledPosition(int position);
 
     @Query("SELECT " +
             "play_queue.id AS itemId," +
@@ -207,7 +207,7 @@ public interface PlayQueueDao {
             "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
             "WHERE itemId = :id " +
             "LIMIT 1")
-    Observable<PlayQueueItemDto> getItemObservable(long id);
+    Observable<PlayQueueItemDto[]> getItemObservable(long id);
 
     @Insert
     List<Long> insertItems(List<PlayQueueEntity> playQueueEntityList);
@@ -226,6 +226,12 @@ public interface PlayQueueDao {
 
     @Query("SELECT shuffledPosition FROM play_queue WHERE id = :id")
     int getShuffledPosition(long id);
+
+    @Query("SELECT position FROM play_queue WHERE id = :id")
+    Observable<Integer> getPositionObservable(long id);
+
+    @Query("SELECT shuffledPosition FROM play_queue WHERE id = :id")
+    Observable<Integer> getShuffledPositionObservable(long id);
 
     @Query("UPDATE play_queue SET shuffledPosition = :shuffledPosition WHERE id = :id")
     void updateShuffledPosition(long id, int shuffledPosition);

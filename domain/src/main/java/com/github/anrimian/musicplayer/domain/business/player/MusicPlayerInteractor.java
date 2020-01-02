@@ -155,8 +155,8 @@ public class MusicPlayerInteractor {
         playQueueRepository.skipToNext().subscribe();
     }
 
-    public void skipToPosition(int position) {
-        playQueueRepository.skipToPosition(position);
+    public void skipToItem(PlayQueueItem item) {
+        playQueueRepository.skipToItem(item);
     }
 
     public Observable<Integer> getRepeatModeObservable() {

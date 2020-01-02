@@ -160,7 +160,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onCompositionItemClicked(int position, PlayQueueItem item) {
         this.currentItem = item;
-        playerInteractor.skipToPosition(position);
+        playerInteractor.skipToItem(item);
 
         onCurrentCompositionChanged(item, 0);
     }

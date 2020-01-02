@@ -65,7 +65,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .toFlowable(BackpressureStrategy.LATEST)
                 .doOnNext(list -> {
                     IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
-                    checkForCurrentItemInNewQueue(newQueue);
                     queueCache.updateQueue(newQueue);
                 }).replay(1)
                 .refCount();
@@ -160,30 +159,14 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public void skipToPosition(int position) {
-        Completable.fromAction(() -> {
-            boolean isShuffled = settingsPreferences.isRandomPlayingEnabled();
-            long itemId = playQueueDao.getItemAtPosition(position, isShuffled);
-            setCurrentItem(itemId);
-        }).subscribeOn(scheduler)
-                .subscribe();
+    public void skipToItem(PlayQueueItem item) {
+        setCurrentItem(item.getId());
     }
 
     @Override
     public Completable removeQueueItem(PlayQueueItem item) {
-        return Completable.fromAction(() -> {
-//            IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
-//            Integer currentPosition = null;
-//            PlayQueueItem currentItem = getCurrentItem();
-//            if (item.equals(currentItem)) {
-//                currentPosition = currentQueue.indexOf(currentItem);
-//            }
-            playQueueDao.deleteItem(item.getId());
-
-//            if (currentPosition != null) {
-//                selectItemAt(currentQueue, currentPosition + 1);
-//            }
-        }).subscribeOn(scheduler);
+        return Completable.fromAction(() -> playQueueDao.deleteItem(item.getId()))
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -263,48 +246,40 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         );
     }
 
-    private void selectItemAt(IndexedList<PlayQueueItem> queue, int position) {
-        PlayQueueItem newItem = null;
-        if (queue.size() > 1) {
-            if (position >= queue.size()) {
-                position = 0;
-            }
-            newItem = queue.get(position);
-        }
-        setCurrentItem(newItem);
-    }
-
-    private void checkForCurrentItemInNewQueue(IndexedList<PlayQueueItem> newQueue) {
-        IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
-        PlayQueueItem currentItem = getCurrentItem();
-        if (currentItem != null && newQueue.contains(currentItem)) {
-            //check for update
-//            Integer currentPosition = newQueue.indexOf(currentItem);
-//            PlayQueueItem newItem = newQueue.get(currentPosition);
-//            if (!PlayQueueItemHelper.areSourcesTheSame(newItem, currentItem)) {
-//                currentCompositionSubject.onNext(new PlayQueueEvent(newItem, true));
-//            }
-        } else {
-            //item not found, select new item on this position
-            Integer currentPosition = currentQueue.indexOf(currentItem);
-            if (currentPosition == null) {
-                currentPosition = 0;
-            }
-            selectItemAt(newQueue, currentPosition);
-        }
-    }
-
     private Observable<PlayQueueEvent> getPlayQueueEvent(long id) {
         if (id == NO_ITEM) {
             return Observable.just(new PlayQueueEvent(null));
         }
-        return playQueueDao.getItemObservable(id)
-                .map(item -> {
+        Observable<Integer> positionObservable = settingsPreferences.getRandomPlayingObservable()
+                .concatMap(isRandom -> playQueueDao.getPositionObservable(id, isRandom))
+                .doOnNext(uiStatePreferences::setCurrentItemLastPosition);
+
+        Observable<PlayQueueItem> itemObservable = playQueueDao.getItemObservable(id)
+                .flatMap(itemOpt -> Observable.create(emitter -> {
+                    PlayQueueItem item = itemOpt.getValue();
+                    if (item == null) {
+                        //handle deleted item
+                        boolean isRandom = settingsPreferences.isRandomPlayingEnabled();
+                        int lastPosition = uiStatePreferences.getCurrentItemLastPosition();
+                        Long nextItemId = playQueueDao.getItemAtPosition(lastPosition, isRandom);
+                        if (nextItemId == null) {
+                            nextItemId = playQueueDao.getItemAtPosition(0, isRandom);
+                        }
+                        setCurrentItem(nextItemId);
+                        return;
+                    }
+                    emitter.onNext(item);
+                }));
+
+        return Observable.combineLatest(itemObservable,
+                positionObservable,
+                (item, position) -> {
+                    long trackPosition = 0;
                     if (!firstItemEmitted) {
                         firstItemEmitted = true;
-                        return new PlayQueueEvent(item, uiStatePreferences.getTrackPosition());
+                        trackPosition = uiStatePreferences.getTrackPosition();
                     }
-                    return new PlayQueueEvent(item);
+                    return new PlayQueueEvent(item, trackPosition, position);
                 });
     }
 }

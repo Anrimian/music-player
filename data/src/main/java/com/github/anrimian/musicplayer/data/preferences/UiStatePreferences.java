@@ -10,6 +10,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.CURRENT_QUEUE_ITEM_ID;
+import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.CURRENT_QUEUE_ITEM_LAST_POSITION;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.IS_PLAYER_PANEL_OPEN;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.PREFERENCES_NAME;
 import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.Constants.SELECTED_DRAWER_SCREEN;
@@ -31,6 +32,7 @@ public class UiStatePreferences {
 
         String TRACK_POSITION = "track_position";
         String CURRENT_QUEUE_ITEM_ID = "current_play_queue_id";
+        String CURRENT_QUEUE_ITEM_LAST_POSITION = "current_queue_item_last_position";
         String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
         String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
         String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
@@ -46,6 +48,14 @@ public class UiStatePreferences {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
         this.preferences = new SharedPreferencesHelper(sharedPreferences);
+    }
+
+    public void setCurrentItemLastPosition(int position) {
+        preferences.putInt(CURRENT_QUEUE_ITEM_LAST_POSITION, position);
+    }
+
+    public int getCurrentItemLastPosition() {
+        return preferences.getInt(CURRENT_QUEUE_ITEM_LAST_POSITION);
     }
 
     public void setPlayerPanelOpen(boolean open) {
