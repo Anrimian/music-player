@@ -104,8 +104,8 @@ public class CompositionSourceEditorTest {
 
         String testName = "Test album artist";
         sourceEditor.setCompositionAlbumArtist(filePath, testName).subscribe();
-        String newGenre = sourceEditor.getCompositionAlbumArtist(filePath).blockingGet();
-        System.out.println("new album artist: " + sourceEditor.getCompositionAlbumArtist(filePath).blockingGet());
-        assertEquals(testName, newGenre);
+        String newArtist = sourceEditor.getCompositionAlbumArtist(filePath).blockingGet();
+        System.out.println("new album artist: " + newArtist);
+        assertEquals(testName, newArtist);
     }
 }

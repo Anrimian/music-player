@@ -73,7 +73,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     add genre - working( no:( )
     change genre
     remove genre
-    update album artist
+    update\change album artist
     update genre name - not sure
      */
 
@@ -198,7 +198,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         }).subscribeOn(scheduler);
     }
 
-    //not working on large sets?
+    //not working on large sets? Seems working
     @Override
     public Completable updateAlbumName(String name, long albumId) {
         return checkAlbumExists(name)

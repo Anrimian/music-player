@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.dao.genre;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.RawQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
@@ -40,7 +41,7 @@ public interface GenreDao {
     @Insert
     long insert(GenreEntity entity);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertGenreEntities(List<GenreEntryEntity> entities);
 
     @Insert
