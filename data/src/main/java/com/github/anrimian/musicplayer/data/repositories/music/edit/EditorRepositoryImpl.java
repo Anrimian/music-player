@@ -75,6 +75,9 @@ public class EditorRepositoryImpl implements EditorRepository {
     remove genre
     update\change album artist
     update genre name - not sure
+    
+    ******
+    Seems, jaudiotagger names 'album-artist' and 'genre' differently than android media scanner 
      */
 
     @Override
@@ -86,7 +89,6 @@ public class EditorRepositoryImpl implements EditorRepository {
                     genresDao.changeCompositionGenre(composition.getId(), oldGenre.getId(), newGenre);
                     storageMusicProvider.scanMedia(composition.getFilePath());
                 })
-                //TODO update media storage
                 .subscribeOn(scheduler);
     }
 
@@ -97,7 +99,6 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .doOnComplete(() -> {
                     genresDao.addCompositionToGenre(composition.getId(), newGenre);
                     storageMusicProvider.scanMedia(composition.getFilePath());
-                    //TODO not working
                 })
                 .subscribeOn(scheduler);
     }
@@ -109,7 +110,6 @@ public class EditorRepositoryImpl implements EditorRepository {
                     genresDao.remoteCompositionFromGenre(composition.getId(), genre.getId());
                     storageMusicProvider.scanMedia(composition.getFilePath());
                 })
-                //TODO update media storage
                 .subscribeOn(scheduler);
     }
 
