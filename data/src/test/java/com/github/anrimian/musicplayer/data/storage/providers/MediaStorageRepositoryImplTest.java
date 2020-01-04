@@ -113,7 +113,7 @@ public class MediaStorageRepositoryImplTest {
         LongSparseArray<StorageComposition> currentCompositions = getFakeStorageCompositionsMap();
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
-        mediaStorageRepository.initialize();
+        mediaStorageRepository.runStorageObserver();
 
         LongSparseArray<StorageComposition> newCompositions = getFakeStorageCompositionsMap();
         StorageComposition removedComposition = newCompositions.get(100L);
@@ -141,7 +141,7 @@ public class MediaStorageRepositoryImplTest {
 
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(map);
 
-        mediaStorageRepository.initialize();
+        mediaStorageRepository.runStorageObserver();
 
         LongSparseArray<StorageComposition> newCompositions = new LongSparseArray<>();
         StorageComposition changedComposition = fakeStorageComposition(1, "new path", 1, 1000);
@@ -160,7 +160,7 @@ public class MediaStorageRepositoryImplTest {
     public void changePlayListTest() {
         when(playListsDao.getAllAsStoragePlayLists()).thenReturn(storagePlayListsAsList(10));
 
-        mediaStorageRepository.initialize();
+        mediaStorageRepository.runStorageObserver();
 
         LongSparseArray<StoragePlayList> newPlayLists = storagePlayLists(10);
 
@@ -191,7 +191,7 @@ public class MediaStorageRepositoryImplTest {
         when(playListsProvider.getPlayLists()).thenReturn(storagePlayLists(1));
         when(playListsDao.getPlayListItemsAsStorageItems(1L)).thenReturn(Collections.emptyList());
 
-        mediaStorageRepository.initialize();
+        mediaStorageRepository.runStorageObserver();
 
         List<StoragePlayListItem> newItems = asList(
                 new StoragePlayListItem(1L, 1L)

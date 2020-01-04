@@ -79,7 +79,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     }
 
     @Override
-    public void initialize() {
+    public void runStorageObserver() {
         runRescanStorage()
                 .doOnComplete(this::subscribeOnMediaStoreChanges)
                 .subscribe();
