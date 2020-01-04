@@ -35,6 +35,7 @@ public class CoverImageLoader extends SimpleImageLoader<Long, Composition> {
     }
 
     @Nullable
+    //TODO get from media store by album id instead
     private static Bitmap extractImageComposition(Composition composition) {
         String filePath = composition.getFilePath();
 
