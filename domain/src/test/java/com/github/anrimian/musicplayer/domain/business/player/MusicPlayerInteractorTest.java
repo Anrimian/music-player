@@ -39,7 +39,7 @@ import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.L
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
-import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.DELETED;
+import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.NOT_FOUND;
 import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.UNKNOWN;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -282,16 +282,19 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onCompositionDeletedErrorTest() {
+        when(playQueueRepository.getQueueSize()).thenReturn(getFakeCompositions().size());
+
         musicPlayerInteractor.play();
 
         Composition composition = getFakeCompositions().get(0);
         inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
         inOrder.verify(musicPlayerController).resume();
 
-        playerEventSubject.onNext(new ErrorEvent(DELETED, composition));
-        currentCompositionSubject.onNext(currentItem(1));
+        playerEventSubject.onNext(new ErrorEvent(NOT_FOUND, composition));
 
-        inOrder.verify(musicProviderRepository).deleteComposition(getFakeCompositions().get(0));
+        inOrder.verify(musicProviderRepository)
+                .writeErrorAboutComposition(CorruptionType.NOT_FOUND, getFakeCompositions().get(0));
+        inOrder.verify(playQueueRepository).skipToNext();
 
         playerStateSubscriber.assertValues(IDLE, PLAY);
     }

@@ -4,6 +4,7 @@ allprojects {
         maven {
             url "https://maven.google.com"
         }
+        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -26,7 +27,6 @@ ext {
     rxJavaVersion = "2.2.11"
     rxAndroidVersion = "2.0.1"
     rxPermissionsVersion = "0.9.4"
-    acraVersion = "4.9.2"
     moxyVersion = "2.0.2"
     butterKnifeVersion = "10.2.0"
     daggerVersion = "2.25.2"
@@ -43,6 +43,7 @@ ext {
 
     //developing
     javaxAnnotationVersion = "3.0.2"
+    acraReportDialogVersion = "0.0.5"
 }
 
 ext {
@@ -63,8 +64,6 @@ ext {
     moxyCompiler = "com.github.moxy-community:moxy-compiler:$moxyVersion"
     moxyAppcompat = "com.github.moxy-community:moxy-androidx:$moxyVersion"
     moxyMaterial = "com.github.moxy-community:moxy-material:$moxyVersion"
-
-    acra = "ch.acra:acra:$acraVersion"
 
     room = "androidx.room:room-runtime:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
@@ -88,6 +87,7 @@ ext {
 
     //develop
     javaxAnnotation = "com.google.code.findbugs:jsr305:$javaxAnnotationVersion"
+    acraReportDialog = "com.github.Anrimian:AcraReportDialog:$acraReportDialogVersion"
 
     //tests
     dexmaker = "com.google.dexmaker:dexmaker:${dexmakerVersion}"

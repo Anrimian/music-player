@@ -76,11 +76,11 @@ public class UiStatePreferences {
         return preferences.getLong(TRACK_POSITION);
     }
 
+    @Deprecated
     public void setCurrentCompositionId(long id) {
         preferences.putLong(CURRENT_COMPOSITION_ID, id);
     }
 
-    @Deprecated
     public void setCurrentPlayQueueItemId(long id) {
         preferences.putLong(CURRENT_PLAY_QUEUE_ID, id);
     }

@@ -153,6 +153,9 @@ public interface PlayListDao {
     @Query("SELECT * FROM play_lists WHERE name = :name")
     PlayListEntity getPlayListByName(String name);
 
+    @Query("SELECT exists(SELECT 1 FROM play_lists WHERE id = :playListId LIMIT 1)")
+    boolean isPlayListExists(long playListId);
+
 //    @Query("SELECT * FROM play_lists_entries WHERE playListId = :playListId")
 //    List<PlayListEntryEntity> getPlayListEntries(long playListId);
 }

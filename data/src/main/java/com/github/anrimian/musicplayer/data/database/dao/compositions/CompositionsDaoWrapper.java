@@ -40,7 +40,7 @@ public class CompositionsDaoWrapper {
     }
 
     public Observable<Composition> getCompositionObservable(long id) {
-        return compositionsDao.getCompoisitionObservable(id)//TODO takeUntil()
+        return compositionsDao.getCompositionObservable(id)//TODO takeUntil()
                 .map(CompositionMapper::toComposition);
     }
 
@@ -83,6 +83,14 @@ public class CompositionsDaoWrapper {
         compositionsDao.updateFilePath(id, filePath);
     }
 
+    public void updateFilesPath(List<Composition> compositions) {
+        appDatabase.runInTransaction(() -> {
+            for (Composition composition: compositions) {
+                compositionsDao.updateFilePath(composition.getId(), composition.getFilePath());
+            }
+        });
+    }
+
     public void updateArtist(long id, String artist) {
         compositionsDao.updateArtist(id, artist);
     }
@@ -96,10 +104,9 @@ public class CompositionsDaoWrapper {
                              List<StorageComposition> changedCompositions) {
         appDatabase.runInTransaction(() -> {
             compositionsDao.insert(mapList(addedCompositions, CompositionMapper::toEntity));
-            compositionsDao.deleteByStorageId(mapList(
-                    deletedCompositions,
-                    StorageComposition::getId)
-            );
+            for (StorageComposition composition: deletedCompositions) {
+                compositionsDao.deleteByStorageId(composition.getId());//TODO delete by id instead
+            }
             for (StorageComposition composition: changedCompositions) {
                 compositionsDao.update(
                         composition.getArtist(),
