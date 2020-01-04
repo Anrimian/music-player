@@ -70,7 +70,7 @@ dependencies {
     implementation deps.rxAndroid
     implementation deps.rxPermissions
 
-    implementation deps.acraReportDialog
+    debugImplementation deps.acraReportDialog
 
     implementation deps.moxy
     implementation deps.moxyAppcompat
