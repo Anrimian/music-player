@@ -90,6 +90,10 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     private synchronized void applyPlayListItemsData(long playListId,
                                                      List<StoragePlayListItem> newItems) {
+        if (!playListsDao.isPlayListExists(playListId)) {
+            playListEntriesDisposable.remove(playListId);
+            return;
+        }
         List<StoragePlayListItem> currentItems = playListsDao.getPlayListItemsAsStorageItems(playListId);
         LongSparseArray<StoragePlayListItem> currentItemsMap = AndroidCollectionUtils.mapToSparseArray(
                 currentItems,
