@@ -88,6 +88,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public int getCurrentPosition() {
         IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
+        //noinspection ConstantConditions
+        if (currentQueue == null) {//hotfix, refactor and solve
+            return 0;
+        }
         return currentQueue.indexOf(getCurrentItem());
     }
 

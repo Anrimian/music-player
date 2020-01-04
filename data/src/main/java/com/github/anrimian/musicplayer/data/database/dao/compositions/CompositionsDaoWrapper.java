@@ -221,10 +221,9 @@ public class CompositionsDaoWrapper {
                              List<StorageComposition> changedCompositions) {
         appDatabase.runInTransaction(() -> {
             compositionsDao.insert(mapList(addedCompositions, this::toCompositionEntity));
-            compositionsDao.deleteByStorageId(mapList(
-                    deletedCompositions,
-                    StorageComposition::getId)
-            );
+            for (StorageComposition composition: deletedCompositions) {
+                compositionsDao.deleteByStorageId(composition.getId());//TODO delete by id instead
+            }
             for (StorageComposition composition: changedCompositions) {
                 compositionsDao.update(
                         composition.getTitle(),

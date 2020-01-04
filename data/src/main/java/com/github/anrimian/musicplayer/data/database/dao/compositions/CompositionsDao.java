@@ -119,6 +119,9 @@ public interface CompositionsDao {
     @Query("DELETE FROM compositions WHERE storageId in (:ids)")
     void deleteByStorageId(List<Long> ids);
 
+    @Query("DELETE FROM compositions WHERE storageId = :id")
+    void deleteByStorageId(long id);
+
     @Query("DELETE FROM compositions")
     void deleteAll();
 
