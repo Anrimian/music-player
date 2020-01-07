@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.utils.java.Optional;
 
 import java.util.List;
 
@@ -60,7 +61,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         });
 
         playQueueObservable = settingsPreferences.getRandomPlayingObservable()
-                .doOnNext(shuffled -> Log.d("KEK2", "new shuffled mode: " + shuffled))
                 .switchMap(playQueueDao::getPlayQueueObservable)
                 .toFlowable(BackpressureStrategy.LATEST)
                 .doOnNext(list -> {
@@ -71,10 +71,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
         currentItemObservable = uiStatePreferences.getCurrentItemIdObservable()
                 .switchMap(this::getPlayQueueEvent)
-                .doOnNext(item -> Log.d("KEK3", "new item: " + item.getPlayQueueItem()))
                 .subscribeOn(scheduler)
                 .replay(1)
                 .refCount();
+
+        subscribeOnPositionChange();
     }
 
     @Override
@@ -93,6 +94,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         ).doOnSuccess(this::setCurrentItem)
                 .ignoreElement()
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Flowable<Integer> getCurrentItemPositionObservable() {
+        return Observable.combineLatest(uiStatePreferences.getCurrentItemIdObservable(),
+                settingsPreferences.getRandomPlayingObservable(),
+                playQueueDao::getIndexPositionObservable)
+                .switchMap(observable -> observable)//hmm, many same events after many play queue switches
+                .toFlowable(BackpressureStrategy.LATEST);
     }
 
     @Nullable
@@ -246,40 +256,52 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         );
     }
 
+    /**
+     * Position saving for moving to next item after current item deleted
+     */
+    private void subscribeOnPositionChange() {
+        Observable.combineLatest(uiStatePreferences.getCurrentItemIdObservable(),
+                settingsPreferences.getRandomPlayingObservable(),
+                playQueueDao::getPositionObservable)
+                .switchMap(observable -> observable)
+                .doOnNext(uiStatePreferences::setCurrentItemLastPosition)
+                .subscribe();
+    }
+
     private Observable<PlayQueueEvent> getPlayQueueEvent(long id) {
         if (id == NO_ITEM) {
             return Observable.just(new PlayQueueEvent(null));
         }
-        Observable<Integer> positionObservable = settingsPreferences.getRandomPlayingObservable()
-                .concatMap(isRandom -> playQueueDao.getPositionObservable(id, isRandom))
-                .doOnNext(uiStatePreferences::setCurrentItemLastPosition);
 
-        Observable<PlayQueueItem> itemObservable = playQueueDao.getItemObservable(id)
-                .flatMap(itemOpt -> Observable.create(emitter -> {
-                    PlayQueueItem item = itemOpt.getValue();
-                    if (item == null) {
-                        //handle deleted item
-                        boolean isRandom = settingsPreferences.isRandomPlayingEnabled();
-                        int lastPosition = uiStatePreferences.getCurrentItemLastPosition();
-                        Long nextItemId = playQueueDao.getItemAtPosition(lastPosition, isRandom);
-                        if (nextItemId == null) {
-                            nextItemId = playQueueDao.getItemAtPosition(0, isRandom);
-                        }
-                        setCurrentItem(nextItemId);
-                        return;
-                    }
-                    emitter.onNext(item);
-                }));
+        return playQueueDao.getItemObservable(id)
+                .flatMap(this::checkForExisting)
+                .map(this::mapToQueueEvent);
+    }
 
-        return Observable.combineLatest(itemObservable,
-                positionObservable,
-                (item, position) -> {
-                    long trackPosition = 0;
-                    if (!firstItemEmitted) {
-                        firstItemEmitted = true;
-                        trackPosition = uiStatePreferences.getTrackPosition();
-                    }
-                    return new PlayQueueEvent(item, trackPosition, position);
-                });
+    private Observable<PlayQueueItem> checkForExisting(Optional<PlayQueueItem> itemOpt) {
+        return Observable.create(emitter -> {
+            PlayQueueItem item = itemOpt.getValue();
+            if (item == null) {
+                //handle deleted item
+                boolean isRandom = settingsPreferences.isRandomPlayingEnabled();
+                int lastPosition = uiStatePreferences.getCurrentItemLastPosition();
+                Long nextItemId = playQueueDao.getItemAtPosition(lastPosition, isRandom);
+                if (nextItemId == null) {
+                    nextItemId = playQueueDao.getItemAtPosition(0, isRandom);
+                }
+                setCurrentItem(nextItemId);
+                return;
+            }
+            emitter.onNext(item);
+        });
+    }
+
+    private PlayQueueEvent mapToQueueEvent(PlayQueueItem item) {
+        long trackPosition = 0;
+        if (!firstItemEmitted) {
+            firstItemEmitted = true;
+            trackPosition = uiStatePreferences.getTrackPosition();
+        }
+        return new PlayQueueEvent(item, trackPosition);
     }
 }

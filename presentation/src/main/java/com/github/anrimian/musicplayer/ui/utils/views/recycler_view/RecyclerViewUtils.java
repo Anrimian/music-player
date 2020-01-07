@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +20,31 @@ import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class RecyclerViewUtils {
+
+    /**
+     * app-specific func
+     */
+    public static boolean isPositionVisible(LinearLayoutManager lm, int position) {
+        return position > lm.findFirstVisibleItemPosition() &&
+                position < lm.findLastCompletelyVisibleItemPosition();
+    }
+
+    public static void scrollToPosition(RecyclerView rv,
+                                            LinearLayoutManager lm,
+                                            int position,
+                                            boolean smooth) {
+        Context context = rv.getContext();
+        rv.post(() -> {
+            if (smooth) {
+                RecyclerViewUtils.smoothScrollToTop(position,
+                        lm,
+                        context,
+                        170);
+            } else {
+                lm.scrollToPositionWithOffset(position, 0);
+            }
+        });
+    }
 
     public static <T extends RecyclerView.ViewHolder> void viewHolders(RecyclerView recyclerView,
                                                                        Callback<T> callback) {

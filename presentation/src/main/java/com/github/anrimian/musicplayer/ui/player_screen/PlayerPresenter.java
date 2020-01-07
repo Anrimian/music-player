@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import android.util.Log;
-
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
@@ -23,7 +21,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
-import static com.github.anrimian.musicplayer.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
@@ -50,11 +47,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
-
-    private int currentPosition = NO_POSITION;
-
-    private boolean scrollToPositionAfterUpdate = false;
-    private boolean jumpToNewItem = true;
 
     public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
@@ -92,11 +84,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         subscribeOnPlayerStateChanges();
         subscribeOnPlayQueue();
         subscribeOnCurrentCompositionChanging();
+        subscribeOnCurrentPosition();
         subscribeOnTrackPositionChanging();
     }
 
     void onStop() {
-        jumpToNewItem = true;
         batterySafeDisposable.clear();
     }
 
@@ -149,7 +141,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onRandomPlayingButtonClicked(boolean enable) {
-        scrollToPositionAfterUpdate = true;
         playerInteractor.setRandomPlayingEnabled(enable);
         getViewState().showRandomPlayingButton(enable);
     }
@@ -257,12 +248,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         Collections.swap(playQueue, from, to);
         getViewState().notifyItemMoved(from, to);
 
-        if (fromItem.equals(currentItem)) {
-            currentPosition = to;
-        }
-        if (toItem.equals(currentItem)) {
-            currentPosition = from;
-        }
         playerInteractor.swapItems(fromItem, from, toItem, to);
     }
 
@@ -318,6 +303,16 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 .subscribe(this::onPlayQueueEventReceived));
     }
 
+    private void subscribeOnCurrentPosition() {
+        batterySafeDisposable.add(playerInteractor.getCurrentItemPositionObservable()
+                .observeOn(uiScheduler)
+                .subscribe(this::onItemPositionReceived));
+    }
+
+    private void onItemPositionReceived(int position) {
+        getViewState().scrollQueueToPosition(position);
+    }
+
     private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem newItem = playQueueEvent.getPlayQueueItem();
         if (currentItem == null || !currentItem.equals(newItem)
@@ -331,14 +326,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showCurrentQueueItem(newItem, isCoversEnabled);
         if (newItem != null) {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
-            scrollToItemPosition(newItem);
         }
-    }
-
-    private void scrollToItemPosition(PlayQueueItem newItem) {
-        playerInteractor.getQueuePosition(newItem)
-                .observeOn(uiScheduler)
-                .subscribe(this::scrollToItemPosition, errorParser::logError);
     }
 
     private void subscribeOnPlayerStateChanges() {
@@ -366,28 +354,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onPlayQueueChanged(List<PlayQueueItem> list) {
-        Log.d("KEK2", "on play queue received");
         playQueue = list;
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setMusicControlsEnabled(!playQueue.isEmpty());
         getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
         getViewState().updatePlayQueue(list);
-//        if (scrollToPositionAfterUpdate) {
-//            Log.d("KEK2", "onPlayQueueChanged, scroll to position");
-//            scrollToPositionAfterUpdate = false;
-            if (currentItem != null) {
-                scrollToItemPosition(currentItem);
-            }
-//        }
-    }
-
-    private void scrollToItemPosition(int position) {
-        boolean fastScroll = Math.abs(position - currentPosition) > 1;
-
-        getViewState().scrollQueueToPosition(position, !jumpToNewItem && !fastScroll);
-        jumpToNewItem = false;
-
-        currentPosition = position;
     }
 
     private void onPlayQueueReceivingError(Throwable throwable) {

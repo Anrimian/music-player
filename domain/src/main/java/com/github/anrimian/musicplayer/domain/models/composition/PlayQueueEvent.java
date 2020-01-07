@@ -11,18 +11,15 @@ public class PlayQueueEvent {
     private final PlayQueueItem playQueueItem;
 
     private final long trackPosition;
-    private final int queuePosition;
 
     public PlayQueueEvent(PlayQueueItem playQueueItem) {
-        this(playQueueItem, 0, 0);
+        this(playQueueItem, 0);
     }
 
     public PlayQueueEvent(@Nullable PlayQueueItem playQueueItem,
-                          long trackPosition,
-                          int queuePosition) {
+                          long trackPosition) {
         this.playQueueItem = playQueueItem;
         this.trackPosition = trackPosition;
-        this.queuePosition = queuePosition;
     }
 
     @Nullable
@@ -32,10 +29,6 @@ public class PlayQueueEvent {
 
     public long getTrackPosition() {
         return trackPosition;
-    }
-
-    public int getQueuePosition() {
-        return queuePosition;
     }
 
     @Override

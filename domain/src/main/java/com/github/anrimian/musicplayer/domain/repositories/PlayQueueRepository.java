@@ -23,6 +23,8 @@ public interface PlayQueueRepository {
 
     Completable setPlayQueue(List<Composition> compositions, int startPosition);
 
+    Flowable<Integer> getCurrentItemPositionObservable();
+
     Maybe<Integer> getCompositionPosition(@Nonnull PlayQueueItem playQueueItem);
 
     int getCurrentPosition();

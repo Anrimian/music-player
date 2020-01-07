@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
-import android.util.Log;
-
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
@@ -59,13 +57,11 @@ public class PlayQueueDaoWrapper {
 
     public Observable<List<PlayQueueItem>> getPlayQueueInNormalOrderObservable() {
         return playQueueDao.getPlayQueueInNormalOrderObservable()
-                .doOnNext(o -> Log.d("KEK2", "new normal order queue: "))
                 .map(list -> mapList(list, this::toQueueItem));
     }
 
     public Observable<List<PlayQueueItem>> getPlayQueueInShuffledOrderObservable() {
         return playQueueDao.getPlayQueueInShuffledOrderObservable()
-                .doOnNext(o -> Log.d("KEK2", "new shuffled order queue: "))
                 .map(list -> mapList(list, this::toQueueItem));
     }
 
@@ -211,11 +207,25 @@ public class PlayQueueDaoWrapper {
     }
 
     public Observable<Integer> getPositionObservable(long id, boolean isShuffle) {
+        Observable<Integer> observable;
         if (isShuffle) {
-            return playQueueDao.getShuffledPositionObservable(id);
+            observable = playQueueDao.getShuffledPositionObservable(id);
         } else {
-            return playQueueDao.getPositionObservable(id);
+            observable = playQueueDao.getPositionObservable(id);
         }
+        return observable.distinctUntilChanged();
+    }
+
+    //id not present -> emit 0 -> need ignore
+    public Observable<Integer> getIndexPositionObservable(long id, boolean isShuffle) {
+        Observable<Integer> observable;
+        if (isShuffle) {
+            observable = playQueueDao.getShuffledIndexPositionObservable(id);
+        } else {
+            observable = playQueueDao.getIndexPositionObservable(id);
+        }
+        return observable.filter(pos -> pos >= 0)
+                .distinctUntilChanged();
     }
 
     public long getNextQueueItemId(long currentItemId, boolean isShuffled) {

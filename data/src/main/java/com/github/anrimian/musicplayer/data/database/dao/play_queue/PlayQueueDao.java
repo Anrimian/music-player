@@ -233,6 +233,26 @@ public interface PlayQueueDao {
     @Query("SELECT shuffledPosition FROM play_queue WHERE id = :id")
     Observable<Integer> getShuffledPositionObservable(long id);
 
+    @Query("WITH item AS (SELECT position FROM play_queue WHERE id = :id) " +
+            "SELECT CASE WHEN item.position IS NULL " +
+            "  THEN -1 " +
+            "  ELSE (SELECT count() FROM play_queue WHERE position < item.position)" +
+            "END " +
+            "AS result " +
+            "FROM play_queue, item " +
+            "LIMIT 1")
+    Observable<Integer> getIndexPositionObservable(long id);
+
+    @Query("WITH item AS (SELECT shuffledPosition FROM play_queue WHERE id = :id) " +
+            "SELECT CASE WHEN item.shuffledPosition IS NULL " +
+            "  THEN -1 " +
+            "  ELSE (SELECT count() FROM play_queue WHERE shuffledPosition < item.shuffledPosition)" +
+            "END " +
+            "AS result " +
+            "FROM play_queue, item " +
+            "LIMIT 1")
+    Observable<Integer> getShuffledIndexPositionObservable(long id);
+
     @Query("UPDATE play_queue SET shuffledPosition = :shuffledPosition WHERE id = :id")
     void updateShuffledPosition(long id, int shuffledPosition);
 

@@ -26,7 +26,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -235,6 +234,10 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getCurrentQueueItemObservable();
     }
 
+    public Flowable<Integer> getCurrentItemPositionObservable() {
+        return playQueueRepository.getCurrentItemPositionObservable();
+    }
+
     public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
         return playQueueRepository.getPlayQueueObservable();
     }
@@ -245,10 +248,6 @@ public class MusicPlayerInteractor {
 
     public Completable deleteCompositions(List<Composition> compositions) {
         return musicProviderRepository.deleteCompositions(compositions);
-    }
-
-    public Maybe<Integer> getQueuePosition(PlayQueueItem item) {
-        return playQueueRepository.getCompositionPosition(item);
     }
 
     public Completable removeQueueItem(PlayQueueItem item) {
