@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
-import android.util.Log;
-
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
@@ -123,7 +121,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {//wrong emits...?
+    public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
         return currentItemObservable;
     }
 
@@ -133,12 +131,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public void setRandomPlayingEnabled(boolean enabled) {//performance issue with large lists
+    public void setRandomPlayingEnabled(boolean enabled) {
         Completable.fromAction(() -> {
             if (enabled) {
-                PlayQueueItem item = getCurrentItem();
-                playQueueDao.reshuffleQueue(item);
-                Log.d("KEK2", "reshuffleQueue");
+                long itemId = uiStatePreferences.getCurrentQueueItemId();
+                playQueueDao.reshuffleQueue(itemId);
             }
             settingsPreferences.setRandomPlayingEnabled(enabled);
         }).subscribeOn(scheduler)
@@ -179,6 +176,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .subscribeOn(scheduler);
     }
 
+    //not working too
     @Override
     public Completable swapItems(PlayQueueItem firstItem,
                                  int firstPosition,
@@ -195,10 +193,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable addCompositionsToPlayNext(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
-            PlayQueueItem currentItem = getCurrentItem();
-            List<PlayQueueItem> list = playQueueDao.addCompositionsToQueue(compositions, currentItem);
-            if (currentItem == null) {
-                setCurrentItem(list.get(0));
+            long id = uiStatePreferences.getCurrentQueueItemId();
+            long firstId = playQueueDao.addCompositionsToQueue(compositions, id);
+            if (id == NO_ITEM) {
+                setCurrentItem(firstId);
             }
         }).subscribeOn(scheduler);
     }
@@ -206,10 +204,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable addCompositionsToEnd(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
-            PlayQueueItem currentItem = getCurrentItem();
-            List<PlayQueueItem> list = playQueueDao.addCompositionsToEndQueue(compositions);
-            if (currentItem == null) {
-                setCurrentItem(list.get(0));
+            long id = uiStatePreferences.getCurrentQueueItemId();
+            long firstId = playQueueDao.addCompositionsToEndQueue(compositions);
+            if (id == NO_ITEM) {
+                setCurrentItem(firstId);
             }
         }).subscribeOn(scheduler);
     }
@@ -227,15 +225,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             return null;
         }
         return toPlayQueueItem(entity);
-    }
-
-    @Deprecated
-    private void setCurrentItem(@Nullable PlayQueueItem item) {
-        long itemId = NO_ITEM;
-        if (item != null) {
-            itemId = item.getId();
-        }
-        uiStatePreferences.setCurrentQueueItemId(itemId);
     }
 
     private void setCurrentItem(@Nullable Long itemId) {

@@ -210,7 +210,7 @@ public interface PlayQueueDao {
     Observable<PlayQueueItemDto[]> getItemObservable(long id);
 
     @Insert
-    List<Long> insertItems(List<PlayQueueEntity> playQueueEntityList);
+    long[] insertItems(List<PlayQueueEntity> playQueueEntityList);
 
     @Query("DELETE FROM play_queue")
     void deletePlayQueue();
@@ -259,13 +259,15 @@ public interface PlayQueueDao {
     @Query("UPDATE play_queue SET position = :position WHERE id = :itemId")
     void updateItemPosition(long itemId, int position);
 
-    @Query("UPDATE play_queue SET position = position + :increaseBy WHERE position > :after")
-    void increasePositions(int increaseBy, int after);
+    @Query("UPDATE play_queue " +
+            "SET position = position + :increaseBy " +
+            "WHERE position = :position")
+    void increasePosition(int increaseBy, int position);
 
     @Query("UPDATE play_queue " +
             "SET shuffledPosition = shuffledPosition + :increaseBy " +
-            "WHERE shuffledPosition > :after")
-    void increaseShuffledPositions(int increaseBy, int after);
+            "WHERE shuffledPosition = :position")
+    void increaseShuffledPosition(int increaseBy, int position);
 
     @Query("SELECT MAX(position) FROM play_queue")
     int getLastPosition();

@@ -259,8 +259,6 @@ public class MusicPlayerInteractor {
                           PlayQueueItem secondItem,
                           int secondPosition) {
         playQueueRepository.swapItems(firstItem, firstPosition, secondItem, secondPosition)
-                .doOnError(analytics::processNonFatalError)
-                .onErrorComplete()
                 .subscribe();
     }
 
@@ -276,7 +274,7 @@ public class MusicPlayerInteractor {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
-            stop();
+            pause();
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
 
