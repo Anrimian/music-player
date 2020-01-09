@@ -1,13 +1,13 @@
 package com.github.anrimian.musicplayer.data.database.mappers;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 
 import javax.annotation.Nullable;
 
 public class CompositionMapper {
 
-    public static CompositionEntity toEntity(StorageComposition composition,
+    public static CompositionEntity toEntity(StorageFullComposition composition,
                                              @Nullable Long artistId,
                                              @Nullable Long albumId) {
         return new CompositionEntity(artistId,

@@ -5,7 +5,6 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 @Entity(tableName = "artists",
         indices = {
@@ -16,25 +15,15 @@ public class ArtistEntity {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-    @Nullable
-    private Long storageId;
-
     @Nonnull
     private String name;
 
-    public ArtistEntity(@Nullable Long storageId,
-                        @Nonnull String name) {
-        this.storageId = storageId;
+    public ArtistEntity(@Nonnull String name) {
         this.name = name;
     }
 
     public long getId() {
         return id;
-    }
-
-    @Nullable
-    public Long getStorageId() {
-        return storageId;
     }
 
     @Nonnull
@@ -44,10 +33,6 @@ public class ArtistEntity {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public void setStorageId(@Nullable Long storageId) {
-        this.storageId = storageId;
     }
 
     public void setName(@Nonnull String name) {

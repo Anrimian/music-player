@@ -76,10 +76,12 @@ public interface CompositionsDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
             "compositions.filePath as filePath, " +
             "compositions.duration as duration, " +
             "compositions.size as size, " +
-            "compositions.storageId as id, " +
+            "compositions.id as id, " +
+            "compositions.storageId as storageId, " +
             "compositions.dateAdded as dateAdded, " +
             "compositions.dateModified as dateModified " +
             "FROM compositions WHERE storageId NOTNULL")

@@ -3,8 +3,6 @@ package com.github.anrimian.musicplayer.data.utils.collections;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
-import com.github.anrimian.musicplayer.domain.utils.changes.map.ChangeInspector;
-import com.github.anrimian.musicplayer.domain.utils.changes.map.EqualComparator;
 import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.java.Mapper;
@@ -30,7 +28,7 @@ public class AndroidCollectionUtils {
 
     public static <V> boolean processChanges(LongSparseArray<V> oldMap,
                                              LongSparseArray<V> newMap,
-                                             ChangeInspector<V> changeInspector,
+                                             ChangeInspector<V, V> changeInspector,
                                              Callback<V> onDeleteCallback,
                                              Callback<V> onAddedCallback,
                                              Callback<V> onModifyCallback) {
@@ -56,6 +54,40 @@ public class AndroidCollectionUtils {
                 hasChanges = true;
             } else if (changeInspector.hasChanges(newValue, existValue)) {
                 onModifyCallback.call(newValue);
+                hasChanges = true;
+            }
+        }
+        return hasChanges;
+    }
+
+    public static <V1, V2> boolean processDiffChanges(LongSparseArray<V1> oldMap,
+                                                      LongSparseArray<V2> newMap,
+                                                      ChangeInspector<V1, V2> changeInspector,
+                                                      Callback<V1> onDeleteCallback,
+                                                      Callback<V2> onAddedCallback,
+                                                      BiCallback<V1, V2> onModifyCallback) {
+        boolean hasChanges = false;
+
+        for(int i = 0, size = oldMap.size(); i < size; i++) {
+            V1 existValue = oldMap.valueAt(i);
+            long existKey = oldMap.keyAt(i);
+            V2 value = newMap.get(existKey);
+            if (value == null) {
+                onDeleteCallback.call(existValue);
+                hasChanges = true;
+            }
+        }
+
+        for(int i = 0, size = newMap.size(); i < size; i++) {
+            long newKey = newMap.keyAt(i);
+            V2 newValue = newMap.valueAt(i);
+
+            V1 existValue = oldMap.get(newKey);
+            if (existValue == null) {
+                onAddedCallback.call(newValue);
+                hasChanges = true;
+            } else if (changeInspector.hasChanges(existValue, newValue)) {
+                onModifyCallback.call(existValue, newValue);
                 hasChanges = true;
             }
         }
@@ -98,35 +130,11 @@ public class AndroidCollectionUtils {
         return hasChanges;
     }
 
-    public static <Old, New> boolean processChanges(Set<Old> currentSet,
-                                                    Set<New> newSet,
-                                                    Mapper<Old, New> newValueFetcher,
-                                                    Mapper<New, Old> oldValueFetcher,
-                                                    EqualComparator<Old, New> equalComparator,
-                                                    Callback<Old> onDeleteCallback,
-                                                    Callback<New> onAddedCallback,
-                                                    BiCallback<Old, New> onModifyCallback) {
-        boolean hasChanges = false;
+    public interface ChangeInspector<V1, V2> {
+        boolean hasChanges(V1 first, V2 second);
+    }
 
-        for(Old existValue: currentSet ) {
-            New newValue = newValueFetcher.map(existValue);
-
-            if (!newSet.contains(newValue)) {
-                onDeleteCallback.call(existValue);
-                hasChanges = true;
-            }
-        }
-
-        for (New newValue: newSet) {
-            Old existValue = oldValueFetcher.map(newValue);
-            if (!currentSet.contains(existValue)) {
-                onAddedCallback.call(newValue);
-                hasChanges = true;
-            } else if (equalComparator.areItemsTheSame(existValue, newValue)) {
-                onModifyCallback.call(existValue, newValue);
-                hasChanges = true;
-            }
-        }
-        return hasChanges;
+    public interface EqualComparator<T, K> {
+        boolean areItemsTheSame(T first, K second);
     }
 }

@@ -1,12 +1,8 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.net.Uri;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
@@ -16,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
@@ -30,13 +27,21 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
 
     private static final int COVER_SIZE = 300;
 
-    public CoverImageLoader(Context context) {
+    private final StorageAlbumsProvider storageAlbumsProvider;
+
+    public CoverImageLoader(StorageAlbumsProvider storageAlbumsProvider) {
         super(R.drawable.ic_music_placeholder_simple,
                 R.drawable.ic_music_placeholder_simple,
                 5,
                 2*1024*1024,
-                data -> getImage(data, context),
                 ImageMetaData::getKey);
+
+        this.storageAlbumsProvider = storageAlbumsProvider;
+    }
+
+    @Override
+    protected ImageFetcher<ImageMetaData> getImageFetcher() {
+        return this::getImage;
     }
 
     public void displayImage(@NonNull ImageView imageView, @NonNull Composition composition) {
@@ -76,21 +81,18 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
         displayImage(widgetView, viewId, new CompositionImage(data), bitmapTransformer, placeholder);
     }
 
-    private static Bitmap getImage(ImageMetaData metaData, Context context) {
+    private Bitmap getImage(ImageMetaData metaData) {
         if (metaData instanceof CompositionImage) {
             return extractImageComposition(((CompositionImage) metaData).getComposition());
         }
         if (metaData instanceof AlbumImage) {
-            return extractAlbumCover(((AlbumImage) metaData).getAlbum(), context);
+            return extractAlbumCover(((AlbumImage) metaData).getAlbum());
         }
         throw new IllegalStateException("unexpected image metaData: " + metaData);
     }
 
-    private static Bitmap extractAlbumCover(Album album, Context context) {
-        Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-        Uri uri = ContentUris.withAppendedId(sArtworkUri, album.getStorageId());
-        ContentResolver res = context.getContentResolver();
-        try (InputStream in = res.openInputStream(uri)) {
+    private Bitmap extractAlbumCover(Album album) {
+        try (InputStream in = storageAlbumsProvider.getAlbumCoverStream(album.getName())) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.outWidth = COVER_SIZE;
             opt.outHeight = COVER_SIZE;

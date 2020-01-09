@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.data.database.dao.artist;
 
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
-import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
-import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
@@ -14,7 +12,6 @@ import java.util.Set;
 
 import io.reactivex.Observable;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class ArtistsDaoWrapper {
@@ -23,10 +20,6 @@ public class ArtistsDaoWrapper {
 
     public ArtistsDaoWrapper(ArtistsDao artistsDao) {
         this.artistsDao = artistsDao;
-    }
-
-    public void insertArtists(List<StorageArtist> artists) {
-        artistsDao.insertAll(mapList(artists, this::toEntity));
     }
 
     public Set<String> selectAllArtistNames() {
@@ -73,13 +66,6 @@ public class ArtistsDaoWrapper {
 
     public boolean isArtistExists(String name) {
         return artistsDao.isArtistExists(name);
-    }
-
-    private ArtistEntity toEntity(StorageArtist artist) {
-        return new ArtistEntity(
-                artist.getId(),
-                artist.getName()
-        );
     }
 
     private String getOrderQuery(Order order) {

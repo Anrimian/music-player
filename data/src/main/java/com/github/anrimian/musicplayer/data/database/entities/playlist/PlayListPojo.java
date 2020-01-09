@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+@Deprecated
 public class PlayListPojo {
 
     private final long id;

@@ -4,6 +4,7 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -138,6 +139,15 @@ public class TestDataProvider {
         return compositions;
     }
 
+    public static LongSparseArray<StorageFullComposition> getFakeStorageFullCompositionsMap() {
+        LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>();
+        for (long i = 0; i < 100000; i++) {
+            StorageFullComposition composition = fakeStorageFullComposition(i, "music-" + i);
+            compositions.put(i, composition);
+        }
+        return compositions;
+    }
+
     public static PlayQueueEvent currentItem(int pos) {
         return new PlayQueueEvent(new PlayQueueItem(pos, fakeComposition(pos)), 0L);
     }
@@ -184,12 +194,29 @@ public class TestDataProvider {
         return new StorageComposition(null,
                 null,
                 null,
+                null,
+                filePath,
+                0,
+                0,
+                id,
+                id,
+                new Date(createDate),
+                new Date(modifyDate));
+    }
+
+    public static StorageFullComposition fakeStorageFullComposition(long id,
+                                                            String filePath,
+                                                            long createDate,
+                                                            long modifyDate) {
+        return new StorageFullComposition(null,
+                null,
                 filePath,
                 0,
                 0,
                 id,
                 new Date(createDate),
-                new Date(modifyDate));
+                new Date(modifyDate),
+                null);
     }
 
     public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
@@ -238,12 +265,26 @@ public class TestDataProvider {
         return new StorageComposition(null,
                 null,
                 null,
+                null,
+                filePath,
+                0,
+                0,
+                id,
+                id,
+                new Date(0),
+                new Date(0));
+    }
+
+    public static StorageFullComposition fakeStorageFullComposition(long id, String filePath) {
+        return new StorageFullComposition(null,
+                null,
                 filePath,
                 0,
                 0,
                 id,
                 new Date(0),
-                new Date(0));
+                new Date(0),
+                null);
     }
 
     public static Composition fakeCompositionWithTitle(long id, String title) {

@@ -1,19 +1,21 @@
 package com.github.anrimian.musicplayer.data.storage.providers.albums;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore.Audio.Albums;
 
 import androidx.annotation.Nullable;
+import androidx.collection.LongSparseArray;
 
-import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import io.reactivex.Observable;
 
@@ -25,12 +27,12 @@ public class StorageAlbumsProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<Map<ShortAlbum, StorageAlbum>> getAlbumsObservable() {
+    public Observable<LongSparseArray<StorageAlbum>> getAlbumsObservable() {
         return RxContentObserver.getObservable(contentResolver, Albums.EXTERNAL_CONTENT_URI)
                 .map(o -> getAlbums());
     }
 
-    public Map<ShortAlbum, StorageAlbum> getAlbums() {
+    public LongSparseArray<StorageAlbum> getAlbums() {
         try(Cursor cursor = contentResolver.query(Albums.EXTERNAL_CONTENT_URI,
                 new String[] {
                         Albums._ID,
@@ -46,20 +48,27 @@ public class StorageAlbumsProvider {
                 null,
                 null)) {
             if (cursor == null) {
-                return new HashMap<>();
+                return new LongSparseArray<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            Map<ShortAlbum, StorageAlbum> artists = new HashMap<>(cursor.getCount());
+            LongSparseArray<StorageAlbum> artists = new LongSparseArray<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
                 StorageAlbum item = getAlbumFromCursor(cursorWrapper);
                 if (item != null) {
-                    artists.put(new ShortAlbum(item.getAlbum(), item.getArtist()), item);
+                    artists.put(item.getId(), item);
                 }
             }
             return artists;
         }
+    }
+
+    public InputStream getAlbumCoverStream(String name) throws FileNotFoundException {
+        long id = getAlbumIdByName(name);
+        Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+        Uri uri = ContentUris.withAppendedId(sArtworkUri, id);
+        return contentResolver.openInputStream(uri);
     }
 
     public void updateAlbumName(String oldName, String artist, String name) {
@@ -78,6 +87,22 @@ public class StorageAlbumsProvider {
                 cv,
                 Albums.ALBUM + " = ? AND " + Albums.ARTIST + " = ?",
                 new String[] { albumName, oldArtist });
+    }
+
+    private long getAlbumIdByName(String name) {
+        try (Cursor cursor = contentResolver.query(Albums.EXTERNAL_CONTENT_URI,
+                new String[] {
+                        Albums._ID,
+                },
+                Albums.ALBUM + " = ? ",
+                new String[] { name },
+                null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+                return cursorWrapper.getLong(Albums._ID);
+            }
+        }
+        return 0;
     }
 
     @Nullable

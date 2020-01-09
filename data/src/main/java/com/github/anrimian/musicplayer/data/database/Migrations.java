@@ -11,7 +11,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionCorruptionDetector;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 
 class Migrations {
@@ -21,17 +23,21 @@ class Migrations {
             @Override
             public void migrate(@NonNull SupportSQLiteDatabase database) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `compositions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `artist` TEXT, `title` TEXT, `album` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT)");
-                StorageMusicProvider provider = new StorageMusicProvider(context);
+                StorageAlbumsProvider albumsProvider = new StorageAlbumsProvider(context);
+                StorageMusicProvider provider = new StorageMusicProvider(context, albumsProvider);
 
                 EnumConverter enumConverter = new EnumConverter();
-                LongSparseArray<StorageComposition> map = provider.getCompositions();
+                LongSparseArray<StorageFullComposition> map = provider.getCompositions();
                 for(int i = 0, size = map.size(); i < size; i++) {
-                    StorageComposition composition = map.valueAt(i);
+                    StorageFullComposition composition = map.valueAt(i);
                     ContentValues cv = new ContentValues();
                     cv.put("storageId", composition.getId());
                     cv.put("artist", composition.getArtist());
                     cv.put("title", composition.getTitle());
-                    cv.put("album", composition.getAlbum());
+                    StorageAlbum storageAlbum = composition.getStorageAlbum();
+                    if (storageAlbum != null) {
+                        cv.put("album", storageAlbum.getAlbum());
+                    }
                     cv.put("filePath", composition.getFilePath());
                     cv.put("duration", composition.getDuration());
                     cv.put("size", composition.getSize());

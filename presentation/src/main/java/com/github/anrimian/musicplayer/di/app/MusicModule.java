@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
@@ -129,7 +130,7 @@ class MusicModule {
     @Provides
     @Nonnull
     @Singleton
-    CoverImageLoader coverImageLoader(Context context) {
-        return new CoverImageLoader(context);
+    CoverImageLoader coverImageLoader(StorageAlbumsProvider storageAlbumsProvider) {
+        return new CoverImageLoader(storageAlbumsProvider);
     }
 }

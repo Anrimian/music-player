@@ -43,7 +43,6 @@ public class AlbumsDaoWrapper {
 
     public Observable<List<Album>> getAllObservable(Order order, String searchText) {
         String query = "SELECT id as id," +
-                "storageId as storageId, " +
                 "name as name, " +
                 "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
                 "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
@@ -89,7 +88,7 @@ public class AlbumsDaoWrapper {
             Long artistId = artistsDao.findArtistIdByName(artistName);
 
             if (artistId == null && artistName != null) {
-                artistId = artistsDao.insertArtist(new ArtistEntity(null, artistName));//hmm, storage?
+                artistId = artistsDao.insertArtist(new ArtistEntity(artistName));//hmm, storage?
             }
 
             Long oldArtistId = albumsDao.getArtistId(albumId);
@@ -122,7 +121,6 @@ public class AlbumsDaoWrapper {
         }
         return new AlbumEntity(
                 artistId,
-                album.getId(),
                 album.getAlbum(),
                 album.getFirstYear(),
                 album.getLastYear()

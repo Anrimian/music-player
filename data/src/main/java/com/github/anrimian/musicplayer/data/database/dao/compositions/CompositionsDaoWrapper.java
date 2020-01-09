@@ -11,7 +11,9 @@ import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
@@ -30,7 +32,6 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToMap;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
-//TODO delete empty authors, albums, genres after delete?
 public class CompositionsDaoWrapper {
 
     private final AppDatabase appDatabase;
@@ -92,7 +93,7 @@ public class CompositionsDaoWrapper {
 
     public LongSparseArray<StorageComposition> selectAllAsStorageCompositions() {
         return AndroidCollectionUtils.mapToSparseArray(compositionsDao.selectAllAsStorageCompositions(),
-                StorageComposition::getId);
+                StorageComposition::getStorageId);
     }
 
     public void delete(long id) {
@@ -136,7 +137,7 @@ public class CompositionsDaoWrapper {
 
             // if album not exists - create album
             if (albumId == null && albumName != null) {
-                albumId = albumsDao.insert(new AlbumEntity(artistId, null, albumName, 0, 0));//hmm, storage?
+                albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
             }
 
             // set new albumId
@@ -156,7 +157,7 @@ public class CompositionsDaoWrapper {
 
             // 2) if artist not exists - create artist
             if (artistId == null && authorName != null) {
-                artistId = artistsDao.insertArtist(new ArtistEntity(null, authorName));//hmm, storage?
+                artistId = artistsDao.insertArtist(new ArtistEntity(authorName));
             }
             // 3) set new artistId
             Long oldArtistId = compositionsDao.getArtistId(id);
@@ -179,7 +180,7 @@ public class CompositionsDaoWrapper {
 
                 // 2) if artist not exists - create artist
                 if (artistId == null && artistName != null) {
-                    artistId = artistsDao.insertArtist(new ArtistEntity(null, artistName));//hmm, storage?
+                    artistId = artistsDao.insertArtist(new ArtistEntity(artistName));
                 }
 
                 AlbumEntity albumEntity = albumsDao.getAlbumEntity(albumId);
@@ -192,7 +193,6 @@ public class CompositionsDaoWrapper {
                 if (newAlbumId == null) {
                     newAlbumId = albumsDao.insert(new AlbumEntity(
                             artistId,
-                            null,
                             albumEntity.getName(),
                             albumEntity.getFirstYear(),
                             albumEntity.getLastYear()
@@ -216,15 +216,16 @@ public class CompositionsDaoWrapper {
         compositionsDao.updateTitle(id, title);
     }
 
-    public void applyChanges(List<StorageComposition> addedCompositions,
+    public void applyChanges(List<StorageFullComposition> addedCompositions,
                              List<StorageComposition> deletedCompositions,
-                             List<StorageComposition> changedCompositions) {
+                             List<StorageFullComposition> changedCompositions) {
         appDatabase.runInTransaction(() -> {
             compositionsDao.insert(mapList(addedCompositions, this::toCompositionEntity));
             for (StorageComposition composition: deletedCompositions) {
-                compositionsDao.deleteByStorageId(composition.getId());//TODO delete by id instead
+                compositionsDao.delete(composition.getId());
             }
-            for (StorageComposition composition: changedCompositions) {
+            for (StorageFullComposition composition: changedCompositions) {
+                //update artist, album, album artist
                 compositionsDao.update(
                         composition.getTitle(),
                         composition.getFilePath(),
@@ -245,23 +246,38 @@ public class CompositionsDaoWrapper {
         compositionsDao.setCorruptionType(corruptionType, id);
     }
 
-    private CompositionEntity toCompositionEntity(StorageComposition composition) {
+    private CompositionEntity toCompositionEntity(StorageFullComposition composition) {
+        //can be optimized, cache inserted albums/artists
 
         String artist = composition.getArtist();
-        Long artistId = null;
-        if (artist != null) {
-            artistId = artistsDao.findArtistIdByName(artist);
-        }
-        String album = composition.getAlbum();
+        Long artistId = getOrInsertArtist(artist);
+
         Long albumId = null;
-        if (album != null) {
-            albumId = albumsDao.findAlbum(artistId, album);
+        StorageAlbum storageAlbum = composition.getStorageAlbum();
+        if (storageAlbum != null) {
+            Long albumArtistId = getOrInsertArtist(storageAlbum.getArtist());
+
+            String albumName = storageAlbum.getAlbum();
+            albumId = albumsDao.findAlbum(albumArtistId, albumName);
+            if (albumId == null) {
+                albumId = albumsDao.insert(new AlbumEntity(albumArtistId,
+                        albumName,
+                        storageAlbum.getFirstYear(),
+                        storageAlbum.getLastYear()));
+            }
         }
         return CompositionMapper.toEntity(composition, artistId, albumId);
     }
 
-    public long selectIdByStorageId(long compositionId) {
-        return compositionsDao.selectIdByStorageId(compositionId);
+    private Long getOrInsertArtist(String artist) {
+        Long artistId = null;
+        if (artist != null) {
+            artistId = artistsDao.findArtistIdByName(artist);
+            if (artistId == null) {
+                artistId = artistsDao.insertArtist(new ArtistEntity(artist));
+            }
+        }
+        return artistId;
     }
 
     private String getOrderQuery(Order order) {

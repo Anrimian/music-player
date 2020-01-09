@@ -23,14 +23,11 @@ import io.reactivex.Observable;
 @Dao
 public interface GenreDao {
 
-    @Query("SELECT id FROM genres WHERE storageId = :storageId")
-    Long selectIdByStorageId(long storageId);
-
     @Query("SELECT name FROM genres")
     List<String> selectAllGenreNames();
 
     @Query("SELECT storageId as id," +
-            "audioId as audioId " + //wrong id
+            "(SELECT storageId FROM compositions WHERE id = audioId) as audioId " +
             "FROM genre_entries " +
             "WHERE genreId = :genreId")
     List<StorageGenreItem> selectAllAsStorageGenreItems(long genreId);

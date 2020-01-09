@@ -2,6 +2,8 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import androidx.annotation.NonNull;
 
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
+
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -11,60 +13,48 @@ import javax.annotation.Nullable;
  * Created on 24.10.2017.
  */
 
-public class StorageComposition {
+public class StorageFullComposition {
 
     @Nullable
     private final String artist;
     @Nullable
-    private final String albumArtist;
-    @Nullable
     private final String title;
-    @Nullable
-    private final String album;
     @Nonnull
     private final String filePath;
 
     private final long duration;
     private final long size;
     private final long id;
-    private final long storageId;
 
     @Nonnull
     private final Date dateAdded;
     @Nonnull
     private final Date dateModified;
 
-    public StorageComposition(@Nullable String artist,
-                              @Nullable String albumArtist,
-                              @Nullable String title,
-                              @Nullable String album,
-                              @Nonnull String filePath,
-                              long duration,
-                              long size,
-                              long id,
-                              long storageId,
-                              @Nonnull Date dateAdded,
-                              @Nonnull Date dateModified) {
+    private final StorageAlbum storageAlbum;
+
+    public StorageFullComposition(@Nullable String artist,
+                                  @Nullable String title,
+                                  @Nonnull String filePath,
+                                  long duration,
+                                  long size,
+                                  long id,
+                                  @Nonnull Date dateAdded,
+                                  @Nonnull Date dateModified,
+                                  StorageAlbum storageAlbum) {
         this.artist = artist;
-        this.albumArtist = albumArtist;
         this.title = title;
-        this.album = album;
         this.filePath = filePath;
         this.duration = duration;
         this.size = size;
         this.id = id;
-        this.storageId = storageId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
+        this.storageAlbum = storageAlbum;
     }
 
-    public long getStorageId() {
-        return storageId;
-    }
-
-    @Nullable
-    public String getAlbumArtist() {
-        return albumArtist;
+    public StorageAlbum getStorageAlbum() {
+        return storageAlbum;
     }
 
     @Nullable
@@ -75,11 +65,6 @@ public class StorageComposition {
     @Nullable
     public String getTitle() {
         return title;
-    }
-
-    @Nullable
-    public String getAlbum() {
-        return album;
     }
 
     @Nonnull
@@ -127,7 +112,7 @@ public class StorageComposition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        StorageComposition that = (StorageComposition) o;
+        StorageFullComposition that = (StorageFullComposition) o;
 
         return id == that.id;
 

@@ -18,9 +18,6 @@ import io.reactivex.Observable;
 @Dao
 public interface ArtistsDao {
 
-    @Query("SELECT id FROM artists WHERE storageId = :storageId")
-    Long selectIdByStorageId(long storageId);
-
     @Query("SELECT name FROM artists")
     List<String> getAllArtistNames();
 
@@ -73,10 +70,10 @@ public interface ArtistsDao {
     @Query("SELECT name FROM artists")
     String[] getAuthorNames();
 
-    @Query("SELECT id FROM artists WHERE name = :author")
-    Long findArtistIdByName(String author);
+    @Query("SELECT id FROM artists WHERE name = :name")
+    Long findArtistIdByName(String name);
 
-    @Insert
+    @Insert()
     long insertArtist(ArtistEntity artistEntity);
 
     @Query("DELETE FROM artists " +

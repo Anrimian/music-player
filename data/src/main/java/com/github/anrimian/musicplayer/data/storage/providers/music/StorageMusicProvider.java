@@ -10,11 +10,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
@@ -25,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import io.reactivex.Observable;
 
 import static android.provider.MediaStore.Audio.Media;
@@ -36,10 +35,12 @@ public class StorageMusicProvider {
 
     private final ContentResolver contentResolver;
     private final Context context;
+    private final StorageAlbumsProvider albumsProvider;
 
-    public StorageMusicProvider(Context context) {
+    public StorageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
         contentResolver = context.getContentResolver();
         this.context = context;
+        this.albumsProvider = albumsProvider;
     }
 
     public void scanMedia(String path) {
@@ -49,12 +50,12 @@ public class StorageMusicProvider {
         context.sendBroadcast(scanFileIntent);
     }
 
-    public Observable<LongSparseArray<StorageComposition>> getCompositionsObservable() {
+    public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable() {
         return RxContentObserver.getObservable(contentResolver, Media.EXTERNAL_CONTENT_URI)
                 .map(o -> getCompositions());
     }
 
-    public LongSparseArray<StorageComposition> getCompositions() {
+    public LongSparseArray<StorageFullComposition> getCompositions() {
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(
@@ -62,13 +63,13 @@ public class StorageMusicProvider {
                     new String[] {
                             Media.ARTIST,
                             Media.TITLE,
-                            Media.ALBUM,
+//                            Media.ALBUM,
                             Media.DATA,
                             Media.DURATION,
                             Media.SIZE,
                             Media._ID,
 //                            Media.ARTIST_ID,
-//                            Media.ALBUM_ID,
+                            Media.ALBUM_ID,
                             Media.DATE_ADDED,
                             Media.DATE_MODIFIED},
                     Media.IS_MUSIC + " = ?",
@@ -77,12 +78,15 @@ public class StorageMusicProvider {
             if (cursor == null) {
                 return new LongSparseArray<>();
             }
+
+            LongSparseArray<StorageAlbum> albums = albumsProvider.getAlbums();
+
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            LongSparseArray<StorageComposition> compositions = new LongSparseArray<>(cursor.getCount());
+            LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>(cursor.getCount());
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
 
-                StorageComposition composition = getCompositionFromCursor(cursorWrapper);
+                StorageFullComposition composition = buildStorageComposition(cursorWrapper, albums);
                 if (composition != null) {
                     compositions.put(composition.getId(), composition);
                 }
@@ -117,34 +121,8 @@ public class StorageMusicProvider {
                 new String[] { String.valueOf(id) });
     }
 
-    @Nullable
-    public StorageComposition getComposition(long id) {
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(
-                    Media.EXTERNAL_CONTENT_URI,
-                    null,
-                    Media._ID + " = ?",
-                    new String[] { String.valueOf(id) },
-                    null);
-            if (cursor == null || cursor.getCount() == 0) {
-                return null;
-            }
-
-            cursor.moveToPosition(0);
-            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            return getCompositionFromCursor(cursorWrapper);
-        } finally {
-            IOUtils.closeSilently(cursor);
-        }
-    }
-
     public void updateCompositionArtist(long id, String author) {
         updateComposition(id, MediaStore.Audio.AudioColumns.ARTIST, author);
-    }
-
-    public void updateCompositionAlbumArtist(long id, String author) {
-        updateComposition(id, /*MediaStore.Audio.AudioColumns.ALBUM_ARTIST*/ "album_artist", author);
     }
 
     public void updateCompositionAlbum(long id, String album) {
@@ -185,18 +163,18 @@ public class StorageMusicProvider {
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
         cv.put(key, value);
-        int updated = contentResolver.update(Media.EXTERNAL_CONTENT_URI,
+        contentResolver.update(Media.EXTERNAL_CONTENT_URI,
                 cv,
                 Media._ID + " = ?",
                 new String[] { String.valueOf(id) });
-        Log.d("KEK2", "updateComposition, key: " + key + ", value: " + value + ", updated: " + updated);
     }
 
-    private StorageComposition getCompositionFromCursor(CursorWrapper cursorWrapper) {
+    private StorageFullComposition buildStorageComposition(CursorWrapper cursorWrapper,
+                                                           LongSparseArray<StorageAlbum> albums) {
 
         String artist = cursorWrapper.getString(Media.ARTIST);
         String title = cursorWrapper.getString(Media.TITLE);
-        String album = cursorWrapper.getString(Media.ALBUM);
+//        String album = cursorWrapper.getString(Media.ALBUM);
         String filePath = cursorWrapper.getString(Media.DATA);
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
@@ -208,7 +186,7 @@ public class StorageMusicProvider {
         long id = cursorWrapper.getLong(Media._ID);
 //        long artistId = cursorWrapper.getLong(Media.ARTIST_ID);
 //        long bookmark = cursorWrapper.getLong(Media.BOOKMARK);
-//        long albumId = cursorWrapper.getLong(Media.ALBUM_ID);
+        long albumId = cursorWrapper.getLong(Media.ALBUM_ID);
         long dateAddedMillis = cursorWrapper.getLong(Media.DATE_ADDED);
         long dateModifiedMillis = cursorWrapper.getLong(Media.DATE_MODIFIED);
 
@@ -245,15 +223,17 @@ public class StorageMusicProvider {
 //            corruptionType = CorruptionType.UNKNOWN;
 //        }
 
-        return new StorageComposition(
+        StorageAlbum storageAlbum = albums.get(albumId);
+
+        return new StorageFullComposition(
                 artist,
                 title,
-                album,
                 filePath,
                 duration,
                 size,
                 id,
                 dateAdded,
-                dateModified);
+                dateModified,
+                storageAlbum);
     }
 }

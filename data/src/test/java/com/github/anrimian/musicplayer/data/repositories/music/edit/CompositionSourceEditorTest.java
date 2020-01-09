@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 public class CompositionSourceEditorTest {
 
     @Rule
-    public ResourceFile res = new ResourceFile("/VersuS - Warriors (Instrumental Kizomba).mp3");
+    public ResourceFile res = new ResourceFile("/Кот Леопольд - Неприятность эту мы переживем.mp3");
 
     private CompositionSourceEditor sourceEditor = new CompositionSourceEditor();
 
@@ -22,6 +22,7 @@ public class CompositionSourceEditorTest {
         System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
         System.out.println("author: " + sourceEditor.getCompositionAuthor(filePath).blockingGet());
         System.out.println("album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());
+        System.out.println("album artist: " + sourceEditor.getCompositionAlbumArtist(filePath).blockingGet());
         System.out.println("genre: " + sourceEditor.getCompositionGenre(filePath).blockingGet());
     }
 

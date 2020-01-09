@@ -23,6 +23,7 @@ import java.util.Set;
 import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class GenresDaoWrapper {
@@ -44,7 +45,7 @@ public class GenresDaoWrapper {
     }
 
     public void applyChanges(List<StorageGenreItem> addedGenres, long genreId) {
-        genreDao.insertGenreEntities(mapList(addedGenres, genre -> toEntity(genre, genreId)));
+        genreDao.insertGenreEntities(mapListNotNull(addedGenres, genre -> toEntity(genre, genreId)));
     }
 
     public Set<String> selectAllGenreNames() {
@@ -175,6 +176,9 @@ public class GenresDaoWrapper {
 
     private GenreEntryEntity toEntity(StorageGenreItem genre, long genreId) {
         long audioId = compositionsDao.selectIdByStorageId(genre.getAudioId());
+        if (audioId == 0) {
+            return null;
+        }
         return new GenreEntryEntity(audioId, genreId, genre.getId());
     }
 

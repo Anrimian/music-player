@@ -8,7 +8,6 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
-import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
@@ -16,6 +15,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArti
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
@@ -35,7 +35,9 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageFullComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeStorageCompositionsMap;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getFakeStorageFullCompositionsMap;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayLists;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayListsAsList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
@@ -58,8 +60,8 @@ public class MediaStorageRepositoryImplTest {
     private AlbumsDaoWrapper albumsDao = mock(AlbumsDaoWrapper.class);
     private GenresDaoWrapper genresDao = mock(GenresDaoWrapper.class);
 
-    private PublishSubject<LongSparseArray<StorageComposition>> newCompositionsSubject = PublishSubject.create();
-    private PublishSubject<Map<ShortAlbum, StorageAlbum>> newAlbumsSubject = PublishSubject.create();
+    private PublishSubject<LongSparseArray<StorageFullComposition>> newCompositionsSubject = PublishSubject.create();
+    private PublishSubject<LongSparseArray<StorageAlbum>> newAlbumsSubject = PublishSubject.create();
     private PublishSubject<Map<String, StorageArtist>> newArtistsSubject = PublishSubject.create();
     private PublishSubject<LongSparseArray<StoragePlayList>> newPlayListsSubject = PublishSubject.create();
     private PublishSubject<List<StoragePlayListItem>> newPlayListItemsSubject = PublishSubject.create();
@@ -70,7 +72,7 @@ public class MediaStorageRepositoryImplTest {
     @Before
     public void setUp() {
         when(albumsProvider.getAlbumsObservable()).thenReturn(newAlbumsSubject);
-        when(albumsProvider.getAlbums()).thenReturn(new HashMap<>());
+        when(albumsProvider.getAlbums()).thenReturn(new LongSparseArray<>());
 
         when(genresProvider.getGenresObservable()).thenReturn(newGenreSubject);
         when(genresProvider.getGenres()).thenReturn(new HashMap<>());
@@ -115,21 +117,20 @@ public class MediaStorageRepositoryImplTest {
 
         mediaStorageRepository.runStorageObserver();
 
-        LongSparseArray<StorageComposition> newCompositions = getFakeStorageCompositionsMap();
-        StorageComposition removedComposition = newCompositions.get(100L);
+        LongSparseArray<StorageFullComposition> newCompositions = getFakeStorageFullCompositionsMap();
         newCompositions.remove(100L);
 
-        StorageComposition changedComposition = fakeStorageComposition(1, "changed composition", 1L, 10000L);
+        StorageFullComposition changedComposition = fakeStorageFullComposition(1, "changed composition", 1L, 10000L);
         newCompositions.put(1L, changedComposition);
 
-        StorageComposition newComposition = fakeStorageComposition(-1L, "new composition");
+        StorageFullComposition newComposition = fakeStorageFullComposition(-1L, "new composition");
         newCompositions.put(-1L, newComposition);
 
         newCompositionsSubject.onNext(newCompositions);
 
         verify(compositionsDao).applyChanges(
                 eq(asList(newComposition)),
-                eq(asList(removedComposition)),
+                eq(asList(currentCompositions.get(100L))),
                 eq(asList(changedComposition))
         );
     }
@@ -143,8 +144,8 @@ public class MediaStorageRepositoryImplTest {
 
         mediaStorageRepository.runStorageObserver();
 
-        LongSparseArray<StorageComposition> newCompositions = new LongSparseArray<>();
-        StorageComposition changedComposition = fakeStorageComposition(1, "new path", 1, 1000);
+        LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
+        StorageFullComposition changedComposition = fakeStorageFullComposition(1, "new path", 1, 1000);
         newCompositions.put(1L, changedComposition);
 
         newCompositionsSubject.onNext(newCompositions);

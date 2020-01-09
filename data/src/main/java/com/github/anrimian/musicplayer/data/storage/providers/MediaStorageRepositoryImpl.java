@@ -8,15 +8,14 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
-import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
@@ -91,12 +90,6 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     }
 
     private void subscribeOnMediaStoreChanges() {
-        mediaStoreDisposable.add(artistsProvider.getArtistsObservable()
-                .subscribeOn(scheduler)
-                .subscribe(this::applyArtistsChanges));
-        mediaStoreDisposable.add(albumsProvider.getAlbumsObservable()
-                .subscribeOn(scheduler)
-                .subscribe(this::applyAlbumsChanges));
         mediaStoreDisposable.add(musicProvider.getCompositionsObservable()
                 .subscribeOn(scheduler)
                 .subscribe(this::applyCompositionsData));
@@ -112,8 +105,6 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
     private Completable runRescanStorage() {
         return Completable.fromAction(() -> {
-            applyArtistsChanges(artistsProvider.getArtists());
-            applyAlbumsChanges(albumsProvider.getAlbums());
             applyCompositionsData(musicProvider.getCompositions());
             applyPlayListData(playListsProvider.getPlayLists());
 
@@ -259,58 +250,22 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
         }
     }
 
-    //TODO we can't merge data by storageId in future, merge by path+filename?
-    private synchronized void applyCompositionsData(LongSparseArray<StorageComposition> newCompositions) {
+    //we can't merge data by storageId in future, merge by path+filename?
+    private synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
-        List<StorageComposition> addedCompositions = new ArrayList<>();
+        List<StorageFullComposition> addedCompositions = new ArrayList<>();
         List<StorageComposition> deletedCompositions = new ArrayList<>();
-        List<StorageComposition> changedCompositions = new ArrayList<>();
-        boolean hasChanges = AndroidCollectionUtils.processChanges(currentCompositions,
+        List<StorageFullComposition> changedCompositions = new ArrayList<>();
+        boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositions,
                 newCompositions,
                 this::hasActualChanges,
                 deletedCompositions::add,
                 addedCompositions::add,
-                changedCompositions::add);
+                (oldItem, newItem) -> changedCompositions.add(newItem));
 
         if (hasChanges) {
             compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
-        }
-    }
-
-    private synchronized void applyAlbumsChanges(Map<ShortAlbum, StorageAlbum> newAlbums) {
-        Set<ShortAlbum> currentAlbums = albumsDao.selectShortAlbumsSet();
-
-        List<StorageAlbum> addedAlbums = new ArrayList<>();
-        boolean hasChanges = AndroidCollectionUtils.processChanges(currentAlbums,
-                newAlbums,
-                shortAlbum -> shortAlbum,
-                newAlbum -> new ShortAlbum(newAlbum.getAlbum(), newAlbum.getArtist()),
-                (o1, o2) -> false,
-                item -> {},
-                addedAlbums::add,
-                (oldItem, newItem) -> {});
-
-        if (hasChanges) {
-            albumsDao.insertAll(addedAlbums);
-        }
-    }
-
-    private synchronized void applyArtistsChanges(Map<String, StorageArtist> newArtists) {
-        Set<String> artistNames = artistsDao.selectAllArtistNames();
-
-        List<StorageArtist> addedArtists = new ArrayList<>();
-        boolean hasChanges = AndroidCollectionUtils.processChanges(artistNames,
-                newArtists,
-                name -> name,
-                StorageArtist::getName,
-                (o1, o2) -> false,
-                item -> {},
-                addedArtists::add,
-                (artistName, item) -> {});
-
-        if (hasChanges) {
-            artistsDao.insertArtists(addedArtists);
         }
     }
 
@@ -321,13 +276,23 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
     }
 
-    private boolean hasActualChanges(StorageComposition first, StorageComposition second) {
+    private boolean hasActualChanges(StorageComposition first, StorageFullComposition second) {
+        String newAlbumName = null;
+        String newAlbumArtist = null;
+        StorageAlbum newAlbum = second.getStorageAlbum();
+        if (newAlbum != null) {
+            newAlbumName = newAlbum.getAlbum();
+            newAlbumArtist = newAlbum.getArtist();
+        }
+
         return !(Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && Objects.equals(first.getDateModified(), second.getDateModified())
                 && first.getDuration() == second.getDuration()
                 && Objects.equals(first.getFilePath(), second.getFilePath())
                 && first.getSize() == second.getSize()
-                && Objects.equals(first.getTitle(), second.getTitle()))
-                && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
+                && Objects.equals(first.getTitle(), second.getTitle())
+                && DateUtils.isAfter(first.getDateModified(), second.getDateModified())
+                && Objects.equals(first.getAlbum(), newAlbumName)
+                && Objects.equals(first.getAlbumArtist(), newAlbumArtist));
     }
 }

@@ -40,8 +40,8 @@ public class StorageModule {
     @Provides
     @Nonnull
     @Singleton
-    StorageMusicProvider storageMusicProvider(Context context) {
-        return new StorageMusicProvider(context);
+    StorageMusicProvider storageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
+        return new StorageMusicProvider(context, albumsProvider);
     }
 
     @Provides

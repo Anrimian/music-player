@@ -21,9 +21,6 @@ import io.reactivex.Observable;
 @Dao
 public interface AlbumsDao {
 
-    @Query("SELECT id FROM albums WHERE storageId = :storageId")
-    Long selectIdByStorageId(long storageId);
-
     @Query("SELECT name as name," +
             "(SELECT name FROM artists WHERE artists.id = artistId) as artist " +
             "FROM albums")
@@ -71,7 +68,6 @@ public interface AlbumsDao {
     List<Composition> getCompositionsInAlbum(long albumId);
 
     @Query("SELECT id as id," +
-            "storageId as storageId, " +
             "name as name, " +
             "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
@@ -80,7 +76,6 @@ public interface AlbumsDao {
     Observable<List<Album>> getAllAlbumsForArtistObservable(long artistId);
 
     @Query("SELECT id as id," +
-            "storageId as storageId, " +
             "name as name, " +
             "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
@@ -89,7 +84,6 @@ public interface AlbumsDao {
     List<Album> getAllAlbumsForArtist(long artistId);
 
     @Query("SELECT id as id," +
-            "storageId as storageId, " +
             "name as name, " +
             "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
@@ -98,7 +92,6 @@ public interface AlbumsDao {
     Observable<List<Album>> getAlbumObservable(long albumId);
 
     @Query("SELECT id as id," +
-            "storageId as storageId, " +
             "name as name, " +
             "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
             "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
