@@ -149,18 +149,24 @@ public class PlayQueueDaoWrapper {
         playQueueDao.deleteItem(itemId);
     }
 
-    public void swapItems(PlayQueueItem firstItem,
-                          int firstPosition,
-                          PlayQueueItem secondItem,
-                          int secondPosition,
-                          boolean shuffleMode) {
+    public void swapItems(PlayQueueItem firstItem, PlayQueueItem secondItem, boolean shuffleMode) {
         appDatabase.runInTransaction(() -> {
+            long firstId = firstItem.getId();
+            long secondId = secondItem.getId();
             if (shuffleMode) {
-                playQueueDao.updateShuffledPosition(firstItem.getId(), secondPosition);
-                playQueueDao.updateShuffledPosition(secondItem.getId(), firstPosition);
+                int firstPosition = playQueueDao.getShuffledPosition(firstId);
+                int secondPosition = playQueueDao.getShuffledPosition(secondId);
+
+                playQueueDao.updateShuffledPosition(secondId, Integer.MIN_VALUE);
+                playQueueDao.updateShuffledPosition(firstId, secondPosition);
+                playQueueDao.updateShuffledPosition(secondId, firstPosition);
             } else {
-                playQueueDao.updateItemPosition(firstItem.getId(), secondPosition);
-                playQueueDao.updateItemPosition(secondItem.getId(), firstPosition);
+                int firstPosition = playQueueDao.getPosition(firstId);
+                int secondPosition = playQueueDao.getPosition(secondId);
+
+                playQueueDao.updateItemPosition(secondId, Integer.MIN_VALUE);
+                playQueueDao.updateItemPosition(firstId, secondPosition);
+                playQueueDao.updateItemPosition(secondId, firstPosition);
             }
         });
     }

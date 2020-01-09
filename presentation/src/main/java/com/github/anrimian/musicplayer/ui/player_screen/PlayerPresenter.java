@@ -248,7 +248,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         Collections.swap(playQueue, from, to);
         getViewState().notifyItemMoved(from, to);
 
-        playerInteractor.swapItems(fromItem, from, toItem, to);
+        playerInteractor.swapItems(fromItem, toItem);
     }
 
     private void deletePlayQueueItem(PlayQueueItem item) {

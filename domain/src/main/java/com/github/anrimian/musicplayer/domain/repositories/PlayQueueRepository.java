@@ -43,10 +43,7 @@ public interface PlayQueueRepository {
 
     Completable removeQueueItem(PlayQueueItem item);
 
-    Completable swapItems(PlayQueueItem firstItem,
-                          int firstPosition,
-                          PlayQueueItem secondItem,
-                          int secondPosition);
+    Completable swapItems(PlayQueueItem firstItem, PlayQueueItem secondItem);
 
     Completable addCompositionsToPlayNext(List<Composition> compositions);
 

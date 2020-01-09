@@ -176,16 +176,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .subscribeOn(scheduler);
     }
 
-    //not working too
     @Override
     public Completable swapItems(PlayQueueItem firstItem,
-                                 int firstPosition,
-                                 PlayQueueItem secondItem,
-                                 int secondPosition) {
+                                 PlayQueueItem secondItem) {
         return Completable.fromRunnable(() -> playQueueDao.swapItems(firstItem,
-                firstPosition,
                 secondItem,
-                secondPosition,
                 settingsPreferences.isRandomPlayingEnabled())
         ).subscribeOn(scheduler);
     }

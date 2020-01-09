@@ -255,11 +255,8 @@ public class MusicPlayerInteractor {
     }
 
     public void swapItems(PlayQueueItem firstItem,
-                          int firstPosition,
-                          PlayQueueItem secondItem,
-                          int secondPosition) {
-        playQueueRepository.swapItems(firstItem, firstPosition, secondItem, secondPosition)
-                .subscribe();
+                          PlayQueueItem secondItem) {
+        playQueueRepository.swapItems(firstItem, secondItem).subscribe();
     }
 
     public Completable addCompositionsToPlayNext(List<Composition> compositions) {
