@@ -242,10 +242,27 @@ public class CompositionsDaoWrapper {
     private void handleCompositionUpdate(Change<StorageComposition, StorageFullComposition> change) {
         StorageFullComposition composition = change.getObj();
         StorageComposition oldComposition = change.getOld();
-        if (!Objects.equals(composition.getArtist(), oldComposition.getArtist())) {
-            updateArtist(oldComposition.getId(), composition.getArtist());
+
+        String newArtist = composition.getArtist();
+        if (!Objects.equals(newArtist, oldComposition.getArtist())) {
+            updateArtist(oldComposition.getId(), newArtist);
         }
-        //update album, album artist
+
+        String newAlbumName = null;
+        String newAlbumArtist = null;
+        StorageAlbum newAlbum = composition.getStorageAlbum();
+        if (newAlbum != null) {
+            newAlbumName = newAlbum.getAlbum();
+            newAlbumArtist = newAlbum.getArtist();
+        }
+        if (!Objects.equals(newAlbumName, oldComposition.getAlbum())) {
+            updateAlbum(oldComposition.getId(), newAlbumName);
+        }
+        //special rules for album artist? ignore if present? update time?
+        if (!Objects.equals(newAlbumArtist, oldComposition.getAlbumArtist())) {
+            updateAlbumArtist(oldComposition.getId(), newAlbumArtist);
+        }
+
         compositionsDao.update(
                 composition.getTitle(),
                 composition.getFilePath(),
