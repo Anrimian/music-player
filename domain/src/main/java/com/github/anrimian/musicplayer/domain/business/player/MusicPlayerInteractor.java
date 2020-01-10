@@ -323,9 +323,10 @@ public class MusicPlayerInteractor {
         musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
-                .doOnComplete(() -> {
-                    if (playQueueRepository.getCurrentPosition() >= playQueueRepository.getQueueSize() - 1) {//mm, no!
-                        stop();
+                .andThen(playQueueRepository.isCurrentCompositionAtEndOfQueue())
+                .doOnSuccess(isLast -> {
+                    if (isLast) {
+                        pause();
                     } else {
                         playQueueRepository.skipToNext().subscribe();
                     }

@@ -6,11 +6,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -24,10 +21,6 @@ public interface PlayQueueRepository {
     Completable setPlayQueue(List<Composition> compositions, int startPosition);
 
     Flowable<Integer> getCurrentItemPositionObservable();
-
-    Maybe<Integer> getCompositionPosition(@Nonnull PlayQueueItem playQueueItem);
-
-    int getCurrentPosition();
 
     Observable<PlayQueueEvent> getCurrentQueueItemObservable();
 
@@ -49,5 +42,5 @@ public interface PlayQueueRepository {
 
     Completable addCompositionsToEnd(List<Composition> compositions);
 
-    int getQueueSize();
+    Single<Boolean> isCurrentCompositionAtEndOfQueue();
 }

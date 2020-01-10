@@ -5,7 +5,6 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
 
@@ -18,96 +17,6 @@ public interface PlayQueueDao {
 
     @Query("SELECT * FROM play_queue ORDER BY position")
     List<PlayQueueEntity> getPlayQueue();
-
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "play_queue.position AS position," +
-            "play_queue.shuffledPosition AS shuffledPosition," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
-            "compositions.title AS title, " +
-            "compositions.album AS album, " +
-            "compositions.filePath AS filePath, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
-            "WHERE play_queue.id = :id")
-    PlayQueueCompositionDto getPlayQueueEntity(long id);
-
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "play_queue.position AS position," +
-            "play_queue.shuffledPosition AS shuffledPosition," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
-            "compositions.title AS title, " +
-            "compositions.album AS album, " +
-            "compositions.filePath AS filePath, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ")
-    Observable<List<PlayQueueCompositionDto>> getPlayQueueObservable();
-
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "play_queue.position AS position," +
-            "play_queue.shuffledPosition AS shuffledPosition," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
-            "compositions.title AS title, " +
-            "compositions.album AS album, " +
-            "compositions.filePath AS filePath, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ")
-    List<PlayQueueCompositionDto> getFullPlayQueue();
-
-
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
-            "compositions.title AS title, " +
-            "compositions.album AS album, " +
-            "compositions.filePath AS filePath, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
-            "ORDER BY position")
-    List<PlayQueueItemDto> getPlayQueueInNormalOrder();
-
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
-            "compositions.title AS title, " +
-            "compositions.album AS album, " +
-            "compositions.filePath AS filePath, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
-            "ORDER BY shuffledPosition")
-    List<PlayQueueItemDto> getPlayQueueInShuffledOrder();
 
     @Query("SELECT " +
             "play_queue.id AS itemId," +
@@ -143,47 +52,11 @@ public interface PlayQueueDao {
             "ORDER BY shuffledPosition")
     Observable<List<PlayQueueItemDto>> getPlayQueueInShuffledOrderObservable();
 
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
-            "compositions.title AS title, " +
-            "compositions.album AS album, " +
-            "compositions.filePath AS filePath, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
-            "WHERE position = :position " +
-            "LIMIT 1")
-    PlayQueueItemDto getItemAtPosition(int position);
-
     @Query("SELECT id " +
             "FROM play_queue " +
             "WHERE position >= :position " +
             "LIMIT 1")
     Long getItemIdAtPosition(int position);
-
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.artist AS artist, " +
-            "compositions.title AS title, " +
-            "compositions.album AS album, " +
-            "compositions.filePath AS filePath, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
-            "WHERE shuffledPosition = :position " +
-            "LIMIT 1")
-    PlayQueueItemDto getItemAtShuffledPosition(int position);
 
     @Query("SELECT id " +
             "FROM play_queue " +
@@ -271,6 +144,9 @@ public interface PlayQueueDao {
 
     @Query("SELECT MAX(position) FROM play_queue")
     int getLastPosition();
+
+    @Query("SELECT MAX(shuffledPosition) FROM play_queue")
+    int getLastShuffledPosition();
 
     @Query("SELECT id " +
             "FROM play_queue " +

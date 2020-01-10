@@ -233,7 +233,7 @@ public class MusicPlayerInteractorTest {
     public void onCompositionUnknownErrorTest() {
         musicPlayerInteractor.play();
 
-        when(playQueueRepository.getQueueSize()).thenReturn(getFakeCompositions().size());
+        when(playQueueRepository.isCurrentCompositionAtEndOfQueue()).thenReturn(Single.just(false));
 
         Composition composition = getFakeCompositions().get(0);
         inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
@@ -253,7 +253,7 @@ public class MusicPlayerInteractorTest {
 
     @Test
     public void onCompositionUnknownErrorInEndTest() {
-        when(playQueueRepository.getQueueSize()).thenReturn(getFakeCompositions().size());
+        when(playQueueRepository.isCurrentCompositionAtEndOfQueue()).thenReturn(Single.just(false));
 
         musicPlayerInteractor.play();
 
@@ -261,27 +261,25 @@ public class MusicPlayerInteractorTest {
         inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
         inOrder.verify(musicPlayerController).resume();
 
-        when(playQueueRepository.getCurrentPosition()).thenReturn(0);
-
         playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
 
         inOrder.verify(musicProviderRepository)
                 .writeErrorAboutComposition(CorruptionType.UNKNOWN, getFakeCompositions().get(0));
         inOrder.verify(playQueueRepository).skipToNext();
 
-        when(playQueueRepository.getCurrentPosition()).thenReturn(getFakeCompositions().size() - 1);
+        when(playQueueRepository.isCurrentCompositionAtEndOfQueue()).thenReturn(Single.just(true));
 
         currentCompositionSubject.onNext(currentItem(1));
         inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(1)), anyLong());
 
         playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
         inOrder.verify(musicPlayerController, never()).resume();
-        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
+        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
     }
 
     @Test
     public void onCompositionDeletedErrorTest() {
-        when(playQueueRepository.getQueueSize()).thenReturn(getFakeCompositions().size());
+        when(playQueueRepository.isCurrentCompositionAtEndOfQueue()).thenReturn(Single.just(false));
 
         musicPlayerInteractor.play();
 
@@ -423,8 +421,8 @@ public class MusicPlayerInteractorTest {
 
         currentCompositionSubject.onNext(new PlayQueueEvent(null));
 
-        verify(musicPlayerController).stop();
-        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
+        verify(musicPlayerController).pause();
+        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
     }
 
     @Test

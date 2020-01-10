@@ -1,10 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
-import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
-import com.github.anrimian.musicplayer.data.utils.collections.IndexedList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
@@ -14,13 +11,11 @@ import com.github.anrimian.musicplayer.domain.utils.java.Optional;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -38,9 +33,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final Flowable<List<PlayQueueItem>> playQueueObservable;
     private final Observable<PlayQueueEvent> currentItemObservable;
 
-    @Deprecated
-    private final PlayQueueCache queueCache;//we really need this? can be moved in db
-
     private boolean firstItemEmitted;
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
@@ -52,19 +44,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         this.uiStatePreferences = uiStatePreferences;
         this.scheduler = scheduler;
 
-        queueCache = new PlayQueueCache(() -> {
-            boolean isRandom = settingsPreferences.isRandomPlayingEnabled();
-            List<PlayQueueItem> items = playQueueDao.getPlayQueue(isRandom);
-            return new IndexedList<>(items);
-        });
-
         playQueueObservable = settingsPreferences.getRandomPlayingObservable()
                 .switchMap(playQueueDao::getPlayQueueObservable)
                 .toFlowable(BackpressureStrategy.LATEST)
-                .doOnNext(list -> {
-                    IndexedList<PlayQueueItem> newQueue = new IndexedList<>(list);
-                    queueCache.updateQueue(newQueue);
-                }).replay(1)
+                .replay(1)
                 .refCount();
 
         currentItemObservable = uiStatePreferences.getCurrentItemIdObservable()
@@ -99,25 +82,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Observable.combineLatest(uiStatePreferences.getCurrentItemIdObservable(),
                 settingsPreferences.getRandomPlayingObservable(),
                 playQueueDao::getIndexPositionObservable)
-                .switchMap(observable -> observable)//hmm, many same events after many play queue switches
+                .switchMap(observable -> observable)
                 .toFlowable(BackpressureStrategy.LATEST);
-    }
-
-    @Nullable
-    @Override
-    public Maybe<Integer> getCompositionPosition(@Nonnull PlayQueueItem playQueueItem) {
-        return Maybe.fromCallable(() -> queueCache.getCurrentQueue().indexOf(playQueueItem))
-                .subscribeOn(scheduler);
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        IndexedList<PlayQueueItem> currentQueue = queueCache.getCurrentQueue();
-        //noinspection ConstantConditions
-        if (currentQueue == null) {//hotfix, refactor and solve
-            return 0;
-        }
-        return currentQueue.indexOf(getCurrentItem());
     }
 
     @Override
@@ -208,18 +174,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public int getQueueSize() {
-        return queueCache.getCurrentQueue().size();
-    }
-
-    @Nullable
-    private PlayQueueItem getSavedQueueItem() {
-        long id = uiStatePreferences.getCurrentQueueItemId();
-        PlayQueueCompositionDto entity = playQueueDao.getPlayQueueItem(id);
-        if (entity == null) {
-            return null;
-        }
-        return toPlayQueueItem(entity);
+    public Single<Boolean> isCurrentCompositionAtEndOfQueue() {
+        return Single.fromCallable(() -> {
+            boolean isShuffled = settingsPreferences.isRandomPlayingEnabled();
+            int currentPosition = playQueueDao.getPosition(
+                    uiStatePreferences.getCurrentQueueItemId(),
+                    isShuffled
+            );
+            return currentPosition == playQueueDao.getLastPosition(isShuffled);
+        });
     }
 
     private void setCurrentItem(@Nullable Long itemId) {
@@ -227,17 +190,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             itemId = NO_ITEM;
         }
         uiStatePreferences.setCurrentQueueItemId(itemId);
-    }
-
-    @Nullable
-    private PlayQueueItem getCurrentItem() {
-        return getSavedQueueItem();
-    }
-
-    private PlayQueueItem toPlayQueueItem(PlayQueueCompositionDto entity) {
-        return new PlayQueueItem(entity.getItemId(),
-                CompositionMapper.toComposition(entity.getComposition())
-        );
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
-import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueCompositionDto;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -32,38 +31,8 @@ public class PlayQueueDaoWrapper {
         this.playQueueDao = playQueueDao;
     }
 
-    public Observable<List<PlayQueueCompositionDto>> getPlayQueueObservable() {
-        return playQueueDao.getPlayQueueObservable();
-    }
-
-    public List<PlayQueueItem> getPlayQueue(boolean isRandom) {
-        return isRandom? getPlayQueueInShuffledOrder(): getPlayQueueInNormalOrder();
-    }
-
-    public List<PlayQueueItem> getPlayQueueInNormalOrder() {
-        return mapList(playQueueDao.getPlayQueueInNormalOrder(), this::toQueueItem);
-    }
-
-    public List<PlayQueueItem> getPlayQueueInShuffledOrder() {
-        return mapList(playQueueDao.getPlayQueueInShuffledOrder(), this::toQueueItem);
-    }
-
     public Observable<List<PlayQueueItem>> getPlayQueueObservable(boolean isRandom) {
         return isRandom? getPlayQueueInShuffledOrderObservable(): getPlayQueueInNormalOrderObservable();
-    }
-
-    public Observable<List<PlayQueueItem>> getPlayQueueInNormalOrderObservable() {
-        return playQueueDao.getPlayQueueInNormalOrderObservable()
-                .map(list -> mapList(list, this::toQueueItem));
-    }
-
-    public Observable<List<PlayQueueItem>> getPlayQueueInShuffledOrderObservable() {
-        return playQueueDao.getPlayQueueInShuffledOrderObservable()
-                .map(list -> mapList(list, this::toQueueItem));
-    }
-
-    public PlayQueueCompositionDto getPlayQueueItem(long id) {
-        return playQueueDao.getPlayQueueEntity(id);
     }
 
     public void reshuffleQueue(long currentItemId) {
@@ -174,9 +143,10 @@ public class PlayQueueDaoWrapper {
     public long addCompositionsToEndQueue(List<Composition> compositions) {
         return appDatabase.runInTransaction(() -> {
             int positionToInsert = playQueueDao.getLastPosition() + 1;
+            int shuffledPositionToInsert = playQueueDao.getLastShuffledPosition() + 1;
             List<PlayQueueEntity> entities = toEntityList(compositions,
                     positionToInsert,
-                    positionToInsert);
+                    shuffledPositionToInsert);
             long[] ids = playQueueDao.insertItems(entities);
             return ids[0];
         });
@@ -195,7 +165,8 @@ public class PlayQueueDaoWrapper {
                 for (int pos = lastPosition; pos > currentPosition; pos--) {
                     playQueueDao.increasePosition(increaseBy, pos);
                 }
-                for (int pos = lastPosition; pos > currentShuffledPosition; pos--) {
+                int lastShuffledPosition = playQueueDao.getLastShuffledPosition();
+                for (int pos = lastShuffledPosition; pos > currentShuffledPosition; pos--) {
                     playQueueDao.increaseShuffledPosition(increaseBy, pos);
                 }
 
@@ -219,6 +190,14 @@ public class PlayQueueDaoWrapper {
         }
     }
 
+    public int getLastPosition(boolean isShuffled) {
+        if (isShuffled) {
+            return playQueueDao.getLastShuffledPosition();
+        } else {
+            return playQueueDao.getLastPosition();
+        }
+    }
+
     public Observable<Integer> getPositionObservable(long id, boolean isShuffle) {
         Observable<Integer> observable;
         if (isShuffle) {
@@ -229,7 +208,6 @@ public class PlayQueueDaoWrapper {
         return observable.distinctUntilChanged();
     }
 
-    //id not present -> emit 0 -> need ignore
     public Observable<Integer> getIndexPositionObservable(long id, boolean isShuffle) {
         Observable<Integer> observable;
         if (isShuffle) {
@@ -280,6 +258,16 @@ public class PlayQueueDaoWrapper {
         } else {
             return playQueueDao.getItemIdAtPosition(position);
         }
+    }
+
+    private Observable<List<PlayQueueItem>> getPlayQueueInNormalOrderObservable() {
+        return playQueueDao.getPlayQueueInNormalOrderObservable()
+                .map(list -> mapList(list, this::toQueueItem));
+    }
+
+    private Observable<List<PlayQueueItem>> getPlayQueueInShuffledOrderObservable() {
+        return playQueueDao.getPlayQueueInShuffledOrderObservable()
+                .map(list -> mapList(list, this::toQueueItem));
     }
 
     private List<PlayQueueEntity> toEntityList(List<Composition> compositions,

@@ -7,14 +7,21 @@ import androidx.room.testing.MigrationTestHelper;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 public class MigrationsTest {
 
     private static final String TEST_DB_NAME = "music_player_database";
+
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE);
 
     private Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
     private Context context = instrumentation.getContext();

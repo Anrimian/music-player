@@ -23,7 +23,7 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
         CompositionEntity.class,
         PlayListEntity.class,
         PlayListEntryEntity.class
-}, version = 3)
+}, version = 3)//update version and migrate to new play queue
 @TypeConverters({
         DateConverter.class,
         EnumConverter.class
