@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
@@ -128,7 +129,7 @@ public class MediaStorageRepositoryImplTest {
         verify(compositionsDao).applyChanges(
                 eq(asList(fakeStorageFullComposition(4, "music-4"))),//new
                 eq(asList(fakeStorageComposition(2, "music-2"))),//removed
-                eq(asList(changedComposition))
+                eq(asList(new Change<>(fakeStorageComposition(3, "music-3"), changedComposition)))
         );
     }
 
@@ -148,7 +149,7 @@ public class MediaStorageRepositoryImplTest {
         verify(compositionsDao, never()).applyChanges(
                 eq(Collections.emptyList()),
                 eq(Collections.emptyList()),
-                eq(asList(changedComposition))
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1000), changedComposition)))
         );
     }
 
@@ -176,7 +177,7 @@ public class MediaStorageRepositoryImplTest {
         verify(compositionsDao).applyChanges(
                 eq(Collections.emptyList()),
                 eq(Collections.emptyList()),
-                eq(asList(changedComposition))
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition)))
         );
     }
 
@@ -204,14 +205,14 @@ public class MediaStorageRepositoryImplTest {
         verify(compositionsDao).applyChanges(
                 eq(Collections.emptyList()),
                 eq(Collections.emptyList()),
-                eq(asList(changedComposition))
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition)))
         );
     }
 
     @Test
     public void testUpdateAlbumArtistChange() {
         LongSparseArray<StorageComposition> map = new LongSparseArray<>();
-        map.put(1L, new StorageComposition(null,
+        StorageComposition oldComposition = new StorageComposition(null,
                 "album artist",
                 null,
                 "test album",
@@ -221,7 +222,8 @@ public class MediaStorageRepositoryImplTest {
                 1L,
                 1L,
                 new Date(1),
-                new Date(1)));
+                new Date(1));
+        map.put(1L, oldComposition);
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(map);
 
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
@@ -242,10 +244,9 @@ public class MediaStorageRepositoryImplTest {
         verify(compositionsDao).applyChanges(
                 eq(Collections.emptyList()),
                 eq(Collections.emptyList()),
-                eq(asList(changedComposition))
+                eq(asList(new Change<>(oldComposition, changedComposition)))
         );
     }
-
 
     @Test
     public void changePlayListTest() {

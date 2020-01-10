@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
+import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -19,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.HashMap;
 import java.util.List;
@@ -218,23 +220,14 @@ public class CompositionsDaoWrapper {
 
     public void applyChanges(List<StorageFullComposition> addedCompositions,
                              List<StorageComposition> deletedCompositions,
-                             List<StorageFullComposition> changedCompositions) {
+                             List<Change<StorageComposition, StorageFullComposition>> changedCompositions) {
         appDatabase.runInTransaction(() -> {
             compositionsDao.insert(mapList(addedCompositions, this::toCompositionEntity));
             for (StorageComposition composition: deletedCompositions) {
                 compositionsDao.delete(composition.getId());
             }
-            for (StorageFullComposition composition: changedCompositions) {
-                //update artist, album, album artist
-                compositionsDao.update(
-                        composition.getTitle(),
-                        composition.getFilePath(),
-                        composition.getDuration(),
-                        composition.getSize(),
-                        composition.getDateAdded(),
-                        composition.getDateModified(),
-                        composition.getId()
-                );
+            for (Change<StorageComposition, StorageFullComposition> change: changedCompositions) {
+                handleCompositionUpdate(change);
             }
             albumsDao.deleteEmptyAlbums();
             artistsDao.deleteEmptyArtists();
@@ -244,6 +237,24 @@ public class CompositionsDaoWrapper {
 
     public void setCorruptionType(CorruptionType corruptionType, long id) {
         compositionsDao.setCorruptionType(corruptionType, id);
+    }
+
+    private void handleCompositionUpdate(Change<StorageComposition, StorageFullComposition> change) {
+        StorageFullComposition composition = change.getObj();
+        StorageComposition oldComposition = change.getOld();
+        if (!Objects.equals(composition.getArtist(), oldComposition.getArtist())) {
+            updateArtist(oldComposition.getId(), composition.getArtist());
+        }
+        //update album, album artist
+        compositionsDao.update(
+                composition.getTitle(),
+                composition.getFilePath(),
+                composition.getDuration(),
+                composition.getSize(),
+                composition.getDateAdded(),
+                composition.getDateModified(),
+                composition.getId()
+        );
     }
 
     private CompositionEntity toCompositionEntity(StorageFullComposition composition) {

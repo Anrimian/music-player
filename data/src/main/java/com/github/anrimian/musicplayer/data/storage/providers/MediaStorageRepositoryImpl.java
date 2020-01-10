@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
@@ -256,13 +257,13 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();
         List<StorageComposition> deletedCompositions = new ArrayList<>();
-        List<StorageFullComposition> changedCompositions = new ArrayList<>();
+        List<Change<StorageComposition, StorageFullComposition>> changedCompositions = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositions,
                 newCompositions,
                 this::hasActualChanges,
                 deletedCompositions::add,
                 addedCompositions::add,
-                (oldItem, newItem) -> changedCompositions.add(newItem));
+                (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
         if (hasChanges) {
             compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
@@ -277,6 +278,10 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
     }
 
     private boolean hasActualChanges(StorageComposition first, StorageFullComposition second) {
+        if (!DateUtils.isAfter(second.getDateModified(), first.getDateModified())) {
+            return false;
+        }
+
         String newAlbumName = null;
         String newAlbumArtist = null;
         StorageAlbum newAlbum = second.getStorageAlbum();
@@ -285,7 +290,7 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
             newAlbumArtist = newAlbum.getArtist();
         }
 
-        boolean hasSourceChanges = !(Objects.equals(first.getDateAdded(), second.getDateAdded())
+        return !(Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && first.getDuration() == second.getDuration()
                 && Objects.equals(first.getFilePath(), second.getFilePath())
                 && first.getSize() == second.getSize()
@@ -293,7 +298,5 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 && Objects.equals(first.getArtist(), second.getArtist())
                 && Objects.equals(first.getAlbum(), newAlbumName)
                 && Objects.equals(first.getAlbumArtist(), newAlbumArtist));
-
-        return hasSourceChanges && DateUtils.isAfter(second.getDateModified(), first.getDateModified());
     }
 }
