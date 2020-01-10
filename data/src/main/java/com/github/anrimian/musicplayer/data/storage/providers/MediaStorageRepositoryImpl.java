@@ -285,14 +285,15 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
             newAlbumArtist = newAlbum.getArtist();
         }
 
-        return !(Objects.equals(first.getDateAdded(), second.getDateAdded())
-                && Objects.equals(first.getDateModified(), second.getDateModified())
+        boolean hasSourceChanges = !(Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && first.getDuration() == second.getDuration()
                 && Objects.equals(first.getFilePath(), second.getFilePath())
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
-                && DateUtils.isAfter(first.getDateModified(), second.getDateModified())
+                && Objects.equals(first.getArtist(), second.getArtist())
                 && Objects.equals(first.getAlbum(), newAlbumName)
                 && Objects.equals(first.getAlbumArtist(), newAlbumArtist));
+
+        return hasSourceChanges && DateUtils.isAfter(second.getDateModified(), first.getDateModified());
     }
 }
