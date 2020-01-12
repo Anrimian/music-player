@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import androidx.annotation.NonNull;
 import androidx.collection.LongSparseArray;
 import androidx.room.migration.Migration;
-import androidx.room.util.CursorUtil;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
@@ -28,7 +27,7 @@ class Migrations {
             LongSparseArray<Integer> positionMap = new LongSparseArray<>();
             for (int i = 0; i < c.getCount(); i++) {
                 c.moveToPosition(i);
-                positionMap.put(CursorUtil.getColumnIndex(c, "id"), i);
+                positionMap.put(c.getLong(c.getColumnIndex("id")), i);
             }
 
             c = database.query("SELECT id, audioId FROM play_queue ORDER BY shuffledPosition");
@@ -36,9 +35,9 @@ class Migrations {
             for (int i = 0; i < c.getCount(); i++) {
                 c.moveToPosition(i);
                 ContentValues cv = new ContentValues();
-                long id = CursorUtil.getColumnIndex(c, "id");
+                long id = c.getLong(c.getColumnIndex("id"));
                 cv.put("id", id);
-                cv.put("audioId", CursorUtil.getColumnIndex(c, "audioId"));
+                cv.put("audioId", c.getLong(c.getColumnIndex( "audioId")));
                 cv.put("position", positionMap.get(id));
                 cv.put("shuffledPosition", i);
                 cvList.add(cv);
