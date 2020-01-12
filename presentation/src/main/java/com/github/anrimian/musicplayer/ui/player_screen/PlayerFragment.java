@@ -183,7 +183,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private int itemIdToStart = NO_ITEM;
 
     private final Handler secondScrollHandler = new Handler(Looper.getMainLooper());
-    private int currentPosition = 0;
+    private int currentPosition = -2;//for immediate first scroll
 
     private LinearLayoutManager playQueueLayoutManager;
     private SeekBarViewWrapper seekBarViewWrapper;
