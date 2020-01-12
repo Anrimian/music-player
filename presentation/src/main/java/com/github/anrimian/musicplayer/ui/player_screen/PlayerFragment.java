@@ -1,8 +1,9 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
-import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -180,6 +181,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private int selectedDrawerItemId = NO_ITEM;
     private int itemIdToStart = NO_ITEM;
+
+    private final Handler secondScrollHandler = new Handler(Looper.getMainLooper());
+    private int currentPosition = -2;//for immediate first scroll
 
     private LinearLayoutManager playQueueLayoutManager;
     private SeekBarViewWrapper seekBarViewWrapper;
@@ -476,7 +480,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover) {
         animateVisibility(bottomSheetTopShadow, VISIBLE);
-        animateVisibility(rvPlayList, VISIBLE);//TODO blink on jump to item on start
+        animateVisibility(rvPlayList, VISIBLE);
 
         btnActionsMenu.setEnabled(item != null);
         if (item == null) {
@@ -512,28 +516,37 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
     }
 
+    //check by:
+    //switch order mode(working)
+    //new queue(so-so, but pass)
+    //remove queue item(working)
     @Override
-    public void scrollQueueToPosition(int position, boolean smoothScroll) {
-        if (position > playQueueLayoutManager.findFirstVisibleItemPosition() &&
-                position < playQueueLayoutManager.findLastCompletelyVisibleItemPosition()) {
+    public void scrollQueueToPosition(int position) {
+        secondScrollHandler.removeCallbacksAndMessages(null);
+        int positionDiff = Math.abs(position - currentPosition);
+        currentPosition = position;
+        if (RecyclerViewUtils.isPositionVisible(playQueueLayoutManager, position)) {
             return;
         }
 
-        boolean smooth = smoothScroll
+        boolean smooth = positionDiff == 1
                 || position == playQueueLayoutManager.findFirstVisibleItemPosition()
                 || position == playQueueLayoutManager.findLastVisibleItemPosition();
 
-        Context context = requireContext();
-        rvPlayList.post(() -> {
-            if (smooth) {
-                RecyclerViewUtils.smoothScrollToTop(position,
+        RecyclerViewUtils.scrollToPosition(rvPlayList,
+                playQueueLayoutManager,
+                position,
+                smooth);
+
+        //sometimes can not scroll, check twice
+        secondScrollHandler.postDelayed(() -> {
+            if (!RecyclerViewUtils.isPositionVisible(playQueueLayoutManager, position)) {
+                RecyclerViewUtils.scrollToPosition(rvPlayList,
                         playQueueLayoutManager,
-                        context,
-                        170);
-            } else {
-                playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
+                        position,
+                        false);
             }
-        });
+        }, 300);
     }
 
     @Override

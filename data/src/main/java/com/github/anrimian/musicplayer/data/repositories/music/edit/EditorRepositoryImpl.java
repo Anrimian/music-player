@@ -79,7 +79,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 throw new FileExistsException();
             }
             if (!file.mkdir()) {
-                throw new Exception("file not created");
+                throw new Exception("file not created, path: " + path);
             }
         }).subscribeOn(scheduler);
     }

@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
@@ -14,7 +15,43 @@ import com.github.anrimian.musicplayer.data.database.mappers.CompositionCorrupti
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 
+import java.util.LinkedList;
+
 class Migrations {
+
+    static Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            //copy values with verified index
+            Cursor c = database.query("SELECT id FROM play_queue ORDER BY position");
+            LongSparseArray<Integer> positionMap = new LongSparseArray<>();
+            for (int i = 0; i < c.getCount(); i++) {
+                c.moveToPosition(i);
+                positionMap.put(c.getLong(c.getColumnIndex("id")), i);
+            }
+
+            c = database.query("SELECT id, audioId FROM play_queue ORDER BY shuffledPosition");
+            LinkedList<ContentValues> cvList = new LinkedList<>();
+            for (int i = 0; i < c.getCount(); i++) {
+                c.moveToPosition(i);
+                ContentValues cv = new ContentValues();
+                long id = c.getLong(c.getColumnIndex("id"));
+                cv.put("id", id);
+                cv.put("audioId", c.getLong(c.getColumnIndex( "audioId")));
+                cv.put("position", positionMap.get(id));
+                cv.put("shuffledPosition", i);
+                cvList.add(cv);
+            }
+
+            database.execSQL("DELETE FROM play_queue");
+            for (ContentValues cv: cvList) {
+                database.insert("play_queue", SQLiteDatabase.CONFLICT_REPLACE, cv);
+            }
+
+            database.execSQL("CREATE UNIQUE INDEX `index_play_queue_position` ON `play_queue` (`position`)");
+            database.execSQL("CREATE UNIQUE INDEX `index_play_queue_shuffledPosition` ON `play_queue` (`shuffledPosition`)");
+        }
+    };
 
     static Migration getMigration1_2(Context context) {
         return new Migration(1, 2) {

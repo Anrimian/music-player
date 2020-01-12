@@ -26,7 +26,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -148,15 +147,15 @@ public class MusicPlayerInteractor {
             musicPlayerController.seekTo(0);
             return;
         }
-        playQueueRepository.skipToPrevious().subscribe();
+        playQueueRepository.skipToPrevious();
     }
 
     public void skipToNext() {
         playQueueRepository.skipToNext().subscribe();
     }
 
-    public void skipToPosition(int position) {
-        playQueueRepository.skipToPosition(position).subscribe();
+    public void skipToItem(PlayQueueItem item) {
+        playQueueRepository.skipToItem(item);
     }
 
     public Observable<Integer> getRepeatModeObservable() {
@@ -235,6 +234,10 @@ public class MusicPlayerInteractor {
         return playQueueRepository.getCurrentQueueItemObservable();
     }
 
+    public Flowable<Integer> getCurrentItemPositionObservable() {
+        return playQueueRepository.getCurrentItemPositionObservable();
+    }
+
     public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
         return playQueueRepository.getPlayQueueObservable();
     }
@@ -247,22 +250,13 @@ public class MusicPlayerInteractor {
         return musicProviderRepository.deleteCompositions(compositions);
     }
 
-    public Maybe<Integer> getQueuePosition(PlayQueueItem item) {
-        return playQueueRepository.getCompositionPosition(item);
-    }
-
     public Completable removeQueueItem(PlayQueueItem item) {
         return playQueueRepository.removeQueueItem(item);
     }
 
     public void swapItems(PlayQueueItem firstItem,
-                          int firstPosition,
-                          PlayQueueItem secondItem,
-                          int secondPosition) {
-        playQueueRepository.swapItems(firstItem, firstPosition, secondItem, secondPosition)
-                .doOnError(analytics::processNonFatalError)
-                .onErrorComplete()
-                .subscribe();
+                          PlayQueueItem secondItem) {
+        playQueueRepository.swapItems(firstItem, secondItem).subscribe();
     }
 
     public Completable addCompositionsToPlayNext(List<Composition> compositions) {
@@ -277,15 +271,18 @@ public class MusicPlayerInteractor {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
-            stop();
+            pause();
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
-            if (compositionEvent.takePositionFromCurrent()) {
-                if (previousItem != null && !hasSourceChanges(previousItem, currentItem)) {
+
+            //if items are equal and content changed -> restart play
+            if (previousItem != null && previousItem.equals(currentItem)) {
+                if (!hasSourceChanges(previousItem, currentItem)) {
                     return;
                 }
                 trackPosition = musicPlayerController.getTrackPosition();
             }
+
             musicPlayerController.prepareToPlay(currentItem.getComposition(), trackPosition);
         }
     }
@@ -326,9 +323,10 @@ public class MusicPlayerInteractor {
         musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
-                .doOnComplete(() -> {
-                    if (playQueueRepository.getCurrentPosition() >= playQueueRepository.getQueueSize() - 1) {//mm, no!
-                        stop();
+                .andThen(playQueueRepository.isCurrentCompositionAtEndOfQueue())
+                .doOnSuccess(isLast -> {
+                    if (isLast) {
+                        pause();
                     } else {
                         playQueueRepository.skipToNext().subscribe();
                     }
