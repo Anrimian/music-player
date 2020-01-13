@@ -153,4 +153,7 @@ public interface CompositionsDao {
 
     @Query("SELECT artistId FROM compositions WHERE id = :id")
     Long getArtistId(long id);
+
+    @Query("UPDATE compositions SET dateModified = :date WHERE id = :id")
+    void setUpdateTime(long id, Date date);
 }

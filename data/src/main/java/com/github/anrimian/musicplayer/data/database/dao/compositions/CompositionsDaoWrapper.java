@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +146,7 @@ public class CompositionsDaoWrapper {
             // set new albumId
             Long oldAlbumId = compositionsDao.getAlbumId(compositionId);
             compositionsDao.updateAlbum(compositionId, albumId);
+            compositionsDao.setUpdateTime(compositionId, new Date());
 
             if (oldAlbumId != null) {
                 albumsDao.deleteEmptyAlbum(oldAlbumId);
@@ -164,6 +166,7 @@ public class CompositionsDaoWrapper {
             // 3) set new artistId
             Long oldArtistId = compositionsDao.getArtistId(id);
             compositionsDao.updateArtist(id, artistId);
+            compositionsDao.setUpdateTime(id, new Date());
 
             // 4) if OLD artist exists and has no references - delete him
             if (oldArtistId != null) {
@@ -176,46 +179,52 @@ public class CompositionsDaoWrapper {
         appDatabase.runInTransaction(() -> {
             //find album
             Long albumId = compositionsDao.getAlbumId(id);
-            if (albumId != null) {
-                // 1) find new artist by name from artists
-                Long artistId = artistsDao.findArtistIdByName(artistName);
-
-                // 2) if artist not exists - create artist
-                if (artistId == null && artistName != null) {
-                    artistId = artistsDao.insertArtist(new ArtistEntity(artistName));
-                }
-
-                AlbumEntity albumEntity = albumsDao.getAlbumEntity(albumId);
-                Long oldArtistId = albumEntity.getArtistId();
-
-                //find new album with author id and name
-                Long newAlbumId = albumsDao.findAlbum(artistId, albumEntity.getName());
-                //if not exists, create
-
-                if (newAlbumId == null) {
-                    newAlbumId = albumsDao.insert(new AlbumEntity(
-                            artistId,
-                            albumEntity.getName(),
-                            albumEntity.getFirstYear(),
-                            albumEntity.getLastYear()
-                    ));
-                }
-                //set new album to composition
-                compositionsDao.setAlbumId(id, newAlbumId);
-
-                //if album is empty, delete
-                albumsDao.deleteEmptyAlbum(albumId);
-
-                // 4) if OLD artist exists and has no references - delete him
-                if (oldArtistId != null) {
-                    artistsDao.deleteEmptyArtist(oldArtistId);
-                }
+            if (albumId == null) {
+                return;
             }
+            // 1) find new artist by name from artists
+            Long artistId = artistsDao.findArtistIdByName(artistName);
+
+            // 2) if artist not exists - create artist
+            if (artistId == null && artistName != null) {
+                artistId = artistsDao.insertArtist(new ArtistEntity(artistName));
+            }
+
+            AlbumEntity albumEntity = albumsDao.getAlbumEntity(albumId);
+            Long oldArtistId = albumEntity.getArtistId();
+
+            //find new album with author id and name
+            Long newAlbumId = albumsDao.findAlbum(artistId, albumEntity.getName());
+            //if not exists, create
+
+            if (newAlbumId == null) {
+                newAlbumId = albumsDao.insert(new AlbumEntity(
+                        artistId,
+                        albumEntity.getName(),
+                        albumEntity.getFirstYear(),
+                        albumEntity.getLastYear()
+                ));
+            }
+            //set new album to composition
+            compositionsDao.setAlbumId(id, newAlbumId);
+            compositionsDao.setUpdateTime(id, new Date());
+
+            //if album is empty, delete
+            albumsDao.deleteEmptyAlbum(albumId);
+
+            // 4) if OLD artist exists and has no references - delete him
+            if (oldArtistId != null) {
+                artistsDao.deleteEmptyArtist(oldArtistId);
+            }
+
         });
     }
 
     public void updateTitle(long id, String title) {
-        compositionsDao.updateTitle(id, title);
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.updateTitle(id, title);
+            compositionsDao.setUpdateTime(id, new Date());
+        });
     }
 
     public void applyChanges(List<StorageFullComposition> addedCompositions,
@@ -259,6 +268,10 @@ public class CompositionsDaoWrapper {
             updateAlbum(oldComposition.getId(), newAlbumName);
         }
         //special rules for album artist? ignore if present? update time?
+        //1) always update modify time(implemented)
+        //2)(first scan with different item tags case) ...
+        // deep scanner?
+        //
         if (!Objects.equals(newAlbumArtist, oldComposition.getAlbumArtist())) {
             updateAlbumArtist(oldComposition.getId(), newAlbumArtist);
         }
