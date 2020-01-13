@@ -34,7 +34,7 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
         AlbumEntity.class,
         GenreEntity.class,
         GenreEntryEntity.class
-}, version = 3)
+}, version = 4)
 @TypeConverters({
         DateConverter.class,
         EnumConverter.class
