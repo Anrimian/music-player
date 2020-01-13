@@ -4,10 +4,10 @@ import android.app.Application;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.github.anrimian.acrareportdialog.AcraReportDialog;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer;
+import com.github.anrimian.musicplayer.utils.DevTools;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
 import io.reactivex.plugins.RxJavaPlugins;
@@ -26,9 +26,7 @@ public class App extends Application {
 
         Components.init(getApplicationContext());
 
-        if (BuildConfig.DEBUG) {
-            AcraReportDialog.setupCrashDialog(this);
-        }
+        DevTools.run(this);
 
         AppComponent appComponent = Components.getAppComponent();
         if (Permissions.hasFilePermission(this)) {

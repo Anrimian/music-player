@@ -226,6 +226,10 @@ public class PlayListsDaoWrapper {
         playListDao.updateStorageId(id, storageId);
     }
 
+    public boolean isPlayListExists(long playListId) {
+        return playListDao.isPlayListExists(playListId);
+    }
+
     private String getUniquePlayListName(String name) {
         String uniqueName = name;
         int i = 0;

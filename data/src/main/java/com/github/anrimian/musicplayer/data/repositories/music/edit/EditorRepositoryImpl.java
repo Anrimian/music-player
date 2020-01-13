@@ -75,9 +75,9 @@ public class EditorRepositoryImpl implements EditorRepository {
     remove genre
     update\change album artist
     update genre name - not sure
-    
+
     ******
-    Seems, jaudiotagger names 'album-artist' and 'genre' differently than android media scanner 
+    Seems, jaudiotagger names 'album-artist' and 'genre' differently than android media scanner
      */
 
     @Override
@@ -193,7 +193,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 throw new FileExistsException();
             }
             if (!file.mkdir()) {
-                throw new Exception("file not created");
+                throw new Exception("file not created, path: " + path);
             }
         }).subscribeOn(scheduler);
     }
