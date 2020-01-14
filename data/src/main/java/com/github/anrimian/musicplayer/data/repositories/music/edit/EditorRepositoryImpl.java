@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
@@ -271,6 +272,12 @@ public class EditorRepositoryImpl implements EditorRepository {
                             storageGenresProvider.updateGenreName(oldName, name);
                         })
                 )
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<CompositionSourceTags> getCompositionFileTags(FullComposition composition) {
+        return sourceEditor.getFullTags(composition.getFilePath())
                 .subscribeOn(scheduler);
     }
 

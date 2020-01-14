@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 import java.util.List;
@@ -45,4 +46,6 @@ public interface EditorRepository {
     Completable updateArtistName(String name, long artistId);
 
     Completable updateGenreName(String name, long genreId);
+
+    Single<CompositionSourceTags> getCompositionFileTags(FullComposition composition);
 }

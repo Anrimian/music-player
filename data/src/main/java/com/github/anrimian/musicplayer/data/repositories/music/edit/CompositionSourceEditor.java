@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.music.edit;
 
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -17,6 +19,7 @@ import java.io.IOException;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 public class CompositionSourceEditor {
 
@@ -109,6 +112,16 @@ public class CompositionSourceEditor {
 
     public Maybe<String> getCompositionGenre(String filePath) {
         return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.GENRE));
+    }
+
+    public Single<CompositionSourceTags> getFullTags(String filePath) {
+        return Single.fromCallable(() -> {
+            Tag tag = getFileTag(filePath);
+            return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
+                    tag.getFirst(FieldKey.ARTIST),
+                    tag.getFirst(FieldKey.ALBUM),
+                    tag.getFirst(FieldKey.ALBUM_ARTIST));
+        });
     }
 
     private Tag getFileTag(String filePath) throws TagException, ReadOnlyFileException,

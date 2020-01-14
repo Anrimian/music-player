@@ -267,11 +267,6 @@ public class CompositionsDaoWrapper {
         if (!Objects.equals(newAlbumName, oldComposition.getAlbum())) {
             updateAlbum(oldComposition.getId(), newAlbumName);
         }
-        //special rules for album artist? ignore if present? update time?
-        //1) always update modify time(implemented)
-        //2)(first scan with different item tags case) ...
-        // deep scanner?
-        //
         if (!Objects.equals(newAlbumArtist, oldComposition.getAlbumArtist())) {
             updateAlbumArtist(oldComposition.getId(), newAlbumArtist);
         }

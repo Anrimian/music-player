@@ -276,8 +276,18 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     }
 
     private void onCompositionReceived(FullComposition composition) {
+        if (this.composition == null) {
+            checkCompositionTagsInSource(composition);
+        }
         this.composition = composition;
         getViewState().showComposition(composition);
+    }
+
+    private void checkCompositionTagsInSource(FullComposition composition) {
+        presenterDisposable.add(editorInteractor.updateTagsFromSource(composition)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError));
+
     }
 
     private void onCompositionLoadingError(Throwable throwable) {
