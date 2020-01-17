@@ -79,6 +79,10 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     ******
     Seems, jaudiotagger names 'album-artist' and 'genre' differently than android media scanner
+
+    We can add genre, but can't delete?
+
+    Scan genres once?
      */
 
     @Override
@@ -108,7 +112,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable removeCompositionGenre(FullComposition composition, ShortGenre genre) {
         return sourceEditor.removeCompositionGenre(composition.getFilePath(), genre.getName())
                 .doOnComplete(() -> {
-                    genresDao.remoteCompositionFromGenre(composition.getId(), genre.getId());
+                    genresDao.removeCompositionFromGenre(composition.getId(), genre.getId());
                     storageMusicProvider.scanMedia(composition.getFilePath());
                 })
                 .subscribeOn(scheduler);

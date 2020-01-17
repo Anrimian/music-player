@@ -125,7 +125,7 @@ public class GenresDaoWrapper {
         });
     }
 
-    public void remoteCompositionFromGenre(long compositionId, long genreId) {
+    public void removeCompositionFromGenre(long compositionId, long genreId) {
         appDatabase.runInTransaction(() -> {
             genreDao.removeGenreEntry(compositionId, genreId);
             genreDao.deleteEmptyGenre(genreId);

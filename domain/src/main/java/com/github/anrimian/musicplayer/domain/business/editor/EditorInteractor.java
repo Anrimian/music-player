@@ -40,7 +40,7 @@ public class EditorInteractor {
         return editorRepository.addCompositionGenre(composition, newGenre);
     }
 
-    public Completable remoteCompositionGenre(FullComposition composition, ShortGenre genre) {
+    public Completable removeCompositionGenre(FullComposition composition, ShortGenre genre) {
         return editorRepository.removeCompositionGenre(composition, genre);
     }
 

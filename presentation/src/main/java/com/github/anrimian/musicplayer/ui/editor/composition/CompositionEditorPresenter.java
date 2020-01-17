@@ -172,7 +172,7 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.remoteCompositionGenre(composition, genre)
+        changeDisposable = editorInteractor.removeCompositionGenre(composition, genre)
                 .observeOn(uiScheduler)
                 .subscribe(() -> onGenreRemoved(genre), this::onDefaultError);
         presenterDisposable.add(changeDisposable);
