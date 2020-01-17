@@ -69,7 +69,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFiles;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareCompositions;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatLinkedFabView;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
@@ -446,8 +446,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void sendCompositions(List<String> paths) {
-        shareFiles(requireContext(), paths);
+    public void sendCompositions(List<Composition> compositions) {
+        shareCompositions(requireContext(), compositions);
     }
 
     @Override

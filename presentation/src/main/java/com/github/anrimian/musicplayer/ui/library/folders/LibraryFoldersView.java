@@ -86,7 +86,7 @@ public interface LibraryFoldersView extends MvpView {
     void showSearchMode(boolean show);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void sendCompositions(List<String> paths);
+    void sendCompositions(List<Composition> compositions);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showReceiveCompositionsForSendError(ErrorCommand errorCommand);

@@ -13,7 +13,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFi
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -405,7 +404,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private void shareFileSources(List<FileSource> fileSources) {
         dispose(shareActionDisposable, presenterDisposable);
         shareActionDisposable = interactor.getAllCompositionsInFileSources(fileSources)
-                .map(compositions -> ListUtils.mapList(compositions, Composition::getFilePath))
                 .observeOn(uiScheduler)
                 .subscribe(getViewState()::sendCompositions, this::onReceiveCompositionsError);
         presenterDisposable.add(shareActionDisposable);

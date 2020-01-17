@@ -87,22 +87,10 @@ public class DialogUtils {
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.share)));
     }
 
-    public static void shareCompositions(Context context, Collection<Composition> filePaths) {
+    public static void shareCompositions(Context context, Collection<Composition> compositions) {
         ArrayList<Uri> uris = new ArrayList<>();
-        for (Composition composition : filePaths) {
+        for (Composition composition : compositions) {
             Uri fileUri = createUri(context, composition.getFilePath());
-            if (fileUri == null) {
-                return;
-            }
-            uris.add(fileUri);
-        }
-        shareFiles(context, uris);
-    }
-
-    public static void shareFiles(Context context, Collection<String> filePaths) {
-        ArrayList<Uri> uris = new ArrayList<>();
-        for (String path : filePaths) {
-            Uri fileUri = createUri(context, path);
             if (fileUri == null) {
                 return;
             }
