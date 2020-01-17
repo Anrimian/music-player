@@ -51,7 +51,6 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 
@@ -391,7 +390,7 @@ public class LibraryCompositionsFragment extends LibraryFragment implements
                 break;
             }
             case R.id.menu_share: {
-                shareFile(requireContext(), composition.getFilePath());
+                DialogUtils.shareComposition(requireContext(), composition);
                 break;
             }
             case R.id.menu_delete: {

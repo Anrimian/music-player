@@ -55,7 +55,6 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_A
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
@@ -362,7 +361,7 @@ public class PlayListFragment extends MvpAppCompatFragment
                 break;
             }
             case R.id.menu_share: {
-                shareFile(requireContext(), composition.getFilePath());
+                DialogUtils.shareComposition(requireContext(), composition);
                 break;
             }
             case R.id.menu_delete_from_play_list: {

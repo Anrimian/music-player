@@ -146,7 +146,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onShareCompositionButtonClicked() {
-        getViewState().showShareMusicDialog(currentItem.getComposition().getFilePath());
+        getViewState().showShareMusicDialog(currentItem.getComposition());
     }
 
     void onCompositionItemClicked(int position, PlayQueueItem item) {

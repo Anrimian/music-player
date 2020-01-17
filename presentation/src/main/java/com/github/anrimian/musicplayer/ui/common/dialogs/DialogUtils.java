@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.reactivex.Maybe;
+
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
@@ -64,14 +66,21 @@ public class DialogUtils {
                 .show();
     }
 
-    public static void shareFile(Context context, String filePath) {
+    public static void shareComposition(Context context, Composition composition) {
+//        Components.getAppComponent().sourceRepository()
+//                .getCompositionUri(composition.getId())
+//                        .observeOn(AndroidSchedulers.mainThread())
+        Maybe.fromCallable(() -> createUri(context, composition.getFilePath()))
+                .doOnSuccess(uri -> shareComposition(context, uri))
+                .doOnError(t -> showShareCompositionErrorMessage(t, context, composition))
+                .ignoreElement()
+                .onErrorComplete()
+                .subscribe();
+    }
+
+    public static void shareComposition(Context context, Uri fileUri) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("audio/*");
-
-        Uri fileUri = createUri(context, filePath);
-        if (fileUri == null) {
-            return;
-        }
         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -144,6 +153,14 @@ public class DialogUtils {
                     Toast.LENGTH_LONG).show();
             return null;
         }
+    }
+
+    private static void showShareCompositionErrorMessage(Throwable throwable,
+                                                         Context context,
+                                                         Composition composition) {
+        Toast.makeText(context,
+                context.getString(R.string.file_uri_extract_error, composition.getTitle()),
+                Toast.LENGTH_LONG).show();
     }
 
     private static String getDativCompositionsMessage(Context context, int count) {

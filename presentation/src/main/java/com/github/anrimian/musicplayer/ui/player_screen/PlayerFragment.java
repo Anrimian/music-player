@@ -84,7 +84,6 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEU
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
@@ -579,8 +578,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showShareMusicDialog(String filePath) {
-        shareFile(requireContext(), filePath);
+    public void showShareMusicDialog(Composition composition) {
+        DialogUtils.shareComposition(requireContext(), composition);
     }
 
     @Override
@@ -801,6 +800,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onShareCompositionClicked(Composition composition) {
-        shareFile(requireContext(), composition.getFilePath());
+        DialogUtils.shareComposition(requireContext(), composition);
     }
 }

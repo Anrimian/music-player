@@ -63,7 +63,7 @@ public interface PlayerView extends MvpView {
     void showSelectPlayListDialog();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showShareMusicDialog(String filePath);
+    void showShareMusicDialog(Composition composition);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showAddingToPlayListError(ErrorCommand errorCommand);

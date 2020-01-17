@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -18,6 +19,8 @@ import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -133,6 +136,15 @@ public class StorageMusicProvider {
         } catch (OperationApplicationException | RemoteException e) {
             throw new UpdateMediaStoreException(e);
         }
+    }
+
+    public Uri getCompositionUri(long id) {
+        //not correct, we expect file uri
+        return ContentUris.withAppendedId(EXTERNAL_CONTENT_URI, id);
+    }
+
+    public InputStream getCompositionStream(long id) throws FileNotFoundException {
+        return contentResolver.openInputStream(getCompositionUri(id));
     }
 
     private void updateComposition(long id, String key, String value) {

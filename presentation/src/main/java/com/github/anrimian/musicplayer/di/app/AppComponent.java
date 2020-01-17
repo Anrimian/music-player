@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 
 import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
+import com.github.anrimian.musicplayer.data.repositories.source.SourceRepository;
 import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
@@ -56,6 +57,7 @@ public interface AppComponent {
     UiStatePreferences uiStatePreferences();
 
     MediaStorageRepository mediaStorageRepository();
+    SourceRepository sourceRepository();
 
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();

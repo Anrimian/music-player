@@ -5,6 +5,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
+import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotFoundException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -129,6 +130,14 @@ public class CompositionsDaoWrapper {
 
     public long selectIdByStorageId(long compositionId) {
         return compositionsDao.selectIdByStorageId(compositionId);
+    }
+
+    public long getStorageId(long compositionId) {
+        Long storageId = compositionsDao.getStorageId(compositionId);
+        if (storageId == null) {
+            throw new CompositionNotFoundException();
+        }
+        return storageId;
     }
 
     private String getOrderQuery(Order order) {

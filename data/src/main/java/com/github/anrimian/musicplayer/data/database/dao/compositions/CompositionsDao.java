@@ -105,6 +105,9 @@ public interface CompositionsDao {
     @Query("SELECT id FROM compositions WHERE storageId = :storageId")
     long selectIdByStorageId(long storageId);
 
+    @Query("SELECT storageId FROM compositions WHERE id = :id")
+    Long getStorageId(long id);
+
     @Query("UPDATE compositions SET corruptionType = :corruptionType WHERE id = :id")
     void setCorruptionType(CorruptionType corruptionType, long id);
 }
