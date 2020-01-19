@@ -56,8 +56,11 @@ public class PlayListsDaoWrapper {
 
             //update
             for (StoragePlayList playList: changedPlayLists) {
-                playListDao.updatePlayListModifyTimeByStorageId(playList.getId(), playList.getDateModified());
-                playListDao.updatePlayListNameByStorageId(playList.getId(), playList.getName());
+                long id = playList.getId();
+                playListDao.updatePlayListModifyTimeByStorageId(id, playList.getDateModified());
+                playListDao.updatePlayListNameByStorageId(id,
+                        getUniquePlayListName(playList.getName())
+                );
             }
         });
     }
