@@ -82,6 +82,20 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
+    public void removeLastTest() throws IOException {
+        String filePath = res.getFile().getPath();
+        String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("genres: " + genres);
+
+        String testGenre1 = "Test genre1";
+        sourceEditor.addCompositionGenre(filePath, testGenre1).subscribe();
+        sourceEditor.removeCompositionGenre(filePath, testGenre1).subscribe();
+        String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
+        System.out.println("new genres: " + newGenres);
+        assertEquals("", newGenres);
+    }
+
+    @Test
     public void changeGenreTest() throws IOException {
         String filePath = res.getFile().getPath();
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();

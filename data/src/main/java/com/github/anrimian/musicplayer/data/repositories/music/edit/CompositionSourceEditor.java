@@ -23,7 +23,7 @@ import io.reactivex.Single;
 
 public class CompositionSourceEditor {
 
-    private static final String GENRE_DIVIDER = "\u0000";
+    private static final char GENRE_DIVIDER = '\u0000';
 
     public CompositionSourceEditor() {
         TagOptionSingleton.getInstance().setAndroid(true);
@@ -81,16 +81,26 @@ public class CompositionSourceEditor {
     public Completable removeCompositionGenre(String filePath, String genre) {
         return Completable.fromAction(() -> {
             String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
-            int lastIndexOfGenre = genres.lastIndexOf(genre);
-            if (lastIndexOfGenre == -1) {
+            int startIndex = genres.indexOf(genre);
+            if (startIndex == -1) {
                 return;
             }
-            String textToDelete = genre;
-            if (lastIndexOfGenre != genres.length()) {
-                textToDelete += GENRE_DIVIDER;
+            int endIndex = startIndex + genre.length();
+            StringBuilder sb = new StringBuilder(genres);
+
+            //clear divider at start
+            if (startIndex == 1 && sb.charAt(0) == GENRE_DIVIDER) {
+                startIndex = 0;
             }
-            String newGenres = genres.replace(textToDelete, "");
-            editFile(filePath, FieldKey.GENRE, newGenres);
+            //clear divider at end or next if genre is at start or has divider before
+            if ((endIndex == sb.length() - 2 || startIndex == 0 || sb.charAt(startIndex - 1) == GENRE_DIVIDER)
+                    && (endIndex < sb.length() && sb.charAt(endIndex) == GENRE_DIVIDER)) {
+                endIndex++;
+            }
+
+            sb.delete(startIndex, endIndex);
+
+            editFile(filePath, FieldKey.GENRE, sb.toString());
         });
     }
 
