@@ -16,7 +16,6 @@ import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
-import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 
@@ -69,12 +68,13 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
                             .newRootFragment(new AlbumsListFragment());
                     break;
                 }
-                case R.id.menu_genres: {
-                    uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_GENRES);
-                    FragmentNavigation.from(requireFragmentManager())
-                            .newRootFragment(new GenresListFragment());
-                    break;
-                }
+                //<return genres after deep scan implementation>
+//                case R.id.menu_genres: {
+//                    uiStatePreferences.setSelectedLibraryScreen(Screens.LIBRARY_GENRES);
+//                    FragmentNavigation.from(requireFragmentManager())
+//                            .newRootFragment(new GenresListFragment());
+//                    break;
+//                }
             }
             return true;
         });

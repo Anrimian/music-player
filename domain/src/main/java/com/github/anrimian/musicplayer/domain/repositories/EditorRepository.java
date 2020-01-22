@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 public interface EditorRepository {
@@ -47,5 +48,7 @@ public interface EditorRepository {
 
     Completable updateGenreName(String name, long genreId);
 
-    Single<CompositionSourceTags> getCompositionFileTags(FullComposition composition);
+    Maybe<CompositionSourceTags> getCompositionFileTags(FullComposition composition);
+
+    Single<String[]> getCompositionFileGenres(FullComposition composition);
 }

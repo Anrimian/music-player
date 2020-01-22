@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -280,8 +281,14 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
-    public Single<CompositionSourceTags> getCompositionFileTags(FullComposition composition) {
+    public Maybe<CompositionSourceTags> getCompositionFileTags(FullComposition composition) {
         return sourceEditor.getFullTags(composition.getFilePath())
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<String[]> getCompositionFileGenres(FullComposition composition) {
+        return sourceEditor.getCompositionGenres(composition.getFilePath())
                 .subscribeOn(scheduler);
     }
 

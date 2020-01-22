@@ -124,9 +124,22 @@ public class CompositionSourceEditor {
         return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.GENRE));
     }
 
-    public Single<CompositionSourceTags> getFullTags(String filePath) {
+    public Single<String[]> getCompositionGenres(String filePath) {
         return Single.fromCallable(() -> {
+            String genres =  getFileTag(filePath).getFirst(FieldKey.GENRE);
+            if (genres == null) {
+                return new String[0];
+            }
+            return genres.split(String.valueOf(GENRE_DIVIDER));
+        });
+    }
+
+    public Maybe<CompositionSourceTags> getFullTags(String filePath) {
+        return Maybe.fromCallable(() -> {
             Tag tag = getFileTag(filePath);
+            if (tag == null) {
+                return null;
+            }
             return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
                     tag.getFirst(FieldKey.ARTIST),
                     tag.getFirst(FieldKey.ALBUM),

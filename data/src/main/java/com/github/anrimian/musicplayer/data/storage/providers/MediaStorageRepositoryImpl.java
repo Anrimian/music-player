@@ -98,10 +98,12 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 .subscribeOn(scheduler)
                 .subscribe(this::onStoragePlayListReceived));
         subscribeOnPlaylistData();
-        mediaStoreDisposable.add(genresProvider.getGenresObservable()
-                .subscribeOn(scheduler)
-                .subscribe(this::onStorageGenresReceived));
-        subscribeOnGenresData();
+        //genre in files and genre in media store are ofter different, we need deep file scanner for them
+        //<return genres after deep scan implementation>
+//        mediaStoreDisposable.add(genresProvider.getGenresObservable()
+//                .subscribeOn(scheduler)
+//                .subscribe(this::onStorageGenresReceived));
+//        subscribeOnGenresData();
     }
 
     private Completable runRescanStorage() {
@@ -115,13 +117,14 @@ public class MediaStorageRepositoryImpl implements MediaStorageRepository {
                 long dbId = playListIds.getDbId();
                 applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
             }
-            applyGenresData(genresProvider.getGenres());
-            List<IdPair> genresIds = genresDao.getGenresIds();
-            for (IdPair genreId: genresIds) {
-                long storageId = genreId.getStorageId();
-                long dbId = genreId.getDbId();
-                applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
-            }
+            //<return genres after deep scan implementation>
+//            applyGenresData(genresProvider.getGenres());
+//            List<IdPair> genresIds = genresDao.getGenresIds();
+//            for (IdPair genreId: genresIds) {
+//                long storageId = genreId.getStorageId();
+//                long dbId = genreId.getDbId();
+//                applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
+//            }
         }).subscribeOn(scheduler);
     }
 

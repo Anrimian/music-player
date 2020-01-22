@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -96,6 +97,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @BindView(R.id.tv_genre_hint)
     TextView tvGenreHint;
+
+    @BindView(R.id.iv_genre_edit)
+    ImageView ivGenreEdit;
 
     @BindView(R.id.change_author_clickable_area)
     View changeAuthorClickableArea;
@@ -214,6 +218,13 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                     presenter.onNewGenreNameEntered(name, GenreSerializer.deserializeShort(extra));
                 })
         );
+
+        //<return genres after deep scan implementation>
+        dividerAlbumArtist.setVisibility(View.INVISIBLE);
+        tvGenreHint.setVisibility(GONE);
+        ivGenreEdit.setVisibility(GONE);
+        changeGenreClickableArea.setVisibility(GONE);
+        rvGenres.setVisibility(GONE);
     }
 
     @Override
@@ -242,7 +253,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         tvAlbumArtist.setVisibility(albumArtistVisibility);
         tvAlbumArtistHint.setVisibility(albumArtistVisibility);
         ivAlbumArtist.setVisibility(albumArtistVisibility);
-        dividerAlbumArtist.setVisibility(albumArtistVisibility);
+        //<return genres after deep scan implementation>
+//        dividerAlbumArtist.setVisibility(albumArtistVisibility);
         tvAlbumArtist.setText(composition.getAlbumArtist());
 
         tvAuthor.setText(formatAuthor(composition.getArtist(), this));
