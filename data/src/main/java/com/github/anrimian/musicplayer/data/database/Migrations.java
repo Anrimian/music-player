@@ -17,9 +17,72 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 class Migrations {
+
+    static Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS artists (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT)");
+            database.execSQL("CREATE UNIQUE INDEX `index_artists_name` ON artists (`name`)");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS albums (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT, `firstYear` INTEGER NOT NULL, `lastYear` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
+            database.execSQL("CREATE  INDEX `index_albums_artistId` ON albums (`artistId`)");
+            database.execSQL("CREATE UNIQUE INDEX `index_albums_artistId_name` ON albums (`artistId`, `name`)");
+
+            //compositions
+            database.execSQL("CREATE TABLE IF NOT EXISTS compositions_temp (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `storageId` INTEGER, `title` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
+
+            Map<String, Long> artistCache = new HashMap<>();
+            Cursor c = database.query("SELECT * FROM compositions");
+            for (int i = 0; i < c.getCount(); i++) {
+                c.moveToPosition(i);
+
+                ContentValues cv = new ContentValues();
+                cv.put("id", c.getLong(c.getColumnIndex("id")));
+
+                //artists
+                String artist = c.getString(c.getColumnIndex("artist"));
+                Long artistId = null;
+                if (artist != null) {
+                    artistId = artistCache.get(artist);
+                    if (artistId == null) {
+                        ContentValues cvArt = new ContentValues();
+                        cvArt.put("name", artist);
+                        artistId = database.insert("artists", SQLiteDatabase.CONFLICT_REPLACE, cvArt);
+                        artistCache.put(artist, artistId);
+                    }
+                }
+                cv.put("artistId", artistId);
+
+                //albumId - don't copy, we doesn't have year, just fill on uto-update
+
+                cv.put("storageId", c.getLong(c.getColumnIndex("storageId")));
+                cv.put("title", c.getString(c.getColumnIndex("title")));
+                cv.put("filePath", c.getString(c.getColumnIndex("filePath")));
+                cv.put("duration", c.getLong(c.getColumnIndex("duration")));
+                cv.put("size", c.getLong(c.getColumnIndex("size")));
+                cv.put("dateAdded", c.getLong(c.getColumnIndex("dateAdded")));
+                cv.put("dateModified", c.getLong(c.getColumnIndex("dateModified")));
+                cv.put("corruptionType", c.getString(c.getColumnIndex("corruptionType")));
+                database.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv);
+            }
+
+            database.execSQL("DROP TABLE compositions");
+            database.execSQL("ALTER TABLE compositions_temp RENAME TO compositions");
+            database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
+            database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS genres (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `name` TEXT)");
+            database.execSQL("CREATE UNIQUE INDEX `index_genres_name` ON genres (`name`)");
+            database.execSQL("CREATE TABLE IF NOT EXISTS genre_entries (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `audioId` INTEGER NOT NULL, `genreId` INTEGER NOT NULL, `storageId` INTEGER, FOREIGN KEY(`audioId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`genreId`) REFERENCES `genres`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+            database.execSQL("CREATE  INDEX `index_genre_entries_audioId` ON genre_entries (`audioId`)");
+            database.execSQL("CREATE  INDEX `index_genre_entries_genreId` ON genre_entries (`genreId`)");
+        }
+    };
 
     static Migration MIGRATION_2_3 = new Migration(2, 3) {
         @Override
