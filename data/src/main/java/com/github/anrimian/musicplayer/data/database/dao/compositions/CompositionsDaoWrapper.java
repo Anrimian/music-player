@@ -107,10 +107,6 @@ public class CompositionsDaoWrapper {
         compositionsDao.delete(ids);
     }
 
-    public void deleteAll() {
-        compositionsDao.deleteAll();
-    }
-
     public void updateFilePath(long id, String filePath) {
         compositionsDao.updateFilePath(id, filePath);
     }

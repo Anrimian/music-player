@@ -86,10 +86,6 @@ public class MediaStorageRepositoryImplTest {
         when(playListsProvider.getPlayListsObservable()).thenReturn(newPlayListsSubject);
         when(playListsProvider.getPlayListEntriesObservable(1L)).thenReturn(newPlayListItemsSubject);
 
-        when(albumsDao.selectShortAlbumsSet()).thenReturn(Collections.emptySet());
-
-        when(artistsDao.selectAllArtistNames()).thenReturn(new HashSet<>());
-
         when(genresDao.selectAllGenreNames()).thenReturn(new HashSet<>());
 
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());

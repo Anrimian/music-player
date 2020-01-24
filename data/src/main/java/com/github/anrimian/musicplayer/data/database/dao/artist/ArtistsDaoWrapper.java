@@ -5,10 +5,8 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
-import java.util.Set;
 
 import io.reactivex.Observable;
 
@@ -20,10 +18,6 @@ public class ArtistsDaoWrapper {
 
     public ArtistsDaoWrapper(ArtistsDao artistsDao) {
         this.artistsDao = artistsDao;
-    }
-
-    public Set<String> selectAllArtistNames() {
-        return ListUtils.mapToSet(artistsDao.getAllArtistNames(), name -> name);
     }
 
     public Observable<List<Artist>> getAllObservable(Order order, String searchText) {
@@ -58,10 +52,6 @@ public class ArtistsDaoWrapper {
 
     public void updateArtistName(String name, long id) {
         artistsDao.updateArtistName(name, id);
-    }
-
-    public String getArtistName(long artistId) {
-        return artistsDao.getArtistName(artistId);
     }
 
     public boolean isArtistExists(String name) {

@@ -118,15 +118,6 @@ public interface CompositionsDao {
     @Query("DELETE FROM compositions WHERE id in (:ids)")
     void delete(List<Long> ids);
 
-    @Query("DELETE FROM compositions WHERE storageId in (:ids)")
-    void deleteByStorageId(List<Long> ids);
-
-    @Query("DELETE FROM compositions WHERE storageId = :id")
-    void deleteByStorageId(long id);
-
-    @Query("DELETE FROM compositions")
-    void deleteAll();
-
     @Query("UPDATE compositions SET filePath = :filePath WHERE id = :id")
     void updateFilePath(long id, String filePath);
 

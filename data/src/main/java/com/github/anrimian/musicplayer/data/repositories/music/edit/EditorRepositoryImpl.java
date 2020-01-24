@@ -204,7 +204,6 @@ public class EditorRepositoryImpl implements EditorRepository {
         }).subscribeOn(scheduler);
     }
 
-    //not working on large sets? Seems working
     @Override
     public Completable updateAlbumName(String name, long albumId) {
         return checkAlbumExists(name)

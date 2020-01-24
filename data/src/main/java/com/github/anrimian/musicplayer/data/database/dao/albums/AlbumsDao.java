@@ -2,13 +2,11 @@ package com.github.anrimian.musicplayer.data.database.dao.albums;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.RawQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
-import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
@@ -20,14 +18,6 @@ import io.reactivex.Observable;
 
 @Dao
 public interface AlbumsDao {
-
-    @Query("SELECT name as name," +
-            "(SELECT name FROM artists WHERE artists.id = artistId) as artist " +
-            "FROM albums")
-    List<ShortAlbum> selectShortAlbumsList();
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<AlbumEntity> artists);
 
     @Insert
     long insert(AlbumEntity entity);
@@ -126,14 +116,6 @@ public interface AlbumsDao {
 
     @Query("SELECT artistId FROM albums WHERE id = :albumId")
     Long getArtistId(long albumId);
-
-    @Query("SELECT name FROM albums WHERE id = :albumId")
-    String getAlbumName(long albumId);
-
-    @Query("SELECT name " +
-            "FROM artists " +
-            "WHERE artists.id = (SELECT artistId FROM albums WHERE id = :albumId)")
-    String getAlbumArtist(long albumId);
 
     @Query("SELECT EXISTS(SELECT 1 FROM albums WHERE name = :name)")
     boolean isAlbumExists(String name);

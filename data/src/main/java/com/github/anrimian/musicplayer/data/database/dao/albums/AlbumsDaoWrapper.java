@@ -4,21 +4,15 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
-import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
-import com.github.anrimian.musicplayer.data.database.entities.albums.ShortAlbum;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
-import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
-import java.util.Set;
 
 import io.reactivex.Observable;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class AlbumsDaoWrapper {
@@ -31,14 +25,6 @@ public class AlbumsDaoWrapper {
         this.appDatabase = appDatabase;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
-    }
-
-    public void insertAll(List<StorageAlbum> albums) {
-        albumsDao.insertAll(mapList(albums, this::toEntity));
-    }
-
-    public Set<ShortAlbum> selectShortAlbumsSet() {
-        return ListUtils.mapToSet(albumsDao.selectShortAlbumsList(), album -> album);
     }
 
     public Observable<List<Album>> getAllObservable(Order order, String searchText) {
@@ -101,30 +87,8 @@ public class AlbumsDaoWrapper {
         });
     }
 
-    public String getAlbumName(long albumId) {
-        return albumsDao.getAlbumName(albumId);
-    }
-
-    public String getAlbumArtist(long albumId) {
-        return albumsDao.getAlbumArtist(albumId);
-    }
-
     public boolean isAlbumExists(String name) {
         return albumsDao.isAlbumExists(name);
-    }
-
-    private AlbumEntity toEntity(StorageAlbum album) {
-        String artist = album.getArtist();
-        Long artistId = null;
-        if (artist != null) {
-            artistId = artistsDao.findArtistIdByName(album.getArtist());
-        }
-        return new AlbumEntity(
-                artistId,
-                album.getAlbum(),
-                album.getFirstYear(),
-                album.getLastYear()
-        );
     }
 
     private String getOrderQuery(Order order) {

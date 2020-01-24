@@ -18,12 +18,6 @@ import io.reactivex.Observable;
 @Dao
 public interface ArtistsDao {
 
-    @Query("SELECT name FROM artists")
-    List<String> getAllArtistNames();
-
-    @Insert
-    void insertAll(List<ArtistEntity> artists);
-
     @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class })
     Observable<List<Artist>> getAllObservable(SupportSQLiteQuery query);
 
@@ -89,9 +83,6 @@ public interface ArtistsDao {
 
     @Query("UPDATE artists SET name = :name WHERE id = :id")
     void updateArtistName(String name, long id);
-
-    @Query("SELECT name FROM artists WHERE id = :artistId")
-    String getArtistName(long artistId);
 
     @Query("SELECT EXISTS(SELECT 1 FROM artists WHERE name = :name)")
     boolean isArtistExists(String name);
