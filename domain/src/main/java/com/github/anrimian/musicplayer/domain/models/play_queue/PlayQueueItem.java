@@ -1,4 +1,6 @@
-package com.github.anrimian.musicplayer.domain.models.composition;
+package com.github.anrimian.musicplayer.domain.models.play_queue;
+
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import javax.annotation.Nonnull;
 

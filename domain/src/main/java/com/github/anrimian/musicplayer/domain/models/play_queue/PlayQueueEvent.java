@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.domain.models.composition;
+package com.github.anrimian.musicplayer.domain.models.play_queue;
 
 import javax.annotation.Nullable;
 

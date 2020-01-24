@@ -38,7 +38,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AR
 import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.MENU_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.setupBottomSheetDialogMaxWidth;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.createMenu;

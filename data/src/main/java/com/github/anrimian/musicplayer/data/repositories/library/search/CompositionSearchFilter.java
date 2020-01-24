@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.search.SearchFilter;
 
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.containsIgnoreCase;
 
 public class CompositionSearchFilter implements SearchFilter<Composition> {
