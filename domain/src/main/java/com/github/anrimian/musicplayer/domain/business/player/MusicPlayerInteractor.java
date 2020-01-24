@@ -16,7 +16,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -52,7 +52,7 @@ public class MusicPlayerInteractor {
     private final SystemServiceController systemServiceController;
     private final SettingsRepository settingsRepository;
     private final PlayQueueRepository playQueueRepository;
-    private final MusicProviderRepository musicProviderRepository;
+    private final LibraryRepository musicProviderRepository;
     private final Analytics analytics;
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
@@ -69,7 +69,7 @@ public class MusicPlayerInteractor {
                                  SystemMusicController systemMusicController,
                                  SystemServiceController systemServiceController,
                                  PlayQueueRepository playQueueRepository,
-                                 MusicProviderRepository musicProviderRepository,
+                                 LibraryRepository musicProviderRepository,
                                  Analytics analytics) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;

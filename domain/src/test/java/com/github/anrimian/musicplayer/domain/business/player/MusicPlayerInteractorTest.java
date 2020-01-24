@@ -14,7 +14,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -58,7 +58,7 @@ public class MusicPlayerInteractorTest {
     private MusicPlayerController musicPlayerController = mock(MusicPlayerController.class);
     private SettingsRepository settingsRepository = mock(SettingsRepository.class);
     private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
-    private MusicProviderRepository musicProviderRepository = mock(MusicProviderRepository.class);
+    private LibraryRepository musicProviderRepository = mock(LibraryRepository.class);
     private SystemMusicController systemMusicController = mock(SystemMusicController.class);
     private SystemServiceController systemServiceController = mock(SystemServiceController.class);
     private Analytics analytics = mock(Analytics.class);

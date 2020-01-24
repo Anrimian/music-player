@@ -5,7 +5,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.LinkedList;
@@ -21,10 +21,10 @@ import static com.github.anrimian.musicplayer.domain.utils.TextUtils.nullIfEmpty
 public class EditorInteractor {
 
     private final EditorRepository editorRepository;
-    private final MusicProviderRepository musicProviderRepository;
+    private final LibraryRepository musicProviderRepository;
 
     public EditorInteractor(EditorRepository editorRepository,
-                            MusicProviderRepository musicProviderRepository) {
+                            LibraryRepository musicProviderRepository) {
         this.editorRepository = editorRepository;
         this.musicProviderRepository = musicProviderRepository;
     }

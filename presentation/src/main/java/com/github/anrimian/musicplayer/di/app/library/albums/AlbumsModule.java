@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.di.app.library.albums;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryAlbumsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListPresenter;
@@ -21,7 +21,7 @@ public class AlbumsModule {
 
     @Provides
     @Nonnull
-    LibraryAlbumsInteractor libraryArtistsInteractor(MusicProviderRepository repository,
+    LibraryAlbumsInteractor libraryArtistsInteractor(LibraryRepository repository,
                                                      EditorRepository editorRepository,
                                                      SettingsRepository settingsRepository) {
         return new LibraryAlbumsInteractor(repository, editorRepository, settingsRepository);

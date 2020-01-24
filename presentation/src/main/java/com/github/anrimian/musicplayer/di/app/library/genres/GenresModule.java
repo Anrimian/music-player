@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.di.app.library.genres;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryGenresInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListPresenter;
@@ -22,7 +22,7 @@ public class GenresModule {
     @Provides
     @Nonnull
     LibraryGenresInteractor libraryGenresInteractor(EditorRepository editorRepository,
-                                                    MusicProviderRepository repository,
+                                                    LibraryRepository repository,
                                                     SettingsRepository settingsRepository) {
         return new LibraryGenresInteractor(editorRepository, repository, settingsRepository);
     }

@@ -12,8 +12,8 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrappe
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.repositories.music.MusicProviderRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
+import com.github.anrimian.musicplayer.data.repositories.library.LibraryRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.library.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
@@ -24,7 +24,7 @@ import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -57,7 +57,7 @@ class MusicModule {
                                                 SystemMusicController systemMusicController,
                                                 SystemServiceController systemServiceController,
                                                 PlayQueueRepository playQueueRepository,
-                                                MusicProviderRepository musicProviderRepository,
+                                                LibraryRepository musicProviderRepository,
                                                 Analytics analytics,
                                                 PlayerErrorParser playerErrorParser) {
         return new MusicPlayerInteractor(musicPlayerController,
@@ -102,15 +102,15 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    MusicProviderRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
-                                                    CompositionsDaoWrapper compositionsDao,
-                                                    ArtistsDaoWrapper artistsDao,
-                                                    AlbumsDaoWrapper albumsDao,
-                                                    GenresDaoWrapper genresDao,
-                                                    MusicFolderDataSource musicFolderDataSource,
-                                                    SettingsRepository settingsPreferences,
-                                                    @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new MusicProviderRepositoryImpl(storageMusicDataSource,
+    LibraryRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
+                                              CompositionsDaoWrapper compositionsDao,
+                                              ArtistsDaoWrapper artistsDao,
+                                              AlbumsDaoWrapper albumsDao,
+                                              GenresDaoWrapper genresDao,
+                                              MusicFolderDataSource musicFolderDataSource,
+                                              SettingsRepository settingsPreferences,
+                                              @Named(IO_SCHEDULER) Scheduler scheduler) {
+        return new LibraryRepositoryImpl(storageMusicDataSource,
                 compositionsDao,
                 artistsDao,
                 albumsDao,

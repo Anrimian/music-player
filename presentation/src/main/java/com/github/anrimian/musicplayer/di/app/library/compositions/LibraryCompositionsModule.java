@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.domain.business.library.LibraryCompositio
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsPresenter;
@@ -43,7 +43,7 @@ public class LibraryCompositionsModule {
 
     @Provides
     @Nonnull
-    LibraryCompositionsInteractor libraryCompositionsInteractor(MusicProviderRepository musicProviderRepository,
+    LibraryCompositionsInteractor libraryCompositionsInteractor(LibraryRepository musicProviderRepository,
                                                                 SettingsRepository settingsRepository) {
         return new LibraryCompositionsInteractor(musicProviderRepository,
                 settingsRepository);

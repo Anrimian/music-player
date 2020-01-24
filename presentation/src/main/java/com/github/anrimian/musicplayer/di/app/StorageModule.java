@@ -7,11 +7,11 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrappe
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.repositories.music.edit.EditorRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.music.folders.CompositionFoldersCache;
-import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.library.folders.CompositionFoldersCache;
+import com.github.anrimian.musicplayer.data.repositories.library.folders.MusicFolderDataSource;
+import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
-import com.github.anrimian.musicplayer.data.storage.providers.MediaStorageRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
@@ -20,8 +20,8 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -124,33 +124,25 @@ public class StorageModule {
     @Provides
     @Nonnull
     EditorInteractor compositionEditorInteractor(EditorRepository editorRepository,
-                                                 MusicProviderRepository musicProviderRepository) {
+                                                 LibraryRepository musicProviderRepository) {
         return new EditorInteractor(editorRepository, musicProviderRepository);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    MediaStorageRepository mediaStorageRepository(StorageMusicProvider musicProvider,
+    MediaScannerRepository mediaScannerRepository(StorageMusicProvider musicProvider,
                                                   StoragePlayListsProvider playListsProvider,
-                                                  StorageArtistsProvider artistsProvider,
-                                                  StorageAlbumsProvider albumsProvider,
                                                   StorageGenresProvider genresProvider,
                                                   CompositionsDaoWrapper compositionsDao,
                                                   PlayListsDaoWrapper playListsDao,
-                                                  ArtistsDaoWrapper artistsDao,
-                                                  AlbumsDaoWrapper albumsDao,
                                                   GenresDaoWrapper genresDao,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new MediaStorageRepositoryImpl(musicProvider,
+        return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
-                artistsProvider,
-                albumsProvider,
                 genresProvider,
                 compositionsDao,
                 playListsDao,
-                artistsDao,
-                albumsDao,
                 genresDao,
                 scheduler);
     }

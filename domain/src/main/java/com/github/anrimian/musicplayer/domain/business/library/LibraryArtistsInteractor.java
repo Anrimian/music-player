@@ -5,7 +5,7 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.List;
@@ -17,11 +17,11 @@ import io.reactivex.Observable;
 
 public class LibraryArtistsInteractor {
 
-    private final MusicProviderRepository musicProviderRepository;
+    private final LibraryRepository musicProviderRepository;
     private final EditorRepository editorRepository;
     private final SettingsRepository settingsRepository;
 
-    public LibraryArtistsInteractor(MusicProviderRepository musicProviderRepository,
+    public LibraryArtistsInteractor(LibraryRepository musicProviderRepository,
                                     EditorRepository editorRepository,
                                     SettingsRepository settingsRepository) {
         this.musicProviderRepository = musicProviderRepository;

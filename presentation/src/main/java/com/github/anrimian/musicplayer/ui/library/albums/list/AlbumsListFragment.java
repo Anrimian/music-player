@@ -152,7 +152,7 @@ public class AlbumsListFragment extends LibraryFragment implements
                 return true;
             }
             case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaStorageRepository().rescanStorage();
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
                 return true;
             }
             default: return super.onOptionsItemSelected(item);

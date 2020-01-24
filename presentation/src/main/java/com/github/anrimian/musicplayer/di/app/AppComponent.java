@@ -12,7 +12,7 @@ import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
@@ -58,8 +58,7 @@ public interface AppComponent {
     ChoosePlayListPresenter choosePlayListPresenter();
 
     UiStateRepository uiStateRepository();
-
-    MediaStorageRepository mediaStorageRepository();
+    MediaScannerRepository mediaScannerRepository();
 
     CoverImageLoader imageLoader();
     WidgetUpdater widgetUpdater();
