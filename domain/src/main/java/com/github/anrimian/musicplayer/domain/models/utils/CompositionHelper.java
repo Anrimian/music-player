@@ -17,6 +17,8 @@ import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
 import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
 import static com.github.anrimian.musicplayer.domain.Payloads.SIZE;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class CompositionHelper {
 
@@ -78,5 +80,13 @@ public class CompositionHelper {
             totalDuration += composition.getDuration();
         }
         return totalDuration;
+    }
+
+    public static String formatCompositionName(Composition composition) {
+        String title = composition.getTitle();
+        if (isEmpty(title)) {
+            return formatFileName(composition.getFilePath());
+        }
+        return title;
     }
 }

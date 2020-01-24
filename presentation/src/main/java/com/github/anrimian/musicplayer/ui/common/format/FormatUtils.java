@@ -10,6 +10,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
@@ -31,9 +33,26 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class FormatUtils {
 
+    public static String formatCompositionsCount(Context context, int compositionsCount) {
+        return context.getResources().getQuantityString(
+                R.plurals.compositions_count,
+                compositionsCount,
+                compositionsCount);
+    }
+
+    public static String formatAlbumsCount(Context context, int albumsCount) {
+        return context.getResources().getQuantityString(
+                R.plurals.albums_count,
+                albumsCount,
+                albumsCount);
+    }
+
     public static StringBuilder formatCompositionAuthor(Composition composition, Context context) {
         String author = composition.getArtist();
+        return formatAuthor(author, context);
+    }
 
+    public static StringBuilder formatAuthor(String author, Context context) {
         StringBuilder sb = new StringBuilder();
         if (!isEmpty(author)) {
             sb.append(author);
@@ -66,10 +85,37 @@ public class FormatUtils {
         return sb.toString();
     }
 
+    public static String formatArtistAdditionalInfo(Context context, Artist artist) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(formatCompositionsCount(context, artist.getCompositionsCount()));
+        int albumsCount = artist.getAlbumsCount();
+        if (albumsCount > 0) {
+            sb.append(" ● ");//TODO split problem • ●
+            sb.append(formatAlbumsCount(context, albumsCount));
+        }
+        return sb.toString();
+    }
+
+    public static String formatAlbumAdditionalInfo(Context context, Album album) {
+        StringBuilder sb = new StringBuilder();
+        String artist = album.getArtist();
+        if (!isEmpty(artist)) {
+            sb.append(artist);
+            sb.append(" ● ");//TODO split problem • ●
+        }
+        sb.append(formatCompositionsCount(
+                context,
+                album.getCompositionsCount())
+        );
+        return sb.toString();
+    }
+
     public static int getOrderTitle(OrderType orderType) {
         switch (orderType) {
             case ALPHABETICAL: return R.string.alphabetical_order;
             case ADD_TIME: return R.string.add_date_order;
+            case COMPOSITION_COUNT: return R.string.by_composition_count;
+            case DURATION: return R.string.by_duration;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }
@@ -78,6 +124,8 @@ public class FormatUtils {
         switch (orderType) {
             case ALPHABETICAL: return R.string.alphabetical_order_desc_title;
             case ADD_TIME: return R.string.add_date_order_desc_title;
+            case COMPOSITION_COUNT: return R.string.more_first;
+            case DURATION: return R.string.longest_first;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }

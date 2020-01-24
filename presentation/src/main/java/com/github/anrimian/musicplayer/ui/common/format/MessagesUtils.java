@@ -18,7 +18,7 @@ import com.google.android.material.snackbar.SnackbarContentLayout;
 
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class MessagesUtils {

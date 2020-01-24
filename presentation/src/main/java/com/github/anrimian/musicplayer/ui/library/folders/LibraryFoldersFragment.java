@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
@@ -32,7 +33,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFr
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
@@ -300,7 +301,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 return true;
             }
             case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaStorageRepository().rescanStorage();
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
                 return true;
             }
             default: return super.onOptionsItemSelected(item);
@@ -406,7 +407,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showSelectOrderScreen(Order folderOrder) {
-        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder);
+        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder,
+                OrderType.ALPHABETICAL,
+                OrderType.ADD_TIME);
         fragment.setOnCompleteListener(presenter::onOrderSelected);
         fragment.show(getChildFragmentManager(), ORDER_TAG);
     }

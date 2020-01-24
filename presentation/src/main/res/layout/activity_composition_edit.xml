@@ -155,7 +155,6 @@
                 app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
                 app:layout_constraintTop_toBottomOf="@id/tv_author_hint"
                 app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
-                app:layout_constraintBottom_toBottomOf="parent"
                 tools:text="author"/>
 
             <ImageView
@@ -176,7 +175,160 @@
                 app:layout_constraintTop_toBottomOf="@id/divider_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/divider_author"/>
+
+            <View
+                android:id="@+id/divider_author"
+                style="@style/Divider.Horizontal.Constraint"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginStart="@dimen/toolbar_content_start"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_author"
+                app:layout_constraintBottom_toTopOf="@id/tv_album_hint"/>
+
+            <TextView
+                android:id="@+id/tv_album_hint"
+                style="@style/TextStyle.Subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/album"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                app:layout_constraintTop_toBottomOf="@id/divider_author"
+                app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
+
+            <TextView
+                android:id="@+id/tv_album"
+                style="@style/TextStyle.Medium"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/content_internal_margin"
+                app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
+                app:layout_constraintTop_toBottomOf="@id/tv_album_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
+                tools:text="album"/>
+
+            <ImageView
+                android:id="@+id/iv_album_edit"
+                style="@style/ButtonStyle"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@+id/tv_album_hint"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_album_hint"
+                app:srcCompat="@drawable/ic_circle_edit_outline" />
+
+            <FrameLayout
+                android:id="@+id/change_album_clickable_area"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:foreground="?selectableItemBackground"
+                app:layout_constraintTop_toBottomOf="@id/divider_author"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/divider_album"/>
+
+            <View
+                android:id="@+id/divider_album"
+                style="@style/Divider.Horizontal.Constraint"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginStart="@dimen/toolbar_content_start"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_album"/>
+
+            <TextView
+                android:id="@+id/tv_album_author_hint"
+                style="@style/TextStyle.Subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/album_artist"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                app:layout_constraintTop_toBottomOf="@id/divider_album"
+                app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
+
+            <TextView
+                android:id="@+id/tv_album_artist"
+                style="@style/TextStyle.Medium"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/content_internal_margin"
+                app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
+                app:layout_constraintTop_toBottomOf="@id/tv_album_author_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
+                tools:text="album artist"/>
+
+            <ImageView
+                android:id="@+id/iv_album_artist"
+                style="@style/ButtonStyle"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@+id/tv_album_author_hint"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_album_author_hint"
+                app:srcCompat="@drawable/ic_circle_edit_outline" />
+
+            <FrameLayout
+                android:id="@+id/change_album_artist_clickable_area"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:foreground="?selectableItemBackground"
+                app:layout_constraintTop_toBottomOf="@id/divider_album"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/divider_album_artist"/>
+
+            <View
+                android:id="@+id/divider_album_artist"
+                style="@style/Divider.Horizontal.Constraint"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginStart="@dimen/toolbar_content_start"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_album_artist"/>
+
+            <TextView
+                android:id="@+id/tv_genre_hint"
+                style="@style/TextStyle.Subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/genres"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                app:layout_constraintTop_toBottomOf="@id/divider_album_artist"
+                app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
+
+            <ImageView
+                android:id="@+id/iv_genre_edit"
+                style="@style/ButtonStyle"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@+id/tv_genre_hint"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_genre_hint"
+                app:srcCompat="@drawable/ic_shape_circle_plus" />
+
+            <FrameLayout
+                android:id="@+id/change_genre_clickable_area"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackground"
+                app:layout_constraintTop_toBottomOf="@id/divider_album_artist"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_genres"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/content_internal_margin"
+                android:layout_marginBottom="@dimen/content_vertical_margin"
+                app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
+                app:layout_constraintTop_toBottomOf="@id/tv_genre_hint"
+                app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:listitem="@layout/item_genre_chip"
+                tools:text="genre"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

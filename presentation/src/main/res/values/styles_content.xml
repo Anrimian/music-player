@@ -36,6 +36,13 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TextStyle.Chip">
+        <item name="android:textStyle">bold</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxWidth">240dp</item>
+    </style>
+
     <style name="TextStyleItemPrimary.Medium">
         <item name="android:textSize">15sp</item>
     </style>
@@ -142,5 +149,12 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textColorHint">?android:attr/textColorSecondary</item>
     </style>
+
+    <style name="TextStyle.ContentTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 
 </resources>

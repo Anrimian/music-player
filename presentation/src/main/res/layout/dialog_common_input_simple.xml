@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/edit_text"
         style="@style/EditTextStyle"
         android:layout_width="match_parent"
@@ -12,6 +12,7 @@
         android:layout_margin="@dimen/content_margin"
         android:inputType="textMultiLine"
         android:importantForAutofill="no"
+        android:textAlignment="viewStart"
         tools:text="dddddddddddddddddddddddddddddddddddddddddddddddddddddd"
         tools:targetApi="o"
         tools:ignore="LabelFor" />

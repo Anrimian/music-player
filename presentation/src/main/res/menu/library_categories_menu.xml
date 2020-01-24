@@ -4,4 +4,11 @@
         android:title="@string/compositions"/>
     <item android:id="@+id/menu_files"
         android:title="@string/folders"/>
+    <item android:id="@+id/menu_artists"
+        android:title="@string/artists"/>
+    <item android:id="@+id/menu_albums"
+        android:title="@string/albums"/>
+<!-- <return genres after deep scan implementation> -->
+<!--    <item android:id="@+id/menu_genres"-->
+<!--        android:title="@string/genres"/>-->
 </menu>

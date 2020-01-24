@@ -33,7 +33,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
@@ -42,11 +42,13 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
+import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
+import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapper;
@@ -83,7 +85,7 @@ import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
@@ -443,6 +445,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 fragment = new LibraryFoldersRootFragment();
                 break;
             }
+            case Screens.LIBRARY_ARTISTS: {
+                fragment = new ArtistsListFragment();
+                break;
+            }
+            case Screens.LIBRARY_ALBUMS: {
+                fragment = new AlbumsListFragment();
+                break;
+            }
+            case Screens.LIBRARY_GENRES: {
+                fragment = new GenresListFragment();
+                break;
+            }
             default: {
                 fragment = new LibraryCompositionsFragment();
             }
@@ -506,7 +520,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             sbTrackState.setContentDescription(null);
 
             if (showCover) {
-                CoverImageLoader.getInstance()
+                Components.getAppComponent()
+                        .imageLoader()
                         .displayImage(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);

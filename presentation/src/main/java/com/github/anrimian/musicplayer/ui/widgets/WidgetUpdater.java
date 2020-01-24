@@ -5,8 +5,8 @@ import android.content.Intent;
 
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 
@@ -22,7 +22,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NA
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 public class WidgetUpdater {

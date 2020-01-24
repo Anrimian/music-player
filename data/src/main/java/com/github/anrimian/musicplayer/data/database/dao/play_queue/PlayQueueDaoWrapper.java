@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.utils.java.Optional;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.Random;
 
 import io.reactivex.Observable;
 
-import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_ITEM;
+import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.NO_ITEM;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 

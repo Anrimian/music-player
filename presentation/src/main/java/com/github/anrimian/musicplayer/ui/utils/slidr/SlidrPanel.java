@@ -1,15 +1,29 @@
 package com.github.anrimian.musicplayer.ui.utils.slidr;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrInterface;
+import com.r0adkll.slidr.model.SlidrPosition;
 import com.r0adkll.slidr.widget.SliderPanel;
 
 public class SlidrPanel {
+
+    public static SlidrInterface simpleSwipeBack(@NonNull View oldScreen,
+                                                 @NonNull Fragment fragment,
+                                                 @Nullable SlideListener slideListener) {
+        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
+        return SlidrPanel.replace(oldScreen,
+                slidrConfig,
+                () -> FragmentNavigation.from(fragment.requireFragmentManager()).goBack(0),
+                slideListener);
+    }
 
     @NonNull
     public static SlidrInterface replace(@NonNull View oldScreen,

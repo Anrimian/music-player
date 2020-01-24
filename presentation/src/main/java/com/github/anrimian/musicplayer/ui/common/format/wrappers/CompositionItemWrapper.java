@@ -12,10 +12,10 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
 import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
@@ -110,7 +110,7 @@ public class CompositionItemWrapper {
     public void showCompositionImage(boolean showCovers) {
         if (ivMusicIcon != null) {
             if (showCovers) {
-                CoverImageLoader.getInstance().displayImage(ivMusicIcon, composition);
+                Components.getAppComponent().imageLoader().displayImage(ivMusicIcon, composition);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder_simple);
             }

@@ -8,8 +8,6 @@ import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
-import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
@@ -108,8 +106,7 @@ public class PlayListsDaoWrapper {
     }
 
     public Observable<List<PlayList>> getPlayListsObservable() {
-        return playListDao.getPlayListsObservable()
-                .map(entities -> mapList(entities, this::toPlayList));
+        return playListDao.getPlayListsObservable();
     }
 
     public List<IdPair> getPlayListsIds() {
@@ -118,8 +115,8 @@ public class PlayListsDaoWrapper {
 
     public Observable<PlayList> getPlayListsObservable(long id) {
         return playListDao.getPlayListObservable(id)
-                .takeWhile(entities -> !entities.isEmpty())
-                .map(entities -> toPlayList(entities.get(0)));
+                .takeWhile(items -> !items.isEmpty())
+                .map(items -> items.get(0));
     }
 
     public Observable<List<PlayListItem>> getPlayListItemsObservable(long playListId) {
@@ -139,12 +136,8 @@ public class PlayListsDaoWrapper {
         });
     }
 
-    public void insertPlayListItems(List<StoragePlayListItem> items,
-                                    long playListId) {
-        insertPlayListItems(items,
-                playListId,
-                playListDao.selectMaxOrder(playListId)
-        );
+    public void insertPlayListItems(List<StoragePlayListItem> items, long playListId) {
+        insertPlayListItems(items, playListId, playListDao.selectMaxOrder(playListId));
     }
 
     public void addCompositions(List<Composition> compositions,
@@ -203,26 +196,7 @@ public class PlayListsDaoWrapper {
     }
 
     private PlayListItem toItem(PlayListEntryDto entryDto) {
-        return new PlayListItem(entryDto.getItemId(),
-                entryDto.getStorageItemId(),
-                CompositionMapper.toComposition(entryDto.getComposition()));
-    }
-
-    private PlayList toPlayList(PlayListPojo pojo) {
-        return new PlayList(pojo.getId(),
-                pojo.getStorageId(),
-                pojo.getName(),
-                pojo.getDateAdded(),
-                pojo.getDateModified(),
-                pojo.getCompositionsCount(),
-                pojo.getTotalDuration());
-    }
-
-    private PlayListEntity toEntity(StoragePlayList storagePlayList) {
-        return new PlayListEntity(storagePlayList.getId(),
-                storagePlayList.getName(),
-                storagePlayList.getDateAdded(),
-                storagePlayList.getDateModified());
+        return new PlayListItem(entryDto.getItemId(), entryDto.getComposition());
     }
 
     public void updateStorageId(long id, Long storageId) {
@@ -236,7 +210,7 @@ public class PlayListsDaoWrapper {
     private String getUniquePlayListName(String name) {
         String uniqueName = name;
         int i = 0;
-        while (playListDao.getPlayListByName(uniqueName) != null) {
+        while (playListDao.isPlayListWithNameExists(uniqueName)) {
             i++;
             uniqueName = name + "("+ i + ")";
         }

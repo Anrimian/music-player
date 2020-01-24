@@ -69,7 +69,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
         AppComponent appComponent = Components.getAppComponent();
         appComponent.widgetUpdater().start();
         appComponent.notificationDisplayer().removeErrorNotification();
-        appComponent.mediaStorageRepository().initialize();
+        appComponent.mediaScannerRepository().runStorageObserver();
     }
 
     @Override

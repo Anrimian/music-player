@@ -171,6 +171,10 @@ public class AdvancedToolbar extends FrameLayout {
     public void setSearchModeEnabled(boolean enabled,
                                      boolean showKeyboard,
                                      boolean jumpToState) {
+        if (bottomSheetListener == null) {
+            return;//uninitialized state
+        }
+
         inSearchMode = enabled;
         searchModeSubject.onNext(enabled);
 
@@ -252,7 +256,6 @@ public class AdvancedToolbar extends FrameLayout {
         if (!isEmpty(subtitle)) {
             flTitleArea.setContentDescription(getTitle() + ", " + subtitle);
         }
-
     }
 
     public void setTitleClickListener(View.OnClickListener listener) {
@@ -286,10 +289,19 @@ public class AdvancedToolbar extends FrameLayout {
         return actionMenuView;
     }
 
+    public void setupSearch(Callback<String> textChangeListener, String text) {
+        this.textChangeListener = textChangeListener;
+        this.textConfirmListener = textChangeListener;
+        etSearch.setText(text);
+        setSearchModeEnabled(!isEmpty(text));
+    }
+
+    @Deprecated
     public void setTextChangeListener(Callback<String> textChangeListener) {
         this.textChangeListener = textChangeListener;
     }
 
+    @Deprecated
     public void setTextConfirmListener(Callback<String> textConfirmListener) {
         this.textConfirmListener = textConfirmListener;
     }
@@ -304,10 +316,10 @@ public class AdvancedToolbar extends FrameLayout {
 
     private void onFragmentStackChanged(int stackSize, boolean jumpToState) {
         boolean isRoot = stackSize <= 1;
-        if (isRoot && bottomSheetListener.isExpanded()) {
+        //hmm, not sure about search mode, check how it works
+        if (isRoot && (bottomSheetListener.isExpanded() || isInSearchMode())) {
             return;
         }
-
         setCommandButtonMode(isRoot, !jumpToState);
     }
 

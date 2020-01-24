@@ -20,7 +20,7 @@ import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class SimpleImageLoader<K, T> {
+public abstract class SimpleImageLoader<K, T> {
 
     @DrawableRes
     private final int loadingPlaceholder;
@@ -41,14 +41,13 @@ public class SimpleImageLoader<K, T> {
                              int errorPlaceholder,
                              int timeoutSeconds,
                              int maxCacheSize,
-                             ImageFetcher<T> imageFetcher,
                              KeyFetcher<K, T> keyFetcher) {
         this.loadingPlaceholder = loadingPlaceholder;
         this.errorPlaceholder = errorPlaceholder;
         this.timeoutSeconds = timeoutSeconds;
-        this.imageFetcher = imageFetcher;
         this.keyFetcher = keyFetcher;
 
+        imageFetcher = getImageFetcher();
         imageCache = new ImageCache<>(maxCacheSize);
     }
 
@@ -123,6 +122,8 @@ public class SimpleImageLoader<K, T> {
                 .onErrorComplete()
                 .subscribe();
     }
+
+    protected abstract ImageFetcher<T> getImageFetcher();
 
     private void onImageLoaded(Bitmap bitmap, ImageView imageView, K key) {
         //if task is actual

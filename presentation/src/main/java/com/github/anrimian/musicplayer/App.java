@@ -31,7 +31,7 @@ public class App extends Application {
         AppComponent appComponent = Components.getAppComponent();
         if (Permissions.hasFilePermission(this)) {
             appComponent.widgetUpdater().start();
-            appComponent.mediaStorageRepository().initialize();
+            appComponent.mediaScannerRepository().runStorageObserver();
         }
     }
 }

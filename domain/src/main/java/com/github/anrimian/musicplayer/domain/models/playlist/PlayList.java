@@ -25,11 +25,12 @@ public class PlayList {
 
     private final long totalDuration;
 
+    @SuppressWarnings("NullableProblems")//annotations break room annotations processing
     public PlayList(long id,
-                    @Nullable Long storageId,
-                    @Nonnull String name,
-                    @Nonnull Date dateAdded,
-                    @Nonnull Date dateModified,
+                    Long storageId,
+                    String name,
+                    Date dateAdded,
+                    Date dateModified,
                     int compositionsCount,
                     long totalDuration) {
         this.id = id;
