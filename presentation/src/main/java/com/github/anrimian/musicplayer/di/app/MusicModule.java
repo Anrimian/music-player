@@ -12,7 +12,6 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrappe
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.music.MusicProviderRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
@@ -28,6 +27,7 @@ import com.github.anrimian.musicplayer.domain.controllers.SystemServiceControlle
 import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 import javax.annotation.Nonnull;
@@ -74,11 +74,11 @@ class MusicModule {
     @Singleton
     PlayQueueRepository playQueueRepository(PlayQueueDaoWrapper playQueueDao,
                                             SettingsRepository settingsPreferences,
-                                            UiStatePreferences uiStatePreferences,
+                                            UiStateRepository uiStateRepository,
                                             @Named(DB_SCHEDULER) Scheduler dbScheduler) {
         return new PlayQueueRepositoryImpl(playQueueDao,
                 settingsPreferences,
-                uiStatePreferences,
+                uiStateRepository,
                 dbScheduler);
     }
 
@@ -92,11 +92,11 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerController provideMusicPlayerController(UiStatePreferences uiStatePreferences,
+    MusicPlayerController provideMusicPlayerController(UiStateRepository uiStateRepository,
                                                        Context context,
                                                        @Named(UI_SCHEDULER) Scheduler scheduler,
                                                        PlayerErrorParser playerErrorParser) {
-        return new MusicPlayerControllerImpl(uiStatePreferences, context, scheduler, playerErrorParser);
+        return new MusicPlayerControllerImpl(uiStateRepository, context, scheduler, playerErrorParser);
     }
 
     @Provides

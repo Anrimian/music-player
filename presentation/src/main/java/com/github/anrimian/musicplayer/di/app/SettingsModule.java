@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
-import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
@@ -34,15 +33,8 @@ public class SettingsModule {
     @Provides
     @Nonnull
     @Singleton
-    UiStateRepository provideUiStateRepository(UiStatePreferences preferences) {
-        return new UiStateRepositoryImpl(preferences);
-    }
-
-    @Provides
-    @Nonnull
-    @Singleton
-    UiStatePreferences uiStatePreferences(Context context) {
-        return new UiStatePreferences(context);
+    UiStateRepository provideUiStateRepository(Context context) {
+        return new UiStateRepositoryImpl(context);
     }
 
     @Provides

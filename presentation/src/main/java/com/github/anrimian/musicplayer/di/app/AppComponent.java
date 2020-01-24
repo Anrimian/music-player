@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
-import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
@@ -14,6 +13,7 @@ import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
@@ -57,7 +57,7 @@ public interface AppComponent {
     CreatePlayListPresenter createPlayListsPresenter();
     ChoosePlayListPresenter choosePlayListPresenter();
 
-    UiStatePreferences uiStatePreferences();
+    UiStateRepository uiStateRepository();
 
     MediaStorageRepository mediaStorageRepository();
 

@@ -1,12 +1,12 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.domain.utils.java.Optional;
 
 import java.util.List;
@@ -20,14 +20,14 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.data.preferences.UiStatePreferences.NO_ITEM;
+import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.NO_ITEM;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     private final PlayQueueDaoWrapper playQueueDao;
     private final SettingsRepository settingsPreferences;
-    private final UiStatePreferences uiStatePreferences;
+    private final UiStateRepository uiStatePreferences;
     private final Scheduler scheduler;
 
     private final Flowable<List<PlayQueueItem>> playQueueObservable;
@@ -37,7 +37,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
                                    SettingsRepository settingsPreferences,
-                                   UiStatePreferences uiStatePreferences,
+                                   UiStateRepository uiStatePreferences,
                                    Scheduler scheduler) {
         this.playQueueDao = playQueueDao;
         this.settingsPreferences = settingsPreferences;
