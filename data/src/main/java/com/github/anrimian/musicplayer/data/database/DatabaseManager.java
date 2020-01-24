@@ -22,7 +22,7 @@ public class DatabaseManager {
         return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME)
                 .addMigrations(Migrations.getMigration1_2(context),
                         Migrations.MIGRATION_2_3,
-                        Migrations.MIGRATION_3_4)
+                        Migrations.getMigration3_4(context))
                 .fallbackToDestructiveMigration()
                 .build();
     }

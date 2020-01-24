@@ -326,7 +326,7 @@ public class CompositionsDaoWrapper {
                     storageAlbum.getFirstYear(),
                     storageAlbum.getLastYear()));
         }
-        albumsCache.put(albumName, albumArtistId);
+        albumsCache.put(albumName, albumId);
         return albumId;
     }
 

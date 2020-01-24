@@ -57,7 +57,7 @@ public class MigrationsTest {
         testHelper.runMigrationsAndValidate(TEST_DB_NAME,
                 4,
                 false,
-                Migrations.MIGRATION_3_4);
+                Migrations.getMigration3_4(context));
 
         Cursor c = db.query("SELECT name FROM artists WHERE id = (SELECT artistId FROM compositions WHERE id = " + id + ")");
         c.moveToFirst();
