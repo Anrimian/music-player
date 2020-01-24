@@ -37,7 +37,7 @@ public class TestBusinessDataProvider {
         List<PlayListItem> items = new ArrayList<>();
         for (long i = 0; i < 100000; i++) {
             Composition composition = fakeComposition(i, "music-" + i);
-            PlayListItem item = new PlayListItem(i, i, composition);
+            PlayListItem item = new PlayListItem(i, composition);
             items.add(item);
         }
         return items;

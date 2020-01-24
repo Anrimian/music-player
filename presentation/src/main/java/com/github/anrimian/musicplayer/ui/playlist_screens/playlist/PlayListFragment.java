@@ -361,9 +361,8 @@ public class PlayListFragment extends MvpAppCompatFragment
                 break;
             }
             case R.id.menu_delete_from_play_list: {
-                presenter.onDeleteFromPlayListButtonClicked(new PlayListItem(playListId,//TODO replace!!!
-                                playListId,
-                                composition),
+                presenter.onDeleteFromPlayListButtonClicked(
+                        new PlayListItem(playListId, composition),
                         position);
                 break;
             }

@@ -278,6 +278,7 @@ public class MediaStorageRepositoryImplTest {
     public void changePlayListItemsTest() {
         when(playListsProvider.getPlayLists()).thenReturn(storagePlayLists(1));
         when(playListsDao.getPlayListItemsAsStorageItems(1L)).thenReturn(Collections.emptyList());
+        when(playListsDao.isPlayListExists(1L)).thenReturn(true);
 
         mediaStorageRepository.runStorageObserver();
 

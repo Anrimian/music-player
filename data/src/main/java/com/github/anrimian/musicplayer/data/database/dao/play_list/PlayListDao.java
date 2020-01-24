@@ -9,9 +9,9 @@ import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListPojo;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
 import java.util.Date;
 import java.util.List;
@@ -55,7 +55,7 @@ public interface PlayListDao {
             "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM play_lists_entries WHERE playListId = play_lists.id)) as totalDuration " +
             "FROM play_lists " +
             "ORDER BY dateModified DESC")
-    Observable<List<PlayListPojo>> getPlayListsObservable();
+    Observable<List<PlayList>> getPlayListsObservable();
 
     @Query("SELECT " +
             "play_lists.storageId as id, " +
@@ -81,11 +81,10 @@ public interface PlayListDao {
             "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM play_lists_entries WHERE playListId = play_lists.id)) as totalDuration " +
             "FROM play_lists " +
             "WHERE play_lists.id = :id ")
-    Observable<List<PlayListPojo>> getPlayListObservable(long id);
+    Observable<List<PlayList>> getPlayListObservable(long id);
 
     @Query("SELECT " +
             "play_lists_entries.itemId AS itemId," +
-            "play_lists_entries.storageItemId as storageItemId, " +
             "compositions.id AS id, " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
@@ -150,11 +149,8 @@ public interface PlayListDao {
     @Query("UPDATE play_lists SET storageId = :storageId WHERE id = :id")//update entries?
     void updateStorageId(long id, Long storageId);
 
-    @Query("SELECT * FROM play_lists WHERE name = :name")
-    PlayListEntity getPlayListByName(String name);
-
-    @Query("SELECT * FROM play_lists_entries WHERE playListId = :playListId")
-    List<PlayListEntryEntity> getPlayListEntries(long playListId);
+    @Query("SELECT exists(SELECT 1 FROM play_lists WHERE name = :name LIMIT 1)")
+    boolean isPlayListWithNameExists(String name);
 
     @Query("SELECT exists(SELECT 1 FROM play_lists WHERE id = :playListId LIMIT 1)")
     boolean isPlayListExists(long playListId);
