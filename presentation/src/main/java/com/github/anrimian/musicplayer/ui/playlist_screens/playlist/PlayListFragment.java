@@ -28,7 +28,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
@@ -39,8 +39,6 @@ import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
 import java.util.Objects;
@@ -97,7 +95,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_play_list, container, false);
+        return inflater.inflate(R.layout.fragment_base_fab_list, container, false);
     }
 
     @Override
@@ -135,10 +133,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(clListContainer, slidrConfig, () ->
-                        FragmentNavigation.from(requireFragmentManager()).goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
         ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) fm
@@ -365,9 +360,8 @@ public class PlayListFragment extends MvpAppCompatFragment
                 break;
             }
             case R.id.menu_delete_from_play_list: {
-                presenter.onDeleteFromPlayListButtonClicked(new PlayListItem(playListId,//TODO replace!!!
-                                playListId,
-                                composition),
+                presenter.onDeleteFromPlayListButtonClicked(
+                        new PlayListItem(playListId, composition),
                         position);
                 break;
             }

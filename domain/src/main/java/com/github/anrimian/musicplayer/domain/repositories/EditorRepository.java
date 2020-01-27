@@ -1,19 +1,36 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 public interface EditorRepository {
 
-    Completable changeCompositionAuthor(Composition composition, String newAuthor);
+    Completable changeCompositionGenre(FullComposition composition,
+                                       ShortGenre oldGenre,
+                                       String newGenre);
 
-    Completable changeCompositionTitle(Composition composition, String title);
+    Completable addCompositionGenre(FullComposition composition,
+                                    String newGenre);
 
-    Completable changeCompositionFileName(Composition composition, String fileName);
+    Completable removeCompositionGenre(FullComposition composition, ShortGenre genre);
+
+    Completable changeCompositionAuthor(FullComposition composition, String newAuthor);
+
+    Completable changeCompositionAlbumArtist(FullComposition composition, String newAuthor);
+
+    Completable changeCompositionAlbum(FullComposition composition, String newAlbum);
+
+    Completable changeCompositionTitle(FullComposition composition, String title);
+
+    Completable changeCompositionFileName(FullComposition composition, String fileName);
 
     Completable changeCompositionsFilePath(List<Composition> compositions);
 
@@ -21,5 +38,17 @@ public interface EditorRepository {
 
     Single<String> moveFile(String filePath, String oldPath, String newPath);
 
-    Completable createFile(String path);
+    Completable createDirectory(String path);
+
+    Completable updateAlbumName(String name, long id);
+
+    Completable updateAlbumArtist(String name, long albumId);
+
+    Completable updateArtistName(String name, long artistId);
+
+    Completable updateGenreName(String name, long genreId);
+
+    Maybe<CompositionSourceTags> getCompositionFileTags(FullComposition composition);
+
+    Single<String[]> getCompositionFileGenres(FullComposition composition);
 }

@@ -5,6 +5,10 @@ import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.source.SourceRepository;
 import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
@@ -12,8 +16,10 @@ import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
@@ -46,6 +52,7 @@ public interface AppComponent {
     PlayListComponent playListComponent(PlayListModule module);
     SettingsComponent settingsComponent();
     CompositionEditorComponent compositionEditorComponent(CompositionEditorModule module);
+    AlbumEditorComponent albumEditorComponent(AlbumEditorModule module);
 
     MusicPlayerInteractor musicPlayerInteractor();
     DisplaySettingsInteractor displaySettingsInteractor();
@@ -54,11 +61,13 @@ public interface AppComponent {
     CreatePlayListPresenter createPlayListsPresenter();
     ChoosePlayListPresenter choosePlayListPresenter();
 
-    UiStatePreferences uiStatePreferences();
+    UiStateRepository uiStateRepository();
+    MediaScannerRepository mediaScannerRepository();
 
     MediaStorageRepository mediaStorageRepository();
     SourceRepository sourceRepository();
 
+    CoverImageLoader imageLoader();
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();
 

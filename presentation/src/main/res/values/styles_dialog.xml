@@ -23,7 +23,7 @@
     </style>
 
     <style name="DialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">?attr/dialogButtonColor</item>
+        <item name="android:textColor">@color/color_text_accent</item>
     </style>
 
 </resources>

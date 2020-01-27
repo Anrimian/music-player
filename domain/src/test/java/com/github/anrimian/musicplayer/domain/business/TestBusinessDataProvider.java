@@ -1,10 +1,10 @@
 package com.github.anrimian.musicplayer.domain.business;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.ArrayList;
@@ -33,17 +33,17 @@ public class TestBusinessDataProvider {
         return compositions;
     }
 
-    public static List<PlayListItem> getFakePlayListItems() {
+    private static List<PlayListItem> getFakePlayListItems() {
         List<PlayListItem> items = new ArrayList<>();
         for (long i = 0; i < 100000; i++) {
             Composition composition = fakeComposition(i, "music-" + i);
-            PlayListItem item = new PlayListItem(i, i, composition);
+            PlayListItem item = new PlayListItem(i, composition);
             items.add(item);
         }
         return items;
     }
 
-    public static List<PlayQueueItem> getFakeItems() {
+    private static List<PlayQueueItem> getFakeItems() {
         List<PlayQueueItem> items = new ArrayList<>();
         for (int i = 0; i < 100000; i++) {
             Composition composition = fakeComposition(i, "music-" + i);
@@ -173,7 +173,7 @@ public class TestBusinessDataProvider {
         return Single.just(getTestFolder(fileSources));
     }
 
-    public static Folder getTestFolder(FileSource... fileSources) {
+    private static Folder getTestFolder(FileSource... fileSources) {
         return new Folder(Observable.create(emitter -> emitter.onNext(asList(fileSources))),
                 Observable.never(),
                 Observable.never());

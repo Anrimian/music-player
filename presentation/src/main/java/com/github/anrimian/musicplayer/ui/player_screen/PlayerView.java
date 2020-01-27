@@ -1,10 +1,10 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public interface PlayerView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void scrollQueueToPosition(int position);
 
-    @StateStrategyType(ListStateStrategyStrategy.class)
+    @StateStrategyType(ListStateStrategy.class)
     void updatePlayQueue(List<PlayQueueItem> items);
 
     @StateStrategyType(AddToEndSingleStrategy.class)

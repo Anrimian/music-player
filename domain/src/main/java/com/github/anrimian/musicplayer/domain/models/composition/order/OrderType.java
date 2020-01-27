@@ -6,7 +6,9 @@ import java.util.Map;
 
 public enum OrderType {
     ALPHABETICAL(1),
-    ADD_TIME(3);
+    ADD_TIME(3),
+    COMPOSITION_COUNT(5),
+    DURATION(7);
 
     private static Map<Integer, OrderType> map = new HashMap<>();
 

@@ -9,8 +9,8 @@ import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
 
@@ -65,11 +65,12 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
 //            ImageFormatUtils.displayImage(widgetView, R.id.iv_cover, compositionFile, compositionId);
 
 
-            CoverImageLoader.getInstance().displayImage(widgetView,
-                    R.id.iv_cover,
-                    compositionForLoading(compositionId, compositionFile),
-                    ImageUtils::toCircleBitmap,
-                    R.drawable.ic_music_placeholder);
+            Components.getAppComponent().imageLoader()
+                    .displayImage(widgetView,
+                            R.id.iv_cover,
+                            compositionForLoading(compositionId, compositionFile),
+                            ImageUtils::toCircleBitmap,
+                            R.drawable.ic_music_placeholder);
         } else {
             widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);
         }

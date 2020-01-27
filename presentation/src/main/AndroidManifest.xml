@@ -43,7 +43,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.editor.CompositionEditorActivity"
+        <activity android:name=".ui.editor.composition.CompositionEditorActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/SlidrActivityTheme"/>
+
+        <activity android:name=".ui.editor.album.AlbumEditorActivity"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/SlidrActivityTheme"/>
 

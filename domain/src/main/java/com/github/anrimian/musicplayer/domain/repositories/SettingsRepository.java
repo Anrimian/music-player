@@ -48,6 +48,24 @@ public interface SettingsRepository {
 
     Order getCompositionsOrder();
 
+    Order getArtistsOrder();
+
+    void setArtistsOrder(Order order);
+
+    Observable<Order> getArtistsOrderObservable();
+
+    Order getAlbumsOrder();
+
+    void setAlbumsOrder(Order order);
+
+    Observable<Order> getAlbumsOrderObservable();
+
+    Order getGenresOrder();
+
+    void setGenresOrder(Order order);
+
+    Observable<Order> getGenresOrderObservable();
+
     int getSkipConstraintMillis();
 
     boolean isCoversEnabled();

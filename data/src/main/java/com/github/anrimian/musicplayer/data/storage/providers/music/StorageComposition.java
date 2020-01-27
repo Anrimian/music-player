@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
+import androidx.annotation.NonNull;
+
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -14,6 +16,8 @@ public class StorageComposition {
     @Nullable
     private final String artist;
     @Nullable
+    private final String albumArtist;
+    @Nullable
     private final String title;
     @Nullable
     private final String album;
@@ -23,6 +27,7 @@ public class StorageComposition {
     private final long duration;
     private final long size;
     private final long id;
+    private final long storageId;
 
     @Nonnull
     private final Date dateAdded;
@@ -30,35 +35,36 @@ public class StorageComposition {
     private final Date dateModified;
 
     public StorageComposition(@Nullable String artist,
+                              @Nullable String albumArtist,
                               @Nullable String title,
                               @Nullable String album,
                               @Nonnull String filePath,
                               long duration,
                               long size,
                               long id,
+                              long storageId,
                               @Nonnull Date dateAdded,
                               @Nonnull Date dateModified) {
         this.artist = artist;
+        this.albumArtist = albumArtist;
         this.title = title;
         this.album = album;
         this.filePath = filePath;
         this.duration = duration;
         this.size = size;
         this.id = id;
+        this.storageId = storageId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
     }
 
-    public StorageComposition copy(String newPath) {
-        return new StorageComposition(artist,
-                title,
-                album,
-                newPath,
-                duration,
-                size,
-                id,
-                dateAdded,
-                dateModified);
+    public long getStorageId() {
+        return storageId;
+    }
+
+    @Nullable
+    public String getAlbumArtist() {
+        return albumArtist;
     }
 
     @Nullable
@@ -103,6 +109,7 @@ public class StorageComposition {
         return dateModified;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Composition{" +

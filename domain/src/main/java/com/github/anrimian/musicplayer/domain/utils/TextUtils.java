@@ -76,4 +76,11 @@ public class TextUtils {
     public static int indexOfEnd(String text, String source) {
         return text.indexOf(source) + source.length();
     }
+
+    public static String nullIfEmpty(String text) {
+        if (TextUtils.isEmpty(text)) {
+            return null;
+        }
+        return text;
+    }
 }

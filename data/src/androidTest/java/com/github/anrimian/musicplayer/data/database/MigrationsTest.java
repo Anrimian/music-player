@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.database;
 import android.app.Instrumentation;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.room.testing.MigrationTestHelper;
@@ -14,8 +15,11 @@ import androidx.test.rule.GrantPermissionRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static org.junit.Assert.assertEquals;
 
 public class MigrationsTest {
 
@@ -33,6 +37,32 @@ public class MigrationsTest {
                     instrumentation,
                     AppDatabase.class.getCanonicalName(),
                     new FrameworkSQLiteOpenHelperFactory());
+
+    @Test
+    public void testMigrationFrom3To4() throws IOException {
+        SupportSQLiteDatabase db = testHelper.createDatabase(TEST_DB_NAME, 3);
+
+        ContentValues cv = new ContentValues();
+        cv.put("storageId", 1L);
+        cv.put("artist", "artist");
+        cv.put("title", "title");
+        cv.put("album", "album");
+        cv.put("filePath", "filePath");
+        cv.put("duration", "duration");
+        cv.put("size", "size");
+        cv.put("dateAdded", 0L);
+        cv.put("dateModified", 0L);
+        long id = db.insert("compositions", SQLiteDatabase.CONFLICT_ABORT, cv);
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                4,
+                false,
+                Migrations.getMigration3_4(context));
+
+        Cursor c = db.query("SELECT name FROM artists WHERE id = (SELECT artistId FROM compositions WHERE id = " + id + ")");
+        c.moveToFirst();
+        assertEquals("artist", c.getString(c.getColumnIndex("name")));
+    }
 
     @Test
     public void testMigrationFrom2To3() throws Exception {

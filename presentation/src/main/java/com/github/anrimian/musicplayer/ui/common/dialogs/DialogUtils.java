@@ -24,7 +24,7 @@ import java.util.List;
 import io.reactivex.Maybe;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
 
 public class DialogUtils {

@@ -5,14 +5,16 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 
 class PlayListViewHolder extends RecyclerView.ViewHolder {
@@ -50,10 +52,7 @@ class PlayListViewHolder extends RecyclerView.ViewHolder {
 
     private void showAdditionalInfo() {
         int compositionsCount = playList.getCompositionsCount();
-        StringBuilder sb = new StringBuilder(getContext().getResources().getQuantityString(
-                R.plurals.compositions_count,
-                compositionsCount,
-                compositionsCount));
+        StringBuilder sb = new StringBuilder(formatCompositionsCount(getContext(), compositionsCount));
         sb.append(" ● ");//TODO split problem
         sb.append(formatMilliseconds(playList.getTotalDuration()));
         tvAdditionalInfo.setText(sb.toString());

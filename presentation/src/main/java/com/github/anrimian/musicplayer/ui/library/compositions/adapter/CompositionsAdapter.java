@@ -92,8 +92,8 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
                 holder.setSelected(false);
                 return;
             }
-            holder.update(getItem(position), payloads);
         }
+        holder.update(getItem(position), payloads);
     }
 
     @Override

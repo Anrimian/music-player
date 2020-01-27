@@ -452,7 +452,7 @@ public class FragmentNavigation {
                         .beginTransaction()
                         .replace(id, bottomFragment)
                         .runOnCommit(() -> isNavigationEnabled = true)
-                        .commit();
+                        .commitAllowingStateLoss();
             } else {
                 isNavigationEnabled = true;
             }

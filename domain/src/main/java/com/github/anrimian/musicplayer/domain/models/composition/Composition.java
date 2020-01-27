@@ -36,6 +36,7 @@ public class Composition {
     @Nullable
     private final CorruptionType corruptionType;
 
+    @SuppressWarnings("NullableProblems")//annotations break room annotations processing
     public Composition(String artist,
                        String title,
                        String album,

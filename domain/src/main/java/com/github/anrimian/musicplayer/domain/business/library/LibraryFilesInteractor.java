@@ -8,7 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderF
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -30,7 +30,7 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public class LibraryFilesInteractor {
 
-    private final MusicProviderRepository musicProviderRepository;
+    private final LibraryRepository musicProviderRepository;
     private final EditorRepository editorRepository;
     private final MusicPlayerInteractor musicPlayerInteractor;
     private final PlayListsRepository playListsRepository;
@@ -42,7 +42,7 @@ public class LibraryFilesInteractor {
     private final LinkedHashSet<FileSource> filesToMove = new LinkedHashSet<>();
     private String fromMovePath;
 
-    public LibraryFilesInteractor(MusicProviderRepository musicProviderRepository,
+    public LibraryFilesInteractor(LibraryRepository musicProviderRepository,
                                   EditorRepository editorRepository,
                                   MusicPlayerInteractor musicPlayerInteractor,
                                   PlayListsRepository playListsRepository,
@@ -187,7 +187,7 @@ public class LibraryFilesInteractor {
     public Completable moveFilesToNewFolder(String path, String folderName) {
         //TODO root(null) path issue
         String newFolderPath = path + "/" + folderName;
-        Completable completable = editorRepository.createFile(newFolderPath);
+        Completable completable = editorRepository.createDirectory(newFolderPath);
         if (!filesToMove.isEmpty()) {
             completable = completable.andThen(Observable.fromIterable(filesToMove)
                     .flatMapCompletable(fileSource -> moveFiles(fileSource, newFolderPath))

@@ -14,6 +14,7 @@
     <color name="text_color_primary">#212121</color>
     <color name="text_color_secondary">#757575</color>
     <color name="text_color_primary_inverse">#FFFFFF</color>
+    <color name="text_color_disabled">#61212121</color>
 
     <color name="colorError">#c62828</color>
     <color name="icon_color">#252728</color>
@@ -44,6 +45,7 @@
 
     <color name="text_color_primary_dark">#F3F3F3</color>
     <color name="text_color_secondary_dark">#B1B1B1</color>
+    <color name="text_color_disabled_dark">#61FFFFFF</color>
 
     <color name="primary_button_color_dark">#F1ECEC</color>
     <color name="secondary_button_color_dark">#B1B1B1</color>

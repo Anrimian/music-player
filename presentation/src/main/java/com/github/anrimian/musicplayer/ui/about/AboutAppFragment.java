@@ -16,10 +16,7 @@ import com.github.anrimian.musicplayer.BuildConfig;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,13 +45,7 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
 
-        FragmentNavigation navigation = FragmentNavigation.from(requireFragmentManager());
-
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(flContainer,
-                slidrConfig,
-                () -> navigation.goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(flContainer, this, toolbar::onStackFragmentSlided);
     }
 
     @Override

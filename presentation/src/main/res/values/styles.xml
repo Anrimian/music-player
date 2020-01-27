@@ -28,6 +28,7 @@
         <item name="toolbarTextColorPrimary">@color/text_color_primary_dark</item>
         <item name="toolbarTextColorSecondary">@color/text_color_secondary_dark</item>
         <item name="dialogTitleColor">@color/text_color_primary</item>
+        <item name="textColorDisabled">@color/text_color_disabled</item>
         <item name="colorError">@color/colorError</item>
         <item name="dialogButtonColor">?attr/colorAccent</item>
 

@@ -34,6 +34,7 @@ ext {
     roomVersion = "2.1.0-rc01"
     jTaggerVersion = '2.0.3'
     circleImageViewVersion = "3.0.1"
+    chipsLayoutManagerVersion = "0.3.7"
 
     //Testing
     jUnitVersion = '4.12'
@@ -77,6 +78,7 @@ ext {
     slidr = "com.r0adkll:slidableactivity:2.1.0"
 
     circleImageView = "de.hdodenhof:circleimageview:$circleImageViewVersion"
+    chipsLayoutManager = "com.beloo.widget:ChipsLayoutManager:$chipsLayoutManagerVersion"
 
     exoPlayerCore = "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
 

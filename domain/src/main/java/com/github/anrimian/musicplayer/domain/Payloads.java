@@ -14,4 +14,6 @@ public interface Payloads {
     Object CORRUPTED = new Object();
     Object ITEM_SELECTED = new Object();
     Object ITEM_UNSELECTED = new Object();
+    Object NAME = new Object();
+    Object COMPOSITIONS_COUNT = new Object();
 }
