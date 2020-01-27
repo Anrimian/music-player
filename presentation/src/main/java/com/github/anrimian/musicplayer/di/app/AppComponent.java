@@ -1,10 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
-import com.github.anrimian.musicplayer.data.preferences.UiStatePreferences;
 import com.github.anrimian.musicplayer.data.repositories.source.SourceRepository;
-import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorComponent;
-import com.github.anrimian.musicplayer.di.app.editor.CompositionEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
@@ -63,8 +60,6 @@ public interface AppComponent {
 
     UiStateRepository uiStateRepository();
     MediaScannerRepository mediaScannerRepository();
-
-    MediaStorageRepository mediaStorageRepository();
     SourceRepository sourceRepository();
 
     CoverImageLoader imageLoader();

@@ -165,7 +165,7 @@ public class StorageMusicProvider {
 
     public Uri getCompositionUri(long id) {
         //not correct, we expect file uri
-        return ContentUris.withAppendedId(EXTERNAL_CONTENT_URI, id);
+        return ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, id);
     }
 
     public InputStream getCompositionStream(long id) throws FileNotFoundException {
