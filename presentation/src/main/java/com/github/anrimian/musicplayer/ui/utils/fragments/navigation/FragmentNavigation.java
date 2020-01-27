@@ -383,8 +383,11 @@ public class FragmentNavigation {
 
     @Nullable
     public Fragment getFragmentOnBottom() {
-        return fragmentManagerProvider.getFragmentManager()
-                .findFragmentById(jugglerView.getBottomViewId());
+        FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+        if (fm == null) {
+            return null;
+        }
+        return fm.findFragmentById(jugglerView.getBottomViewId());
     }
 
     public boolean isVisible() {
