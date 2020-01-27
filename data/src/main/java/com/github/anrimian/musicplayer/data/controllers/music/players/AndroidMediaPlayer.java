@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.media.AudioManager;
 import android.util.Log;
 
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -39,7 +40,13 @@ public class AndroidMediaPlayer implements MediaPlayer {
     @Nullable
     private Disposable trackPositionDisposable;
 
+    @Nullable
+    private Disposable preparationDisposable;
+
     private Composition currentComposition;
+
+    private boolean isSourcePrepared = false;
+    private boolean playWhenPrepared = false;
 
     public AndroidMediaPlayer(Scheduler scheduler,
                               PlayerErrorParser playerErrorParser,
@@ -55,8 +62,7 @@ public class AndroidMediaPlayer implements MediaPlayer {
             sendErrorEvent(what, extra);
             return false;
         });
-        //prepared event duplication
-        //new queue - prepare - error
+        //sometimes not start, see below
     }
 
     @Override
@@ -70,7 +76,8 @@ public class AndroidMediaPlayer implements MediaPlayer {
     public void prepareToPlay(Composition composition, long startPosition) {
         this.currentComposition = composition;
         //check if file exists
-        prepareMediaSource(composition)
+        RxUtils.dispose(preparationDisposable);
+        preparationDisposable = prepareMediaSource(composition)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
                 .subscribeOn(scheduler)
@@ -86,8 +93,11 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     @Override
     public void resume() {
-        mediaPlayer.start();
-        startTracingTrackPosition();
+        if (isSourcePrepared) {
+            start();
+        } else {
+            playWhenPrepared = true;
+        }
     }
 
     @Override
@@ -184,6 +194,21 @@ public class AndroidMediaPlayer implements MediaPlayer {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setDataSource(composition.getFilePath());
             mediaPlayer.prepare();
-        });
+        }).doOnSubscribe(d -> isSourcePrepared = false)
+                .doOnComplete(this::onSourcePrepared);
+    }
+
+    private void onSourcePrepared() {
+        //sometimes overwrite and we don't start. often switch
+        if (playWhenPrepared) {
+            playWhenPrepared = false;
+            start();
+        }
+        isSourcePrepared = true;
+    }
+
+    private void start() {
+        mediaPlayer.start();
+        startTracingTrackPosition();
     }
 }
