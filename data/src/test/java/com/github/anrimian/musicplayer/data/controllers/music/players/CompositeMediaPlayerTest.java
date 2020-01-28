@@ -20,8 +20,8 @@ import static org.mockito.Mockito.when;
 
 public class CompositeMediaPlayerTest {
 
-    private final MediaPlayer player1 = mock(MediaPlayer.class);
-    private final MediaPlayer player2 = mock(MediaPlayer.class);
+    private final AppMediaPlayer player1 = mock(AppMediaPlayer.class);
+    private final AppMediaPlayer player2 = mock(AppMediaPlayer.class);
 
     private CompositeMediaPlayer compositeMediaPlayer;
 

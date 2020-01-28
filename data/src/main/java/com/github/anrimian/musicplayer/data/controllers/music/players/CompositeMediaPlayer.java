@@ -10,23 +10,23 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.PublishSubject;
 
-public class CompositeMediaPlayer implements MediaPlayer {
+public class CompositeMediaPlayer implements AppMediaPlayer {
 
-    private final Function<MediaPlayer>[] mediaPlayers;
+    private final Function<AppMediaPlayer>[] mediaPlayers;
     private final int startPlayerIndex = 0;
 
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
-    private MediaPlayer currentPlayer;
+    private AppMediaPlayer currentPlayer;
     private int currentPlayerIndex;
 
     private Composition currentComposition;
     private long currentTrackPosition;
 
     @SafeVarargs
-    public CompositeMediaPlayer(Function<MediaPlayer>... mediaPlayers) {
+    public CompositeMediaPlayer(Function<AppMediaPlayer>... mediaPlayers) {
         this.mediaPlayers = mediaPlayers;
 
         setPlayer(startPlayerIndex);

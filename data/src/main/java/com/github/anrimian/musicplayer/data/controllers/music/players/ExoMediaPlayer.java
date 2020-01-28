@@ -36,7 +36,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
-public class ExoMediaPlayer implements MediaPlayer {
+public class ExoMediaPlayer implements AppMediaPlayer {
 
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();

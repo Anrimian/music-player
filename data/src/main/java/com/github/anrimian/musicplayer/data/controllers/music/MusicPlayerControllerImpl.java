@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.data.controllers.music;
 import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.controllers.music.players.AndroidMediaPlayer;
-import com.github.anrimian.musicplayer.data.controllers.music.players.MediaPlayer;
+import com.github.anrimian.musicplayer.data.controllers.music.players.AppMediaPlayer;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
@@ -20,7 +20,7 @@ import io.reactivex.Scheduler;
 
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
-    private final MediaPlayer mediaPlayer;
+    private final AppMediaPlayer mediaPlayer;
     private final UiStateRepository uiStateRepository;
 
     public MusicPlayerControllerImpl(UiStateRepository uiStateRepository,
@@ -30,7 +30,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                                      Analytics analytics) {
         this.uiStateRepository = uiStateRepository;
 //        Function<ExoMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, scheduler, playerErrorParser);
-//        Function<MediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, playerErrorParser);
+//        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, playerErrorParser);
 //        mediaPlayer = new CompositeMediaPlayer(androidMediaPlayer);
 
         mediaPlayer = new AndroidMediaPlayer(scheduler, playerErrorParser, analytics);

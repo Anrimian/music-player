@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
@@ -26,7 +27,7 @@ import io.reactivex.subjects.PublishSubject;
 
 import static android.media.MediaPlayer.MEDIA_ERROR_UNSUPPORTED;
 
-public class AndroidMediaPlayer implements MediaPlayer {
+public class AndroidMediaPlayer implements AppMediaPlayer {
 
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
@@ -35,7 +36,7 @@ public class AndroidMediaPlayer implements MediaPlayer {
     private final PlayerErrorParser playerErrorParser;
     private final Analytics analytics;
 
-    private android.media.MediaPlayer mediaPlayer;
+    private final MediaPlayer mediaPlayer;
 
     @Nullable
     private Disposable trackPositionDisposable;
@@ -43,10 +44,12 @@ public class AndroidMediaPlayer implements MediaPlayer {
     @Nullable
     private Disposable preparationDisposable;
 
+    @Nullable
     private Composition currentComposition;
 
     private boolean isSourcePrepared = false;
     private boolean playWhenPrepared = false;
+    private boolean isPlaying = false;
 
     public AndroidMediaPlayer(Scheduler scheduler,
                               PlayerErrorParser playerErrorParser,
@@ -54,15 +57,20 @@ public class AndroidMediaPlayer implements MediaPlayer {
         this.scheduler = scheduler;
         this.playerErrorParser = playerErrorParser;
         this.analytics = analytics;
-        mediaPlayer = new android.media.MediaPlayer();
-        mediaPlayer.setOnCompletionListener(mediaPlayer ->
-                playerEventSubject.onNext(new FinishedEvent(currentComposition))
-        );
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnCompletionListener(mediaPlayer -> {
+            Log.d("KEK2", "completed");
+            if (currentComposition != null) {
+                playerEventSubject.onNext(new FinishedEvent(currentComposition));
+            }
+        });
         mediaPlayer.setOnErrorListener((mediaPlayer, what, extra) -> {
+            Log.d("KEK2", "error");
             sendErrorEvent(what, extra);
             return false;
         });
         //sometimes not start, see below
+        //install app, start play - skipped to next
     }
 
     @Override
@@ -74,6 +82,7 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
+        Log.d("KEK2", "prepare to play");
         this.currentComposition = composition;
         //check if file exists
         RxUtils.dispose(preparationDisposable);
@@ -86,13 +95,16 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     @Override
     public void stop() {
+        Log.d("KEK2", "stop");
         seekTo(0);
         stopTracingTrackPosition();
         mediaPlayer.stop();
+        isPlaying = false;
     }
 
     @Override
     public void resume() {
+        Log.d("KEK2", "resume");
         if (isSourcePrepared) {
             start();
         } else {
@@ -102,8 +114,10 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     @Override
     public void pause() {
+        Log.d("KEK2", "pause");
         mediaPlayer.pause();
         stopTracingTrackPosition();
+        isPlaying = false;
     }
 
     @Override
@@ -208,7 +222,12 @@ public class AndroidMediaPlayer implements MediaPlayer {
     }
 
     private void start() {
+        if (isPlaying) {
+            return;
+        }
+        Log.d("KEK2", "start");
         mediaPlayer.start();
         startTracingTrackPosition();
+        isPlaying = true;
     }
 }
