@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
@@ -11,12 +12,12 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullC
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Date;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageFullComposition;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+import static java.util.Collections.emptyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.when;
 public class StorageCompositionAnalyzerTest {
 
     private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
+    private FoldersDaoWrapper foldersDaoWrapper = mock(FoldersDaoWrapper.class);
 
     private StorageCompositionAnalyzer analyzer;
     
@@ -33,7 +35,7 @@ public class StorageCompositionAnalyzerTest {
     public void setUp() {
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());
 
-        analyzer = new StorageCompositionAnalyzer(compositionsDao);
+        analyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDaoWrapper);
     }
 
     @Test
@@ -72,8 +74,8 @@ public class StorageCompositionAnalyzerTest {
         analyzer.applyCompositionsData(newCompositions);
 
         verify(compositionsDao, never()).applyChanges(
-                eq(Collections.emptyList()),
-                eq(Collections.emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1000), changedComposition)))
         );
     }
@@ -99,8 +101,8 @@ public class StorageCompositionAnalyzerTest {
         analyzer.applyCompositionsData(newCompositions);
 
         verify(compositionsDao).applyChanges(
-                eq(Collections.emptyList()),
-                eq(Collections.emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition)))
         );
     }
@@ -126,8 +128,8 @@ public class StorageCompositionAnalyzerTest {
         analyzer.applyCompositionsData(newCompositions);
 
         verify(compositionsDao).applyChanges(
-                eq(Collections.emptyList()),
-                eq(Collections.emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition)))
         );
     }
@@ -164,10 +166,26 @@ public class StorageCompositionAnalyzerTest {
         analyzer.applyCompositionsData(newCompositions);
 
         verify(compositionsDao).applyChanges(
-                eq(Collections.emptyList()),
-                eq(Collections.emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
                 eq(asList(new Change<>(oldComposition, changedComposition)))
         );
+    }
+
+    @Test
+    public void excludeFoldersTest() {
+        String[] excludedFolders = {"music/wazap"};
+
+        when(foldersDaoWrapper.getIgnoredFolders()).thenReturn(excludedFolders);
+
+        LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
+        newCompositions.put(1, fakeStorageFullComposition(1, "0/etc/sdcard/music/wazap/music-1"));
+        newCompositions.put(2, fakeStorageFullComposition(1, "0/etc/sdcard/music/wazap/music-2"));
+        newCompositions.put(3, fakeStorageFullComposition(1, "0/etc/sdcard/music/wazap/music-3"));
+
+        analyzer.applyCompositionsData(newCompositions);
+
+        verify(compositionsDao).applyChanges(eq(emptyList()), eq(emptyList()), eq(emptyList()));
     }
 
 }

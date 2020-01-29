@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
@@ -33,7 +34,6 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final StorageMusicProvider musicProvider;
     private final StoragePlayListsProvider playListsProvider;
     private final StorageGenresProvider genresProvider;
-    private final CompositionsDaoWrapper compositionsDao;
     private final PlayListsDaoWrapper playListsDao;
     private final GenresDaoWrapper genresDao;
     private final Scheduler scheduler;
@@ -48,18 +48,18 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                                       StoragePlayListsProvider playListsProvider,
                                       StorageGenresProvider genresProvider,
                                       CompositionsDaoWrapper compositionsDao,
+                                      FoldersDaoWrapper foldersDaoWrapper,
                                       PlayListsDaoWrapper playListsDao,
                                       GenresDaoWrapper genresDao,
                                       Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.playListsProvider = playListsProvider;
         this.genresProvider = genresProvider;
-        this.compositionsDao = compositionsDao;
         this.playListsDao = playListsDao;
         this.genresDao = genresDao;
         this.scheduler = scheduler;
 
-        compositionAnalyzer = new StorageCompositionAnalyzer(compositionsDao);
+        compositionAnalyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDaoWrapper);
     }
 
     @Override

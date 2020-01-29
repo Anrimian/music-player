@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListDao;
@@ -124,6 +125,13 @@ public class DbModule {
                 compositionsDao,
                 albumsDao,
                 genresDao);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    FoldersDaoWrapper foldersDaoWrapper() {
+        return new FoldersDaoWrapper();
     }
 
     @Provides

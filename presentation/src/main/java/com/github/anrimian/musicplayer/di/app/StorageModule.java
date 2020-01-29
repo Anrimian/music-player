@@ -5,6 +5,7 @@ import android.content.Context;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
@@ -135,6 +136,7 @@ public class StorageModule {
                                                   StoragePlayListsProvider playListsProvider,
                                                   StorageGenresProvider genresProvider,
                                                   CompositionsDaoWrapper compositionsDao,
+                                                  FoldersDaoWrapper foldersDaoWrapper,
                                                   PlayListsDaoWrapper playListsDao,
                                                   GenresDaoWrapper genresDao,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
@@ -142,6 +144,7 @@ public class StorageModule {
                 playListsProvider,
                 genresProvider,
                 compositionsDao,
+                foldersDaoWrapper,
                 playListsDao,
                 genresDao,
                 scheduler);

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
@@ -17,17 +18,22 @@ import java.util.List;
 class StorageCompositionAnalyzer {
 
     private final CompositionsDaoWrapper compositionsDao;
+    private final FoldersDaoWrapper foldersDaoWrapper;
 
-    StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao) {
+    StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
+                               FoldersDaoWrapper foldersDaoWrapper) {
         this.compositionsDao = compositionsDao;
+        this.foldersDaoWrapper = foldersDaoWrapper;
     }
 
     //we can't merge data by storageId in future, merge by path+filename?
     synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
-        //create new tree
+        //create new tree <String, Long>?
         //get current tree?
-        //exclude compositions in ignored tree parts
-        //insert tree?
+        //exclude compositions in ignored tree parts (root/example/example1)
+        String[] ignoresFolders = foldersDaoWrapper.getIgnoredFolders();
+
+        //insert/delete missed tree parts?
 
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
