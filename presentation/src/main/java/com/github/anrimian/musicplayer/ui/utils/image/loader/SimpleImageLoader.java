@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.utils.image.loader;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
@@ -8,6 +10,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 
@@ -23,7 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 public abstract class SimpleImageLoader<K, T> {
 
     @DrawableRes
-    private final int loadingPlaceholder;
+    private final int loadingPlaceholderId;
 
     @DrawableRes
     private final int errorPlaceholder;
@@ -37,12 +40,14 @@ public abstract class SimpleImageLoader<K, T> {
 
     private final WeakHashMap<ImageView, K> imageLoadingMap = new WeakHashMap<>();
 
-    public SimpleImageLoader(int loadingPlaceholder,
+    private Drawable loadingPlaceholder;
+
+    public SimpleImageLoader(int loadingPlaceholderId,
                              int errorPlaceholder,
                              int timeoutSeconds,
                              int maxCacheSize,
                              KeyFetcher<K, T> keyFetcher) {
-        this.loadingPlaceholder = loadingPlaceholder;
+        this.loadingPlaceholderId = loadingPlaceholderId;
         this.errorPlaceholder = errorPlaceholder;
         this.timeoutSeconds = timeoutSeconds;
         this.keyFetcher = keyFetcher;
@@ -65,11 +70,7 @@ public abstract class SimpleImageLoader<K, T> {
             return;
         }
 
-        if (loadingPlaceholder == -1) {
-            imageView.setImageBitmap(null);
-        } else {
-            imageView.setImageResource(loadingPlaceholder);
-        }
+        imageView.setImageDrawable(getPlaceholder(imageView.getContext()));
         Maybe.fromCallable(() -> getDataOrThrow(data))
                 .timeout(timeoutSeconds, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
@@ -112,7 +113,7 @@ public abstract class SimpleImageLoader<K, T> {
         if (placeholder == -1) {
             widgetView.setImageViewBitmap(viewId, null);
         } else {
-            widgetView.setImageViewResource(viewId, loadingPlaceholder);
+            widgetView.setImageViewResource(viewId, loadingPlaceholderId);
         }
         Maybe.fromCallable(() -> getDataOrThrow(data))
                 .timeout(timeoutSeconds, TimeUnit.SECONDS)
@@ -124,6 +125,13 @@ public abstract class SimpleImageLoader<K, T> {
     }
 
     protected abstract ImageFetcher<T> getImageFetcher();
+
+    private Drawable getPlaceholder(Context context) {
+        if (loadingPlaceholder == null && loadingPlaceholderId != -1) {
+            loadingPlaceholder = ContextCompat.getDrawable(context, loadingPlaceholderId);
+        }
+        return loadingPlaceholder;
+    }
 
     private void onImageLoaded(Bitmap bitmap, ImageView imageView, K key) {
         //if task is actual
