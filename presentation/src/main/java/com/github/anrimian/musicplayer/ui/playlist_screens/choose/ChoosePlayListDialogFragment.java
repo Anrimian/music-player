@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
@@ -122,7 +123,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         int minHeight = (int) (height * heightPercent);
         view.setMinimumHeight(minHeight);
 
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
+        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(view);
         bottomSheetBehavior.setPeekHeight(minHeight);
 
         ButterKnife.bind(this, view);
