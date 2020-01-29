@@ -32,7 +32,7 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
     public CoverImageLoader(StorageAlbumsProvider storageAlbumsProvider) {
         super(R.drawable.ic_music_placeholder_simple,
                 R.drawable.ic_music_placeholder_simple,
-                5,
+                5000,
                 2*1024*1024,
                 ImageMetaData::getKey);
 
@@ -65,8 +65,8 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
     }
 
     @Nullable
-    public Bitmap getImage(@Nonnull Composition data, long timeoutSeconds) {
-        return getImage(new CompositionImage(data), timeoutSeconds);
+    public Bitmap getImage(@Nonnull Composition data, long timeoutMillis) {
+        return getImage(new CompositionImage(data), timeoutMillis);
     }
 
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
