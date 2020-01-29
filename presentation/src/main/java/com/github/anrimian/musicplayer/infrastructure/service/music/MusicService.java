@@ -251,7 +251,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
                 break;
             }
             case PAUSE: {
-                mediaSession.setActive(false);
                 notificationsDisplayer.updateForegroundNotification(
                         false,
                         currentItem,
