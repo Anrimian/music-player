@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 
@@ -20,6 +21,7 @@ import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,6 +67,7 @@ public class StorageMusicProvider {
                             Media.TITLE,
 //                            Media.ALBUM,
                             Media.DATA,
+                            Media.RELATIVE_PATH,
                             Media.DURATION,
                             Media.SIZE,
                             Media._ID,
@@ -176,6 +179,19 @@ public class StorageMusicProvider {
         String title = cursorWrapper.getString(Media.TITLE);
 //        String album = cursorWrapper.getString(Media.ALBUM);
         String filePath = cursorWrapper.getString(Media.DATA);
+        if (isEmpty(filePath)) {
+            return null;
+        }
+
+        String relativePath;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
+        } else {
+            relativePath = FileUtils.getParentDirPath(filePath);
+        }
+        if (isEmpty(relativePath)) {
+            return null;
+        }
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
 //        String displayName = cursorWrapper.getString(DISPLAY_NAME);
@@ -198,9 +214,7 @@ public class StorageMusicProvider {
 
 //        @Nullable Integer year = cursorWrapper.getInt(YEAR);
 
-        if (isEmpty(filePath)) {
-            return null;
-        }
+
         Date dateAdded;
         if (dateAddedMillis == 0) {
             dateAdded = new Date(System.currentTimeMillis());
@@ -229,6 +243,7 @@ public class StorageMusicProvider {
                 artist,
                 title,
                 filePath,
+                relativePath,
                 duration,
                 size,
                 id,

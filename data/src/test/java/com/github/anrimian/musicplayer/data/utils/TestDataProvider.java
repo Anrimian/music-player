@@ -211,6 +211,7 @@ public class TestDataProvider {
         return new StorageFullComposition(null,
                 null,
                 filePath,
+                filePath,
                 0,
                 0,
                 id,
@@ -278,6 +279,7 @@ public class TestDataProvider {
     public static StorageFullComposition fakeStorageFullComposition(long id, String filePath) {
         return new StorageFullComposition(null,
                 null,
+                filePath,
                 filePath,
                 0,
                 0,

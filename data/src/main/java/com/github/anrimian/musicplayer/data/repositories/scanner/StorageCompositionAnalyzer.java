@@ -5,6 +5,7 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeNode;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -20,15 +21,26 @@ class StorageCompositionAnalyzer {
     private final CompositionsDaoWrapper compositionsDao;
     private final FoldersDaoWrapper foldersDaoWrapper;
 
+    private final FolderTreeNode.Builder<StorageFullComposition, Long> folderTreeBuilder;
+
     StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
                                FoldersDaoWrapper foldersDaoWrapper) {
         this.compositionsDao = compositionsDao;
         this.foldersDaoWrapper = foldersDaoWrapper;
+
+        folderTreeBuilder = new FolderTreeNode.Builder<>(
+                StorageFullComposition::getRelativePath,
+                StorageFullComposition::getId
+        );
     }
 
     //we can't merge data by storageId in future, merge by path+filename?
     synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
+        //FileUtils.getParentDirPath - to old file path, use only relative paths
+
         //create new tree <String, Long>?
+//        folderTreeBuilder.createFileTree(newCompositions);//iterable
+
         //get current tree?
         //exclude compositions in ignored tree parts (root/example/example1)
         String[] ignoresFolders = foldersDaoWrapper.getIgnoredFolders();

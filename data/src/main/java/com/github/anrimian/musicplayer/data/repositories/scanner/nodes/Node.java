@@ -34,7 +34,6 @@ public class Node<K, V> {
         return new ArrayList<>(nodes.values());
     }
 
-    @Nonnull
     public K getKey() {
         return key;
     }

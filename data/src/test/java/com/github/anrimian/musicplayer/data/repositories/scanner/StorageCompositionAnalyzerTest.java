@@ -90,6 +90,7 @@ public class StorageCompositionAnalyzerTest {
         StorageFullComposition changedComposition = new StorageFullComposition("new artist",
                 null,
                 "test",
+                "test",
                 0,
                 0,
                 1L,
@@ -116,6 +117,7 @@ public class StorageCompositionAnalyzerTest {
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         StorageFullComposition changedComposition = new StorageFullComposition(null,
                 null,
+                "test",
                 "test",
                 0,
                 0,
@@ -154,6 +156,7 @@ public class StorageCompositionAnalyzerTest {
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         StorageFullComposition changedComposition = new StorageFullComposition(null,
                 null,
+                "test",
                 "test",
                 0,
                 0,
