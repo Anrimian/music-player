@@ -122,7 +122,6 @@ public class CoverImageLoader {
                 return null;
             }
             BitmapFactory.Options opt = new BitmapFactory.Options();
-            long start = System.currentTimeMillis();
             opt.outWidth = getCoverSize();
             opt.outHeight = getCoverSize();
             return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
