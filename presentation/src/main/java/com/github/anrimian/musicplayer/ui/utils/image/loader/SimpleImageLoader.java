@@ -25,7 +25,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class SimpleImageLoader<K, T> {
+public class SimpleImageLoader<K, T> {
 
     @DrawableRes
     private final int loadingPlaceholderId;
@@ -48,13 +48,14 @@ public abstract class SimpleImageLoader<K, T> {
                              int errorPlaceholder,
                              int timeoutMillis,
                              int maxCacheSize,
-                             KeyFetcher<K, T> keyFetcher) {
+                             KeyFetcher<K, T> keyFetcher,
+                             ImageFetcher<T> imageFetcher) {
         this.loadingPlaceholderId = loadingPlaceholderId;
         this.errorPlaceholder = errorPlaceholder;
         this.timeoutMillis = timeoutMillis;
         this.keyFetcher = keyFetcher;
+        this.imageFetcher = imageFetcher;
 
-        imageFetcher = getImageFetcher();
         imageCache = new ImageCache<>(maxCacheSize);
     }
 
@@ -130,8 +131,6 @@ public abstract class SimpleImageLoader<K, T> {
                 .onErrorComplete()
                 .subscribe();
     }
-
-    protected abstract ImageFetcher<T> getImageFetcher();
 
     private Drawable getPlaceholder(Context context) {
         if (loadingPlaceholder == null && loadingPlaceholderId != -1) {
