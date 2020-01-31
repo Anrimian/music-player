@@ -40,7 +40,7 @@ public class SimpleImageLoader<K, T> {
 
     private final ImageCache<K> imageCache;
 
-    private final WeakHashMap<ImageView, Disposable> loadingTasks = new WeakHashMap<>();
+    private final WeakHashMap<Integer, Disposable> loadingTasks = new WeakHashMap<>();
 
     private Drawable loadingPlaceholder;
 
@@ -66,7 +66,8 @@ public class SimpleImageLoader<K, T> {
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull T data,
                              @DrawableRes int errorPlaceholder) {
-        Disposable taskToCancel = loadingTasks.get(imageView);
+        int targetKey = getTargetKey(imageView);
+        Disposable taskToCancel = loadingTasks.get(targetKey);
         RxUtils.dispose(taskToCancel);
 
         K key = keyFetcher.getKey(data);
@@ -82,12 +83,12 @@ public class SimpleImageLoader<K, T> {
                 .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doFinally(() -> loadingTasks.remove(imageView))
+                .doFinally(() -> loadingTasks.remove(targetKey))
                 .subscribe(
                         bitmap -> onImageLoaded(bitmap, imageView),
                         t -> imageView.setImageResource(errorPlaceholder)
                 );
-        loadingTasks.put(imageView, disposable);
+        loadingTasks.put(targetKey, disposable);
     }
 
     @Nullable
@@ -141,6 +142,10 @@ public class SimpleImageLoader<K, T> {
 
     private void onImageLoaded(Bitmap bitmap, ImageView imageView) {
         imageView.setImageBitmap(bitmap);
+    }
+
+    private int getTargetKey(ImageView imageView) {
+        return System.identityHashCode(imageView);
     }
 
     @Nonnull
