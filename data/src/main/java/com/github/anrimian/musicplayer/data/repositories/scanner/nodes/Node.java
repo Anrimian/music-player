@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -30,8 +31,8 @@ public class Node<K, V> {
     }
 
     @Nonnull
-    public List<Node<K, V>> getNodes() {
-        return new ArrayList<>(nodes.values());
+    public Collection<Node<K, V>> getNodes() {
+        return nodes.values();
     }
 
     public K getKey() {
@@ -79,6 +80,10 @@ public class Node<K, V> {
         return nodes.get(key);
     }
 
+    public Node<K, V> getFirstChild() {
+        return nodes.entrySet().iterator().next().getValue();
+    }
+
     public void updateNode(K key, V nodeData) {
         Node<K, V> node = nodes.get(key);
         if (node != null) {
@@ -97,6 +102,10 @@ public class Node<K, V> {
 
     public void updateData(V nodeData) {
         this.data = nodeData;
+    }
+
+    public void setParent(@Nullable Node<K, V> parent) {
+        this.parent = parent;
     }
 
     private void updateChildKey(Node<K, V> node, K newKey) {
@@ -136,4 +145,5 @@ public class Node<K, V> {
     public int hashCode() {
         return key.hashCode();
     }
+
 }

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.java.Mapper;
 
@@ -14,6 +16,21 @@ public class FolderTreeNode<T> extends Node<String, T> {
         super(key, data);
     }
 
+    //for debug purposes
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getKey());
+        Node<String, T> parent = getParent();
+        while (parent != null) {
+            sb.append("/");
+            sb.append(parent.getKey());
+            parent = parent.getParent();
+        }
+        return sb.toString();
+    }
+
     public static class Builder<M, V> {
 
         private final Mapper<M, String> pathFunc;
@@ -24,10 +41,9 @@ public class FolderTreeNode<T> extends Node<String, T> {
             this.valueFunc = valueFunc;
         }
 
-        public FolderTreeNode createFileTree(Iterable<M> objects) {
+        public Node<String, V> createFileTree(Observable<M> objectsObservable) {
             FolderTreeNode<V> rootNode = new FolderTreeNode<>(null, null);
-            Observable.fromIterable(objects)
-                    .groupBy(pathFunc::map)
+            objectsObservable.groupBy(pathFunc::map)
                     .doOnNext(group -> group.collect(ArrayList<M>::new, List::add)
                             .map(this::toNodeList)
                             .doOnSuccess(list -> addNodesToRoot(rootNode, group.getKey(), list))
