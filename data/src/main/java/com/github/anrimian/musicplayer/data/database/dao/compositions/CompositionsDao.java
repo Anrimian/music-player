@@ -60,6 +60,23 @@ public interface CompositionsDao {
     @RawQuery(observedEntities = CompositionEntity.class)
     Observable<List<Composition>> getAllObservable(SupportSQLiteQuery query);
 
+    //temp
+    @Query("SELECT " +
+            "(SELECT name FROM artists WHERE id = compositions.artistId) as artist, " +
+            "compositions.title as title, " +
+            "(SELECT name FROM albums WHERE id = compositions.albumId) as album, " +
+            "compositions.filePath as filePath, " +
+            "compositions.duration as duration, " +
+            "compositions.size as size, " +
+            "compositions.id as id, " +
+            "compositions.storageId as storageId, " +
+            "compositions.dateAdded as dateAdded, " +
+            "compositions.dateModified as dateModified, " +
+            "compositions.corruptionType as corruptionType " +
+            "FROM compositions " +
+            "WHERE folderId = :folderId")
+    Observable<List<Composition>> getAllInFolderObservable(Long folderId);
+
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +

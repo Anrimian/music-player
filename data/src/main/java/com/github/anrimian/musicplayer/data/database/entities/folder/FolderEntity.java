@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.entities.folder;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import javax.annotation.Nonnull;
@@ -13,6 +14,9 @@ import javax.annotation.Nullable;
                         parentColumns = "id",
                         childColumns = "parentId",
                         onDelete = ForeignKey.CASCADE)
+        },
+        indices = {
+                @Index("parentId")
         }
 )
 public class FolderEntity {
@@ -29,6 +33,10 @@ public class FolderEntity {
     public FolderEntity(@Nullable Long parentId, @Nonnull String name) {
         this.parentId = parentId;
         this.name = name;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public long getId() {

@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
+import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 
 import java.util.Date;
@@ -21,11 +22,15 @@ import javax.annotation.Nullable;
                         childColumns = "artistId"),
                 @ForeignKey(entity = AlbumEntity.class,
                         parentColumns = "id",
-                        childColumns = "albumId")
+                        childColumns = "albumId"),
+                @ForeignKey(entity = FolderEntity.class,
+                        parentColumns = "id",
+                        childColumns = "folderId")
         },
         indices = {
                 @Index("artistId"),
-                @Index("albumId")
+                @Index("albumId"),
+                @Index("folderId")
         }
 )
 public class CompositionEntity {
@@ -38,6 +43,9 @@ public class CompositionEntity {
 
     @Nullable
     private Long albumId;
+
+    @Nullable
+    private Long folderId;
 
     @Nullable
     private Long storageId;
@@ -61,6 +69,7 @@ public class CompositionEntity {
 
     public CompositionEntity(@Nullable Long artistId,
                              @Nullable Long albumId,
+                             @Nullable Long folderId,
                              @Nullable String title,
                              @Nonnull String filePath,
                              long duration,
@@ -71,6 +80,7 @@ public class CompositionEntity {
                              @Nullable CorruptionType corruptionType) {
         this.artistId = artistId;
         this.albumId = albumId;
+        this.folderId = folderId;
         this.storageId = storageId;
         this.title = title;
         this.filePath = filePath;
@@ -79,6 +89,11 @@ public class CompositionEntity {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
+    }
+
+    @Nullable
+    public Long getFolderId() {
+        return folderId;
     }
 
     @Nullable

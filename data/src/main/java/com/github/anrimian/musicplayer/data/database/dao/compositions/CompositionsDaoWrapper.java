@@ -86,6 +86,10 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getAllObservable(sqlQuery);
     }
 
+    public Observable<List<Composition>> getCompositionsInFolderObservable(Long folderId) {
+        return compositionsDao.getAllInFolderObservable(folderId);
+    }
+
     public List<Composition> getAll() {
         return compositionsDao.getAll();
     }
@@ -302,7 +306,7 @@ public class CompositionsDaoWrapper {
             Long albumArtistId = getOrInsertArtist(storageAlbum.getArtist(), artistsCache);
             albumId = getOrInsertAlbum(storageAlbum, albumArtistId, albumsCache);
         }
-        return CompositionMapper.toEntity(composition, artistId, albumId);
+        return CompositionMapper.toEntity(composition, artistId, albumId, null);//finish with folder
     }
 
     private Long getOrInsertAlbum(StorageAlbum storageAlbum,

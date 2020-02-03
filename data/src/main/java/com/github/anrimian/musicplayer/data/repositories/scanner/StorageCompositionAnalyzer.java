@@ -25,14 +25,14 @@ import io.reactivex.Observable;
 class StorageCompositionAnalyzer {
 
     private final CompositionsDaoWrapper compositionsDao;
-    private final FoldersDaoWrapper foldersDaoWrapper;
+    private final FoldersDaoWrapper foldersDao;
 
     private final FolderTreeNode.Builder<StorageFullComposition, Long> folderTreeBuilder;
 
     StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
-                               FoldersDaoWrapper foldersDaoWrapper) {
+                               FoldersDaoWrapper foldersDao) {
         this.compositionsDao = compositionsDao;
-        this.foldersDaoWrapper = foldersDaoWrapper;
+        this.foldersDao = foldersDao;
 
         folderTreeBuilder = new FolderTreeNode.Builder<>(
                 StorageFullComposition::getRelativePath,
@@ -47,7 +47,7 @@ class StorageCompositionAnalyzer {
 
         excludeCompositions(folderTree, newCompositions);
 
-        //get current tree?
+        //get current tree as list/map key-parent ?
 
         //insert/delete missed tree parts?
 
@@ -65,13 +65,16 @@ class StorageCompositionAnalyzer {
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
         if (hasChanges) {
+            //apply tree changes here
+
+
             compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
         }
     }
 
     private void excludeCompositions(Node<String, Long> folderTree,
                                      LongSparseArray<StorageFullComposition> compositions) {
-        String[] ignoresFolders = foldersDaoWrapper.getIgnoredFolders();
+        String[] ignoresFolders = foldersDao.getIgnoredFolders();
         for (String ignoredFoldersPath: ignoresFolders) {
             //find and remove
             Node<String, Long> ignoreNode = findNode(folderTree, ignoredFoldersPath);

@@ -9,9 +9,11 @@ public class CompositionMapper {
 
     public static CompositionEntity toEntity(StorageFullComposition composition,
                                              @Nullable Long artistId,
-                                             @Nullable Long albumId) {
+                                             @Nullable Long albumId,
+                                             @Nullable Long folderId) {
         return new CompositionEntity(artistId,
                 albumId,
+                folderId,
                 composition.getTitle(),
                 composition.getFilePath(),
                 composition.getDuration(),

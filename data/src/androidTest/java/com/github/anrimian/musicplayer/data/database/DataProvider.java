@@ -10,6 +10,7 @@ public class DataProvider {
         return new CompositionEntity(
                 artistId,
                 albumId,
+                0L,
                 title,
                 "test file path",
                 100L,
