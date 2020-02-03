@@ -21,6 +21,9 @@ import io.reactivex.Observable;
 @Dao
 public interface CompositionsDao {
 
+    //error at ~530 line(v 0.8.1.1)?
+    //remove/rewrite?
+    //https://stackoverflow.com/questions/52917946/room-library-initializing-cursor-error
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = compositions.artistId) as artist, " +
             "compositions.title as title, " +
