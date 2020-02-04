@@ -5,6 +5,7 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderInfo;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
@@ -12,6 +13,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageCompo
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
+
+import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 
 class StorageCompositionAnalyzer {
 
@@ -42,32 +46,40 @@ class StorageCompositionAnalyzer {
 
     //we can't merge data by storageId in future, merge by path+filename?
     synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
-        Node<String, Long> folderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
-        folderTree = cutEmptyRootNodes(folderTree);
+        Node<String, Long> folderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));//add folder name to compositions?
+        folderTree = cutEmptyRootNodes(folderTree);//save excluded part?
 
         excludeCompositions(folderTree, newCompositions);
-
-        //get current tree as list/map key-parent ?
-
-        //insert/delete missed tree parts?
 
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();
         List<StorageComposition> deletedCompositions = new ArrayList<>();
         List<Change<StorageComposition, StorageFullComposition>> changedCompositions = new ArrayList<>();
-
         boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositions,
                 newCompositions,
-                this::hasActualChanges,
+                this::hasActualChanges,//also compare by folder path?
                 deletedCompositions::add,
                 addedCompositions::add,
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
-        if (hasChanges) {
-            //apply tree changes here
 
+        boolean hasFolderChanges = false;
 
+        //1) select all folders from db,
+        //2) extract all folders from tree,
+        //3) compare by name and parent name
+        //4) apply changes, on insert?... in update?...
+
+        //insert all folders
+        //set inserted folder id to composition
+
+//        List<FolderInfo> foldersList = getAllFoldersInTree(folderTree);
+//        foldersDao.insertFolders(foldersList, (folderId, compositionId) -> {
+//            newCompositions.get(compositionId).setFolderId(folderId);
+//        });
+
+        if (hasChanges || hasFolderChanges) {
             compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
         }
     }
@@ -76,7 +88,6 @@ class StorageCompositionAnalyzer {
                                      LongSparseArray<StorageFullComposition> compositions) {
         String[] ignoresFolders = foldersDao.getIgnoredFolders();
         for (String ignoredFoldersPath: ignoresFolders) {
-            //find and remove
             Node<String, Long> ignoreNode = findNode(folderTree, ignoredFoldersPath);
             if (ignoreNode == null) {
                 continue;
@@ -111,6 +122,41 @@ class StorageCompositionAnalyzer {
             }
         }
         return currentNode;
+    }
+
+    private List<FolderInfo> getAllFoldersInTree(Node<String, Long> parentNode) {
+        LinkedList<FolderInfo> result = new LinkedList<>();
+        result.add(new FolderInfo(parentNode.getKey(), null, getCompositionsInNode(parentNode)));
+        for (Node<String, Long> node: parentNode.getNodes()) {
+            if (node.getData() == null) {
+                result.add(new FolderInfo(node.getKey(),
+                        requireNonNull(node.getParent()).getKey(),
+                        getCompositionsInNode(node))
+                );
+            } else {
+                result.addAll(getAllFoldersInTree(node));
+            }
+        }
+        return result;
+    }
+
+    private void forEachNode(Node<String, Long> parentNode, Callback<Node<String, Long>> action) {
+        for (Node<String, Long> node: parentNode.getNodes()) {
+            action.call(node);
+            if (node.getData() == null) {
+                forEachNode(node, action);
+            }
+        }
+    }
+
+    private List<Long> getCompositionsInNode(Node<String, Long> parentNode) {
+        LinkedList<Long> result = new LinkedList<>();
+        for (Node<String, Long> node: parentNode.getNodes()) {
+            if (node.getData() != null) {
+                result.add(node.getData());
+            }
+        }
+        return result;
     }
 
     private List<Long> getAllCompositionsInNode(Node<String, Long> parentNode) {
