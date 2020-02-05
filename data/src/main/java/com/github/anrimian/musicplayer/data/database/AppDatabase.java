@@ -16,7 +16,7 @@ import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
+import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
@@ -36,6 +36,7 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
         AlbumEntity.class,
         GenreEntity.class,
         GenreEntryEntity.class,
+        IgnoredFolderEntity.class,
         FolderEntity.class
 }, version = 5)
 @TypeConverters({

@@ -1,12 +1,15 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
+import android.annotation.SuppressLint;
+
+import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
@@ -19,6 +22,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +47,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 @InjectViewState
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
-    private final LibraryFilesInteractor interactor;
+    private final LibraryFoldersInteractor interactor;
     private final MusicPlayerInteractor playerInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
@@ -87,7 +91,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private Composition currentComposition;
 
     public LibraryFoldersPresenter(@Nullable String path,
-                                   LibraryFilesInteractor interactor,
+                                   LibraryFoldersInteractor interactor,
                                    MusicPlayerInteractor playerInteractor,
                                    DisplaySettingsInteractor displaySettingsInteractor,
                                    ErrorParser errorParser,
@@ -392,6 +396,15 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         fileActionDisposable = interactor.moveFilesToNewFolder(path, name)
                 .observeOn(uiScheduler)
                 .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
+    }
+
+    @SuppressLint("CheckResult")
+    void onExcludeFolderClicked(FolderFileSource folder) {
+        //TODO folder.getPath() - invalid relative path for scanner, not working
+        //noinspection ResultOfMethodCallIgnored
+        interactor.addFolderToIgnore(new IgnoredFolder(folder.getPath(), new Date()))
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
     }
 
     LinkedHashSet<FileSource> getSelectedFiles() {

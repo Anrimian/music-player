@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.root;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
+import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -17,14 +17,14 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 @InjectViewState
 public class FolderRootPresenter extends MvpPresenter<FolderRootView> {
 
-    private final LibraryFilesInteractor interactor;
+    private final LibraryFoldersInteractor interactor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable filesDisposable;
 
-    public FolderRootPresenter(LibraryFilesInteractor interactor,
+    public FolderRootPresenter(LibraryFoldersInteractor interactor,
                                ErrorParser errorParser,
                                Scheduler uiScheduler) {
         this.interactor = interactor;
