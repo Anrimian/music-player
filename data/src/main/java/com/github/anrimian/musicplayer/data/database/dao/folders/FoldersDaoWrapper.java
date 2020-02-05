@@ -2,19 +2,14 @@ package com.github.anrimian.musicplayer.data.database.dao.folders;
 
 import androidx.annotation.Nullable;
 
-import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
-
-import java.util.List;
-
-import io.reactivex.Observable;
-
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
+import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.ArrayList;
@@ -45,10 +40,6 @@ public class FoldersDaoWrapper {
         return null;
     }
 
-    public void insert(IgnoredFolder folder) {
-        foldersDao.insert(new IgnoredFolderEntity(folder.getRelativePath(), folder.getAddDate()));
-    }
-
     public Observable<List<FileSource2>> getFilesObservable(Long parentFolderId) {
         Observable<List<FolderFileSource2>> folderObservable =
                 foldersDao.getFolderObservable(parentFolderId);
@@ -75,6 +66,10 @@ public class FoldersDaoWrapper {
 
     public List<FolderEntity> getAllFolders() {
         return foldersDao.getAllFolders();
+    }
+
+    public void insert(IgnoredFolder folder) {
+        foldersDao.insert(new IgnoredFolderEntity(folder.getRelativePath(), folder.getAddDate()));
     }
 
     public void insertFolders(Set<String> paths,
