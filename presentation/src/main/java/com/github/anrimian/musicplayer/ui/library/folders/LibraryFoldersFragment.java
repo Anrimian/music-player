@@ -660,6 +660,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                     presenter.onShareFolderClicked(folder);
                     return true;
                 }
+                case R.id.menu_hide: {
+                    presenter.onExcludeFolderClicked(folder);
+                    return true;
+                }
                 case R.id.menu_delete: {
                     presenter.onDeleteFolderButtonClicked(folder);
                     return true;

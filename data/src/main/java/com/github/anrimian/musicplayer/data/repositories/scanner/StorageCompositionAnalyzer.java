@@ -47,10 +47,6 @@ class StorageCompositionAnalyzer {
 
         excludeCompositions(folderTree, newCompositions);
 
-        //get current tree?
-
-        //insert/delete missed tree parts?
-
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();

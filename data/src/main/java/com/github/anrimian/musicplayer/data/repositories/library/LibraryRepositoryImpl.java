@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.library;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.comparators.DescComparator;
 import com.github.anrimian.musicplayer.data.repositories.library.comparators.composition.AlphabeticalCompositionComparator;
@@ -21,6 +22,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
@@ -52,6 +54,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     private final ArtistsDaoWrapper artistsDao;
     private final AlbumsDaoWrapper albumsDao;
     private final GenresDaoWrapper genresDao;
+    private final FoldersDaoWrapper foldersDao;
     private final MusicFolderDataSource musicFolderDataSource;
     private final SettingsRepository settingsPreferences;
     private final Scheduler scheduler;
@@ -61,6 +64,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
                                  ArtistsDaoWrapper artistsDao,
                                  AlbumsDaoWrapper albumsDao,
                                  GenresDaoWrapper genresDao,
+                                 FoldersDaoWrapper foldersDao,
                                  MusicFolderDataSource musicFolderDataSource,
                                  SettingsRepository settingsPreferences,
                                  Scheduler scheduler) {
@@ -69,6 +73,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
         this.artistsDao = artistsDao;
         this.albumsDao = albumsDao;
         this.genresDao = genresDao;
+        this.foldersDao = foldersDao;
         this.musicFolderDataSource = musicFolderDataSource;
         this.settingsPreferences = settingsPreferences;
         this.scheduler = scheduler;
@@ -216,6 +221,23 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Observable<Genre> getGenreObservable(long genreId) {
         return genresDao.getGenreObservable(genreId);
+    }
+
+    @Override
+    public Completable addFolderToIgnore(IgnoredFolder folder) {
+        return Completable.fromAction(() -> foldersDao.insert(folder))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Observable<List<IgnoredFolder>> getIgnoredFoldersObservable() {
+        return foldersDao.getIgnoredFoldersObservable();
+    }
+
+    @Override
+    public Completable deleteIgnoredFolder(IgnoredFolder folder) {
+        return Completable.fromAction(() -> foldersDao.deleteIgnoredFolder(folder))
+                .subscribeOn(scheduler);
     }
 
     private Comparator<FileSource> getFileComparator(Order order) {

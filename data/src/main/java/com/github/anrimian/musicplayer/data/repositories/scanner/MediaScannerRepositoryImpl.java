@@ -74,6 +74,11 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         runRescanStorage().subscribe();
     }
 
+    @Override
+    public Completable runStorageScanner() {
+        return runRescanStorage();
+    }
+
     private void subscribeOnMediaStoreChanges() {
         mediaStoreDisposable.add(musicProvider.getCompositionsObservable()
                 .subscribeOn(scheduler)
