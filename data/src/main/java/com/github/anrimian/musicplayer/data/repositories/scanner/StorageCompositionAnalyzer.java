@@ -17,8 +17,12 @@ import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -49,7 +53,7 @@ class StorageCompositionAnalyzer {
         Node<String, Long> folderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));//add folder name to compositions?
         folderTree = cutEmptyRootNodes(folderTree);//save excluded part?
 
-        excludeCompositions(folderTree, newCompositions);
+        excludeCompositions(folderTree, newCompositions);//also remove node from tree
 
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
@@ -63,12 +67,11 @@ class StorageCompositionAnalyzer {
                 addedCompositions::add,
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
-
         boolean hasFolderChanges = false;
 
-        //1) select all folders from db,
+        //1) select all folders from db, create tree?
         //2) extract all folders from tree,
-        //3) compare by name and parent name
+        //3) compare by name and parent name24
         //4) apply changes, on insert?... in update?...
 
         //insert all folders
@@ -79,8 +82,15 @@ class StorageCompositionAnalyzer {
 //            newCompositions.get(compositionId).setFolderId(folderId);
 //        });
 
+        Set<String> pathsToInsert = new LinkedHashSet<>();//prepopulate
+        HashMap<String, Long> existsPathIdMap = new LinkedHashMap<>();//prepopulate
+        HashMap<String, Long> outPathIdMap = new LinkedHashMap<>();
+        foldersDao.insertFolders(pathsToInsert, existsPathIdMap, outPathIdMap);
+
         if (hasChanges || hasFolderChanges) {
             compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
+
+
         }
     }
 

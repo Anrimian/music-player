@@ -138,9 +138,10 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
-    FoldersDaoWrapper foldersDaoWrapper(FoldersDao foldersDao,
+    FoldersDaoWrapper foldersDaoWrapper(AppDatabase appDatabase,
+                                        FoldersDao foldersDao,
                                         CompositionsDaoWrapper compositionsDao) {
-        return new FoldersDaoWrapper(foldersDao, compositionsDao);
+        return new FoldersDaoWrapper(appDatabase, foldersDao, compositionsDao);
     }
 
     @Provides

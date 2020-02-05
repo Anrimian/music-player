@@ -2,13 +2,18 @@ package com.github.anrimian.musicplayer.data.database.dao.folders;
 
 import androidx.annotation.Nullable;
 
+import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Observable;
 
@@ -16,10 +21,14 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class FoldersDaoWrapper {
 
+    private final AppDatabase appDatabase;
     private final FoldersDao foldersDao;
     private final CompositionsDaoWrapper compositionsDao;
 
-    public FoldersDaoWrapper(FoldersDao foldersDao, CompositionsDaoWrapper compositionsDao) {
+    public FoldersDaoWrapper(AppDatabase appDatabase,
+                             FoldersDao foldersDao,
+                             CompositionsDaoWrapper compositionsDao) {
+        this.appDatabase = appDatabase;
         this.foldersDao = foldersDao;
         this.compositionsDao = compositionsDao;
     }
@@ -51,6 +60,33 @@ public class FoldersDaoWrapper {
         return foldersDao.getFolderObservable(folderId)
                 .takeWhile(list -> !list.isEmpty())
                 .map(list -> list.get(0));
+    }
+
+    public List<FolderEntity> getAllFolders() {
+        return foldersDao.getAllFolders();
+    }
+
+    public void insertFolders(Set<String> paths,
+                              HashMap<String, Long> existsPathIdMap,
+                              HashMap<String, Long> outPathIdMap) {
+        appDatabase.runInTransaction(() -> {
+            for (String path : paths) {
+                String name = TextUtils.getLastPathSegment(path);
+                String parentPath;
+                if (paths.contains("/")) {
+                    parentPath = TextUtils.removeLastPathSegment(path);
+                } else {
+                    parentPath = null;
+                }
+
+                Long parentId = outPathIdMap.get(parentPath);
+                if (parentId == null) {
+                    existsPathIdMap.get(parentPath);
+                }
+                long id = foldersDao.insertFolder(new FolderEntity(parentId, name));
+                outPathIdMap.put(path, id);
+            }
+        });
     }
 
     public String[] getIgnoredFolders() {
