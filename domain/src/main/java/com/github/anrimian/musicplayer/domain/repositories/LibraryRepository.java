@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
@@ -77,7 +78,7 @@ public interface LibraryRepository {
 
     Observable<Genre> getGenreObservable(long genreId);
 
-    Completable addFolderToIgnore(IgnoredFolder folder);
+    Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder);
 
     Observable<List<IgnoredFolder>> getIgnoredFoldersObservable();
 

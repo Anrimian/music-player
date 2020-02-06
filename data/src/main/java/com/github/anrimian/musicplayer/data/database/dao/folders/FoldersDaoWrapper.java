@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -20,6 +21,12 @@ public class FoldersDaoWrapper {
     @Nullable
     public Long getFolderIdToInsert(String filePath) {
         return null;
+    }
+
+    public IgnoredFolder insert(String path) {
+        Date addDate = new Date();
+        foldersDao.insert(new IgnoredFolderEntity(path, addDate));
+        return new IgnoredFolder(path, addDate);
     }
 
     public void insert(IgnoredFolder folder) {

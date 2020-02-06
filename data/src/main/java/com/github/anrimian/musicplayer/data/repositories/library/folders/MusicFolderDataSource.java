@@ -147,6 +147,15 @@ public class MusicFolderDataSource {
                 });
     }
 
+    //TODO folder.getPath() - invalid relative path for scanner, not working
+    public Single<String> getRelativePath(String path) {
+        return getMusicFileTree()
+                .map(tree -> {
+                    RxNode<String> targetNode = findNodeByPath(path, tree);
+                    return ((FolderNode) targetNode.getData()).getFullPath();
+                });
+    }
+
     private void updateNodePaths(RxNode<String> node,
                                  String newPath,
                                  List<Composition> outAffectedCompositions) {

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -135,4 +136,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showPlayState(boolean play);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddedIgnoredFolderMessage(IgnoredFolder folder);
 }

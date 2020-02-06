@@ -177,6 +177,7 @@
     <string name="edit_genre">Edit genre</string>
     <string name="genre_removed_message">Genre \"%s\" was removed</string>
     <string name="exclude_from_scanning">Hide</string>
+    <string name="ignored_folder_added">Folder \'%s\' added to excluded folder list</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
