@@ -22,7 +22,6 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,6 +88,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     @Nullable
     private Composition currentComposition;
+
+    @Nullable
+    private IgnoredFolder recentlyAddedIgnoredFolder;
 
     public LibraryFoldersPresenter(@Nullable String path,
                                    LibraryFoldersInteractor interactor,
@@ -400,9 +402,16 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     @SuppressLint("CheckResult")
     void onExcludeFolderClicked(FolderFileSource folder) {
-        //TODO folder.getPath() - invalid relative path for scanner, not working
         //noinspection ResultOfMethodCallIgnored
-        interactor.addFolderToIgnore(new IgnoredFolder(folder.getPath(), new Date()))
+        interactor.addFolderToIgnore(folder)
+                .observeOn(uiScheduler)
+                .subscribe(this::onIgnoreFolderAdded, this::onDefaultError);
+    }
+
+    @SuppressLint("CheckResult")
+    void onRemoveIgnoredFolderClicked() {
+        //noinspection ResultOfMethodCallIgnored
+        interactor.deleteIgnoredFolder(recentlyAddedIgnoredFolder)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
     }
@@ -413,6 +422,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     LinkedHashSet<FileSource> getSelectedMoveFiles() {
         return interactor.getFilesToMove();
+    }
+
+    private void onIgnoreFolderAdded(IgnoredFolder folder) {
+        recentlyAddedIgnoredFolder = folder;
+        getViewState().showAddedIgnoredFolderMessage(folder);
     }
 
     private void shareFileSources(List<FileSource> fileSources) {

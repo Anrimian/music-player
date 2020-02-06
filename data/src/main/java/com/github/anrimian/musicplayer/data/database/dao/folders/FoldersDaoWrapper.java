@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Ignored
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +67,12 @@ public class FoldersDaoWrapper {
 
     public List<FolderEntity> getAllFolders() {
         return foldersDao.getAllFolders();
+    }
+
+    public IgnoredFolder insert(String path) {
+        Date addDate = new Date();
+        foldersDao.insert(new IgnoredFolderEntity(path, addDate));
+        return new IgnoredFolder(path, addDate);
     }
 
     public void insert(IgnoredFolder folder) {

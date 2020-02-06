@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -557,6 +558,14 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showPlayState(boolean play) {
         adapter.showPlaying(play);
+    }
+
+    @Override
+    public void showAddedIgnoredFolderMessage(IgnoredFolder folder) {
+        String message = getString(R.string.ignored_folder_added, folder.getRelativePath());
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.cancel, v -> presenter.onRemoveIgnoredFolderClicked())
+                .show();
     }
 
     private void onSelectionModeChanged(boolean enabled) {

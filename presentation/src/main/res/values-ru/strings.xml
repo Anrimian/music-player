@@ -169,6 +169,7 @@
     <string name="edit_genre">Изменить жанр</string>
     <string name="genre_removed_message">Жанр \"%s\" убран</string>
     <string name="exclude_from_scanning">Скрыть</string>
+    <string name="ignored_folder_added">Папка \'%s\' добавлена в список игнорируемых папок</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

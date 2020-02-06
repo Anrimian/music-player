@@ -224,8 +224,9 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Completable addFolderToIgnore(IgnoredFolder folder) {
-        return Completable.fromAction(() -> foldersDao.insert(folder))
+    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
+        return musicFolderDataSource.getRelativePath(folder.getPath())
+                .map(foldersDao::insert)
                 .subscribeOn(scheduler);
     }
 
