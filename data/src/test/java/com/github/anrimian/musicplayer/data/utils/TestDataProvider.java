@@ -289,6 +289,21 @@ public class TestDataProvider {
                 null);
     }
 
+    public static StorageFullComposition fakeStorageFullComposition(long id,
+                                                                    String filePath,
+                                                                    String relativePath) {
+        return new StorageFullComposition(null,
+                null,
+                filePath,
+                relativePath,
+                0,
+                0,
+                id,
+                new Date(0),
+                new Date(0),
+                null);
+    }
+
     public static Composition fakeCompositionWithTitle(long id, String title) {
         return new Composition(null,
                 title,

@@ -1,9 +1,11 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
 import androidx.collection.LongSparseArray;
+import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderInfo;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeNode;
@@ -50,10 +52,18 @@ class StorageCompositionAnalyzer {
 
     //we can't merge data by storageId in future, merge by path+filename?
     synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
-        Node<String, Long> folderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));//add folder name to compositions?
-        folderTree = cutEmptyRootNodes(folderTree);//save excluded part?
+        Node<String, Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));//add folder name to compositions?
+        actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?
 
-        excludeCompositions(folderTree, newCompositions);//also remove node from tree
+        excludeCompositions(actualFolderTree, newCompositions);//also remove node from tree
+
+        //1) select all folders from db, create tree?
+        Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());
+
+        //3) compare by name and parent name24
+        List<Long> foldersToDelete = new LinkedList<>();
+        List<Pair<Long, Node<String, Long>>> foldersToInsert = new LinkedList<>();
+        mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
 
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
@@ -69,9 +79,7 @@ class StorageCompositionAnalyzer {
 
         boolean hasFolderChanges = false;
 
-        //1) select all folders from db, create tree?
         //2) extract all folders from tree,
-        //3) compare by name and parent name24
         //4) apply changes, on insert?... in update?...
 
         //insert all folders
@@ -89,8 +97,83 @@ class StorageCompositionAnalyzer {
 
         if (hasChanges || hasFolderChanges) {
             compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
+        }
+    }
 
+    private void mergeFolderTrees(Node<String, Long> actualFolderNode,
+                                  Node<String, FolderEntity> existsFoldersNode,
+                                  List<Long> foldersToDelete,
+                                  List<Pair<Long, Node<String, Long>>> foldersToInsert) {
+        for (Node<String, FolderEntity> existFolder : existsFoldersNode.getNodes()) {
+            String key = existFolder.getKey();
 
+            Node<String, Long> actualFolder = actualFolderNode.getChild(key);
+            if (actualFolder == null) {
+                foldersToDelete.add(existFolder.getData().getId());
+            }
+        }
+        for (Node<String, Long> actualFolder : actualFolderNode.getNodes()) {
+            String key = actualFolder.getKey();
+
+            Node<String, FolderEntity> existFolder = existsFoldersNode.getChild(key);
+            if (existFolder == null) {
+                Long parentId = null;
+                FolderEntity entity = existsFoldersNode.getData();
+                if (entity != null) {
+                    parentId = entity.getId();
+                }
+
+                Pair<Long, Node<String, Long>> pair = new Pair<>(parentId, actualFolder);
+                foldersToInsert.add(pair);
+            } else {
+                mergeFolderTrees(actualFolder, existsFoldersNode, foldersToDelete, foldersToInsert);
+            }
+        }
+    }
+
+    private Node<String, FolderEntity> createTreeFromIdMap(List<FolderEntity> folders) {
+        LongSparseArray<List<FolderEntity>> idMap = new LongSparseArray<>();
+
+        FolderTreeNode<FolderEntity> rootNode = new FolderTreeNode<>(null, null);
+
+        for (FolderEntity entity: folders) {
+            Long parentId = entity.getParentId();
+            if (parentId == null) {
+                rootNode.addNode(new Node<>(entity.getName(), entity));
+            } else {
+                List<FolderEntity> childList = idMap.get(parentId);
+                if (childList == null) {
+                    childList = new LinkedList<>();
+                    idMap.put(parentId, childList);
+                }
+                childList.add(entity);
+            }
+        }
+
+        fillIdTree(rootNode, idMap);
+
+        if (!idMap.isEmpty()) {
+            throw new IllegalStateException("found missed folders");
+        }
+
+        return rootNode;
+    }
+
+    private void fillIdTree(Node<String, FolderEntity> targetNode,
+                            LongSparseArray<List<FolderEntity>> idMap) {
+        for (Node<String, FolderEntity> childNode: targetNode.getNodes()) {
+            FolderEntity folderEntity = childNode.getData();
+            long id = folderEntity.getId();
+            List<FolderEntity> childList = idMap.get(id);
+            if (childList == null) {
+                break;
+            }
+            for (FolderEntity entity: childList) {
+                Node<String, FolderEntity> node = new Node<>(entity.getName(), entity);
+                childNode.addNode(node);
+                fillIdTree(node, idMap);
+            }
+            idMap.remove(id);
         }
     }
 

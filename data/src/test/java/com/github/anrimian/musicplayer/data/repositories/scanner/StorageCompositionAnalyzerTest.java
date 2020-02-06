@@ -205,8 +205,8 @@ public class StorageCompositionAnalyzerTest {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
-        StorageFullComposition c1 = fakeStorageFullComposition(1, "music-1");
-        StorageFullComposition c2 = fakeStorageFullComposition(2, "new/music-2");
+        StorageFullComposition c1 = fakeStorageFullComposition(1, "music/music-1", "music");
+        StorageFullComposition c2 = fakeStorageFullComposition(2, "music/new/music-2", "music/new");
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         newCompositions.put(1, c1);
         newCompositions.put(2, c2);
@@ -214,7 +214,8 @@ public class StorageCompositionAnalyzerTest {
         analyzer.applyCompositionsData(newCompositions);
 
         Set<String> expectedPathsToInsert = new HashSet<>();
-        expectedPathsToInsert.add("new");
+        expectedPathsToInsert.add("music");
+        expectedPathsToInsert.add("music/new");
         verify(foldersDao).insertFolders(
                 eq(expectedPathsToInsert),
                 any(),
