@@ -1,12 +1,12 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
 import androidx.collection.LongSparseArray;
-import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderInfo;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
@@ -19,8 +19,6 @@ import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,14 +55,13 @@ class StorageCompositionAnalyzer {
 
         excludeCompositions(actualFolderTree, newCompositions);//also remove node from tree
 
-        //1) select all folders from db, create tree?
         Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());
 
-        //3) compare by name and parent name24
         List<Long> foldersToDelete = new LinkedList<>();
-        List<Pair<Long, Node<String, Long>>> foldersToInsert = new LinkedList<>();
+        List<AddedNode> foldersToInsert = new LinkedList<>();//not sure if it right filled
         mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
 
+        Set<Long> movedCompositions = getAffectedCompositions(foldersToInsert);
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();
@@ -72,38 +69,31 @@ class StorageCompositionAnalyzer {
         List<Change<StorageComposition, StorageFullComposition>> changedCompositions = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositions,
                 newCompositions,
-                this::hasActualChanges,//also compare by folder path?
+                (first, second) -> hasActualChanges(first, second) || movedCompositions.contains(first.getStorageId()),//is in folder change
                 deletedCompositions::add,
                 addedCompositions::add,
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
-        boolean hasFolderChanges = false;
-
-        //2) extract all folders from tree,
-        //4) apply changes, on insert?... in update?...
-
-        //insert all folders
-        //set inserted folder id to composition
-
-//        List<FolderInfo> foldersList = getAllFoldersInTree(folderTree);
-//        foldersDao.insertFolders(foldersList, (folderId, compositionId) -> {
-//            newCompositions.get(compositionId).setFolderId(folderId);
-//        });
-
-        Set<String> pathsToInsert = new LinkedHashSet<>();//prepopulate
-        HashMap<String, Long> existsPathIdMap = new LinkedHashMap<>();//prepopulate
-        HashMap<String, Long> outPathIdMap = new LinkedHashMap<>();
-        foldersDao.insertFolders(pathsToInsert, existsPathIdMap, outPathIdMap);
-
-        if (hasChanges || hasFolderChanges) {
+        if (hasChanges) {
+            foldersDao.insertFolders(foldersToInsert);
+            //apply folder ids
             compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
+            //delete old folders
         }
+    }
+
+    private Set<Long> getAffectedCompositions(List<AddedNode> nodes) {
+        Set<Long> result = new LinkedHashSet<>();
+        for (AddedNode addedNode: nodes) {
+            result.addAll(getAllCompositionsInNode(addedNode.getNode()));
+        }
+        return result;
     }
 
     private void mergeFolderTrees(Node<String, Long> actualFolderNode,
                                   Node<String, FolderEntity> existsFoldersNode,
                                   List<Long> foldersToDelete,
-                                  List<Pair<Long, Node<String, Long>>> foldersToInsert) {
+                                  List<AddedNode> foldersToInsert) {
         for (Node<String, FolderEntity> existFolder : existsFoldersNode.getNodes()) {
             String key = existFolder.getKey();
 
@@ -123,8 +113,8 @@ class StorageCompositionAnalyzer {
                     parentId = entity.getId();
                 }
 
-                Pair<Long, Node<String, Long>> pair = new Pair<>(parentId, actualFolder);
-                foldersToInsert.add(pair);
+                AddedNode addedNode = new AddedNode(parentId, actualFolder);
+                foldersToInsert.add(addedNode);
             } else {
                 mergeFolderTrees(actualFolder, existsFoldersNode, foldersToDelete, foldersToInsert);
             }
@@ -252,8 +242,8 @@ class StorageCompositionAnalyzer {
         return result;
     }
 
-    private List<Long> getAllCompositionsInNode(Node<String, Long> parentNode) {
-        LinkedList<Long> result = new LinkedList<>();
+    private Set<Long> getAllCompositionsInNode(Node<String, Long> parentNode) {
+        Set<Long> result = new LinkedHashSet<>();
         for (Node<String, Long> node: parentNode.getNodes()) {
             if (node.getData() == null) {
                 result.addAll(getAllCompositionsInNode(node));

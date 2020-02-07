@@ -138,12 +138,14 @@ public class Node<K, V> {
 
         Node<?, ?> node = (Node<?, ?>) o;
 
-        return key.equals(node.key);
+        if (key != null ? !key.equals(node.key) : node.key != null) return false;
+        return data != null ? data.equals(node.data) : node.data == null;
     }
 
     @Override
     public int hashCode() {
-        return key.hashCode();
+        int result = key != null ? key.hashCode() : 0;
+        result = 31 * result + (data != null ? data.hashCode() : 0);
+        return result;
     }
-
 }

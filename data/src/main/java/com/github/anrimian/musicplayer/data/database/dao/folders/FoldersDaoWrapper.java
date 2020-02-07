@@ -6,17 +6,16 @@ import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
-import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import io.reactivex.Observable;
 
@@ -79,27 +78,19 @@ public class FoldersDaoWrapper {
         foldersDao.insert(new IgnoredFolderEntity(folder.getRelativePath(), folder.getAddDate()));
     }
 
-    public void insertFolders(Set<String> paths,
-                              HashMap<String, Long> existsPathIdMap,
-                              HashMap<String, Long> outPathIdMap) {
+    public void insertFolders(List<AddedNode> foldersToInsert) {
         appDatabase.runInTransaction(() -> {
-            for (String path : paths) {
-                String name = TextUtils.getLastPathSegment(path);
-                String parentPath;
-                if (paths.contains("/")) {
-                    parentPath = TextUtils.removeLastPathSegment(path);
-                } else {
-                    parentPath = null;
-                }
-
-                Long parentId = outPathIdMap.get(parentPath);
-                if (parentId == null) {
-                    existsPathIdMap.get(parentPath);
-                }
-                long id = foldersDao.insertFolder(new FolderEntity(parentId, name));
-                outPathIdMap.put(path, id);
+            for (AddedNode node: foldersToInsert) {
+                insertNode(node.getFolderDbId(), node.getNode());
             }
         });
+    }
+
+    private void insertNode(long parentId, Node<String, Long> parentNode) {
+        long id = foldersDao.insertFolder(new FolderEntity(parentId, parentNode.getKey()));
+        for (Node<String, Long> node: parentNode.getNodes()) {
+            insertNode(id, node);
+        }
     }
 
     public String[] getIgnoredFolders() {

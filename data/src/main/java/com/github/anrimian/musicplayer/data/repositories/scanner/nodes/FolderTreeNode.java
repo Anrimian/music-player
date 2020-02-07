@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 
-import androidx.annotation.NonNull;
-
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.java.Mapper;
 
@@ -17,19 +15,19 @@ public class FolderTreeNode<T> extends Node<String, T> {
     }
 
     //for debug purposes
-    @NonNull
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getKey());
-        Node<String, T> parent = getParent();
-        while (parent != null) {
-            sb.append("/");
-            sb.append(parent.getKey());
-            parent = parent.getParent();
-        }
-        return sb.toString();
-    }
+//    @NonNull
+//    @Override
+//    public String toString() {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(getKey());
+//        Node<String, T> parent = getParent();
+//        while (parent != null) {
+//            sb.append("/");
+//            sb.append(parent.getKey());
+//            parent = parent.getParent();
+//        }
+//        return sb.toString();
+//    }
 
     public static class Builder<M, V> {
 

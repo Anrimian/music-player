@@ -5,6 +5,8 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -12,15 +14,14 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullC
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageFullComposition;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static java.util.Collections.emptyList;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -213,14 +214,11 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        Set<String> expectedPathsToInsert = new HashSet<>();
-        expectedPathsToInsert.add("music");
-        expectedPathsToInsert.add("music/new");
-        verify(foldersDao).insertFolders(
-                eq(expectedPathsToInsert),
-                any(),
-                any()
-        );
+        List<AddedNode> expectedNodesToInsert = new ArrayList<>();
+        Node<String, Long> node = new Node<>("music", null);
+        node.addNode(new Node<>("new", null));
+        expectedNodesToInsert.add(new AddedNode(null, node));
+        verify(foldersDao).insertFolders(eq(expectedNodesToInsert));
 
         verify(compositionsDao).applyChanges(
                 eq(asList(c1, c2)),
