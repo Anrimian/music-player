@@ -135,7 +135,7 @@ class MusicModule {
     @Provides
     @Nonnull
     @Singleton
-    CoverImageLoader coverImageLoader(StorageAlbumsProvider storageAlbumsProvider) {
-        return new CoverImageLoader(storageAlbumsProvider);
+    CoverImageLoader coverImageLoader(Context context, StorageAlbumsProvider storageAlbumsProvider) {
+        return new CoverImageLoader(context, storageAlbumsProvider);
     }
 }

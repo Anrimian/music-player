@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.utils.image.loader;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
@@ -8,7 +10,9 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 
 import java.util.WeakHashMap;
@@ -18,36 +22,40 @@ import javax.annotation.Nonnull;
 
 import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class SimpleImageLoader<K, T> {
+public class SimpleImageLoader<K, T> {
 
     @DrawableRes
-    private final int loadingPlaceholder;
+    private final int loadingPlaceholderId;
 
     @DrawableRes
     private final int errorPlaceholder;
 
-    private final int timeoutSeconds;
+    private final int timeoutMillis;
 
     private final ImageFetcher<T> imageFetcher;
     private final KeyFetcher<K, T> keyFetcher;
 
     private final ImageCache<K> imageCache;
 
-    private final WeakHashMap<ImageView, K> imageLoadingMap = new WeakHashMap<>();
+    private final WeakHashMap<Integer, Disposable> loadingTasks = new WeakHashMap<>();
 
-    public SimpleImageLoader(int loadingPlaceholder,
+    private Drawable loadingPlaceholder;
+
+    public SimpleImageLoader(int loadingPlaceholderId,
                              int errorPlaceholder,
-                             int timeoutSeconds,
+                             int timeoutMillis,
                              int maxCacheSize,
-                             KeyFetcher<K, T> keyFetcher) {
-        this.loadingPlaceholder = loadingPlaceholder;
+                             KeyFetcher<K, T> keyFetcher,
+                             ImageFetcher<T> imageFetcher) {
+        this.loadingPlaceholderId = loadingPlaceholderId;
         this.errorPlaceholder = errorPlaceholder;
-        this.timeoutSeconds = timeoutSeconds;
+        this.timeoutMillis = timeoutMillis;
         this.keyFetcher = keyFetcher;
+        this.imageFetcher = imageFetcher;
 
-        imageFetcher = getImageFetcher();
         imageCache = new ImageCache<>(maxCacheSize);
     }
 
@@ -58,6 +66,10 @@ public abstract class SimpleImageLoader<K, T> {
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull T data,
                              @DrawableRes int errorPlaceholder) {
+        int targetKey = getTargetKey(imageView);
+        Disposable taskToCancel = loadingTasks.get(targetKey);
+        RxUtils.dispose(taskToCancel);
+
         K key = keyFetcher.getKey(data);
         Bitmap cachedBitmap = imageCache.getBitmap(key);
         if (cachedBitmap != null) {
@@ -65,33 +77,31 @@ public abstract class SimpleImageLoader<K, T> {
             return;
         }
 
-        if (loadingPlaceholder == -1) {
-            imageView.setImageBitmap(null);
-        } else {
-            imageView.setImageResource(loadingPlaceholder);
-        }
-        Maybe.fromCallable(() -> getDataOrThrow(data))
-                .timeout(timeoutSeconds, TimeUnit.SECONDS)
+        imageView.setImageDrawable(getPlaceholder(imageView.getContext()));
+
+        Disposable disposable = Maybe.fromCallable(() -> getDataOrThrow(data))
+                .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(bitmap -> onImageLoaded(bitmap, imageView, key))
-                .doOnError(t -> imageView.setImageResource(errorPlaceholder))
-                .onErrorComplete()
-                .subscribe();
-        imageLoadingMap.put(imageView, key);
+                .doFinally(() -> loadingTasks.remove(targetKey))
+                .subscribe(
+                        bitmap -> onImageLoaded(bitmap, imageView),
+                        t -> imageView.setImageResource(errorPlaceholder)
+                );
+        loadingTasks.put(targetKey, disposable);
     }
 
     @Nullable
-    public Bitmap getImage(@Nonnull T data, long timeoutSeconds) {
+    public Bitmap getImage(@Nonnull T data, long timeoutMillis) {
         return Maybe.fromCallable(() -> getDataOrThrow(data))
-                .timeout(timeoutSeconds, TimeUnit.SECONDS)
+                .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
                 .onErrorComplete()
                 .blockingGet();
     }
 
     public void loadImage(@Nonnull T data, Callback<Bitmap> onCompleted) {
         Maybe.fromCallable(() -> getDataOrThrow(data))
-                .timeout(timeoutSeconds, TimeUnit.SECONDS)
+                .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
                 .doOnSuccess(onCompleted::call)
                 .doOnError(t -> onCompleted.call(null))
                 .onErrorComplete()
@@ -112,10 +122,10 @@ public abstract class SimpleImageLoader<K, T> {
         if (placeholder == -1) {
             widgetView.setImageViewBitmap(viewId, null);
         } else {
-            widgetView.setImageViewResource(viewId, loadingPlaceholder);
+            widgetView.setImageViewResource(viewId, loadingPlaceholderId);
         }
         Maybe.fromCallable(() -> getDataOrThrow(data))
-                .timeout(timeoutSeconds, TimeUnit.SECONDS)
+                .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
                 .map(bitmapTransformer::transform)
                 .doOnSuccess(bitmap -> widgetView.setImageViewBitmap(viewId, bitmap))
                 .doOnError(t -> widgetView.setImageViewResource(viewId, placeholder))
@@ -123,13 +133,19 @@ public abstract class SimpleImageLoader<K, T> {
                 .subscribe();
     }
 
-    protected abstract ImageFetcher<T> getImageFetcher();
-
-    private void onImageLoaded(Bitmap bitmap, ImageView imageView, K key) {
-        //if task is actual
-        if (imageLoadingMap.get(imageView) == key) {
-            imageView.setImageBitmap(bitmap);
+    private Drawable getPlaceholder(Context context) {
+        if (loadingPlaceholder == null && loadingPlaceholderId != -1) {
+            loadingPlaceholder = ContextCompat.getDrawable(context, loadingPlaceholderId);
         }
+        return loadingPlaceholder;
+    }
+
+    private void onImageLoaded(Bitmap bitmap, ImageView imageView) {
+        imageView.setImageBitmap(bitmap);
+    }
+
+    private int getTargetKey(ImageView imageView) {
+        return System.identityHashCode(imageView);
     }
 
     @Nonnull

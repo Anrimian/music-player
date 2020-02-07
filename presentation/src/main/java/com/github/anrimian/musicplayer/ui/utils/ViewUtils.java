@@ -14,6 +14,7 @@ import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
@@ -25,9 +26,11 @@ import androidx.annotation.ColorInt;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 
 import static android.view.View.VISIBLE;
@@ -49,6 +52,24 @@ public class ViewUtils {
         } else {
             view.post(runnable);
         }
+    }
+
+    /**
+     * workaround for very rarely app crush. hope it helps
+     */
+    public static <V extends View> BottomSheetBehavior<V> findBottomSheetBehavior(V view) {
+        V target = view;
+        do {
+            ViewGroup.LayoutParams params = target.getLayoutParams();
+            if ((params instanceof CoordinatorLayout.LayoutParams)) {
+                return BottomSheetBehavior.from(target);
+            } else {
+                //noinspection unchecked
+                target = (V) target.getParent();
+            }
+        } while (target != null);
+
+        throw new IllegalArgumentException("View with coordinator layout in parent not found");
     }
 
     public static void onCheckChanged(CheckBox checkBox, Callback<Boolean> listener) {
