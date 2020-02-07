@@ -213,6 +213,11 @@ public class LibraryFoldersInteractor {
         return filesToMove;
     }
 
+    public Completable addFolderToIgnore(IgnoredFolder folder) {
+        return libraryRepository.addFolderToIgnore(folder)
+                .andThen(mediaScannerRepository.runStorageScanner());
+    }
+
     public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
         return libraryRepository.addFolderToIgnore(folder)
                 .flatMap(ignoredFolder -> mediaScannerRepository.runStorageScanner()

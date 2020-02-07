@@ -80,7 +80,10 @@ public interface LibraryRepository {
 
     Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder);
 
+    Completable addFolderToIgnore(IgnoredFolder folder);
+
     Observable<List<IgnoredFolder>> getIgnoredFoldersObservable();
 
     Completable deleteIgnoredFolder(IgnoredFolder folder);
+
 }

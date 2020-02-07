@@ -231,6 +231,12 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
+    public Completable addFolderToIgnore(IgnoredFolder folder) {
+        return Completable.fromAction(() -> foldersDao.insert(folder))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Observable<List<IgnoredFolder>> getIgnoredFoldersObservable() {
         return foldersDao.getIgnoredFoldersObservable();
     }
