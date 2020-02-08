@@ -47,8 +47,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     @Nullable
     private Composition currentComposition;
 
+    private boolean isListenersInitialized = false;
     private boolean isSourcePrepared = false;
-    private boolean playWhenPrepared = false;
+    private boolean playWhenReady = false;
     private boolean isPlaying = false;
 
     public AndroidMediaPlayer(Scheduler scheduler,
@@ -65,12 +66,11 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             }
         });
         mediaPlayer.setOnErrorListener((mediaPlayer, what, extra) -> {
-            Log.d("KEK2", "error");
+            Log.d("KEK2", "error, what: " + what + ", extra: " + extra);
             sendErrorEvent(what, extra);
             return false;
         });
-        //sometimes not start, see below
-        //install app, start play - skipped to next
+        //not found errors so far
     }
 
     @Override
@@ -82,7 +82,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
-        Log.d("KEK2", "prepare to play");
+        Log.d("KEK2", "prepare to play, startPosition: " + startPosition);
         this.currentComposition = composition;
         //check if file exists
         RxUtils.dispose(preparationDisposable);
@@ -95,29 +95,39 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void stop() {
+        if (!isPlaying) {
+            return;
+        }
         Log.d("KEK2", "stop");
         seekTo(0);
         stopTracingTrackPosition();
         mediaPlayer.stop();
         isPlaying = false;
+        playWhenReady = false;
     }
 
     @Override
     public void resume() {
+        if (isPlaying) {
+            return;
+        }
         Log.d("KEK2", "resume");
         if (isSourcePrepared) {
             start();
-        } else {
-            playWhenPrepared = true;
         }
+        playWhenReady = true;
     }
 
     @Override
     public void pause() {
+        if (!isPlaying) {
+            return;
+        }
         Log.d("KEK2", "pause");
         mediaPlayer.pause();
         stopTracingTrackPosition();
         isPlaying = false;
+        playWhenReady = false;
     }
 
     @Override
@@ -138,6 +148,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public long getTrackPosition() {
+        if (currentComposition == null) {
+            return 0;
+        }
         return mediaPlayer.getCurrentPosition();
     }
 
@@ -213,21 +226,38 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     private void onSourcePrepared() {
-        //sometimes overwrite and we don't start. often switch
-        if (playWhenPrepared) {
-            playWhenPrepared = false;
+        Log.d("KEK2", "onSourcePrepared, playWhenReady: " + playWhenReady);
+        if (playWhenReady) {
             start();
         }
         isSourcePrepared = true;
     }
 
     private void start() {
-        if (isPlaying) {
-            return;
-        }
         Log.d("KEK2", "start");
         mediaPlayer.start();
+
+        //possible can solve smth
+//        if (!isListenersInitialized) {
+//            initializeListeners();
+//            isListenersInitialized = true;
+//        }
+
         startTracingTrackPosition();
         isPlaying = true;
+    }
+
+    private void initializeListeners() {
+        mediaPlayer.setOnCompletionListener(mediaPlayer -> {
+            Log.d("KEK2", "completed");
+            if (currentComposition != null) {
+                playerEventSubject.onNext(new FinishedEvent(currentComposition));
+            }
+        });
+        mediaPlayer.setOnErrorListener((mediaPlayer, what, extra) -> {
+            Log.d("KEK2", "error, what: " + what + ", extra: " + extra);
+            sendErrorEvent(what, extra);
+            return false;
+        });
     }
 }

@@ -271,7 +271,9 @@ public class MusicPlayerInteractor {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
-            pause();
+            if (previousItem != null) {
+                pause();
+            }
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
 
