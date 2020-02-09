@@ -72,7 +72,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Single.fromCallable(() -> playQueueDao.insertNewPlayQueue(compositions,
                 settingsPreferences.isRandomPlayingEnabled(),
                 startPosition)
-        ).doOnSuccess(this::setCurrentItem)
+        ).doOnSuccess(this::setCurrentItem)//who's first here run run run
                 .ignoreElement()
                 .subscribeOn(scheduler);
     }
@@ -225,7 +225,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 if (nextItemId == null) {
                     nextItemId = playQueueDao.getItemAtPosition(0, isRandom);
                 }
-                setCurrentItem(nextItemId);
+                setCurrentItem(nextItemId);//can call after queue switch, for old queue
                 return;
             }
             emitter.onNext(item);

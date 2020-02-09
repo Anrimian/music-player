@@ -70,7 +70,8 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             sendErrorEvent(what, extra);
             return false;
         });
-        //not found errors so far
+        //set new queue multiple times - play but not display play state(check, seems gone after fixes)
+        //set new queue multiple times - run deleted item case
     }
 
     @Override

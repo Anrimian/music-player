@@ -106,13 +106,13 @@ public class MusicPlayerInteractor {
             return;
         }
 
+        systemEventsDisposable.clear();
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
             playerStateSubject.onNext(PLAY);
             musicPlayerController.resume();
             systemServiceController.startMusicService();
 
-            systemEventsDisposable.clear();
             systemEventsDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
             systemEventsDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
                     .subscribe(this::onAudioBecomingNoisy));
