@@ -122,7 +122,7 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         bottomSheetBehavior.setPeekHeight(minHeight);
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismiss();
+                dismissAllowingStateLoss();
             }
         }, this::showBottomSheetSlided));
 

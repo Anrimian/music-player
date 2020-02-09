@@ -145,7 +145,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismiss();
+                dismissAllowingStateLoss();
             }
         }, presenter::onBottomSheetSlided));
 
