@@ -19,4 +19,19 @@ public class IgnoredFolder {
     public Date getAddDate() {
         return addDate;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IgnoredFolder that = (IgnoredFolder) o;
+
+        return relativePath.equals(that.relativePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return relativePath.hashCode();
+    }
 }

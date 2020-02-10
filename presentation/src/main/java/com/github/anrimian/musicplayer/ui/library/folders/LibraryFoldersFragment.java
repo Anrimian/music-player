@@ -39,6 +39,7 @@ import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialog
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
@@ -295,6 +296,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         switch (id) {
             case R.id.menu_order: {
                 presenter.onOrderMenuItemClicked();
+                return true;
+            }
+            case R.id.menu_excluded_folders: {
+                //noinspection ConstantConditions
+                FragmentNavigation.from(getParentFragment().requireFragmentManager())
+                        .addNewFragment(new ExcludedFoldersFragment());
                 return true;
             }
             case R.id.menu_search: {

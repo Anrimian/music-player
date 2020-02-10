@@ -170,6 +170,10 @@
     <string name="genre_removed_message">Жанр \"%s\" убран</string>
     <string name="exclude_from_scanning">Скрыть</string>
     <string name="ignored_folder_added">Папка \'%s\' добавлена в список игнорируемых папок</string>
+    <string name="excluded_folders">Игнорируемые папки</string>
+    <string name="remove_excluded_folder">Убрать игнорируемую папку</string>
+    <string name="no_excluded_folders">Нет игнорируемых папок</string>
+    <string name="ignored_folder_removed">Игнорируемая папка убрана</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

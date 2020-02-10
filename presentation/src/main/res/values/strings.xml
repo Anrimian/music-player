@@ -178,6 +178,10 @@
     <string name="genre_removed_message">Genre \"%s\" was removed</string>
     <string name="exclude_from_scanning">Hide</string>
     <string name="ignored_folder_added">Folder \'%s\' added to excluded folder list</string>
+    <string name="excluded_folders">Excluded folders</string>
+    <string name="remove_excluded_folder">Remove excluded folder</string>
+    <string name="no_excluded_folders">No excluded folders</string>
+    <string name="ignored_folder_removed">Excluded folder removed</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
