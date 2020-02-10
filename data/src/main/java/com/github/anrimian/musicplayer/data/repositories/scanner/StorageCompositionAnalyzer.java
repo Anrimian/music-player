@@ -8,7 +8,7 @@ import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntit
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderInfo;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeNode;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeBuilder;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
@@ -35,14 +35,14 @@ class StorageCompositionAnalyzer {
     private final CompositionsDaoWrapper compositionsDao;
     private final FoldersDaoWrapper foldersDao;
 
-    private final FolderTreeNode.Builder<StorageFullComposition, Long> folderTreeBuilder;
+    private final FolderTreeBuilder<StorageFullComposition, Long> folderTreeBuilder;
 
     StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
                                FoldersDaoWrapper foldersDao) {
         this.compositionsDao = compositionsDao;
         this.foldersDao = foldersDao;
 
-        folderTreeBuilder = new FolderTreeNode.Builder<>(
+        folderTreeBuilder = new FolderTreeBuilder<>(
                 StorageFullComposition::getRelativePath,
                 StorageFullComposition::getId
         );
@@ -58,7 +58,7 @@ class StorageCompositionAnalyzer {
         Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());
 
         List<Long> foldersToDelete = new LinkedList<>();
-        List<AddedNode> foldersToInsert = new LinkedList<>();//not sure if it right filled
+        List<AddedNode> foldersToInsert = new LinkedList<>();
         mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
 
         Set<Long> movedCompositions = getAffectedCompositions(foldersToInsert);
@@ -96,6 +96,9 @@ class StorageCompositionAnalyzer {
                                   List<AddedNode> foldersToInsert) {
         for (Node<String, FolderEntity> existFolder : existsFoldersNode.getNodes()) {
             String key = existFolder.getKey();
+            if (key == null) {
+                continue;//not a folder
+            }
 
             Node<String, Long> actualFolder = actualFolderNode.getChild(key);
             if (actualFolder == null) {
@@ -104,6 +107,9 @@ class StorageCompositionAnalyzer {
         }
         for (Node<String, Long> actualFolder : actualFolderNode.getNodes()) {
             String key = actualFolder.getKey();
+            if (key == null) {
+                continue;//not a folder
+            }
 
             Node<String, FolderEntity> existFolder = existsFoldersNode.getChild(key);
             if (existFolder == null) {
@@ -114,7 +120,7 @@ class StorageCompositionAnalyzer {
                 }
 
                 AddedNode addedNode = new AddedNode(parentId, actualFolder);
-                foldersToInsert.add(addedNode);
+                foldersToInsert.add(addedNode);//we add unnecessary child folders, hm
             } else {
                 mergeFolderTrees(actualFolder, existsFoldersNode, foldersToDelete, foldersToInsert);
             }
@@ -124,7 +130,7 @@ class StorageCompositionAnalyzer {
     private Node<String, FolderEntity> createTreeFromIdMap(List<FolderEntity> folders) {
         LongSparseArray<List<FolderEntity>> idMap = new LongSparseArray<>();
 
-        FolderTreeNode<FolderEntity> rootNode = new FolderTreeNode<>(null, null);
+        Node<String, FolderEntity> rootNode = new Node<>(null, null);
 
         for (FolderEntity entity: folders) {
             Long parentId = entity.getParentId();

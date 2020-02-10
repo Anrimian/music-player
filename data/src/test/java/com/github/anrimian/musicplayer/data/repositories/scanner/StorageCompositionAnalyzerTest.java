@@ -208,9 +208,11 @@ public class StorageCompositionAnalyzerTest {
 
         StorageFullComposition c1 = fakeStorageFullComposition(1, "music/music-1", "music");
         StorageFullComposition c2 = fakeStorageFullComposition(2, "music/new/music-2", "music/new");
+        StorageFullComposition c3 = fakeStorageFullComposition(3, "music-3", "");
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         newCompositions.put(1, c1);
         newCompositions.put(2, c2);
+        newCompositions.put(3, c3);
 
         analyzer.applyCompositionsData(newCompositions);
 
@@ -221,7 +223,7 @@ public class StorageCompositionAnalyzerTest {
         verify(foldersDao).insertFolders(eq(expectedNodesToInsert));
 
         verify(compositionsDao).applyChanges(
-                eq(asList(c1, c2)),
+                eq(asList(c1, c2, c3)),
                 eq(emptyList()),
                 eq(emptyList())
         );

@@ -86,9 +86,13 @@ public class FoldersDaoWrapper {
         });
     }
 
-    private void insertNode(long parentId, Node<String, Long> parentNode) {
-        long id = foldersDao.insertFolder(new FolderEntity(parentId, parentNode.getKey()));
-        for (Node<String, Long> node: parentNode.getNodes()) {
+    private void insertNode(long parentId, Node<String, Long> nodeToInsert) {
+        String name = nodeToInsert.getKey();
+        if (name == null) {
+            return;
+        }
+        long id = foldersDao.insertFolder(new FolderEntity(parentId, name));
+        for (Node<String, Long> node: nodeToInsert.getNodes()) {
             insertNode(id, node);
         }
     }
