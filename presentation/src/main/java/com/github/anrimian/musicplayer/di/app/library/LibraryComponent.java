@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.di.app.library.genres.GenresComponent;
 import com.github.anrimian.musicplayer.di.app.library.genres.GenresModule;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerPresenter;
+import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersPresenter;
 
 import dagger.Subcomponent;
 
@@ -31,4 +32,5 @@ public interface LibraryComponent {
 
     PlayerPresenter playerPresenter();
     SelectOrderPresenter selectOrderPresenter();
+    ExcludedFoldersPresenter excludedFoldersPresenter();
 }

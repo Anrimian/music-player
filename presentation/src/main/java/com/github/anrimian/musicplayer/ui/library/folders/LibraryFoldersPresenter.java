@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 
 import android.annotation.SuppressLint;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersInteractor;
+import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersScreenInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -46,7 +46,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 @InjectViewState
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
-    private final LibraryFoldersInteractor interactor;
+    private final LibraryFoldersScreenInteractor interactor;
     private final MusicPlayerInteractor playerInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
@@ -93,7 +93,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private IgnoredFolder recentlyAddedIgnoredFolder;
 
     public LibraryFoldersPresenter(@Nullable String path,
-                                   LibraryFoldersInteractor interactor,
+                                   LibraryFoldersScreenInteractor interactor,
                                    MusicPlayerInteractor playerInteractor,
                                    DisplaySettingsInteractor displaySettingsInteractor,
                                    ErrorParser errorParser,

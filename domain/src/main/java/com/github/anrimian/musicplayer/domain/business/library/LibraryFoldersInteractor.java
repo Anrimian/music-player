@@ -15,8 +15,6 @@ import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -24,7 +22,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Created on 24.10.2017.
@@ -39,11 +36,6 @@ public class LibraryFoldersInteractor {
     private final SettingsRepository settingsRepository;
     private final UiStateRepository uiStateRepository;
     private final MediaScannerRepository mediaScannerRepository;
-
-    private final BehaviorSubject<Boolean> moveModeSubject = BehaviorSubject.createDefault(false);
-    private final LinkedHashSet<FileSource> filesToCopy = new LinkedHashSet<>();
-    private final LinkedHashSet<FileSource> filesToMove = new LinkedHashSet<>();
-    private String fromMovePath;
 
     public LibraryFoldersInteractor(LibraryRepository libraryRepository,
                                     EditorRepository editorRepository,
@@ -155,64 +147,6 @@ public class LibraryFoldersInteractor {
                 );
     }
 
-    public void addFilesToMove(String fromMovePath, Collection<FileSource> fileSources) {
-        filesToMove.clear();
-        filesToMove.addAll(fileSources);
-        this.fromMovePath = fromMovePath;
-        moveModeSubject.onNext(true);
-    }
-
-    public void addFilesToCopy(String fromMovePath, Collection<FileSource> fileSources) {
-        filesToCopy.clear();
-        filesToCopy.addAll(fileSources);
-        this.fromMovePath = fromMovePath;
-        moveModeSubject.onNext(true);
-    }
-
-    public void stopMoveMode() {
-        filesToCopy.clear();
-        filesToMove.clear();
-        fromMovePath = null;
-        moveModeSubject.onNext(false);
-    }
-
-    public Completable copyFilesTo(String path) {
-        Completable completable;
-        if (!filesToMove.isEmpty()) {
-            completable = Observable.fromIterable(filesToMove)
-                    .flatMapCompletable(fileSource -> moveFiles(fileSource, path));
-        } else if (!filesToCopy.isEmpty()) {
-            completable = Completable.error(new Exception("not implemented"));
-        } else {
-            throw new IllegalStateException("unexpected state");
-        }
-        return completable.doOnComplete(this::stopMoveMode);
-    }
-
-    public Completable moveFilesToNewFolder(String path, String folderName) {
-        //TODO root(null) path issue
-        String newFolderPath = path + "/" + folderName;
-        Completable completable = editorRepository.createDirectory(newFolderPath);
-        if (!filesToMove.isEmpty()) {
-            completable = completable.andThen(Observable.fromIterable(filesToMove)
-                    .flatMapCompletable(fileSource -> moveFiles(fileSource, newFolderPath))
-            );
-        } else if (!filesToCopy.isEmpty()) {
-            completable = Completable.error(new Exception("not implemented"));
-        } else {
-            throw new IllegalStateException("unexpected state");
-        }
-        return completable.doOnComplete(this::stopMoveMode);
-    }
-
-    public BehaviorSubject<Boolean> getMoveModeObservable() {
-        return moveModeSubject;
-    }
-
-    public LinkedHashSet<FileSource> getFilesToMove() {
-        return filesToMove;
-    }
-
     public Completable addFolderToIgnore(IgnoredFolder folder) {
         return libraryRepository.addFolderToIgnore(folder)
                 .andThen(mediaScannerRepository.runStorageScanner());
@@ -234,9 +168,4 @@ public class LibraryFoldersInteractor {
                 .andThen(mediaScannerRepository.runStorageScanner());
     }
 
-    private Completable moveFiles(FileSource fileSource, String path) {
-        return editorRepository.moveFile(fileSource.getPath(), fromMovePath, path)
-                .flatMap(newPath -> libraryRepository.moveFileTo(path, newPath, fileSource))
-                .flatMapCompletable(editorRepository::changeCompositionsFilePath);
-    }
 }
