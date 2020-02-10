@@ -50,6 +50,7 @@ class StorageCompositionAnalyzer {
 
     //we can't merge data by storageId in future, merge by path+filename?
     synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
+        //remake nodes, split into two lists
         Node<String, Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));//add folder name to compositions?
         actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?
 
@@ -75,9 +76,12 @@ class StorageCompositionAnalyzer {
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
         if (hasChanges) {
-            foldersDao.insertFolders(foldersToInsert);
-            //apply folder ids
-            compositionsDao.applyChanges(addedCompositions, deletedCompositions, changedCompositions);
+            LongSparseArray<Long> compositionIdMap = foldersDao.insertFolders(foldersToInsert);
+            //apply folder ids map<compositionId, folderId>
+            compositionsDao.applyChanges(addedCompositions,
+                    deletedCompositions,
+                    changedCompositions,
+                    compositionIdMap);
             //delete old folders
         }
     }

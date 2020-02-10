@@ -32,7 +32,7 @@ public class FolderTreeBuilder<M, V> {
     }
 
     private List<Node<String, V>> toNodeList(List<M> list) {
-        return ListUtils.mapList(list, obj -> new Node<>(null, valueFunc.map(obj)));
+        return ListUtils.mapList(list, obj -> new Node<>(null, valueFunc.map(obj)));//no, null key filters duplicates
     }
 
     private void addNodesToRoot(Node<String, V> root,

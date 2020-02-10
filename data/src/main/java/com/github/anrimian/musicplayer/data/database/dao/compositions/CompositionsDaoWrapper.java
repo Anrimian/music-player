@@ -229,16 +229,17 @@ public class CompositionsDaoWrapper {
 
     public void applyChanges(List<StorageFullComposition> addedCompositions,
                              List<StorageComposition> deletedCompositions,
-                             List<Change<StorageComposition, StorageFullComposition>> changedCompositions) {
+                             List<Change<StorageComposition, StorageFullComposition>> changedCompositions,
+                             LongSparseArray<Long> folderIdMap) {
         appDatabase.runInTransaction(() -> {
-            insertCompositions(addedCompositions);
+            insertCompositions(addedCompositions, folderIdMap);
 
             for (StorageComposition composition: deletedCompositions) {
                 compositionsDao.delete(composition.getId());
             }
 
             for (Change<StorageComposition, StorageFullComposition> change: changedCompositions) {
-                handleCompositionUpdate(change);
+                handleCompositionUpdate(change, folderIdMap);
             }
             albumsDao.deleteEmptyAlbums();
             artistsDao.deleteEmptyArtists();
@@ -250,7 +251,8 @@ public class CompositionsDaoWrapper {
         compositionsDao.setCorruptionType(corruptionType, id);
     }
 
-    private void handleCompositionUpdate(Change<StorageComposition, StorageFullComposition> change) {
+    private void handleCompositionUpdate(Change<StorageComposition, StorageFullComposition> change,
+                                         LongSparseArray<Long> folderIdMap) {
         StorageFullComposition composition = change.getObj();
         StorageComposition oldComposition = change.getOld();
 
@@ -272,6 +274,9 @@ public class CompositionsDaoWrapper {
         if (!Objects.equals(newAlbumArtist, oldComposition.getAlbumArtist())) {
             updateAlbumArtist(oldComposition.getId(), newAlbumArtist);
         }
+//        if (oldComposition.getFolderId != folderIdMap.get(storageId)) {
+        //update folderId
+//        }
 
         compositionsDao.update(
                 composition.getTitle(),
@@ -284,19 +289,21 @@ public class CompositionsDaoWrapper {
         );
     }
 
-    private void insertCompositions(List<StorageFullComposition> addedCompositions) {
+    private void insertCompositions(List<StorageFullComposition> addedCompositions,
+                                    LongSparseArray<Long> folderIdMap) {
         //optimization with cache, ~33% faster
         Map<String, Long> artistsCache = new HashMap<>();
         Map<String, Long> albumsCache = new HashMap<>();
         compositionsDao.insert(mapList(
                 addedCompositions,
-                composition -> toCompositionEntity(composition, artistsCache, albumsCache))
+                composition -> toCompositionEntity(composition, artistsCache, albumsCache, folderIdMap))
         );
     }
 
     private CompositionEntity toCompositionEntity(StorageFullComposition composition,
                                                   Map<String, Long> artistsCache,
-                                                  Map<String, Long> albumsCache) {
+                                                  Map<String, Long> albumsCache,
+                                                  LongSparseArray<Long> folderIdMap) {
         String artist = composition.getArtist();
         Long artistId = getOrInsertArtist(artist, artistsCache);
 
@@ -306,7 +313,7 @@ public class CompositionsDaoWrapper {
             Long albumArtistId = getOrInsertArtist(storageAlbum.getArtist(), artistsCache);
             albumId = getOrInsertAlbum(storageAlbum, albumArtistId, albumsCache);
         }
-        return CompositionMapper.toEntity(composition, artistId, albumId, null);//finish with folder
+        return CompositionMapper.toEntity(composition, artistId, albumId, folderIdMap.get(composition.getId()));
     }
 
     private Long getOrInsertAlbum(StorageAlbum storageAlbum,

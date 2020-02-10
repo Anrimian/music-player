@@ -188,9 +188,9 @@ public class TestDataProvider {
     }
 
     public static StorageComposition fakeStorageComposition(long id,
-                                              String filePath,
-                                              long createDate,
-                                              long modifyDate) {
+                                                            String filePath,
+                                                            long createDate,
+                                                            long modifyDate) {
         return new StorageComposition(null,
                 null,
                 null,
@@ -205,13 +205,30 @@ public class TestDataProvider {
     }
 
     public static StorageFullComposition fakeStorageFullComposition(long id,
-                                                            String filePath,
-                                                            long createDate,
-                                                            long modifyDate) {
+                                                                    String filePath,
+                                                                    long createDate,
+                                                                    long modifyDate) {
         return new StorageFullComposition(null,
                 null,
                 filePath,
+                "",
+                0,
+                0,
+                id,
+                new Date(createDate),
+                new Date(modifyDate),
+                null);
+    }
+
+    public static StorageFullComposition fakeStorageFullComposition(long id,
+                                                                    String filePath,
+                                                                    String artist,
+                                                                    long createDate,
+                                                                    long modifyDate) {
+        return new StorageFullComposition(artist,
+                null,
                 filePath,
+                "",
                 0,
                 0,
                 id,
@@ -280,7 +297,7 @@ public class TestDataProvider {
         return new StorageFullComposition(null,
                 null,
                 filePath,
-                filePath,
+                "",
                 0,
                 0,
                 id,

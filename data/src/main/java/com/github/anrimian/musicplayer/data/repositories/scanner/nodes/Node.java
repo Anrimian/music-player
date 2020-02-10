@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 
-import androidx.annotation.NonNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -123,11 +121,11 @@ public class Node<K, V> {
         }
     }
 
-    @NonNull
     @Override
     public String toString() {
-        return "RxNode{" +
+        return "Node{" +
                 "key=" + key +
+                ", data=" + data +
                 '}';
     }
 

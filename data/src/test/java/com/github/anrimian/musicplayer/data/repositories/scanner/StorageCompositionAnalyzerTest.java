@@ -22,6 +22,7 @@ import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeSt
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageFullComposition;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static java.util.Collections.emptyList;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -40,6 +41,7 @@ public class StorageCompositionAnalyzerTest {
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());
 
         when(foldersDao.getIgnoredFolders()).thenReturn(new String[0]);
+        when(foldersDao.insertFolders(any())).thenReturn(new LongSparseArray<>());
 
         analyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDao);
     }
@@ -54,7 +56,7 @@ public class StorageCompositionAnalyzerTest {
 
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         newCompositions.put(1, fakeStorageFullComposition(1, "music-1"));
-        StorageFullComposition changedComposition = fakeStorageFullComposition(3, "changed composition", 1L, 10000L);
+        StorageFullComposition changedComposition = fakeStorageFullComposition(3, "music-3", "new artist", 1L, 10000L);
         newCompositions.put(3L, changedComposition);
         newCompositions.put(4, fakeStorageFullComposition(4, "music-4"));
 
@@ -63,8 +65,8 @@ public class StorageCompositionAnalyzerTest {
         verify(compositionsDao).applyChanges(
                 eq(asList(fakeStorageFullComposition(4, "music-4"))),//new
                 eq(asList(fakeStorageComposition(2, "music-2"))),//removed
-                eq(asList(new Change<>(fakeStorageComposition(3, "music-3"), changedComposition)))
-        );
+                eq(asList(new Change<>(fakeStorageComposition(3, "music-3"), changedComposition))),
+                any());
     }
 
     @Test
@@ -82,8 +84,8 @@ public class StorageCompositionAnalyzerTest {
         verify(compositionsDao, never()).applyChanges(
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1000), changedComposition)))
-        );
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1000), changedComposition))),
+                any());
     }
 
     @Test
@@ -110,8 +112,8 @@ public class StorageCompositionAnalyzerTest {
         verify(compositionsDao).applyChanges(
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition)))
-        );
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition))),
+                any());
     }
 
     @Test
@@ -138,8 +140,8 @@ public class StorageCompositionAnalyzerTest {
         verify(compositionsDao).applyChanges(
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition)))
-        );
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition))),
+                any());
     }
 
     @Test
@@ -177,8 +179,8 @@ public class StorageCompositionAnalyzerTest {
         verify(compositionsDao).applyChanges(
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(new Change<>(oldComposition, changedComposition)))
-        );
+                eq(asList(new Change<>(oldComposition, changedComposition))),
+                any());
     }
 
     @Test
@@ -187,18 +189,18 @@ public class StorageCompositionAnalyzerTest {
 
         when(foldersDao.getIgnoredFolders()).thenReturn(excludedFolders);
 
-        StorageFullComposition expectedComposition = fakeStorageFullComposition(4, "0/etc/sdcard/music-4");
+        StorageFullComposition expectedComposition = fakeStorageFullComposition(4, "0/etc/sdcard/music-4", "0/etc/sdcard");
 
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
-        newCompositions.put(1, fakeStorageFullComposition(1, "0/etc/sdcard/music/wazap/music-1"));
-        newCompositions.put(2, fakeStorageFullComposition(2, "0/etc/sdcard/music/wazap/music-2"));
-        newCompositions.put(3, fakeStorageFullComposition(3, "0/etc/sdcard/music/wazap/music-3"));
+        newCompositions.put(1, fakeStorageFullComposition(1, "0/etc/sdcard/music/wazap/music-1", "0/etc/sdcard/music/wazap"));
+        newCompositions.put(2, fakeStorageFullComposition(2, "0/etc/sdcard/music/wazap/music-2", "0/etc/sdcard/music/wazap"));
+        newCompositions.put(3, fakeStorageFullComposition(3, "0/etc/sdcard/music/wazap/music-3", "0/etc/sdcard/music/wazap"));
         newCompositions.put(4, expectedComposition);
-        newCompositions.put(5, fakeStorageFullComposition(5, "0/etc/sdcard/rubbish"));
+        newCompositions.put(5, fakeStorageFullComposition(5, "0/etc/sdcard/rubbish", "0/etc/sdcard/rubbish"));
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao).applyChanges(eq(asList(expectedComposition)), eq(emptyList()), eq(emptyList()));
+        verify(compositionsDao).applyChanges(eq(asList(expectedComposition)), eq(emptyList()), eq(emptyList()), any());
     }
 
     @Test
@@ -225,8 +227,8 @@ public class StorageCompositionAnalyzerTest {
         verify(compositionsDao).applyChanges(
                 eq(asList(c1, c2, c3)),
                 eq(emptyList()),
-                eq(emptyList())
-        );
+                eq(emptyList()),
+                any());
     }
 
 }
