@@ -90,7 +90,7 @@ public class FoldersDaoWrapper {
         });
     }
 
-    private void insertNode(long parentId,
+    private void insertNode(Long parentId,
                             Node<String, Long> nodeToInsert,
                             LongSparseArray<Long> compositionsIdMap) {
         String name = nodeToInsert.getKey();
