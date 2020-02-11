@@ -126,8 +126,10 @@ public class Node<K, V> {
     @NonNull
     @Override
     public String toString() {
-        return "RxNode{" +
+        return "Node{" +
                 "key=" + key +
+                ", data=" + data +
+                ", nodesCount=" + nodes.size() +
                 '}';
     }
 

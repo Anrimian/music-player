@@ -5,8 +5,8 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderNode;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeBuilder;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -27,14 +27,14 @@ class StorageCompositionAnalyzer {
     private final CompositionsDaoWrapper compositionsDao;
     private final FoldersDaoWrapper foldersDaoWrapper;
 
-    private final FolderTreeNode.Builder<StorageFullComposition, Long> folderTreeBuilder;
+    private final FolderTreeBuilder<StorageFullComposition, Long> folderTreeBuilder;
 
     StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
                                FoldersDaoWrapper foldersDaoWrapper) {
         this.compositionsDao = compositionsDao;
         this.foldersDaoWrapper = foldersDaoWrapper;
 
-        folderTreeBuilder = new FolderTreeNode.Builder<>(
+        folderTreeBuilder = new FolderTreeBuilder<>(
                 StorageFullComposition::getRelativePath,
                 StorageFullComposition::getId
         );
@@ -42,7 +42,7 @@ class StorageCompositionAnalyzer {
 
     //we can't merge data by storageId in future, merge by path+filename?
     synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
-        Node<String, Long> folderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
+        FolderNode<Long> folderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
         folderTree = cutEmptyRootNodes(folderTree);
 
         excludeCompositions(folderTree, newCompositions);
@@ -65,12 +65,12 @@ class StorageCompositionAnalyzer {
         }
     }
 
-    private void excludeCompositions(Node<String, Long> folderTree,
+    private void excludeCompositions(FolderNode<Long> folderTree,
                                      LongSparseArray<StorageFullComposition> compositions) {
         String[] ignoresFolders = foldersDaoWrapper.getIgnoredFolders();
         for (String ignoredFoldersPath: ignoresFolders) {
             //find and remove
-            Node<String, Long> ignoreNode = findNode(folderTree, ignoredFoldersPath);
+            FolderNode<Long> ignoreNode = findFolder(folderTree, ignoredFoldersPath);
             if (ignoreNode == null) {
                 continue;
             }
@@ -80,23 +80,23 @@ class StorageCompositionAnalyzer {
         }
     }
 
-    private Node<String, Long> cutEmptyRootNodes(Node<String, Long> root) {
-        Node<String, Long> found = root;
+    private FolderNode<Long> cutEmptyRootNodes(FolderNode<Long> root) {
+        FolderNode<Long> found = root;
         while (isEmptyFolderNode(found)) {
-            found = found.getFirstChild();
+            found = found.getFirstFolder();
         }
         return found;
     }
 
-    private boolean isEmptyFolderNode(Node<String, Long> node) {
-        return node.getNodes().size() == 1 && node.getData() == null;
+    private boolean isEmptyFolderNode(FolderNode<Long> node) {
+        return node.getFolders().size() == 1 && node.getFiles().isEmpty();
     }
 
     @Nullable
-    private Node<String, Long> findNode(Node<String, Long> folderTree, String path) {
-        Node<String, Long> currentNode = folderTree;
+    private FolderNode<Long> findFolder(FolderNode<Long> folderTree, String path) {
+        FolderNode<Long> currentNode = folderTree;
         for (String partialPath: path.split("/")) {
-            currentNode = currentNode.getChild(partialPath);
+            currentNode = currentNode.getFolder(partialPath);
 
             if (currentNode == null) {
                 //perhaps we can implement find. Find up and down on tree.
@@ -106,14 +106,10 @@ class StorageCompositionAnalyzer {
         return currentNode;
     }
 
-    private List<Long> getAllCompositionsInNode(Node<String, Long> parentNode) {
-        LinkedList<Long> result = new LinkedList<>();
-        for (Node<String, Long> node: parentNode.getNodes()) {
-            if (node.getData() == null) {
-                result.addAll(getAllCompositionsInNode(node));
-            } else {
-                result.add(node.getData());
-            }
+    private List<Long> getAllCompositionsInNode(FolderNode<Long> parentNode) {
+        LinkedList<Long> result = new LinkedList<>(parentNode.getFiles());
+        for (FolderNode<Long> node: parentNode.getFolders()) {
+            result.addAll(getAllCompositionsInNode(node));
         }
         return result;
     }
