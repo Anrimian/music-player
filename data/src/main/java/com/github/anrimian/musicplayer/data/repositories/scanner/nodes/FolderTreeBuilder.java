@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.domain.utils.java.Mapper;
 
 import java.util.ArrayList;
@@ -41,6 +42,10 @@ public class FolderTreeBuilder<M, V> {
     }
 
     private FolderNode<V> getNode(FolderNode<V> root, String path) {
+        if (TextUtils.isEmpty(path)) {
+            return root;
+        }
+
         FolderNode<V> target = root;
 
         String[] partialPaths = path.split("/");

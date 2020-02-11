@@ -4,10 +4,8 @@ import org.junit.Test;
 
 import io.reactivex.Observable;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@SuppressWarnings("ConstantConditions")
 public class FolderTreeBuilderTest {
 
     private final FolderTreeBuilder<String, String> folderTreeBuilder = new FolderTreeBuilder<>(
@@ -16,17 +14,20 @@ public class FolderTreeBuilderTest {
     );
 
     @Test
-    public void createFileTree() {
-        Node<String, String> root = folderTreeBuilder.createFileTree(Observable.fromArray(
+    public void createFileTreeTest() {
+        FolderNode<String> root = folderTreeBuilder.createFileTree(Observable.fromArray(
                 "music",
                 "music/new",
                 ""
         ));
-        assertEquals("", root.getChild(null).getData());
+        assert root.getFiles().contains("");
 
-        Node<String, String> musicFolder = root.getChild("music");
+        FolderNode<String> musicFolder = root.getFolder("music");
         assertNotNull(musicFolder);
-        assertNotNull(musicFolder.getChild("new"));
-        assertEquals("music/new", musicFolder.getChild("new").getChild(null).getData());
+        assert musicFolder.getFiles().contains("music");
+
+        FolderNode<String> newFolder = musicFolder.getFolder("new");
+        assertNotNull(newFolder);
+        assert newFolder.getFiles().contains("music/new");
     }
 }

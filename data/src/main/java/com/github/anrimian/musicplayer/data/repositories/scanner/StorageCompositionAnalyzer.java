@@ -8,16 +8,14 @@ import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntit
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderInfo;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeBuilder;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeBuilder;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
 import java.util.ArrayList;
@@ -52,14 +50,16 @@ class StorageCompositionAnalyzer {
 
     //we can't merge data by storageId in future, merge by path+filename?
     synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
-        FolderNode<Long> folderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
-        folderTree = cutEmptyRootNodes(folderTree);//save excluded part?
+        FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
+        actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?
 
-        Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());//also remove node from tree
+        excludeCompositions(actualFolderTree, newCompositions);//also remove node from tree
+
+        Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-        mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
+//        mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);//remake
 
         Set<Long> movedCompositions = getAffectedCompositions(foldersToInsert);
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
@@ -88,7 +88,7 @@ class StorageCompositionAnalyzer {
     private Set<Long> getAffectedCompositions(List<AddedNode> nodes) {
         Set<Long> result = new LinkedHashSet<>();
         for (AddedNode addedNode: nodes) {
-            result.addAll(getAllCompositionsInNode(addedNode.getNode()));
+//            result.addAll(getAllCompositionsInNode(addedNode.getNode()));//remake
         }
         return result;
     }
@@ -236,6 +236,16 @@ class StorageCompositionAnalyzer {
                 );
             } else {
                 result.addAll(getAllFoldersInTree(node));
+            }
+        }
+        return result;
+    }
+
+    private List<Long> getCompositionsInNode(Node<String, Long> parentNode) {
+        LinkedList<Long> result = new LinkedList<>();
+        for (Node<String, Long> node: parentNode.getNodes()) {
+            if (node.getData() != null) {
+                result.add(node.getData());
             }
         }
         return result;

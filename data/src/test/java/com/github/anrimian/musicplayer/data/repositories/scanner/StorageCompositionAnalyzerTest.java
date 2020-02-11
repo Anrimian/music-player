@@ -194,7 +194,7 @@ public class StorageCompositionAnalyzerTest {
     public void excludeFoldersTest() {
         String[] excludedFolders = {"music/wazap", "rubbish"};
 
-        when(foldersDaoWrapper.getIgnoredFolders()).thenReturn(excludedFolders);
+        when(foldersDao.getIgnoredFolders()).thenReturn(excludedFolders);
 
         StorageFullComposition expectedComposition = new StorageCompositionBuilder(4, "music-4")
                 .relativePath("0/etc/sdcard")
@@ -209,7 +209,11 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao).applyChanges(eq(asList(expectedComposition)), eq(emptyList()), eq(emptyList()));
+        verify(compositionsDao).applyChanges(
+                eq(asList(expectedComposition)),
+                eq(emptyList()),
+                eq(emptyList()),
+                any());
     }
 
     @Test
@@ -217,9 +221,9 @@ public class StorageCompositionAnalyzerTest {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
-        StorageFullComposition c1 = fakeStorageFullComposition(1, "music/music-1", "music");
-        StorageFullComposition c2 = fakeStorageFullComposition(2, "music/new/music-2", "music/new");
-        StorageFullComposition c3 = fakeStorageFullComposition(3, "music-3", "");
+        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
+        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("music/new").build();
+        StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         newCompositions.put(1, c1);
         newCompositions.put(2, c2);
