@@ -6,7 +6,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
 
 import static androidx.core.graphics.ColorUtils.setAlphaComponent;
@@ -20,7 +20,7 @@ public abstract class FileViewHolder extends SelectableViewHolder {
 
     public abstract void setSelectedToMove(boolean selected);
 
-    public abstract FileSource getFileSource();
+    public abstract FileSource2 getFileSource();
 
     @ColorInt
     protected int getMoveSelectionColor() {

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.business.library;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
@@ -55,6 +56,10 @@ public class LibraryFoldersInteractor {
 
     public Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText) {
         return libraryRepository.getCompositionsInPath(path, searchText);
+    }
+
+    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId) {
+        return libraryRepository.getFoldersInFolder(folderId);
     }
 
     public void playAllMusicInPath(@Nullable String path) {

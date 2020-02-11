@@ -7,9 +7,9 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
@@ -28,19 +28,19 @@ import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
  * Created on 31.10.2017.
  */
 
-public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileViewHolder> {
+public class MusicFileSourceAdapter extends DiffListAdapter<FileSource2, FileViewHolder> {
 
     private static final int TYPE_MUSIC = 1;
     private static final int TYPE_FILE = 2;
 
     private final Set<FileViewHolder> viewHolders = new HashSet<>();
-    private final HashSet<FileSource> selectedItems;
-    private final HashSet<FileSource> selectedMoveItems;
+    private final HashSet<FileSource2> selectedItems;
+    private final HashSet<FileSource2> selectedMoveItems;
 
-    private OnPositionItemClickListener<MusicFileSource> onCompositionClickListener;
-    private OnPositionItemClickListener<FolderFileSource> onFolderClickListener;
-    private OnPositionItemClickListener<FileSource> onLongClickListener;
-    private OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener;
+    private OnPositionItemClickListener<CompositionFileSource2> onCompositionClickListener;
+    private OnPositionItemClickListener<FolderFileSource2> onFolderClickListener;
+    private OnPositionItemClickListener<FileSource2> onLongClickListener;
+    private OnViewItemClickListener<FolderFileSource2> onFolderMenuClickListener;
     private OnPositionItemClickListener<Composition> compositionIconClickListener;
 
     @Nullable
@@ -49,8 +49,8 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
     private boolean isCoversEnabled;
 
     public MusicFileSourceAdapter(RecyclerView recyclerView,
-                                  HashSet<FileSource> selectedItems,
-                                  HashSet<FileSource> selectedMoveItems) {
+                                  HashSet<FileSource2> selectedItems,
+                                  HashSet<FileSource2> selectedMoveItems) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 FolderHelper::areSourcesTheSame,
                 FolderHelper::getChangePayload)
@@ -83,7 +83,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
     public void onBindViewHolder(@NonNull FileViewHolder holder, int position) {
         viewHolders.add(holder);
 
-        FileSource fileSource = getItem(position);
+        FileSource2 fileSource = getItem(position);
 
         boolean selected = selectedItems.contains(fileSource);
         holder.setSelected(selected);
@@ -94,7 +94,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
         switch (holder.getItemViewType()) {
             case TYPE_MUSIC: {
                 MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
-                MusicFileSource musicFileSource = (MusicFileSource) fileSource;
+                CompositionFileSource2 musicFileSource = (CompositionFileSource2) fileSource;
                 musicViewHolder.bind(musicFileSource, isCoversEnabled);
 
                 Composition composition = musicFileSource.getComposition();
@@ -105,7 +105,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
             }
             case TYPE_FILE: {
                 FolderViewHolder folderViewHolder = (FolderViewHolder) holder;
-                FolderFileSource folderFileSource = (FolderFileSource) fileSource;
+                FolderFileSource2 folderFileSource = (FolderFileSource2) fileSource;
                 folderViewHolder.bind(folderFileSource);
                 break;
             }
@@ -120,17 +120,17 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
             onBindViewHolder(holder, position);
             return;
         }
-        FileSource fileSource = getItem(position);
+        FileSource2 fileSource = getItem(position);
         switch (holder.getItemViewType()) {
             case TYPE_MUSIC: {
                 MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
-                MusicFileSource musicFileSource = (MusicFileSource) fileSource;
+                CompositionFileSource2 musicFileSource = (CompositionFileSource2) fileSource;
                 musicViewHolder.update(musicFileSource, payloads);
                 break;
             }
             case TYPE_FILE: {
                 FolderViewHolder folderViewHolder = (FolderViewHolder) holder;
-                FolderFileSource folderFileSource = (FolderFileSource) fileSource;
+                FolderFileSource2 folderFileSource = (FolderFileSource2) fileSource;
                 folderViewHolder.update(folderFileSource, payloads);
                 break;
             }
@@ -145,8 +145,8 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
 
     @Override
     public int getItemViewType(int position) {
-        FileSource source = getItem(position);
-        if (source instanceof FolderFileSource) {
+        FileSource2 source = getItem(position);
+        if (source instanceof FolderFileSource2) {
             return TYPE_FILE;
         } else {
             return TYPE_MUSIC;
@@ -167,19 +167,19 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
         }
     }
 
-    public void setOnCompositionClickListener(OnPositionItemClickListener<MusicFileSource> onCompositionClickListener) {
+    public void setOnCompositionClickListener(OnPositionItemClickListener<CompositionFileSource2> onCompositionClickListener) {
         this.onCompositionClickListener = onCompositionClickListener;
     }
 
-    public void setOnFolderClickListener(OnPositionItemClickListener<FolderFileSource> onFolderClickListener) {
+    public void setOnFolderClickListener(OnPositionItemClickListener<FolderFileSource2> onFolderClickListener) {
         this.onFolderClickListener = onFolderClickListener;
     }
 
-    public void setOnLongClickListener(OnPositionItemClickListener<FileSource> onLongClickListener) {
+    public void setOnLongClickListener(OnPositionItemClickListener<FileSource2> onLongClickListener) {
         this.onLongClickListener = onLongClickListener;
     }
 
-    public void setOnFolderMenuClickListener(OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener) {
+    public void setOnFolderMenuClickListener(OnViewItemClickListener<FolderFileSource2> onFolderMenuClickListener) {
         this.onFolderMenuClickListener = onFolderMenuClickListener;
     }
 

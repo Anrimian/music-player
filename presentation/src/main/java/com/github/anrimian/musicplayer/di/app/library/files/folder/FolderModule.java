@@ -24,10 +24,10 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 public class FolderModule {
 
     @Nullable
-    private String path;
+    private Long folderId;
 
-    public FolderModule(@Nullable String path) {
-        this.path = path;
+    public FolderModule(@Nullable Long folderId) {
+        this.folderId = folderId;
     }
 
     @Provides
@@ -37,7 +37,7 @@ public class FolderModule {
                                                     DisplaySettingsInteractor displaySettingsInteractor,
                                                     ErrorParser errorParser,
                                                     @Named(UI_SCHEDULER) Scheduler uiScheduler) {
-        return new LibraryFoldersPresenter(path,
+        return new LibraryFoldersPresenter(folderId,
                 interactor,
                 playerInteractor,
                 displaySettingsInteractor,

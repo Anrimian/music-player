@@ -23,6 +23,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
@@ -64,6 +65,7 @@ import moxy.presenter.ProvidePresenter;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
@@ -132,9 +134,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private DialogFragmentRunner<InputTextDialogFragment> newFolderDialogFragmentRunner;
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
 
-    public static LibraryFoldersFragment newInstance(@Nullable String path) {
+    public static LibraryFoldersFragment newInstance(@Nullable Long folderId) {
         Bundle args = new Bundle();
-        args.putString(PATH_ARG, path);
+        args.putLong(ID_ARG, folderId == null? 0 : folderId);
         LibraryFoldersFragment fragment = new LibraryFoldersFragment();
         fragment.setArguments(args);
         return fragment;
@@ -142,13 +144,14 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @SuppressWarnings("ConstantConditions")
     @Nullable
-    private String getPath() {
-        return getArguments().getString(PATH_ARG);
+    private Long getFolderId() {
+        long value = getArguments().getLong(ID_ARG);
+        return value == 0? null: value;
     }
 
     @ProvidePresenter
     LibraryFoldersPresenter providePresenter() {
-        return Components.getLibraryFolderComponent(getPath()).storageLibraryPresenter();
+        return Components.getLibraryFolderComponent(getFolderId()).storageLibraryPresenter();
     }
 
     @Override
@@ -186,8 +189,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter.getSelectedMoveFiles());
         adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
         adapter.setOnFolderClickListener(presenter::onFolderClicked);
-        adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
-        adapter.setOnLongClickListener(presenter::onItemLongClick);
+//        adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
+//        adapter.setOnLongClickListener(presenter::onItemLongClick);
         adapter.setCompositionIconClickListener(presenter::onCompositionIconClicked);
         recyclerView.setAdapter(adapter);
 
@@ -243,7 +246,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 NEW_FOLDER_NAME_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewFileNameForPasteEntered));
 
-        if (getPath() != null) {//TODO root path -> not root path change case
+        if (getFolderId() != null) {//TODO root path -> not root path change case
             SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
             SlidrPanel.replace(contentContainer,
                     () -> {
@@ -317,7 +320,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void updateList(List<FileSource> list) {
+    public void updateList(List<FileSource2> list) {
         adapter.submitList(list);
     }
 
@@ -380,7 +383,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             toolbar.setSearchModeEnabled(false);
             return true;
         }
-        if (getPath() != null) {
+        if (getFolderId() != null) {
             presenter.onBackPathButtonClicked();
             return true;
         }
@@ -471,9 +474,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void goToMusicStorageScreen(String path) {
+    public void goToMusicStorageScreen(Long folderId) {
         FragmentNavigation.from(requireFragmentManager())
-                .addNewFragment(LibraryFoldersFragment.newInstance(path));
+                .addNewFragment(LibraryFoldersFragment.newInstance(folderId));
     }
 
     @Override

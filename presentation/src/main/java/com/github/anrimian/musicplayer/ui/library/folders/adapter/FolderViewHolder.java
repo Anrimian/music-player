@@ -7,8 +7,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
@@ -22,8 +22,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.domain.Payloads.FILES_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
-import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
-import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
+import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
@@ -46,15 +45,15 @@ class FolderViewHolder extends FileViewHolder {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
-    private FolderFileSource folder;
+    private FolderFileSource2 folder;
     private String path;
 
     private boolean selected = false;
 
     FolderViewHolder(ViewGroup parent,
-                     OnPositionItemClickListener<FolderFileSource> onFolderClickListener,
-                     OnViewItemClickListener<FolderFileSource> onMenuClickListener,
-                     OnPositionItemClickListener<FileSource> onLongClickListener) {
+                     OnPositionItemClickListener<FolderFileSource2> onFolderClickListener,
+                     OnViewItemClickListener<FolderFileSource2> onMenuClickListener,
+                     OnPositionItemClickListener<FileSource2> onLongClickListener) {
         super(parent, R.layout.item_storage_folder);
         ButterKnife.bind(this, itemView);
         if (onFolderClickListener != null) {
@@ -94,25 +93,25 @@ class FolderViewHolder extends FileViewHolder {
     }
 
     @Override
-    public FileSource getFileSource() {
+    public FileSource2 getFileSource() {
         return folder;
     }
 
-    void bind(@Nonnull FolderFileSource folderFileSource) {
-        this.folder = folderFileSource;
-        this.path = folderFileSource.getPath();
+    void bind(@Nonnull FolderFileSource2 folderFileSource2) {
+        this.folder = folderFileSource2;
+        this.path = folderFileSource2.getName();
         showFolderName();
         showFilesCount();
     }
 
-    public void update(FolderFileSource folderFileSource, List<Object> payloads) {
-        this.folder = folderFileSource;
-        this.path = folderFileSource.getPath();
-        bind(folderFileSource);
+    public void update(FolderFileSource2 folderFileSource2, List<Object> payloads) {
+        this.folder = folderFileSource2;
+        this.path = folderFileSource2.getName();
+        bind(folderFileSource2);
         for (Object payload: payloads) {
             if (payload instanceof List) {
                 //noinspection SingleStatementInBlock,unchecked
-                update(folderFileSource, (List) payload);
+                update(folderFileSource2, (List) payload);
             }
             if (payload == ITEM_SELECTED) {
                 setSelected(true);
@@ -122,7 +121,7 @@ class FolderViewHolder extends FileViewHolder {
                 setSelected(false);
                 return;
             }
-            if (payload == PATH) {
+            if (payload == NAME) {
                 showFolderName();
             }
             if (payload == FILES_COUNT) {
@@ -140,8 +139,8 @@ class FolderViewHolder extends FileViewHolder {
     }
 
     private void showFolderName() {
-        String displayPath = getFileName(path);
-        tvFolderName.setText(displayPath);
+//        String displayPath = getFileName(path);
+        tvFolderName.setText(path);
     }
 
     private void selectImmediate() {

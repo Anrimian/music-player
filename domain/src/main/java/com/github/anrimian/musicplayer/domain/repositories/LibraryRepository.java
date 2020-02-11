@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
@@ -57,6 +58,8 @@ public interface LibraryRepository {
     Single<String[]> getGenreNames();
 
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
+
+    Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
 

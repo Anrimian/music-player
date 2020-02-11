@@ -72,8 +72,8 @@ public class Components {
         return getInstance().buildLibraryComponent();
     }
 
-    public static FolderComponent getLibraryFolderComponent(@Nullable String path) {
-        return getLibraryRootFolderComponent().folderComponent(new FolderModule(path));
+    public static FolderComponent getLibraryFolderComponent(@Nullable Long folderId) {
+        return getLibraryRootFolderComponent().folderComponent(new FolderModule(folderId));
     }
 
     public static LibraryFilesComponent getLibraryRootFolderComponent() {

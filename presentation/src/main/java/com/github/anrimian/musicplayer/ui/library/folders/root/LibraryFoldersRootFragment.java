@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 public class LibraryFoldersRootFragment extends LibraryFragment
         implements FolderRootView, BackButtonListener {
@@ -104,8 +104,10 @@ public class LibraryFoldersRootFragment extends LibraryFragment
 
     @Override
     public void showFolderScreens(List<String> paths) {
-        navigation.addNewFragmentStack(mapList(paths, LibraryFoldersFragment::newInstance),
+        navigation.addNewFragmentStack(asList(LibraryFoldersFragment.newInstance(null)),
                 R.anim.anim_alpha_appear);
+//        navigation.addNewFragmentStack(mapList(paths, LibraryFoldersFragment::newInstance),
+//                R.anim.anim_alpha_appear);
     }
 
     @Override

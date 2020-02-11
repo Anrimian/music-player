@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
@@ -161,12 +162,18 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
+    @Deprecated
     public Single<Folder> getCompositionsInPath(@Nullable String path,
                                                 @Nullable String searchText) {
         return musicFolderDataSource.getCompositionsInPath(path)
                 .doOnSuccess(folder -> folder.applyFileOrder(getSelectedFileComparatorObservable()))
                 .doOnSuccess(folder -> folder.applySearchFilter(searchText, new FileSourceSearchFilter()))
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId) {
+        return foldersDao.getFilesObservable(folderId);
     }
 
     @Override

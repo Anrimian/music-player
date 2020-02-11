@@ -147,7 +147,7 @@ class StorageCompositionAnalyzer {
         fillIdTree(rootNode, idMap);
 
         if (!idMap.isEmpty()) {
-            throw new IllegalStateException("found missed folders");
+            throw new IllegalStateException("found missed folders");//called on live device, why
         }
 
         return rootNode;

@@ -44,7 +44,7 @@ public class FoldersDaoWrapper {
 
     public Observable<List<FileSource2>> getFilesObservable(Long parentFolderId) {
         Observable<List<FolderFileSource2>> folderObservable =
-                foldersDao.getFolderObservable(parentFolderId);
+                foldersDao.getFoldersObservable(parentFolderId);
 
         Observable<List<CompositionFileSource2>> compositionsObservable =
                 compositionsDao.getCompositionsInFolderObservable(parentFolderId)

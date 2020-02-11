@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
@@ -54,7 +55,7 @@ public interface LibraryFoldersView extends MvpView {
     void goBackToParentFolderScreen();
 
     @StateStrategyType(ListStateStrategy.class)
-    void updateList(List<FileSource> update);
+    void updateList(List<FileSource2> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order folderOrder);
@@ -93,7 +94,7 @@ public interface LibraryFoldersView extends MvpView {
     void showReceiveCompositionsForSendError(ErrorCommand errorCommand);
 
     @StateStrategyType(SkipStrategy.class)
-    void goToMusicStorageScreen(String path);
+    void goToMusicStorageScreen(Long folderId);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showCurrentPlayingComposition(Composition composition);

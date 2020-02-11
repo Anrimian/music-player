@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.business.library;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
@@ -35,8 +36,8 @@ public class LibraryFoldersScreenInteractor {
 
 
     private final BehaviorSubject<Boolean> moveModeSubject = BehaviorSubject.createDefault(false);
-    private final LinkedHashSet<FileSource> filesToCopy = new LinkedHashSet<>();
-    private final LinkedHashSet<FileSource> filesToMove = new LinkedHashSet<>();
+    private final LinkedHashSet<FileSource2> filesToCopy = new LinkedHashSet<>();
+    private final LinkedHashSet<FileSource2> filesToMove = new LinkedHashSet<>();
     private String fromMovePath;
 
     public LibraryFoldersScreenInteractor(LibraryFoldersInteractor foldersInteractor,
@@ -51,6 +52,10 @@ public class LibraryFoldersScreenInteractor {
 
     public Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText) {
         return foldersInteractor.getCompositionsInPath(path, searchText);
+    }
+
+    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId) {
+        return foldersInteractor.getFoldersInFolder(folderId);
     }
 
     public void playAllMusicInPath(@Nullable String path) {
@@ -117,14 +122,14 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.renameFolder(folderPath, newName);
     }
 
-    public void addFilesToMove(String fromMovePath, Collection<FileSource> fileSources) {
+    public void addFilesToMove(String fromMovePath, Collection<FileSource2> fileSources) {
         filesToMove.clear();
         filesToMove.addAll(fileSources);
         this.fromMovePath = fromMovePath;
         moveModeSubject.onNext(true);
     }
 
-    public void addFilesToCopy(String fromMovePath, Collection<FileSource> fileSources) {
+    public void addFilesToCopy(String fromMovePath, Collection<FileSource2> fileSources) {
         filesToCopy.clear();
         filesToCopy.addAll(fileSources);
         this.fromMovePath = fromMovePath;
@@ -171,7 +176,7 @@ public class LibraryFoldersScreenInteractor {
         return moveModeSubject;
     }
 
-    public LinkedHashSet<FileSource> getFilesToMove() {
+    public LinkedHashSet<FileSource2> getFilesToMove() {
         return filesToMove;
     }
 
@@ -196,9 +201,10 @@ public class LibraryFoldersScreenInteractor {
                 .andThen(mediaScannerRepository.runStorageScanner());
     }
 
-    private Completable moveFiles(FileSource fileSource, String path) {
-        return editorRepository.moveFile(fileSource.getPath(), fromMovePath, path)
-                .flatMap(newPath -> libraryRepository.moveFileTo(path, newPath, fileSource))
-                .flatMapCompletable(editorRepository::changeCompositionsFilePath);
+    private Completable moveFiles(FileSource2 fileSource, String path) {
+        return Completable.complete();
+//        return editorRepository.moveFile(fileSource.getPath(), fromMovePath, path)
+//                .flatMap(newPath -> libraryRepository.moveFileTo(path, newPath, fileSource))
+//                .flatMapCompletable(editorRepository::changeCompositionsFilePath);
     }
 }

@@ -4,10 +4,12 @@ public class FolderFileSource2 implements FileSource2 {
 
     private final long id;
     private final String name;
+    private final int filesCount;
 
-    public FolderFileSource2(long id, String name) {
+    public FolderFileSource2(long id, String name, int filesCount) {
         this.id = id;
         this.name = name;
+        this.filesCount = filesCount;
     }
 
     public long getId() {
@@ -16,6 +18,10 @@ public class FolderFileSource2 implements FileSource2 {
 
     public String getName() {
         return name;
+    }
+
+    public int getFilesCount() {
+        return filesCount;
     }
 
     @Override
