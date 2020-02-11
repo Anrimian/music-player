@@ -6,7 +6,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderNode;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -232,8 +232,8 @@ public class StorageCompositionAnalyzerTest {
         analyzer.applyCompositionsData(newCompositions);
 
         List<AddedNode> expectedNodesToInsert = new ArrayList<>();
-        Node<String, Long> node = new Node<>("music", null);
-        node.addNode(new Node<>("new", null));
+        FolderNode<Long> node = new FolderNode<>("music");
+        node.addFolder(new FolderNode<>("new"));
         expectedNodesToInsert.add(new AddedNode(null, node));
         verify(foldersDao).insertFolders(eq(expectedNodesToInsert));
 

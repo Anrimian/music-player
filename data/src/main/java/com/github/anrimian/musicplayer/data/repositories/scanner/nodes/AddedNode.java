@@ -5,9 +5,9 @@ import androidx.annotation.NonNull;
 public class AddedNode {
 
     private final Long folderDbId;
-    private final Node<String, Long> node;
+    private final FolderNode<Long> node;
 
-    public AddedNode(Long folderDbId, Node<String, Long> node) {
+    public AddedNode(Long folderDbId, FolderNode<Long> node) {
         this.folderDbId = folderDbId;
         this.node = node;
     }
@@ -16,7 +16,7 @@ public class AddedNode {
         return folderDbId;
     }
 
-    public Node<String, Long> getNode() {
+    public FolderNode<Long> getNode() {
         return node;
     }
 

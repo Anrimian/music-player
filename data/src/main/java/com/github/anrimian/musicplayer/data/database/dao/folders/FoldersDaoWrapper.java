@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderNode;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
@@ -91,19 +91,18 @@ public class FoldersDaoWrapper {
     }
 
     private void insertNode(Long parentId,
-                            Node<String, Long> nodeToInsert,
+                            FolderNode<Long> nodeToInsert,
                             LongSparseArray<Long> compositionsIdMap) {
-        String name = nodeToInsert.getKey();
+        for (Long id : nodeToInsert.getFiles()) {
+            compositionsIdMap.put(id, parentId);
+        }
+        String name = nodeToInsert.getKeyPath();
         if (name == null) {
-            //compositions case
-            Long id = nodeToInsert.getData();
-            if (id != null) {
-                compositionsIdMap.put(id, parentId);
-            }
             return;
         }
+
         long id = foldersDao.insertFolder(new FolderEntity(parentId, name));
-        for (Node<String, Long> node: nodeToInsert.getNodes()) {
+        for (FolderNode<Long> node: nodeToInsert.getFolders()) {
             insertNode(id, node, compositionsIdMap);
         }
     }

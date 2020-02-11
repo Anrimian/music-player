@@ -48,18 +48,17 @@ class StorageCompositionAnalyzer {
         );
     }
 
-    //we can't merge data by storageId in future, merge by path+filename?
-    synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
+    synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
         FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
         actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?
 
-        excludeCompositions(actualFolderTree, newCompositions);//also remove node from tree
+        excludeCompositions(actualFolderTree, newCompositions);
 
         Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-//        mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);//remake
+        mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
 
         Set<Long> movedCompositions = getAffectedCompositions(foldersToInsert);
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
@@ -75,12 +74,11 @@ class StorageCompositionAnalyzer {
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
         if (hasChanges) {
-            LongSparseArray<Long> compositionIdMap = foldersDao.insertFolders(foldersToInsert);
-            //apply folder ids map<compositionId, folderId>
+            LongSparseArray<Long> compositionIdMap = foldersDao.insertFolders(foldersToInsert);//how to test this?
             compositionsDao.applyChanges(addedCompositions,
                     deletedCompositions,
-                    changedCompositions,
-                    compositionIdMap);
+                    changedCompositions,//move folder change
+                    compositionIdMap);//and this
             //delete old folders
         }
     }
@@ -88,12 +86,12 @@ class StorageCompositionAnalyzer {
     private Set<Long> getAffectedCompositions(List<AddedNode> nodes) {
         Set<Long> result = new LinkedHashSet<>();
         for (AddedNode addedNode: nodes) {
-//            result.addAll(getAllCompositionsInNode(addedNode.getNode()));//remake
+            result.addAll(getAllCompositionsInNode(addedNode.getNode()));
         }
         return result;
     }
 
-    private void mergeFolderTrees(Node<String, Long> actualFolderNode,
+    private void mergeFolderTrees(FolderNode<Long> actualFolderNode,
                                   Node<String, FolderEntity> existsFoldersNode,
                                   List<Long> foldersToDelete,
                                   List<AddedNode> foldersToInsert) {
@@ -103,16 +101,13 @@ class StorageCompositionAnalyzer {
                 continue;//not a folder
             }
 
-            Node<String, Long> actualFolder = actualFolderNode.getChild(key);
+            FolderNode<Long> actualFolder = actualFolderNode.getFolder(key);
             if (actualFolder == null) {
                 foldersToDelete.add(existFolder.getData().getId());
             }
         }
-        for (Node<String, Long> actualFolder : actualFolderNode.getNodes()) {
-            String key = actualFolder.getKey();
-            if (key == null) {
-                continue;//not a folder
-            }
+        for (FolderNode<Long> actualFolder : actualFolderNode.getFolders()) {
+            String key = actualFolder.getKeyPath();
 
             Node<String, FolderEntity> existFolder = existsFoldersNode.getChild(key);
             if (existFolder == null) {
@@ -180,11 +175,17 @@ class StorageCompositionAnalyzer {
                                      LongSparseArray<StorageFullComposition> compositions) {
         String[] ignoresFolders = foldersDao.getIgnoredFolders();
         for (String ignoredFoldersPath: ignoresFolders) {
-            //find and remove
+
             FolderNode<Long> ignoreNode = findFolder(folderTree, ignoredFoldersPath);
             if (ignoreNode == null) {
                 continue;
             }
+
+            FolderNode<Long> parent = ignoreNode.getParentFolder();
+            if (parent != null) {
+                parent.removeFolder(ignoreNode.getKeyPath());
+            }
+
             for (Long id: getAllCompositionsInNode(ignoreNode)) {
                 compositions.remove(id);
             }
