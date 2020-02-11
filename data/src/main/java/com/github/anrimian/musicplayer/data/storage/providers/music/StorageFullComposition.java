@@ -107,14 +107,13 @@ public class StorageFullComposition {
     @NonNull
     @Override
     public String toString() {
-        return "Composition{" +
-                "\n id=" + id +
-                "\n filePath='" + filePath + '\'' +
-                "\n duration=" + duration +
-                "\n size=" + size +
-                "\n dateAdded=" + dateAdded +
-                "\n dateModified=" + dateModified +
-                '}';
+        return "\n StorageFullComposition{" +
+                "\n artist='" + artist + '\'' +
+                ",\n title='" + title + '\'' +
+                ",\n filePath='" + filePath + '\'' +
+                ",\n relativePath='" + relativePath + '\'' +
+                ",\n id=" + id +
+                "\n }";
     }
 
     @Override

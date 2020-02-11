@@ -139,15 +139,6 @@ public class TestDataProvider {
         return compositions;
     }
 
-    public static LongSparseArray<StorageFullComposition> getFakeStorageFullCompositionsMap() {
-        LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>();
-        for (long i = 0; i < 100000; i++) {
-            StorageFullComposition composition = fakeStorageFullComposition(i, "music-" + i);
-            compositions.put(i, composition);
-        }
-        return compositions;
-    }
-
     public static PlayQueueEvent currentItem(int pos) {
         return new PlayQueueEvent(new PlayQueueItem(pos, fakeComposition(pos)), 0L);
     }
@@ -188,9 +179,9 @@ public class TestDataProvider {
     }
 
     public static StorageComposition fakeStorageComposition(long id,
-                                                            String filePath,
-                                                            long createDate,
-                                                            long modifyDate) {
+                                              String filePath,
+                                              long createDate,
+                                              long modifyDate) {
         return new StorageComposition(null,
                 null,
                 null,
@@ -202,39 +193,6 @@ public class TestDataProvider {
                 id,
                 new Date(createDate),
                 new Date(modifyDate));
-    }
-
-    public static StorageFullComposition fakeStorageFullComposition(long id,
-                                                                    String filePath,
-                                                                    long createDate,
-                                                                    long modifyDate) {
-        return new StorageFullComposition(null,
-                null,
-                filePath,
-                "",
-                0,
-                0,
-                id,
-                new Date(createDate),
-                new Date(modifyDate),
-                null);
-    }
-
-    public static StorageFullComposition fakeStorageFullComposition(long id,
-                                                                    String filePath,
-                                                                    String artist,
-                                                                    long createDate,
-                                                                    long modifyDate) {
-        return new StorageFullComposition(artist,
-                null,
-                filePath,
-                "",
-                0,
-                0,
-                id,
-                new Date(createDate),
-                new Date(modifyDate),
-                null);
     }
 
     public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
@@ -293,34 +251,6 @@ public class TestDataProvider {
                 new Date(0));
     }
 
-    public static StorageFullComposition fakeStorageFullComposition(long id, String filePath) {
-        return new StorageFullComposition(null,
-                null,
-                filePath,
-                "",
-                0,
-                0,
-                id,
-                new Date(0),
-                new Date(0),
-                null);
-    }
-
-    public static StorageFullComposition fakeStorageFullComposition(long id,
-                                                                    String filePath,
-                                                                    String relativePath) {
-        return new StorageFullComposition(null,
-                null,
-                filePath,
-                relativePath,
-                0,
-                0,
-                id,
-                new Date(0),
-                new Date(0),
-                null);
-    }
-
     public static Composition fakeCompositionWithTitle(long id, String title) {
         return new Composition(null,
                 title,
@@ -375,5 +305,52 @@ public class TestDataProvider {
         entity.setPosition(position);
         entity.setShuffledPosition(shuffledPosition);
         return entity;
+    }
+
+    public static StorageFullComposition fakeStorageFullComposition(long id, String title) {
+        return new StorageCompositionBuilder(id, title).build();
+    }
+
+    public static class StorageCompositionBuilder {
+
+        private long id;
+        private String title;
+        private String relativePath = "";
+        private Date createDate = new Date(0);
+        private Date modifyDate = new Date(0);
+
+        public StorageCompositionBuilder(long id, String title) {
+            this.id = id;
+            this.title = title;
+        }
+
+        public StorageCompositionBuilder relativePath(String relativePath) {
+            this.relativePath = relativePath;
+            return this;
+        }
+
+
+        public StorageCompositionBuilder createDate(long date) {
+            createDate = new Date(date);
+            return this;
+        }
+
+        public StorageCompositionBuilder modifyDate(long date) {
+            modifyDate = new Date(date);
+            return this;
+        }
+
+        public StorageFullComposition build() {
+            return new StorageFullComposition(null,
+                    title,
+                    "",
+                    relativePath,
+                    0,
+                    0,
+                    id,
+                    createDate,
+                    modifyDate,
+                    null);
+        }
     }
 }

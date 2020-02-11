@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
+import com.github.anrimian.musicplayer.data.utils.TestDataProvider.StorageCompositionBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +57,10 @@ public class StorageCompositionAnalyzerTest {
 
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         newCompositions.put(1, fakeStorageFullComposition(1, "music-1"));
-        StorageFullComposition changedComposition = fakeStorageFullComposition(3, "music-3", "new artist", 1L, 10000L);
+        StorageFullComposition changedComposition = new StorageCompositionBuilder(3, "changed composition")
+                .createDate(1L)
+                .modifyDate(10000L)
+                .build();
         newCompositions.put(3L, changedComposition);
         newCompositions.put(4, fakeStorageFullComposition(4, "music-4"));
 
@@ -76,7 +80,10 @@ public class StorageCompositionAnalyzerTest {
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(map);
 
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
-        StorageFullComposition changedComposition = fakeStorageFullComposition(1, "new path", 1, 1000);
+        StorageFullComposition changedComposition = new StorageCompositionBuilder(1, "new title")
+                .createDate(1L)
+                .modifyDate(1000L)
+                .build();
         newCompositions.put(1L, changedComposition);
 
         analyzer.applyCompositionsData(newCompositions);
@@ -187,20 +194,22 @@ public class StorageCompositionAnalyzerTest {
     public void excludeFoldersTest() {
         String[] excludedFolders = {"music/wazap", "rubbish"};
 
-        when(foldersDao.getIgnoredFolders()).thenReturn(excludedFolders);
+        when(foldersDaoWrapper.getIgnoredFolders()).thenReturn(excludedFolders);
 
-        StorageFullComposition expectedComposition = fakeStorageFullComposition(4, "0/etc/sdcard/music-4", "0/etc/sdcard");
+        StorageFullComposition expectedComposition = new StorageCompositionBuilder(4, "music-4")
+                .relativePath("0/etc/sdcard")
+                .build();
 
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
-        newCompositions.put(1, fakeStorageFullComposition(1, "0/etc/sdcard/music/wazap/music-1", "0/etc/sdcard/music/wazap"));
-        newCompositions.put(2, fakeStorageFullComposition(2, "0/etc/sdcard/music/wazap/music-2", "0/etc/sdcard/music/wazap"));
-        newCompositions.put(3, fakeStorageFullComposition(3, "0/etc/sdcard/music/wazap/music-3", "0/etc/sdcard/music/wazap"));
+        newCompositions.put(1, new StorageCompositionBuilder(1, "music-1").relativePath("0/etc/sdcard/music/wazap").build());
+        newCompositions.put(2, new StorageCompositionBuilder(2, "music-2").relativePath("0/etc/sdcard/music/wazap").build());
+        newCompositions.put(3, new StorageCompositionBuilder(3, "music-3").relativePath("0/etc/sdcard/music/wazap").build());
         newCompositions.put(4, expectedComposition);
-        newCompositions.put(5, fakeStorageFullComposition(5, "0/etc/sdcard/rubbish", "0/etc/sdcard/rubbish"));
+        newCompositions.put(5, new StorageCompositionBuilder(5, "music-5").relativePath("0/etc/sdcard/rubbish").build());
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao).applyChanges(eq(asList(expectedComposition)), eq(emptyList()), eq(emptyList()), any());
+        verify(compositionsDao).applyChanges(eq(asList(expectedComposition)), eq(emptyList()), eq(emptyList()));
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -121,11 +123,13 @@ public class Node<K, V> {
         }
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Node{" +
                 "key=" + key +
                 ", data=" + data +
+                ", nodesCount=" + nodes.size() +
                 '}';
     }
 
@@ -136,14 +140,12 @@ public class Node<K, V> {
 
         Node<?, ?> node = (Node<?, ?>) o;
 
-        if (key != null ? !key.equals(node.key) : node.key != null) return false;
-        return data != null ? data.equals(node.data) : node.data == null;
+        return key.equals(node.key);
     }
 
     @Override
     public int hashCode() {
-        int result = key != null ? key.hashCode() : 0;
-        result = 31 * result + (data != null ? data.hashCode() : 0);
-        return result;
+        return key.hashCode();
     }
+
 }

@@ -10,6 +10,8 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderInfo;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeBuilder;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderNode;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeBuilder;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -50,13 +52,10 @@ class StorageCompositionAnalyzer {
 
     //we can't merge data by storageId in future, merge by path+filename?
     synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {
-        //remake nodes, split into two lists
-        Node<String, Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));//add folder name to compositions?
-        actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?
+        FolderNode<Long> folderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
+        folderTree = cutEmptyRootNodes(folderTree);//save excluded part?
 
-        excludeCompositions(actualFolderTree, newCompositions);//also remove node from tree
-
-        Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());
+        Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());//also remove node from tree
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
@@ -177,11 +176,12 @@ class StorageCompositionAnalyzer {
         }
     }
 
-    private void excludeCompositions(Node<String, Long> folderTree,
+    private void excludeCompositions(FolderNode<Long> folderTree,
                                      LongSparseArray<StorageFullComposition> compositions) {
         String[] ignoresFolders = foldersDao.getIgnoredFolders();
         for (String ignoredFoldersPath: ignoresFolders) {
-            Node<String, Long> ignoreNode = findNode(folderTree, ignoredFoldersPath);
+            //find and remove
+            FolderNode<Long> ignoreNode = findFolder(folderTree, ignoredFoldersPath);
             if (ignoreNode == null) {
                 continue;
             }
@@ -191,23 +191,23 @@ class StorageCompositionAnalyzer {
         }
     }
 
-    private Node<String, Long> cutEmptyRootNodes(Node<String, Long> root) {
-        Node<String, Long> found = root;
+    private FolderNode<Long> cutEmptyRootNodes(FolderNode<Long> root) {
+        FolderNode<Long> found = root;
         while (isEmptyFolderNode(found)) {
-            found = found.getFirstChild();
+            found = found.getFirstFolder();
         }
         return found;
     }
 
-    private boolean isEmptyFolderNode(Node<String, Long> node) {
-        return node.getNodes().size() == 1 && node.getData() == null;
+    private boolean isEmptyFolderNode(FolderNode<Long> node) {
+        return node.getFolders().size() == 1 && node.getFiles().isEmpty();
     }
 
     @Nullable
-    private Node<String, Long> findNode(Node<String, Long> folderTree, String path) {
-        Node<String, Long> currentNode = folderTree;
+    private FolderNode<Long> findFolder(FolderNode<Long> folderTree, String path) {
+        FolderNode<Long> currentNode = folderTree;
         for (String partialPath: path.split("/")) {
-            currentNode = currentNode.getChild(partialPath);
+            currentNode = currentNode.getFolder(partialPath);
 
             if (currentNode == null) {
                 //perhaps we can implement find. Find up and down on tree.
@@ -215,6 +215,14 @@ class StorageCompositionAnalyzer {
             }
         }
         return currentNode;
+    }
+
+    private List<Long> getAllCompositionsInNode(FolderNode<Long> parentNode) {
+        LinkedList<Long> result = new LinkedList<>(parentNode.getFiles());
+        for (FolderNode<Long> node: parentNode.getFolders()) {
+            result.addAll(getAllCompositionsInNode(node));
+        }
+        return result;
     }
 
     private List<FolderInfo> getAllFoldersInTree(Node<String, Long> parentNode) {
@@ -228,37 +236,6 @@ class StorageCompositionAnalyzer {
                 );
             } else {
                 result.addAll(getAllFoldersInTree(node));
-            }
-        }
-        return result;
-    }
-
-    private void forEachNode(Node<String, Long> parentNode, Callback<Node<String, Long>> action) {
-        for (Node<String, Long> node: parentNode.getNodes()) {
-            action.call(node);
-            if (node.getData() == null) {
-                forEachNode(node, action);
-            }
-        }
-    }
-
-    private List<Long> getCompositionsInNode(Node<String, Long> parentNode) {
-        LinkedList<Long> result = new LinkedList<>();
-        for (Node<String, Long> node: parentNode.getNodes()) {
-            if (node.getData() != null) {
-                result.add(node.getData());
-            }
-        }
-        return result;
-    }
-
-    private Set<Long> getAllCompositionsInNode(Node<String, Long> parentNode) {
-        Set<Long> result = new LinkedHashSet<>();
-        for (Node<String, Long> node: parentNode.getNodes()) {
-            if (node.getData() == null) {
-                result.addAll(getAllCompositionsInNode(node));
-            } else {
-                result.add(node.getData());
             }
         }
         return result;
