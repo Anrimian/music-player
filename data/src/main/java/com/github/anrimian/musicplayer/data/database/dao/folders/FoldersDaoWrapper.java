@@ -91,18 +91,18 @@ public class FoldersDaoWrapper {
         });
     }
 
-    private void insertNode(Long parentId,
+    private void insertNode(Long dbParentId,
                             FolderNode<Long> nodeToInsert,
                             LongSparseArray<Long> compositionsIdMap) {
-        for (Long id : nodeToInsert.getFiles()) {
-            compositionsIdMap.put(id, parentId);
-        }
         String name = nodeToInsert.getKeyPath();
         if (name == null) {
             return;
         }
 
-        long id = foldersDao.insertFolder(new FolderEntity(parentId, name));
+        long id = foldersDao.insertFolder(new FolderEntity(dbParentId, name));
+        for (Long compositionId : nodeToInsert.getFiles()) {
+            compositionsIdMap.put(compositionId, id);
+        }
         for (FolderNode<Long> node: nodeToInsert.getFolders()) {
             insertNode(id, node, compositionsIdMap);
         }

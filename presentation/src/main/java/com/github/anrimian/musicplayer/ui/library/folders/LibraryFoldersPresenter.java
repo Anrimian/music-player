@@ -206,7 +206,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onBackPathButtonClicked() {
-        if (path == null) {
+        if (folderId == null) {
             throw new IllegalStateException("can not go back in root screen");
         }
         closeSelectionMode();

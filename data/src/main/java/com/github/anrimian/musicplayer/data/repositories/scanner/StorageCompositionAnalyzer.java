@@ -38,6 +38,7 @@ class StorageCompositionAnalyzer {
 
     private final FolderTreeBuilder<StorageFullComposition, Long> folderTreeBuilder;
     private final NodeTreeBuilder nodeTreeBuilder = new NodeTreeBuilder();
+    private final FolderMerger folderMerger = new FolderMerger();
 
     StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
                                FoldersDaoWrapper foldersDao) {
@@ -60,9 +61,9 @@ class StorageCompositionAnalyzer {
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-        mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);//test cover
+        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
 
-        Set<Long> movedCompositions = getAffectedCompositions(foldersToInsert);
+        Set<Long> movedCompositions = getAffectedCompositions(foldersToInsert);//move to merge
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();
@@ -91,40 +92,6 @@ class StorageCompositionAnalyzer {
             result.addAll(getAllCompositionsInNode(addedNode.getNode()));
         }
         return result;
-    }
-
-    private void mergeFolderTrees(FolderNode<Long> actualFolderNode,
-                                  Node<String, StorageFolder> existsFoldersNode,
-                                  List<Long> foldersToDelete,
-                                  List<AddedNode> foldersToInsert) {
-        for (Node<String, StorageFolder> existFolder : existsFoldersNode.getNodes()) {
-            String key = existFolder.getKey();
-            if (key == null) {
-                continue;//not a folder
-            }
-
-            FolderNode<Long> actualFolder = actualFolderNode.getFolder(key);
-            if (actualFolder == null) {
-                foldersToDelete.add(existFolder.getData().getId());
-            }
-        }
-        for (FolderNode<Long> actualFolder : actualFolderNode.getFolders()) {
-            String key = actualFolder.getKeyPath();
-
-            Node<String, StorageFolder> existFolder = existsFoldersNode.getChild(key);
-            if (existFolder == null) {
-                Long parentId = null;
-                StorageFolder entity = existsFoldersNode.getData();
-                if (entity != null) {
-                    parentId = entity.getId();
-                }
-
-                AddedNode addedNode = new AddedNode(parentId, actualFolder);
-                foldersToInsert.add(addedNode);//we add unnecessary child folders, hm
-            } else {
-                mergeFolderTrees(actualFolder, existsFoldersNode, foldersToDelete, foldersToInsert);
-            }
-        }
     }
 
     private void excludeCompositions(FolderNode<Long> folderTree,
