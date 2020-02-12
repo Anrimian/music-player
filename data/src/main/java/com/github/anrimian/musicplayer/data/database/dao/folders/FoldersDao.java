@@ -30,15 +30,15 @@ public interface FoldersDao {
     @Query("DELETE FROM ignored_folders WHERE relativePath = :path")
     void deleteIgnoredFolder(String path);
 
-    /*    WITH RECURSIVE allChildFolders(childFolderId) AS (
-    SELECT id FROM folders WHERE parentId = 1
-    UNION
-    SELECT id FROM folders, allChildFolders WHERE parentId = allChildFolders.childFolderId
-)
-    SELECT parentId, id, name,
-(SELECT count() FROM compositions WHERE folderId IN allChildFolders) as filesCount
-    FROM folders, allChildFolders
-    WHERE parentId IS NULL AND id = 1*/
+/*    @Query("WITH RECURSIVE allChildFolders(childFolderId) AS (" +
+            "SELECT id FROM folders WHERE id = :parentId " +
+            "UNION ALL " +
+            "SELECT id FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId " +
+            ") " +
+            "SELECT id, name, " +
+            "(SELECT count() FROM compositions INNER JOIN allChildFolders ON folderId = allChildFolders.childFolderId) as filesCount " +
+            "FROM folders " +
+            "WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL) ")//+ order by - later*/
 
     @Query("SELECT id, name, " +
             "(SELECT count() FROM compositions WHERE folderId = folders.id) as filesCount " +//not right, select recursive
