@@ -7,6 +7,7 @@ import androidx.room.Query;
 
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
+import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 
@@ -53,7 +54,7 @@ public interface FoldersDao {
     Observable<List<FolderFileSource2>> getFolderObservable(Long folderId);
 
     @Query("SELECT * FROM folders")
-    List<FolderEntity> getAllFolders();
+    List<StorageFolder> getAllFolders();
 
     @Insert
     long insertFolder(FolderEntity entity);

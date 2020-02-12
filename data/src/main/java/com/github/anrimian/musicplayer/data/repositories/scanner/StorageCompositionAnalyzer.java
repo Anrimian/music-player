@@ -4,13 +4,14 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
+import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
+import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
+import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderTreeBuilder;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderInfo;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderTreeBuilder;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.NodeTreeBuilder;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -36,6 +37,7 @@ class StorageCompositionAnalyzer {
     private final FoldersDaoWrapper foldersDao;
 
     private final FolderTreeBuilder<StorageFullComposition, Long> folderTreeBuilder;
+    private final NodeTreeBuilder nodeTreeBuilder = new NodeTreeBuilder();
 
     StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
                                FoldersDaoWrapper foldersDao) {
@@ -54,11 +56,11 @@ class StorageCompositionAnalyzer {
 
         excludeCompositions(actualFolderTree, newCompositions);
 
-        Node<String, FolderEntity> existsFolders = createTreeFromIdMap(foldersDao.getAllFolders());
+        Node<String, StorageFolder> existsFolders = nodeTreeBuilder.createTreeFromIdMap(foldersDao.getAllFolders());
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-        mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
+        mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);//test cover
 
         Set<Long> movedCompositions = getAffectedCompositions(foldersToInsert);
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
@@ -92,10 +94,10 @@ class StorageCompositionAnalyzer {
     }
 
     private void mergeFolderTrees(FolderNode<Long> actualFolderNode,
-                                  Node<String, FolderEntity> existsFoldersNode,
+                                  Node<String, StorageFolder> existsFoldersNode,
                                   List<Long> foldersToDelete,
                                   List<AddedNode> foldersToInsert) {
-        for (Node<String, FolderEntity> existFolder : existsFoldersNode.getNodes()) {
+        for (Node<String, StorageFolder> existFolder : existsFoldersNode.getNodes()) {
             String key = existFolder.getKey();
             if (key == null) {
                 continue;//not a folder
@@ -109,10 +111,10 @@ class StorageCompositionAnalyzer {
         for (FolderNode<Long> actualFolder : actualFolderNode.getFolders()) {
             String key = actualFolder.getKeyPath();
 
-            Node<String, FolderEntity> existFolder = existsFoldersNode.getChild(key);
+            Node<String, StorageFolder> existFolder = existsFoldersNode.getChild(key);
             if (existFolder == null) {
                 Long parentId = null;
-                FolderEntity entity = existsFoldersNode.getData();
+                StorageFolder entity = existsFoldersNode.getData();
                 if (entity != null) {
                     parentId = entity.getId();
                 }
@@ -122,52 +124,6 @@ class StorageCompositionAnalyzer {
             } else {
                 mergeFolderTrees(actualFolder, existsFoldersNode, foldersToDelete, foldersToInsert);
             }
-        }
-    }
-
-    private Node<String, FolderEntity> createTreeFromIdMap(List<FolderEntity> folders) {
-        LongSparseArray<List<FolderEntity>> idMap = new LongSparseArray<>();
-
-        Node<String, FolderEntity> rootNode = new Node<>(null, null);
-
-        for (FolderEntity entity: folders) {
-            Long parentId = entity.getParentId();
-            if (parentId == null) {
-                rootNode.addNode(new Node<>(entity.getName(), entity));
-            } else {
-                List<FolderEntity> childList = idMap.get(parentId);
-                if (childList == null) {
-                    childList = new LinkedList<>();
-                    idMap.put(parentId, childList);
-                }
-                childList.add(entity);
-            }
-        }
-
-        fillIdTree(rootNode, idMap);
-
-        if (!idMap.isEmpty()) {
-            throw new IllegalStateException("found missed folders");//called on live device, why
-        }
-
-        return rootNode;
-    }
-
-    private void fillIdTree(Node<String, FolderEntity> targetNode,
-                            LongSparseArray<List<FolderEntity>> idMap) {
-        for (Node<String, FolderEntity> childNode: targetNode.getNodes()) {
-            FolderEntity folderEntity = childNode.getData();
-            long id = folderEntity.getId();
-            List<FolderEntity> childList = idMap.get(id);
-            if (childList == null) {
-                break;
-            }
-            for (FolderEntity entity: childList) {
-                Node<String, FolderEntity> node = new Node<>(entity.getName(), entity);
-                childNode.addNode(node);
-                fillIdTree(node, idMap);
-            }
-            idMap.remove(id);
         }
     }
 

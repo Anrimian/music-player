@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
+package com.github.anrimian.musicplayer.data.repositories.scanner.folders;
 
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;

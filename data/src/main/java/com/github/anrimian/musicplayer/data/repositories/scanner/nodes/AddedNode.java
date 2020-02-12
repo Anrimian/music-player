@@ -2,6 +2,8 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 
 import androidx.annotation.NonNull;
 
+import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
+
 public class AddedNode {
 
     private final Long folderDbId;

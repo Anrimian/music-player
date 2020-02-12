@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
+package com.github.anrimian.musicplayer.data.repositories.scanner.folders;
 
 import org.junit.Test;
 

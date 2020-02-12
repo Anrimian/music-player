@@ -8,8 +8,9 @@ import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
+import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
+import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderNode;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
@@ -66,7 +67,7 @@ public class FoldersDaoWrapper {
                 .map(list -> list.get(0));
     }
 
-    public List<FolderEntity> getAllFolders() {
+    public List<StorageFolder> getAllFolders() {
         return foldersDao.getAllFolders();
     }
 
