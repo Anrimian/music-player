@@ -34,6 +34,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final Observable<PlayQueueEvent> currentItemObservable;
 
     private boolean firstItemEmitted;
+    private boolean consumeDeletedItemEvent = false;
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
                                    SettingsRepository settingsPreferences,
@@ -69,11 +70,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         if (compositions.isEmpty()) {
             return Completable.complete();
         }
-        return Single.fromCallable(() -> playQueueDao.insertNewPlayQueue(compositions,
-                settingsPreferences.isRandomPlayingEnabled(),
-                startPosition)
-        ).doOnSuccess(this::setCurrentItem)//who's first here run run run
-                .ignoreElement()
+        return Completable.fromAction(() -> insertNewQueue(compositions, startPosition))
                 .subscribeOn(scheduler);
     }
 
@@ -204,6 +201,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .subscribe();
     }
 
+    private void insertNewQueue(List<Composition> compositions, int startPosition) {
+        consumeDeletedItemEvent = true;
+        long itemId = playQueueDao.insertNewPlayQueue(compositions,
+                settingsPreferences.isRandomPlayingEnabled(),
+                startPosition);
+        setCurrentItem(itemId);
+        consumeDeletedItemEvent = false;
+    }
+
     private Observable<PlayQueueEvent> getPlayQueueEvent(long id) {
         if (id == NO_ITEM) {
             return Observable.just(new PlayQueueEvent(null));
@@ -218,6 +224,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Observable.create(emitter -> {
             PlayQueueItem item = itemOpt.getValue();
             if (item == null) {
+                if (consumeDeletedItemEvent) {
+                    return;
+                }
                 //handle deleted item
                 boolean isRandom = settingsPreferences.isRandomPlayingEnabled();
                 int lastPosition = uiStatePreferences.getCurrentItemLastPosition();
@@ -225,7 +234,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 if (nextItemId == null) {
                     nextItemId = playQueueDao.getItemAtPosition(0, isRandom);
                 }
-                setCurrentItem(nextItemId);//can call after queue switch, for old queue
+                setCurrentItem(nextItemId);
                 return;
             }
             emitter.onNext(item);
