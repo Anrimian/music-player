@@ -59,8 +59,9 @@ public class LibraryFoldersInteractor {
         return libraryRepository.getCompositionsInPath(path, searchText);
     }
 
-    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId) {
-        return libraryRepository.getFoldersInFolder(folderId);
+    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId,
+                                                            @Nullable String searchQuery) {
+        return libraryRepository.getFoldersInFolder(folderId, searchQuery);
     }
 
     public Observable<FolderFileSource2> getFolderObservable(long folderId) {

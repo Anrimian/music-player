@@ -60,7 +60,8 @@ public interface LibraryRepository {
 
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
-    Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId);
+    Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId,
+                                                     @Nullable String searchQuery);
 
     Observable<FolderFileSource2> getFolderObservable(long folderId);
 

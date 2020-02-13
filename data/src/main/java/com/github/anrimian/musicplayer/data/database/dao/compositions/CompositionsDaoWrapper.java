@@ -86,8 +86,34 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getAllObservable(sqlQuery);
     }
 
-    public Observable<List<Composition>> getCompositionsInFolderObservable(Long folderId) {
-        return compositionsDao.getAllInFolderObservable(folderId);
+    public Observable<List<Composition>> getCompositionsInFolderObservable(Long folderId,
+                                                                           Order order,
+                                                                           @Nullable String searchText) {
+        StringBuilder query = new StringBuilder("SELECT " +
+                "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
+                "(SELECT name FROM albums WHERE id = albumId) as album,  " +
+                "title as title,  " +
+                "filePath as filePath,  " +
+                "duration as duration,  " +
+                "size as size,  " +
+                "id as id,  " +
+                "storageId as storageId,  " +
+                "dateAdded as dateAdded,  " +
+                "dateModified as dateModified,  " +
+                "corruptionType as corruptionType  " +
+                "FROM compositions");
+        String searchQuery = getSearchQuery(searchText);
+        query.append(searchQuery);
+        if (isEmpty(searchQuery)) {
+            query.append(" WHERE ");
+        } else {
+            query.append(" AND ");
+        }
+        query.append("folderId = ");
+        query.append(folderId);
+        query.append(getOrderQuery(order));
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString());
+        return compositionsDao.getAllInFolderObservable(sqlQuery);
     }
 
     public List<Composition> getAll() {

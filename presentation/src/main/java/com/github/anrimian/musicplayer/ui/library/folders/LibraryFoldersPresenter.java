@@ -563,7 +563,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             getViewState().showLoading();
         }
         dispose(folderDisposable, presenterDisposable);
-        folderDisposable = interactor.getFoldersInFolder(folderId)
+        folderDisposable = interactor.getFoldersInFolder(folderId, searchText)
                 .observeOn(uiScheduler)
                 .subscribe(this::onFilesLoaded, this::onMusicLoadingError);
         presenterDisposable.add(folderDisposable);

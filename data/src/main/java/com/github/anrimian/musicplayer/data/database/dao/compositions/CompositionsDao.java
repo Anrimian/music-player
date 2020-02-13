@@ -7,6 +7,8 @@ import androidx.room.RawQuery;
 import androidx.room.Update;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -57,25 +59,11 @@ public interface CompositionsDao {
             "LIMIT 1")
     Observable<List<FullComposition>> getCompositionObservable(long id);
 
-    @RawQuery(observedEntities = CompositionEntity.class)
+    @RawQuery(observedEntities = { CompositionEntity.class, ArtistEntity.class, AlbumEntity.class })
     Observable<List<Composition>> getAllObservable(SupportSQLiteQuery query);
 
-    //temp
-    @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = compositions.artistId) as artist, " +
-            "compositions.title as title, " +
-            "(SELECT name FROM albums WHERE id = compositions.albumId) as album, " +
-            "compositions.filePath as filePath, " +
-            "compositions.duration as duration, " +
-            "compositions.size as size, " +
-            "compositions.id as id, " +
-            "compositions.storageId as storageId, " +
-            "compositions.dateAdded as dateAdded, " +
-            "compositions.dateModified as dateModified, " +
-            "compositions.corruptionType as corruptionType " +
-            "FROM compositions " +
-            "WHERE folderId = :folderId")
-    Observable<List<Composition>> getAllInFolderObservable(Long folderId);
+    @RawQuery(observedEntities = { CompositionEntity.class, ArtistEntity.class, AlbumEntity.class })
+    Observable<List<Composition>> getAllInFolderObservable(SupportSQLiteQuery query);
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +

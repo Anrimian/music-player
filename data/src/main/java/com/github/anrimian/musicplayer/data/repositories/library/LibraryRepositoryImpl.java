@@ -173,8 +173,10 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId) {
-        return foldersDao.getFilesObservable(folderId);
+    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId,
+                                                            @Nullable String searchQuery) {
+        return settingsPreferences.getFolderOrderObservable()
+                .switchMap(order -> foldersDao.getFilesObservable(folderId, order, searchQuery));
     }
 
     @Override

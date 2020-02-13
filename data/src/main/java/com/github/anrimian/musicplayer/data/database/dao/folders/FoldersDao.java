@@ -4,7 +4,10 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RawQuery;
+import androidx.sqlite.db.SupportSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
@@ -30,17 +33,8 @@ public interface FoldersDao {
     @Query("DELETE FROM ignored_folders WHERE relativePath = :path")
     void deleteIgnoredFolder(String path);
 
-    @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//seems can't in recursive queries inspection for now
-    @Query("WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
-            "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)" +
-            "UNION " +
-            "SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
-            ")" +
-            "SELECT id, name, " +
-            "(SELECT count() FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id)) as filesCount " +
-            "FROM folders " +
-            "WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL) ")//+ order by - later
-    Observable<List<FolderFileSource2>> getFoldersObservable(Long parentId);
+    @RawQuery(observedEntities = { CompositionEntity.class, FolderEntity.class })
+    Observable<List<FolderFileSource2>> getFoldersObservable(SupportSQLiteQuery query);
 
     @Query("SELECT id, name, " +
             "0 as filesCount " +//we don't use it for now

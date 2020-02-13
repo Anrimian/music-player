@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.database.dao.folders;
 
 import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
@@ -15,6 +16,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Composi
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +25,7 @@ import java.util.List;
 import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class FoldersDaoWrapper {
 
@@ -43,13 +46,20 @@ public class FoldersDaoWrapper {
         return null;
     }
 
-    public Observable<List<FileSource2>> getFilesObservable(Long parentFolderId) {
-        Observable<List<FolderFileSource2>> folderObservable =
-                foldersDao.getFoldersObservable(parentFolderId);
+    public Observable<List<FileSource2>> getFilesObservable(Long parentFolderId,
+                                                            Order order,
+                                                            @Nullable String searchText) {
+        Observable<List<FolderFileSource2>> folderObservable = getFoldersObservable(
+                parentFolderId,
+                order,
+                searchText);
 
         Observable<List<CompositionFileSource2>> compositionsObservable =
-                compositionsDao.getCompositionsInFolderObservable(parentFolderId)
-                        .map(list -> mapList(list, CompositionFileSource2::new));
+                compositionsDao.getCompositionsInFolderObservable(
+                        parentFolderId,
+                        order,
+                        searchText
+                ).map(list -> mapList(list, CompositionFileSource2::new));
 
         return Observable.combineLatest(folderObservable,
                 compositionsObservable,
@@ -118,6 +128,55 @@ public class FoldersDaoWrapper {
 
     public void deleteIgnoredFolder(IgnoredFolder folder) {
         foldersDao.deleteIgnoredFolder(folder.getRelativePath());
+    }
+
+    private Observable<List<FolderFileSource2>> getFoldersObservable(Long parentFolderId,
+                                                                     Order order,
+                                                                     @Nullable String searchText) {
+        String query = "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
+                "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)" +
+                "UNION " +
+                "SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
+                ")" +
+                "SELECT id, name, " +
+                "(SELECT count() FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id)) as filesCount " +
+                "FROM folders " +
+                "WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)";
+
+        query += getSearchQuery(searchText);
+        query += getOrderQuery(order);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        return foldersDao.getFoldersObservable(sqlQuery);
+    }
+
+    private String getOrderQuery(Order order) {
+        StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
+        switch (order.getOrderType()) {
+            case ALPHABETICAL: {
+                orderQuery.append("name");
+                break;
+            }
+            case ADD_TIME: {
+                orderQuery.append("(SELECT max(dateAdded) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
+                break;
+            }
+            default: throw new IllegalStateException("unknown order type" + order);
+        }
+        orderQuery.append(" ");
+        orderQuery.append(order.isReversed()? "DESC" : "ASC");
+        return orderQuery.toString();
+    }
+
+    private String getSearchQuery(String searchText) {
+        if (isEmpty(searchText)) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(" AND ");
+        sb.append("name NOTNULL AND name LIKE '%");
+        sb.append(searchText);
+        sb.append("%'");
+
+        return sb.toString();
     }
 
 }
