@@ -30,24 +30,20 @@ public interface FoldersDao {
     @Query("DELETE FROM ignored_folders WHERE relativePath = :path")
     void deleteIgnoredFolder(String path);
 
-/*    @Query("WITH RECURSIVE allChildFolders(childFolderId) AS (" +
-            "SELECT id FROM folders WHERE id = :parentId " +
-            "UNION ALL " +
-            "SELECT id FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId " +
-            ") " +
+    @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//seems can't in recursive queries inspection for now
+    @Query("WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
+            "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)" +
+            "UNION " +
+            "SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
+            ")" +
             "SELECT id, name, " +
-            "(SELECT count() FROM compositions INNER JOIN allChildFolders ON folderId = allChildFolders.childFolderId) as filesCount " +
-            "FROM folders " +
-            "WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL) ")//+ order by - later*/
-
-    @Query("SELECT id, name, " +
-            "(SELECT count() FROM compositions WHERE folderId = folders.id) as filesCount " +//not right, select recursive
+            "(SELECT count() FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id)) as filesCount " +
             "FROM folders " +
             "WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL) ")//+ order by - later
     Observable<List<FolderFileSource2>> getFoldersObservable(Long parentId);
 
     @Query("SELECT id, name, " +
-            "(SELECT count() FROM compositions WHERE folderId = folders.id) as filesCount " +
+            "0 as filesCount " +//we don't use it for now
             "FROM folders " +
             "WHERE id = :folderId OR (id IS NULL AND :folderId IS NULL) " +
             "LIMIT 1")
