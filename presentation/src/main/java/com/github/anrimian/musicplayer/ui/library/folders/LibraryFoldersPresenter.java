@@ -115,17 +115,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        if (path == null) {
-            getViewState().hideBackPathButton();
-        } else {
-            getViewState().showBackPathButton(path);
-        }
         getViewState().showQueueActions(false);
         getViewState().showSearchMode(false);
 
-//        loadMusic();
-        subscribeOnFolders();
         subscribeOnFolder();
+        subscribeOnFolders();
         subscribeOnUiSettings();
         subscribeOnMoveEnabledState();
     }
@@ -210,7 +204,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             throw new IllegalStateException("can not go back in root screen");
         }
         closeSelectionMode();
-        goBackToPreviousPath();
+        goBackToPreviousScreen();
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
@@ -286,7 +280,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     void onFolderClicked(int position, FolderFileSource2 folder) {
 //        processMultiSelectClick(position, folder, () ->
-                getViewState().goToMusicStorageScreen(folder.getId());
+        getViewState().goToMusicStorageScreen(folder.getId());
 //        );
     }
 
@@ -544,14 +538,24 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         }
     }
 
-    private void goBackToPreviousPath() {
-        if (path != null) {
+    private void goBackToPreviousScreen() {
+        if (folderId != null) {
             getViewState().goBackToParentFolderScreen();
         }
     }
 
     private void subscribeOnFolder() {
-
+        if (folderId == null) {
+            getViewState().hideFolderInfo();
+            return;
+        }
+        presenterDisposable.add(interactor.getFolderObservable(folderId)
+                .observeOn(uiScheduler)
+                .subscribe(
+                        getViewState()::showFolderInfo,
+                        this::onDefaultError,
+                        this::goBackToPreviousScreen)
+        );
     }
 
     private void subscribeOnFolders() {
@@ -620,7 +624,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         if (path == null) {
             getViewState().showEmptyList();
         } else {
-            goBackToPreviousPath();
+            goBackToPreviousScreen();
         }
     }
 

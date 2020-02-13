@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSou
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
@@ -60,6 +61,8 @@ public interface LibraryRepository {
     Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
 
     Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId);
+
+    Observable<FolderFileSource2> getFolderObservable(long folderId);
 
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
 

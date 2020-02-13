@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
@@ -53,8 +54,6 @@ import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -325,13 +324,13 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showBackPathButton(@Nonnull String path) {
+    public void showFolderInfo(FolderFileSource2 folder) {
         headerViewWrapper.setVisible(true);
-        headerViewWrapper.bind(path);
+        headerViewWrapper.bind(folder);
     }
 
     @Override
-    public void hideBackPathButton() {
+    public void hideFolderInfo() {
         headerViewWrapper.setVisible(false);
     }
 

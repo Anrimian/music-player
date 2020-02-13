@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -12,8 +13,6 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import moxy.MvpView;
 import moxy.viewstate.strategy.AddToEndSingleStrategy;
@@ -28,7 +27,7 @@ import moxy.viewstate.strategy.StateStrategyType;
 public interface LibraryFoldersView extends MvpView {
 
     String LIST_STATE = "list_state";
-    String BACK_PATH_BUTTON_STATE = "back_path_button_state";
+    String FOLDER_STATE = "back_path_button_state";
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
@@ -45,11 +44,11 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showError(ErrorCommand errorCommand);
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BACK_PATH_BUTTON_STATE)
-    void showBackPathButton(@Nonnull String path);
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
+    void showFolderInfo(FolderFileSource2 folder);
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BACK_PATH_BUTTON_STATE)
-    void hideBackPathButton();
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
+    void hideFolderInfo();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goBackToParentFolderScreen();
