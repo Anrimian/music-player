@@ -7,8 +7,10 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 
 import org.junit.Test;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -34,7 +36,8 @@ public class FolderMergerTest {
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
+        Set<Long> movedFiles = new LinkedHashSet<>();
+        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert, movedFiles);
 
         AddedNode addedNode = foldersToInsert.get(0);
         FolderNode<Long> testFolder1 = addedNode.getNode();
@@ -45,5 +48,9 @@ public class FolderMergerTest {
         assertNotNull(testFolder2);
         assertEquals(folder2, testFolder2);
         assert testFolder2.getFiles().contains(2L);
+
+        assert movedFiles.contains(1L);
+        assert movedFiles.contains(2L);
+        assert movedFiles.contains(3L);
     }
 }

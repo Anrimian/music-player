@@ -61,9 +61,9 @@ class StorageCompositionAnalyzer {
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert);
+        Set<Long> movedCompositions = new LinkedHashSet<>();
+        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert, movedCompositions);
 
-        Set<Long> movedCompositions = getAffectedCompositions(foldersToInsert);//move to merge
         LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();

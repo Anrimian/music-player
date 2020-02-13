@@ -5,14 +5,17 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderN
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class FolderMerger {
 
     public void mergeFolderTrees(FolderNode<Long> actualFolderNode,
-                                  Node<String, StorageFolder> existsFoldersNode,
-                                  List<Long> foldersToDelete,
-                                  List<AddedNode> foldersToInsert) {
+                                 Node<String, StorageFolder> existsFoldersNode,
+                                 List<Long> foldersToDelete,
+                                 List<AddedNode> foldersToInsert,
+                                 Set<Long> addedFiles) {
         for (Node<String, StorageFolder> existFolder : existsFoldersNode.getNodes()) {
             String key = existFolder.getKey();
             if (key == null) {
@@ -37,11 +40,20 @@ public class FolderMerger {
 
                 AddedNode addedNode = new AddedNode(parentId, actualFolder);
                 foldersToInsert.add(addedNode);//we add unnecessary child folders, hm
+                List<Long> affectedFiles = getAllFilesInNode(actualFolder);
+                addedFiles.addAll(affectedFiles);//not added files in root node
             } else {
-                mergeFolderTrees(actualFolder, existsFoldersNode, foldersToDelete, foldersToInsert);
+                mergeFolderTrees(actualFolder, existsFoldersNode, foldersToDelete, foldersToInsert, addedFiles);
             }
         }
     }
 
+    private List<Long> getAllFilesInNode(FolderNode<Long> parentNode) {
+        LinkedList<Long> result = new LinkedList<>(parentNode.getFiles());
+        for (FolderNode<Long> node: parentNode.getFolders()) {
+            result.addAll(getAllFilesInNode(node));
+        }
+        return result;
+    }
 
 }
