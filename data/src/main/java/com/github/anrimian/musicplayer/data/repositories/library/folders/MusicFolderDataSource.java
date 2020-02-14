@@ -344,6 +344,11 @@ public class MusicFolderDataSource {
                         .doOnSuccess(pathCompositions ->
                                 putCompositions(root, group.getKey(), pathCompositions))
                         .subscribe())
+                //retry and onErrorComplete() are temporary workaround to prevent rare craches from db.
+                //this class will be gone after folders remake
+                .retry(5)
+                .ignoreElements()
+                .onErrorComplete()
                 .subscribe();
         return root;
     }
