@@ -138,6 +138,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void release() {
+        stopTracingTrackPosition();
         player.release();
     }
 
