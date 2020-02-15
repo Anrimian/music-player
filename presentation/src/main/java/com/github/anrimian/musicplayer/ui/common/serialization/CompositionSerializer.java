@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.common.serealization;
+package com.github.anrimian.musicplayer.ui.common.serialization;
 
 import android.os.Bundle;
 

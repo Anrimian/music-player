@@ -20,7 +20,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.java.TripleCallback;
-import com.github.anrimian.musicplayer.ui.common.serealization.CompositionSerializer;
+import com.github.anrimian.musicplayer.ui.common.serialization.CompositionSerializer;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuAdapter;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;

@@ -21,7 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.serealization.GenreSerializer;
+import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
