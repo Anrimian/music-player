@@ -328,7 +328,7 @@ public class MusicPlayerInteractor {
                 .andThen(playQueueRepository.isCurrentCompositionAtEndOfQueue())
                 .doOnSuccess(isLast -> {
                     if (isLast) {
-                        pause();
+                        pause();//get current position called from wrong thread
                     } else {
                         playQueueRepository.skipToNext().subscribe();
                     }
