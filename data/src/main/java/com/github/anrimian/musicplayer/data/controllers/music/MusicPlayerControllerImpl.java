@@ -2,13 +2,17 @@ package com.github.anrimian.musicplayer.data.controllers.music;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.controllers.music.players.AndroidMediaPlayer;
+import com.github.anrimian.musicplayer.data.controllers.music.players.AppMediaPlayer;
+import com.github.anrimian.musicplayer.data.controllers.music.players.CompositeMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.ExoMediaPlayer;
-import com.github.anrimian.musicplayer.data.controllers.music.players.MediaPlayer;
+import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.domain.utils.java.Function;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
@@ -19,19 +23,21 @@ import io.reactivex.Scheduler;
 
 public class MusicPlayerControllerImpl implements MusicPlayerController {
 
-    private final MediaPlayer mediaPlayer;
+    private final AppMediaPlayer mediaPlayer;
     private final UiStateRepository uiStateRepository;
 
     public MusicPlayerControllerImpl(UiStateRepository uiStateRepository,
                                      Context context,
                                      Scheduler scheduler,
-                                     PlayerErrorParser playerErrorParser) {
+                                     PlayerErrorParser playerErrorParser,
+                                     Analytics analytics) {
         this.uiStateRepository = uiStateRepository;
-//        Function<ExoMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, scheduler, playerErrorParser);
-//        Function<MediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, playerErrorParser);
-//        mediaPlayer = new CompositeMediaPlayer(androidMediaPlayer);
+        Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, scheduler, playerErrorParser);
+        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, playerErrorParser, analytics);
+        mediaPlayer = new CompositeMediaPlayer(exoMediaPlayer, androidMediaPlayer);
 
-        mediaPlayer = new ExoMediaPlayer(context, scheduler, playerErrorParser);
+//        mediaPlayer = new AndroidMediaPlayer(scheduler, playerErrorParser, analytics);
+//        mediaPlayer = new ExoMediaPlayer(context, scheduler, playerErrorParser);
     }
 
     @Override
