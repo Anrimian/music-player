@@ -11,7 +11,7 @@ allprojects {
 ext {
     //Android
     androidBuildToolsVersion = "29.0.2"
-    androidMinSdkVersion = 21//16
+    androidMinSdkVersion = 21
     androidTargetSdkVersion = 29
     androidCompileSdkVersion = 29
 
@@ -27,20 +27,23 @@ ext {
     rxJavaVersion = "2.2.11"
     rxAndroidVersion = "2.0.1"
     rxPermissionsVersion = "0.9.4"
+    rxJavaExtVersion = "0.20.10"
     moxyVersion = "2.0.2"
-    butterKnifeVersion = "10.2.0"
-    daggerVersion = "2.25.2"
+    butterKnifeVersion = "10.2.1"
+    daggerVersion = "2.26"
+    slidrVersion = "2.1.0"
     exoPlayerVersion = "2.9.6"
     roomVersion = "2.1.0-rc01"
     jTaggerVersion = '2.0.3'
-    circleImageViewVersion = "3.0.1"
+    circleImageViewVersion = "3.1.0"
     chipsLayoutManagerVersion = "0.3.7"
 
     //Testing
-    jUnitVersion = '4.12'
+    jUnitVersion = '4.13'
     espressoVersion = '3.1.0'
     mockitoVersion = '1.9.5'
     dexmakerVersion = '1.2'
+    androidXTestVersion = "1.1.0"
 
     //developing
     javaxAnnotationVersion = "3.0.2"
@@ -57,7 +60,7 @@ ext {
     constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
 
     rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:0.20.10"
+    rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:$rxJavaExtVersion"
     rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     rxPermissions = "com.tbruyelle.rxpermissions2:rxpermissions:$rxPermissionsVersion"
 
@@ -75,7 +78,7 @@ ext {
     dagger = "com.google.dagger:dagger:$daggerVersion"
     daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    slidr = "com.r0adkll:slidableactivity:2.1.0"
+    slidr = "com.r0adkll:slidableactivity:$slidrVersion"
 
     circleImageView = "de.hdodenhof:circleimageview:$circleImageViewVersion"
     chipsLayoutManager = "com.beloo.widget:ChipsLayoutManager:$chipsLayoutManagerVersion"
@@ -97,6 +100,6 @@ ext {
     junit = "junit:junit:${jUnitVersion}"
     espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
     mockito = "org.mockito:mockito-core:${mockitoVersion}"
-    rules = "androidx.test:rules:1.1.0"
-    supportTest = "androidx.test:runner:1.1.0"
+    rules = "androidx.test:rules:$androidXTestVersion"
+    supportTest = "androidx.test:runner:$androidXTestVersion"
 }
