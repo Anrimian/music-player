@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.infrastructure.analytics;
 
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 
 public class AnalyticsImpl implements Analytics {
@@ -12,5 +14,10 @@ public class AnalyticsImpl implements Analytics {
 //                Crashlytics.logException(throwable);
 //            }
 //        }
+    }
+
+    @Override
+    public void logMessage(String message) {
+        Log.d("UNEXPECTED", message);
     }
 }

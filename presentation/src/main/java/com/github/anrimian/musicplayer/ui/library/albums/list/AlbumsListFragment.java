@@ -23,7 +23,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.serealization.AlbumSerializer;
+import com.github.anrimian.musicplayer.ui.common.serialization.AlbumSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;

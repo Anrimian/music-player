@@ -5,7 +5,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import io.reactivex.Observable;
 
-public interface MediaPlayer {
+public interface AppMediaPlayer {
 
     Observable<PlayerEvent> getEventsObservable();
 

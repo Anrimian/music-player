@@ -79,9 +79,8 @@ public class SimpleImageLoader<K, T> {
 
         imageView.setImageDrawable(getPlaceholder(imageView.getContext()));
 
-        Disposable disposable = Maybe.fromCallable(() -> getDataOrThrow(data))
+        Disposable disposable = getDataMaybe(data)
                 .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(() -> loadingTasks.remove(targetKey))
                 .subscribe(
@@ -93,14 +92,14 @@ public class SimpleImageLoader<K, T> {
 
     @Nullable
     public Bitmap getImage(@Nonnull T data, long timeoutMillis) {
-        return Maybe.fromCallable(() -> getDataOrThrow(data))
+        return getDataMaybe(data)
                 .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
                 .onErrorComplete()
                 .blockingGet();
     }
 
     public void loadImage(@Nonnull T data, Callback<Bitmap> onCompleted) {
-        Maybe.fromCallable(() -> getDataOrThrow(data))
+        getDataMaybe(data)
                 .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
                 .doOnSuccess(onCompleted::call)
                 .doOnError(t -> onCompleted.call(null))
@@ -146,6 +145,11 @@ public class SimpleImageLoader<K, T> {
 
     private int getTargetKey(ImageView imageView) {
         return System.identityHashCode(imageView);
+    }
+
+    private Maybe<Bitmap> getDataMaybe(T data) {
+        return Maybe.fromCallable(() -> getDataOrThrow(data))
+                .subscribeOn(Schedulers.io());
     }
 
     @Nonnull
