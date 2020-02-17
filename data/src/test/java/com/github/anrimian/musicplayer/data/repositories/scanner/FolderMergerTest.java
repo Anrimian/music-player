@@ -29,7 +29,7 @@ public class FolderMergerTest {
         folder1.addFolder(folder2);
 
         actualFolderTree.addFolder(folder1);
-//        actualFolderTree.addFile(3L);//hm, skip this case now
+        actualFolderTree.addFile(3L);
 
         LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
 
@@ -50,7 +50,7 @@ public class FolderMergerTest {
 
         assert movedFiles.contains(1L);
         assert movedFiles.contains(2L);
-//        assert movedFiles.contains(3L);
+        assert movedFiles.contains(3L);
     }
 
     @Test
@@ -67,8 +67,10 @@ public class FolderMergerTest {
 
         LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
         LocalFolderNode<Long> folder1Node = new LocalFolderNode<>("folder 1", 1L);
+        folder1Node.addFile(1L);
         existsFolders.addFolder(folder1Node);
         LocalFolderNode<Long> folder2Node = new LocalFolderNode<>("folder 2", 2L);
+        folder2Node.addFile(2L);
         folder1Node.addFolder(folder2Node);
 
         List<Long> foldersToDelete = new LinkedList<>();
@@ -94,8 +96,10 @@ public class FolderMergerTest {
 
         LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
         LocalFolderNode<Long> folder1Node = new LocalFolderNode<>("folder 1", 1L);
+        folder1Node.addFile(1L);
         existsFolders.addFolder(folder1Node);
         LocalFolderNode<Long> folder2Node = new LocalFolderNode<>("folder 2", 2L);
+        folder2Node.addFile(2L);
         folder1Node.addFolder(folder2Node);
 
         List<Long> foldersToDelete = new LinkedList<>();
@@ -118,18 +122,20 @@ public class FolderMergerTest {
         FolderNode<Long> folder1 = new FolderNode<>("folder 1");
         folder1.addFile(1L);
         folder1.addFile(2L);
+        actualFolderTree.addFolder(folder1);
 
         FolderNode<Long> folder2 = new FolderNode<>("folder 2");
         folder2.addFile(3L);
         folder1.addFolder(folder2);
 
-        actualFolderTree.addFolder(folder1);
-
         LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
-        LocalFolderNode<Long> folder1Node = new LocalFolderNode<>("folder 1", 1L);
-        existsFolders.addFolder(folder1Node);
-        LocalFolderNode<Long> folder2Node = new LocalFolderNode<>("folder 2", 2L);
-        folder1Node.addFolder(folder2Node);
+        LocalFolderNode<Long> localFolder1 = new LocalFolderNode<>("folder 1", 1L);
+        localFolder1.addFile(1L);
+        existsFolders.addFolder(localFolder1);
+        LocalFolderNode<Long> localFolder2 = new LocalFolderNode<>("folder 2", 2L);
+        localFolder2.addFile(3L);
+        localFolder2.addFile(2L);
+        localFolder1.addFolder(localFolder2);
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
@@ -138,6 +144,8 @@ public class FolderMergerTest {
 
         assertEquals(0, foldersToDelete.size());
         assertEquals(0, foldersToInsert.size());
-        assertEquals(0, movedFiles.size());
+        assertEquals(1, movedFiles.size());
+
+        assert movedFiles.contains(2L);
     }
 }

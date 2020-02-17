@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class LocalFolderNode<V> {
     private Long id;
     @Nullable
     private String key;
-    private List<V> files = new LinkedList<>();
+    private LinkedHashSet<V> files = new LinkedHashSet<>();
 
     @Nullable
     private LocalFolderNode<V> parent;
@@ -49,8 +50,12 @@ public class LocalFolderNode<V> {
         return id;
     }
 
-    public List<V> getFiles() {
+    public Collection<V> getFiles() {
         return files;
+    }
+
+    public boolean containsFile(V file) {
+        return files.contains(file);
     }
 
     public void addFile(V file) {

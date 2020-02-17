@@ -165,6 +165,7 @@ public class StorageCompositionAnalyzerTest {
                 0,
                 1L,
                 1L,
+                null,
                 new Date(1),
                 new Date(1));
         map.put(1L, oldComposition);

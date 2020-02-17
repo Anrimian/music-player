@@ -178,23 +178,6 @@ public class TestDataProvider {
                 null);
     }
 
-    public static StorageComposition fakeStorageComposition(long id,
-                                              String filePath,
-                                              long createDate,
-                                              long modifyDate) {
-        return new StorageComposition(null,
-                null,
-                null,
-                null,
-                filePath,
-                0,
-                0,
-                id,
-                id,
-                new Date(createDate),
-                new Date(modifyDate));
-    }
-
     public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
         return new Composition(null,
                 null,
@@ -235,20 +218,6 @@ public class TestDataProvider {
                 new Date(0),
                 new Date(0),
                 null);
-    }
-
-    public static StorageComposition fakeStorageComposition(long id, String filePath) {
-        return new StorageComposition(null,
-                null,
-                null,
-                null,
-                filePath,
-                0,
-                0,
-                id,
-                id,
-                new Date(0),
-                new Date(0));
     }
 
     public static Composition fakeCompositionWithTitle(long id, String title) {
@@ -305,6 +274,75 @@ public class TestDataProvider {
         entity.setPosition(position);
         entity.setShuffledPosition(shuffledPosition);
         return entity;
+    }
+
+    public static StorageComposition fakeStorageComposition(long id, String title) {
+        return new StorageLocalCompositionBuilder(id, id, title).build();
+    }
+
+    public static StorageComposition fakeStorageComposition(long id,
+                                                            String title,
+                                                            long createDate,
+                                                            long modifyDate) {
+        return new StorageLocalCompositionBuilder(id, id, title)
+                .createDate(createDate)
+                .modifyDate(modifyDate)
+                .build();
+    }
+
+    public static class StorageLocalCompositionBuilder {
+
+        private String artist;
+        private String albumArtist;
+        private String title;
+        private String album;
+        private String filePath;
+
+        private long duration;
+        private long size;
+        private final long id;
+        private final long storageId;
+
+        private Long folderId;
+
+        private Date dateAdded = new Date(0);
+        private Date dateModified = new Date(0);
+
+        public StorageLocalCompositionBuilder(long id, long storageId, String title) {
+            this.id = id;
+            this.storageId = storageId;
+            this.title = title;
+        }
+
+        public StorageLocalCompositionBuilder folderId(Long folderId) {
+            this.folderId = folderId;
+            return this;
+        }
+
+        public StorageLocalCompositionBuilder createDate(long date) {
+            dateAdded = new Date(date);
+            return this;
+        }
+
+        public StorageLocalCompositionBuilder modifyDate(long date) {
+            dateModified = new Date(date);
+            return this;
+        }
+
+        public StorageComposition build() {
+            return new StorageComposition(artist,
+                    albumArtist,
+                    title,
+                    album,
+                    filePath,
+                    duration,
+                    size,
+                    id,
+                    storageId,
+                    folderId,
+                    dateAdded,
+                    dateModified);
+        }
     }
 
     public static StorageFullComposition fakeStorageFullComposition(long id, String title) {

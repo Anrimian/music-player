@@ -10,16 +10,17 @@ import java.util.Set;
 
 public class FolderMerger {
 
-    //moved files case
     //deleted folders case
     public void mergeFolderTrees(FolderNode<Long> actualFolderNode,
                                  LocalFolderNode<Long> existsFoldersNode,
                                  List<Long> outFoldersToDelete,
                                  List<AddedNode> outFoldersToInsert,
                                  Set<Long> outAddedFiles) {
-//        for (Long file: actualFolderNode.getFiles()) {
-//            if (existsFoldersNode.get)
-//        }
+        for (Long file: actualFolderNode.getFiles()) {
+            if (!existsFoldersNode.containsFile(file)) {
+                outAddedFiles.add(file);
+            }
+        }
         for (LocalFolderNode<Long> existFolder : existsFoldersNode.getFolders()) {
             String key = existFolder.getKeyPath();
 
@@ -39,7 +40,7 @@ public class FolderMerger {
                 outFoldersToInsert.add(addedNode);
 
                 List<Long> affectedFiles = getAllFilesInNode(actualFolder);
-                outAddedFiles.addAll(affectedFiles);//not added files in root node
+                outAddedFiles.addAll(affectedFiles);
             } else {
                 mergeFolderTrees(actualFolder, existFolder, outFoldersToDelete, outFoldersToInsert, outAddedFiles);
             }

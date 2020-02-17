@@ -29,6 +29,9 @@ public class StorageComposition {
     private final long id;
     private final long storageId;
 
+    @Nullable
+    private final Long folderId;
+
     @Nonnull
     private final Date dateAdded;
     @Nonnull
@@ -43,6 +46,7 @@ public class StorageComposition {
                               long size,
                               long id,
                               long storageId,
+                              @Nullable Long folderId,
                               @Nonnull Date dateAdded,
                               @Nonnull Date dateModified) {
         this.artist = artist;
@@ -54,8 +58,14 @@ public class StorageComposition {
         this.size = size;
         this.id = id;
         this.storageId = storageId;
+        this.folderId = folderId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
+    }
+
+    @Nullable
+    public Long getFolderId() {
+        return folderId;
     }
 
     public long getStorageId() {

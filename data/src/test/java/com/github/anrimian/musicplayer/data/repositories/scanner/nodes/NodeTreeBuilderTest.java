@@ -3,12 +3,16 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
+import com.github.anrimian.musicplayer.data.utils.TestDataProvider.StorageCompositionBuilder;
 
 import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -18,6 +22,12 @@ public class NodeTreeBuilderTest {
 
     @Test
     public void createTreeFromIdMap() {
+        LongSparseArray<StorageComposition> compositionsMap = new LongSparseArray<>();
+        compositionsMap.put(1, new TestDataProvider.StorageLocalCompositionBuilder(1L, 1L, "test")
+                .folderId(null)
+                .build()
+        );
+
         List<StorageFolder> folderEntities = new LinkedList<>();
         folderEntities.add(new StorageFolder(1, null, "1"));
         folderEntities.add(new StorageFolder(2, null, "2"));
@@ -25,8 +35,15 @@ public class NodeTreeBuilderTest {
         folderEntities.add(new StorageFolder(4, 1L, "4"));
         folderEntities.add(new StorageFolder(5, 4L, "5"));
         folderEntities.add(new StorageFolder(6, 1L, "6"));
-        LocalFolderNode<Long> rootNode = nodeTreeBuilder.createTreeFromIdMap(folderEntities, new LongSparseArray<>());
+
+        LocalFolderNode<Long> rootNode = nodeTreeBuilder.createTreeFromIdMap(
+                folderEntities,
+                compositionsMap
+        );
         assertEquals(3, rootNode.getFolders().size());
+        assertEquals(1, rootNode.getFiles().size());
+        assert rootNode.containsFile(1L);
+
         LocalFolderNode<Long> nodeThree = rootNode.getFolder("1");
         assertNotNull(nodeThree);
         LocalFolderNode<Long> nodeFour = nodeThree.getFolder("4");
