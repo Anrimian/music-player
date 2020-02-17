@@ -11,11 +11,16 @@ import java.util.Set;
 
 public class FolderMerger {
 
+    //moved files case
+    //deleted folders case
     public void mergeFolderTrees(FolderNode<Long> actualFolderNode,
                                  Node<String, StorageFolder> existsFoldersNode,
-                                 List<Long> foldersToDelete,
-                                 List<AddedNode> foldersToInsert,
-                                 Set<Long> addedFiles) {
+                                 List<Long> outFoldersToDelete,
+                                 List<AddedNode> outFoldersToInsert,
+                                 Set<Long> outAddedFiles) {
+//        for (Long file: actualFolderNode.getFiles()) {
+//            if (existsFoldersNode.get)
+//        }
         for (Node<String, StorageFolder> existFolder : existsFoldersNode.getNodes()) {
             String key = existFolder.getKey();
             if (key == null) {
@@ -24,7 +29,7 @@ public class FolderMerger {
 
             FolderNode<Long> actualFolder = actualFolderNode.getFolder(key);
             if (actualFolder == null) {
-                foldersToDelete.add(existFolder.getData().getId());
+                outFoldersToDelete.add(existFolder.getData().getId());
             }
         }
         for (FolderNode<Long> actualFolder : actualFolderNode.getFolders()) {
@@ -39,11 +44,12 @@ public class FolderMerger {
                 }
 
                 AddedNode addedNode = new AddedNode(parentId, actualFolder);
-                foldersToInsert.add(addedNode);//we add unnecessary child folders, hm
+                outFoldersToInsert.add(addedNode);
+
                 List<Long> affectedFiles = getAllFilesInNode(actualFolder);
-                addedFiles.addAll(affectedFiles);//not added files in root node
+                outAddedFiles.addAll(affectedFiles);//not added files in root node
             } else {
-                mergeFolderTrees(actualFolder, existsFoldersNode, foldersToDelete, foldersToInsert, addedFiles);
+                mergeFolderTrees(actualFolder, existFolder, outFoldersToDelete, outFoldersToInsert, outAddedFiles);
             }
         }
     }

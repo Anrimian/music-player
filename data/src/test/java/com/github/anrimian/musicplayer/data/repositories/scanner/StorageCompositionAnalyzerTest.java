@@ -4,6 +4,7 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
@@ -17,6 +18,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
@@ -242,6 +244,33 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 any());
+    }
+
+    @Test
+    public void mergeSameFoldersTest() {
+        LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1"));
+        currentCompositions.put(2, fakeStorageComposition(2, "music-2"));
+        currentCompositions.put(3, fakeStorageComposition(3, "music-3"));
+        when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
+
+        List<StorageFolder> folders = new LinkedList<>();
+        folders.add(new StorageFolder(1L, null, "music"));
+        folders.add(new StorageFolder(2L, 1L, "new"));
+        when(foldersDao.getAllFolders()).thenReturn(folders);
+
+        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
+        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("music/new").build();
+        StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
+        LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
+        newCompositions.put(1, c1);
+        newCompositions.put(2, c2);
+        newCompositions.put(3, c3);
+
+        analyzer.applyCompositionsData(newCompositions);
+
+        verify(foldersDao, never()).insertFolders(any());
+        verify(compositionsDao, never()).applyChanges(any(), any(), any(), any());
     }
 
 }
