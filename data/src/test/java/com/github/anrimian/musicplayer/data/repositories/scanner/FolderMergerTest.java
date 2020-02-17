@@ -1,9 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
-import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.LocalFolderNode;
 
 import org.junit.Test;
 
@@ -32,7 +31,7 @@ public class FolderMergerTest {
         actualFolderTree.addFolder(folder1);
 //        actualFolderTree.addFile(3L);//hm, skip this case now
 
-        Node<String, StorageFolder> existsFolders = new Node<>(null, null);
+        LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
@@ -66,11 +65,71 @@ public class FolderMergerTest {
 
         actualFolderTree.addFolder(folder1);
 
-        Node<String, StorageFolder> existsFolders = new Node<>(null, null);
-        Node<String, StorageFolder> folder1Node = new Node<>("folder 1", new StorageFolder(1L, null, "folder 1"));
-        existsFolders.addNode(folder1Node);
-        Node<String, StorageFolder> folder2Node = new Node<>("folder 2", new StorageFolder(2L, 1L, "folder 2"));
-        folder1Node.addNode(folder2Node);
+        LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
+        LocalFolderNode<Long> folder1Node = new LocalFolderNode<>("folder 1", 1L);
+        existsFolders.addFolder(folder1Node);
+        LocalFolderNode<Long> folder2Node = new LocalFolderNode<>("folder 2", 2L);
+        folder1Node.addFolder(folder2Node);
+
+        List<Long> foldersToDelete = new LinkedList<>();
+        List<AddedNode> foldersToInsert = new LinkedList<>();
+        Set<Long> movedFiles = new LinkedHashSet<>();
+        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert, movedFiles);
+
+        assertEquals(0, foldersToDelete.size());
+        assertEquals(0, foldersToInsert.size());
+        assertEquals(0, movedFiles.size());
+    }
+
+    @Test
+    public void mergeMovedFolderTest() {
+        FolderNode<Long> actualFolderTree = new FolderNode<>(null);
+        FolderNode<Long> folder1 = new FolderNode<>("folder 1");
+        folder1.addFile(1L);
+        actualFolderTree.addFolder(folder1);
+
+        FolderNode<Long> folder2 = new FolderNode<>("folder 2");
+        folder2.addFile(2L);
+        actualFolderTree.addFolder(folder2);
+
+        LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
+        LocalFolderNode<Long> folder1Node = new LocalFolderNode<>("folder 1", 1L);
+        existsFolders.addFolder(folder1Node);
+        LocalFolderNode<Long> folder2Node = new LocalFolderNode<>("folder 2", 2L);
+        folder1Node.addFolder(folder2Node);
+
+        List<Long> foldersToDelete = new LinkedList<>();
+        List<AddedNode> foldersToInsert = new LinkedList<>();
+        Set<Long> movedFiles = new LinkedHashSet<>();
+        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert, movedFiles);
+
+        assertEquals(1, foldersToDelete.size());
+        assertEquals(1, foldersToInsert.size());
+        assertEquals(1, movedFiles.size());
+
+        assert foldersToDelete.contains(2L);
+        assert foldersToInsert.contains(new AddedNode(null, folder2));
+        assert movedFiles.contains(2L);
+    }
+
+    @Test
+    public void mergeMovedFileTest() {//ewww
+        FolderNode<Long> actualFolderTree = new FolderNode<>(null);
+        FolderNode<Long> folder1 = new FolderNode<>("folder 1");
+        folder1.addFile(1L);
+        folder1.addFile(2L);
+
+        FolderNode<Long> folder2 = new FolderNode<>("folder 2");
+        folder2.addFile(3L);
+        folder1.addFolder(folder2);
+
+        actualFolderTree.addFolder(folder1);
+
+        LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
+        LocalFolderNode<Long> folder1Node = new LocalFolderNode<>("folder 1", 1L);
+        existsFolders.addFolder(folder1Node);
+        LocalFolderNode<Long> folder2Node = new LocalFolderNode<>("folder 2", 2L);
+        folder1Node.addFolder(folder2Node);
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();

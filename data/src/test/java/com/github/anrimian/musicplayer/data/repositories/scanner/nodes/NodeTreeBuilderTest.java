@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 
+import androidx.collection.LongSparseArray;
+
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 
 import org.junit.Test;
@@ -23,15 +25,15 @@ public class NodeTreeBuilderTest {
         folderEntities.add(new StorageFolder(4, 1L, "4"));
         folderEntities.add(new StorageFolder(5, 4L, "5"));
         folderEntities.add(new StorageFolder(6, 1L, "6"));
-        Node<String, StorageFolder> rootNode = nodeTreeBuilder.createTreeFromIdMap(folderEntities);
-        assertEquals(3, rootNode.getNodes().size());
-        Node<String, StorageFolder> nodeThree = rootNode.getChild("1");
+        LocalFolderNode<Long> rootNode = nodeTreeBuilder.createTreeFromIdMap(folderEntities, new LongSparseArray<>());
+        assertEquals(3, rootNode.getFolders().size());
+        LocalFolderNode<Long> nodeThree = rootNode.getFolder("1");
         assertNotNull(nodeThree);
-        Node<String, StorageFolder> nodeFour = nodeThree.getChild("4");
+        LocalFolderNode<Long> nodeFour = nodeThree.getFolder("4");
         assertNotNull(nodeFour);
-        Node<String, StorageFolder> nodeFive = nodeFour.getChild("5");
+        LocalFolderNode<Long> nodeFive = nodeFour.getFolder("5");
         assertNotNull(nodeFive);
-        Node<String, StorageFolder> nodeSix = nodeThree.getChild("6");
+        LocalFolderNode<Long> nodeSix = nodeThree.getFolder("6");
         assertNotNull(nodeSix);
     }
 }

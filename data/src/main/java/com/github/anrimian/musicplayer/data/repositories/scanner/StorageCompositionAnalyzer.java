@@ -9,8 +9,7 @@ import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderTreeBuilder;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.FolderInfo;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.LocalFolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.NodeTreeBuilder;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
@@ -28,8 +27,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
-
-import static com.github.anrimian.musicplayer.domain.utils.Objects.requireNonNull;
 
 class StorageCompositionAnalyzer {
 
@@ -57,21 +54,24 @@ class StorageCompositionAnalyzer {
 
         excludeCompositions(actualFolderTree, newCompositions);
 
-        Node<String, StorageFolder> existsFolders = nodeTreeBuilder.createTreeFromIdMap(foldersDao.getAllFolders());
+        List<StorageFolder> storageFolders = foldersDao.getAllFolders();
+        LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
+
+        LocalFolderNode<Long> existsFolders = nodeTreeBuilder.createTreeFromIdMap(
+                storageFolders,
+                currentCompositions);
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
         Set<Long> movedCompositions = new LinkedHashSet<>();
         folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert, movedCompositions);
 
-        LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
-
         List<StorageFullComposition> addedCompositions = new ArrayList<>();
         List<StorageComposition> deletedCompositions = new ArrayList<>();
         List<Change<StorageComposition, StorageFullComposition>> changedCompositions = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositions,
                 newCompositions,
-                (first, second) -> hasActualChanges(first, second) || movedCompositions.contains(first.getStorageId()),//is in folder change
+                (first, second) -> hasActualChanges(first, second) || movedCompositions.contains(first.getStorageId()),
                 deletedCompositions::add,
                 addedCompositions::add,
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
@@ -145,32 +145,6 @@ class StorageCompositionAnalyzer {
         LinkedList<Long> result = new LinkedList<>(parentNode.getFiles());
         for (FolderNode<Long> node: parentNode.getFolders()) {
             result.addAll(getAllCompositionsInNode(node));
-        }
-        return result;
-    }
-
-    private List<FolderInfo> getAllFoldersInTree(Node<String, Long> parentNode) {
-        LinkedList<FolderInfo> result = new LinkedList<>();
-        result.add(new FolderInfo(parentNode.getKey(), null, getCompositionsInNode(parentNode)));
-        for (Node<String, Long> node: parentNode.getNodes()) {
-            if (node.getData() == null) {
-                result.add(new FolderInfo(node.getKey(),
-                        requireNonNull(node.getParent()).getKey(),
-                        getCompositionsInNode(node))
-                );
-            } else {
-                result.addAll(getAllFoldersInTree(node));
-            }
-        }
-        return result;
-    }
-
-    private List<Long> getCompositionsInNode(Node<String, Long> parentNode) {
-        LinkedList<Long> result = new LinkedList<>();
-        for (Node<String, Long> node: parentNode.getNodes()) {
-            if (node.getData() != null) {
-                result.add(node.getData());
-            }
         }
         return result;
     }

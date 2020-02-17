@@ -3,21 +3,23 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.nodes;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class NodeTreeBuilder {
 
-    public Node<String, StorageFolder> createTreeFromIdMap(List<StorageFolder> folders) {
+    public LocalFolderNode<Long> createTreeFromIdMap(List<StorageFolder> folders,
+                                                     LongSparseArray<StorageComposition> filesMap) {
         LongSparseArray<List<StorageFolder>> idMap = new LongSparseArray<>();
 
-        Node<String, StorageFolder> rootNode = new Node<>(null, null);
+        LocalFolderNode<Long> rootNode = new LocalFolderNode<>(null, null);
 
         for (StorageFolder entity: folders) {
             Long parentId = entity.getParentId();
             if (parentId == null) {
-                rootNode.addNode(new Node<>(entity.getName(), entity));
+                rootNode.addFolder(new LocalFolderNode<>(entity.getName(), entity.getId()));
             } else {
                 List<StorageFolder> childList = idMap.get(parentId);
                 if (childList == null) {
@@ -28,7 +30,7 @@ public class NodeTreeBuilder {
             }
         }
 
-        for (Node<String, StorageFolder> childNode: rootNode.getNodes()) {
+        for (LocalFolderNode<Long> childNode: rootNode.getFolders()) {
             fillNode(childNode, idMap);
         }
 
@@ -39,18 +41,21 @@ public class NodeTreeBuilder {
         return rootNode;
     }
 
-    private void fillNode(Node<String, StorageFolder> targetNode,
+    private void fillNode(LocalFolderNode<Long> targetNode,
                           LongSparseArray<List<StorageFolder>> parentIdMap) {
-        StorageFolder folderEntity = targetNode.getData();
-        long id = folderEntity.getId();
+        Long id = targetNode.getId();
+        if (id == null) {
+            throw new IllegalStateException("try to access folder with null value");
+        }
         List<StorageFolder> childList = parentIdMap.get(id);
         if (childList != null) {
             for (StorageFolder entity: childList) {
-                Node<String, StorageFolder> node = new Node<>(entity.getName(), entity);
-                targetNode.addNode(node);
+                LocalFolderNode<Long> node = new LocalFolderNode<>(entity.getName(), entity.getId());
+                targetNode.addFolder(node);
                 fillNode(node, parentIdMap);
             }
         }
         parentIdMap.remove(id);
     }
+
 }

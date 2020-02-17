@@ -1,9 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
-import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.Node;
+import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.LocalFolderNode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,34 +13,27 @@ public class FolderMerger {
     //moved files case
     //deleted folders case
     public void mergeFolderTrees(FolderNode<Long> actualFolderNode,
-                                 Node<String, StorageFolder> existsFoldersNode,
+                                 LocalFolderNode<Long> existsFoldersNode,
                                  List<Long> outFoldersToDelete,
                                  List<AddedNode> outFoldersToInsert,
                                  Set<Long> outAddedFiles) {
 //        for (Long file: actualFolderNode.getFiles()) {
 //            if (existsFoldersNode.get)
 //        }
-        for (Node<String, StorageFolder> existFolder : existsFoldersNode.getNodes()) {
-            String key = existFolder.getKey();
-            if (key == null) {
-                continue;//not a folder
-            }
+        for (LocalFolderNode<Long> existFolder : existsFoldersNode.getFolders()) {
+            String key = existFolder.getKeyPath();
 
             FolderNode<Long> actualFolder = actualFolderNode.getFolder(key);
             if (actualFolder == null) {
-                outFoldersToDelete.add(existFolder.getData().getId());
+                outFoldersToDelete.add(existFolder.getId());
             }
         }
         for (FolderNode<Long> actualFolder : actualFolderNode.getFolders()) {
             String key = actualFolder.getKeyPath();
 
-            Node<String, StorageFolder> existFolder = existsFoldersNode.getChild(key);
+            LocalFolderNode<Long> existFolder = existsFoldersNode.getFolder(key);
             if (existFolder == null) {
-                Long parentId = null;
-                StorageFolder entity = existsFoldersNode.getData();
-                if (entity != null) {
-                    parentId = entity.getId();
-                }
+                Long parentId = existsFoldersNode.getId();
 
                 AddedNode addedNode = new AddedNode(parentId, actualFolder);
                 outFoldersToInsert.add(addedNode);
