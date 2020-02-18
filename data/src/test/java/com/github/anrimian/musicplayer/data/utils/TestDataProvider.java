@@ -280,6 +280,10 @@ public class TestDataProvider {
         return new StorageLocalCompositionBuilder(id, id, title).build();
     }
 
+    public static StorageComposition fakeStorageComposition(long id, String title, Long folderId) {
+        return new StorageLocalCompositionBuilder(id, id, title).folderId(folderId).build();
+    }
+
     public static StorageComposition fakeStorageComposition(long id,
                                                             String title,
                                                             long createDate,
@@ -307,6 +311,12 @@ public class TestDataProvider {
 
         private Date dateAdded = new Date(0);
         private Date dateModified = new Date(0);
+
+        public StorageLocalCompositionBuilder(long id, String title) {
+            this.id = id;
+            this.storageId = id;
+            this.title = title;
+        }
 
         public StorageLocalCompositionBuilder(long id, long storageId, String title) {
             this.id = id;

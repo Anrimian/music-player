@@ -80,7 +80,7 @@ class StorageCompositionAnalyzer {
             LongSparseArray<Long> compositionIdMap = foldersDao.insertFolders(foldersToInsert);//how to test this?
             compositionsDao.applyChanges(addedCompositions,
                     deletedCompositions,
-                    changedCompositions,//move folder change
+                    changedCompositions,
                     compositionIdMap);//and this
             //delete old folders
         }

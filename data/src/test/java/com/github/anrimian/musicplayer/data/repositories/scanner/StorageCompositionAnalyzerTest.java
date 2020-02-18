@@ -11,7 +11,9 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
+import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
 import com.github.anrimian.musicplayer.data.utils.TestDataProvider.StorageCompositionBuilder;
+import com.github.anrimian.musicplayer.data.utils.TestDataProvider.StorageLocalCompositionBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -250,8 +252,8 @@ public class StorageCompositionAnalyzerTest {
     @Test
     public void mergeSameFoldersTest() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1"));
-        currentCompositions.put(2, fakeStorageComposition(2, "music-2"));
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
+        currentCompositions.put(2, fakeStorageComposition(2, "music-2", 2L));
         currentCompositions.put(3, fakeStorageComposition(3, "music-3"));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
@@ -277,10 +279,10 @@ public class StorageCompositionAnalyzerTest {
     @Test
     public void mergeMovedFoldersTest() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1"));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2");
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
+        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
         currentCompositions.put(2, composition2);
-        currentCompositions.put(3, fakeStorageComposition(3, "music-3"));
+        currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
         List<StorageFolder> folders = new LinkedList<>();
@@ -313,10 +315,10 @@ public class StorageCompositionAnalyzerTest {
     @Test
     public void mergeMovedFilesTest() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1"));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2");
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
+        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
         currentCompositions.put(2, composition2);
-        currentCompositions.put(3, fakeStorageComposition(3, "music-3"));
+        currentCompositions.put(3, fakeStorageComposition(3, "music-3", null));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
         List<StorageFolder> folders = new LinkedList<>();
@@ -325,7 +327,7 @@ public class StorageCompositionAnalyzerTest {
         when(foldersDao.getAllFolders()).thenReturn(folders);
 
         StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
-        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("music/new").build();
+        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("new").build();
         StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         newCompositions.put(1, c1);

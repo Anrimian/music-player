@@ -27,6 +27,10 @@ public class NodeTreeBuilderTest {
                 .folderId(null)
                 .build()
         );
+        compositionsMap.put(2, new TestDataProvider.StorageLocalCompositionBuilder(2L, 2L, "test2")
+                .folderId(4L)
+                .build()
+        );
 
         List<StorageFolder> folderEntities = new LinkedList<>();
         folderEntities.add(new StorageFolder(1, null, "1"));
@@ -46,8 +50,12 @@ public class NodeTreeBuilderTest {
 
         LocalFolderNode<Long> nodeThree = rootNode.getFolder("1");
         assertNotNull(nodeThree);
+
         LocalFolderNode<Long> nodeFour = nodeThree.getFolder("4");
         assertNotNull(nodeFour);
+        assertEquals(1, nodeFour.getFiles().size());
+        assert nodeFour.containsFile(2L);
+
         LocalFolderNode<Long> nodeFive = nodeFour.getFolder("5");
         assertNotNull(nodeFive);
         LocalFolderNode<Long> nodeSix = nodeThree.getFolder("6");
