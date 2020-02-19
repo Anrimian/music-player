@@ -82,16 +82,9 @@ class StorageCompositionAnalyzer {
                     deletedCompositions,
                     changedCompositions,
                     compositionIdMap);//and this
-            //delete old folders
-        }
-    }
 
-    private Set<Long> getAffectedCompositions(List<AddedNode> nodes) {
-        Set<Long> result = new LinkedHashSet<>();
-        for (AddedNode addedNode: nodes) {
-            result.addAll(getAllCompositionsInNode(addedNode.getNode()));
+            foldersDao.deleteFolders(foldersToDelete);
         }
-        return result;
     }
 
     private void excludeCompositions(FolderNode<Long> folderTree,

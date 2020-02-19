@@ -48,4 +48,7 @@ public interface FoldersDao {
 
     @Insert
     long insertFolder(FolderEntity entity);
+
+    @Query("DELETE FROM folders WHERE id IN(:ids)")
+    void deleteFolders(List<Long> ids);
 }

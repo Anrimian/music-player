@@ -247,6 +247,8 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 any());
+
+        verify(foldersDao).deleteFolders(eq(emptyList()));
     }
 
     @Test
@@ -274,6 +276,7 @@ public class StorageCompositionAnalyzerTest {
 
         verify(foldersDao, never()).insertFolders(any());
         verify(compositionsDao, never()).applyChanges(any(), any(), any(), any());
+        verify(foldersDao, never()).deleteFolders(any());
     }
 
     @Test
@@ -310,6 +313,8 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(asList(new Change<>(composition2, c2))),
                 any());
+
+        verify(foldersDao).deleteFolders(eq(asList(2L)));
     }
 
     @Test
@@ -346,6 +351,39 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(asList(new Change<>(composition2, c2))),
                 any());
+    }
+
+    @Test
+    public void mergeDeletedFoldersTest() {
+        LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
+        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
+        currentCompositions.put(2, composition2);
+        currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
+        when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
+
+        List<StorageFolder> folders = new LinkedList<>();
+        folders.add(new StorageFolder(1L, null, "music"));
+        folders.add(new StorageFolder(2L, 1L, "new"));
+        when(foldersDao.getAllFolders()).thenReturn(folders);
+
+        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
+        StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
+        LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
+        newCompositions.put(1, c1);
+        newCompositions.put(3, c3);
+
+        analyzer.applyCompositionsData(newCompositions);
+
+        verify(foldersDao).insertFolders(eq(emptyList()));
+
+        verify(compositionsDao).applyChanges(
+                eq(emptyList()),
+                eq(asList(composition2)),
+                eq(emptyList()),
+                any());
+
+        verify(foldersDao).deleteFolders(eq(asList(2L)));
     }
 
 }

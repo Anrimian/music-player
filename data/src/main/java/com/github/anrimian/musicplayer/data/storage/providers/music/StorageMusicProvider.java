@@ -60,21 +60,41 @@ public class StorageMusicProvider {
     public LongSparseArray<StorageFullComposition> getCompositions() {
         Cursor cursor = null;
         try {
+            String[] query;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                query = new String[] {
+                        Media.ARTIST,
+                        Media.TITLE,
+//                            Media.ALBUM,
+                        Media.DATA,
+                        Media.RELATIVE_PATH,
+                        Media.DURATION,
+                        Media.SIZE,
+                        Media._ID,
+//                            Media.ARTIST_ID,
+                        Media.ALBUM_ID,
+                        Media.DATE_ADDED,
+                        Media.DATE_MODIFIED
+                };
+            } else {
+                query = new String[] {
+                        Media.ARTIST,
+                        Media.TITLE,
+//                            Media.ALBUM,
+                        Media.DATA,
+                        Media.DURATION,
+                        Media.SIZE,
+                        Media._ID,
+//                            Media.ARTIST_ID,
+                        Media.ALBUM_ID,
+                        Media.DATE_ADDED,
+                        Media.DATE_MODIFIED
+                };
+            }
+
             cursor = contentResolver.query(
                     Media.EXTERNAL_CONTENT_URI,
-                    new String[] {
-                            Media.ARTIST,
-                            Media.TITLE,
-//                            Media.ALBUM,
-                            Media.DATA,
-                            Media.RELATIVE_PATH,
-                            Media.DURATION,
-                            Media.SIZE,
-                            Media._ID,
-//                            Media.ARTIST_ID,
-                            Media.ALBUM_ID,
-                            Media.DATE_ADDED,
-                            Media.DATE_MODIFIED},
+                    query,
                     Media.IS_MUSIC + " = ?",
                     new String[] { String.valueOf(1) },
                     null);

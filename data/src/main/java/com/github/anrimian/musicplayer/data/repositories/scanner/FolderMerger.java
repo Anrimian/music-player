@@ -10,7 +10,6 @@ import java.util.Set;
 
 public class FolderMerger {
 
-    //deleted folders case
     public void mergeFolderTrees(FolderNode<Long> actualFolderNode,
                                  LocalFolderNode<Long> existsFoldersNode,
                                  List<Long> outFoldersToDelete,

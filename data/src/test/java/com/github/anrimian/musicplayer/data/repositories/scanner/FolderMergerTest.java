@@ -117,7 +117,7 @@ public class FolderMergerTest {
     }
 
     @Test
-    public void mergeMovedFileTest() {//ewww
+    public void mergeMovedFileTest() {
         FolderNode<Long> actualFolderTree = new FolderNode<>(null);
         FolderNode<Long> folder1 = new FolderNode<>("folder 1");
         folder1.addFile(1L);
@@ -147,5 +147,33 @@ public class FolderMergerTest {
         assertEquals(1, movedFiles.size());
 
         assert movedFiles.contains(2L);
+    }
+
+    @Test
+    public void mergeDeletedFolderTest() {
+        FolderNode<Long> actualFolderTree = new FolderNode<>(null);
+        FolderNode<Long> folder1 = new FolderNode<>("folder 1");
+        folder1.addFile(1L);
+        actualFolderTree.addFolder(folder1);
+
+        LocalFolderNode<Long> existsFolders = new LocalFolderNode<>(null, null);
+        LocalFolderNode<Long> localFolder1 = new LocalFolderNode<>("folder 1", 1L);
+        localFolder1.addFile(1L);
+        existsFolders.addFolder(localFolder1);
+        LocalFolderNode<Long> localFolder2 = new LocalFolderNode<>("folder 2", 2L);
+        localFolder2.addFile(2L);
+        localFolder2.addFile(3L);
+        localFolder1.addFolder(localFolder2);
+
+        List<Long> foldersToDelete = new LinkedList<>();
+        List<AddedNode> foldersToInsert = new LinkedList<>();
+        Set<Long> movedFiles = new LinkedHashSet<>();
+        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert, movedFiles);
+
+        assertEquals(1, foldersToDelete.size());
+        assert foldersToDelete.contains(2L);
+
+        assertEquals(0, foldersToInsert.size());
+        assertEquals(0, movedFiles.size());
     }
 }

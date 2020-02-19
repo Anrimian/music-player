@@ -111,6 +111,9 @@ public class CompositionsDaoWrapper {
         }
         query.append("folderId = ");
         query.append(folderId);
+        query.append(" OR (folderId IS NULL AND ");
+        query.append(folderId);
+        query.append(" IS NULL)");
         query.append(getOrderQuery(order));
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString());
         return compositionsDao.getAllInFolderObservable(sqlQuery);

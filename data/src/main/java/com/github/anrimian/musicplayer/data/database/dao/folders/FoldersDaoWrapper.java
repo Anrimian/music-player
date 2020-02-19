@@ -101,21 +101,8 @@ public class FoldersDaoWrapper {
         });
     }
 
-    private void insertNode(Long dbParentId,
-                            FolderNode<Long> nodeToInsert,
-                            LongSparseArray<Long> compositionsIdMap) {
-        String name = nodeToInsert.getKeyPath();
-        if (name == null) {
-            return;
-        }
-
-        long id = foldersDao.insertFolder(new FolderEntity(dbParentId, name));
-        for (Long compositionId : nodeToInsert.getFiles()) {
-            compositionsIdMap.put(compositionId, id);
-        }
-        for (FolderNode<Long> node: nodeToInsert.getFolders()) {
-            insertNode(id, node, compositionsIdMap);
-        }
+    public void deleteFolders(List<Long> ids) {
+        foldersDao.deleteFolders(ids);
     }
 
     public String[] getIgnoredFolders() {
@@ -177,6 +164,23 @@ public class FoldersDaoWrapper {
         sb.append("%'");
 
         return sb.toString();
+    }
+
+    private void insertNode(Long dbParentId,
+                            FolderNode<Long> nodeToInsert,
+                            LongSparseArray<Long> compositionsIdMap) {
+        String name = nodeToInsert.getKeyPath();
+        if (name == null) {
+            return;
+        }
+
+        long id = foldersDao.insertFolder(new FolderEntity(dbParentId, name));
+        for (Long compositionId : nodeToInsert.getFiles()) {
+            compositionsIdMap.put(compositionId, id);
+        }
+        for (FolderNode<Long> node: nodeToInsert.getFolders()) {
+            insertNode(id, node, compositionsIdMap);
+        }
     }
 
 }
