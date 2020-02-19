@@ -146,23 +146,23 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onCompositionClicked(int position, CompositionFileSource2 musicFileSource) {
-//        processMultiSelectClick(position, musicFileSource, () -> {
-//            Composition composition = musicFileSource.getComposition();
-//            getViewState().showCompositionActionDialog(composition);
-//        });
+        processMultiSelectClick(position, musicFileSource, () -> {
+            Composition composition = musicFileSource.getComposition();
+            getViewState().showCompositionActionDialog(composition);
+        });
     }
 
     void onCompositionIconClicked(int position, Composition composition) {
         if (composition.equals(currentComposition)) {
             playerInteractor.playOrPause();
         } else {
-            interactor.play(path, composition);
+            interactor.play(folderId, composition);
             getViewState().showCurrentPlayingComposition(composition);
         }
     }
 
     void onPlayActionSelected(Composition composition) {
-        interactor.play(path, composition);
+        interactor.play(folderId, composition);
     }
 
     void onPlayNextCompositionClicked(Composition composition) {
@@ -440,20 +440,20 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 //        presenterDisposable.add(shareActionDisposable);
     }
 
-    private void processMultiSelectClick(int position, FileSource folder, Runnable onClick) {
-//        if (selectedFiles.isEmpty()) {
-//            onClick.run();
-//            closeSelectionMode();
-//        } else {
-//            if (selectedFiles.contains(folder)) {
-//                selectedFiles.remove(folder);
-//                getViewState().onItemUnselected(folder, position);
-//            } else {
-//                selectedFiles.add(folder);
-//                getViewState().onItemSelected(folder, position);
-//            }
-//            getViewState().showSelectionMode(selectedFiles.size());
-//        }
+    private void processMultiSelectClick(int position, FileSource2 folder, Runnable onClick) {
+        if (selectedFiles.isEmpty()) {
+            onClick.run();
+            closeSelectionMode();
+        } else {
+            if (selectedFiles.contains(folder)) {
+                selectedFiles.remove(folder);
+                getViewState().onItemUnselected(folder, position);
+            } else {
+                selectedFiles.add(folder);
+                getViewState().onItemSelected(folder, position);
+            }
+            getViewState().showSelectionMode(selectedFiles.size());
+        }
     }
 
     private void closeSelectionMode() {

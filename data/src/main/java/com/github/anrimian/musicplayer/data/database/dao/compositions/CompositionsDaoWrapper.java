@@ -6,6 +6,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
@@ -67,19 +68,7 @@ public class CompositionsDaoWrapper {
 
     public Observable<List<Composition>> getAllObservable(Order order,
                                                           @Nullable String searchText) {
-        String query = "SELECT " +
-                "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
-                "(SELECT name FROM albums WHERE id = albumId) as album,  " +
-                "title as title,  " +
-                "filePath as filePath,  " +
-                "duration as duration,  " +
-                "size as size,  " +
-                "id as id,  " +
-                "storageId as storageId,  " +
-                "dateAdded as dateAdded,  " +
-                "dateModified as dateModified,  " +
-                "corruptionType as corruptionType  " +
-                "FROM compositions";
+        String query = CompositionsDao.getCompositionQuery();
         query += getSearchQuery(searchText);
         query += getOrderQuery(order);
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
@@ -89,19 +78,7 @@ public class CompositionsDaoWrapper {
     public Observable<List<Composition>> getCompositionsInFolderObservable(Long folderId,
                                                                            Order order,
                                                                            @Nullable String searchText) {
-        StringBuilder query = new StringBuilder("SELECT " +
-                "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
-                "(SELECT name FROM albums WHERE id = albumId) as album,  " +
-                "title as title,  " +
-                "filePath as filePath,  " +
-                "duration as duration,  " +
-                "size as size,  " +
-                "id as id,  " +
-                "storageId as storageId,  " +
-                "dateAdded as dateAdded,  " +
-                "dateModified as dateModified,  " +
-                "corruptionType as corruptionType  " +
-                "FROM compositions");
+        StringBuilder query = new StringBuilder(CompositionsDao.getCompositionQuery());
         String searchQuery = getSearchQuery(searchText);
         query.append(searchQuery);
         if (isEmpty(searchQuery)) {
@@ -117,6 +94,17 @@ public class CompositionsDaoWrapper {
         query.append(getOrderQuery(order));
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString());
         return compositionsDao.getAllInFolderObservable(sqlQuery);
+    }
+
+    public List<Composition> getAllCompositionsInFolder(Long parentFolderId, Order order) {
+        String query = FoldersDao.getRecursiveFolderQuery(parentFolderId);
+        query += CompositionsDao.getCompositionQuery();
+        query += " WHERE folderId IN (SELECT childFolderId FROM allChildFolders) ";
+        query += "OR folderId = ";
+        query += parentFolderId;
+        query += getOrderQuery(order);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        return compositionsDao.getAllFolder(sqlQuery);
     }
 
     public List<Composition> getAll() {

@@ -88,8 +88,8 @@ public class LibraryFoldersInteractor {
                 .subscribe();
     }
 
-    public void play(String path, Composition composition) {
-        libraryRepository.getAllCompositionsInPath(path)
+    public void play(Long folderId, Composition composition) {
+        libraryRepository.getAllCompositionsInFolder(folderId)
                 .doOnSuccess(compositions -> {
                     int firstPosition = compositions.indexOf(composition);
                     musicPlayerInteractor.startPlaying(compositions, firstPosition);

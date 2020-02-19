@@ -65,7 +65,10 @@ public interface LibraryRepository {
 
     Observable<FolderFileSource2> getFolderObservable(long folderId);
 
+    @Deprecated
     Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
+
+    Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId);
 
     Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources);
 

@@ -5,11 +5,13 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RawQuery;
 import androidx.room.Update;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
@@ -64,6 +66,9 @@ public interface CompositionsDao {
 
     @RawQuery(observedEntities = { CompositionEntity.class, ArtistEntity.class, AlbumEntity.class })
     Observable<List<Composition>> getAllInFolderObservable(SupportSQLiteQuery query);
+
+    @RawQuery
+    List<Composition> getAllFolder(SimpleSQLiteQuery sqlQuery);
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
@@ -155,4 +160,20 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET dateModified = :date WHERE id = :id")
     void setUpdateTime(long id, Date date);
+
+    static String getCompositionQuery() {
+        return "SELECT " +
+                "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
+                "(SELECT name FROM albums WHERE id = albumId) as album,  " +
+                "title as title,  " +
+                "filePath as filePath,  " +
+                "duration as duration,  " +
+                "size as size,  " +
+                "id as id,  " +
+                "storageId as storageId,  " +
+                "dateAdded as dateAdded,  " +
+                "dateModified as dateModified,  " +
+                "corruptionType as corruptionType  " +
+                "FROM compositions";
+    }
 }

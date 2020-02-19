@@ -192,6 +192,14 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
+    public Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId) {
+        return Single.fromCallable(() -> compositionsDao.getAllCompositionsInFolder(
+                folderId,
+                settingsPreferences.getFolderOrder()
+        )).subscribeOn(scheduler);
+    }
+
+    @Override
     public Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources) {
         return extractAllCompositionsInFolders(fileSources)
                 .subscribeOn(scheduler);

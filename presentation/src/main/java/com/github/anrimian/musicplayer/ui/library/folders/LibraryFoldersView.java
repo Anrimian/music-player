@@ -117,10 +117,10 @@ public interface LibraryFoldersView extends MvpView {
     void showSelectionMode(int count);
 
     @StateStrategyType(SkipStrategy.class)
-    void onItemSelected(FileSource item, int position);
+    void onItemSelected(FileSource2 item, int position);
 
     @StateStrategyType(SkipStrategy.class)
-    void onItemUnselected(FileSource item, int position);
+    void onItemUnselected(FileSource2 item, int position);
 
     @StateStrategyType(SkipStrategy.class)
     void setItemsSelected(boolean selected);

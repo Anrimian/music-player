@@ -51,4 +51,12 @@ public interface FoldersDao {
 
     @Query("DELETE FROM folders WHERE id IN(:ids)")
     void deleteFolders(List<Long> ids);
+
+    static String getRecursiveFolderQuery(Long parentFolderId) {
+        return "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
+                "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)" +
+                "UNION " +
+                "SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
+                ")";
+    }
 }

@@ -540,12 +540,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void onItemSelected(FileSource item, int position) {
+    public void onItemSelected(FileSource2 item, int position) {
         adapter.setItemSelected(position);
     }
 
     @Override
-    public void onItemUnselected(FileSource item, int position) {
+    public void onItemUnselected(FileSource2 item, int position) {
         adapter.setItemUnselected(position);
     }
 

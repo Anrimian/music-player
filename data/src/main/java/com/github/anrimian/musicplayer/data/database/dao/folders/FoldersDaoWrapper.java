@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFold
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
@@ -120,11 +121,7 @@ public class FoldersDaoWrapper {
     private Observable<List<FolderFileSource2>> getFoldersObservable(Long parentFolderId,
                                                                      Order order,
                                                                      @Nullable String searchText) {
-        String query = "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
-                "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)" +
-                "UNION " +
-                "SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
-                ")" +
+        String query = FoldersDao.getRecursiveFolderQuery(parentFolderId) +
                 "SELECT id, name, " +
                 "(SELECT count() FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id)) as filesCount " +
                 "FROM folders " +
@@ -182,5 +179,4 @@ public class FoldersDaoWrapper {
             insertNode(id, node, compositionsIdMap);
         }
     }
-
 }

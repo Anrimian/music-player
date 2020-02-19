@@ -80,8 +80,8 @@ public class LibraryFoldersScreenInteractor {
         foldersInteractor.play(fileSources);
     }
 
-    public void play(String path, Composition composition) {
-        foldersInteractor.play(path, composition);
+    public void play(Long folderId, Composition composition) {
+        foldersInteractor.play(folderId, composition);
     }
 
     public void addCompositionsToPlayNext(List<FileSource> fileSources) {

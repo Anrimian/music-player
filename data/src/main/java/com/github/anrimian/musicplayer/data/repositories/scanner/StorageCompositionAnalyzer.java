@@ -77,6 +77,7 @@ class StorageCompositionAnalyzer {
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
         if (hasChanges) {
+            //move all in 1 transaction and in 1 class
             LongSparseArray<Long> compositionIdMap = foldersDao.insertFolders(foldersToInsert);//how to test this?
             compositionsDao.applyChanges(addedCompositions,
                     deletedCompositions,
