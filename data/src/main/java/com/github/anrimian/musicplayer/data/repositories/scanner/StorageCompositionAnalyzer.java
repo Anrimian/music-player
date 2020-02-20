@@ -52,6 +52,7 @@ public class StorageCompositionAnalyzer {
         );
     }
 
+    //mess after second live rescan
     public synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
         FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
         actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?

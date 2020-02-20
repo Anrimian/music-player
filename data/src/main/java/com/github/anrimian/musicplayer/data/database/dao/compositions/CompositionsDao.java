@@ -95,6 +95,7 @@ public interface CompositionsDao {
             "compositions.size as size, " +
             "compositions.id as id, " +
             "compositions.storageId as storageId, " +
+            "compositions.folderId as folderId, " +
             "compositions.dateAdded as dateAdded, " +
             "compositions.dateModified as dateModified " +
             "FROM compositions WHERE storageId NOTNULL")
