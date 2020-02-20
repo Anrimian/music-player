@@ -36,6 +36,7 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -278,6 +279,25 @@ public class LibraryRepositoryImpl implements LibraryRepository {
                         .doOnComplete(() -> foldersDao.deleteFolder(folder.getId(), compositions))
                         .toSingleDefault(compositions))
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Composition>> deleteFolders(List<FileSource2> folders) {
+        return extractAllCompositionsInFolders(folders)
+                .flatMap(compositions -> storageMusicDataSource.deleteCompositionFiles(compositions)
+                        .doOnComplete(() -> foldersDao.deleteFolders(extractFolderIds(folders), compositions))
+                        .toSingleDefault(compositions))
+                .subscribeOn(scheduler);
+    }
+
+    private List<Long> extractFolderIds(List<FileSource2> sources) {
+        List<Long> result = new LinkedList<>();
+        for (FileSource2 source : sources) {
+            if (source instanceof FolderFileSource2) {
+                result.add(((FolderFileSource2) source).getId());
+            }
+        }
+        return result;
     }
 
     private Comparator<FileSource> getFileComparator(Order order) {

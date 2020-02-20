@@ -215,7 +215,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onDeleteCompositionsDialogConfirmed() {
-        deletePreparedCompositions();
+        deletePreparedFiles();
     }
 
     void onDeleteFolderDialogConfirmed() {
@@ -484,9 +484,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         getViewState().showReceiveCompositionsForSendError(errorCommand);
     }
 
-    private void deletePreparedCompositions() {
+    private void deletePreparedFiles() {
         dispose(deleteActionDisposable, presenterDisposable);
-        deleteActionDisposable = interactor.deleteCompositions(filesToDelete)
+        deleteActionDisposable = interactor.deleteFiles(filesToDelete)
                 .observeOn(uiScheduler)
                 .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionsError);
         presenterDisposable.add(deleteActionDisposable);

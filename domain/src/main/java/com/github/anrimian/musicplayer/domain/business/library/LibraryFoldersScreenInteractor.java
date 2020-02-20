@@ -92,7 +92,7 @@ public class LibraryFoldersScreenInteractor {
         foldersInteractor.addCompositionsToEnd(fileSources);
     }
 
-    public Single<List<Composition>> deleteCompositions(List<FileSource2> fileSources) {
+    public Single<List<Composition>> deleteFiles(List<FileSource2> fileSources) {
         return foldersInteractor.deleteCompositions(fileSources);
     }
 

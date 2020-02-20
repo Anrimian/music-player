@@ -97,4 +97,6 @@ public interface LibraryRepository {
     Completable deleteIgnoredFolder(IgnoredFolder folder);
 
     Single<List<Composition>> deleteFolder(FolderFileSource2 folder);
+
+    Single<List<Composition>> deleteFolders(List<FileSource2> folders);
 }

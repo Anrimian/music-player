@@ -94,6 +94,13 @@ public class FoldersDaoWrapper {
         });
     }
 
+    public void deleteFolders(List<Long> folders, List<Composition> childCompositions) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.deleteAll(mapList(childCompositions, Composition::getId));
+            foldersDao.deleteFolders(folders);
+        });
+    }
+
     public String[] getIgnoredFolders() {
         return foldersDao.getIgnoredFolders();
     }

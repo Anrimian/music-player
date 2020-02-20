@@ -110,9 +110,7 @@ public class LibraryFoldersInteractor {
     }
 
     public Single<List<Composition>> deleteCompositions(List<FileSource2> fileSources) {
-        return libraryRepository.getAllCompositionsInFolders(fileSources)//blinking on delete, use separate method
-                .flatMap(compositions -> libraryRepository.deleteCompositions(compositions)
-                        .toSingleDefault(compositions));
+        return libraryRepository.deleteFolders(fileSources);
     }
 
     public Single<List<Composition>> deleteFolder(FolderFileSource2 folder) {
