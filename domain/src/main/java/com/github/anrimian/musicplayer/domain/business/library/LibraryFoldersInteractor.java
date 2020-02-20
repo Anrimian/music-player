@@ -78,11 +78,11 @@ public class LibraryFoldersInteractor {
         return libraryRepository.getAllCompositionsInFolder(folderId);
     }
 
-    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource> fileSources) {
+    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource2> fileSources) {
         return libraryRepository.getAllCompositionsInFolders(fileSources);
     }
 
-    public void play(List<FileSource> fileSources) {
+    public void play(List<FileSource2> fileSources) {
         libraryRepository.getAllCompositionsInFolders(fileSources)
                 .doOnSuccess(musicPlayerInteractor::startPlaying)
                 .subscribe();
@@ -97,37 +97,35 @@ public class LibraryFoldersInteractor {
                 .subscribe();
     }
 
-    public void addCompositionsToPlayNext(List<FileSource> fileSources) {
+    public void addCompositionsToPlayNext(List<FileSource2> fileSources) {
         libraryRepository.getAllCompositionsInFolders(fileSources)
                 .flatMapCompletable(musicPlayerInteractor::addCompositionsToPlayNext)
                 .subscribe();
     }
 
-    public void addCompositionsToEnd(List<FileSource> fileSources) {
+    public void addCompositionsToEnd(List<FileSource2> fileSources) {
         libraryRepository.getAllCompositionsInFolders(fileSources)
                 .flatMapCompletable(musicPlayerInteractor::addCompositionsToEnd)
                 .subscribe();
     }
 
-    public Single<List<Composition>> deleteCompositions(List<FileSource> fileSources) {
-        return libraryRepository.getAllCompositionsInFolders(fileSources)
+    public Single<List<Composition>> deleteCompositions(List<FileSource2> fileSources) {
+        return libraryRepository.getAllCompositionsInFolders(fileSources)//blinking on delete, use separate method
                 .flatMap(compositions -> libraryRepository.deleteCompositions(compositions)
                         .toSingleDefault(compositions));
     }
 
-    public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
-        return libraryRepository.getAllCompositionsInPath(folder.getPath())
-                .flatMap(compositions -> libraryRepository.deleteCompositions(compositions)
-                        .toSingleDefault(compositions));
+    public Single<List<Composition>> deleteFolder(FolderFileSource2 folder) {
+        return libraryRepository.deleteFolder(folder);
     }
 
-    public Single<List<Composition>> addCompositionsToPlayList(String path, PlayList playList) {
-        return libraryRepository.getAllCompositionsInPath(path)
+    public Single<List<Composition>> addCompositionsToPlayList(FolderFileSource2 folder, PlayList playList) {
+        return libraryRepository.getAllCompositionsInFolder(folder.getId())
                 .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
                         .toSingleDefault(compositions));
     }
 
-    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource> fileSources, PlayList playList) {
+    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource2> fileSources, PlayList playList) {
         return libraryRepository.getAllCompositionsInFolders(fileSources)
                 .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
                         .toSingleDefault(compositions));

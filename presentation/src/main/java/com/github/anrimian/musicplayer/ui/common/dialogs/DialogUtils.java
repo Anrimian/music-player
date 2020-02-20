@@ -13,6 +13,7 @@ import androidx.core.content.FileProvider;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -37,11 +38,11 @@ public class DialogUtils {
     }
 
     public static void showConfirmDeleteDialog(Context context,
-                                               FolderFileSource folderFileSource,
+                                               FolderFileSource2 folder,
                                                Runnable deleteCallback) {
         String message = context.getString(R.string.delete_folder_template,
-                getLastPathSegment(folderFileSource.getPath()),
-                getDativCompositionsMessage(context, folderFileSource.getFilesCount()));
+                folder.getName(),
+                getDativCompositionsMessage(context, folder.getFilesCount()));
         showConfirmDeleteDialog(context, message, deleteCallback);
     }
 

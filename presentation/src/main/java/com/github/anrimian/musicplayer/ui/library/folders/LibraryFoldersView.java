@@ -81,7 +81,7 @@ public interface LibraryFoldersView extends MvpView {
     void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showConfirmDeleteDialog(FolderFileSource folder);
+    void showConfirmDeleteDialog(FolderFileSource2 folder);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showSearchMode(boolean show);
@@ -111,7 +111,7 @@ public interface LibraryFoldersView extends MvpView {
     void setDisplayCoversEnabled(boolean isCoversEnabled);
 
     @StateStrategyType(SkipStrategy.class)
-    void showInputFolderNameDialog(String path);
+    void showInputFolderNameDialog(FolderFileSource2 folder);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showSelectionMode(int count);

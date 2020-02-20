@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
@@ -44,6 +45,8 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
+
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
  * Created on 24.10.2017.
@@ -193,14 +196,12 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId) {
-        return Single.fromCallable(() -> compositionsDao.getAllCompositionsInFolder(
-                folderId,
-                settingsPreferences.getFolderOrder()
-        )).subscribeOn(scheduler);
+        return Single.fromCallable(() -> selectAllCompositionsInFolder(folderId))
+                .subscribeOn(scheduler);
     }
 
     @Override
-    public Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources) {
+    public Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource2> fileSources) {
         return extractAllCompositionsInFolders(fileSources)
                 .subscribeOn(scheduler);
     }
@@ -267,6 +268,15 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Completable deleteIgnoredFolder(IgnoredFolder folder) {
         return Completable.fromAction(() -> foldersDao.deleteIgnoredFolder(folder))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Composition>> deleteFolder(FolderFileSource2 folder) {
+        return Single.fromCallable(() -> selectAllCompositionsInFolder(folder.getId()))
+                .flatMap(compositions -> storageMusicDataSource.deleteCompositionFiles(compositions)
+                        .doOnComplete(() -> foldersDao.deleteFolder(folder.getId(), compositions))
+                        .toSingleDefault(compositions))
                 .subscribeOn(scheduler);
     }
 
@@ -350,19 +360,27 @@ public class LibraryRepositoryImpl implements LibraryRepository {
         });
     }
 
-    private Single<List<Composition>> extractAllCompositionsInFolders(Iterable<FileSource> fileSources) {
+    private Single<List<Composition>> extractAllCompositionsInFolders(Iterable<FileSource2> fileSources) {
         return Observable.fromIterable(fileSources)
                 .flatMap(this::fileSourceToComposition)
                 .collect(ArrayList::new, List::add);
     }
 
-    private Observable<Composition> fileSourceToComposition(FileSource fileSource) {
-        if (fileSource instanceof MusicFileSource) {
-            return Observable.just(((MusicFileSource) fileSource).getComposition());
+    private Observable<Composition> fileSourceToComposition(FileSource2 fileSource) {
+        if (fileSource instanceof CompositionFileSource2) {
+            return Observable.just(((CompositionFileSource2) fileSource).getComposition());
         }
-        if (fileSource instanceof FolderFileSource) {
-            return getCompositionsObservable(((FolderFileSource) fileSource).getPath());
+        if (fileSource instanceof FolderFileSource2) {
+            return Observable.fromIterable(selectAllCompositionsInFolder(
+                    ((FolderFileSource2) fileSource).getId()
+            ));
         }
         throw new IllegalStateException("unexpected file source: " + fileSource);
+    }
+
+    private List<Composition> selectAllCompositionsInFolder(Long folderId) {
+        return compositionsDao.getAllCompositionsInFolder(
+                folderId,
+                settingsPreferences.getFolderOrder());
     }
 }

@@ -72,11 +72,11 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.getAllCompositionsInFolder(folderId);
     }
 
-    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource> fileSources) {
+    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource2> fileSources) {
         return foldersInteractor.getAllCompositionsInFileSources(fileSources);
     }
 
-    public void play(List<FileSource> fileSources) {
+    public void play(List<FileSource2> fileSources) {
         foldersInteractor.play(fileSources);
     }
 
@@ -84,27 +84,27 @@ public class LibraryFoldersScreenInteractor {
         foldersInteractor.play(folderId, composition);
     }
 
-    public void addCompositionsToPlayNext(List<FileSource> fileSources) {
+    public void addCompositionsToPlayNext(List<FileSource2> fileSources) {
         foldersInteractor.addCompositionsToPlayNext(fileSources);
     }
 
-    public void addCompositionsToEnd(List<FileSource> fileSources) {
+    public void addCompositionsToEnd(List<FileSource2> fileSources) {
         foldersInteractor.addCompositionsToEnd(fileSources);
     }
 
-    public Single<List<Composition>> deleteCompositions(List<FileSource> fileSources) {
+    public Single<List<Composition>> deleteCompositions(List<FileSource2> fileSources) {
         return foldersInteractor.deleteCompositions(fileSources);
     }
 
-    public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
+    public Single<List<Composition>> deleteFolder(FolderFileSource2 folder) {
         return foldersInteractor.deleteFolder(folder);
     }
 
-    public Single<List<Composition>> addCompositionsToPlayList(String path, PlayList playList) {
-        return foldersInteractor.addCompositionsToPlayList(path, playList);
+    public Single<List<Composition>> addCompositionsToPlayList(FolderFileSource2 folder, PlayList playList) {
+        return foldersInteractor.addCompositionsToPlayList(folder, playList);
     }
 
-    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource> fileSources, PlayList playList) {
+    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource2> fileSources, PlayList playList) {
         return foldersInteractor.addCompositionsToPlayList(fileSources, playList);
     }
 

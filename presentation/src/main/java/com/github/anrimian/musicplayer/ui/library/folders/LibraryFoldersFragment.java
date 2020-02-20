@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
@@ -237,8 +236,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         filenameDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 FILE_NAME_TAG,
-                fragment -> fragment.setComplexCompleteListener((path, extra) -> {
-                    presenter.onNewFolderNameInputed(extra.getString(PATH_ARG), path);
+                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
+                    presenter.onNewFolderNameInputed(extra.getLong(ID_ARG), name);
                 }));
 
         newFolderDialogFragmentRunner = new DialogFragmentRunner<>(fm,
@@ -439,7 +438,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showConfirmDeleteDialog(FolderFileSource folder) {
+    public void showConfirmDeleteDialog(FolderFileSource2 folder) {
         DialogUtils.showConfirmDeleteDialog(requireContext(),
                 folder,
                 presenter::onDeleteFolderDialogConfirmed);
@@ -510,14 +509,14 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showInputFolderNameDialog(String path) {
+    public void showInputFolderNameDialog(FolderFileSource2 folder) {
         Bundle extra = new Bundle();
-        extra.putString(PATH_ARG, path);
+        extra.putLong(ID_ARG, folder.getId());
         InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.rename_folder,
                 R.string.change,
                 R.string.cancel,
                 R.string.folder_name,
-                formatFileName(path),
+                folder.getName(),
                 false,
                 extra);
         filenameDialogFragmentRunner.show(fragment);
@@ -637,7 +636,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 return true;
             }
             case R.id.menu_share: {
-                presenter.onShareSelectedSourcessClicked();
+                presenter.onShareSelectedSourcesClicked();
                 return true;
             }
             case R.id.menu_delete: {

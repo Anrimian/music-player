@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
  * Created on 31.10.2017.
  */
 
+@Deprecated
 public class MusicFileSource implements FileSource {
 
     @Nonnull

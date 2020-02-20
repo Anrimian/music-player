@@ -70,7 +70,7 @@ public interface LibraryRepository {
 
     Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId);
 
-    Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources);
+    Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource2> fileSources);
 
     Single<List<String>> getAvailablePathsForPath(@Nullable String path);
 
@@ -96,4 +96,5 @@ public interface LibraryRepository {
 
     Completable deleteIgnoredFolder(IgnoredFolder folder);
 
+    Single<List<Composition>> deleteFolder(FolderFileSource2 folder);
 }

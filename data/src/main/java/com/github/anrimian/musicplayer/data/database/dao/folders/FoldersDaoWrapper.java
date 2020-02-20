@@ -2,16 +2,12 @@ package com.github.anrimian.musicplayer.data.database.dao.folders;
 
 
 import androidx.annotation.Nullable;
-import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
-import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
@@ -30,11 +26,14 @@ import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class FoldersDaoWrapper {
 
+    private final AppDatabase appDatabase;
     private final FoldersDao foldersDao;
     private final CompositionsDaoWrapper compositionsDao;
 
-    public FoldersDaoWrapper(FoldersDao foldersDao,
+    public FoldersDaoWrapper(AppDatabase appDatabase,
+                             FoldersDao foldersDao,
                              CompositionsDaoWrapper compositionsDao) {
+        this.appDatabase = appDatabase;
         this.foldersDao = foldersDao;
         this.compositionsDao = compositionsDao;
     }
@@ -86,6 +85,13 @@ public class FoldersDaoWrapper {
 
     public void deleteFolders(List<Long> ids) {
         foldersDao.deleteFolders(ids);
+    }
+
+    public void deleteFolder(Long folderId, List<Composition> childCompositions) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.deleteAll(mapList(childCompositions, Composition::getId));
+            foldersDao.deleteFolder(folderId);
+        });
     }
 
     public String[] getIgnoredFolders() {

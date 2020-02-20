@@ -35,16 +35,21 @@ public class StorageMusicDataSource {
         this.scheduler = scheduler;
     }
 
-    public Completable deleteCompositions(List<Composition> compositionsToDelete) {
+    public Completable deleteCompositions(List<Composition> compositions) {
         return Completable.fromAction(() -> {
-            for (Composition composition: compositionsToDelete) {
-                deleteCompositionFile(composition);
-            }
-            compositionsDao.deleteAll(mapList(compositionsToDelete, Composition::getId));
+            deleteFiles(compositions);
+            compositionsDao.deleteAll(mapList(compositions, Composition::getId));
             musicProvider.deleteCompositions(mapListNotNull(
-                    compositionsToDelete,
+                    compositions,
                     Composition::getStorageId)
             );
+        });
+    }
+
+    public Completable deleteCompositionFiles(List<Composition> compositions) {
+        return Completable.fromAction(() -> {
+            deleteFiles(compositions);
+            musicProvider.deleteCompositions(mapListNotNull(compositions, Composition::getStorageId));
         });
     }
 
@@ -120,6 +125,12 @@ public class StorageMusicDataSource {
             compositionsDao.updateFilesPath(compositions);
             musicProvider.updateCompositionsFilePath(compositions);
         }).subscribeOn(scheduler);
+    }
+
+    private void deleteFiles(List<Composition> compositions) {
+        for (Composition composition: compositions) {
+            deleteCompositionFile(composition);
+        }
     }
 
     private void deleteCompositionFile(Composition composition) {
