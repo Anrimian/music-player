@@ -23,8 +23,8 @@ import java.util.Date;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.getTestFolderSingle;
+import static utils.TestDataProvider.fakeComposition;
+import static utils.TestDataProvider.getTestFolderSingle;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

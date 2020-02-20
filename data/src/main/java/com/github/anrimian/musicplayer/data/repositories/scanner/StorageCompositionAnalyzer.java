@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
@@ -28,19 +29,22 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
 
-class StorageCompositionAnalyzer {
+public class StorageCompositionAnalyzer {
 
     private final CompositionsDaoWrapper compositionsDao;
     private final FoldersDaoWrapper foldersDao;
+    private final StorageCompositionsInserter compositionsInserter;
 
     private final FolderTreeBuilder<StorageFullComposition, Long> folderTreeBuilder;
     private final NodeTreeBuilder nodeTreeBuilder = new NodeTreeBuilder();
     private final FolderMerger folderMerger = new FolderMerger();
 
-    StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
-                               FoldersDaoWrapper foldersDao) {
+    public StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
+                               FoldersDaoWrapper foldersDao,
+                               StorageCompositionsInserter compositionsInserter) {
         this.compositionsDao = compositionsDao;
         this.foldersDao = foldersDao;
+        this.compositionsInserter = compositionsInserter;
 
         folderTreeBuilder = new FolderTreeBuilder<>(
                 StorageFullComposition::getRelativePath,
@@ -48,7 +52,7 @@ class StorageCompositionAnalyzer {
         );
     }
 
-    synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
+    public synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
         FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
         actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?
 
@@ -77,14 +81,11 @@ class StorageCompositionAnalyzer {
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
 
         if (hasChanges) {
-            //move all in 1 transaction and in 1 class
-            LongSparseArray<Long> compositionIdMap = foldersDao.insertFolders(foldersToInsert);//how to test this?
-            compositionsDao.applyChanges(addedCompositions,
+            compositionsInserter.applyChanges(foldersToInsert,
+                    addedCompositions,
                     deletedCompositions,
                     changedCompositions,
-                    compositionIdMap);//and this
-
-            foldersDao.deleteFolders(foldersToDelete);
+                    foldersToDelete);
         }
     }
 

@@ -2,12 +2,11 @@ package com.github.anrimian.musicplayer.data.storage.providers;
 
 import androidx.collection.LongSparseArray;
 
-import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtist;
@@ -33,8 +32,8 @@ import java.util.Map;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayLists;
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.storagePlayListsAsList;
+import static utils.TestDataProvider.storagePlayLists;
+import static utils.TestDataProvider.storagePlayListsAsList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -48,10 +47,9 @@ public class MediaScannerRepositoryImplTest {
     private StorageArtistsProvider artistsProvider = mock(StorageArtistsProvider.class);
     private StorageAlbumsProvider albumsProvider = mock(StorageAlbumsProvider.class);
     private StorageGenresProvider genresProvider = mock(StorageGenresProvider.class);
-    private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
-    private FoldersDaoWrapper foldersDao = mock(FoldersDaoWrapper.class);
     private PlayListsDaoWrapper playListsDao = mock(PlayListsDaoWrapper.class);
     private GenresDaoWrapper genresDao = mock(GenresDaoWrapper.class);
+    private StorageCompositionAnalyzer compositionAnalyzer = mock(StorageCompositionAnalyzer.class);
 
     private PublishSubject<LongSparseArray<StorageFullComposition>> newCompositionsSubject = PublishSubject.create();
     private PublishSubject<LongSparseArray<StorageAlbum>> newAlbumsSubject = PublishSubject.create();
@@ -82,17 +80,14 @@ public class MediaScannerRepositoryImplTest {
 
         when(genresDao.selectAllGenreNames()).thenReturn(new HashSet<>());
 
-        when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());
-
         when(playListsDao.getPlayListsIds()).thenReturn(asList(new IdPair(1L, 1L)));
 
         mediaStorageRepository = new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
                 genresProvider,
-                compositionsDao,
-                foldersDao,
                 playListsDao,
                 genresDao,
+                compositionAnalyzer,
                 Schedulers.trampoline());
     }
 

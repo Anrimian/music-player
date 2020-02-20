@@ -119,13 +119,12 @@ public class DbModule {
     CompositionsDaoWrapper compositionsDaoWrapper(AppDatabase appDatabase,
                                                   ArtistsDao artistsDao,
                                                   CompositionsDao compositionsDao,
-                                                  AlbumsDao albumsDao,
-                                                  GenreDao genresDao) {
+                                                  AlbumsDao albumsDao) {
         return new CompositionsDaoWrapper(appDatabase,
                 artistsDao,
                 compositionsDao,
-                albumsDao,
-                genresDao);
+                albumsDao
+        );
     }
 
     @Provides
@@ -138,10 +137,9 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
-    FoldersDaoWrapper foldersDaoWrapper(AppDatabase appDatabase,
-                                        FoldersDao foldersDao,
+    FoldersDaoWrapper foldersDaoWrapper(FoldersDao foldersDao,
                                         CompositionsDaoWrapper compositionsDao) {
-        return new FoldersDaoWrapper(appDatabase, foldersDao, compositionsDao);
+        return new FoldersDaoWrapper(foldersDao, compositionsDao);
     }
 
     @Provides

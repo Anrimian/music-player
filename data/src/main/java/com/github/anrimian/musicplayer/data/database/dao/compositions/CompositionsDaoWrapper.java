@@ -42,18 +42,15 @@ public class CompositionsDaoWrapper {
     private final CompositionsDao compositionsDao;
     private final ArtistsDao artistsDao;
     private final AlbumsDao albumsDao;
-    private final GenreDao genresDao;
 
     public CompositionsDaoWrapper(AppDatabase appDatabase,
                                   ArtistsDao artistsDao,
                                   CompositionsDao compositionsDao,
-                                  AlbumsDao albumsDao,
-                                  GenreDao genresDao) {
+                                  AlbumsDao albumsDao) {
         this.appDatabase = appDatabase;
         this.artistsDao = artistsDao;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
-        this.genresDao = genresDao;
     }
 
     public Observable<List<Composition>> getAllObservable() {
@@ -244,129 +241,8 @@ public class CompositionsDaoWrapper {
         });
     }
 
-    public void applyChanges(List<StorageFullComposition> addedCompositions,
-                             List<StorageComposition> deletedCompositions,
-                             List<Change<StorageComposition, StorageFullComposition>> changedCompositions,
-                             LongSparseArray<Long> folderIdMap) {
-        appDatabase.runInTransaction(() -> {
-            insertCompositions(addedCompositions, folderIdMap);
-
-            for (StorageComposition composition: deletedCompositions) {
-                compositionsDao.delete(composition.getId());
-            }
-
-            for (Change<StorageComposition, StorageFullComposition> change: changedCompositions) {
-                handleCompositionUpdate(change, folderIdMap);
-            }
-            albumsDao.deleteEmptyAlbums();
-            artistsDao.deleteEmptyArtists();
-            genresDao.deleteEmptyGenres();//not working properly here. Or just not working. Check
-        });
-    }
-
     public void setCorruptionType(CorruptionType corruptionType, long id) {
         compositionsDao.setCorruptionType(corruptionType, id);
-    }
-
-    private void handleCompositionUpdate(Change<StorageComposition, StorageFullComposition> change,
-                                         LongSparseArray<Long> folderIdMap) {
-        StorageFullComposition composition = change.getObj();
-        StorageComposition oldComposition = change.getOld();
-
-        String newArtist = composition.getArtist();
-        if (!Objects.equals(newArtist, oldComposition.getArtist())) {
-            updateArtist(oldComposition.getId(), newArtist);
-        }
-
-        String newAlbumName = null;
-        String newAlbumArtist = null;
-        StorageAlbum newAlbum = composition.getStorageAlbum();
-        if (newAlbum != null) {
-            newAlbumName = newAlbum.getAlbum();
-            newAlbumArtist = newAlbum.getArtist();
-        }
-        if (!Objects.equals(newAlbumName, oldComposition.getAlbum())) {
-            updateAlbum(oldComposition.getId(), newAlbumName);
-        }
-        if (!Objects.equals(newAlbumArtist, oldComposition.getAlbumArtist())) {
-            updateAlbumArtist(oldComposition.getId(), newAlbumArtist);
-        }
-//        if (oldComposition.getFolderId != folderIdMap.get(storageId)) {
-        //update folderId
-//        }
-
-        compositionsDao.update(
-                composition.getTitle(),
-                composition.getFilePath(),
-                composition.getDuration(),
-                composition.getSize(),
-                composition.getDateAdded(),
-                composition.getDateModified(),
-                composition.getId()
-        );
-    }
-
-    private void insertCompositions(List<StorageFullComposition> addedCompositions,
-                                    LongSparseArray<Long> folderIdMap) {
-        //optimization with cache, ~33% faster
-        Map<String, Long> artistsCache = new HashMap<>();
-        Map<String, Long> albumsCache = new HashMap<>();
-        compositionsDao.insert(mapList(
-                addedCompositions,
-                composition -> toCompositionEntity(composition, artistsCache, albumsCache, folderIdMap))
-        );
-    }
-
-    private CompositionEntity toCompositionEntity(StorageFullComposition composition,
-                                                  Map<String, Long> artistsCache,
-                                                  Map<String, Long> albumsCache,
-                                                  LongSparseArray<Long> folderIdMap) {
-        String artist = composition.getArtist();
-        Long artistId = getOrInsertArtist(artist, artistsCache);
-
-        Long albumId = null;
-        StorageAlbum storageAlbum = composition.getStorageAlbum();
-        if (storageAlbum != null) {
-            Long albumArtistId = getOrInsertArtist(storageAlbum.getArtist(), artistsCache);
-            albumId = getOrInsertAlbum(storageAlbum, albumArtistId, albumsCache);
-        }
-        return CompositionMapper.toEntity(composition, artistId, albumId, folderIdMap.get(composition.getId()));
-    }
-
-    private Long getOrInsertAlbum(StorageAlbum storageAlbum,
-                                  Long albumArtistId,
-                                  Map<String, Long> albumsCache) {
-        String albumName = storageAlbum.getAlbum();
-
-        Long albumId = albumsCache.get(albumName);
-        if (albumId != null) {
-            return albumId;
-        }
-
-        albumId = albumsDao.findAlbum(albumArtistId, albumName);
-        if (albumId == null) {
-            albumId = albumsDao.insert(new AlbumEntity(albumArtistId,
-                    albumName,
-                    storageAlbum.getFirstYear(),
-                    storageAlbum.getLastYear()));
-        }
-        albumsCache.put(albumName, albumId);
-        return albumId;
-    }
-
-    private Long getOrInsertArtist(String artist, Map<String, Long> artistsCache) {
-        Long artistId = artistsCache.get(artist);
-        if (artistId != null) {
-            return artistId;
-        }
-        if (artist != null) {
-            artistId = artistsDao.findArtistIdByName(artist);
-            if (artistId == null) {
-                artistId = artistsDao.insertArtist(new ArtistEntity(artist));
-            }
-            artistsCache.put(artist, artistId);
-        }
-        return artistId;
     }
 
     private String getOrderQuery(Order order) {

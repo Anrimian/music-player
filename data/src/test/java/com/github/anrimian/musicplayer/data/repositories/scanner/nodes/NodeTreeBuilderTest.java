@@ -4,15 +4,14 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
-import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
-import com.github.anrimian.musicplayer.data.utils.TestDataProvider.StorageCompositionBuilder;
+import utils.TestDataProvider;
 
 import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
+import static utils.TestDataProvider.fakeStorageComposition;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

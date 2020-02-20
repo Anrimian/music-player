@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
+import static utils.TestDataProvider.fakeComposition;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 

@@ -30,21 +30,13 @@ import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class FoldersDaoWrapper {
 
-    private final AppDatabase appDatabase;
     private final FoldersDao foldersDao;
     private final CompositionsDaoWrapper compositionsDao;
 
-    public FoldersDaoWrapper(AppDatabase appDatabase,
-                             FoldersDao foldersDao,
+    public FoldersDaoWrapper(FoldersDao foldersDao,
                              CompositionsDaoWrapper compositionsDao) {
-        this.appDatabase = appDatabase;
         this.foldersDao = foldersDao;
         this.compositionsDao = compositionsDao;
-    }
-
-    @Nullable
-    public Long getFolderIdToInsert(String filePath) {
-        return null;
     }
 
     public Observable<List<FileSource2>> getFilesObservable(Long parentFolderId,
@@ -90,16 +82,6 @@ public class FoldersDaoWrapper {
 
     public void insert(IgnoredFolder folder) {
         foldersDao.insert(new IgnoredFolderEntity(folder.getRelativePath(), folder.getAddDate()));
-    }
-
-    public LongSparseArray<Long> insertFolders(List<AddedNode> foldersToInsert) {
-        return appDatabase.runInTransaction(() -> {
-            LongSparseArray<Long> compositionsIdMap = new LongSparseArray<>();
-            for (AddedNode node: foldersToInsert) {
-                insertNode(node.getFolderDbId(), node.getNode(), compositionsIdMap);
-            }
-            return compositionsIdMap;
-        });
     }
 
     public void deleteFolders(List<Long> ids) {
@@ -161,22 +143,5 @@ public class FoldersDaoWrapper {
         sb.append("%'");
 
         return sb.toString();
-    }
-
-    private void insertNode(Long dbParentId,
-                            FolderNode<Long> nodeToInsert,
-                            LongSparseArray<Long> compositionsIdMap) {
-        String name = nodeToInsert.getKeyPath();
-        if (name == null) {
-            return;
-        }
-
-        long id = foldersDao.insertFolder(new FolderEntity(dbParentId, name));
-        for (Long compositionId : nodeToInsert.getFiles()) {
-            compositionsIdMap.put(compositionId, id);
-        }
-        for (FolderNode<Long> node: nodeToInsert.getFolders()) {
-            insertNode(id, node, compositionsIdMap);
-        }
     }
 }

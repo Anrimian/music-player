@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
-import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
+import utils.TestDataProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;

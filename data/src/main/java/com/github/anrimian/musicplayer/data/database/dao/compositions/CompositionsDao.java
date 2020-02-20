@@ -143,6 +143,9 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
 
+    @Query("UPDATE compositions SET folderId = :folderId WHERE id = :id")
+    void updateFolderId(long id, Long folderId);
+
     @Query("SELECT id FROM compositions WHERE storageId = :storageId")
     long selectIdByStorageId(long storageId);
 
@@ -176,4 +179,5 @@ public interface CompositionsDao {
                 "corruptionType as corruptionType  " +
                 "FROM compositions";
     }
+
 }

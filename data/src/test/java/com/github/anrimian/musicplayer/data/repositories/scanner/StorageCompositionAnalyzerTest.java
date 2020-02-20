@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
@@ -11,9 +12,7 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
-import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
-import com.github.anrimian.musicplayer.data.utils.TestDataProvider.StorageCompositionBuilder;
-import com.github.anrimian.musicplayer.data.utils.TestDataProvider.StorageLocalCompositionBuilder;
+import utils.TestDataProvider.StorageCompositionBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +22,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageFullComposition;
+import static utils.TestDataProvider.fakeStorageComposition;
+import static utils.TestDataProvider.fakeStorageFullComposition;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static java.util.Collections.emptyList;
 import static org.mockito.Matchers.any;
@@ -38,6 +37,7 @@ public class StorageCompositionAnalyzerTest {
 
     private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
     private FoldersDaoWrapper foldersDao = mock(FoldersDaoWrapper.class);
+    private StorageCompositionsInserter compositionsInserter = mock(StorageCompositionsInserter.class);
 
     private StorageCompositionAnalyzer analyzer;
     
@@ -46,9 +46,8 @@ public class StorageCompositionAnalyzerTest {
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());
 
         when(foldersDao.getIgnoredFolders()).thenReturn(new String[0]);
-        when(foldersDao.insertFolders(any())).thenReturn(new LongSparseArray<>());
 
-        analyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDao);
+        analyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDao, compositionsInserter);
     }
 
     @Test
@@ -70,7 +69,8 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                any(),
                 eq(asList(fakeStorageFullComposition(4, "music-4"))),//new
                 eq(asList(fakeStorageComposition(2, "music-2"))),//removed
                 eq(asList(new Change<>(fakeStorageComposition(3, "music-3"), changedComposition))),
@@ -92,7 +92,8 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao, never()).applyChanges(
+        verify(compositionsInserter, never()).applyChanges(
+                any(),
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1000), changedComposition))),
@@ -120,7 +121,8 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                any(),
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition))),
@@ -148,7 +150,8 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                any(),
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition))),
@@ -188,7 +191,8 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                any(),
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(oldComposition, changedComposition))),
@@ -214,7 +218,8 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                any(),
                 eq(asList(expectedComposition)),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -240,15 +245,13 @@ public class StorageCompositionAnalyzerTest {
         FolderNode<Long> node = new FolderNode<>("music");
         node.addFolder(new FolderNode<>("new"));
         expectedNodesToInsert.add(new AddedNode(null, node));
-        verify(foldersDao).insertFolders(eq(expectedNodesToInsert));
 
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                eq(expectedNodesToInsert),
                 eq(asList(c1, c2, c3)),
                 eq(emptyList()),
                 eq(emptyList()),
-                any());
-
-        verify(foldersDao).deleteFolders(eq(emptyList()));
+                eq(emptyList()));
     }
 
     @Test
@@ -274,9 +277,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(foldersDao, never()).insertFolders(any());
-        verify(compositionsDao, never()).applyChanges(any(), any(), any(), any());
-        verify(foldersDao, never()).deleteFolders(any());
+        verify(compositionsInserter, never()).applyChanges(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -306,15 +307,13 @@ public class StorageCompositionAnalyzerTest {
         List<AddedNode> expectedNodesToInsert = new ArrayList<>();
         FolderNode<Long> node = new FolderNode<>("new");
         expectedNodesToInsert.add(new AddedNode(null, node));
-        verify(foldersDao).insertFolders(eq(expectedNodesToInsert));
 
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                eq(expectedNodesToInsert),
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(composition2, c2))),
-                any());
-
-        verify(foldersDao).deleteFolders(eq(asList(2L)));
+                eq(asList(2L)));
     }
 
     @Test
@@ -344,9 +343,9 @@ public class StorageCompositionAnalyzerTest {
         List<AddedNode> expectedNodesToInsert = new ArrayList<>();
         FolderNode<Long> node = new FolderNode<>("new");
         expectedNodesToInsert.add(new AddedNode(null, node));
-        verify(foldersDao).insertFolders(eq(expectedNodesToInsert));
 
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                eq(expectedNodesToInsert),
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(composition2, c2))),
@@ -375,15 +374,12 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(foldersDao).insertFolders(eq(emptyList()));
-
-        verify(compositionsDao).applyChanges(
+        verify(compositionsInserter).applyChanges(
+                eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(composition2)),
                 eq(emptyList()),
-                any());
-
-        verify(foldersDao).deleteFolders(eq(asList(2L)));
+                eq(asList(2L)));
     }
 
 }

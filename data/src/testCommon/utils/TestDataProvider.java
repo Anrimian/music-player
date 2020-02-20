@@ -1,7 +1,8 @@
-package com.github.anrimian.musicplayer.data.utils;
+package utils;
 
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -30,6 +31,28 @@ import static java.util.Arrays.asList;
  * Created on 16.04.2018.
  */
 public class TestDataProvider {
+
+    public static CompositionEntity composition(Long artistId,
+                                                Long albumId,
+                                                String title,
+                                                Long folderId) {
+        return new CompositionEntity(
+                artistId,
+                albumId,
+                folderId,
+                title,
+                "test file path",
+                100L,
+                100L,
+                null,
+                new Date(),
+                new Date(),
+                null);
+    }
+
+    public static CompositionEntity composition(Long artistId, Long albumId, String title) {
+        return composition(artistId, albumId, title, null);
+    }
 
     public static List<Composition> getFakeCompositions() {
         List<Composition> compositions = new ArrayList<>();
@@ -357,6 +380,12 @@ public class TestDataProvider {
 
     public static StorageFullComposition fakeStorageFullComposition(long id, String title) {
         return new StorageCompositionBuilder(id, title).build();
+    }
+
+    public static StorageFullComposition fakeStorageFullComposition(long id,
+                                                                    String title,
+                                                                    String relativePath) {
+        return new StorageCompositionBuilder(id, title).relativePath(relativePath).build();
     }
 
     public static class StorageCompositionBuilder {

@@ -20,8 +20,8 @@ import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeCompositionWithSize;
+import static utils.TestDataProvider.fakeComposition;
+import static utils.TestDataProvider.fakeCompositionWithSize;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;

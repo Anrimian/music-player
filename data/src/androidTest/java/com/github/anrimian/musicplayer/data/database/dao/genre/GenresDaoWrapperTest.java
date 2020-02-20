@@ -14,10 +14,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.github.anrimian.musicplayer.data.database.DataProvider.composition;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static utils.TestDataProvider.composition;
 
 public class GenresDaoWrapperTest {
 

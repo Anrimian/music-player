@@ -2,9 +2,15 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
@@ -12,6 +18,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepo
 import com.github.anrimian.musicplayer.data.repositories.library.folders.CompositionFoldersCache;
 import com.github.anrimian.musicplayer.data.repositories.library.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
@@ -135,19 +142,43 @@ public class StorageModule {
     MediaScannerRepository mediaScannerRepository(StorageMusicProvider musicProvider,
                                                   StoragePlayListsProvider playListsProvider,
                                                   StorageGenresProvider genresProvider,
-                                                  CompositionsDaoWrapper compositionsDao,
-                                                  FoldersDaoWrapper foldersDaoWrapper,
                                                   PlayListsDaoWrapper playListsDao,
                                                   GenresDaoWrapper genresDao,
+                                                  StorageCompositionAnalyzer compositionAnalyzer,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
                 genresProvider,
-                compositionsDao,
-                foldersDaoWrapper,
                 playListsDao,
                 genresDao,
+                compositionAnalyzer,
                 scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    StorageCompositionAnalyzer compositionAnalyzer(CompositionsDaoWrapper compositionsDao,
+                                                   FoldersDaoWrapper foldersDaoWrapper,
+                                                   StorageCompositionsInserter compositionsInserter) {
+        return new StorageCompositionAnalyzer(compositionsDao,
+                foldersDaoWrapper,
+                compositionsInserter);
+    }
+
+    @Provides
+    @Nonnull
+    StorageCompositionsInserter compositionsInserter(AppDatabase appDatabase,
+                                                     CompositionsDao compositionsDao,
+                                                     CompositionsDaoWrapper compositionsDaoWrapper,
+                                                     FoldersDao foldersDao,
+                                                     ArtistsDao artistsDao,
+                                                     AlbumsDao albumsDao) {
+        return new StorageCompositionsInserter(appDatabase,
+                compositionsDao,
+                compositionsDaoWrapper,
+                foldersDao,
+                artistsDao,
+                albumsDao);
     }
 
 }

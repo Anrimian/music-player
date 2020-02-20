@@ -36,9 +36,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final StorageGenresProvider genresProvider;
     private final PlayListsDaoWrapper playListsDao;
     private final GenresDaoWrapper genresDao;
-    private final Scheduler scheduler;
-
     private final StorageCompositionAnalyzer compositionAnalyzer;
+    private final Scheduler scheduler;
 
     private CompositeDisposable mediaStoreDisposable = new CompositeDisposable();
     private LongSparseArray<Disposable> playListEntriesDisposable = new LongSparseArray<>();
@@ -47,19 +46,17 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     public MediaScannerRepositoryImpl(StorageMusicProvider musicProvider,
                                       StoragePlayListsProvider playListsProvider,
                                       StorageGenresProvider genresProvider,
-                                      CompositionsDaoWrapper compositionsDao,
-                                      FoldersDaoWrapper foldersDaoWrapper,
                                       PlayListsDaoWrapper playListsDao,
                                       GenresDaoWrapper genresDao,
+                                      StorageCompositionAnalyzer compositionAnalyzer,
                                       Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.playListsProvider = playListsProvider;
         this.genresProvider = genresProvider;
         this.playListsDao = playListsDao;
         this.genresDao = genresDao;
+        this.compositionAnalyzer = compositionAnalyzer;
         this.scheduler = scheduler;
-
-        compositionAnalyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDaoWrapper);
     }
 
     @Override

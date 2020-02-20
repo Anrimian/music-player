@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeComposition;
+import static utils.TestDataProvider.fakeComposition;
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 
