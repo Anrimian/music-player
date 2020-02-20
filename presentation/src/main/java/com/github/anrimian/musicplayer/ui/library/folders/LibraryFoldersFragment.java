@@ -185,12 +185,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         adapter = new MusicFileSourceAdapter(recyclerView,
                 presenter.getSelectedFiles(),
-                presenter.getSelectedMoveFiles());
-        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-        adapter.setOnFolderClickListener(presenter::onFolderClicked);
-//        adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
-//        adapter.setOnLongClickListener(presenter::onItemLongClick);
-        adapter.setCompositionIconClickListener(presenter::onCompositionIconClicked);
+                presenter.getSelectedMoveFiles(),
+                presenter::onCompositionClicked,
+                presenter::onFolderClicked,
+                presenter::onItemLongClick,
+                this::onFolderMenuClicked,
+                presenter::onCompositionIconClicked);
         recyclerView.setAdapter(adapter);
 
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
@@ -648,7 +648,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         return false;
     }
 
-    private void onFolderMenuClicked(View view, FolderFileSource folder) {
+    private void onFolderMenuClicked(View view, FolderFileSource2 folder) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.folder_item_menu);
         Menu menu = popup.getMenu();
@@ -667,11 +667,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                     return true;
                 }
                 case R.id.menu_add_to_playlist: {
-                    presenter.onAddFolderToPlayListButtonClicked(folder.getPath());
+                    presenter.onAddFolderToPlayListButtonClicked(folder);
                     return true;
                 }
                 case R.id.menu_rename_folder: {
-                    presenter.onRenameFolderClicked(folder.getPath());
+                    presenter.onRenameFolderClicked(folder);
                     return true;
                 }
                 case R.id.menu_share: {

@@ -68,14 +68,14 @@ public class LibraryFoldersInteractor {
         return libraryRepository.getFolderObservable(folderId);
     }
 
-    public void playAllMusicInPath(@Nullable String path) {
-        libraryRepository.getAllCompositionsInPath(path)
+    public void playAllMusicInFolder(@Nullable Long folderId) {
+        libraryRepository.getAllCompositionsInFolder(folderId)
                 .doOnSuccess(musicPlayerInteractor::startPlaying)
                 .subscribe();
     }
 
-    public Single<List<Composition>> getAllCompositionsInPath(@Nullable String path) {
-        return libraryRepository.getAllCompositionsInPath(path);
+    public Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId) {
+        return libraryRepository.getAllCompositionsInFolder(folderId);
     }
 
     public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource> fileSources) {

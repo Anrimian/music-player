@@ -37,11 +37,11 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource2, FileVie
     private final HashSet<FileSource2> selectedItems;
     private final HashSet<FileSource2> selectedMoveItems;
 
-    private OnPositionItemClickListener<CompositionFileSource2> onCompositionClickListener;
-    private OnPositionItemClickListener<FolderFileSource2> onFolderClickListener;
-    private OnPositionItemClickListener<FileSource2> onLongClickListener;
-    private OnViewItemClickListener<FolderFileSource2> onFolderMenuClickListener;
-    private OnPositionItemClickListener<Composition> compositionIconClickListener;
+    private final OnPositionItemClickListener<CompositionFileSource2> onCompositionClickListener;
+    private final OnPositionItemClickListener<FolderFileSource2> onFolderClickListener;
+    private final OnPositionItemClickListener<FileSource2> onLongClickListener;
+    private final OnViewItemClickListener<FolderFileSource2> onFolderMenuClickListener;
+    private final OnPositionItemClickListener<Composition> compositionIconClickListener;
 
     @Nullable
     private Composition currentComposition;
@@ -50,13 +50,23 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource2, FileVie
 
     public MusicFileSourceAdapter(RecyclerView recyclerView,
                                   HashSet<FileSource2> selectedItems,
-                                  HashSet<FileSource2> selectedMoveItems) {
+                                  HashSet<FileSource2> selectedMoveItems,
+                                  OnPositionItemClickListener<CompositionFileSource2> onCompositionClickListener,
+                                  OnPositionItemClickListener<FolderFileSource2> onFolderClickListener,
+                                  OnPositionItemClickListener<FileSource2> onLongClickListener,
+                                  OnViewItemClickListener<FolderFileSource2> onFolderMenuClickListener,
+                                  OnPositionItemClickListener<Composition> compositionIconClickListener) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 FolderHelper::areSourcesTheSame,
                 FolderHelper::getChangePayload)
         );
         this.selectedItems = selectedItems;
         this.selectedMoveItems = selectedMoveItems;
+        this.onCompositionClickListener = onCompositionClickListener;
+        this.onFolderClickListener = onFolderClickListener;
+        this.onLongClickListener = onLongClickListener;
+        this.onFolderMenuClickListener = onFolderMenuClickListener;
+        this.compositionIconClickListener = compositionIconClickListener;
     }
 
     @NonNull
@@ -165,26 +175,6 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource2, FileVie
         for (SelectableViewHolder holder: viewHolders) {
             holder.setSelected(selected);
         }
-    }
-
-    public void setOnCompositionClickListener(OnPositionItemClickListener<CompositionFileSource2> onCompositionClickListener) {
-        this.onCompositionClickListener = onCompositionClickListener;
-    }
-
-    public void setOnFolderClickListener(OnPositionItemClickListener<FolderFileSource2> onFolderClickListener) {
-        this.onFolderClickListener = onFolderClickListener;
-    }
-
-    public void setOnLongClickListener(OnPositionItemClickListener<FileSource2> onLongClickListener) {
-        this.onLongClickListener = onLongClickListener;
-    }
-
-    public void setOnFolderMenuClickListener(OnViewItemClickListener<FolderFileSource2> onFolderMenuClickListener) {
-        this.onFolderMenuClickListener = onFolderMenuClickListener;
-    }
-
-    public void setCompositionIconClickListener(OnPositionItemClickListener<Composition> compositionIconClickListener) {
-        this.compositionIconClickListener = compositionIconClickListener;
     }
 
     public void showCurrentComposition(Composition currentComposition) {

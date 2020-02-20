@@ -64,12 +64,12 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.getFolderObservable(folderId);
     }
 
-    public void playAllMusicInPath(@Nullable String path) {
-        foldersInteractor.playAllMusicInPath(path);
+    public void playAllMusicInFolder(@Nullable Long folderId) {
+        foldersInteractor.playAllMusicInFolder(folderId);
     }
 
-    public Single<List<Composition>> getAllCompositionsInPath(@Nullable String path) {
-        return foldersInteractor.getAllCompositionsInPath(path);
+    public Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId) {
+        return foldersInteractor.getAllCompositionsInFolder(folderId);
     }
 
     public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource> fileSources) {

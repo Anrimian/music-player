@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
  * Created on 31.10.2017.
  */
 
+@Deprecated
 public class FolderFileSource implements FileSource {
 
     @Nonnull
