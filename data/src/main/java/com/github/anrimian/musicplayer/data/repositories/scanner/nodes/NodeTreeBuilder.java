@@ -61,7 +61,7 @@ public class NodeTreeBuilder {
                 childList = new LinkedList<>();
                 folderIdMap.put(folderId, childList);
             }
-            childList.add(file.getId());
+            childList.add(file.getStorageId());
         }
         return folderIdMap;
     }

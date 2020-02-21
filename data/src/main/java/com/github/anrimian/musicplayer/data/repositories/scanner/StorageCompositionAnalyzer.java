@@ -52,7 +52,7 @@ public class StorageCompositionAnalyzer {
         );
     }
 
-    //mess after second live rescan
+    //folders from second level come to first level after move(not first scan)
     public synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
         FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
         actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?

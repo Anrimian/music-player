@@ -22,11 +22,11 @@ public class NodeTreeBuilderTest {
     @Test
     public void createTreeFromIdMap() {
         LongSparseArray<StorageComposition> compositionsMap = new LongSparseArray<>();
-        compositionsMap.put(1, new TestDataProvider.StorageLocalCompositionBuilder(1L, 1L, "test")
+        compositionsMap.put(1, new TestDataProvider.StorageLocalCompositionBuilder(1L, 11L, "test")
                 .folderId(null)
                 .build()
         );
-        compositionsMap.put(2, new TestDataProvider.StorageLocalCompositionBuilder(2L, 2L, "test2")
+        compositionsMap.put(2, new TestDataProvider.StorageLocalCompositionBuilder(2L, 22L, "test2")
                 .folderId(4L)
                 .build()
         );
@@ -45,7 +45,7 @@ public class NodeTreeBuilderTest {
         );
         assertEquals(3, rootNode.getFolders().size());
         assertEquals(1, rootNode.getFiles().size());
-        assert rootNode.containsFile(1L);
+        assert rootNode.containsFile(11L);
 
         LocalFolderNode<Long> nodeThree = rootNode.getFolder("1");
         assertNotNull(nodeThree);
@@ -53,7 +53,7 @@ public class NodeTreeBuilderTest {
         LocalFolderNode<Long> nodeFour = nodeThree.getFolder("4");
         assertNotNull(nodeFour);
         assertEquals(1, nodeFour.getFiles().size());
-        assert nodeFour.containsFile(2L);
+        assert nodeFour.containsFile(22L);
 
         LocalFolderNode<Long> nodeFive = nodeFour.getFolder("5");
         assertNotNull(nodeFive);
