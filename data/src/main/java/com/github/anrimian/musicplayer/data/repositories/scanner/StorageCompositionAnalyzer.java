@@ -20,10 +20,8 @@ import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -52,7 +50,6 @@ public class StorageCompositionAnalyzer {
         );
     }
 
-    //folders from second level come to first level after move(not first scan)
     public synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
         FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
         actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?
@@ -68,7 +65,7 @@ public class StorageCompositionAnalyzer {
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-        Set<Long> movedCompositions = new LinkedHashSet<>();
+        LongSparseArray<Long> movedCompositions = new LongSparseArray<>();
         folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert, movedCompositions);
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();
@@ -76,7 +73,7 @@ public class StorageCompositionAnalyzer {
         List<Change<StorageComposition, StorageFullComposition>> changedCompositions = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositions,
                 newCompositions,
-                (first, second) -> hasActualChanges(first, second) || movedCompositions.contains(first.getStorageId()),
+                (first, second) -> hasActualChanges(first, second) || movedCompositions.containsKey(first.getStorageId()),
                 deletedCompositions::add,
                 addedCompositions::add,
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
@@ -86,6 +83,7 @@ public class StorageCompositionAnalyzer {
                     addedCompositions,
                     deletedCompositions,
                     changedCompositions,
+                    movedCompositions,
                     foldersToDelete);
         }
     }

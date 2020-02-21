@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
+import androidx.collection.LongSparseArray;
+
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.LocalFolderNode;
@@ -14,10 +16,10 @@ public class FolderMerger {
                                  LocalFolderNode<Long> existsFoldersNode,
                                  List<Long> outFoldersToDelete,
                                  List<AddedNode> outFoldersToInsert,
-                                 Set<Long> outAddedFiles) {
+                                 LongSparseArray<Long> outAddedFiles) {
         for (Long file: actualFolderNode.getFiles()) {
             if (!existsFoldersNode.containsFile(file)) {
-                outAddedFiles.add(file);
+                outAddedFiles.put(file, existsFoldersNode.getId());
             }
         }
         for (LocalFolderNode<Long> existFolder : existsFoldersNode.getFolders()) {
@@ -38,18 +40,22 @@ public class FolderMerger {
                 AddedNode addedNode = new AddedNode(parentId, actualFolder);
                 outFoldersToInsert.add(addedNode);
 
-                List<Long> affectedFiles = getAllFilesInNode(actualFolder);
-                outAddedFiles.addAll(affectedFiles);
+                LongSparseArray<Long> affectedFiles = getAllFilesInNode(actualFolder);
+                outAddedFiles.putAll(affectedFiles);
             } else {
                 mergeFolderTrees(actualFolder, existFolder, outFoldersToDelete, outFoldersToInsert, outAddedFiles);
             }
         }
     }
 
-    private List<Long> getAllFilesInNode(FolderNode<Long> parentNode) {
-        LinkedList<Long> result = new LinkedList<>(parentNode.getFiles());
+    private LongSparseArray<Long> getAllFilesInNode(FolderNode<Long> parentNode) {
+        LongSparseArray<Long> result = new LongSparseArray<>();
+        for (Long file: parentNode.getFiles()) {
+            result.put(file, null);
+        }
+
         for (FolderNode<Long> node: parentNode.getFolders()) {
-            result.addAll(getAllFilesInNode(node));
+            result.putAll(getAllFilesInNode(node));
         }
         return result;
     }

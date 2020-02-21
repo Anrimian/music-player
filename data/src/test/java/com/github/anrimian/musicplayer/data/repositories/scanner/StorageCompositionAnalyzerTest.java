@@ -12,6 +12,8 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
+import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
+
 import utils.TestDataProvider.StorageCompositionBuilder;
 
 import org.junit.Before;
@@ -22,6 +24,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils.sparseArrayOf;
 import static utils.TestDataProvider.fakeStorageComposition;
 import static utils.TestDataProvider.fakeStorageFullComposition;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
@@ -74,6 +77,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(asList(fakeStorageFullComposition(4, "music-4"))),//new
                 eq(asList(fakeStorageComposition(2, "music-2"))),//removed
                 eq(asList(new Change<>(fakeStorageComposition(3, "music-3"), changedComposition))),
+                any(),
                 any());
     }
 
@@ -97,6 +101,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1000), changedComposition))),
+                any(),
                 any());
     }
 
@@ -126,6 +131,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition))),
+                any(),
                 any());
     }
 
@@ -155,6 +161,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition))),
+                any(),
                 any());
     }
 
@@ -196,6 +203,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(oldComposition, changedComposition))),
+                any(),
                 any());
     }
 
@@ -223,6 +231,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(asList(expectedComposition)),
                 eq(emptyList()),
                 eq(emptyList()),
+                any(),
                 any());
     }
 
@@ -246,11 +255,13 @@ public class StorageCompositionAnalyzerTest {
         node.addFolder(new FolderNode<>("new"));
         expectedNodesToInsert.add(new AddedNode(null, node));
 
+
         verify(compositionsInserter).applyChanges(
                 eq(expectedNodesToInsert),
                 eq(asList(c1, c2, c3)),
                 eq(emptyList()),
                 eq(emptyList()),
+                any(),
                 eq(emptyList()));
     }
 
@@ -277,7 +288,12 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(compositionsInserter, never()).applyChanges(any(), any(), any(), any(), any());
+        verify(compositionsInserter, never()).applyChanges(any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any());
     }
 
     @Test
@@ -306,6 +322,7 @@ public class StorageCompositionAnalyzerTest {
 
         List<AddedNode> expectedNodesToInsert = new ArrayList<>();
         FolderNode<Long> node = new FolderNode<>("new");
+        node.addFile(2L);
         expectedNodesToInsert.add(new AddedNode(null, node));
 
         verify(compositionsInserter).applyChanges(
@@ -313,6 +330,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(composition2, c2))),
+                any(),
                 eq(asList(2L)));
     }
 
@@ -349,6 +367,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(asList(new Change<>(composition2, c2))),
+                any(),
                 any());
     }
 
@@ -379,6 +398,7 @@ public class StorageCompositionAnalyzerTest {
                 eq(emptyList()),
                 eq(asList(composition2)),
                 eq(emptyList()),
+                any(),
                 eq(asList(2L)));
     }
 

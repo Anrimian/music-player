@@ -52,13 +52,14 @@ public class StorageCompositionsInserter {
                              List<StorageFullComposition> addedCompositions,
                              List<StorageComposition> deletedCompositions,
                              List<Change<StorageComposition, StorageFullComposition>> changedCompositions,
+                             LongSparseArray<Long> movedCompositions,
                              List<Long> foldersToDelete) {
         appDatabase.runInTransaction(() -> {
-            LongSparseArray<Long> compositionIdMap = insertFolders(foldersToInsert);
+            movedCompositions.putAll(insertFolders(foldersToInsert));
             applyCompositionChanges(addedCompositions,
                     deletedCompositions,
                     changedCompositions,
-                    compositionIdMap);
+                    movedCompositions);
             foldersDao.deleteFolders(foldersToDelete);
         });
     }
@@ -66,15 +67,15 @@ public class StorageCompositionsInserter {
     private void applyCompositionChanges(List<StorageFullComposition> addedCompositions,
                                          List<StorageComposition> deletedCompositions,
                                          List<Change<StorageComposition, StorageFullComposition>> changedCompositions,
-                                         LongSparseArray<Long> folderIdMap) {
-        insertCompositions(addedCompositions, folderIdMap);
+                                         LongSparseArray<Long> insertedCompositionFolderMap) {
+        insertCompositions(addedCompositions, insertedCompositionFolderMap);
 
         for (StorageComposition composition: deletedCompositions) {
             compositionsDao.delete(composition.getId());
         }
 
         for (Change<StorageComposition, StorageFullComposition> change: changedCompositions) {
-            handleCompositionUpdate(change, folderIdMap);
+            handleCompositionUpdate(change, insertedCompositionFolderMap);
         }
         albumsDao.deleteEmptyAlbums();
         artistsDao.deleteEmptyArtists();
@@ -82,7 +83,7 @@ public class StorageCompositionsInserter {
     }
 
     private void handleCompositionUpdate(Change<StorageComposition, StorageFullComposition> change,
-                                         LongSparseArray<Long> folderIdMap) {
+                                         LongSparseArray<Long> insertedCompositionFolderMap) {
         StorageFullComposition composition = change.getObj();
         StorageComposition oldComposition = change.getOld();
         long compositionId = oldComposition.getId();
@@ -105,7 +106,7 @@ public class StorageCompositionsInserter {
         if (!Objects.equals(newAlbumArtist, oldComposition.getAlbumArtist())) {
             compositionsDaoWrapper.updateAlbumArtist(compositionId, newAlbumArtist);
         }
-        Long newFolderId = folderIdMap.get(compositionId);
+        Long newFolderId = insertedCompositionFolderMap.get(compositionId);
         if (!Objects.equals(oldComposition.getFolderId(), newFolderId)) {
             compositionsDao.updateFolderId(compositionId, newFolderId);
         }
@@ -122,20 +123,20 @@ public class StorageCompositionsInserter {
     }
 
     private void insertCompositions(List<StorageFullComposition> addedCompositions,
-                                    LongSparseArray<Long> folderIdMap) {
+                                    LongSparseArray<Long> insertedCompositionFolderMap) {
         //optimization with cache, ~33% faster
         Map<String, Long> artistsCache = new HashMap<>();
         Map<String, Long> albumsCache = new HashMap<>();
         compositionsDao.insert(mapList(
                 addedCompositions,
-                composition -> toCompositionEntity(composition, artistsCache, albumsCache, folderIdMap))
+                composition -> toCompositionEntity(composition, artistsCache, albumsCache, insertedCompositionFolderMap))
         );
     }
 
     private CompositionEntity toCompositionEntity(StorageFullComposition composition,
                                                   Map<String, Long> artistsCache,
                                                   Map<String, Long> albumsCache,
-                                                  LongSparseArray<Long> folderIdMap) {
+                                                  LongSparseArray<Long> insertedCompositionFolderMap) {
         String artist = composition.getArtist();
         Long artistId = getOrInsertArtist(artist, artistsCache);
 
@@ -145,7 +146,8 @@ public class StorageCompositionsInserter {
             Long albumArtistId = getOrInsertArtist(storageAlbum.getArtist(), artistsCache);
             albumId = getOrInsertAlbum(storageAlbum, albumArtistId, albumsCache);
         }
-        return CompositionMapper.toEntity(composition, artistId, albumId, folderIdMap.get(composition.getId()));
+        Long folderId = insertedCompositionFolderMap.get(composition.getId());
+        return CompositionMapper.toEntity(composition, artistId, albumId, folderId);
     }
 
     private Long getOrInsertAlbum(StorageAlbum storageAlbum,
@@ -186,17 +188,17 @@ public class StorageCompositionsInserter {
 
     private LongSparseArray<Long> insertFolders(List<AddedNode> foldersToInsert) {
         return appDatabase.runInTransaction(() -> {
-            LongSparseArray<Long> compositionsIdMap = new LongSparseArray<>();
+            LongSparseArray<Long> insertedCompositionFolderMap = new LongSparseArray<>();
             for (AddedNode node: foldersToInsert) {
-                insertNode(node.getFolderDbId(), node.getNode(), compositionsIdMap);
+                insertNode(node.getFolderDbId(), node.getNode(), insertedCompositionFolderMap);
             }
-            return compositionsIdMap;
+            return insertedCompositionFolderMap;
         });
     }
 
     private void insertNode(Long dbParentId,
                             FolderNode<Long> nodeToInsert,
-                            LongSparseArray<Long> compositionsIdMap) {
+                            LongSparseArray<Long> insertedCompositionFolderMap) {
         String name = nodeToInsert.getKeyPath();
         if (name == null) {
             return;
@@ -204,10 +206,10 @@ public class StorageCompositionsInserter {
 
         long id = foldersDao.insertFolder(new FolderEntity(dbParentId, name));
         for (Long compositionId : nodeToInsert.getFiles()) {
-            compositionsIdMap.put(compositionId, id);
+            insertedCompositionFolderMap.put(compositionId, id);
         }
         for (FolderNode<Long> node: nodeToInsert.getFolders()) {
-            insertNode(id, node, compositionsIdMap);
+            insertNode(id, node, insertedCompositionFolderMap);
         }
     }
 }
