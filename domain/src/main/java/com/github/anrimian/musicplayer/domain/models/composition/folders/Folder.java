@@ -46,7 +46,9 @@ public class Folder {
     @SuppressWarnings("Java8ListSort")//lets wait:)
     public void applyFileOrder(Observable<Comparator<FileSource>> orderObservable) {
         filesObservable = Observable.combineLatest(filesObservable, orderObservable, (fileSources, fileSourceComparator) -> {
-            Collections.sort(fileSources, fileSourceComparator);
+            try {
+                Collections.sort(fileSources, fileSourceComparator);//temporary ignored, class will be removed after folders remake
+            } catch (Exception ignored) {}
             return new ArrayList<>(fileSources);
         });
     }
