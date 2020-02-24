@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.library.edit;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
@@ -19,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
@@ -42,10 +44,12 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final AlbumsDaoWrapper albumsDao;
     private final ArtistsDaoWrapper artistsDao;
     private final GenresDaoWrapper genresDao;
+    private final FoldersDaoWrapper foldersDao;
     private final StorageMusicProvider storageMusicProvider;
     private final StorageGenresProvider storageGenresProvider;
     private final StorageArtistsProvider storageArtistsProvider;
     private final StorageAlbumsProvider storageAlbumsProvider;
+    private final StateRepository stateRepository;
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
@@ -53,20 +57,24 @@ public class EditorRepositoryImpl implements EditorRepository {
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
                                 GenresDaoWrapper genresDao,
+                                FoldersDaoWrapper foldersDao,
                                 StorageMusicProvider storageMusicProvider,
                                 StorageGenresProvider storageGenresProvider,
                                 StorageArtistsProvider storageArtistsProvider,
                                 StorageAlbumsProvider storageAlbumsProvider,
+                                StateRepository stateRepository,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
         this.genresDao = genresDao;
+        this.foldersDao = foldersDao;
         this.storageMusicProvider = storageMusicProvider;
         this.storageGenresProvider = storageGenresProvider;
         this.storageArtistsProvider = storageArtistsProvider;
         this.storageAlbumsProvider = storageAlbumsProvider;
+        this.stateRepository = stateRepository;
         this.scheduler = scheduler;
     }
 
@@ -175,10 +183,15 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
-    public Single<String> changeFolderName(String filePath, String folderName) {
-        return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, folderName))
-                .flatMap(newPath -> renameFile(filePath, newPath))
-                .subscribeOn(scheduler);
+    public Completable changeFolderName(long folderId, String newName) {
+        // state repository getRootFolderPath() +
+        // foldersDao.getFullFolderPath(folderId);
+        String rootPath = stateRepository.getRootFolderPath();
+//        return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, folderName))
+//                .flatMap(newPath -> renameFile(filePath, newPath))
+//                .doOnSuccess(o -> foldersDao.changeFolderName(folderId, newName))
+//                .subscribeOn(scheduler);
+        return Completable.never();
     }
 
     @Override

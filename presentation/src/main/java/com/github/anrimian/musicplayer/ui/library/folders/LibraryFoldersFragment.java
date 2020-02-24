@@ -23,7 +23,6 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
@@ -64,7 +63,6 @@ import moxy.presenter.ProvidePresenter;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.NEW_FOLDER_NAME_TAG;
@@ -237,7 +235,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         filenameDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 FILE_NAME_TAG,
                 fragment -> fragment.setComplexCompleteListener((name, extra) -> {
-                    presenter.onNewFolderNameInputed(extra.getLong(ID_ARG), name);
+                    presenter.onNewFolderNameEntered(extra.getLong(ID_ARG), name);
                 }));
 
         newFolderDialogFragmentRunner = new DialogFragmentRunner<>(fm,

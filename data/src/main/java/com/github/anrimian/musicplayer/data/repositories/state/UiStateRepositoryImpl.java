@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.repositories.ui_state;
+package com.github.anrimian.musicplayer.data.repositories.state;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,15 +10,15 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_ID;
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_LAST_POSITION;
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.IS_PLAYER_PANEL_OPEN;
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.PREFERENCES_NAME;
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.SELECTED_DRAWER_SCREEN;
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.SELECTED_FOLDER_SCREEN;
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.SELECTED_LIBRARY_SCREEN;
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.SELECTED_PLAYLIST_SCREEN;
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.Constants.TRACK_POSITION;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_ID;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_LAST_POSITION;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.IS_PLAYER_PANEL_OPEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PREFERENCES_NAME;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_DRAWER_SCREEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_FOLDER_SCREEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_LIBRARY_SCREEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_PLAYLIST_SCREEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.TRACK_POSITION;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
 /**
@@ -49,7 +49,8 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     public UiStateRepositoryImpl(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
-        this.preferences = new SharedPreferencesHelper(sharedPreferences);    }
+        this.preferences = new SharedPreferencesHelper(sharedPreferences);
+    }
 
     @Override
     public void setCurrentItemLastPosition(int position) {

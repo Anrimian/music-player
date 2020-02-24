@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
@@ -101,6 +102,10 @@ public class FoldersDaoWrapper {
         });
     }
 
+    public void changeFolderName(long folderId, String newName) {
+        foldersDao.changeFolderName(folderId, newName);
+    }
+
     public String[] getIgnoredFolders() {
         return foldersDao.getIgnoredFolders();
     }
@@ -157,4 +162,5 @@ public class FoldersDaoWrapper {
 
         return sb.toString();
     }
+
 }

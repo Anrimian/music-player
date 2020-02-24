@@ -232,11 +232,6 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Single<List<Composition>> changeFolderName(String folderPath, String newPath) {
-        return musicFolderDataSource.changeFolderName(folderPath, newPath);
-    }
-
-    @Override
     public Single<List<Composition>> moveFileTo(String folderPath,
                                                 String newSourcePath,
                                                 FileSource fileSource) {

@@ -41,6 +41,7 @@ public class FileUtils {
         return fileName;
     }
 
+    //what if filename and part of path are equal?
     public static String getChangedFilePath(String fullPath, String newFileName) {
         String fileName = FileUtils.formatFileName(fullPath);
         String newPath = fullPath.replace(fileName, newFileName);

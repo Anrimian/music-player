@@ -42,6 +42,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
  * Created on 23.10.2017.
  */
 
+//TODO delete large amount of files - show progress dialog
 @InjectViewState
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
@@ -297,14 +298,14 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         getViewState().showInputFolderNameDialog(folder);
     }
 
-    void onNewFolderNameInputed(Long folderId, String name) {
-//        if (isActive(fileActionDisposable)) {
-//            return;
-//        }
-//        dispose(fileActionDisposable);
-//        fileActionDisposable = interactor.renameFolder(folderId, name)
-//                .observeOn(uiScheduler)
-//                .subscribe(() -> {}, this::onDefaultError);
+    void onNewFolderNameEntered(long folderId, String name) {
+        if (isActive(fileActionDisposable)) {
+            return;
+        }
+        dispose(fileActionDisposable);
+        fileActionDisposable = interactor.renameFolder(folderId, name)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
     }
 
     void onSelectionModeBackPressed() {

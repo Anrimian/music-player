@@ -14,7 +14,7 @@ import java.util.Random;
 
 import io.reactivex.Observable;
 
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.NO_ITEM;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 

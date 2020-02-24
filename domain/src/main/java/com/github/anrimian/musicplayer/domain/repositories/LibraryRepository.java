@@ -80,8 +80,6 @@ public interface LibraryRepository {
 
     Completable deleteCompositions(List<Composition> compositions);
 
-    Single<List<Composition>> changeFolderName(String folderPath, String newPath);
-
     Single<List<Composition>> moveFileTo(String folderPath,
                                          String newSourcePath,
                                          FileSource fileSource);

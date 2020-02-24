@@ -12,7 +12,7 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
-import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 
 import utils.TestDataProvider.StorageCompositionBuilder;
 
@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils.sparseArrayOf;
 import static utils.TestDataProvider.fakeStorageComposition;
 import static utils.TestDataProvider.fakeStorageFullComposition;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
@@ -40,6 +39,7 @@ public class StorageCompositionAnalyzerTest {
 
     private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
     private FoldersDaoWrapper foldersDao = mock(FoldersDaoWrapper.class);
+    private StateRepository stateRepository = mock(StateRepository.class);
     private StorageCompositionsInserter compositionsInserter = mock(StorageCompositionsInserter.class);
 
     private StorageCompositionAnalyzer analyzer;
@@ -50,7 +50,7 @@ public class StorageCompositionAnalyzerTest {
 
         when(foldersDao.getIgnoredFolders()).thenReturn(new String[0]);
 
-        analyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDao, compositionsInserter);
+        analyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDao, stateRepository, compositionsInserter);
     }
 
     @Test
@@ -72,6 +72,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
+        verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter).applyChanges(
                 any(),
                 eq(asList(fakeStorageFullComposition(4, "music-4"))),//new
@@ -96,6 +97,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
+        verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter, never()).applyChanges(
                 any(),
                 eq(emptyList()),
@@ -126,6 +128,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
+        verify(stateRepository).setRootFolderPath(eq("test"));
         verify(compositionsInserter).applyChanges(
                 any(),
                 eq(emptyList()),
@@ -156,6 +159,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
+        verify(stateRepository).setRootFolderPath(eq("test"));
         verify(compositionsInserter).applyChanges(
                 any(),
                 eq(emptyList()),
@@ -198,6 +202,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
+        verify(stateRepository).setRootFolderPath(eq("test"));
         verify(compositionsInserter).applyChanges(
                 any(),
                 eq(emptyList()),
@@ -226,6 +231,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
+        verify(stateRepository).setRootFolderPath(eq("0/etc/sdcard"));
         verify(compositionsInserter).applyChanges(
                 any(),
                 eq(asList(expectedComposition)),
@@ -255,7 +261,7 @@ public class StorageCompositionAnalyzerTest {
         node.addFolder(new FolderNode<>("new"));
         expectedNodesToInsert.add(new AddedNode(null, node));
 
-
+        verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter).applyChanges(
                 eq(expectedNodesToInsert),
                 eq(asList(c1, c2, c3)),
@@ -288,6 +294,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
+        verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter, never()).applyChanges(any(),
                 any(),
                 any(),
@@ -325,6 +332,7 @@ public class StorageCompositionAnalyzerTest {
         node.addFile(2L);
         expectedNodesToInsert.add(new AddedNode(null, node));
 
+        verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter).applyChanges(
                 eq(expectedNodesToInsert),
                 eq(emptyList()),
@@ -362,6 +370,7 @@ public class StorageCompositionAnalyzerTest {
         FolderNode<Long> node = new FolderNode<>("new");
         expectedNodesToInsert.add(new AddedNode(null, node));
 
+        verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter).applyChanges(
                 eq(expectedNodesToInsert),
                 eq(emptyList()),
@@ -393,6 +402,7 @@ public class StorageCompositionAnalyzerTest {
 
         analyzer.applyCompositionsData(newCompositions);
 
+        verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter).applyChanges(
                 eq(emptyList()),
                 eq(emptyList()),

@@ -124,8 +124,8 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.getCurrentFolderScreens();
     }
 
-    public Completable renameFolder(String folderPath, String newName) {
-        return foldersInteractor.renameFolder(folderPath, newName);
+    public Completable renameFolder(long folderId, String newName) {
+        return foldersInteractor.renameFolder(folderId, newName);
     }
 
     public void addFilesToMove(String fromMovePath, Collection<FileSource2> fileSources) {

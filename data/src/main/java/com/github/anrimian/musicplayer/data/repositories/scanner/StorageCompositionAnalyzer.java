@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
 import androidx.collection.LongSparseArray;
+import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
@@ -16,9 +17,12 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +35,7 @@ public class StorageCompositionAnalyzer {
 
     private final CompositionsDaoWrapper compositionsDao;
     private final FoldersDaoWrapper foldersDao;
+    private final StateRepository stateRepository;
     private final StorageCompositionsInserter compositionsInserter;
 
     private final FolderTreeBuilder<StorageFullComposition, Long> folderTreeBuilder;
@@ -38,10 +43,12 @@ public class StorageCompositionAnalyzer {
     private final FolderMerger folderMerger = new FolderMerger();
 
     public StorageCompositionAnalyzer(CompositionsDaoWrapper compositionsDao,
-                               FoldersDaoWrapper foldersDao,
-                               StorageCompositionsInserter compositionsInserter) {
+                                      FoldersDaoWrapper foldersDao,
+                                      StateRepository stateRepository,
+                                      StorageCompositionsInserter compositionsInserter) {
         this.compositionsDao = compositionsDao;
         this.foldersDao = foldersDao;
+        this.stateRepository = stateRepository;
         this.compositionsInserter = compositionsInserter;
 
         folderTreeBuilder = new FolderTreeBuilder<>(
@@ -52,7 +59,11 @@ public class StorageCompositionAnalyzer {
 
     public synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
         FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
-        actualFolderTree = cutEmptyRootNodes(actualFolderTree);//save excluded part?
+
+        StringBuilder sbRootPath = new StringBuilder();
+        actualFolderTree = cutEmptyRootNodes(actualFolderTree, sbRootPath);
+        String parentPath = TextUtils.toNullableString(sbRootPath);
+        stateRepository.setRootFolderPath(parentPath);
 
         excludeCompositions(actualFolderTree, newCompositions);
 
@@ -109,11 +120,18 @@ public class StorageCompositionAnalyzer {
         }
     }
 
-    private FolderNode<Long> cutEmptyRootNodes(FolderNode<Long> root) {
+    private FolderNode<Long> cutEmptyRootNodes(FolderNode<Long> root, StringBuilder sbRootPath) {
         FolderNode<Long> found = root;
+
         while (isEmptyFolderNode(found)) {
             found = found.getFirstFolder();
+
+            if (sbRootPath.length() != 0) {
+                sbRootPath.append('/');
+            }
+            sbRootPath.append(found.getKeyPath());
         }
+
         return found;
     }
 

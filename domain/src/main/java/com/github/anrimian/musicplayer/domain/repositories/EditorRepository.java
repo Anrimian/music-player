@@ -34,7 +34,7 @@ public interface EditorRepository {
 
     Completable changeCompositionsFilePath(List<Composition> compositions);
 
-    Single<String> changeFolderName(String filePath, String folderName);
+    Completable changeFolderName(long folderId, String folderName);
 
     Single<String> moveFile(String filePath, String oldPath, String newPath);
 

@@ -83,4 +83,8 @@ public class TextUtils {
         }
         return text;
     }
+
+    public static String toNullableString(StringBuilder sb) {
+        return sb.length() == 0 ? null : sb.toString();
+    }
 }

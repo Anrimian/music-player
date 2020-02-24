@@ -30,6 +30,7 @@ import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -112,20 +113,24 @@ public class StorageModule {
                                                  AlbumsDaoWrapper albumsDao,
                                                  ArtistsDaoWrapper artistsDao,
                                                  GenresDaoWrapper genresDao,
+                                                 FoldersDaoWrapper foldersDao,
                                                  StorageMusicProvider storageMusicProvider,
                                                  StorageGenresProvider storageGenresProvider,
                                                  StorageArtistsProvider storageArtistsProvider,
                                                  StorageAlbumsProvider storageAlbumsProvider,
+                                                 StateRepository stateRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new EditorRepositoryImpl(storageMusicDataSource,
                 compositionsDao,
                 albumsDao,
                 artistsDao,
                 genresDao,
+                foldersDao,
                 storageMusicProvider,
                 storageGenresProvider,
                 storageArtistsProvider,
                 storageAlbumsProvider,
+                stateRepository,
                 scheduler);
     }
 
@@ -159,9 +164,11 @@ public class StorageModule {
     @Nonnull
     StorageCompositionAnalyzer compositionAnalyzer(CompositionsDaoWrapper compositionsDao,
                                                    FoldersDaoWrapper foldersDaoWrapper,
+                                                   StateRepository stateRepository,
                                                    StorageCompositionsInserter compositionsInserter) {
         return new StorageCompositionAnalyzer(compositionsDao,
                 foldersDaoWrapper,
+                stateRepository,
                 compositionsInserter);
     }
 

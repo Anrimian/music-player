@@ -20,7 +20,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.NO_ITEM;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
