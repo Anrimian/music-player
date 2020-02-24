@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.library.edit;
 
+import android.provider.DocumentsContract;
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
@@ -23,6 +26,7 @@ import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.io.File;
 import java.util.LinkedHashSet;
@@ -171,7 +175,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Single.fromCallable(() -> FileUtils.getChangedFilePath(composition.getFilePath(), fileName))
-                .flatMap(newPath -> renameFile(composition.getFilePath(), newPath))
+                .flatMap(newPath -> runRenameFile(composition.getFilePath(), newPath))
                 .flatMapCompletable(newPath -> storageMusicDataSource.updateCompositionFilePath(composition, newPath))
                 .subscribeOn(scheduler);
     }
@@ -184,14 +188,22 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable changeFolderName(long folderId, String newName) {
-        // state repository getRootFolderPath() +
-        // foldersDao.getFullFolderPath(folderId);
-        String rootPath = stateRepository.getRootFolderPath();
-//        return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, folderName))
-//                .flatMap(newPath -> renameFile(filePath, newPath))
-//                .doOnSuccess(o -> foldersDao.changeFolderName(folderId, newName))
-//                .subscribeOn(scheduler);
-        return Completable.never();
+        return getFullFolderPath(folderId)
+                .doOnSuccess(fullPath -> {
+                    //seems working for android <10, implement for scoped storage
+                    String newPath = FileUtils.getChangedFilePath(fullPath, newName);
+                    Log.d("KEK2", "changeFolderName, oldPath: " + fullPath);
+                    Log.d("KEK2", "changeFolderName, newPath: " + newPath);
+
+                    renameFile(fullPath, newPath);
+
+                    List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId);
+                    compositionsDao.updateFilesPath(compositions, fullPath, newPath);
+                    storageMusicProvider.updateCompositionsFilePath(compositions, fullPath, newPath);
+                })
+                .ignoreElement()
+                .doOnComplete(() -> foldersDao.changeFolderName(folderId, newName))
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -200,7 +212,7 @@ public class EditorRepositoryImpl implements EditorRepository {
             return Single.error(new MoveInTheSameFolderException("move in the same folder"));
         }
         return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, oldPath, newPath))
-                .flatMap(path -> renameFile(filePath, path))
+                .flatMap(path -> runRenameFile(filePath, path))
                 .subscribeOn(scheduler);
     }
 
@@ -328,19 +340,38 @@ public class EditorRepositoryImpl implements EditorRepository {
         });
     }
 
-    private Single<String> renameFile(String oldPath, String newPath) {
-        return Single.create(emitter -> {
-
-            File oldFile = new File(oldPath);
-            File newFile = new File(newPath);
-            if (oldFile.renameTo(newFile)) {
-                emitter.onSuccess(newPath);
-            } else {
-                emitter.onError(new Exception("file not renamed"));
-            }
+    private Single<String> runRenameFile(String oldPath, String newPath) {
+        return Single.fromCallable(() -> {
+            renameFile(oldPath, newPath);
+            return newPath;
         });
     }
 
+    private void renameFile(String oldPath, String newPath) {
+        File oldFile = new File(oldPath);
+        if (!oldFile.exists()) {
+            throw new RuntimeException("target file not exists");
+        }
+        File newFile = new File(newPath);
+        boolean renamed = oldFile.renameTo(newFile);
+        if (!renamed) {
+            throw new RuntimeException("file not renamed");
+        }
+    }
 
+    private Single<String> getFullFolderPath(long folderId) {
+        return Single.fromCallable(() -> {
+            StringBuilder sbPath = new StringBuilder();
+            String rootFolderPath = stateRepository.getRootFolderPath();
+            if (rootFolderPath != null) {
+                sbPath.append(rootFolderPath);
+            }
+            if (sbPath.length() != 0) {
+                sbPath.append('/');
+            }
+            sbPath.append(foldersDao.getFullFolderPath(folderId));
+            return sbPath.toString();
+        });
+    }
 
 }

@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.RemoteException;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.collection.LongSparseArray;
 
@@ -158,6 +159,32 @@ public class StorageMusicProvider {
 
     public void updateCompositionFilePath(long id, String filePath) {
         updateComposition(id, MediaStore.Audio.AudioColumns.DATA, filePath);
+    }
+
+    public void updateCompositionsFilePath(List<Composition> compositions,
+                                           String oldPath,
+                                           String newPath) {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
+        for (Composition composition: compositions) {
+            Long storageId = composition.getStorageId();
+            if (storageId == null) {
+                continue;
+            }
+            String path = composition.getFilePath().replace(oldPath, newPath);
+            ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
+                    .withValue(Media.DATA, path)
+                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
+                    .build();
+
+            operations.add(operation);
+        }
+
+        try {
+            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
+        } catch (OperationApplicationException | RemoteException e) {
+            throw new UpdateMediaStoreException(e);
+        }
     }
 
     public void updateCompositionsFilePath(List<Composition> compositions) {

@@ -41,10 +41,13 @@ public class FileUtils {
         return fileName;
     }
 
-    //what if filename and part of path are equal?
-    public static String getChangedFilePath(String fullPath, String newFileName) {
+    public static String getNewPath(String fullPath, String newFileName) {
         String fileName = FileUtils.formatFileName(fullPath);
-        String newPath = fullPath.replace(fileName, newFileName);
+        return TextUtils.replaceLast(fullPath, fileName, newFileName);
+    }
+
+    public static String getChangedFilePath(String fullPath, String newFileName) {
+        String newPath = getNewPath(fullPath, newFileName);
         return getUniqueFilePath(newPath, newFileName);
     }
 
@@ -68,6 +71,6 @@ public class FileUtils {
                 file = new File(newPath);
             }
         }
-        return file.getAbsolutePath();
+        return file.getPath();
     }
 }

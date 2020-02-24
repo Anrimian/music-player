@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import android.util.Log;
+
 import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
@@ -21,6 +23,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.Date;
@@ -93,6 +96,10 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getAllInFolderObservable(sqlQuery);
     }
 
+    public List<Composition> getAllCompositionsInFolder(Long parentFolderId) {
+        return getAllCompositionsInFolder(parentFolderId, new Order(OrderType.ALPHABETICAL, false));
+    }
+
     public List<Composition> getAllCompositionsInFolder(Long parentFolderId, Order order) {
         String query = FoldersDao.getRecursiveFolderQuery(parentFolderId);
         query += CompositionsDao.getCompositionQuery();
@@ -133,6 +140,15 @@ public class CompositionsDaoWrapper {
         appDatabase.runInTransaction(() -> {
             for (Composition composition: compositions) {
                 compositionsDao.updateFilePath(composition.getId(), composition.getFilePath());
+            }
+        });
+    }
+
+    public void updateFilesPath(List<Composition> compositions, String oldPath, String newPath) {
+        appDatabase.runInTransaction(() -> {
+            for (Composition composition: compositions) {
+                String path = composition.getFilePath().replace(oldPath, newPath);
+                compositionsDao.updateFilePath(composition.getId(), path);
             }
         });
     }

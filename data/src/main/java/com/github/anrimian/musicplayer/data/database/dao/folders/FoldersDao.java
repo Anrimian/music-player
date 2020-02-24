@@ -58,6 +58,27 @@ public interface FoldersDao {
     @Query("UPDATE folders SET name = :newName WHERE id = :folderId")
     void changeFolderName(long folderId, String newName);
 
+    @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//room can't on recursive queries now
+    @Query("WITH RECURSIVE path(level, name, parentId) AS (" +
+            "    SELECT 0, name, parentId" +
+            "    FROM folders" +
+            "    WHERE id = :folderId" +
+            "    UNION ALL" +
+            "    SELECT path.level + 1," +
+            "           folders.name," +
+            "           folders.parentId" +
+            "    FROM folders" +
+            "    JOIN path ON folders.id = path.parentId" +
+            ")," +
+            "path_from_root AS (" +
+            "    SELECT name" +
+            "    FROM path" +
+            "    ORDER BY level DESC" +
+            ")" +
+            "SELECT group_concat(name, '/')" +
+            "FROM path_from_root")
+    String getFullFolderPath(long folderId);
+
     static String getRecursiveFolderQuery(Long parentFolderId) {
         return "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
                 "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)" +

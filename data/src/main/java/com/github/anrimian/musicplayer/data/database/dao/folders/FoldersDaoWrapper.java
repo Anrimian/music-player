@@ -106,6 +106,10 @@ public class FoldersDaoWrapper {
         foldersDao.changeFolderName(folderId, newName);
     }
 
+    public String getFullFolderPath(long folderId) {
+        return foldersDao.getFullFolderPath(folderId);
+    }
+
     public String[] getIgnoredFolders() {
         return foldersDao.getIgnoredFolders();
     }
@@ -162,5 +166,4 @@ public class FoldersDaoWrapper {
 
         return sb.toString();
     }
-
 }
