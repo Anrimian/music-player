@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.folders.MusicFo
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.files.FileManager;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
@@ -109,6 +110,7 @@ public class StorageModule {
     @Provides
     @Nonnull
     EditorRepository compositionEditorRepository(StorageMusicDataSource storageMusicDataSource,
+                                                 StorageFilesDataSource filesDataSource,
                                                  CompositionsDaoWrapper compositionsDao,
                                                  AlbumsDaoWrapper albumsDao,
                                                  ArtistsDaoWrapper artistsDao,
@@ -121,6 +123,7 @@ public class StorageModule {
                                                  StateRepository stateRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new EditorRepositoryImpl(storageMusicDataSource,
+                filesDataSource,
                 compositionsDao,
                 albumsDao,
                 artistsDao,
@@ -132,6 +135,12 @@ public class StorageModule {
                 storageAlbumsProvider,
                 stateRepository,
                 scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    StorageFilesDataSource storageFilesDataSource(StorageMusicProvider musicProvider) {
+        return new StorageFilesDataSource(musicProvider);
     }
 
     @Provides

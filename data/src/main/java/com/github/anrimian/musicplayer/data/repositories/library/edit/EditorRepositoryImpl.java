@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.library.edit;
 
-import android.provider.DocumentsContract;
 import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
@@ -13,6 +12,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
@@ -26,7 +26,6 @@ import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
-import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.io.File;
 import java.util.LinkedHashSet;
@@ -39,11 +38,14 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
+import static com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource.renameFile;
+
 public class EditorRepositoryImpl implements EditorRepository {
 
     private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor();
 
     private final StorageMusicDataSource storageMusicDataSource;
+    private final StorageFilesDataSource filesDataSource;
     private final CompositionsDaoWrapper compositionsDao;
     private final AlbumsDaoWrapper albumsDao;
     private final ArtistsDaoWrapper artistsDao;
@@ -57,6 +59,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
+                                StorageFilesDataSource filesDataSource,
                                 CompositionsDaoWrapper compositionsDao,
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
@@ -69,6 +72,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                                 StateRepository stateRepository,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
+        this.filesDataSource = filesDataSource;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
@@ -190,16 +194,13 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeFolderName(long folderId, String newName) {
         return getFullFolderPath(folderId)
                 .doOnSuccess(fullPath -> {
-                    //seems working for android <10, implement for scoped storage
                     String newPath = FileUtils.getChangedFilePath(fullPath, newName);
-                    Log.d("KEK2", "changeFolderName, oldPath: " + fullPath);
-                    Log.d("KEK2", "changeFolderName, newPath: " + newPath);
-
-                    renameFile(fullPath, newPath);
-
                     List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId);
+
+                    filesDataSource.renameCompositionsFolder(compositions, fullPath, newPath, newName);
+
+                    //legacy file path support
                     compositionsDao.updateFilesPath(compositions, fullPath, newPath);
-                    storageMusicProvider.updateCompositionsFilePath(compositions, fullPath, newPath);
                 })
                 .ignoreElement()
                 .doOnComplete(() -> foldersDao.changeFolderName(folderId, newName))
@@ -345,18 +346,6 @@ public class EditorRepositoryImpl implements EditorRepository {
             renameFile(oldPath, newPath);
             return newPath;
         });
-    }
-
-    private void renameFile(String oldPath, String newPath) {
-        File oldFile = new File(oldPath);
-        if (!oldFile.exists()) {
-            throw new RuntimeException("target file not exists");
-        }
-        File newFile = new File(newPath);
-        boolean renamed = oldFile.renameTo(newFile);
-        if (!renamed) {
-            throw new RuntimeException("file not renamed");
-        }
     }
 
     private Single<String> getFullFolderPath(long folderId) {

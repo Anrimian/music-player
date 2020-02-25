@@ -57,6 +57,7 @@ public class StorageCompositionAnalyzer {
         );
     }
 
+    //moved composition from renamed folder to new folder
     public synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
         FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
 

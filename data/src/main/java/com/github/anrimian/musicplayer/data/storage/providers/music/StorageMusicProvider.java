@@ -11,8 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.RemoteException;
 import android.provider.MediaStore;
-import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
@@ -174,7 +174,75 @@ public class StorageMusicProvider {
             String path = composition.getFilePath().replace(oldPath, newPath);
             ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
                     .withValue(Media.DATA, path)
-                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
+                    .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
+                    .build();
+
+            operations.add(operation);
+        }
+
+        try {
+            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
+        } catch (OperationApplicationException | RemoteException e) {
+            throw new UpdateMediaStoreException(e);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void updateCompositionsRelativePath(List<Composition> compositions,
+                                               String oldPath,
+                                               String newPath) {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
+//        Cursor cursor = null;
+//        try {
+//            String[] query;
+//            query = new String[] {
+//                    Media.RELATIVE_PATH,
+//                    Media._ID,
+//            };
+//
+//            cursor = contentResolver.query(
+//                    Media.EXTERNAL_CONTENT_URI,
+//                    query,
+//                    Media.RELATIVE_PATH + " LIKE ?",
+//                    new String[] { oldPath },//need selection
+//                    null);
+//            if (cursor == null) {
+//                return;
+//            }
+//
+//            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+//            for (int i = 0; i < cursor.getCount(); i++) {
+//                cursor.moveToPosition(i);
+//                long id = cursorWrapper.getLong(Media._ID);
+//                String relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
+//                if (relativePath == null) {
+//                    continue;
+//                }
+//
+//                String path = relativePath.replace(oldPath, newPath);
+//
+//                ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
+//                        .withValue(Media.RELATIVE_PATH, path)
+//                        .withSelection(Media._ID + " = ?", new String[] { String.valueOf(id) })
+//                        .build();
+//
+//                operations.add(operation);
+//
+//            }
+//        } finally {
+//            IOUtils.closeSilently(cursor);
+//        }
+
+        for (Composition composition: compositions) {
+            Long storageId = composition.getStorageId();
+            if (storageId == null) {
+                continue;
+            }
+//            String path = composition.getFilePath().replace(oldPath, newPath);
+            ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
+                    .withValue(Media.RELATIVE_PATH, newPath)//we can't move? Path seems right
+                    .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
             operations.add(operation);
