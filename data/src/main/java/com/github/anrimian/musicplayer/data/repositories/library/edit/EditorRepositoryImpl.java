@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.library.edit;
 
-import android.util.Log;
-
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
@@ -20,6 +18,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
@@ -28,9 +27,12 @@ import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -39,6 +41,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource.renameFile;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class EditorRepositoryImpl implements EditorRepository {
 
@@ -217,6 +220,27 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
+    public Completable moveFiles(Collection<FileSource2> files,
+                                 @Nullable Long fromFolderId,
+                                 @Nullable Long toFolderId) {
+        if (Objects.equals(fromFolderId, toFolderId)) {
+            return Completable.error(new MoveInTheSameFolderException("move in the same folder"));
+        }
+        return Single.zip(getFullFolderPath(fromFolderId),
+                getFullFolderPath(toFolderId),
+                compositionsDao.extractAllCompositionsFromFiles(files),
+                (fromPath, toPath, compositions) -> {
+                    filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);//implement
+
+                    compositionsDao.updateFilesPath(compositions, fromPath, toPath);
+                    return TRIGGER;
+                })
+                .ignoreElement()
+                .doOnComplete(() -> foldersDao.updateFolderId(files, toFolderId))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Completable createDirectory(String path) {
         return Completable.fromAction(() -> {
             File file = new File(path);
@@ -347,17 +371,19 @@ public class EditorRepositoryImpl implements EditorRepository {
         });
     }
 
-    private Single<String> getFullFolderPath(long folderId) {
+    private Single<String> getFullFolderPath(@Nullable Long folderId) {
         return Single.fromCallable(() -> {
             StringBuilder sbPath = new StringBuilder();
             String rootFolderPath = stateRepository.getRootFolderPath();
             if (rootFolderPath != null) {
                 sbPath.append(rootFolderPath);
             }
-            if (sbPath.length() != 0) {
-                sbPath.append('/');
+            if (folderId != null) {
+                if (sbPath.length() != 0) {
+                    sbPath.append('/');
+                }
+                sbPath.append(foldersDao.getFullFolderPath(folderId));
             }
-            sbPath.append(foldersDao.getFullFolderPath(folderId));
             return sbPath.toString();
         });
     }

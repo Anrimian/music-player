@@ -22,10 +22,15 @@ import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionU
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +39,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToMap;
@@ -111,6 +117,17 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getAllFolder(sqlQuery);
     }
 
+    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource2> fileSources) {
+        return extractAllCompositionsFromFiles(fileSources, new Order(OrderType.ALPHABETICAL, false));
+    }
+
+    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource2> fileSources,
+                                                                      Order order) {
+        return Observable.fromIterable(fileSources)
+                .flatMap(fileSource -> fileSourceToComposition(fileSource, order))
+                .collect(ArrayList::new, List::add);
+    }
+
     public List<Composition> getAll() {
         return compositionsDao.getAll();
     }
@@ -130,6 +147,10 @@ public class CompositionsDaoWrapper {
 
     public void deleteAll(List<Long> ids) {
         compositionsDao.delete(ids);
+    }
+
+    public void updateFolderId(long id, Long folderId) {
+        compositionsDao.updateFolderId(id, folderId);
     }
 
     public void updateFilePath(long id, String filePath) {
@@ -292,5 +313,22 @@ public class CompositionsDaoWrapper {
         sb.append("%'");
 
         return sb.toString();
+    }
+
+    private Observable<Composition> fileSourceToComposition(FileSource2 fileSource, Order order) {
+        if (fileSource instanceof CompositionFileSource2) {
+            return Observable.just(((CompositionFileSource2) fileSource).getComposition());
+        }
+        if (fileSource instanceof FolderFileSource2) {
+            return Observable.fromIterable(selectAllCompositionsInFolder(
+                    ((FolderFileSource2) fileSource).getId(),
+                    order
+            ));
+        }
+        throw new IllegalStateException("unexpected file source: " + fileSource);
+    }
+
+    private List<Composition> selectAllCompositionsInFolder(Long folderId, Order order) {
+        return getAllCompositionsInFolder(folderId, order);
     }
 }

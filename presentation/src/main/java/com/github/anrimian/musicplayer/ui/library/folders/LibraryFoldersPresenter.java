@@ -56,8 +56,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private final CompositeDisposable presenterBatterySafeDisposable = new CompositeDisposable();
 
     private Disposable folderDisposable;
-    private Disposable filesDisposable;
-    private Disposable deleteSelfDisposable;
     private Disposable currentCompositionDisposable;
 
     private Disposable playActionDisposable;
@@ -357,13 +355,13 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onMoveSelectedFoldersButtonClicked() {
-        interactor.addFilesToMove(path, selectedFiles);
+        interactor.addFilesToMove(folderId, selectedFiles);
         closeSelectionMode();
         getViewState().updateMoveFilesList();
     }
 
     void onCopySelectedFoldersButtonClicked() {
-        interactor.addFilesToCopy(path, selectedFiles);
+        interactor.addFilesToCopy(folderId, selectedFiles);
         closeSelectionMode();
     }
 
@@ -380,7 +378,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             return;
         }
         dispose(fileActionDisposable);
-        fileActionDisposable = interactor.copyFilesTo(path)
+        fileActionDisposable = interactor.copyFilesTo(folderId)
                 .observeOn(uiScheduler)
                 .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
     }

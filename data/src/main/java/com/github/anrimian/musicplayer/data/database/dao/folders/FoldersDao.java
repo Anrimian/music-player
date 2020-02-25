@@ -58,6 +58,9 @@ public interface FoldersDao {
     @Query("UPDATE folders SET name = :newName WHERE id = :folderId")
     void changeFolderName(long folderId, String newName);
 
+    @Query("UPDATE folders SET parentId = :toFolderId WHERE id = :id")
+    void updateParentId(long id, Long toFolderId);
+
     @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//room can't on recursive queries now
     @Query("WITH RECURSIVE path(level, name, parentId) AS (" +
             "    SELECT 0, name, parentId" +

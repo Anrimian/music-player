@@ -203,7 +203,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource2> fileSources) {
-        return extractAllCompositionsInFolders(fileSources)
+        return compositionsDao.extractAllCompositionsFromFiles(fileSources, settingsPreferences.getFolderOrder())
                 .subscribeOn(scheduler);
     }
 
@@ -278,7 +278,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<Composition>> deleteFolders(List<FileSource2> folders) {
-        return extractAllCompositionsInFolders(folders)
+        return compositionsDao.extractAllCompositionsFromFiles(folders)
                 .flatMap(compositions -> storageMusicDataSource.deleteCompositionFiles(compositions)
                         .doOnComplete(() -> foldersDao.deleteFolders(extractFolderIds(folders), compositions))
                         .toSingleDefault(compositions))
@@ -373,24 +373,6 @@ public class LibraryRepositoryImpl implements LibraryRepository {
                 emitter.onNext(composition);
             }
         });
-    }
-
-    private Single<List<Composition>> extractAllCompositionsInFolders(Iterable<FileSource2> fileSources) {
-        return Observable.fromIterable(fileSources)
-                .flatMap(this::fileSourceToComposition)
-                .collect(ArrayList::new, List::add);
-    }
-
-    private Observable<Composition> fileSourceToComposition(FileSource2 fileSource) {
-        if (fileSource instanceof CompositionFileSource2) {
-            return Observable.just(((CompositionFileSource2) fileSource).getComposition());
-        }
-        if (fileSource instanceof FolderFileSource2) {
-            return Observable.fromIterable(selectAllCompositionsInFolder(
-                    ((FolderFileSource2) fileSource).getId()
-            ));
-        }
-        throw new IllegalStateException("unexpected file source: " + fileSource);
     }
 
     private List<Composition> selectAllCompositionsInFolder(Long folderId) {

@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Ignored
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -110,6 +111,21 @@ public class FoldersDaoWrapper {
         return foldersDao.getFullFolderPath(folderId);
     }
 
+    public void updateFolderId(Collection<FileSource2> files, Long toFolderId) {
+        appDatabase.runInTransaction(() -> {
+            for (FileSource2 fileSource: files) {
+                if (fileSource instanceof CompositionFileSource2) {
+                    long id = ((CompositionFileSource2) fileSource).getComposition().getId();
+                    compositionsDao.updateFolderId(id, toFolderId);
+                }
+                if (fileSource instanceof FolderFileSource2) {
+                    long id = ((FolderFileSource2) fileSource).getId();
+                    foldersDao.updateParentId(id, toFolderId);
+                }
+            }
+        });
+    }
+
     public String[] getIgnoredFolders() {
         return foldersDao.getIgnoredFolders();
     }
@@ -166,4 +182,5 @@ public class FoldersDaoWrapper {
 
         return sb.toString();
     }
+
 }

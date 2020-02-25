@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.domain.business.library;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
@@ -39,7 +38,9 @@ public class LibraryFoldersScreenInteractor {
     private final BehaviorSubject<Boolean> moveModeSubject = BehaviorSubject.createDefault(false);
     private final LinkedHashSet<FileSource2> filesToCopy = new LinkedHashSet<>();
     private final LinkedHashSet<FileSource2> filesToMove = new LinkedHashSet<>();
-    private String fromMovePath;
+
+    @Nullable
+    private Long moveFromFolderId;
 
     public LibraryFoldersScreenInteractor(LibraryFoldersInteractor foldersInteractor,
                                           LibraryRepository libraryRepository,
@@ -128,32 +129,31 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.renameFolder(folderId, newName);
     }
 
-    public void addFilesToMove(String fromMovePath, Collection<FileSource2> fileSources) {
+    public void addFilesToMove(@Nullable Long folderId, Collection<FileSource2> fileSources) {
         filesToMove.clear();
         filesToMove.addAll(fileSources);
-        this.fromMovePath = fromMovePath;
+        this.moveFromFolderId = folderId;
         moveModeSubject.onNext(true);
     }
 
-    public void addFilesToCopy(String fromMovePath, Collection<FileSource2> fileSources) {
+    public void addFilesToCopy(@Nullable Long folderId, Collection<FileSource2> fileSources) {
         filesToCopy.clear();
         filesToCopy.addAll(fileSources);
-        this.fromMovePath = fromMovePath;
+        this.moveFromFolderId = folderId;
         moveModeSubject.onNext(true);
     }
 
     public void stopMoveMode() {
         filesToCopy.clear();
         filesToMove.clear();
-        fromMovePath = null;
+        moveFromFolderId = null;
         moveModeSubject.onNext(false);
     }
 
-    public Completable copyFilesTo(String path) {
+    public Completable copyFilesTo(@Nullable Long folderId) {
         Completable completable;
         if (!filesToMove.isEmpty()) {
-            completable = Observable.fromIterable(filesToMove)
-                    .flatMapCompletable(fileSource -> moveFiles(fileSource, path));
+            completable = editorRepository.moveFiles(filesToMove, moveFromFolderId, folderId);
         } else if (!filesToCopy.isEmpty()) {
             completable = Completable.error(new Exception("not implemented"));
         } else {
