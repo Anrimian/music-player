@@ -29,10 +29,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
+import static android.text.TextUtils.regionMatches;
 
 public class StorageMusicProvider {
 
@@ -62,13 +65,27 @@ public class StorageMusicProvider {
         Cursor cursor = null;
         try {
             String[] query;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                query = new String[] {
+//                        Media.ARTIST,
+//                        Media.TITLE,
+////                            Media.ALBUM,
+//                        Media.DATA,
+//                        Media.RELATIVE_PATH,
+//                        Media.DURATION,
+//                        Media.SIZE,
+//                        Media._ID,
+////                            Media.ARTIST_ID,
+//                        Media.ALBUM_ID,
+//                        Media.DATE_ADDED,
+//                        Media.DATE_MODIFIED
+//                };
+//            } else {
                 query = new String[] {
                         Media.ARTIST,
                         Media.TITLE,
 //                            Media.ALBUM,
                         Media.DATA,
-                        Media.RELATIVE_PATH,
                         Media.DURATION,
                         Media.SIZE,
                         Media._ID,
@@ -77,21 +94,7 @@ public class StorageMusicProvider {
                         Media.DATE_ADDED,
                         Media.DATE_MODIFIED
                 };
-            } else {
-                query = new String[] {
-                        Media.ARTIST,
-                        Media.TITLE,
-//                            Media.ALBUM,
-                        Media.DATA,
-                        Media.DURATION,
-                        Media.SIZE,
-                        Media._ID,
-//                            Media.ARTIST_ID,
-                        Media.ALBUM_ID,
-                        Media.DATE_ADDED,
-                        Media.DATE_MODIFIED
-                };
-            }
+//            }
 
             cursor = contentResolver.query(
                     Media.EXTERNAL_CONTENT_URI,
@@ -116,6 +119,33 @@ public class StorageMusicProvider {
                 }
             }
             return compositions;
+        } finally {
+            IOUtils.closeSilently(cursor);
+        }
+    }
+
+    @Nullable
+    public String getCompositionFilePath(long storageId) {
+        Cursor cursor = null;
+        try {
+            String[] query;
+                query = new String[] {
+                        Media.DATA,
+                };
+
+            cursor = contentResolver.query(
+                    Media.EXTERNAL_CONTENT_URI,
+                    query,
+                    Media._ID + " = ?",
+                    new String[] { String.valueOf(storageId) },
+                    null);
+            if (cursor == null) {
+                return null;
+            }
+
+            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+            cursor.moveToFirst();
+            return cursorWrapper.getString(Media.DATA);
         } finally {
             IOUtils.closeSilently(cursor);
         }
@@ -299,11 +329,11 @@ public class StorageMusicProvider {
         }
 
         String relativePath;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
-        } else {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
+//        } else {
             relativePath = FileUtils.getParentDirPath(filePath);
-        }
+//        }
         if (isEmpty(relativePath)) {
             return null;
         }

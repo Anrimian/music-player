@@ -1,10 +1,5 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
-import android.os.Build;
-import android.util.Log;
-
-import androidx.documentfile.provider.DocumentFile;
-
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
@@ -21,26 +16,22 @@ public class StorageFilesDataSource {
 
     public void renameCompositionsFolder(List<Composition> compositions,
                                          String oldPath,
-                                         String newPath,
-                                         String newName) {
-        Log.d("KEK2", "changeFolderName, oldPath: " + oldPath);
-        Log.d("KEK2", "changeFolderName, newPath: " + newPath);
+                                         String newPath) {
+//        Log.d("KEK2", "changeFolderName, oldPath: " + oldPath);
+//        Log.d("KEK2", "changeFolderName, newPath: " + newPath);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-
-            //not working
-            File oldFile = new File(oldPath);
-            DocumentFile documentFile = DocumentFile.fromFile(oldFile);
-            documentFile.renameTo(newName);
-            storageMusicProvider.scanMedia(oldPath);
-            storageMusicProvider.scanMedia(newPath);
-
-//            storageMusicProvider.updateCompositionsRelativePath(compositions, oldPath, newPath);
-        } else {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            String newName = FileUtils.formatFileName(newPath);
+//            File oldFile = new File(oldPath);
+//            DocumentFile documentFile = DocumentFile.fromFile(oldFile);
+//            documentFile.renameTo(newName);
+//            storageMusicProvider.scanMedia(oldPath);
+//            storageMusicProvider.scanMedia(newPath);
+//        } else {
             //seems working for android <10, implement for scoped storage
             renameFile(oldPath, newPath);
             storageMusicProvider.updateCompositionsFilePath(compositions, oldPath, newPath);
-        }
+//        }
     }
 
     public static void renameFile(String oldPath, String newPath) {

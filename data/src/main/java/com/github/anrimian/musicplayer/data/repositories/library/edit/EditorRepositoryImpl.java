@@ -197,9 +197,8 @@ public class EditorRepositoryImpl implements EditorRepository {
                     String newPath = FileUtils.getChangedFilePath(fullPath, newName);
                     List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId);
 
-                    filesDataSource.renameCompositionsFolder(compositions, fullPath, newPath, newName);
+                    filesDataSource.renameCompositionsFolder(compositions, fullPath, newPath);
 
-                    //legacy file path support
                     compositionsDao.updateFilesPath(compositions, fullPath, newPath);
                 })
                 .ignoreElement()
