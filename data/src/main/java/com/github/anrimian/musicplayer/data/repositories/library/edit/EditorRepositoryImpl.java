@@ -222,7 +222,6 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .subscribeOn(scheduler);
     }
 
-    //move in directory with duplicate name
     @Override
     public Completable moveFiles(Collection<FileSource2> files,
                                  @Nullable Long fromFolderId,
@@ -245,8 +244,25 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable moveFilesToNewDirectory(Collection<FileSource2> files,
                                                @Nullable Long fromFolderId,
+                                               @Nullable Long targetParentFolderId,
                                                String directoryName) {
-        return null;
+        return Single.zip(getFullFolderPath(fromFolderId),
+                getFullFolderPath(targetParentFolderId),
+                compositionsDao.extractAllCompositionsFromFiles(files),
+                (fromPath, toParentPath, compositions) -> {
+                    String destPath = filesDataSource.moveCompositionsToNewFolder(compositions,
+                            fromPath,
+                            toParentPath,
+                            directoryName);
+
+                    compositionsDao.updateFilesPath(compositions, fromPath, destPath);
+
+                    String name = FileUtils.getFileName(destPath);
+                    return foldersDao.createFolder(targetParentFolderId, name);
+                })
+                .doOnSuccess(folderId -> foldersDao.updateFolderId(files, folderId))
+                .ignoreElement()
+                .subscribeOn(scheduler);
     }
 
     @Override

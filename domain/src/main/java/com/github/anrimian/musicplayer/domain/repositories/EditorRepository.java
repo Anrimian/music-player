@@ -49,6 +49,7 @@ public interface EditorRepository {
 
     Completable moveFilesToNewDirectory(Collection<FileSource2> files,
                                         @Nullable Long fromFolderId,
+                                        @Nullable Long targetParentFolderId,
                                         String directoryName);
 
     Completable createDirectory(String path);

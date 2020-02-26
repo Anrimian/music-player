@@ -392,7 +392,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             return;
         }
         dispose(fileActionDisposable);
-        fileActionDisposable = interactor.moveFilesToNewFolder(path, name)
+        fileActionDisposable = interactor.moveFilesToNewFolder(folderId, name)
                 .observeOn(uiScheduler)
                 .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
     }

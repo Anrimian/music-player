@@ -6,6 +6,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -136,6 +137,10 @@ public class FoldersDaoWrapper {
                 }
             }
         });
+    }
+
+    public long createFolder(Long parentId, String name) {
+        return foldersDao.insertFolder(new FolderEntity(parentId, name));
     }
 
     public String[] getIgnoredFolders() {

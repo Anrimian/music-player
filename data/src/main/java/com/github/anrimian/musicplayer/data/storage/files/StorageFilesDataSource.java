@@ -1,11 +1,14 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.io.File;
 import java.util.List;
+
+import io.reactivex.Completable;
 
 public class StorageFilesDataSource {
 
@@ -50,9 +53,36 @@ public class StorageFilesDataSource {
 //            Log.d("KEK2", "rename file, oldPath: " + oldPath);
 //            Log.d("KEK2", "rename file, newPath: " + newPath);
 
-            moveFile(oldPath, newPath);//can't move folder
+            moveFile(oldPath, newPath);
         }
         storageMusicProvider.updateCompositionsFilePath(compositions, fromPath, toPath);
+    }
+
+    public String moveCompositionsToNewFolder(List<Composition> compositions,
+                                              String fromPath,
+                                              String toParentPath,
+                                              String directoryName) {
+        String newFolderPath = toParentPath + '/' + directoryName;
+        createDirectory(newFolderPath);
+
+        for (Composition composition: compositions) {
+            String oldPath = composition.getFilePath();
+            String newPath = FileUtils.getChangedFilePath(oldPath, fromPath, newFolderPath);
+
+            moveFile(oldPath, newPath);
+        }
+        storageMusicProvider.updateCompositionsFilePath(compositions, fromPath, newFolderPath);
+        return newFolderPath;
+    }
+
+    private void createDirectory(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            throw new FileExistsException();
+        }
+        if (!file.mkdir()) {
+            throw new RuntimeException("file not created, path: " + path);
+        }
     }
 
     private static void moveFile(String oldPath,

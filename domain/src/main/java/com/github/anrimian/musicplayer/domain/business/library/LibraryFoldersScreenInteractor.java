@@ -162,14 +162,13 @@ public class LibraryFoldersScreenInteractor {
         return completable.doOnComplete(this::stopMoveMode);
     }
 
-    public Completable moveFilesToNewFolder(String path, String folderName) {
-        //TODO root(null) path issue
-        String newFolderPath = path + "/" + folderName;
-        Completable completable = editorRepository.createDirectory(newFolderPath);
+    public Completable moveFilesToNewFolder(@Nullable Long folderId, String folderName) {
+        Completable completable;
         if (!filesToMove.isEmpty()) {
-            completable = completable.andThen(Observable.fromIterable(filesToMove)
-                    .flatMapCompletable(fileSource -> moveFiles(fileSource, newFolderPath))
-            );
+            completable = editorRepository.moveFilesToNewDirectory(filesToMove,
+                    moveFromFolderId,
+                    folderId,
+                    folderName);
         } else if (!filesToCopy.isEmpty()) {
             completable = Completable.error(new Exception("not implemented"));
         } else {
