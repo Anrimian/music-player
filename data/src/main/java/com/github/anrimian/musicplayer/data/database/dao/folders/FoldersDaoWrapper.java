@@ -115,6 +115,14 @@ public class FoldersDaoWrapper {
         return foldersDao.getAllChildFoldersId(parentId);
     }
 
+    public String getFolderName(long folderId) {
+        return foldersDao.getFolderName(folderId);
+    }
+
+    public List<String> getChildFoldersNames(Long toFolderId) {
+        return foldersDao.getChildFoldersNames(toFolderId);
+    }
+
     public void updateFolderId(Collection<FileSource2> files, Long toFolderId) {
         appDatabase.runInTransaction(() -> {
             for (FileSource2 fileSource: files) {

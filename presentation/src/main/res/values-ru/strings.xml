@@ -175,6 +175,7 @@
     <string name="no_excluded_folders">Нет игнорируемых папок</string>
     <string name="ignored_folder_removed">Игнорируемая папка убрана</string>
     <string name="moving_and_destination_folders_matches">Перемещаемая и целевая папка совпадает</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Папка с таким именем уже существует в целевой папке</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

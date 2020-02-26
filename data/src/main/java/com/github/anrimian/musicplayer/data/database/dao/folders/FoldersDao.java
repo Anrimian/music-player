@@ -93,6 +93,14 @@ public interface FoldersDao {
             "SELECT childFolderId FROM allChildFolders")
     List<Long> getAllChildFoldersId(Long parentId);
 
+    @Query("SELECT name FROM folders WHERE id = :folderId")
+    String getFolderName(long folderId);
+
+    @Query("SELECT name " +
+            "FROM folders " +
+            "WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)")
+    List<String> getChildFoldersNames(Long parentId);
+
     static String getRecursiveFolderQuery(Long parentFolderId) {
         return "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
                 "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)" +

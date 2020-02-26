@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapp
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
@@ -221,7 +222,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .subscribeOn(scheduler);
     }
 
-    //move to itself(working) in child folder
+    //move in directory with duplicate name
     @Override
     public Completable moveFiles(Collection<FileSource2> files,
                                  @Nullable Long fromFolderId,
@@ -407,12 +408,18 @@ public class EditorRepositoryImpl implements EditorRepository {
                 if (fileSource instanceof FolderFileSource2) {
                     FolderFileSource2 folder = (FolderFileSource2) fileSource;
                     long folderId = folder.getId();
+
                     List<Long> childFoldersId = foldersDao.getAllChildFoldersId(folderId);
                     if (Objects.equals(toFolderId, folderId) || childFoldersId.contains(toFolderId)) {
                         throw new MoveFolderToItselfException("moving and destination folders matches");
                     }
+                    String name = foldersDao.getFolderName(folderId);
+                    if (foldersDao.getChildFoldersNames(toFolderId).contains(name)) {
+                        throw new DuplicateFolderNamesException();
+                    }
                 }
             }
+
         });
     }
 }
