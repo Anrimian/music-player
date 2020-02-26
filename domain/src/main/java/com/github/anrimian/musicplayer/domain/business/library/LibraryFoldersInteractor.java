@@ -148,7 +148,6 @@ public class LibraryFoldersInteractor {
 
     public Completable renameFolder(long folderId, String newName) {
         return editorRepository.changeFolderName(folderId, newName);
-//                                .flatMapCompletable(editorRepository::changeCompositionsFilePath)
     }
 
     public Completable addFolderToIgnore(IgnoredFolder folder) {

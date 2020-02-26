@@ -111,6 +111,10 @@ public class FoldersDaoWrapper {
         return foldersDao.getFullFolderPath(folderId);
     }
 
+    public List<Long> getAllChildFoldersId(Long parentId) {
+        return foldersDao.getAllChildFoldersId(parentId);
+    }
+
     public void updateFolderId(Collection<FileSource2> files, Long toFolderId) {
         appDatabase.runInTransaction(() -> {
             for (FileSource2 fileSource: files) {

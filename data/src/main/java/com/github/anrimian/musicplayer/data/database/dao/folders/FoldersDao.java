@@ -16,6 +16,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.folders.Ignored
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 
 @Dao
@@ -81,6 +83,15 @@ public interface FoldersDao {
             "SELECT group_concat(name, '/')" +
             "FROM path_from_root")
     String getFullFolderPath(long folderId);
+
+    @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//room can't on recursive queries now
+    @Query("WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
+            "                SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)" +
+            "                UNION" +
+            "                SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
+            "                )" +
+            "SELECT childFolderId FROM allChildFolders")
+    List<Long> getAllChildFoldersId(Long parentId);
 
     static String getRecursiveFolderQuery(Long parentFolderId) {
         return "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +

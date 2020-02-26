@@ -221,6 +221,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .subscribeOn(scheduler);
     }
 
+    //move to itself(working) in child folder
     @Override
     public Completable moveFiles(Collection<FileSource2> files,
                                  @Nullable Long fromFolderId,
@@ -238,6 +239,13 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .ignoreElement()
                 .doOnComplete(() -> foldersDao.updateFolderId(files, toFolderId))
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable moveFilesToNewDirectory(Collection<FileSource2> files,
+                                               @Nullable Long fromFolderId,
+                                               String directoryName) {
+        return null;
     }
 
     @Override
@@ -398,7 +406,9 @@ public class EditorRepositoryImpl implements EditorRepository {
             for (FileSource2 fileSource: files) {
                 if (fileSource instanceof FolderFileSource2) {
                     FolderFileSource2 folder = (FolderFileSource2) fileSource;
-                    if (Objects.equals(toFolderId, folder.getId())) {
+                    long folderId = folder.getId();
+                    List<Long> childFoldersId = foldersDao.getAllChildFoldersId(folderId);
+                    if (Objects.equals(toFolderId, folderId) || childFoldersId.contains(toFolderId)) {
                         throw new MoveFolderToItselfException("moving and destination folders matches");
                     }
                 }
