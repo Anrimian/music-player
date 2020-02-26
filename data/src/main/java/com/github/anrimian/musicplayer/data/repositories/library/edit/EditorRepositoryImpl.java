@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
@@ -19,6 +20,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
+import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
@@ -197,10 +199,9 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeFolderName(long folderId, String newName) {
         return getFullFolderPath(folderId)
                 .doOnSuccess(fullPath -> {
-                    String newPath = FileUtils.getChangedFilePath(fullPath, newName);
                     List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId);
 
-                    filesDataSource.renameCompositionsFolder(compositions, fullPath, newPath);
+                    String newPath = filesDataSource.renameCompositionsFolder(compositions, fullPath, newName);
 
                     compositionsDao.updateFilesPath(compositions, fullPath, newPath);
                 })
@@ -223,18 +224,16 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable moveFiles(Collection<FileSource2> files,
                                  @Nullable Long fromFolderId,
                                  @Nullable Long toFolderId) {
-        if (Objects.equals(fromFolderId, toFolderId)) {
-            return Completable.error(new MoveInTheSameFolderException("move in the same folder"));
-        }
-        return Single.zip(getFullFolderPath(fromFolderId),
-                getFullFolderPath(toFolderId),
-                compositionsDao.extractAllCompositionsFromFiles(files),
-                (fromPath, toPath, compositions) -> {
-                    filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);//implement
+        return verifyFolderMove(fromFolderId, toFolderId, files)
+                .andThen(Single.zip(getFullFolderPath(fromFolderId),
+                        getFullFolderPath(toFolderId),
+                        compositionsDao.extractAllCompositionsFromFiles(files),
+                        (fromPath, toPath, compositions) -> {
+                            filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);
 
-                    compositionsDao.updateFilesPath(compositions, fromPath, toPath);
-                    return TRIGGER;
-                })
+                            compositionsDao.updateFilesPath(compositions, fromPath, toPath);
+                            return TRIGGER;
+                        }))
                 .ignoreElement()
                 .doOnComplete(() -> foldersDao.updateFolderId(files, toFolderId))
                 .subscribeOn(scheduler);
@@ -388,4 +387,21 @@ public class EditorRepositoryImpl implements EditorRepository {
         });
     }
 
+    private Completable verifyFolderMove(@Nullable Long fromFolderId,
+                                         @Nullable Long toFolderId,
+                                         Collection<FileSource2> files) {
+        return Completable.fromAction(() -> {
+            if (Objects.equals(fromFolderId, toFolderId)) {
+                throw new MoveInTheSameFolderException("move in the same folder");
+            }
+            for (FileSource2 fileSource: files) {
+                if (fileSource instanceof FolderFileSource2) {
+                    FolderFileSource2 folder = (FolderFileSource2) fileSource;
+                    if (Objects.equals(toFolderId, folder.getId())) {
+                        throw new MoveFolderToItselfException("moving and destination folders matches");
+                    }
+                }
+            }
+        });
+    }
 }

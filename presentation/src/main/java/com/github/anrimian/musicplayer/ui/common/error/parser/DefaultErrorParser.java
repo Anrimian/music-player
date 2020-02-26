@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFoundException;
@@ -60,6 +61,9 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof MoveInTheSameFolderException) {
             return error(R.string.move_in_the_same_folder_error);
+        }
+        if (throwable instanceof MoveFolderToItselfException) {
+            return error(R.string.moving_and_destination_folders_matches);
         }
         if (throwable instanceof FileExistsException) {
             return error(R.string.file_already_exists);

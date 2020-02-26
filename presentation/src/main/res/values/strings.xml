@@ -182,6 +182,7 @@
     <string name="remove_excluded_folder">Remove excluded folder</string>
     <string name="no_excluded_folders">No excluded folders</string>
     <string name="ignored_folder_removed">Excluded folder removed</string>
+    <string name="moving_and_destination_folders_matches">Moving and destination folders matches</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

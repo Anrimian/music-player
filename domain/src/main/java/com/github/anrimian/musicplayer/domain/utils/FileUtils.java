@@ -53,7 +53,7 @@ public class FileUtils {
 
     public static String getChangedFilePath(String filePath, String oldPath, String newPath) {
         String fileName = FileUtils.formatFileName(filePath);
-        String path = filePath.replace(oldPath, newPath);
+        String path = filePath.replaceFirst(oldPath, newPath);
         return getUniqueFilePath(path, fileName);
     }
 
