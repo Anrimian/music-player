@@ -15,7 +15,6 @@ public class StorageFilesDataSource {
         this.storageMusicProvider = storageMusicProvider;
     }
 
-    //rename to duplicate path
     public String renameCompositionsFolder(List<Composition> compositions,
                                            String oldPath,
                                            String newName) {

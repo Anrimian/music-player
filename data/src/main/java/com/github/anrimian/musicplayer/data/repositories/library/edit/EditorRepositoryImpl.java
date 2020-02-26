@@ -198,15 +198,16 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeFolderName(long folderId, String newName) {
         return getFullFolderPath(folderId)
-                .doOnSuccess(fullPath -> {
+                .map(fullPath -> {
                     List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId);
 
                     String newPath = filesDataSource.renameCompositionsFolder(compositions, fullPath, newName);
 
                     compositionsDao.updateFilesPath(compositions, fullPath, newPath);
+                    return FileUtils.getFileName(fullPath);
                 })
+                .doOnSuccess(name -> foldersDao.changeFolderName(folderId, name))
                 .ignoreElement()
-                .doOnComplete(() -> foldersDao.changeFolderName(folderId, newName))
                 .subscribeOn(scheduler);
     }
 
