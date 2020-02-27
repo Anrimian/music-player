@@ -97,4 +97,6 @@ public interface LibraryRepository {
     Single<List<Composition>> deleteFolder(FolderFileSource2 folder);
 
     Single<List<Composition>> deleteFolders(List<FileSource2> folders);
+
+    Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder);
 }

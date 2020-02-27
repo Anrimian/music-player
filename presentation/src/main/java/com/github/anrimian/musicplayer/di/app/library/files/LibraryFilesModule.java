@@ -22,7 +22,7 @@ public class LibraryFilesModule {
 
     @Provides
     @Nonnull
-    FolderRootPresenter folderRootPresenter(LibraryFoldersInteractor interactor,
+    FolderRootPresenter folderRootPresenter(LibraryFoldersScreenInteractor interactor,
                                             ErrorParser errorParser,
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new FolderRootPresenter(interactor,

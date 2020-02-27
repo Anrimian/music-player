@@ -285,6 +285,12 @@ public class LibraryRepositoryImpl implements LibraryRepository {
                 .subscribeOn(scheduler);
     }
 
+    @Override
+    public Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder) {
+        return Single.fromCallable(() -> foldersDao.getAllParentFoldersId(currentFolder))
+                .subscribeOn(scheduler);
+    }
+
     private List<Long> extractFolderIds(List<FileSource2> sources) {
         List<Long> result = new LinkedList<>();
         for (FileSource2 source : sources) {

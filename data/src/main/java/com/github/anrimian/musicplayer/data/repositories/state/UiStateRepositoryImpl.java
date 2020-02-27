@@ -7,6 +7,8 @@ import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesH
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
@@ -38,7 +40,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
         String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
         String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
-        String SELECTED_FOLDER_SCREEN = "selected_folder_screen";
+        String SELECTED_FOLDER_SCREEN = "selected_folder_screen_id";
         String SELECTED_PLAYLIST_SCREEN = "selected_playlist_screen";
     }
 
@@ -103,13 +105,14 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     }
 
     @Override
-    public void setSelectedFolderScreen(String path) {
-        preferences.putString(SELECTED_FOLDER_SCREEN, path);
+    public void setSelectedFolderScreen(@Nullable Long folderId) {
+        preferences.putLong(SELECTED_FOLDER_SCREEN, folderId == null? 0: folderId);
     }
 
     @Override
-    public String getSelectedFolderScreen() {
-        return preferences.getString(SELECTED_FOLDER_SCREEN);
+    public Long getSelectedFolderScreen() {
+        long id = preferences.getLong(SELECTED_FOLDER_SCREEN);
+        return id == 0? null: id;
     }
 
     @Override

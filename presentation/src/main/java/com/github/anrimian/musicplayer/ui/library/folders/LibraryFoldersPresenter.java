@@ -289,7 +289,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     void onFragmentDisplayed() {
-        interactor.saveCurrentPath(path);
+        interactor.saveCurrentFolder(folderId);
     }
 
     void onRenameFolderClicked(FolderFileSource2 folder) {

@@ -25,6 +25,8 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+
 /**
  * Created on 24.10.2017.
  */
@@ -137,13 +139,13 @@ public class LibraryFoldersInteractor {
         return settingsRepository.getFolderOrder();
     }
 
-    public void saveCurrentPath(@Nullable String path) {
-        uiStateRepository.setSelectedFolderScreen(path);
+    public void saveCurrentFolder(@Nullable Long folderId) {
+        uiStateRepository.setSelectedFolderScreen(folderId);
     }
 
-    public Single<List<String>> getCurrentFolderScreens() {
-        String currentPath = uiStateRepository.getSelectedFolderScreen();
-        return libraryRepository.getAvailablePathsForPath(currentPath);
+    public Single<List<Long>> getCurrentFolderScreens() {
+        Long currentFolder = uiStateRepository.getSelectedFolderScreen();
+        return libraryRepository.getAllParentFolders(currentFolder);
     }
 
     public Completable renameFolder(long folderId, String newName) {

@@ -93,6 +93,21 @@ public interface FoldersDao {
             "SELECT childFolderId FROM allChildFolders")
     List<Long> getAllChildFoldersId(Long parentId);
 
+    @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//room can't on recursive queries now
+    @Query("WITH RECURSIVE path(level, id, parentId) AS (" +
+            "    SELECT 0, id, parentId" +
+            "    FROM folders" +
+            "    WHERE id = :folderId OR (id IS NULL AND :folderId IS NULL)" +
+            "    UNION ALL" +
+            "    SELECT path.level + 1," +
+            "           folders.id," +
+            "           folders.parentId" +
+            "    FROM folders" +
+            "    JOIN path ON folders.id = path.parentId" +
+            ")" +
+            "SELECT id FROM path ORDER BY level DESC")
+    List<Long> getAllParentFoldersId(Long folderId);
+
     @Query("SELECT name FROM folders WHERE id = :folderId")
     String getFolderName(long folderId);
 

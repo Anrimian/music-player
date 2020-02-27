@@ -117,11 +117,11 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.getFolderOrder();
     }
 
-    public void saveCurrentPath(@Nullable String path) {
-        foldersInteractor.saveCurrentPath(path);
+    public void saveCurrentFolder(@Nullable Long folderId) {
+        foldersInteractor.saveCurrentFolder(folderId);
     }
 
-    public Single<List<String>> getCurrentFolderScreens() {
+    public Single<List<Long>> getCurrentFolderScreens() {
         return foldersInteractor.getCurrentFolderScreens();
     }
 

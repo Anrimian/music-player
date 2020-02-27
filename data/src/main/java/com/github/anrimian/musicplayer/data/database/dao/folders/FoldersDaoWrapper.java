@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -114,6 +115,13 @@ public class FoldersDaoWrapper {
 
     public List<Long> getAllChildFoldersId(Long parentId) {
         return foldersDao.getAllChildFoldersId(parentId);
+    }
+
+    public List<Long> getAllParentFoldersId(Long currentFolder) {
+        List<Long> result = new LinkedList<>();
+        result.add(null);//null folder is always first
+        result.addAll(foldersDao.getAllParentFoldersId(currentFolder));
+        return result;
     }
 
     public String getFolderName(long folderId) {
