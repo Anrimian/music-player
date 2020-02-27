@@ -184,6 +184,8 @@
     <string name="ignored_folder_removed">Excluded folder removed</string>
     <string name="moving_and_destination_folders_matches">Moving and destination folders matches</string>
     <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
+    <string name="move_progress">Moving…</string>
+    <string name="delete_progress">Deleting…</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

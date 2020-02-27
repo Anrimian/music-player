@@ -42,7 +42,6 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
  * Created on 23.10.2017.
  */
 
-//TODO delete large amount of files - show progress dialog
 //TODO delete empty folder - show different dialog
 @InjectViewState
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
@@ -106,8 +105,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().showQueueActions(false);
         getViewState().showSearchMode(false);
+        getViewState().hideProgressDialog();
 
         subscribeOnFolder();
         subscribeOnChildFolders();
@@ -217,6 +216,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         dispose(deleteActionDisposable, presenterDisposable);
         deleteActionDisposable = interactor.deleteFolder(folderToDelete)
                 .observeOn(uiScheduler)
+                .doOnSubscribe(o -> getViewState().showDeleteProgress())
+                .doFinally(() -> getViewState().hideProgressDialog())
                 .subscribe(this::onDeleteFolderSuccess, this::onDeleteCompositionsError);
         presenterDisposable.add(deleteActionDisposable);
     }
@@ -299,6 +300,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         dispose(fileActionDisposable);
         fileActionDisposable = interactor.renameFolder(folderId, name)
                 .observeOn(uiScheduler)
+                .doOnSubscribe(o -> getViewState().showRenameProgress())
+                .doFinally(() -> getViewState().hideProgressDialog())
                 .subscribe(() -> {}, this::onDefaultError);
     }
 
@@ -347,6 +350,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         filesToDelete.addAll(selectedFiles);
         deleteActionDisposable = interactor.getAllCompositionsInFileSources(new ArrayList<>(selectedFiles))
                 .observeOn(uiScheduler)
+                .doOnSubscribe(o -> getViewState().showDeleteProgress())
+                .doFinally(() -> getViewState().hideProgressDialog())
                 .subscribe(getViewState()::showConfirmDeleteDialog, this::onDefaultError);
     }
 
@@ -374,8 +379,10 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             return;
         }
         dispose(fileActionDisposable);
-        fileActionDisposable = interactor.copyFilesTo(folderId)
+        fileActionDisposable = interactor.moveFilesTo(folderId)
                 .observeOn(uiScheduler)
+                .doOnSubscribe(o -> getViewState().showMoveProgress())
+                .doFinally(() -> getViewState().hideProgressDialog())
                 .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
     }
 
@@ -390,6 +397,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         dispose(fileActionDisposable);
         fileActionDisposable = interactor.moveFilesToNewFolder(folderId, name)
                 .observeOn(uiScheduler)
+                .doOnSubscribe(o -> getViewState().showMoveProgress())
+                .doFinally(() -> getViewState().hideProgressDialog())
                 .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
     }
 
@@ -598,7 +607,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         } else {
             currentComposition = null;
         }
-        getViewState().showQueueActions(currentComposition != null);
         getViewState().showCurrentPlayingComposition(currentComposition);
     }
 

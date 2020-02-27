@@ -144,7 +144,7 @@ public class LibraryFoldersScreenInteractor {
         moveModeSubject.onNext(false);
     }
 
-    public Completable copyFilesTo(@Nullable Long folderId) {
+    public Completable moveFilesTo(@Nullable Long folderId) {
         Completable completable;
         if (!filesToMove.isEmpty()) {
             completable = editorRepository.moveFiles(filesToMove, moveFromFolderId, folderId);

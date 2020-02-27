@@ -28,6 +28,7 @@ public interface LibraryFoldersView extends MvpView {
 
     String LIST_STATE = "list_state";
     String FOLDER_STATE = "back_path_button_state";
+    String PROGRESS_DIALOG_STATE = "progress_dialog_state";
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
@@ -49,6 +50,18 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
     void hideFolderInfo();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
+    void hideProgressDialog();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
+    void showMoveProgress();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
+    void showDeleteProgress();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
+    void showRenameProgress();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goBackToParentFolderScreen();
@@ -103,9 +116,6 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);
-
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showQueueActions(boolean show);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void setDisplayCoversEnabled(boolean isCoversEnabled);
