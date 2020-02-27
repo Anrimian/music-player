@@ -157,7 +157,7 @@ public class LibraryFoldersInteractor {
                 .andThen(mediaScannerRepository.runStorageScanner());
     }
 
-    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
+    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource2 folder) {
         return libraryRepository.addFolderToIgnore(folder)
                 .flatMap(ignoredFolder -> mediaScannerRepository.runStorageScanner()
                         .toSingleDefault(ignoredFolder)

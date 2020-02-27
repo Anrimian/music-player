@@ -43,6 +43,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
  */
 
 //TODO delete large amount of files - show progress dialog
+//TODO delete empty folder - show different dialog
 @InjectViewState
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
@@ -63,10 +64,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     private Disposable playlistActionDisposable;
     private Disposable shareActionDisposable;
     private Disposable fileActionDisposable;
-
-    @Nullable
-    @Deprecated
-    private String path;
 
     @Nullable
     private final Long folderId;
@@ -99,7 +96,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
                                    ErrorParser errorParser,
                                    Scheduler uiScheduler) {
         this.folderId = folderId;
-        this.path = null;
         this.interactor = interactor;
         this.playerInteractor = playerInteractor;
         this.displaySettingsInteractor = displaySettingsInteractor;
@@ -400,9 +396,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     @SuppressLint("CheckResult")
     void onExcludeFolderClicked(FolderFileSource2 folder) {
         //noinspection ResultOfMethodCallIgnored
-//        interactor.addFolderToIgnore(folder)
-//                .observeOn(uiScheduler)
-//                .subscribe(this::onIgnoreFolderAdded, this::onDefaultError);
+        interactor.addFolderToIgnore(folder)
+                .observeOn(uiScheduler)
+                .subscribe(this::onIgnoreFolderAdded, this::onDefaultError);
     }
 
     @SuppressLint("CheckResult")

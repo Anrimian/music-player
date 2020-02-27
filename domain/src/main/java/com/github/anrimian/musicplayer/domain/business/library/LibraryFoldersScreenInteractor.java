@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.domain.business.library;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
@@ -50,10 +48,6 @@ public class LibraryFoldersScreenInteractor {
         this.libraryRepository = libraryRepository;
         this.editorRepository = editorRepository;
         this.mediaScannerRepository = mediaScannerRepository;
-    }
-
-    public Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText) {
-        return foldersInteractor.getCompositionsInPath(path, searchText);
     }
 
     public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId,
@@ -185,31 +179,12 @@ public class LibraryFoldersScreenInteractor {
         return filesToMove;
     }
 
-    public Completable addFolderToIgnore(IgnoredFolder folder) {
-        return libraryRepository.addFolderToIgnore(folder)
-                .andThen(mediaScannerRepository.runStorageScanner());
-    }
-
-    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
-        return libraryRepository.addFolderToIgnore(folder)
-                .flatMap(ignoredFolder -> mediaScannerRepository.runStorageScanner()
-                        .toSingleDefault(ignoredFolder)
-                );
-    }
-
-    public Observable<List<IgnoredFolder>> getIgnoredFoldersObservable() {
-        return libraryRepository.getIgnoredFoldersObservable();
+    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource2 folder) {
+        return foldersInteractor.addFolderToIgnore(folder);
     }
 
     public Completable deleteIgnoredFolder(IgnoredFolder folder) {
         return libraryRepository.deleteIgnoredFolder(folder)
                 .andThen(mediaScannerRepository.runStorageScanner());
-    }
-
-    private Completable moveFiles(FileSource2 fileSource, String path) {
-        return Completable.complete();
-//        return editorRepository.moveFile(fileSource.getPath(), fromMovePath, path)
-//                .flatMap(newPath -> libraryRepository.moveFileTo(path, newPath, fileSource))
-//                .flatMapCompletable(editorRepository::changeCompositionsFilePath);
     }
 }

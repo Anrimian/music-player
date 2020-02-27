@@ -86,7 +86,7 @@ public interface LibraryRepository {
 
     Observable<Genre> getGenreObservable(long genreId);
 
-    Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder);
+    Single<IgnoredFolder> addFolderToIgnore(FolderFileSource2 folder);
 
     Completable addFolderToIgnore(IgnoredFolder folder);
 

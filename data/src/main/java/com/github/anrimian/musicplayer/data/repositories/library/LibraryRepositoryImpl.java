@@ -244,8 +244,8 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
-        return musicFolderDataSource.getRelativePath(folder.getPath())
+    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource2 folder) {
+        return Single.fromCallable(() -> foldersDao.getFullFolderPath(folder.getId()))
                 .map(foldersDao::insert)
                 .subscribeOn(scheduler);
     }

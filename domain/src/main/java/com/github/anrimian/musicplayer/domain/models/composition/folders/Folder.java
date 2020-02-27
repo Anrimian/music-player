@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
 
+@Deprecated
 public class Folder {
 
     private Observable<List<FileSource>> filesObservable;
