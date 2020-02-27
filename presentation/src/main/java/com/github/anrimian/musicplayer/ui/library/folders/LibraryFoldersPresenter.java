@@ -42,7 +42,6 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
  * Created on 23.10.2017.
  */
 
-//TODO delete empty folder - show different dialog
 @InjectViewState
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 

@@ -57,6 +57,7 @@
     <string name="cancel">Cancel</string>
     <string name="deleting">Deleting</string>
     <string name="delete_composition_template">Delete song %1$s? This action cannot be undone.</string>
+    <string name="delete_empty_folder">Delete folder %s? This action cannot be undone.</string>
     <string name="delete_folder_template">Delete %2$s from folder %1$s?
         If there are no more files in the folder, it will also be deleted.
         This action cannot be undone.

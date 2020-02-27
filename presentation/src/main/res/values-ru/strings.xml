@@ -60,6 +60,7 @@
         Если в папке больше нет файлов, то она тоже будет удалена.
         Это действие нельзя будет отменить.
     </string>
+    <string name="delete_empty_folder">Удалить папку %s? Это действие нельзя будет отменить.</string>
     <string name="delete_template">Удалить %1$s? Это действие нельзя будет отменить.</string>
     <string name="delete_composition_success">Композиция %1$s удалена</string>
     <string name="delete_compositions_success">%1$d композиций удалено</string>

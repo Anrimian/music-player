@@ -29,8 +29,8 @@ import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPath
 public class DialogUtils {
 
     public static void showConfirmDeleteDialog(Context context,
-                                        List<Composition> compositions,
-                                        Runnable deleteCallback) {
+                                               List<Composition> compositions,
+                                               Runnable deleteCallback) {
         String message = compositions.size() == 1?
                 context.getString(R.string.delete_composition_template, formatCompositionName(compositions.get(0))):
                 context.getString(R.string.delete_template, getDativCompositionsMessage(context, compositions.size()));
@@ -40,9 +40,17 @@ public class DialogUtils {
     public static void showConfirmDeleteDialog(Context context,
                                                FolderFileSource2 folder,
                                                Runnable deleteCallback) {
-        String message = context.getString(R.string.delete_folder_template,
-                folder.getName(),
-                getDativCompositionsMessage(context, folder.getFilesCount()));
+        int filesCount = folder.getFilesCount();
+        String name = folder.getName();
+        String message;
+        if (filesCount == 0) {
+            message = context.getString(R.string.delete_empty_folder, name);
+        } else {
+            message = context.getString(R.string.delete_folder_template,
+                    name,
+                    getDativCompositionsMessage(context, filesCount));
+        }
+
         showConfirmDeleteDialog(context, message, deleteCallback);
     }
 
