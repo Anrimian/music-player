@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.settings.folders;
 
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 
 import java.util.List;

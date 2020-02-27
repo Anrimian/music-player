@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.ui.library.common.order.adapter.OrderAdapter;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 

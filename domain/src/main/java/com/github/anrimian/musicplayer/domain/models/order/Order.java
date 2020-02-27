@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.domain.models.composition.order;
+package com.github.anrimian.musicplayer.domain.models.order;
 
 import java.io.Serializable;
 

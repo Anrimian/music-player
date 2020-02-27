@@ -1,12 +1,10 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
@@ -46,7 +44,7 @@ public interface LibraryFoldersView extends MvpView {
     void showError(ErrorCommand errorCommand);
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
-    void showFolderInfo(FolderFileSource2 folder);
+    void showFolderInfo(FolderFileSource folder);
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
     void hideFolderInfo();
@@ -67,7 +65,7 @@ public interface LibraryFoldersView extends MvpView {
     void goBackToParentFolderScreen();
 
     @StateStrategyType(ListStateStrategy.class)
-    void updateList(List<FileSource2> update);
+    void updateList(List<FileSource> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order folderOrder);
@@ -82,7 +80,7 @@ public interface LibraryFoldersView extends MvpView {
     void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showSelectPlayListForFolderDialog();
+    void showSelectPlayListForFolderDialog(FolderFileSource folder);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
@@ -94,7 +92,7 @@ public interface LibraryFoldersView extends MvpView {
     void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showConfirmDeleteDialog(FolderFileSource2 folder);
+    void showConfirmDeleteDialog(FolderFileSource folder);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showSearchMode(boolean show);
@@ -121,16 +119,16 @@ public interface LibraryFoldersView extends MvpView {
     void setDisplayCoversEnabled(boolean isCoversEnabled);
 
     @StateStrategyType(SkipStrategy.class)
-    void showInputFolderNameDialog(FolderFileSource2 folder);
+    void showInputFolderNameDialog(FolderFileSource folder);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showSelectionMode(int count);
 
     @StateStrategyType(SkipStrategy.class)
-    void onItemSelected(FileSource2 item, int position);
+    void onItemSelected(FileSource item, int position);
 
     @StateStrategyType(SkipStrategy.class)
-    void onItemUnselected(FileSource2 item, int position);
+    void onItemUnselected(FileSource item, int position);
 
     @StateStrategyType(SkipStrategy.class)
     void setItemsSelected(boolean selected);

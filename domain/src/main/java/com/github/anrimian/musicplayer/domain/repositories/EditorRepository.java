@@ -2,9 +2,8 @@ package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 import java.util.Collection;
@@ -43,11 +42,11 @@ public interface EditorRepository {
 
     Single<String> moveFile(String filePath, String oldPath, String newPath);
 
-    Completable moveFiles(Collection<FileSource2> files,
+    Completable moveFiles(Collection<FileSource> files,
                           @Nullable Long fromFolderId,
                           @Nullable Long toFolderId);
 
-    Completable moveFilesToNewDirectory(Collection<FileSource2> files,
+    Completable moveFilesToNewDirectory(Collection<FileSource> files,
                                         @Nullable Long fromFolderId,
                                         @Nullable Long targetParentFolderId,
                                         String directoryName);

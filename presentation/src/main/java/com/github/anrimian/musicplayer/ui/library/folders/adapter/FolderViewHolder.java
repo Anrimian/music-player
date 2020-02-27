@@ -7,8 +7,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
@@ -45,15 +45,15 @@ class FolderViewHolder extends FileViewHolder {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
-    private FolderFileSource2 folder;
+    private FolderFileSource folder;
     private String path;
 
     private boolean selected = false;
 
     FolderViewHolder(ViewGroup parent,
-                     OnPositionItemClickListener<FolderFileSource2> onFolderClickListener,
-                     OnViewItemClickListener<FolderFileSource2> onMenuClickListener,
-                     OnPositionItemClickListener<FileSource2> onLongClickListener) {
+                     OnPositionItemClickListener<FolderFileSource> onFolderClickListener,
+                     OnViewItemClickListener<FolderFileSource> onMenuClickListener,
+                     OnPositionItemClickListener<FileSource> onLongClickListener) {
         super(parent, R.layout.item_storage_folder);
         ButterKnife.bind(this, itemView);
         if (onFolderClickListener != null) {
@@ -93,25 +93,25 @@ class FolderViewHolder extends FileViewHolder {
     }
 
     @Override
-    public FileSource2 getFileSource() {
+    public FileSource getFileSource() {
         return folder;
     }
 
-    void bind(@Nonnull FolderFileSource2 folderFileSource2) {
-        this.folder = folderFileSource2;
-        this.path = folderFileSource2.getName();
+    void bind(@Nonnull FolderFileSource folderFileSource) {
+        this.folder = folderFileSource;
+        this.path = folderFileSource.getName();
         showFolderName();
         showFilesCount();
     }
 
-    public void update(FolderFileSource2 folderFileSource2, List<Object> payloads) {
-        this.folder = folderFileSource2;
-        this.path = folderFileSource2.getName();
-        bind(folderFileSource2);
+    public void update(FolderFileSource folderFileSource, List<Object> payloads) {
+        this.folder = folderFileSource;
+        this.path = folderFileSource.getName();
+        bind(folderFileSource);
         for (Object payload: payloads) {
             if (payload instanceof List) {
                 //noinspection SingleStatementInBlock,unchecked
-                update(folderFileSource2, (List) payload);
+                update(folderFileSource, (List) payload);
             }
             if (payload == ITEM_SELECTED) {
                 setSelected(true);

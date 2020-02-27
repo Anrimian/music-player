@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.domain.models.utils;
 
-import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
+import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.LinkedList;
@@ -15,42 +15,42 @@ import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 
 public class FolderHelper {
 
-    public static boolean areSourcesTheSame(FileSource2 oldSource, FileSource2 newSource) {
+    public static boolean areSourcesTheSame(FileSource oldSource, FileSource newSource) {
         if (oldSource.getClass().equals(newSource.getClass())) {
-            if (oldSource instanceof FolderFileSource2) {
-                return !FolderHelper.hasChanges(((FolderFileSource2) oldSource),
-                        ((FolderFileSource2) newSource));
+            if (oldSource instanceof FolderFileSource) {
+                return !FolderHelper.hasChanges(((FolderFileSource) oldSource),
+                        ((FolderFileSource) newSource));
             }
-            if (oldSource instanceof CompositionFileSource2) {
-                return CompositionHelper.areSourcesTheSame(((CompositionFileSource2) oldSource).getComposition(),
-                        ((CompositionFileSource2) newSource).getComposition());
+            if (oldSource instanceof CompositionFileSource) {
+                return CompositionHelper.areSourcesTheSame(((CompositionFileSource) oldSource).getComposition(),
+                        ((CompositionFileSource) newSource).getComposition());
             }
         }
         return false;
     }
 
-    public static List<Object> getChangePayload(FileSource2 oldSource, FileSource2 newSource) {
+    public static List<Object> getChangePayload(FileSource oldSource, FileSource newSource) {
         if (oldSource.getClass().equals(newSource.getClass())) {
-            if (oldSource instanceof FolderFileSource2) {
-                return FolderHelper.getChangePayload(((FolderFileSource2) oldSource),
-                        ((FolderFileSource2) newSource));
+            if (oldSource instanceof FolderFileSource) {
+                return FolderHelper.getChangePayload(((FolderFileSource) oldSource),
+                        ((FolderFileSource) newSource));
             }
-            if (oldSource instanceof CompositionFileSource2) {
+            if (oldSource instanceof CompositionFileSource) {
                 return CompositionHelper.getChangePayload(
-                        ((CompositionFileSource2) oldSource).getComposition(),
-                        ((CompositionFileSource2) newSource).getComposition());
+                        ((CompositionFileSource) oldSource).getComposition(),
+                        ((CompositionFileSource) newSource).getComposition());
             }
         }
         return null;
     }
 
-    public static boolean hasChanges(@Nonnull FolderFileSource2 first, @Nonnull FolderFileSource2 second) {
+    public static boolean hasChanges(@Nonnull FolderFileSource first, @Nonnull FolderFileSource second) {
         return /*!Objects.equals(first.getEarliestCreateDate(), second.getEarliestCreateDate())
                 || */first.getFilesCount() != second.getFilesCount()
                 || !Objects.equals(first.getName(), second.getName());
     }
 
-    private static List<Object> getChangePayload(FolderFileSource2 first, FolderFileSource2 second) {
+    private static List<Object> getChangePayload(FolderFileSource first, FolderFileSource second) {
         List<Object> payloads = new LinkedList<>();
 //        if (!Objects.equals(first.getEarliestCreateDate(), second.getEarliestCreateDate())) {
 //            payloads.add(CREATE_DATE);

@@ -20,8 +20,8 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
@@ -59,8 +59,6 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final FoldersDaoWrapper foldersDao;
     private final StorageMusicProvider storageMusicProvider;
     private final StorageGenresProvider storageGenresProvider;
-    private final StorageArtistsProvider storageArtistsProvider;
-    private final StorageAlbumsProvider storageAlbumsProvider;
     private final StateRepository stateRepository;
     private final Scheduler scheduler;
 
@@ -73,8 +71,6 @@ public class EditorRepositoryImpl implements EditorRepository {
                                 FoldersDaoWrapper foldersDao,
                                 StorageMusicProvider storageMusicProvider,
                                 StorageGenresProvider storageGenresProvider,
-                                StorageArtistsProvider storageArtistsProvider,
-                                StorageAlbumsProvider storageAlbumsProvider,
                                 StateRepository stateRepository,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
@@ -86,8 +82,6 @@ public class EditorRepositoryImpl implements EditorRepository {
         this.foldersDao = foldersDao;
         this.storageMusicProvider = storageMusicProvider;
         this.storageGenresProvider = storageGenresProvider;
-        this.storageArtistsProvider = storageArtistsProvider;
-        this.storageAlbumsProvider = storageAlbumsProvider;
         this.stateRepository = stateRepository;
         this.scheduler = scheduler;
     }
@@ -223,7 +217,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
-    public Completable moveFiles(Collection<FileSource2> files,
+    public Completable moveFiles(Collection<FileSource> files,
                                  @Nullable Long fromFolderId,
                                  @Nullable Long toFolderId) {
         return verifyFolderMove(fromFolderId, toFolderId, files)
@@ -242,7 +236,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
-    public Completable moveFilesToNewDirectory(Collection<FileSource2> files,
+    public Completable moveFilesToNewDirectory(Collection<FileSource> files,
                                                @Nullable Long fromFolderId,
                                                @Nullable Long targetParentFolderId,
                                                String directoryName) {
@@ -415,14 +409,14 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     private Completable verifyFolderMove(@Nullable Long fromFolderId,
                                          @Nullable Long toFolderId,
-                                         Collection<FileSource2> files) {
+                                         Collection<FileSource> files) {
         return Completable.fromAction(() -> {
             if (Objects.equals(fromFolderId, toFolderId)) {
                 throw new MoveInTheSameFolderException("move in the same folder");
             }
-            for (FileSource2 fileSource: files) {
-                if (fileSource instanceof FolderFileSource2) {
-                    FolderFileSource2 folder = (FolderFileSource2) fileSource;
+            for (FileSource fileSource: files) {
+                if (fileSource instanceof FolderFileSource) {
+                    FolderFileSource folder = (FolderFileSource) fileSource;
                     long folderId = folder.getId();
 
                     List<Long> childFoldersId = foldersDao.getAllChildFoldersId(folderId);

@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
-import android.util.Log;
-
 import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
@@ -9,32 +7,22 @@ import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
-import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
-import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
-import com.github.anrimian.musicplayer.data.models.changes.Change;
-import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
+import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -42,7 +30,6 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapToMap;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class CompositionsDaoWrapper {
@@ -60,10 +47,6 @@ public class CompositionsDaoWrapper {
         this.artistsDao = artistsDao;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
-    }
-
-    public Observable<List<Composition>> getAllObservable() {
-        return compositionsDao.getAllObservable();
     }
 
     public Observable<FullComposition> getCompositionObservable(long id) {
@@ -114,26 +97,18 @@ public class CompositionsDaoWrapper {
         query += parentFolderId;
         query += getOrderQuery(order);
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
-        return compositionsDao.getAllFolder(sqlQuery);
+        return compositionsDao.getAllInFolder(sqlQuery);
     }
 
-    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource2> fileSources) {
+    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources) {
         return extractAllCompositionsFromFiles(fileSources, new Order(OrderType.ALPHABETICAL, false));
     }
 
-    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource2> fileSources,
+    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources,
                                                                       Order order) {
         return Observable.fromIterable(fileSources)
                 .flatMap(fileSource -> fileSourceToComposition(fileSource, order))
                 .collect(ArrayList::new, List::add);
-    }
-
-    public List<Composition> getAll() {
-        return compositionsDao.getAll();
-    }
-
-    public Map<Long, Composition> getAllMap() {
-        return mapToMap(getAll(), new HashMap<>(), Composition::getId);
     }
 
     public LongSparseArray<StorageComposition> selectAllAsStorageCompositions() {
@@ -315,13 +290,13 @@ public class CompositionsDaoWrapper {
         return sb.toString();
     }
 
-    private Observable<Composition> fileSourceToComposition(FileSource2 fileSource, Order order) {
-        if (fileSource instanceof CompositionFileSource2) {
-            return Observable.just(((CompositionFileSource2) fileSource).getComposition());
+    private Observable<Composition> fileSourceToComposition(FileSource fileSource, Order order) {
+        if (fileSource instanceof CompositionFileSource) {
+            return Observable.just(((CompositionFileSource) fileSource).getComposition());
         }
-        if (fileSource instanceof FolderFileSource2) {
+        if (fileSource instanceof FolderFileSource) {
             return Observable.fromIterable(selectAllCompositionsInFolder(
-                    ((FolderFileSource2) fileSource).getId(),
+                    ((FolderFileSource) fileSource).getId(),
                     order
             ));
         }

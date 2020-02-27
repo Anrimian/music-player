@@ -1,12 +1,12 @@
-package com.github.anrimian.musicplayer.domain.models.composition.folders;
+package com.github.anrimian.musicplayer.domain.models.folders;
 
-public class FolderFileSource2 implements FileSource2 {
+public class FolderFileSource implements FileSource {
 
     private final long id;
     private final String name;
     private final int filesCount;
 
-    public FolderFileSource2(long id, String name, int filesCount) {
+    public FolderFileSource(long id, String name, int filesCount) {
         this.id = id;
         this.name = name;
         this.filesCount = filesCount;
@@ -29,7 +29,7 @@ public class FolderFileSource2 implements FileSource2 {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        FolderFileSource2 that = (FolderFileSource2) o;
+        FolderFileSource that = (FolderFileSource) o;
 
         return id == that.id;
     }

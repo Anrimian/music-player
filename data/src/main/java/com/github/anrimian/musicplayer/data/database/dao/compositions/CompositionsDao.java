@@ -25,24 +25,6 @@ import io.reactivex.Observable;
 @Dao
 public interface CompositionsDao {
 
-    //error at ~530 line(v 0.8.1.1)?
-    //remove/rewrite?
-    //https://stackoverflow.com/questions/52917946/room-library-initializing-cursor-error
-    @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = compositions.artistId) as artist, " +
-            "compositions.title as title, " +
-            "(SELECT name FROM albums WHERE id = compositions.albumId) as album, " +
-            "compositions.filePath as filePath, " +
-            "compositions.duration as duration, " +
-            "compositions.size as size, " +
-            "compositions.id as id, " +
-            "compositions.storageId as storageId, " +
-            "compositions.dateAdded as dateAdded, " +
-            "compositions.dateModified as dateModified, " +
-            "compositions.corruptionType as corruptionType " +
-            "FROM compositions")
-    Observable<List<Composition>> getAllObservable();
-
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
@@ -68,22 +50,7 @@ public interface CompositionsDao {
     Observable<List<Composition>> getAllInFolderObservable(SupportSQLiteQuery query);
 
     @RawQuery
-    List<Composition> getAllFolder(SimpleSQLiteQuery sqlQuery);
-
-    @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "title as title, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "filePath as filePath, " +
-            "duration as duration, " +
-            "size as size, " +
-            "id as id, " +
-            "storageId as storageId, " +
-            "dateAdded as dateAdded, " +
-            "dateModified as dateModified, " +
-            "corruptionType as corruptionType " +
-            "FROM compositions")
-    List<Composition> getAll();
+    List<Composition> getAllInFolder(SimpleSQLiteQuery sqlQuery);
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
@@ -106,9 +73,6 @@ public interface CompositionsDao {
 
     @Insert
     void insert(List<CompositionEntity> entities);
-
-    @Update
-    void update(List<CompositionEntity> entities);
 
     @Query("UPDATE compositions SET " +
             "title = :title, " +

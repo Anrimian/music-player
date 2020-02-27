@@ -8,8 +8,8 @@ import androidx.annotation.ColorInt;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
+import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 
@@ -36,15 +36,15 @@ public class MusicFileViewHolder extends FileViewHolder {
 
     private CompositionItemWrapper compositionItemWrapper;
 
-    private CompositionFileSource2 fileSource;
+    private CompositionFileSource fileSource;
 
     private boolean selected = false;
     private boolean selectedToMove = false;
     private boolean isCurrent = false;
 
     public MusicFileViewHolder(ViewGroup parent,
-                               OnPositionItemClickListener<CompositionFileSource2> onCompositionClickListener,
-                               OnPositionItemClickListener<FileSource2> onLongClickListener,
+                               OnPositionItemClickListener<CompositionFileSource> onCompositionClickListener,
+                               OnPositionItemClickListener<FileSource> onLongClickListener,
                                OnPositionItemClickListener<Composition> iconClickListener) {
         super(parent, R.layout.item_storage_music);
         ButterKnife.bind(this, itemView);
@@ -65,12 +65,12 @@ public class MusicFileViewHolder extends FileViewHolder {
         }
     }
 
-    public void bind(@Nonnull CompositionFileSource2 fileSource, boolean isCoversEnabled) {
+    public void bind(@Nonnull CompositionFileSource fileSource, boolean isCoversEnabled) {
         this.fileSource = fileSource;
         compositionItemWrapper.bind(fileSource.getComposition(), isCoversEnabled);
     }
 
-    public void update(CompositionFileSource2 fileSource, List<Object> payloads) {
+    public void update(CompositionFileSource fileSource, List<Object> payloads) {
         this.fileSource = fileSource;
         compositionItemWrapper.update(fileSource.getComposition(), payloads);
         for (Object payload: payloads) {
@@ -112,7 +112,7 @@ public class MusicFileViewHolder extends FileViewHolder {
     }
 
     @Override
-    public FileSource2 getFileSource() {
+    public FileSource getFileSource() {
         return fileSource;
     }
 

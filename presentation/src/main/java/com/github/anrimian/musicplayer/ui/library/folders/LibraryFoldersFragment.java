@@ -23,11 +23,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
@@ -127,6 +127,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> newFolderDialogFragmentRunner;
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
+    private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlaylistForFolderDialogRunner;
     private DialogFragmentDelayRunner progressDialogRunner;
 
     public static LibraryFoldersFragment newInstance(@Nullable Long folderId) {
@@ -214,11 +215,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
 
-        ChoosePlayListDialogFragment folderPlayListDialog = (ChoosePlayListDialogFragment) fm
-                .findFragmentByTag(SELECT_PLAYLIST_FOR_FOLDER_TAG);
-        if (folderPlayListDialog != null) {
-            folderPlayListDialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
-        }
+        choosePlaylistForFolderDialogRunner = new DialogFragmentRunner<>(fm,
+                SELECT_PLAYLIST_FOR_FOLDER_TAG,
+                fragment -> fragment.setComplexCompleteListener((playlist, bundle) -> {
+                    long folderId = bundle.getLong(ID_ARG);
+                    presenter.onPlayListForFolderSelected(folderId, playlist);
+                }));
 
         compositionActionDialogRunner = new DialogFragmentRunner<>(fm,
                 COMPOSITION_ACTION_TAG,
@@ -308,12 +310,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void updateList(List<FileSource2> list) {
+    public void updateList(List<FileSource> list) {
         adapter.submitList(list);
     }
 
     @Override
-    public void showFolderInfo(FolderFileSource2 folder) {
+    public void showFolderInfo(FolderFileSource folder) {
         headerViewWrapper.setVisible(true);
         headerViewWrapper.bind(folder);
     }
@@ -394,10 +396,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showSelectPlayListForFolderDialog() {
-        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
-        dialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
-        dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_FOR_FOLDER_TAG);
+    public void showSelectPlayListForFolderDialog(FolderFileSource folder) {
+        Bundle bundle = new Bundle();
+        bundle.putLong(ID_ARG, folder.getId());
+        ChoosePlayListDialogFragment dialog = ChoosePlayListDialogFragment.newInstance(bundle);
+        choosePlaylistForFolderDialogRunner.show(dialog);
     }
 
     @Override
@@ -424,10 +427,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showConfirmDeleteDialog(FolderFileSource2 folder) {
+    public void showConfirmDeleteDialog(FolderFileSource folder) {
         DialogUtils.showConfirmDeleteDialog(requireContext(),
                 folder,
-                presenter::onDeleteFolderDialogConfirmed);
+                () -> presenter.onDeleteFolderDialogConfirmed(folder));
     }
 
     @Override
@@ -490,7 +493,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showInputFolderNameDialog(FolderFileSource2 folder) {
+    public void showInputFolderNameDialog(FolderFileSource folder) {
         Bundle extra = new Bundle();
         extra.putLong(ID_ARG, folder.getId());
         InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.rename_folder,
@@ -520,12 +523,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void onItemSelected(FileSource2 item, int position) {
+    public void onItemSelected(FileSource item, int position) {
         adapter.setItemSelected(position);
     }
 
     @Override
-    public void onItemUnselected(FileSource2 item, int position) {
+    public void onItemUnselected(FileSource item, int position) {
         adapter.setItemUnselected(position);
     }
 
@@ -652,7 +655,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         return false;
     }
 
-    private void onFolderMenuClicked(View view, FolderFileSource2 folder) {
+    private void onFolderMenuClicked(View view, FolderFileSource folder) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.folder_item_menu);
 

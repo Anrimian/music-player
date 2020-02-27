@@ -1,10 +1,10 @@
 package com.github.anrimian.musicplayer.domain.business.library;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
@@ -34,8 +34,8 @@ public class LibraryFoldersScreenInteractor {
 
 
     private final BehaviorSubject<Boolean> moveModeSubject = BehaviorSubject.createDefault(false);
-    private final LinkedHashSet<FileSource2> filesToCopy = new LinkedHashSet<>();
-    private final LinkedHashSet<FileSource2> filesToMove = new LinkedHashSet<>();
+    private final LinkedHashSet<FileSource> filesToCopy = new LinkedHashSet<>();
+    private final LinkedHashSet<FileSource> filesToMove = new LinkedHashSet<>();
 
     @Nullable
     private Long moveFromFolderId;
@@ -50,12 +50,12 @@ public class LibraryFoldersScreenInteractor {
         this.mediaScannerRepository = mediaScannerRepository;
     }
 
-    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId,
+    public Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
                                                             @Nullable String searchQuery) {
         return foldersInteractor.getFoldersInFolder(folderId, searchQuery);
     }
 
-    public Observable<FolderFileSource2> getFolderObservable(long folderId) {
+    public Observable<FolderFileSource> getFolderObservable(long folderId) {
         return foldersInteractor.getFolderObservable(folderId);
     }
 
@@ -67,11 +67,11 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.getAllCompositionsInFolder(folderId);
     }
 
-    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource2> fileSources) {
+    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource> fileSources) {
         return foldersInteractor.getAllCompositionsInFileSources(fileSources);
     }
 
-    public void play(List<FileSource2> fileSources) {
+    public void play(List<FileSource> fileSources) {
         foldersInteractor.play(fileSources);
     }
 
@@ -79,27 +79,27 @@ public class LibraryFoldersScreenInteractor {
         foldersInteractor.play(folderId, composition);
     }
 
-    public void addCompositionsToPlayNext(List<FileSource2> fileSources) {
+    public void addCompositionsToPlayNext(List<FileSource> fileSources) {
         foldersInteractor.addCompositionsToPlayNext(fileSources);
     }
 
-    public void addCompositionsToEnd(List<FileSource2> fileSources) {
+    public void addCompositionsToEnd(List<FileSource> fileSources) {
         foldersInteractor.addCompositionsToEnd(fileSources);
     }
 
-    public Single<List<Composition>> deleteFiles(List<FileSource2> fileSources) {
+    public Single<List<Composition>> deleteFiles(List<FileSource> fileSources) {
         return foldersInteractor.deleteCompositions(fileSources);
     }
 
-    public Single<List<Composition>> deleteFolder(FolderFileSource2 folder) {
+    public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
         return foldersInteractor.deleteFolder(folder);
     }
 
-    public Single<List<Composition>> addCompositionsToPlayList(FolderFileSource2 folder, PlayList playList) {
-        return foldersInteractor.addCompositionsToPlayList(folder, playList);
+    public Single<List<Composition>> addCompositionsToPlayList(Long folderId, PlayList playList) {
+        return foldersInteractor.addCompositionsToPlayList(folderId, playList);
     }
 
-    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource2> fileSources, PlayList playList) {
+    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource> fileSources, PlayList playList) {
         return foldersInteractor.addCompositionsToPlayList(fileSources, playList);
     }
 
@@ -123,14 +123,14 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.renameFolder(folderId, newName);
     }
 
-    public void addFilesToMove(@Nullable Long folderId, Collection<FileSource2> fileSources) {
+    public void addFilesToMove(@Nullable Long folderId, Collection<FileSource> fileSources) {
         filesToMove.clear();
         filesToMove.addAll(fileSources);
         this.moveFromFolderId = folderId;
         moveModeSubject.onNext(true);
     }
 
-    public void addFilesToCopy(@Nullable Long folderId, Collection<FileSource2> fileSources) {
+    public void addFilesToCopy(@Nullable Long folderId, Collection<FileSource> fileSources) {
         filesToCopy.clear();
         filesToCopy.addAll(fileSources);
         this.moveFromFolderId = folderId;
@@ -175,11 +175,11 @@ public class LibraryFoldersScreenInteractor {
         return moveModeSubject;
     }
 
-    public LinkedHashSet<FileSource2> getFilesToMove() {
+    public LinkedHashSet<FileSource> getFilesToMove() {
         return filesToMove;
     }
 
-    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource2 folder) {
+    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
         return foldersInteractor.addFolderToIgnore(folder);
     }
 

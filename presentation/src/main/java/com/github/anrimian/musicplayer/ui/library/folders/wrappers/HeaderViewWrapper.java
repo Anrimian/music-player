@@ -6,7 +6,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +34,7 @@ public class HeaderViewWrapper {
         ButterKnife.bind(this, view);
     }
 
-    public void bind(@NonNull FolderFileSource2 folder) {
+    public void bind(@NonNull FolderFileSource folder) {
         tvParentPath.setText(folder.getName());
     }
 

@@ -5,12 +5,9 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
@@ -58,21 +55,14 @@ public interface LibraryRepository {
 
     Single<String[]> getGenreNames();
 
-    Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText);
+    Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
+                                                    @Nullable String searchQuery);
 
-    Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId,
-                                                     @Nullable String searchQuery);
-
-    Observable<FolderFileSource2> getFolderObservable(long folderId);
-
-    @Deprecated
-    Single<List<Composition>> getAllCompositionsInPath(@Nullable String path);
+    Observable<FolderFileSource> getFolderObservable(long folderId);
 
     Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId);
 
-    Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource2> fileSources);
-
-    Single<List<String>> getAvailablePathsForPath(@Nullable String path);
+    Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources);
 
     Completable writeErrorAboutComposition(CorruptionType errorType, Composition composition);
 
@@ -80,13 +70,9 @@ public interface LibraryRepository {
 
     Completable deleteCompositions(List<Composition> compositions);
 
-    Single<List<Composition>> moveFileTo(String folderPath,
-                                         String newSourcePath,
-                                         FileSource fileSource);
-
     Observable<Genre> getGenreObservable(long genreId);
 
-    Single<IgnoredFolder> addFolderToIgnore(FolderFileSource2 folder);
+    Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder);
 
     Completable addFolderToIgnore(IgnoredFolder folder);
 
@@ -94,9 +80,9 @@ public interface LibraryRepository {
 
     Completable deleteIgnoredFolder(IgnoredFolder folder);
 
-    Single<List<Composition>> deleteFolder(FolderFileSource2 folder);
+    Single<List<Composition>> deleteFolder(FolderFileSource folder);
 
-    Single<List<Composition>> deleteFolders(List<FileSource2> folders);
+    Single<List<Composition>> deleteFolders(List<FileSource> folders);
 
     Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder);
 }

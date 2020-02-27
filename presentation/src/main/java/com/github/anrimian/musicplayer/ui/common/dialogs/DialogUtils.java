@@ -12,8 +12,7 @@ import androidx.core.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -24,7 +23,6 @@ import java.util.List;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
 
 public class DialogUtils {
 
@@ -38,7 +36,7 @@ public class DialogUtils {
     }
 
     public static void showConfirmDeleteDialog(Context context,
-                                               FolderFileSource2 folder,
+                                               FolderFileSource folder,
                                                Runnable deleteCallback) {
         int filesCount = folder.getFilesCount();
         String name = folder.getName();

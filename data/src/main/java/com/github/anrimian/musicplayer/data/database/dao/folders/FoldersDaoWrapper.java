@@ -10,11 +10,11 @@ import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntit
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.CompositionFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +23,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
@@ -42,32 +41,32 @@ public class FoldersDaoWrapper {
         this.compositionsDao = compositionsDao;
     }
 
-    public Observable<List<FileSource2>> getFilesObservable(Long parentFolderId,
+    public Observable<List<FileSource>> getFilesObservable(Long parentFolderId,
                                                             Order order,
                                                             @Nullable String searchText) {
-        Observable<List<FolderFileSource2>> folderObservable = getFoldersObservable(
+        Observable<List<FolderFileSource>> folderObservable = getFoldersObservable(
                 parentFolderId,
                 order,
                 searchText);
 
-        Observable<List<CompositionFileSource2>> compositionsObservable =
+        Observable<List<CompositionFileSource>> compositionsObservable =
                 compositionsDao.getCompositionsInFolderObservable(
                         parentFolderId,
                         order,
                         searchText
-                ).map(list -> mapList(list, CompositionFileSource2::new));
+                ).map(list -> mapList(list, CompositionFileSource::new));
 
         return Observable.combineLatest(folderObservable,
                 compositionsObservable,
                 (folders, compositions) -> {
-                    List<FileSource2> list = new ArrayList<>(folders.size() + compositions.size());
+                    List<FileSource> list = new ArrayList<>(folders.size() + compositions.size());
                     list.addAll(folders);
                     list.addAll(compositions);
                     return list;
                 });
     }
 
-    public Observable<FolderFileSource2> getFolderObservable(long folderId) {
+    public Observable<FolderFileSource> getFolderObservable(long folderId) {
         return foldersDao.getFolderObservable(folderId)
                 .takeWhile(list -> !list.isEmpty())
                 .map(list -> list.get(0));
@@ -132,15 +131,15 @@ public class FoldersDaoWrapper {
         return foldersDao.getChildFoldersNames(toFolderId);
     }
 
-    public void updateFolderId(Collection<FileSource2> files, Long toFolderId) {
+    public void updateFolderId(Collection<FileSource> files, Long toFolderId) {
         appDatabase.runInTransaction(() -> {
-            for (FileSource2 fileSource: files) {
-                if (fileSource instanceof CompositionFileSource2) {
-                    long id = ((CompositionFileSource2) fileSource).getComposition().getId();
+            for (FileSource fileSource: files) {
+                if (fileSource instanceof CompositionFileSource) {
+                    long id = ((CompositionFileSource) fileSource).getComposition().getId();
                     compositionsDao.updateFolderId(id, toFolderId);
                 }
-                if (fileSource instanceof FolderFileSource2) {
-                    long id = ((FolderFileSource2) fileSource).getId();
+                if (fileSource instanceof FolderFileSource) {
+                    long id = ((FolderFileSource) fileSource).getId();
                     foldersDao.updateParentId(id, toFolderId);
                 }
             }
@@ -163,9 +162,9 @@ public class FoldersDaoWrapper {
         foldersDao.deleteIgnoredFolder(folder.getRelativePath());
     }
 
-    private Observable<List<FolderFileSource2>> getFoldersObservable(Long parentFolderId,
-                                                                     Order order,
-                                                                     @Nullable String searchText) {
+    private Observable<List<FolderFileSource>> getFoldersObservable(Long parentFolderId,
+                                                                    Order order,
+                                                                    @Nullable String searchText) {
         String query = FoldersDao.getRecursiveFolderQuery(parentFolderId) +
                 "SELECT id, name, " +
                 "(SELECT count() FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id)) as filesCount " +

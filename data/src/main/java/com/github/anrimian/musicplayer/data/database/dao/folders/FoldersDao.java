@@ -11,12 +11,10 @@ import com.github.anrimian.musicplayer.data.database.entities.composition.Compos
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
 
@@ -36,14 +34,14 @@ public interface FoldersDao {
     void deleteIgnoredFolder(String path);
 
     @RawQuery(observedEntities = { CompositionEntity.class, FolderEntity.class })
-    Observable<List<FolderFileSource2>> getFoldersObservable(SupportSQLiteQuery query);
+    Observable<List<FolderFileSource>> getFoldersObservable(SupportSQLiteQuery query);
 
     @Query("SELECT id, name, " +
             "0 as filesCount " +//we don't use it for now
             "FROM folders " +
             "WHERE id = :folderId OR (id IS NULL AND :folderId IS NULL) " +
             "LIMIT 1")
-    Observable<List<FolderFileSource2>> getFolderObservable(Long folderId);
+    Observable<List<FolderFileSource>> getFolderObservable(Long folderId);
 
     @Query("SELECT * FROM folders")
     List<StorageFolder> getAllFolders();

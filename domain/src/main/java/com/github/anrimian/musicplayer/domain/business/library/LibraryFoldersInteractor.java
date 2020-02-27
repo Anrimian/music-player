@@ -2,13 +2,10 @@ package com.github.anrimian.musicplayer.domain.business.library;
 
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource2;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.IgnoredFolder;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
@@ -24,8 +21,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 /**
  * Created on 24.10.2017.
@@ -57,16 +52,12 @@ public class LibraryFoldersInteractor {
         this.mediaScannerRepository = mediaScannerRepository;
     }
 
-    public Single<Folder> getCompositionsInPath(@Nullable String path, @Nullable String searchText) {
-        return libraryRepository.getCompositionsInPath(path, searchText);
-    }
-
-    public Observable<List<FileSource2>> getFoldersInFolder(@Nullable Long folderId,
+    public Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
                                                             @Nullable String searchQuery) {
         return libraryRepository.getFoldersInFolder(folderId, searchQuery);
     }
 
-    public Observable<FolderFileSource2> getFolderObservable(long folderId) {
+    public Observable<FolderFileSource> getFolderObservable(long folderId) {
         return libraryRepository.getFolderObservable(folderId);
     }
 
@@ -80,11 +71,11 @@ public class LibraryFoldersInteractor {
         return libraryRepository.getAllCompositionsInFolder(folderId);
     }
 
-    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource2> fileSources) {
+    public Single<List<Composition>> getAllCompositionsInFileSources(List<FileSource> fileSources) {
         return libraryRepository.getAllCompositionsInFolders(fileSources);
     }
 
-    public void play(List<FileSource2> fileSources) {
+    public void play(List<FileSource> fileSources) {
         libraryRepository.getAllCompositionsInFolders(fileSources)
                 .doOnSuccess(musicPlayerInteractor::startPlaying)
                 .subscribe();
@@ -99,33 +90,33 @@ public class LibraryFoldersInteractor {
                 .subscribe();
     }
 
-    public void addCompositionsToPlayNext(List<FileSource2> fileSources) {
+    public void addCompositionsToPlayNext(List<FileSource> fileSources) {
         libraryRepository.getAllCompositionsInFolders(fileSources)
                 .flatMapCompletable(musicPlayerInteractor::addCompositionsToPlayNext)
                 .subscribe();
     }
 
-    public void addCompositionsToEnd(List<FileSource2> fileSources) {
+    public void addCompositionsToEnd(List<FileSource> fileSources) {
         libraryRepository.getAllCompositionsInFolders(fileSources)
                 .flatMapCompletable(musicPlayerInteractor::addCompositionsToEnd)
                 .subscribe();
     }
 
-    public Single<List<Composition>> deleteCompositions(List<FileSource2> fileSources) {
+    public Single<List<Composition>> deleteCompositions(List<FileSource> fileSources) {
         return libraryRepository.deleteFolders(fileSources);
     }
 
-    public Single<List<Composition>> deleteFolder(FolderFileSource2 folder) {
+    public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
         return libraryRepository.deleteFolder(folder);
     }
 
-    public Single<List<Composition>> addCompositionsToPlayList(FolderFileSource2 folder, PlayList playList) {
-        return libraryRepository.getAllCompositionsInFolder(folder.getId())
+    public Single<List<Composition>> addCompositionsToPlayList(Long folderId, PlayList playList) {
+        return libraryRepository.getAllCompositionsInFolder(folderId)
                 .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
                         .toSingleDefault(compositions));
     }
 
-    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource2> fileSources, PlayList playList) {
+    public Single<List<Composition>> addCompositionsToPlayList(List<FileSource> fileSources, PlayList playList) {
         return libraryRepository.getAllCompositionsInFolders(fileSources)
                 .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
                         .toSingleDefault(compositions));
@@ -157,7 +148,7 @@ public class LibraryFoldersInteractor {
                 .andThen(mediaScannerRepository.runStorageScanner());
     }
 
-    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource2 folder) {
+    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
         return libraryRepository.addFolderToIgnore(folder)
                 .flatMap(ignoredFolder -> mediaScannerRepository.runStorageScanner()
                         .toSingleDefault(ignoredFolder)

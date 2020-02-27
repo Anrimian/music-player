@@ -14,7 +14,6 @@ import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapp
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.LibraryRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.library.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
@@ -114,7 +113,6 @@ class MusicModule {
                                               AlbumsDaoWrapper albumsDao,
                                               GenresDaoWrapper genresDao,
                                               FoldersDaoWrapper foldersDao,
-                                              MusicFolderDataSource musicFolderDataSource,
                                               SettingsRepository settingsPreferences,
                                               @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new LibraryRepositoryImpl(storageMusicDataSource,
@@ -123,7 +121,6 @@ class MusicModule {
                 albumsDao,
                 genresDao,
                 foldersDao,
-                musicFolderDataSource,
                 settingsPreferences,
                 scheduler);
     }
