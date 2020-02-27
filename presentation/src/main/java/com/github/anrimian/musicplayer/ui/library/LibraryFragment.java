@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
@@ -43,36 +44,36 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.library_categories_menu);
         popup.setOnMenuItemClickListener(item -> {
+            FragmentManager fm = getFragmentManager();
+            if (fm == null) {//can be null in some state, don't know which
+                return false;
+            }
+            FragmentNavigation navigation = FragmentNavigation.from(fm);
             switch (item.getItemId()) {
                 case R.id.menu_compositions: {
                     uiStateRepository.setSelectedLibraryScreen(Screens.LIBRARY_COMPOSITIONS);
-                    FragmentNavigation.from(requireFragmentManager())
-                            .newRootFragment(new LibraryCompositionsFragment());
+                    navigation.newRootFragment(new LibraryCompositionsFragment());
                     break;
                 }
                 case R.id.menu_files: {
-                    FragmentNavigation.from(requireFragmentManager())
-                            .newRootFragment(new LibraryFoldersRootFragment());
+                    navigation.newRootFragment(new LibraryFoldersRootFragment());
                     uiStateRepository.setSelectedLibraryScreen(Screens.LIBRARY_FOLDERS);
                     break;
                 }
                 case R.id.menu_artists: {
                     uiStateRepository.setSelectedLibraryScreen(Screens.LIBRARY_ARTISTS);
-                    FragmentNavigation.from(requireFragmentManager())
-                            .newRootFragment(new ArtistsListFragment());
+                    navigation.newRootFragment(new ArtistsListFragment());
                     break;
                 }
                 case R.id.menu_albums: {
                     uiStateRepository.setSelectedLibraryScreen(Screens.LIBRARY_ALBUMS);
-                    FragmentNavigation.from(requireFragmentManager())
-                            .newRootFragment(new AlbumsListFragment());
+                    navigation.newRootFragment(new AlbumsListFragment());
                     break;
                 }
                 //<return genres after deep scan implementation>
 //                case R.id.menu_genres: {
 //                    uiStateRepository.setSelectedLibraryScreen(Screens.LIBRARY_GENRES);
-//                    FragmentNavigation.from(requireFragmentManager())
-//                            .newRootFragment(new GenresListFragment());
+//                    navigation.newRootFragment(new GenresListFragment());
 //                    break;
 //                }
             }

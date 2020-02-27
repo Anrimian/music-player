@@ -441,9 +441,11 @@ public class FragmentNavigation {
     }
 
     private void moveBottomFragmentToTop(@AnimRes int exitAnimation) {
-        Fragment fragment = requireFragmentAtBottom();
-        fragment.setMenuVisibility(true);
-        notifyFragmentMovedToTop(fragment);
+        Fragment fragment = getFragmentOnBottom();
+        if (fragment != null) {
+            fragment.setMenuVisibility(true);
+            notifyFragmentMovedToTop(fragment);
+        }
 
         jugglerView.postDelayed(() -> {
             int id = jugglerView.prepareBottomView();
@@ -460,14 +462,6 @@ public class FragmentNavigation {
                 isNavigationEnabled = true;
             }
         }, getAnimationDuration(exitAnimation));
-    }
-
-    private Fragment requireFragmentAtBottom() {
-        Fragment fragment = getFragmentOnBottom();
-        if (fragment == null) {
-            throw new NullPointerException("required fragment from bottom is null");
-        }
-        return fragment;
     }
 
     private void hideBottomFragmentMenu() {

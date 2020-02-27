@@ -67,7 +67,9 @@ public class ArtistViewHolder extends BaseViewHolder {
     }
 
     private void showAuthorName() {
-        tvAuthorName.setText(artist.getName());
+        String name = artist.getName();
+        tvAuthorName.setText(name);
+        clickableItem.setContentDescription(name);
     }
 
     private void showCompositionsCount() {
