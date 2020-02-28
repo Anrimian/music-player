@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
 
@@ -58,6 +61,8 @@ dependencies {
 
     def deps = rootProject.ext
 
+    implementation kotlinStdLib
+
     implementation deps.appCompat
     implementation deps.material
     implementation deps.cardView
@@ -75,16 +80,16 @@ dependencies {
     implementation deps.moxy
     implementation deps.moxyAppcompat
     implementation deps.moxyMaterial
-    annotationProcessor deps.moxyCompiler
+    kapt deps.moxyCompiler
 
     implementation deps.butterKnife
-    annotationProcessor deps.butterKnifeCompiler
+    kapt deps.butterKnifeCompiler
 
     implementation deps.dagger
-    annotationProcessor deps.daggerCompiler
+    kapt deps.daggerCompiler
 
     implementation deps.room
-    annotationProcessor deps.roomCompiler
+    kapt deps.roomCompiler
 
     implementation deps.slidr
 
