@@ -4,7 +4,7 @@ import java.io.File;
 
 public class FileManager {
 
-    public void deleteFile(String path) {
+    public static void deleteFile(String path) {
         File file = new File(path);
         if (!file.exists()) {
             return;
@@ -14,14 +14,18 @@ public class FileManager {
     }
 
 
-    public void deleteEmptyDirectory(File fileOrDirectory) {
+    public static void deleteEmptyDirectory(File fileOrDirectory) {
         if (fileOrDirectory.isDirectory()) {
-            for (File child : fileOrDirectory.listFiles()) {
+            File[] files = fileOrDirectory.listFiles();
+            if (files == null) {
+                return;
+            }
+            for (File child : files) {
                 if (fileOrDirectory.isDirectory()) {
                     deleteEmptyDirectory(child);
                 }
             }
-            if (fileOrDirectory.listFiles().length == 0) {
+            if (files.length == 0) {
                 //noinspection ResultOfMethodCallIgnored
                 fileOrDirectory.delete();
             }

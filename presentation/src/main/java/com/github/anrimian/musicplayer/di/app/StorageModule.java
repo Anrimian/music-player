@@ -76,18 +76,9 @@ public class StorageModule {
     @Provides
     @Nonnull
     @Singleton
-    FileManager fileManager() {
-        return new FileManager();
-    }
-
-    @Provides
-    @Nonnull
-    @Singleton
     StorageMusicDataSource storageMusicDataSource(StorageMusicProvider musicProvider,
-                                                  FileManager fileManager,
-                                                  CompositionsDaoWrapper compositionsDao,
-                                                  @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new StorageMusicDataSource(musicProvider, compositionsDao, fileManager, scheduler);
+                                                  CompositionsDaoWrapper compositionsDao) {
+        return new StorageMusicDataSource(musicProvider, compositionsDao);
     }
 
     @Provides

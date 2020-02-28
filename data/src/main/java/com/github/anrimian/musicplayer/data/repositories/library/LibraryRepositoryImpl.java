@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrappe
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
@@ -29,6 +30,8 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+
 /**
  * Created on 24.10.2017.
  */
@@ -36,6 +39,7 @@ import io.reactivex.Single;
 public class LibraryRepositoryImpl implements LibraryRepository {
 
     private final StorageMusicDataSource storageMusicDataSource;
+    private final StorageFilesDataSource storageFilesDataSource;
     private final CompositionsDaoWrapper compositionsDao;
     private final ArtistsDaoWrapper artistsDao;
     private final AlbumsDaoWrapper albumsDao;
@@ -45,6 +49,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     private final Scheduler scheduler;
 
     public LibraryRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
+                                 StorageFilesDataSource storageFilesDataSource,
                                  CompositionsDaoWrapper compositionsDao,
                                  ArtistsDaoWrapper artistsDao,
                                  AlbumsDaoWrapper albumsDao,
@@ -53,6 +58,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
                                  SettingsRepository settingsPreferences,
                                  Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
+        this.storageFilesDataSource = storageFilesDataSource;
         this.compositionsDao = compositionsDao;
         this.artistsDao = artistsDao;
         this.albumsDao = albumsDao;
@@ -181,8 +187,10 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Completable deleteCompositions(List<Composition> compositions) {
-        return storageMusicDataSource.deleteCompositions(compositions)
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            storageFilesDataSource.deleteCompositionFiles(compositions);
+            compositionsDao.deleteAll(mapList(compositions, Composition::getId));
+        }).subscribeOn(scheduler);
     }
 
     @Override

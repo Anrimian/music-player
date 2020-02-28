@@ -15,32 +15,16 @@ import io.reactivex.Scheduler;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 
+@Deprecated
 public class StorageMusicDataSource {
 
     private final StorageMusicProvider musicProvider;
     private final CompositionsDaoWrapper compositionsDao;
-    private final FileManager fileManager;
-    private final Scheduler scheduler;
 
     public StorageMusicDataSource(StorageMusicProvider musicProvider,
-                                  CompositionsDaoWrapper compositionsDao,
-                                  FileManager fileManager,
-                                  Scheduler scheduler) {
+                                  CompositionsDaoWrapper compositionsDao) {
         this.musicProvider = musicProvider;
         this.compositionsDao = compositionsDao;
-        this.fileManager = fileManager;
-        this.scheduler = scheduler;
-    }
-
-    public Completable deleteCompositions(List<Composition> compositions) {
-        return Completable.fromAction(() -> {
-            deleteFiles(compositions);
-            compositionsDao.deleteAll(mapList(compositions, Composition::getId));
-            musicProvider.deleteCompositions(mapListNotNull(
-                    compositions,
-                    Composition::getStorageId)
-            );
-        });
     }
 
     public Completable deleteCompositionFiles(List<Composition> compositions) {
@@ -91,9 +75,9 @@ public class StorageMusicDataSource {
         String filePath = composition.getFilePath();
         File parentDirectory = new File(filePath).getParentFile();
 
-        fileManager.deleteFile(filePath);
+        FileManager.deleteFile(filePath);
         if (parentDirectory != null) {
-            fileManager.deleteEmptyDirectory(parentDirectory);
+            FileManager.deleteEmptyDirectory(parentDirectory);
         }
     }
 }

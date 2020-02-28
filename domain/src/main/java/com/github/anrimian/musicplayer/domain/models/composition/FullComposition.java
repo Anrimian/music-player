@@ -21,6 +21,7 @@ public class FullComposition {
     private final String albumArtist;
 
     @Nonnull
+    @Deprecated
     private final String filePath;
 
     private final long duration;
@@ -90,6 +91,7 @@ public class FullComposition {
         return album;
     }
 
+    @Deprecated
     @Nonnull
     public String getFilePath() {
         return filePath;
