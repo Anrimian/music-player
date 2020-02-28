@@ -13,7 +13,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;

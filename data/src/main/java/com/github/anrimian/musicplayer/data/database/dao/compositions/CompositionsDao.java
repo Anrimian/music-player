@@ -5,9 +5,13 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RawQuery;
 import androidx.room.Update;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
@@ -20,21 +24,6 @@ import io.reactivex.Observable;
 
 @Dao
 public interface CompositionsDao {
-
-    @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = compositions.artistId) as artist, " +
-            "compositions.title as title, " +
-            "(SELECT name FROM albums WHERE id = compositions.albumId) as album, " +
-            "compositions.filePath as filePath, " +
-            "compositions.duration as duration, " +
-            "compositions.size as size, " +
-            "compositions.id as id, " +
-            "compositions.storageId as storageId, " +
-            "compositions.dateAdded as dateAdded, " +
-            "compositions.dateModified as dateModified, " +
-            "compositions.corruptionType as corruptionType " +
-            "FROM compositions")
-    Observable<List<Composition>> getAllObservable();
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
@@ -54,23 +43,14 @@ public interface CompositionsDao {
             "LIMIT 1")
     Observable<List<FullComposition>> getCompositionObservable(long id);
 
-    @RawQuery(observedEntities = CompositionEntity.class)
+    @RawQuery(observedEntities = { CompositionEntity.class, ArtistEntity.class, AlbumEntity.class })
     Observable<List<Composition>> getAllObservable(SupportSQLiteQuery query);
 
-    @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "title as title, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "filePath as filePath, " +
-            "duration as duration, " +
-            "size as size, " +
-            "id as id, " +
-            "storageId as storageId, " +
-            "dateAdded as dateAdded, " +
-            "dateModified as dateModified, " +
-            "corruptionType as corruptionType " +
-            "FROM compositions")
-    List<Composition> getAll();
+    @RawQuery(observedEntities = { CompositionEntity.class, ArtistEntity.class, AlbumEntity.class })
+    Observable<List<Composition>> getAllInFolderObservable(SupportSQLiteQuery query);
+
+    @RawQuery
+    List<Composition> getAllInFolder(SimpleSQLiteQuery sqlQuery);
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
@@ -82,6 +62,7 @@ public interface CompositionsDao {
             "compositions.size as size, " +
             "compositions.id as id, " +
             "compositions.storageId as storageId, " +
+            "compositions.folderId as folderId, " +
             "compositions.dateAdded as dateAdded, " +
             "compositions.dateModified as dateModified " +
             "FROM compositions WHERE storageId NOTNULL")
@@ -92,9 +73,6 @@ public interface CompositionsDao {
 
     @Insert
     void insert(List<CompositionEntity> entities);
-
-    @Update
-    void update(List<CompositionEntity> entities);
 
     @Query("UPDATE compositions SET " +
             "title = :title, " +
@@ -130,6 +108,9 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
 
+    @Query("UPDATE compositions SET folderId = :folderId WHERE id = :id")
+    void updateFolderId(long id, Long folderId);
+
     @Query("SELECT id FROM compositions WHERE storageId = :storageId")
     long selectIdByStorageId(long storageId);
 
@@ -150,4 +131,21 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET dateModified = :date WHERE id = :id")
     void setUpdateTime(long id, Date date);
+
+    static String getCompositionQuery() {
+        return "SELECT " +
+                "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
+                "(SELECT name FROM albums WHERE id = albumId) as album,  " +
+                "title as title,  " +
+                "filePath as filePath,  " +
+                "duration as duration,  " +
+                "size as size,  " +
+                "id as id,  " +
+                "storageId as storageId,  " +
+                "dateAdded as dateAdded,  " +
+                "dateModified as dateModified,  " +
+                "corruptionType as corruptionType  " +
+                "FROM compositions";
+    }
+
 }

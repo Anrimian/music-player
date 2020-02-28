@@ -13,6 +13,7 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
@@ -22,10 +23,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
@@ -38,20 +40,20 @@ import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialog
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,15 +64,16 @@ import moxy.presenter.ProvidePresenter;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
-import static com.github.anrimian.musicplayer.Constants.Arguments.PATH_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.NEW_FOLDER_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareCompositions;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFiles;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatLinkedFabView;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
@@ -121,31 +124,23 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     private HeaderViewWrapper headerViewWrapper;
 
-    private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
-
-    private boolean showQueueActions;
-
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> newFolderDialogFragmentRunner;
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
+    private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlaylistForFolderDialogRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
-    public static LibraryFoldersFragment newInstance(@Nullable String path) {
+    public static LibraryFoldersFragment newInstance(@Nullable Long folderId) {
         Bundle args = new Bundle();
-        args.putString(PATH_ARG, path);
+        args.putLong(ID_ARG, folderId == null? 0 : folderId);
         LibraryFoldersFragment fragment = new LibraryFoldersFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @Nullable
-    private String getPath() {
-        return getArguments().getString(PATH_ARG);
-    }
-
     @ProvidePresenter
     LibraryFoldersPresenter providePresenter() {
-        return Components.getLibraryFolderComponent(getPath()).storageLibraryPresenter();
+        return Components.getLibraryFolderComponent(getFolderId()).storageLibraryPresenter();
     }
 
     @Override
@@ -180,12 +175,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         adapter = new MusicFileSourceAdapter(recyclerView,
                 presenter.getSelectedFiles(),
-                presenter.getSelectedMoveFiles());
-        adapter.setOnCompositionClickListener(presenter::onCompositionClicked);
-        adapter.setOnFolderClickListener(presenter::onFolderClicked);
-        adapter.setOnFolderMenuClickListener(this::onFolderMenuClicked);
-        adapter.setOnLongClickListener(presenter::onItemLongClick);
-        adapter.setCompositionIconClickListener(presenter::onCompositionIconClicked);
+                presenter.getSelectedMoveFiles(),
+                presenter::onCompositionClicked,
+                presenter::onFolderClicked,
+                presenter::onItemLongClick,
+                this::onFolderMenuClicked,
+                presenter::onCompositionIconClicked);
         recyclerView.setAdapter(adapter);
 
         headerViewWrapper = new HeaderViewWrapper(headerContainer);
@@ -220,11 +215,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
 
-        ChoosePlayListDialogFragment folderPlayListDialog = (ChoosePlayListDialogFragment) fm
-                .findFragmentByTag(SELECT_PLAYLIST_FOR_FOLDER_TAG);
-        if (folderPlayListDialog != null) {
-            folderPlayListDialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
-        }
+        choosePlaylistForFolderDialogRunner = new DialogFragmentRunner<>(fm,
+                SELECT_PLAYLIST_FOR_FOLDER_TAG,
+                fragment -> fragment.setComplexCompleteListener((playlist, bundle) -> {
+                    long folderId = bundle.getLong(ID_ARG);
+                    presenter.onPlayListForFolderSelected(folderId, playlist);
+                }));
 
         compositionActionDialogRunner = new DialogFragmentRunner<>(fm,
                 COMPOSITION_ACTION_TAG,
@@ -232,15 +228,17 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         filenameDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 FILE_NAME_TAG,
-                fragment -> fragment.setComplexCompleteListener((path, extra) -> {
-                    presenter.onNewFolderNameInputed(extra.getString(PATH_ARG), path);
+                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
+                    presenter.onNewFolderNameEntered(extra.getLong(ID_ARG), name);
                 }));
 
         newFolderDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 NEW_FOLDER_NAME_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewFileNameForPasteEntered));
 
-        if (getPath() != null) {//TODO root path -> not root path change case
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
+
+        if (getFolderId() != null) {
             SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
             SlidrPanel.replace(contentContainer,
                     () -> {
@@ -281,9 +279,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-//        menu.clear();//what fix was it?
         inflater.inflate(R.menu.library_files_menu, menu);
-        orderMenuItem.setMenuItem(menu, R.id.menu_order);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -293,6 +289,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         switch (id) {
             case R.id.menu_order: {
                 presenter.onOrderMenuItemClicked();
+                return true;
+            }
+            case R.id.menu_excluded_folders: {
+                //noinspection ConstantConditions
+                FragmentNavigation.from(getParentFragment().requireFragmentManager())
+                        .addNewFragment(new ExcludedFoldersFragment());
                 return true;
             }
             case R.id.menu_search: {
@@ -313,40 +315,36 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showBackPathButton(@Nonnull String path) {
+    public void showFolderInfo(FolderFileSource folder) {
         headerViewWrapper.setVisible(true);
-        headerViewWrapper.bind(path);
+        headerViewWrapper.bind(folder);
     }
 
     @Override
-    public void hideBackPathButton() {
+    public void hideFolderInfo() {
         headerViewWrapper.setVisible(false);
     }
 
     @Override
     public void showEmptyList() {
-        orderMenuItem.call(item -> item.setVisible(false));
         fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
     }
 
     @Override
     public void showEmptySearchResult() {
-        orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_and_folders_for_search_not_found, false);
     }
 
     @Override
     public void showList() {
-        orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(VISIBLE);
         progressViewWrapper.hideAll();
     }
 
     @Override
     public void showLoading() {
-        orderMenuItem.call(item -> item.setVisible(false));
         progressViewWrapper.showProgress();
     }
 
@@ -371,7 +369,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             toolbar.setSearchModeEnabled(false);
             return true;
         }
-        if (getPath() != null) {
+        if (getFolderId() != null) {
             presenter.onBackPathButtonClicked();
             return true;
         }
@@ -398,10 +396,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showSelectPlayListForFolderDialog() {
-        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
-        dialog.setOnCompleteListener(presenter::onPlayListForFolderSelected);
-        dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_FOR_FOLDER_TAG);
+    public void showSelectPlayListForFolderDialog(FolderFileSource folder) {
+        Bundle bundle = new Bundle();
+        bundle.putLong(ID_ARG, folder.getId());
+        ChoosePlayListDialogFragment dialog = ChoosePlayListDialogFragment.newInstance(bundle);
+        choosePlaylistForFolderDialogRunner.show(dialog);
     }
 
     @Override
@@ -431,7 +430,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public void showConfirmDeleteDialog(FolderFileSource folder) {
         DialogUtils.showConfirmDeleteDialog(requireContext(),
                 folder,
-                presenter::onDeleteFolderDialogConfirmed);
+                () -> presenter.onDeleteFolderDialogConfirmed(folder));
     }
 
     @Override
@@ -462,9 +461,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void goToMusicStorageScreen(String path) {
+    public void goToMusicStorageScreen(Long folderId) {
         FragmentNavigation.from(requireFragmentManager())
-                .addNewFragment(LibraryFoldersFragment.newInstance(path));
+                .addNewFragment(LibraryFoldersFragment.newInstance(folderId));
     }
 
     @Override
@@ -489,24 +488,19 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showQueueActions(boolean show) {
-        showQueueActions = show;
-    }
-
-    @Override
     public void setDisplayCoversEnabled(boolean isCoversEnabled) {
         adapter.setCoversEnabled(isCoversEnabled);
     }
 
     @Override
-    public void showInputFolderNameDialog(String path) {
+    public void showInputFolderNameDialog(FolderFileSource folder) {
         Bundle extra = new Bundle();
-        extra.putString(PATH_ARG, path);
+        extra.putLong(ID_ARG, folder.getId());
         InputTextDialogFragment fragment = InputTextDialogFragment.newInstance(R.string.rename_folder,
                 R.string.change,
                 R.string.cancel,
                 R.string.folder_name,
-                formatFileName(path),
+                folder.getName(),
                 false,
                 extra);
         filenameDialogFragmentRunner.show(fragment);
@@ -556,6 +550,38 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showPlayState(boolean play) {
         adapter.showPlaying(play);
+    }
+
+    @Override
+    public void showAddedIgnoredFolderMessage(IgnoredFolder folder) {
+        String message = getString(R.string.ignored_folder_added, folder.getRelativePath());
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.cancel, v -> presenter.onRemoveIgnoredFolderClicked())
+                .show();
+    }
+
+    @Override
+    public void hideProgressDialog() {
+        progressDialogRunner.cancel();
+    }
+
+    @Override
+    public void showMoveProgress() {
+        showProgressDialog(R.string.move_progress);
+    }
+
+    @Override
+    public void showDeleteProgress() {
+        showProgressDialog(R.string.delete_progress);
+    }
+
+    @Override
+    public void showRenameProgress() {
+        showProgressDialog(R.string.rename_progress);
+    }
+
+    private void showProgressDialog(@StringRes int resId) {
+        progressDialogRunner.show(ProgressDialogFragment.newInstance(resId));
     }
 
     private void onSelectionModeChanged(boolean enabled) {
@@ -618,7 +644,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 return true;
             }
             case R.id.menu_share: {
-                presenter.onShareSelectedSourcessClicked();
+                presenter.onShareSelectedSourcesClicked();
                 return true;
             }
             case R.id.menu_delete: {
@@ -632,10 +658,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private void onFolderMenuClicked(View view, FolderFileSource folder) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.folder_item_menu);
-        Menu menu = popup.getMenu();
-
-        menu.findItem(R.id.menu_play_next).setVisible(showQueueActions);
-        menu.findItem(R.id.menu_add_to_queue).setVisible(showQueueActions);
 
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -648,15 +670,19 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                     return true;
                 }
                 case R.id.menu_add_to_playlist: {
-                    presenter.onAddFolderToPlayListButtonClicked(folder.getPath());
+                    presenter.onAddFolderToPlayListButtonClicked(folder);
                     return true;
                 }
                 case R.id.menu_rename_folder: {
-                    presenter.onRenameFolderClicked(folder.getPath());
+                    presenter.onRenameFolderClicked(folder);
                     return true;
                 }
                 case R.id.menu_share: {
                     presenter.onShareFolderClicked(folder);
+                    return true;
+                }
+                case R.id.menu_hide: {
+                    presenter.onExcludeFolderClicked(folder);
                     return true;
                 }
                 case R.id.menu_delete: {
@@ -668,4 +694,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         });
         popup.show();
     }
+
+    @SuppressWarnings("ConstantConditions")
+    @Nullable
+    private Long getFolderId() {
+        long value = getArguments().getLong(ID_ARG);
+        return value == 0? null: value;
+    }
+
 }

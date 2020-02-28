@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.domain.business;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
@@ -13,11 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.reactivex.Observable;
-import io.reactivex.Single;
-
-import static java.util.Arrays.asList;
 
 /**
  * Created on 16.04.2018.
@@ -169,13 +162,4 @@ public class TestBusinessDataProvider {
                 null);
     }
 
-    public static Single<Folder> getTestFolderSingle(FileSource... fileSources) {
-        return Single.just(getTestFolder(fileSources));
-    }
-
-    private static Folder getTestFolder(FileSource... fileSources) {
-        return new Folder(Observable.create(emitter -> emitter.onNext(asList(fileSources))),
-                Observable.never(),
-                Observable.never());
-    }
 }

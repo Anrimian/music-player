@@ -28,6 +28,7 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class LibraryFoldersRootFragment extends LibraryFragment
@@ -103,8 +104,8 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     }
 
     @Override
-    public void showFolderScreens(List<String> paths) {
-        navigation.addNewFragmentStack(mapList(paths, LibraryFoldersFragment::newInstance),
+    public void showFolderScreens(List<Long> ids) {
+        navigation.addNewFragmentStack(mapList(ids, LibraryFoldersFragment::newInstance),
                 R.anim.anim_alpha_appear);
     }
 

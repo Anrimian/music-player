@@ -63,6 +63,7 @@ public interface Constants {
         String ARTIST_NAME_TAG = "artist_name_tag";
         String GENRE_NAME_TAG = "genre_name_tag";
         String MESSAGE_ARG = "message_arg";
+        String MESSAGE_RES_ARG = "message_res_arg";
         String PROGRESS_DIALOG_TAG = "progress_dialog_arg";
     }
 

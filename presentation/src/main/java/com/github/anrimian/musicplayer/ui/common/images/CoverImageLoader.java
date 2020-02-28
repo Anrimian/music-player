@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
@@ -23,62 +24,62 @@ import java.io.InputStream;
 
 import javax.annotation.Nonnull;
 
-public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
+public class CoverImageLoader {
 
-    private static final int COVER_SIZE = 300;
-
+    private final Context context;
     private final StorageAlbumsProvider storageAlbumsProvider;
 
-    public CoverImageLoader(StorageAlbumsProvider storageAlbumsProvider) {
-        super(R.drawable.ic_music_placeholder_simple,
-                R.drawable.ic_music_placeholder_simple,
-                5,
-                2*1024*1024,
-                ImageMetaData::getKey);
+    private final SimpleImageLoader<String, ImageMetaData> imageLoader;
 
+    public CoverImageLoader(Context context, StorageAlbumsProvider storageAlbumsProvider) {
+        this.context = context;
         this.storageAlbumsProvider = storageAlbumsProvider;
-    }
 
-    @Override
-    protected ImageFetcher<ImageMetaData> getImageFetcher() {
-        return this::getImage;
+        imageLoader = new SimpleImageLoader<>(
+                R.drawable.ic_music_placeholder_simple,
+                R.drawable.ic_music_placeholder_simple,
+                5000,
+                2 * 1024 * 1024,
+                ImageMetaData::getKey,
+                this::getImage
+        );
     }
 
     public void displayImage(@NonNull ImageView imageView, @NonNull Composition composition) {
-        displayImage(imageView, new CompositionImage(composition));
+        imageLoader.displayImage(imageView, new CompositionImage(composition));
     }
 
     public void displayImage(@NonNull ImageView imageView, @NonNull Album album) {
-        displayImage(imageView, new AlbumImage(album));
+        imageLoader.displayImage(imageView, new AlbumImage(album));
     }
 
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull Composition data,
                              @DrawableRes int errorPlaceholder) {
-        displayImage(imageView, new CompositionImage(data), errorPlaceholder);
+        imageLoader.displayImage(imageView, new CompositionImage(data), errorPlaceholder);
     }
 
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull Album album,
                              @DrawableRes int errorPlaceholder) {
-        displayImage(imageView, new AlbumImage(album), errorPlaceholder);
+        imageLoader.displayImage(imageView, new AlbumImage(album), errorPlaceholder);
     }
 
     @Nullable
-    public Bitmap getImage(@Nonnull Composition data, long timeoutSeconds) {
-        return getImage(new CompositionImage(data), timeoutSeconds);
+    public Bitmap getImage(@Nonnull Composition data, long timeoutMillis) {
+        return imageLoader.getImage(new CompositionImage(data), timeoutMillis);
     }
 
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
-        loadImage(new CompositionImage(data), onCompleted);
+        imageLoader.loadImage(new CompositionImage(data), onCompleted);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
                              @NonNull Composition data,
-                             @NonNull BitmapTransformer bitmapTransformer,
+                             @NonNull SimpleImageLoader.BitmapTransformer bitmapTransformer,
                              @DrawableRes int placeholder) {
-        displayImage(widgetView, viewId, new CompositionImage(data), bitmapTransformer, placeholder);
+        imageLoader.displayImage(widgetView, viewId, new CompositionImage(data), bitmapTransformer, placeholder);
     }
 
     private Bitmap getImage(ImageMetaData metaData) {
@@ -94,8 +95,8 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
     private Bitmap extractAlbumCover(Album album) {
         try (InputStream in = storageAlbumsProvider.getAlbumCoverStream(album.getName())) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
-            opt.outWidth = COVER_SIZE;
-            opt.outHeight = COVER_SIZE;
+            opt.outWidth = getCoverSize();
+            opt.outHeight = getCoverSize();
             return BitmapFactory.decodeStream(in, null, opt);
         } catch (IOException ignores) {
             return null;
@@ -103,8 +104,7 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
     }
 
     @Nullable
-    //TODO get from media store by album id instead
-    private static Bitmap extractImageComposition(Composition composition) {
+    private Bitmap extractImageComposition(Composition composition) {
         String filePath = composition.getFilePath();
 
         //noinspection ConstantConditions
@@ -122,8 +122,8 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
                 return null;
             }
             BitmapFactory.Options opt = new BitmapFactory.Options();
-            opt.outWidth = COVER_SIZE;
-            opt.outHeight = COVER_SIZE;
+            opt.outWidth = getCoverSize();
+            opt.outHeight = getCoverSize();
             return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
         } catch (Exception ignored) {
             return null;
@@ -132,5 +132,9 @@ public class CoverImageLoader extends SimpleImageLoader<String, ImageMetaData> {
                 mmr.release();
             }
         }
+    }
+
+    private int getCoverSize() {
+        return context.getResources().getDimensionPixelSize(R.dimen.notification_large_icon_size);
     }
 }

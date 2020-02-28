@@ -24,6 +24,47 @@ import java.util.Map;
 
 class Migrations {
 
+    static Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `ignored_folders` (`relativePath` TEXT NOT NULL, `addDate` INTEGER, PRIMARY KEY(`relativePath`))");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS `folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentId` INTEGER, `name` TEXT, FOREIGN KEY(`parentId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+            database.execSQL("CREATE  INDEX `index_folders_parentId` ON `folders` (`parentId`)");
+
+            //migrate compositions
+            database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
+
+            //don't migrate folders, they will update automatically on next storage rescan
+            Cursor c = database.query("SELECT * FROM compositions");
+            for (int i = 0; i < c.getCount(); i++) {
+                c.moveToPosition(i);
+
+                ContentValues cv = new ContentValues();
+
+                cv.put("id", c.getLong(c.getColumnIndex("id")));
+                cv.put("artistId", c.getLong(c.getColumnIndex("artistId")));
+                cv.put("albumId", c.getLong(c.getColumnIndex("albumId")));
+                cv.put("storageId", c.getLong(c.getColumnIndex("storageId")));
+                cv.put("title", c.getString(c.getColumnIndex("title")));
+                cv.put("filePath", c.getString(c.getColumnIndex("filePath")));
+                cv.put("duration", c.getLong(c.getColumnIndex("duration")));
+                cv.put("size", c.getLong(c.getColumnIndex("size")));
+                cv.put("dateAdded", c.getLong(c.getColumnIndex("dateAdded")));
+                cv.put("dateModified", c.getLong(c.getColumnIndex("dateModified")));
+                cv.put("corruptionType", c.getString(c.getColumnIndex("corruptionType")));
+                database.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv);
+            }
+
+            database.execSQL("DROP TABLE `compositions`");
+            database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
+
+            database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
+            database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
+            database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
+        }
+    };
+
     static Migration getMigration3_4(Context context) {
         return new Migration(3, 4) {
             @Override

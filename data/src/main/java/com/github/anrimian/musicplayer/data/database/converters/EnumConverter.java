@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.data.database.converters;
 import androidx.room.TypeConverter;
 
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 
 import javax.annotation.Nullable;
 

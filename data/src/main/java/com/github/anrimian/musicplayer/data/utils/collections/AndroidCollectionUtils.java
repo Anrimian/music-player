@@ -13,6 +13,12 @@ import java.util.Set;
 
 public class AndroidCollectionUtils {
 
+    public static <E> LongSparseArray<E> sparseArrayOf(long key, E item) {
+        LongSparseArray<E> sparseArray = new LongSparseArray<>();
+        sparseArray.put(key, item);
+        return sparseArray;
+    }
+
     public static <E> LongSparseArray<E> mapToSparseArray(List<E> from,
                                                           ListUtils.MapperFunction<E, Long> keySelector) {
         LongSparseArray<E> to = new LongSparseArray<>();

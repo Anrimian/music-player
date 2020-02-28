@@ -10,10 +10,10 @@ import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControl
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.LibraryRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.library.folders.MusicFolderDataSource;
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.source.SourceRepository;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
@@ -97,8 +97,13 @@ class MusicModule {
     MusicPlayerController provideMusicPlayerController(UiStateRepository uiStateRepository,
                                                        Context context,
                                                        @Named(UI_SCHEDULER) Scheduler scheduler,
-                                                       PlayerErrorParser playerErrorParser) {
-        return new MusicPlayerControllerImpl(uiStateRepository, context, scheduler, playerErrorParser);
+                                                       PlayerErrorParser playerErrorParser,
+                                                       Analytics analytics) {
+        return new MusicPlayerControllerImpl(uiStateRepository,
+                context,
+                scheduler,
+                playerErrorParser,
+                analytics);
     }
 
     @Provides
@@ -109,7 +114,7 @@ class MusicModule {
                                               ArtistsDaoWrapper artistsDao,
                                               AlbumsDaoWrapper albumsDao,
                                               GenresDaoWrapper genresDao,
-                                              MusicFolderDataSource musicFolderDataSource,
+                                              FoldersDaoWrapper foldersDao,
                                               SettingsRepository settingsPreferences,
                                               @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new LibraryRepositoryImpl(storageMusicDataSource,
@@ -117,7 +122,7 @@ class MusicModule {
                 artistsDao,
                 albumsDao,
                 genresDao,
-                musicFolderDataSource,
+                foldersDao,
                 settingsPreferences,
                 scheduler);
     }
@@ -132,8 +137,8 @@ class MusicModule {
     @Provides
     @Nonnull
     @Singleton
-    CoverImageLoader coverImageLoader(StorageAlbumsProvider storageAlbumsProvider) {
-        return new CoverImageLoader(storageAlbumsProvider);
+    CoverImageLoader coverImageLoader(Context context, StorageAlbumsProvider storageAlbumsProvider) {
+        return new CoverImageLoader(context, storageAlbumsProvider);
     }
 
     @Provides

@@ -106,13 +106,13 @@ public class MusicPlayerInteractor {
             return;
         }
 
+        systemEventsDisposable.clear();
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
             playerStateSubject.onNext(PLAY);
             musicPlayerController.resume();
             systemServiceController.startMusicService();
 
-            systemEventsDisposable.clear();
             systemEventsDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
             systemEventsDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
                     .subscribe(this::onAudioBecomingNoisy));
@@ -271,7 +271,9 @@ public class MusicPlayerInteractor {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
-            pause();
+            if (previousItem != null) {
+                pause();
+            }
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
 
@@ -326,7 +328,7 @@ public class MusicPlayerInteractor {
                 .andThen(playQueueRepository.isCurrentCompositionAtEndOfQueue())
                 .doOnSuccess(isLast -> {
                     if (isLast) {
-                        pause();
+                        pause();//get current position called from wrong thread
                     } else {
                         playQueueRepository.skipToNext().subscribe();
                     }

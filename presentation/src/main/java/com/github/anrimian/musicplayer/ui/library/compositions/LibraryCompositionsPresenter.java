@@ -5,7 +5,7 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 

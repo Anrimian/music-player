@@ -3,36 +3,24 @@ package com.github.anrimian.musicplayer.data.repositories.library;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
-import com.github.anrimian.musicplayer.data.repositories.library.comparators.DescComparator;
-import com.github.anrimian.musicplayer.data.repositories.library.comparators.composition.AlphabeticalCompositionComparator;
-import com.github.anrimian.musicplayer.data.repositories.library.comparators.composition.CreateDateCompositionComparator;
-import com.github.anrimian.musicplayer.data.repositories.library.comparators.folder.AlphabeticalFileComparator;
-import com.github.anrimian.musicplayer.data.repositories.library.comparators.folder.CreateDateFileComparator;
-import com.github.anrimian.musicplayer.data.repositories.library.comparators.folder.FolderComparator;
-import com.github.anrimian.musicplayer.data.repositories.library.folders.MusicFolderDataSource;
-import com.github.anrimian.musicplayer.data.repositories.library.search.FileSourceSearchFilter;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.Folder;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.MusicFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -52,7 +40,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     private final ArtistsDaoWrapper artistsDao;
     private final AlbumsDaoWrapper albumsDao;
     private final GenresDaoWrapper genresDao;
-    private final MusicFolderDataSource musicFolderDataSource;
+    private final FoldersDaoWrapper foldersDao;
     private final SettingsRepository settingsPreferences;
     private final Scheduler scheduler;
 
@@ -61,7 +49,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
                                  ArtistsDaoWrapper artistsDao,
                                  AlbumsDaoWrapper albumsDao,
                                  GenresDaoWrapper genresDao,
-                                 MusicFolderDataSource musicFolderDataSource,
+                                 FoldersDaoWrapper foldersDao,
                                  SettingsRepository settingsPreferences,
                                  Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
@@ -69,7 +57,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
         this.artistsDao = artistsDao;
         this.albumsDao = albumsDao;
         this.genresDao = genresDao;
-        this.musicFolderDataSource = musicFolderDataSource;
+        this.foldersDao = foldersDao;
         this.settingsPreferences = settingsPreferences;
         this.scheduler = scheduler;
     }
@@ -156,30 +144,26 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Single<Folder> getCompositionsInPath(@Nullable String path,
-                                                @Nullable String searchText) {
-        return musicFolderDataSource.getCompositionsInPath(path)
-                .doOnSuccess(folder -> folder.applyFileOrder(getSelectedFileComparatorObservable()))
-                .doOnSuccess(folder -> folder.applySearchFilter(searchText, new FileSourceSearchFilter()))
-                .subscribeOn(scheduler);
+    public Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
+                                                            @Nullable String searchQuery) {
+        return settingsPreferences.getFolderOrderObservable()
+                .switchMap(order -> foldersDao.getFilesObservable(folderId, order, searchQuery));
     }
 
     @Override
-    public Single<List<Composition>> getAllCompositionsInPath(@Nullable String path) {
-        return getCompositionsObservable(path)//FolderNodeNonExistException
-                .toList()
+    public Observable<FolderFileSource> getFolderObservable(long folderId) {
+        return foldersDao.getFolderObservable(folderId);
+    }
+
+    @Override
+    public Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId) {
+        return Single.fromCallable(() -> selectAllCompositionsInFolder(folderId))
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources) {
-        return extractAllCompositionsInFolders(fileSources)
-                .subscribeOn(scheduler);
-    }
-
-    @Override
-    public Single<List<String>> getAvailablePathsForPath(@Nullable String path) {
-        return musicFolderDataSource.getAvailablePathsForPath(path)
+        return compositionsDao.extractAllCompositionsFromFiles(fileSources, settingsPreferences.getFolderOrder())
                 .subscribeOn(scheduler);
     }
 
@@ -202,115 +186,71 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Single<List<Composition>> changeFolderName(String folderPath, String newPath) {
-        return musicFolderDataSource.changeFolderName(folderPath, newPath);
-    }
-
-    @Override
-    public Single<List<Composition>> moveFileTo(String folderPath,
-                                                String newSourcePath,
-                                                FileSource fileSource) {
-        return musicFolderDataSource.moveFileTo(folderPath, newSourcePath, fileSource);
-    }
-
-    @Override
     public Observable<Genre> getGenreObservable(long genreId) {
         return genresDao.getGenreObservable(genreId);
     }
 
-    private Comparator<FileSource> getFileComparator(Order order) {
-        Comparator<FileSource> comparator;
-        switch (order.getOrderType()) {
-            case ALPHABETICAL: {
-                comparator = new AlphabeticalFileComparator();
-                break;
+    @Override
+    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
+        return Single.fromCallable(() -> foldersDao.getFullFolderPath(folder.getId()))
+                .map(foldersDao::insert)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable addFolderToIgnore(IgnoredFolder folder) {
+        return Completable.fromAction(() -> foldersDao.insert(folder))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Observable<List<IgnoredFolder>> getIgnoredFoldersObservable() {
+        return foldersDao.getIgnoredFoldersObservable();
+    }
+
+    @Override
+    public Completable deleteIgnoredFolder(IgnoredFolder folder) {
+        return Completable.fromAction(() -> foldersDao.deleteIgnoredFolder(folder))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
+        return Single.fromCallable(() -> selectAllCompositionsInFolder(folder.getId()))
+                .flatMap(compositions -> storageMusicDataSource.deleteCompositionFiles(compositions)
+                        .doOnComplete(() -> foldersDao.deleteFolder(folder.getId(), compositions))
+                        .toSingleDefault(compositions))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Composition>> deleteFolders(List<FileSource> folders) {
+        return compositionsDao.extractAllCompositionsFromFiles(folders)
+                .flatMap(compositions -> storageMusicDataSource.deleteCompositionFiles(compositions)
+                        .doOnComplete(() -> foldersDao.deleteFolders(extractFolderIds(folders), compositions))
+                        .toSingleDefault(compositions))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder) {
+        return Single.fromCallable(() -> foldersDao.getAllParentFoldersId(currentFolder))
+                .subscribeOn(scheduler);
+    }
+
+    private List<Long> extractFolderIds(List<FileSource> sources) {
+        List<Long> result = new LinkedList<>();
+        for (FileSource source : sources) {
+            if (source instanceof FolderFileSource) {
+                result.add(((FolderFileSource) source).getId());
             }
-            case ADD_TIME: {
-                comparator = new CreateDateFileComparator();
-                break;
-            }
-            default: return new AlphabeticalFileComparator();
         }
-        if (order.isReversed()) {
-            comparator = new DescComparator<>(comparator);
-        }
-        return new FolderComparator(comparator);
+        return result;
     }
 
-    private Comparator<FileSource> getSelectedFileComparator() {
-        return getFileComparator(settingsPreferences.getFolderOrder());
-    }
-
-    private Observable<Comparator<FileSource>> getSelectedFileComparatorObservable() {
-        return settingsPreferences.getFolderOrderObservable()
-                .map(this::getFileComparator);
-    }
-
-    private Comparator<Composition> getCompositionComparator() {
-        Order order = settingsPreferences.getCompositionsOrder();
-        Comparator<Composition> comparator;
-        switch (order.getOrderType()) {
-            case ALPHABETICAL: {
-                comparator = new AlphabeticalCompositionComparator();
-                break;
-            }
-            case ADD_TIME: {
-                comparator = new CreateDateCompositionComparator();
-                break;
-            }
-            default: return new AlphabeticalCompositionComparator();
-        }
-        if (order.isReversed()) {
-            comparator = new DescComparator<>(comparator);
-        }
-        return comparator;
-    }
-
-    private Observable<Composition> getCompositionsObservable(@Nullable String path) {
-        return musicFolderDataSource.getCompositionsInPath(path)
-                .doOnSuccess(folder -> folder.applyFileOrder(this::getSelectedFileComparator))
-                .flatMap(folder -> folder.getFilesObservable().firstOrError())
-                .flatMapObservable(Observable::fromIterable)
-                .flatMap(fileSource -> {
-                    if (fileSource instanceof FolderFileSource) {
-                        return getCompositionsObservable(((FolderFileSource) fileSource).getPath());
-                    } else if (fileSource instanceof MusicFileSource) {
-                        return Observable.just(((MusicFileSource) fileSource).getComposition());
-                    }
-                    throw new IllegalStateException("unexpected file source type: " + fileSource);
-                });
-    }
-
-    private List<Composition> toSortedList(Map<Long, Composition> compositionMap) {
-        List<Composition> list = new ArrayList<>(compositionMap.values());
-        Collections.sort(list, getCompositionComparator());
-        return list;
-    }
-
-    private Observable<Composition> findComposition(Map<Long, Composition> compositions, long id) {
-        return Observable.create(emitter -> {
-            Composition composition = compositions.get(id);
-            if (composition == null) {
-                emitter.onComplete();
-            } else {
-                emitter.onNext(composition);
-            }
-        });
-    }
-
-    private Single<List<Composition>> extractAllCompositionsInFolders(Iterable<FileSource> fileSources) {
-        return Observable.fromIterable(fileSources)
-                .flatMap(this::fileSourceToComposition)
-                .collect(ArrayList::new, List::add);
-    }
-
-    private Observable<Composition> fileSourceToComposition(FileSource fileSource) {
-        if (fileSource instanceof MusicFileSource) {
-            return Observable.just(((MusicFileSource) fileSource).getComposition());
-        }
-        if (fileSource instanceof FolderFileSource) {
-            return getCompositionsObservable(((FolderFileSource) fileSource).getPath());
-        }
-        throw new IllegalStateException("unexpected file source: " + fileSource);
+    private List<Composition> selectAllCompositionsInFolder(Long folderId) {
+        return compositionsDao.getAllCompositionsInFolder(
+                folderId,
+                settingsPreferences.getFolderOrder());
     }
 }

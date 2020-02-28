@@ -22,6 +22,9 @@ public class StorageFullComposition {
     @Nonnull
     private final String filePath;
 
+    @Nonnull
+    private final String relativePath;
+
     private final long duration;
     private final long size;
     private final long id;
@@ -36,6 +39,7 @@ public class StorageFullComposition {
     public StorageFullComposition(@Nullable String artist,
                                   @Nullable String title,
                                   @Nonnull String filePath,
+                                  @Nonnull String relativePath,
                                   long duration,
                                   long size,
                                   long id,
@@ -45,12 +49,18 @@ public class StorageFullComposition {
         this.artist = artist;
         this.title = title;
         this.filePath = filePath;
+        this.relativePath = relativePath;
         this.duration = duration;
         this.size = size;
         this.id = id;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.storageAlbum = storageAlbum;
+    }
+
+    @Nonnull
+    public String getRelativePath() {
+        return relativePath;
     }
 
     public StorageAlbum getStorageAlbum() {
@@ -97,14 +107,13 @@ public class StorageFullComposition {
     @NonNull
     @Override
     public String toString() {
-        return "Composition{" +
-                "\n id=" + id +
-                "\n filePath='" + filePath + '\'' +
-                "\n duration=" + duration +
-                "\n size=" + size +
-                "\n dateAdded=" + dateAdded +
-                "\n dateModified=" + dateModified +
-                '}';
+        return "\n StorageFullComposition{" +
+                "\n artist='" + artist + '\'' +
+                ",\n title='" + title + '\'' +
+                ",\n filePath='" + filePath + '\'' +
+                ",\n relativePath='" + relativePath + '\'' +
+                ",\n id=" + id +
+                "\n }";
     }
 
     @Override

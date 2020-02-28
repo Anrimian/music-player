@@ -6,6 +6,9 @@
         android:title="@string/order"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/menu_excluded_folders"
+        android:title="@string/excluded_folders"/>
+
     <item android:id="@+id/menu_rescan_storage"
         android:title="@string/scan_storage"
         app:showAsAction="never"/>

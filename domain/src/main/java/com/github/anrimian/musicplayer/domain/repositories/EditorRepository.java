@@ -3,9 +3,13 @@ package com.github.anrimian.musicplayer.domain.repositories;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
+import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -32,13 +36,16 @@ public interface EditorRepository {
 
     Completable changeCompositionFileName(FullComposition composition, String fileName);
 
-    Completable changeCompositionsFilePath(List<Composition> compositions);
+    Completable changeFolderName(long folderId, String folderName);
 
-    Single<String> changeFolderName(String filePath, String folderName);
+    Completable moveFiles(Collection<FileSource> files,
+                          @Nullable Long fromFolderId,
+                          @Nullable Long toFolderId);
 
-    Single<String> moveFile(String filePath, String oldPath, String newPath);
-
-    Completable createDirectory(String path);
+    Completable moveFilesToNewDirectory(Collection<FileSource> files,
+                                        @Nullable Long fromFolderId,
+                                        @Nullable Long targetParentFolderId,
+                                        String directoryName);
 
     Completable updateAlbumName(String name, long id);
 

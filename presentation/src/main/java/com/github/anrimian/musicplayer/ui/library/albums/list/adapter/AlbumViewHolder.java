@@ -78,7 +78,9 @@ public class AlbumViewHolder extends BaseViewHolder {
     }
 
     private void showAlbumName() {
-        tvAlbumName.setText(album.getName());
+        String name = album.getName();
+        tvAlbumName.setText(name);
+        clickableItem.setContentDescription(name);
     }
 
     private void showAdditionalInfo() {

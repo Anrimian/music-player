@@ -39,6 +39,40 @@ public class MigrationsTest {
                     new FrameworkSQLiteOpenHelperFactory());
 
     @Test
+    public void testMigrationFrom4To5() throws IOException {
+        SupportSQLiteDatabase db = testHelper.createDatabase(TEST_DB_NAME, 4);
+
+        ContentValues cv = new ContentValues();
+        cv.put("storageId", 1L);
+        cv.put("title", "titleHH");
+        cv.put("filePath", "filePath");
+        cv.put("duration", 13);
+        cv.put("size", 100);
+        cv.put("dateAdded", 0L);
+        cv.put("dateModified", 0L);
+        long id = db.insert("compositions", SQLiteDatabase.CONFLICT_ABORT, cv);
+
+        ContentValues cvQueueItem = new ContentValues();
+        cvQueueItem.put("audioId", id);
+        cvQueueItem.put("position", 0);
+        cvQueueItem.put("shuffledPosition", 0);
+        long queueId = db.insert("play_queue", SQLiteDatabase.CONFLICT_ABORT, cvQueueItem);
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                5,
+                false,
+                Migrations.MIGRATION_4_5);
+
+        Cursor c = db.query("SELECT title FROM compositions WHERE id = " + id);
+        c.moveToFirst();
+        assertEquals("titleHH", c.getString(c.getColumnIndex("title")));
+
+        Cursor cursorQueue = db.query("SELECT audioId FROM play_queue WHERE id = " + queueId);
+        cursorQueue.moveToFirst();
+        assertEquals(id, cursorQueue.getLong(cursorQueue.getColumnIndex("audioId")));
+    }
+
+    @Test
     public void testMigrationFrom3To4() throws IOException {
         SupportSQLiteDatabase db = testHelper.createDatabase(TEST_DB_NAME, 3);
 

@@ -392,9 +392,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
     @Override
     public void showRenameProgress() {
-        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(
-                getString(R.string.rename_progress)
-        );
+        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.rename_progress);
         fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
     }
 

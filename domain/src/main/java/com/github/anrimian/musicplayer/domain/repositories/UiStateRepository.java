@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 
 /**
@@ -28,9 +30,10 @@ public interface UiStateRepository {
 
     int getSelectedLibraryScreen();
 
-    void setSelectedFolderScreen(String path);
+    void setSelectedFolderScreen(@Nullable Long folderId);
 
-    String getSelectedFolderScreen();
+    @Nullable
+    Long getSelectedFolderScreen();
 
     void setSelectedPlayListScreenId(long playListId);
 

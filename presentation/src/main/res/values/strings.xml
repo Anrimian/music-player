@@ -57,6 +57,7 @@
     <string name="cancel">Cancel</string>
     <string name="deleting">Deleting</string>
     <string name="delete_composition_template">Delete song %1$s? This action cannot be undone.</string>
+    <string name="delete_empty_folder">Delete folder %s? This action cannot be undone.</string>
     <string name="delete_folder_template">Delete %2$s from folder %1$s?
         If there are no more files in the folder, it will also be deleted.
         This action cannot be undone.
@@ -176,6 +177,16 @@
     <string name="add">Add</string>
     <string name="edit_genre">Edit genre</string>
     <string name="genre_removed_message">Genre \"%s\" was removed</string>
+    <string name="exclude_from_scanning">Hide</string>
+    <string name="ignored_folder_added">Folder \'%s\' added to excluded folder list</string>
+    <string name="excluded_folders">Excluded folders</string>
+    <string name="remove_excluded_folder">Remove excluded folder</string>
+    <string name="no_excluded_folders">No excluded folders</string>
+    <string name="ignored_folder_removed">Excluded folder removed</string>
+    <string name="moving_and_destination_folders_matches">Moving and destination folders matches</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
+    <string name="move_progress">Moving…</string>
+    <string name="delete_progress">Deleting…</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

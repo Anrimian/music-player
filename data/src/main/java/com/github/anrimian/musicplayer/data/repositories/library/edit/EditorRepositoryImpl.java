@@ -3,29 +3,41 @@ package com.github.anrimian.musicplayer.data.repositories.library.edit;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -33,40 +45,46 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
+import static com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource.renameFile;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+
 public class EditorRepositoryImpl implements EditorRepository {
 
     private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor();
 
     private final StorageMusicDataSource storageMusicDataSource;
+    private final StorageFilesDataSource filesDataSource;
     private final CompositionsDaoWrapper compositionsDao;
     private final AlbumsDaoWrapper albumsDao;
     private final ArtistsDaoWrapper artistsDao;
     private final GenresDaoWrapper genresDao;
+    private final FoldersDaoWrapper foldersDao;
     private final StorageMusicProvider storageMusicProvider;
     private final StorageGenresProvider storageGenresProvider;
-    private final StorageArtistsProvider storageArtistsProvider;
-    private final StorageAlbumsProvider storageAlbumsProvider;
+    private final StateRepository stateRepository;
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
+                                StorageFilesDataSource filesDataSource,
                                 CompositionsDaoWrapper compositionsDao,
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
                                 GenresDaoWrapper genresDao,
+                                FoldersDaoWrapper foldersDao,
                                 StorageMusicProvider storageMusicProvider,
                                 StorageGenresProvider storageGenresProvider,
-                                StorageArtistsProvider storageArtistsProvider,
-                                StorageAlbumsProvider storageAlbumsProvider,
+                                StateRepository stateRepository,
                                 Scheduler scheduler) {
         this.storageMusicDataSource = storageMusicDataSource;
+        this.filesDataSource = filesDataSource;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
         this.genresDao = genresDao;
+        this.foldersDao = foldersDao;
         this.storageMusicProvider = storageMusicProvider;
         this.storageGenresProvider = storageGenresProvider;
-        this.storageArtistsProvider = storageArtistsProvider;
-        this.storageAlbumsProvider = storageAlbumsProvider;
+        this.stateRepository = stateRepository;
         this.scheduler = scheduler;
     }
 
@@ -163,45 +181,72 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Single.fromCallable(() -> FileUtils.getChangedFilePath(composition.getFilePath(), fileName))
-                .flatMap(newPath -> renameFile(composition.getFilePath(), newPath))
+                .doOnSuccess(newPath -> renameFile(composition.getFilePath(), newPath))
                 .flatMapCompletable(newPath -> storageMusicDataSource.updateCompositionFilePath(composition, newPath))
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Completable changeCompositionsFilePath(List<Composition> compositions) {
-        return storageMusicDataSource.updateCompositionsFilePath(compositions)
+    public Completable changeFolderName(long folderId, String newName) {
+        return getFullFolderPath(folderId)
+                .map(fullPath -> {
+                    List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId);
+
+                    List<FilePathComposition> updatedCompositions = new LinkedList<>();
+                    String name = filesDataSource.renameCompositionsFolder(compositions,
+                            fullPath,
+                            newName,
+                            updatedCompositions);
+
+                    compositionsDao.updateFilesPath(updatedCompositions);
+                    return name;
+                })
+                .doOnSuccess(name -> foldersDao.changeFolderName(folderId, name))
+                .ignoreElement()
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Single<String> changeFolderName(String filePath, String folderName) {
-        return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, folderName))
-                .flatMap(newPath -> renameFile(filePath, newPath))
+    public Completable moveFiles(Collection<FileSource> files,
+                                 @Nullable Long fromFolderId,
+                                 @Nullable Long toFolderId) {
+        return verifyFolderMove(fromFolderId, toFolderId, files)
+                .andThen(Single.zip(getFullFolderPath(fromFolderId),
+                        getFullFolderPath(toFolderId),
+                        compositionsDao.extractAllCompositionsFromFiles(files),
+                        (fromPath, toPath, compositions) -> {
+                            List<FilePathComposition> updateCompositions = filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);
+                            compositionsDao.updateFilesPath(updateCompositions);
+                            return TRIGGER;
+                        }))
+                .ignoreElement()
+                .doOnComplete(() -> foldersDao.updateFolderId(files, toFolderId))
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Single<String> moveFile(String filePath, String oldPath, String newPath) {
-        if (Objects.equals(oldPath, newPath)) {
-            return Single.error(new MoveInTheSameFolderException("move in the same folder"));
-        }
-        return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, oldPath, newPath))
-                .flatMap(path -> renameFile(filePath, path))
-                .subscribeOn(scheduler);
-    }
+    public Completable moveFilesToNewDirectory(Collection<FileSource> files,
+                                               @Nullable Long fromFolderId,
+                                               @Nullable Long targetParentFolderId,
+                                               String directoryName) {
+        return Single.zip(getFullFolderPath(fromFolderId),
+                getFullFolderPath(targetParentFolderId),
+                compositionsDao.extractAllCompositionsFromFiles(files),
+                (fromPath, toParentPath, compositions) -> {
+                    List<FilePathComposition> updatedCompositions = new LinkedList<>();
+                    String name = filesDataSource.moveCompositionsToNewFolder(compositions,
+                            fromPath,
+                            toParentPath,
+                            directoryName,
+                            updatedCompositions);
 
-    @Override
-    public Completable createDirectory(String path) {
-        return Completable.fromAction(() -> {
-            File file = new File(path);
-            if (file.exists()) {
-                throw new FileExistsException();
-            }
-            if (!file.mkdir()) {
-                throw new Exception("file not created, path: " + path);
-            }
-        }).subscribeOn(scheduler);
+                    compositionsDao.updateFilesPath(updatedCompositions);
+
+                    return foldersDao.createFolder(targetParentFolderId, name);
+                })
+                .doOnSuccess(folderId -> foldersDao.updateFolderId(files, folderId))
+                .ignoreElement()
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -315,19 +360,46 @@ public class EditorRepositoryImpl implements EditorRepository {
         });
     }
 
-    private Single<String> renameFile(String oldPath, String newPath) {
-        return Single.create(emitter -> {
-
-            File oldFile = new File(oldPath);
-            File newFile = new File(newPath);
-            if (oldFile.renameTo(newFile)) {
-                emitter.onSuccess(newPath);
-            } else {
-                emitter.onError(new Exception("file not renamed"));
+    private Single<String> getFullFolderPath(@Nullable Long folderId) {
+        return Single.fromCallable(() -> {
+            StringBuilder sbPath = new StringBuilder();
+            String rootFolderPath = stateRepository.getRootFolderPath();
+            if (rootFolderPath != null) {
+                sbPath.append(rootFolderPath);
             }
+            if (folderId != null) {
+                if (sbPath.length() != 0) {
+                    sbPath.append('/');
+                }
+                sbPath.append(foldersDao.getFullFolderPath(folderId));
+            }
+            return sbPath.toString();
         });
     }
 
+    private Completable verifyFolderMove(@Nullable Long fromFolderId,
+                                         @Nullable Long toFolderId,
+                                         Collection<FileSource> files) {
+        return Completable.fromAction(() -> {
+            if (Objects.equals(fromFolderId, toFolderId)) {
+                throw new MoveInTheSameFolderException("move in the same folder");
+            }
+            for (FileSource fileSource: files) {
+                if (fileSource instanceof FolderFileSource) {
+                    FolderFileSource folder = (FolderFileSource) fileSource;
+                    long folderId = folder.getId();
 
+                    List<Long> childFoldersId = foldersDao.getAllChildFoldersId(folderId);
+                    if (Objects.equals(toFolderId, folderId) || childFoldersId.contains(toFolderId)) {
+                        throw new MoveFolderToItselfException("moving and destination folders matches");
+                    }
+                    String name = foldersDao.getFolderName(folderId);
+                    if (foldersDao.getChildFoldersNames(toFolderId).contains(name)) {
+                        throw new DuplicateFolderNamesException();
+                    }
+                }
+            }
 
+        });
+    }
 }

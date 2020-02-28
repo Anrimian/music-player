@@ -19,32 +19,34 @@ public class StorageMusicDataSource {
 
     private final StorageMusicProvider musicProvider;
     private final CompositionsDaoWrapper compositionsDao;
-    private final GenresDaoWrapper genreDao;
     private final FileManager fileManager;
     private final Scheduler scheduler;
 
     public StorageMusicDataSource(StorageMusicProvider musicProvider,
                                   CompositionsDaoWrapper compositionsDao,
-                                  GenresDaoWrapper genreDao,
                                   FileManager fileManager,
                                   Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.compositionsDao = compositionsDao;
-        this.genreDao = genreDao;
         this.fileManager = fileManager;
         this.scheduler = scheduler;
     }
 
-    public Completable deleteCompositions(List<Composition> compositionsToDelete) {
+    public Completable deleteCompositions(List<Composition> compositions) {
         return Completable.fromAction(() -> {
-            for (Composition composition: compositionsToDelete) {
-                deleteCompositionFile(composition);
-            }
-            compositionsDao.deleteAll(mapList(compositionsToDelete, Composition::getId));
+            deleteFiles(compositions);
+            compositionsDao.deleteAll(mapList(compositions, Composition::getId));
             musicProvider.deleteCompositions(mapListNotNull(
-                    compositionsToDelete,
+                    compositions,
                     Composition::getStorageId)
             );
+        });
+    }
+
+    public Completable deleteCompositionFiles(List<Composition> compositions) {
+        return Completable.fromAction(() -> {
+            deleteFiles(compositions);
+            musicProvider.deleteCompositions(mapListNotNull(compositions, Composition::getStorageId));
         });
     }
 
@@ -56,42 +58,6 @@ public class StorageMusicDataSource {
                 musicProvider.deleteComposition(storageId);
             }
             compositionsDao.delete(composition.getId());
-        });
-    }
-
-    public Completable updateCompositionAuthor(FullComposition composition, String authorName) {
-        return Completable.fromAction(() -> {
-            compositionsDao.updateArtist(composition.getId(), authorName);
-            Long storageId = composition.getStorageId();
-            if (storageId != null) {
-                musicProvider.updateCompositionArtist(storageId, authorName);
-            }
-        });
-    }
-
-    public Completable updateCompositionAlbumArtist(FullComposition composition, String authorName) {
-        return Completable.fromAction(() ->
-                compositionsDao.updateAlbumArtist(composition.getId(), authorName)
-        );
-    }
-
-    public Completable updateCompositionGenre(FullComposition composition, String genre) {
-        return Completable.fromAction(() -> {
-            genreDao.updateCompositionGenre(composition.getId(), genre);
-//            Long storageId = composition.getStorageId();
-//            if (storageId != null) {
-//                storageGenresProvider.updateCompositionGenre(storageId, genre);
-//            }
-        });
-    }
-
-    public Completable updateCompositionAlbum(FullComposition composition, String albumName) {
-        return Completable.fromAction(() -> {
-            compositionsDao.updateAlbum(composition.getId(), albumName);
-            Long storageId = composition.getStorageId();
-            if (storageId != null) {
-                musicProvider.updateCompositionAlbum(storageId, albumName);
-            }
         });
     }
 
@@ -115,11 +81,10 @@ public class StorageMusicDataSource {
         });
     }
 
-    public Completable updateCompositionsFilePath(List<Composition> compositions) {
-        return Completable.fromAction(() -> {
-            compositionsDao.updateFilesPath(compositions);
-            musicProvider.updateCompositionsFilePath(compositions);
-        }).subscribeOn(scheduler);
+    private void deleteFiles(List<Composition> compositions) {
+        for (Composition composition: compositions) {
+            deleteCompositionFile(composition);
+        }
     }
 
     private void deleteCompositionFile(Composition composition) {

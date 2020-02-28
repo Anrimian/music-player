@@ -20,7 +20,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.data.repositories.ui_state.UiStateRepositoryImpl.NO_ITEM;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
@@ -34,6 +34,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final Observable<PlayQueueEvent> currentItemObservable;
 
     private boolean firstItemEmitted;
+    private boolean consumeDeletedItemEvent = false;
 
     public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
                                    SettingsRepository settingsPreferences,
@@ -69,11 +70,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         if (compositions.isEmpty()) {
             return Completable.complete();
         }
-        return Single.fromCallable(() -> playQueueDao.insertNewPlayQueue(compositions,
-                settingsPreferences.isRandomPlayingEnabled(),
-                startPosition)
-        ).doOnSuccess(this::setCurrentItem)
-                .ignoreElement()
+        return Completable.fromAction(() -> insertNewQueue(compositions, startPosition))
                 .subscribeOn(scheduler);
     }
 
@@ -204,6 +201,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .subscribe();
     }
 
+    private void insertNewQueue(List<Composition> compositions, int startPosition) {
+        consumeDeletedItemEvent = true;
+        long itemId = playQueueDao.insertNewPlayQueue(compositions,
+                settingsPreferences.isRandomPlayingEnabled(),
+                startPosition);
+        setCurrentItem(itemId);
+        consumeDeletedItemEvent = false;
+    }
+
     private Observable<PlayQueueEvent> getPlayQueueEvent(long id) {
         if (id == NO_ITEM) {
             return Observable.just(new PlayQueueEvent(null));
@@ -218,6 +224,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return Observable.create(emitter -> {
             PlayQueueItem item = itemOpt.getValue();
             if (item == null) {
+                if (consumeDeletedItemEvent) {
+                    return;
+                }
                 //handle deleted item
                 boolean isRandom = settingsPreferences.isRandomPlayingEnabled();
                 int lastPosition = uiStatePreferences.getCurrentItemLastPosition();

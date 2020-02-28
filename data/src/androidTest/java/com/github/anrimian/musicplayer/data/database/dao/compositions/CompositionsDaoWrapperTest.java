@@ -8,7 +8,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
-import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 
@@ -16,11 +15,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.github.anrimian.musicplayer.data.database.DataProvider.composition;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static utils.TestDataProvider.composition;
 
 public class CompositionsDaoWrapperTest {
 
@@ -28,7 +27,6 @@ public class CompositionsDaoWrapperTest {
     private CompositionsDao compositionsDao;
     private ArtistsDao artistsDao;
     private AlbumsDao albumsDao;
-    private GenreDao genresDao;
 
     private CompositionsDaoWrapper daoWrapper;
 
@@ -39,9 +37,8 @@ public class CompositionsDaoWrapperTest {
         compositionsDao = db.compositionsDao();
         artistsDao = db.artistsDao();
         albumsDao = db.albumsDao();
-        genresDao = db.genreDao();
 
-        daoWrapper = new CompositionsDaoWrapper(db, artistsDao, compositionsDao, albumsDao, genresDao);
+        daoWrapper = new CompositionsDaoWrapper(db, artistsDao, compositionsDao, albumsDao);
     }
 
     @After
