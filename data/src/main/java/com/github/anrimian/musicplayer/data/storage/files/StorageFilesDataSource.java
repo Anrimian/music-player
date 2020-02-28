@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.Completable;
+
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 
 public class StorageFilesDataSource {
@@ -105,7 +107,7 @@ public class StorageFilesDataSource {
 
     public void deleteCompositionFiles(List<Composition> compositions) {
         for (Composition composition: compositions) {
-            deleteCompositionFile(composition);
+            deleteFile(composition);
         }
         storageMusicProvider.deleteCompositions(mapListNotNull(
                 compositions,
@@ -114,6 +116,14 @@ public class StorageFilesDataSource {
     }
 
     public void deleteCompositionFile(Composition composition) {
+        deleteFile(composition);
+        Long storageId = composition.getStorageId();
+        if (storageId != null) {
+            storageMusicProvider.deleteComposition(storageId);
+        }
+    }
+
+    private void deleteFile(Composition composition) {
         String filePath = composition.getFilePath();
         File parentDirectory = new File(filePath).getParentFile();
 

@@ -27,24 +27,6 @@ public class StorageMusicDataSource {
         this.compositionsDao = compositionsDao;
     }
 
-    public Completable deleteCompositionFiles(List<Composition> compositions) {
-        return Completable.fromAction(() -> {
-            deleteFiles(compositions);
-            musicProvider.deleteCompositions(mapListNotNull(compositions, Composition::getStorageId));
-        });
-    }
-
-    public Completable deleteComposition(Composition composition) {
-        return Completable.fromAction(() -> {
-            deleteCompositionFile(composition);
-            Long storageId = composition.getStorageId();
-            if (storageId != null) {
-                musicProvider.deleteComposition(storageId);
-            }
-            compositionsDao.delete(composition.getId());
-        });
-    }
-
     public Completable updateCompositionTitle(FullComposition composition, String title) {
         return Completable.fromAction(() -> {
             compositionsDao.updateTitle(composition.getId(), title);
@@ -63,21 +45,5 @@ public class StorageMusicDataSource {
                 musicProvider.updateCompositionFilePath(storageId, filePath);
             }
         });
-    }
-
-    private void deleteFiles(List<Composition> compositions) {
-        for (Composition composition: compositions) {
-            deleteCompositionFile(composition);
-        }
-    }
-
-    private void deleteCompositionFile(Composition composition) {
-        String filePath = composition.getFilePath();
-        File parentDirectory = new File(filePath).getParentFile();
-
-        FileManager.deleteFile(filePath);
-        if (parentDirectory != null) {
-            FileManager.deleteEmptyDirectory(parentDirectory);
-        }
     }
 }

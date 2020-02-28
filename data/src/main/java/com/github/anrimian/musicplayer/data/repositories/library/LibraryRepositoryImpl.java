@@ -181,8 +181,10 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Completable deleteComposition(Composition composition) {
-        return storageMusicDataSource.deleteComposition(composition)
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            storageFilesDataSource.deleteCompositionFile(composition);
+            compositionsDao.delete(composition.getId());
+        }).subscribeOn(scheduler);
     }
 
     @Override
@@ -225,18 +227,20 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
         return Single.fromCallable(() -> selectAllCompositionsInFolder(folder.getId()))
-                .flatMap(compositions -> storageMusicDataSource.deleteCompositionFiles(compositions)
-                        .doOnComplete(() -> foldersDao.deleteFolder(folder.getId(), compositions))
-                        .toSingleDefault(compositions))
+                .doOnSuccess(compositions -> {
+                    storageFilesDataSource.deleteCompositionFiles(compositions);
+                    foldersDao.deleteFolder(folder.getId(), compositions);
+                })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Single<List<Composition>> deleteFolders(List<FileSource> folders) {
         return compositionsDao.extractAllCompositionsFromFiles(folders)
-                .flatMap(compositions -> storageMusicDataSource.deleteCompositionFiles(compositions)
-                        .doOnComplete(() -> foldersDao.deleteFolders(extractFolderIds(folders), compositions))
-                        .toSingleDefault(compositions))
+                .doOnSuccess(compositions -> {
+                    storageFilesDataSource.deleteCompositionFiles(compositions);
+                    foldersDao.deleteFolders(extractFolderIds(folders), compositions);
+                })
                 .subscribeOn(scheduler);
     }
 
