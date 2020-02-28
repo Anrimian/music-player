@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
+import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotFoundException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
@@ -115,6 +116,14 @@ public class CompositionsDaoWrapper {
     public LongSparseArray<StorageComposition> selectAllAsStorageCompositions() {
         return AndroidCollectionUtils.mapToSparseArray(compositionsDao.selectAllAsStorageCompositions(),
                 StorageComposition::getStorageId);
+    }
+
+    public long getStorageId(long compositionId) {
+        Long storageId = compositionsDao.getStorageId(compositionId);
+        if (storageId == null) {
+            throw new CompositionNotFoundException();
+        }
+        return storageId;
     }
 
     public void delete(long id) {
