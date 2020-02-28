@@ -6,7 +6,6 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -38,7 +37,6 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class LibraryRepositoryImpl implements LibraryRepository {
 
-    private final StorageMusicDataSource storageMusicDataSource;
     private final StorageFilesDataSource storageFilesDataSource;
     private final CompositionsDaoWrapper compositionsDao;
     private final ArtistsDaoWrapper artistsDao;
@@ -48,8 +46,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     private final SettingsRepository settingsPreferences;
     private final Scheduler scheduler;
 
-    public LibraryRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
-                                 StorageFilesDataSource storageFilesDataSource,
+    public LibraryRepositoryImpl(StorageFilesDataSource storageFilesDataSource,
                                  CompositionsDaoWrapper compositionsDao,
                                  ArtistsDaoWrapper artistsDao,
                                  AlbumsDaoWrapper albumsDao,
@@ -57,7 +54,6 @@ public class LibraryRepositoryImpl implements LibraryRepository {
                                  FoldersDaoWrapper foldersDao,
                                  SettingsRepository settingsPreferences,
                                  Scheduler scheduler) {
-        this.storageMusicDataSource = storageMusicDataSource;
         this.storageFilesDataSource = storageFilesDataSource;
         this.compositionsDao = compositionsDao;
         this.artistsDao = artistsDao;

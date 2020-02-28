@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.io.File;
@@ -55,6 +56,18 @@ public class StorageFilesDataSource {
         storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
         return FileUtils.getFileName(newPath);
 //        }
+    }
+
+    public String renameCompositionFile(FullComposition composition, String fileName) {
+        String oldPath = composition.getFilePath();
+        String newPath = FileUtils.getChangedFilePath(oldPath, fileName);
+        renameFile(oldPath, newPath);
+
+        Long storageId = composition.getStorageId();
+        if (storageId != null) {
+            storageMusicProvider.updateCompositionFilePath(storageId, newPath);
+        }
+        return newPath;
     }
 
     public List<FilePathComposition> moveCompositionsToFolder(List<Composition> compositions,
@@ -176,6 +189,5 @@ public class StorageFilesDataSource {
             throw new RuntimeException("file wasn't renamed");
         }
     }
-
 
 }

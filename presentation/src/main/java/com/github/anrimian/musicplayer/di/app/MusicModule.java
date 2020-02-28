@@ -18,7 +18,6 @@ import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRep
 import com.github.anrimian.musicplayer.data.repositories.source.SourceRepository;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
@@ -110,8 +109,7 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    LibraryRepository musicProviderRepository(StorageMusicDataSource storageMusicDataSource,
-                                              StorageFilesDataSource storageFilesDataSource,
+    LibraryRepository musicProviderRepository(StorageFilesDataSource storageFilesDataSource,
                                               CompositionsDaoWrapper compositionsDao,
                                               ArtistsDaoWrapper artistsDao,
                                               AlbumsDaoWrapper albumsDao,
@@ -119,7 +117,7 @@ class MusicModule {
                                               FoldersDaoWrapper foldersDao,
                                               SettingsRepository settingsPreferences,
                                               @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new LibraryRepositoryImpl(storageMusicDataSource,
+        return new LibraryRepositoryImpl(
                 storageFilesDataSource,
                 compositionsDao,
                 artistsDao,

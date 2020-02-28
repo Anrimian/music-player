@@ -8,16 +8,12 @@ import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
-import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
-import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -27,10 +23,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.source.Composit
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
-import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -45,14 +39,12 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource.renameFile;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class EditorRepositoryImpl implements EditorRepository {
 
     private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor();
 
-    private final StorageMusicDataSource storageMusicDataSource;
     private final StorageFilesDataSource filesDataSource;
     private final CompositionsDaoWrapper compositionsDao;
     private final AlbumsDaoWrapper albumsDao;
@@ -64,8 +56,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final StateRepository stateRepository;
     private final Scheduler scheduler;
 
-    public EditorRepositoryImpl(StorageMusicDataSource storageMusicDataSource,
-                                StorageFilesDataSource filesDataSource,
+    public EditorRepositoryImpl(StorageFilesDataSource filesDataSource,
                                 CompositionsDaoWrapper compositionsDao,
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
@@ -75,7 +66,6 @@ public class EditorRepositoryImpl implements EditorRepository {
                                 StorageGenresProvider storageGenresProvider,
                                 StateRepository stateRepository,
                                 Scheduler scheduler) {
-        this.storageMusicDataSource = storageMusicDataSource;
         this.filesDataSource = filesDataSource;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
@@ -170,20 +160,22 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionTitle(FullComposition composition, String title) {
         return sourceEditor.setCompositionTitle(composition.getFilePath(), title)
-                .andThen(storageMusicDataSource.updateCompositionTitle(composition, title))
                 .doOnComplete(() -> {
+                    Long storageId = composition.getStorageId();
+                    if (storageId != null) {
+                        storageMusicProvider.updateCompositionTitle(storageId, title);
+                    }
                     compositionsDao.updateTitle(composition.getId(), title);
-                    storageMusicProvider.scanMedia(composition.getFilePath());
                 })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
-        return Single.fromCallable(() -> FileUtils.getChangedFilePath(composition.getFilePath(), fileName))
-                .doOnSuccess(newPath -> renameFile(composition.getFilePath(), newPath))
-                .flatMapCompletable(newPath -> storageMusicDataSource.updateCompositionFilePath(composition, newPath))
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            String newPath = filesDataSource.renameCompositionFile(composition, fileName);
+            compositionsDao.updateFilePath(composition.getId(), newPath);
+        }).subscribeOn(scheduler);
     }
 
     @Override

@@ -17,12 +17,10 @@ import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoW
 import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
-import com.github.anrimian.musicplayer.data.storage.files.FileManager;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
@@ -75,16 +73,7 @@ public class StorageModule {
 
     @Provides
     @Nonnull
-    @Singleton
-    StorageMusicDataSource storageMusicDataSource(StorageMusicProvider musicProvider,
-                                                  CompositionsDaoWrapper compositionsDao) {
-        return new StorageMusicDataSource(musicProvider, compositionsDao);
-    }
-
-    @Provides
-    @Nonnull
-    EditorRepository compositionEditorRepository(StorageMusicDataSource storageMusicDataSource,
-                                                 StorageFilesDataSource filesDataSource,
+    EditorRepository compositionEditorRepository(StorageFilesDataSource filesDataSource,
                                                  CompositionsDaoWrapper compositionsDao,
                                                  AlbumsDaoWrapper albumsDao,
                                                  ArtistsDaoWrapper artistsDao,
@@ -94,7 +83,7 @@ public class StorageModule {
                                                  StorageGenresProvider storageGenresProvider,
                                                  StateRepository stateRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new EditorRepositoryImpl(storageMusicDataSource,
+        return new EditorRepositoryImpl(
                 filesDataSource,
                 compositionsDao,
                 albumsDao,
