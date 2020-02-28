@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
+import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -132,19 +133,10 @@ public class CompositionsDaoWrapper {
         compositionsDao.updateFilePath(id, filePath);
     }
 
-    public void updateFilesPath(List<Composition> compositions) {
+    public void updateFilesPath(List<FilePathComposition> compositions) {
         appDatabase.runInTransaction(() -> {
-            for (Composition composition: compositions) {
+            for (FilePathComposition composition: compositions) {
                 compositionsDao.updateFilePath(composition.getId(), composition.getFilePath());
-            }
-        });
-    }
-
-    public void updateFilesPath(List<Composition> compositions, String oldPath, String newPath) {
-        appDatabase.runInTransaction(() -> {
-            for (Composition composition: compositions) {
-                String path = composition.getFilePath().replace(oldPath, newPath);
-                compositionsDao.updateFilePath(composition.getId(), path);
             }
         });
     }

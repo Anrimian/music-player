@@ -1,14 +1,14 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
+import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
-
-import io.reactivex.Completable;
 
 public class StorageFilesDataSource {
 
@@ -20,7 +20,8 @@ public class StorageFilesDataSource {
 
     public String renameCompositionsFolder(List<Composition> compositions,
                                            String oldPath,
-                                           String newName) {
+                                           String newName,
+                                           List<FilePathComposition> updatedCompositions) {
 //        Log.d("KEK2", "changeFolderName, oldPath: " + oldPath);
 //        Log.d("KEK2", "changeFolderName, newPath: " + newPath);
 
@@ -35,33 +36,53 @@ public class StorageFilesDataSource {
         //seems working for android <10, implement for scoped storage
         String newPath = FileUtils.getChangedFilePath(oldPath, newName);
         renameFile(oldPath, newPath);
-        storageMusicProvider.updateCompositionsFilePath(compositions, oldPath, newPath);
-        return newPath;
+
+        for (Composition composition: compositions) {
+            String oldFilePath = composition.getFilePath();
+            String newFilePath = FileUtils.safeReplacePath(oldFilePath, oldPath, newPath);
+
+            updatedCompositions.add(new FilePathComposition(
+                    composition.getId(),
+                    composition.getStorageId(),
+                    newFilePath)
+            );
+        }
+
+        storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
+        return FileUtils.getFileName(newPath);
 //        }
     }
 
-    public void moveCompositionsToFolder(List<Composition> compositions,
-                                         String fromPath,
-                                         String toPath) {
-//        Log.d("KEK2", "changeFolderName, fromPath: " + fromPath);
-//        Log.d("KEK2", "changeFolderName, toPath: " + toPath);
+    public List<FilePathComposition> moveCompositionsToFolder(List<Composition> compositions,
+                                                              String fromPath,
+                                                              String toPath) {
+//        Log.d("KEK2", "moveCompositionsToFolder, fromPath: " + fromPath);
+//        Log.d("KEK2", "moveCompositionsToFolder, toPath: " + toPath);
 
+        List<FilePathComposition> updatedCompositions = new LinkedList<>();
         for (Composition composition: compositions) {
             String oldPath = composition.getFilePath();
-            String newPath = FileUtils.getChangedFilePath(oldPath, fromPath, toPath);
+            String newPath = FileUtils.safeReplacePath(oldPath, fromPath, toPath);
 
 //            Log.d("KEK2", "rename file, oldPath: " + oldPath);
 //            Log.d("KEK2", "rename file, newPath: " + newPath);
 
             moveFile(oldPath, newPath);
+
+            updatedCompositions.add(new FilePathComposition(composition.getId(),
+                    composition.getStorageId(),
+                    newPath)
+            );
         }
-        storageMusicProvider.updateCompositionsFilePath(compositions, fromPath, toPath);
+        storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
+        return updatedCompositions;
     }
 
     public String moveCompositionsToNewFolder(List<Composition> compositions,
                                               String fromPath,
                                               String toParentPath,
-                                              String directoryName) {
+                                              String directoryName,
+                                              List<FilePathComposition> updatedCompositions) {
         String newFolderPath = toParentPath + '/' + directoryName;
         createDirectory(newFolderPath);
 
@@ -70,9 +91,14 @@ public class StorageFilesDataSource {
             String newPath = FileUtils.getChangedFilePath(oldPath, fromPath, newFolderPath);
 
             moveFile(oldPath, newPath);
+
+            updatedCompositions.add(new FilePathComposition(composition.getId(),
+                    composition.getStorageId(),
+                    newPath)
+            );
         }
-        storageMusicProvider.updateCompositionsFilePath(compositions, fromPath, newFolderPath);
-        return newFolderPath;
+        storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
+        return FileUtils.getFileName(newFolderPath);
     }
 
     private void createDirectory(String path) {

@@ -36,11 +36,7 @@ public interface EditorRepository {
 
     Completable changeCompositionFileName(FullComposition composition, String fileName);
 
-    Completable changeCompositionsFilePath(List<Composition> compositions);
-
     Completable changeFolderName(long folderId, String folderName);
-
-    Single<String> moveFile(String filePath, String oldPath, String newPath);
 
     Completable moveFiles(Collection<FileSource> files,
                           @Nullable Long fromFolderId,
@@ -50,8 +46,6 @@ public interface EditorRepository {
                                         @Nullable Long fromFolderId,
                                         @Nullable Long targetParentFolderId,
                                         String directoryName);
-
-    Completable createDirectory(String path);
 
     Completable updateAlbumName(String name, long id);
 

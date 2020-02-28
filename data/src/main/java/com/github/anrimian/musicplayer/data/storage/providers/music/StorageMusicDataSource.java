@@ -81,13 +81,6 @@ public class StorageMusicDataSource {
         });
     }
 
-    public Completable updateCompositionsFilePath(List<Composition> compositions) {
-        return Completable.fromAction(() -> {
-            compositionsDao.updateFilesPath(compositions);
-            musicProvider.updateCompositionsFilePath(compositions);
-        }).subscribeOn(scheduler);
-    }
-
     private void deleteFiles(List<Composition> compositions) {
         for (Composition composition: compositions) {
             deleteCompositionFile(composition);

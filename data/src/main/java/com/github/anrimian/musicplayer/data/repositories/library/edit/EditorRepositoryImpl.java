@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -32,6 +33,7 @@ import com.github.anrimian.musicplayer.domain.utils.Objects;
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -179,14 +181,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Single.fromCallable(() -> FileUtils.getChangedFilePath(composition.getFilePath(), fileName))
-                .flatMap(newPath -> runRenameFile(composition.getFilePath(), newPath))
+                .doOnSuccess(newPath -> renameFile(composition.getFilePath(), newPath))
                 .flatMapCompletable(newPath -> storageMusicDataSource.updateCompositionFilePath(composition, newPath))
-                .subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable changeCompositionsFilePath(List<Composition> compositions) {
-        return storageMusicDataSource.updateCompositionsFilePath(compositions)
                 .subscribeOn(scheduler);
     }
 
@@ -196,23 +192,17 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .map(fullPath -> {
                     List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId);
 
-                    String newPath = filesDataSource.renameCompositionsFolder(compositions, fullPath, newName);
+                    List<FilePathComposition> updatedCompositions = new LinkedList<>();
+                    String name = filesDataSource.renameCompositionsFolder(compositions,
+                            fullPath,
+                            newName,
+                            updatedCompositions);
 
-                    compositionsDao.updateFilesPath(compositions, fullPath, newPath);
-                    return FileUtils.getFileName(fullPath);
+                    compositionsDao.updateFilesPath(updatedCompositions);
+                    return name;
                 })
                 .doOnSuccess(name -> foldersDao.changeFolderName(folderId, name))
                 .ignoreElement()
-                .subscribeOn(scheduler);
-    }
-
-    @Override
-    public Single<String> moveFile(String filePath, String oldPath, String newPath) {
-        if (Objects.equals(oldPath, newPath)) {
-            return Single.error(new MoveInTheSameFolderException("move in the same folder"));
-        }
-        return Single.fromCallable(() -> FileUtils.getChangedFilePath(filePath, oldPath, newPath))
-                .flatMap(path -> runRenameFile(filePath, path))
                 .subscribeOn(scheduler);
     }
 
@@ -225,9 +215,8 @@ public class EditorRepositoryImpl implements EditorRepository {
                         getFullFolderPath(toFolderId),
                         compositionsDao.extractAllCompositionsFromFiles(files),
                         (fromPath, toPath, compositions) -> {
-                            filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);
-
-                            compositionsDao.updateFilesPath(compositions, fromPath, toPath);
+                            List<FilePathComposition> updateCompositions = filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);
+                            compositionsDao.updateFilesPath(updateCompositions);
                             return TRIGGER;
                         }))
                 .ignoreElement()
@@ -244,32 +233,20 @@ public class EditorRepositoryImpl implements EditorRepository {
                 getFullFolderPath(targetParentFolderId),
                 compositionsDao.extractAllCompositionsFromFiles(files),
                 (fromPath, toParentPath, compositions) -> {
-                    String destPath = filesDataSource.moveCompositionsToNewFolder(compositions,
+                    List<FilePathComposition> updatedCompositions = new LinkedList<>();
+                    String name = filesDataSource.moveCompositionsToNewFolder(compositions,
                             fromPath,
                             toParentPath,
-                            directoryName);
+                            directoryName,
+                            updatedCompositions);
 
-                    compositionsDao.updateFilesPath(compositions, fromPath, destPath);
+                    compositionsDao.updateFilesPath(updatedCompositions);
 
-                    String name = FileUtils.getFileName(destPath);
                     return foldersDao.createFolder(targetParentFolderId, name);
                 })
                 .doOnSuccess(folderId -> foldersDao.updateFolderId(files, folderId))
                 .ignoreElement()
                 .subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable createDirectory(String path) {
-        return Completable.fromAction(() -> {
-            File file = new File(path);
-            if (file.exists()) {
-                throw new FileExistsException();
-            }
-            if (!file.mkdir()) {
-                throw new Exception("file not created, path: " + path);
-            }
-        }).subscribeOn(scheduler);
     }
 
     @Override
@@ -380,13 +357,6 @@ public class EditorRepositoryImpl implements EditorRepository {
             if (genresDao.isGenreExists(name)) {
                 throw new GenreAlreadyExistsException();
             }
-        });
-    }
-
-    private Single<String> runRenameFile(String oldPath, String newPath) {
-        return Single.fromCallable(() -> {
-            renameFile(oldPath, newPath);
-            return newPath;
         });
     }
 

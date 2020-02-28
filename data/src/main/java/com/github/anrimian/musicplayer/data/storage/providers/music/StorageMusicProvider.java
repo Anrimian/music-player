@@ -35,7 +35,6 @@ import io.reactivex.Observable;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
-import static android.text.TextUtils.regionMatches;
 
 public class StorageMusicProvider {
 
@@ -191,19 +190,16 @@ public class StorageMusicProvider {
         updateComposition(id, MediaStore.Audio.AudioColumns.DATA, filePath);
     }
 
-    public void updateCompositionsFilePath(List<Composition> compositions,
-                                           String oldPath,
-                                           String newPath) {
+    public void updateCompositionsFilePath(List<FilePathComposition> compositions) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
-        for (Composition composition: compositions) {
+        for (FilePathComposition composition: compositions) {
             Long storageId = composition.getStorageId();
             if (storageId == null) {
                 continue;
             }
-            String path = composition.getFilePath().replace(oldPath, newPath);
             ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
-                    .withValue(Media.DATA, path)
+                    .withValue(Media.DATA, composition.getFilePath())
                     .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
@@ -273,29 +269,6 @@ public class StorageMusicProvider {
             ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
                     .withValue(Media.RELATIVE_PATH, newPath)//we can't move? Path seems right
                     .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
-                    .build();
-
-            operations.add(operation);
-        }
-
-        try {
-            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
-        } catch (OperationApplicationException | RemoteException e) {
-            throw new UpdateMediaStoreException(e);
-        }
-    }
-
-    public void updateCompositionsFilePath(List<Composition> compositions) {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-
-        for (Composition composition: compositions) {
-            Long storageId = composition.getStorageId();
-            if (storageId == null) {
-                continue;
-            }
-            ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
-                    .withValue(Media.DATA, composition.getFilePath())
-                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
             operations.add(operation);
