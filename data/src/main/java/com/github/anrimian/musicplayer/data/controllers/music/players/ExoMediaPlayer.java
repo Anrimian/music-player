@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import android.content.Context;
-import android.net.Uri;
 
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -18,12 +18,10 @@ import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.upstream.ContentDataSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
-import com.google.android.exoplayer2.upstream.FileDataSource;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -41,10 +39,12 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
 
-    private final SimpleExoPlayer player;
-
+    private final Context context;
+    private final CompositionSourceProvider sourceRepository;
     private final Scheduler scheduler;
     private final PlayerErrorParser playerErrorParser;
+
+    private final SimpleExoPlayer player;
 
     @Nullable
     private Disposable trackPositionDisposable;
@@ -52,15 +52,18 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     private Composition currentComposition;
 
     public ExoMediaPlayer(Context context,
+                          CompositionSourceProvider sourceRepository,
                           Scheduler scheduler,
                           PlayerErrorParser playerErrorParser) {
+        this.context = context;
+        this.playerErrorParser = playerErrorParser;
+        this.sourceRepository = sourceRepository;
         this.scheduler = scheduler;
         player = ExoPlayerFactory.newSimpleInstance(
                 context,
                 new DefaultRenderersFactory(context),
                 new DefaultTrackSelector(),
                 new DefaultLoadControl());
-        this.playerErrorParser = playerErrorParser;
 
         PlayerEventListener playerEventListener = new PlayerEventListener(
                 () -> playerEventSubject.onNext(new FinishedEvent(currentComposition)),
@@ -77,7 +80,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
         this.currentComposition = composition;
-        checkComposition(composition)
+        Single.fromCallable(() -> composition)
                 .flatMap(this::prepareMediaSource)
                 .ignoreElement()
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
@@ -177,29 +180,19 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         }
     }
 
-    private Single<Composition> checkComposition(Composition composition) {
-        return Single.fromCallable(() -> {
-            File file = new File(composition.getFilePath());
-            if (!file.exists()) {
-                throw new FileNotFoundException(composition.getFilePath() + " not found");
-            }
-            return composition;
-        });
-    }
-
     private Single<MediaSource> prepareMediaSource(Composition composition) {
-        return Single.create(emitter -> {
-            Uri uri = Uri.fromFile(new File(composition.getFilePath()));
-            DataSpec dataSpec = new DataSpec(uri);
-            final FileDataSource fileDataSource = new FileDataSource();
-            fileDataSource.open(dataSpec);
+        return sourceRepository.getCompositionUri(composition.getId())
+                .map(uri -> {
+                    DataSpec dataSpec = new DataSpec(uri);
+                    final ContentDataSource dataSource = new ContentDataSource(context);
+                    dataSource.open(dataSpec);
 
-            DataSource.Factory factory = () -> fileDataSource;
-            MediaSource mediaSource = new ExtractorMediaSource.Factory(factory)
-                    .setExtractorsFactory(new DefaultExtractorsFactory())
-                    .createMediaSource(uri);
-            player.prepare(mediaSource);
-            emitter.onSuccess(mediaSource);
-        });
+                    DataSource.Factory factory = () -> dataSource;
+                    MediaSource mediaSource = new ExtractorMediaSource.Factory(factory)
+                            .setExtractorsFactory(new DefaultExtractorsFactory())
+                            .createMediaSource(uri);
+                    player.prepare(mediaSource);
+                    return mediaSource;
+                });
     }
 }

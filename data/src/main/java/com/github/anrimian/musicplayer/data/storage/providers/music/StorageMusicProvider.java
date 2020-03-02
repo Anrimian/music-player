@@ -10,6 +10,7 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 
@@ -26,6 +27,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -285,12 +287,20 @@ public class StorageMusicProvider {
     }
 
     public Uri getCompositionUri(long id) {
-        //not correct, we expect file uri
         return ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, id);
     }
 
     public InputStream getCompositionStream(long id) throws FileNotFoundException {
         return contentResolver.openInputStream(getCompositionUri(id));
+    }
+
+    public FileDescriptor getFileDescriptor(long id) throws FileNotFoundException {
+        Uri uri = getCompositionUri(id);
+        ParcelFileDescriptor fd = contentResolver.openFileDescriptor(uri, "r");
+        if (fd == null) {
+            throw new RuntimeException("file descriptor not found");
+        }
+        return fd.getFileDescriptor();
     }
 
     private void updateComposition(long id, String key, String value) {

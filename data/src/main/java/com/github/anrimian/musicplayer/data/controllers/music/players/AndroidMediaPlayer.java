@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
@@ -12,9 +13,8 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -35,6 +35,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
 
     private final Scheduler scheduler;
+    private final CompositionSourceProvider sourceRepository;
     private final PlayerErrorParser playerErrorParser;
     private final Analytics analytics;
 
@@ -53,10 +54,13 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private boolean playWhenReady = false;
     private boolean isPlaying = false;
 
+    //problem with error case(file not found), multiple error events
     public AndroidMediaPlayer(Scheduler scheduler,
+                              CompositionSourceProvider sourceRepository,
                               PlayerErrorParser playerErrorParser,
                               Analytics analytics) {
         this.scheduler = scheduler;
+        this.sourceRepository = sourceRepository;
         this.playerErrorParser = playerErrorParser;
         this.analytics = analytics;
         mediaPlayer = new MediaPlayer();
@@ -80,7 +84,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     public void prepareToPlay(Composition composition, long startPosition) {
         this.currentComposition = composition;
         RxUtils.dispose(preparationDisposable);
-        preparationDisposable = checkComposition(composition)
+        preparationDisposable = Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
@@ -152,16 +156,6 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         mediaPlayer.release();
     }
 
-    private Single<Composition> checkComposition(Composition composition) {
-        return Single.fromCallable(() -> {
-            File file = new File(composition.getFilePath());
-            if (!file.exists()) {
-                throw new FileNotFoundException(composition.getFilePath() + " not found");
-            }
-            return composition;
-        });
-    }
-
     private void startTracingTrackPosition() {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
@@ -219,12 +213,15 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     private Completable prepareMediaSource(Composition composition) {
-        return Completable.fromAction(() -> {
-            mediaPlayer.reset();
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setDataSource(composition.getFilePath());
-            mediaPlayer.prepare();
-        }).doOnSubscribe(d -> isSourcePrepared = false)
+        return sourceRepository.getCompositionFileDescriptor(composition.getId())
+                .doOnSuccess(fileDescriptor -> {
+                    mediaPlayer.reset();
+                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    mediaPlayer.setDataSource(fileDescriptor);
+                    mediaPlayer.prepare();
+                })
+                .ignoreElement()
+                .doOnSubscribe(d -> isSourcePrepared = false)
                 .doOnComplete(this::onSourcePrepared);
     }
 
