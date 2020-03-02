@@ -108,6 +108,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
     }
 
     protected void applyViewLogic(RemoteViews widgetView,
+                                  AppWidgetManager appWidgetManager,
+                                  int widgetId,
                                   Context context,
                                   boolean play,
                                   String compositionName,
@@ -177,6 +179,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         RemoteViews widgetView = new RemoteViews(context.getPackageName(), getRemoteViewId());
 
         applyViewLogic(widgetView,
+                appWidgetManager,
+                widgetId,
                 context,
                 play,
                 compositionName,
