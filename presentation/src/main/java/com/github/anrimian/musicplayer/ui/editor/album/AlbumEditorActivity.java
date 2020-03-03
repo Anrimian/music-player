@@ -100,9 +100,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeNameClickableArea, () -> copyText(tvName, tvNameHint));
 
-        @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
-        Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
-        setStatusBarColor(getWindow(), statusBarColor);
+        Slidr.attach(this);
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,

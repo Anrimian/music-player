@@ -183,9 +183,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         onLongClick(changeAlbumClickableArea, () -> copyText(tvAlbum, tvAlbumHint));
         onLongClick(changeAlbumArtistClickableArea, () -> copyText(tvAlbumArtist, tvAlbumArtistHint));
 
-        @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
-        Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
-        setStatusBarColor(getWindow(), statusBarColor);
+        Slidr.attach(this);
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
