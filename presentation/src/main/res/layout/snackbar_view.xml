@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <Button
-        android:id="@+id/snackbar_action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/design_snackbar_extra_spacing_horizontal"
-        android:layout_marginStart="@dimen/design_snackbar_extra_spacing_horizontal"
-        android:layout_gravity="center_vertical|right|end"
-        android:paddingTop="@dimen/design_snackbar_padding_vertical"
-        android:paddingBottom="@dimen/design_snackbar_padding_vertical"
-        android:paddingLeft="@dimen/design_snackbar_padding_horizontal"
-        android:paddingRight="@dimen/design_snackbar_padding_horizontal"
-        android:visibility="gone"
-        android:textColor="?attr/colorAccent"
-        style="?attr/borderlessButtonStyle"/>
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_snackbar">
 
     <TextView
-        android:gravity="center_vertical|right"
-        android:id="@+id/snackbar_text"
-        android:layout_width="wrap_content"
+        style="@style/TextStyle.Snackbar"
+        android:id="@+id/tv_message"
+        android:gravity="center_vertical|start"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingTop="@dimen/design_snackbar_padding_vertical"
-        android:paddingBottom="@dimen/design_snackbar_padding_vertical"
-        android:paddingLeft="@dimen/design_snackbar_padding_horizontal"
-        android:paddingRight="@dimen/design_snackbar_padding_horizontal"
-        android:textAppearance="@style/TextAppearance.Design.Snackbar.Message"
-        android:maxLines="@integer/design_snackbar_text_max_lines"
-        android:layout_gravity="center_vertical|left|start"
-        android:ellipsize="end"/>
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginTop="@dimen/snackbar_padding_vertical"
+        android:layout_marginBottom="@dimen/snackbar_padding_vertical"
+        android:layout_marginStart="@dimen/snackbar_padding_start"
+        android:textColor="?android:attr/textColorPrimaryInverse"
+        android:maxLines="@integer/snackbar_max_lines"
+        android:ellipsize="end"
+        tools:text="messagemessagemessagemessagemessagemessage"/>
+
+    <Button
+        style="@style/ButtonBorderlessStyle"
+        android:id="@+id/tv_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginStart="@dimen/snackbar_margin_content"
+        android:layout_marginEnd="@dimen/snackbar_padding_end"
+        android:layout_marginTop="@dimen/snackbar_padding_vertical"
+        android:layout_marginBottom="@dimen/snackbar_padding_vertical"
+        android:textColor="?attr/colorAccent"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="retry"/>
 
 </LinearLayout>

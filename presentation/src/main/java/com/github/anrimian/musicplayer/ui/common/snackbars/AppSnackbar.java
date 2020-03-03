@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.snackbars;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +25,15 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
 
         ContentViewCallback callback = new ContentViewCallback(view);
         AppSnackbar appSnackbar = new AppSnackbar(parent, view, callback);
-        appSnackbar.getView().setPadding(0, 0, 0, 0);
+        View snackbarView = appSnackbar.getView();
+        int padding = parent.getResources().getDimensionPixelSize(R.dimen.snackbar_margin);
+        snackbarView.setPadding(padding, padding, padding, padding);
+        snackbarView.setBackgroundColor(Color.TRANSPARENT);
 
-        TextView textView = appSnackbar.getView().findViewById(R.id.snackbar_text);
+        TextView textView = snackbarView.findViewById(R.id.tv_message);
         textView.setText(text);
 
-        Button actionView = appSnackbar.getView().findViewById(R.id.snackbar_action);
+        Button actionView = snackbarView.findViewById(R.id.tv_action);
         actionView.setText(actionText);
         actionView.setVisibility(View.VISIBLE);
         actionView.setOnClickListener(v -> {
@@ -37,7 +41,7 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
             appSnackbar.dismiss();
         });
 
-        appSnackbar.setDuration(2000);
+        appSnackbar.setDuration(20000);
         return appSnackbar;
     }
 
@@ -48,13 +52,13 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
     }
 
     public AppSnackbar setText(CharSequence text) {
-        TextView textView = getView().findViewById(R.id.snackbar_text);
+        TextView textView = getView().findViewById(R.id.tv_message);
         textView.setText(text);
         return this;
     }
 
     public AppSnackbar setAction(CharSequence text, final Runnable  listener) {
-        Button actionView = getView().findViewById(R.id.snackbar_action);
+        Button actionView = getView().findViewById(R.id.tv_action);
         actionView.setText(text);
         actionView.setVisibility(View.VISIBLE);
         actionView.setOnClickListener(view -> {

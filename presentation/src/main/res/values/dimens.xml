@@ -104,4 +104,14 @@
 
     <!--notification-->
     <dimen name="notification_large_icon_size">300dp</dimen>
+
+    <!--snackbar-->
+    <integer name="snackbar_max_lines">3</integer>
+    <dimen name="snackbar_padding_start">16dp</dimen>
+    <dimen name="snackbar_padding_end">8dp</dimen>
+    <dimen name="snackbar_padding_vertical">16dp</dimen>
+    <dimen name="snackbar_margin_content">16dp</dimen>
+    <dimen name="snackbar_margin">8dp</dimen>
+    <dimen name="snackbar_corners">4dp</dimen>
+
 </resources>
