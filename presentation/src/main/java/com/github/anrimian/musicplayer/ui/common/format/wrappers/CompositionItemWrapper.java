@@ -16,7 +16,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.ui.common.format.DescriptionSpannableStringBuilder;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 
 import java.util.List;
 

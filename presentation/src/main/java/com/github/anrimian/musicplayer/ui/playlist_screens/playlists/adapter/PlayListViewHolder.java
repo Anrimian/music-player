@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.ui.common.format.DescriptionSpannableStringBuilder;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
 import butterknife.BindView;

@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.ui.common.format.DescriptionSpannableStringBuilder;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;

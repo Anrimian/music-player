@@ -1,9 +1,13 @@
-package com.github.anrimian.musicplayer.ui.common.format;
+package com.github.anrimian.musicplayer.ui.common.format.description;
 
 import android.content.Context;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.style.ImageSpan;
 
 import androidx.annotation.NonNull;
+
+import com.github.anrimian.musicplayer.R;
 
 public class DescriptionSpannableStringBuilder extends SpannableStringBuilder {
 
@@ -27,7 +31,14 @@ public class DescriptionSpannableStringBuilder extends SpannableStringBuilder {
     @Override
     public SpannableStringBuilder append(CharSequence text) {
         if (length() > 0) {
-            super.append(" ● ");//TODO split problem • ●
+//            super.append(" ● ");//just for compare
+
+            //problems on line switch - circle missing
+            super.append("   ");
+            ImageSpan imageSpan = new CenteredImageSpan(context, R.drawable.ic_description_text_circle);
+            setSpan(imageSpan, length() - 2, length() - 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+
+//            super.append(" ● ");
         }
         return super.append(text);
     }
