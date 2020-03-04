@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -27,6 +28,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DimenRes;
 import androidx.annotation.DrawableRes;
@@ -36,8 +38,12 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 
 import static android.text.TextUtils.isEmpty;
+import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
+import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 /**
  * Created on 16.02.2017.
@@ -208,6 +214,22 @@ public class AndroidUtils {
             v.vibrate(VibrationEffect.createOneShot(vibrationTime, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
             v.vibrate(vibrationTime);
+        }
+    }
+
+    //evaluate color on transition?
+    public static void setNavigationBarColor(Activity activity, @AttrRes int attrRes) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            Window window = activity.getWindow();
+
+            int color = AndroidUtils.getColorFromAttr(activity, attrRes);
+            window.setNavigationBarColor(color);
+            if (ColorUtils.calculateLuminance(color) >= 0.5f) {//white
+                View decorView = window.getDecorView();
+                decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+
+            }
         }
     }
 }

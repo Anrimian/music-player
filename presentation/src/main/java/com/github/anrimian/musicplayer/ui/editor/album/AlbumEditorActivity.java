@@ -88,6 +88,8 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         setContentView(R.layout.activity_album_edit);
         ButterKnife.bind(this);
 
+        AndroidUtils.setNavigationBarColor(this, android.R.attr.colorBackground);
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

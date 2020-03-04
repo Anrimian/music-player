@@ -157,6 +157,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         setContentView(R.layout.activity_composition_edit);
         ButterKnife.bind(this);
 
+        AndroidUtils.setNavigationBarColor(this, android.R.attr.colorBackground);
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
