@@ -60,8 +60,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void pause() {
-        mediaPlayer.pause();
         uiStateRepository.setTrackPosition(mediaPlayer.getTrackPosition());
+        mediaPlayer.pause();
     }
 
     @Override
