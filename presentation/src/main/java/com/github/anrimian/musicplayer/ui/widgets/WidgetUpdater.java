@@ -93,7 +93,6 @@ public class WidgetUpdater {
         if (item != null) {
             compositionName = formatCompositionName(item.getComposition());
             compositionAuthor = formatCompositionAuthor(item.getComposition(), context).toString();
-            compositionFile = item.getComposition().getFilePath();
             compositionId = item.getComposition().getId();
         }
         updateComposition(compositionName, compositionAuthor, compositionFile, compositionId);
@@ -105,7 +104,6 @@ public class WidgetUpdater {
                                    long compositionId) {
         WidgetDataHolder.setCompositionName(context, compositionName);
         WidgetDataHolder.setCompositionAuthor(context, compositionAuthor);
-        WidgetDataHolder.setCompositionFile(context, compositionFile);
         WidgetDataHolder.setCompositionId(context, compositionId);
 
         updateWidgets(intent -> {

@@ -213,7 +213,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     private Completable prepareMediaSource(Composition composition) {
-        return sourceRepository.getCompositionFileDescriptor(composition.getId())
+        return sourceRepository.getCompositionFileDescriptorSingle(composition.getId())
                 .doOnSuccess(fileDescriptor -> {
                     mediaPlayer.reset();
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);

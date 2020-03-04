@@ -46,7 +46,7 @@ public class CompositionSourceProvider {
                 .collect(ArrayList::new, List::add);
     }
 
-    public Single<FileDescriptor> getCompositionFileDescriptor(long compositionId) {
+    public Single<FileDescriptor> getCompositionFileDescriptorSingle(long compositionId) {
         return Single.fromCallable(() -> compositionsDao.getStorageId(compositionId))
                 .map(storageMusicProvider::getFileDescriptor)
                 .timeout(1, TimeUnit.SECONDS)
@@ -58,9 +58,9 @@ public class CompositionSourceProvider {
         return storageMusicProvider.getCompositionStream(storageId);
     }
 
-//    public Uri getCompositionUri(long compositionId) {
-//        long storageId =  compositionsDao.getStorageId(compositionId);
-//        return storageMusicProvider.getCompositionUri(storageId);
-//    }
+    public FileDescriptor getCompositionFileDescriptor(long compositionId) throws FileNotFoundException {
+        long storageId =  compositionsDao.getStorageId(compositionId);
+        return storageMusicProvider.getFileDescriptor(storageId);
+    }
 
 }
