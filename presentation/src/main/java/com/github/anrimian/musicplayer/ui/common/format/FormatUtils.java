@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common.format;
 
 import android.content.Context;
+import android.text.SpannableStringBuilder;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
@@ -85,29 +86,27 @@ public class FormatUtils {
         return sb.toString();
     }
 
-    public static String formatArtistAdditionalInfo(Context context, Artist artist) {
-        StringBuilder sb = new StringBuilder();
+    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context, Artist artist) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context);
         sb.append(formatCompositionsCount(context, artist.getCompositionsCount()));
         int albumsCount = artist.getAlbumsCount();
         if (albumsCount > 0) {
-            sb.append(" ● ");//TODO split problem • ●
             sb.append(formatAlbumsCount(context, albumsCount));
         }
-        return sb.toString();
+        return sb;
     }
 
-    public static String formatAlbumAdditionalInfo(Context context, Album album) {
-        StringBuilder sb = new StringBuilder();
+    public static SpannableStringBuilder formatAlbumAdditionalInfo(Context context, Album album) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context);
         String artist = album.getArtist();
         if (!isEmpty(artist)) {
             sb.append(artist);
-            sb.append(" ● ");//TODO split problem • ●
         }
         sb.append(formatCompositionsCount(
                 context,
                 album.getCompositionsCount())
         );
-        return sb.toString();
+        return sb;
     }
 
     public static int getOrderTitle(OrderType orderType) {
