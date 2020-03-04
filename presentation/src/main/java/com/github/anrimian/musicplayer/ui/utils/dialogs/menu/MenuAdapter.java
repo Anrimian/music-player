@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,10 +15,14 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
 
     private final Menu menu;
 
+    @LayoutRes
+    private final int menuViewRes;
+
     private OnItemClickListener<MenuItem> onItemClickListener;
 
-    public MenuAdapter(Menu menu) {
+    public MenuAdapter(Menu menu, @LayoutRes int menuViewRes) {
         this.menu = menu;
+        this.menuViewRes = menuViewRes;
     }
 
     @NonNull
@@ -25,6 +30,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
     public MenuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MenuViewHolder(LayoutInflater.from(parent.getContext()),
                 parent,
+                menuViewRes,
                 onItemClickListener);
     }
 

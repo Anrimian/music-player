@@ -138,7 +138,7 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         composition = CompositionSerializer.deserialize(args.getBundle(COMPOSITION_ARG));
 
         Menu menu = createMenu(requireContext(), getArguments().getInt(MENU_ARG));
-        MenuAdapter menuAdapter = new MenuAdapter(menu);
+        MenuAdapter menuAdapter = new MenuAdapter(menu, R.layout.item_menu);
         menuAdapter.setOnItemClickListener(this::onActionItemClicked);
         recyclerView.setAdapter(menuAdapter);
 
