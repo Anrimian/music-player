@@ -12,6 +12,11 @@
         android:importantForAccessibility="no"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalThumbDrawable="@drawable/a_thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/drawable_empty"
+        app:fastScrollVerticalThumbDrawable="@drawable/a_thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/drawable_empty"
         tools:listitem="@layout/item_storage_music" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -19,7 +19,7 @@ ext {
     androidXVersion = "1.1.0-alpha02"
     googleMaterialVersion = "1.1.0-alpha01"
     cardViewVersion = "1.0.0"
-    recyclerViewVersion = "1.0.0"
+    recyclerViewVersion = "1.2.0-alpha01"
     mediaCompatVersion = "1.0.0"
     paletteVersion = "1.0.0"
 
