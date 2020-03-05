@@ -90,7 +90,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     public void stop() {
         Completable.fromRunnable(() -> {
             seekTo(0);
-            player.stop();
+            player.setPlayWhenReady(false);
             stopTracingTrackPosition();
         }).subscribeOn(scheduler).subscribe();
     }
