@@ -13,82 +13,110 @@ import androidx.core.view.ViewCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
 
-    public static AppSnackbar make(ViewGroup parent,
-                                   String text,
-                                   @StringRes int actionText,
-                                   Runnable listener) {
+    private static final int DURATION_SHORT_MILLIS = 2000;
+    private static final int DURATION_LONG_MILLIS = 5000;
+    private static final int DURATION_INDEFINITE_MILLIS = Integer.MAX_VALUE;
+
+    private TextView tvMessage;
+    private Button tvAction;
+
+    public static AppSnackbar make(ViewGroup parent, String text) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.snackbar_view, parent, false);
 
         ContentViewCallback callback = new ContentViewCallback(view);
-        AppSnackbar appSnackbar = new AppSnackbar(parent, view, callback);
+        AppSnackbar appSnackbar = new AppSnackbar(parent, view, callback, text);
         View snackbarView = appSnackbar.getView();
         int padding = parent.getResources().getDimensionPixelSize(R.dimen.snackbar_margin);
         snackbarView.setPadding(padding, padding, padding, padding);
         snackbarView.setBackgroundColor(Color.TRANSPARENT);
 
-        TextView textView = snackbarView.findViewById(R.id.tv_message);
-        textView.setText(text);
-
-        Button actionView = snackbarView.findViewById(R.id.tv_action);
-        actionView.setText(actionText);
-        actionView.setVisibility(View.VISIBLE);
-        actionView.setOnClickListener(v -> {
-            listener.run();
-            appSnackbar.dismiss();
-        });
-
-        appSnackbar.setDuration(20000);
         return appSnackbar;
     }
 
     protected AppSnackbar(@NonNull ViewGroup parent,
                           @NonNull View content,
-                          @NonNull ContentViewCallback contentViewCallback) {
+                          @NonNull ContentViewCallback contentViewCallback,
+                          String message) {
         super(parent, content, contentViewCallback);
+        tvMessage = content.findViewById(R.id.tv_message);
+        tvMessage.setText(message);
+
+        tvAction = content.findViewById(R.id.tv_action);
+        tvAction.setVisibility(View.GONE);
+
+        setDurationMillis(DURATION_SHORT_MILLIS);
     }
 
     public AppSnackbar setText(CharSequence text) {
-        TextView textView = getView().findViewById(R.id.tv_message);
-        textView.setText(text);
+        tvMessage.setText(text);
         return this;
     }
 
-    public AppSnackbar setAction(CharSequence text, final Runnable  listener) {
-        Button actionView = getView().findViewById(R.id.tv_action);
-        actionView.setText(text);
-        actionView.setVisibility(View.VISIBLE);
-        actionView.setOnClickListener(view -> {
+    public AppSnackbar setAction(@StringRes int actionText, Runnable listener) {
+        return setAction(getContext().getString(actionText), listener);
+    }
+
+    public AppSnackbar setAction(CharSequence text, Runnable listener) {
+        tvAction.setText(text);
+        tvAction.setVisibility(View.VISIBLE);
+        tvAction.setOnClickListener(view -> {
             listener.run();
             dismiss();
         });
         return this;
     }
 
+    public AppSnackbar duration(@Snackbar.Duration int duration) {
+        int durationMillis = DURATION_SHORT_MILLIS;
+        switch (duration) {
+            case Snackbar.LENGTH_LONG: {
+                durationMillis = DURATION_LONG_MILLIS;
+                break;
+            }
+            case Snackbar.LENGTH_SHORT: {
+                durationMillis = DURATION_SHORT_MILLIS;
+                break;
+            }
+            case Snackbar.LENGTH_INDEFINITE: {
+                durationMillis = DURATION_INDEFINITE_MILLIS;
+                break;
+            }
+        }
+        return setDurationMillis(durationMillis);
+    }
+
+    public AppSnackbar setDurationMillis(int durationMillis) {
+        setDuration(durationMillis);
+        return this;
+    }
+
     private static class ContentViewCallback implements com.google.android.material.snackbar.ContentViewCallback {
 
-        private View content;
+        private final View content;
 
-        public ContentViewCallback(View content) {
+        ContentViewCallback(View content) {
             this.content = content;
         }
 
         @Override
         public void animateContentIn(int delay, int duration) {
-            ViewCompat.setScaleY(content, 0f);
+            content.setTranslationY(content.getHeight());
             ViewCompat.animate(content)
-                    .scaleY(1f).setDuration(duration)
+                    .translationY(0f)
+                    .setDuration(duration)
                     .setStartDelay(delay);
         }
 
         @Override
         public void animateContentOut(int delay, int duration) {
-            ViewCompat.setScaleY(content, 1f);
+            content.setTranslationY(0f);
             ViewCompat.animate(content)
-                    .scaleY(0f)
+                    .translationY(content.getHeight())
                     .setDuration(duration)
                     .setStartDelay(delay);
         }
