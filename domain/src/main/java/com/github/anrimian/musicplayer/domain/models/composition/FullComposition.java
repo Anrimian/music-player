@@ -19,6 +19,8 @@ public class FullComposition {
     private final String album;
     @Nullable
     private final String albumArtist;
+    @Nonnull
+    private final String fileName;
 
     @Nonnull
     @Deprecated
@@ -44,6 +46,7 @@ public class FullComposition {
                            String title,
                            String album,
                            String albumArtist,
+                           String fileName,
                            String filePath,
                            long duration,
                            long size,
@@ -56,6 +59,7 @@ public class FullComposition {
         this.title = title;
         this.album = album;
         this.albumArtist = albumArtist;
+        this.fileName = fileName;
         this.filePath = filePath;
         this.duration = duration;
         this.size = size;
@@ -89,6 +93,11 @@ public class FullComposition {
     @Nullable
     public String getAlbum() {
         return album;
+    }
+
+    @Nonnull
+    public String getFileName() {
+        return fileName;
     }
 
     @Deprecated

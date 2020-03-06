@@ -34,6 +34,7 @@ public class TestDataProvider {
                 albumId,
                 folderId,
                 title,
+                "test file name",
                 "test file path",
                 100L,
                 100L,
@@ -113,6 +114,7 @@ public class TestDataProvider {
     public static Composition fakeComposition(long id) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 String.valueOf(id),
                 0,
@@ -166,6 +168,7 @@ public class TestDataProvider {
     public static Composition fakeComposition(long id, String filePath, long createDate) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 filePath,
                 0,
@@ -183,6 +186,7 @@ public class TestDataProvider {
                                               long modifyDate) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 filePath,
                 0,
@@ -197,6 +201,7 @@ public class TestDataProvider {
     public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 filePath,
                 0,
@@ -211,6 +216,7 @@ public class TestDataProvider {
     public static Composition fakeComposition(long id, long createDate) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 String.valueOf(id),
                 0,
@@ -225,6 +231,7 @@ public class TestDataProvider {
     public static Composition fakeComposition(long id, String filePath) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 filePath,
                 0,
@@ -239,6 +246,7 @@ public class TestDataProvider {
     public static Composition fakeCompositionWithTitle(long id, String title) {
         return new Composition(null,
                 title,
+                "fileName",
                 null,
                 String.valueOf(id),
                 0,
@@ -306,6 +314,7 @@ public class TestDataProvider {
         private String albumArtist;
         private String title;
         private String album;
+        private String fileName = "fileName";
         private String filePath;
 
         private long duration;
@@ -349,6 +358,7 @@ public class TestDataProvider {
             return new StorageComposition(artist,
                     albumArtist,
                     title,
+                    fileName,
                     album,
                     filePath,
                     duration,
@@ -403,6 +413,7 @@ public class TestDataProvider {
         public StorageFullComposition build() {
             return new StorageFullComposition(null,
                     title,
+                    "fileName",
                     "",
                     relativePath,
                     0,

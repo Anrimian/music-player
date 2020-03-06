@@ -17,12 +17,41 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 class Migrations {
+
+    static Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE compositions ADD COLUMN fileName TEXT");
+
+            //migrate file name
+            Cursor c = database.query("SELECT id, filePath FROM compositions");
+            for (int i = 0; i < c.getCount(); i++) {
+                c.moveToPosition(i);
+
+                long id = c.getLong(c.getColumnIndex("id"));
+                String filePath = c.getString(c.getColumnIndex("filePath"));
+
+                String fileName = FileUtils.formatFileName(filePath, true);
+
+                ContentValues cv = new ContentValues();
+                cv.put("fileName", fileName);
+
+                database.update("compositions",
+                        SQLiteDatabase.CONFLICT_REPLACE,
+                        cv,
+                        "id = ?",
+                        new String[]{ String.valueOf(id) }
+                );
+            }
+        }
+    };
 
     static Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override

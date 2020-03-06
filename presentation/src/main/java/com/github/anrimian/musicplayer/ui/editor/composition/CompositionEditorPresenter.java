@@ -249,7 +249,7 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         if (composition == null) {
             return;
         }
-        getViewState().copyFileNameText(composition.getFilePath());
+        getViewState().copyFileNameText(composition.getFileName());
     }
 
     private void onDefaultError(Throwable throwable) {

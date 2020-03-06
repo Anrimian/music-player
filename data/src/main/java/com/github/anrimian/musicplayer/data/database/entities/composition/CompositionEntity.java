@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.Date;
 
@@ -54,6 +55,9 @@ public class CompositionEntity {
     private String title;
 
     @Nonnull
+    private String fileName;
+
+    @Nonnull
     private String filePath;
 
     private long duration;
@@ -71,6 +75,7 @@ public class CompositionEntity {
                              @Nullable Long albumId,
                              @Nullable Long folderId,
                              @Nullable String title,
+                             @Nonnull String fileName,
                              @Nonnull String filePath,
                              long duration,
                              long size,
@@ -83,12 +88,15 @@ public class CompositionEntity {
         this.folderId = folderId;
         this.storageId = storageId;
         this.title = title;
+        this.fileName = fileName;
         this.filePath = filePath;
         this.duration = duration;
         this.size = size;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
+
+        Objects.requireNonNull(fileName);
     }
 
     @Nullable
@@ -122,6 +130,11 @@ public class CompositionEntity {
     @Nullable
     public String getTitle() {
         return title;
+    }
+
+    @Nonnull
+    public String getFileName() {
+        return fileName;
     }
 
     @Nonnull

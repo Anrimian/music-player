@@ -258,7 +258,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         tvAlbumArtist.setText(composition.getAlbumArtist());
 
         tvAuthor.setText(formatAuthor(composition.getArtist(), this));
-        tvFileName.setText(formatFileName(composition.getFilePath(), true));
+        tvFileName.setText(formatFileName(composition.getFileName(), true));
     }
 
     @Override
@@ -337,7 +337,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 R.string.change,
                 R.string.cancel,
                 R.string.filename,
-                formatFileName(composition.getFilePath()),
+                formatFileName(composition.getFileName()),
                 false);
         filenameDialogFragmentRunner.show(fragment);
     }

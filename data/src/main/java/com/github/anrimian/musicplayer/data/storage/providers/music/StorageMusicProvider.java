@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -73,6 +74,7 @@ public class StorageMusicProvider {
 //                query = new String[] {
 //                        Media.ARTIST,
 //                        Media.TITLE,
+//                        Media.DISPLAY_NAME,
 ////                            Media.ALBUM,
 //                        Media.DATA,
 //                        Media.RELATIVE_PATH,
@@ -88,6 +90,7 @@ public class StorageMusicProvider {
                 query = new String[] {
                         Media.ARTIST,
                         Media.TITLE,
+                        Media.DISPLAY_NAME,
 //                            Media.ALBUM,
                         Media.DATA,
                         Media.DURATION,
@@ -334,7 +337,10 @@ public class StorageMusicProvider {
         }
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
-//        String displayName = cursorWrapper.getString(DISPLAY_NAME);
+        String displayName = cursorWrapper.getString(Media.DISPLAY_NAME);
+        if (TextUtils.isEmpty(displayName)) {
+            displayName = "<unknown>";
+        }
 //        String mimeType = cursorWrapper.getString(Media.MIME_TYPE);
 
         long duration = cursorWrapper.getLong(Media.DURATION);
@@ -382,6 +388,7 @@ public class StorageMusicProvider {
         return new StorageFullComposition(
                 artist,
                 title,
+                displayName,
                 filePath,
                 relativePath,
                 duration,

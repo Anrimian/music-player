@@ -31,6 +31,7 @@ public interface CompositionsDao {
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
             "filePath as filePath, " +
+            "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
             "id as id, " +
@@ -58,6 +59,7 @@ public interface CompositionsDao {
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
             "compositions.filePath as filePath, " +
+            "compositions.fileName as fileName, " +
             "compositions.duration as duration, " +
             "compositions.size as size, " +
             "compositions.id as id, " +
@@ -76,6 +78,7 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET " +
             "title = :title, " +
+            "fileName = :fileName, " +
             "filePath = :filePath, " +
             "duration = :duration, " +
             "size = :size, " +
@@ -83,6 +86,7 @@ public interface CompositionsDao {
             "dateModified = :dateModified " +
             "WHERE storageId = :storageId")
     void update(String title,
+                String fileName,
                 String filePath,
                 long duration,
                 long size,
@@ -138,6 +142,7 @@ public interface CompositionsDao {
                 "(SELECT name FROM albums WHERE id = albumId) as album,  " +
                 "title as title,  " +
                 "filePath as filePath,  " +
+                "fileName as fileName, " +
                 "duration as duration,  " +
                 "size as size,  " +
                 "id as id,  " +

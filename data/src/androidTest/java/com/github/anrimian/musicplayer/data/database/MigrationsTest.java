@@ -39,6 +39,30 @@ public class MigrationsTest {
                     new FrameworkSQLiteOpenHelperFactory());
 
     @Test
+    public void testMigrationFrom5To6() throws IOException {
+        SupportSQLiteDatabase db = testHelper.createDatabase(TEST_DB_NAME, 5);
+
+        ContentValues cv = new ContentValues();
+        cv.put("storageId", 1L);
+        cv.put("title", "titleHH");
+        cv.put("filePath", "test/music/filename34.mp3");
+        cv.put("duration", 13);
+        cv.put("size", 100);
+        cv.put("dateAdded", 0L);
+        cv.put("dateModified", 0L);
+        long id = db.insert("compositions", SQLiteDatabase.CONFLICT_ABORT, cv);
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                6,
+                false,
+                Migrations.MIGRATION_5_6);
+
+        Cursor c = db.query("SELECT fileName FROM compositions WHERE id = " + id);
+        c.moveToFirst();
+        assertEquals("filename34.mp3", c.getString(c.getColumnIndex("fileName")));
+    }
+
+    @Test
     public void testMigrationFrom4To5() throws IOException {
         SupportSQLiteDatabase db = testHelper.createDatabase(TEST_DB_NAME, 4);
 

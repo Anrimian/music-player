@@ -55,6 +55,7 @@ public class TestBusinessDataProvider {
     public static Composition fakeComposition(long id) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 String.valueOf(id),
                 0,
@@ -95,6 +96,7 @@ public class TestBusinessDataProvider {
     public static Composition fakeComposition(long id, String filePath, long createDate) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 filePath,
                 0,
@@ -109,6 +111,7 @@ public class TestBusinessDataProvider {
     public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 filePath,
                 0,
@@ -123,6 +126,7 @@ public class TestBusinessDataProvider {
     public static Composition fakeComposition(long id, long createDate) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 String.valueOf(id),
                 0,
@@ -137,6 +141,7 @@ public class TestBusinessDataProvider {
     public static Composition fakeComposition(long id, String filePath) {
         return new Composition(null,
                 null,
+                "fileName",
                 null,
                 filePath,
                 0,
@@ -151,6 +156,7 @@ public class TestBusinessDataProvider {
     public static Composition fakeCompositionWithTitle(long id, String title) {
         return new Composition(null,
                 title,
+                "fileName",
                 null,
                 String.valueOf(id),
                 0,

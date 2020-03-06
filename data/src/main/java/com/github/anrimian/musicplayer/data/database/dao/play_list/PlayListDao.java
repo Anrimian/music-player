@@ -91,6 +91,7 @@ public interface PlayListDao {
             "compositions.storageId AS storageId, " +
             "compositions.title AS title, " +
             "compositions.filePath AS filePath, " +
+            "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
             "compositions.dateAdded AS dateAdded, " +

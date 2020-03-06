@@ -30,6 +30,7 @@ public interface AlbumsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
+            "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
             "id as id, " +
@@ -46,6 +47,7 @@ public interface AlbumsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "filePath as filePath, " +
+            "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
             "id as id, " +

@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
-import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
+import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
@@ -94,7 +94,7 @@ public class CompositionItemWrapper {
                 //noinspection SingleStatementInBlock,unchecked
                 update(composition, (List) payload);
             }
-            if (payload == PATH || payload == TITLE) {
+            if (payload == FILE_NAME || payload == TITLE) {
                 showCompositionName();
             }
             if (payload == ARTIST || payload == DURATION) {
