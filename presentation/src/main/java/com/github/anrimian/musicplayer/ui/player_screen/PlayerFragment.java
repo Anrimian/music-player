@@ -42,6 +42,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.menu.AppPopupMenu;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
@@ -698,6 +699,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onCompositionMenuClicked(View view) {
+        AppPopupMenu.showPopupWindow(view);
+
         PopupMenu popup = new PopupMenu(requireContext(), view);
         popup.inflate(R.menu.composition_short_actions_menu);
         popup.setOnMenuItemClickListener(item -> {

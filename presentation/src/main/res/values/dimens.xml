@@ -107,4 +107,8 @@
 
     <!--notification-->
     <dimen name="notification_large_icon_size">300dp</dimen>
+
+    <!--popup-->
+    <dimen name="popup_y_touch_offset">96dp</dimen>
+    <dimen name="popup_y_bottom_padding">16dp</dimen>
 </resources>
