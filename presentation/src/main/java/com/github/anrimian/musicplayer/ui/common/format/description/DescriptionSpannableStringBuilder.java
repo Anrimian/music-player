@@ -32,13 +32,9 @@ public class DescriptionSpannableStringBuilder extends SpannableStringBuilder {
     public SpannableStringBuilder append(CharSequence text) {
         if (length() > 0) {
 //            super.append(" ● ");//just for compare
-
-            //problems on line switch - circle missing
-            super.append("   ");
+            super.append("  \u00A0");//3rd character not space for line break handling
             ImageSpan imageSpan = new CenteredImageSpan(context, R.drawable.ic_description_text_circle);
             setSpan(imageSpan, length() - 2, length() - 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-
-//            super.append(" ● ");
         }
         return super.append(text);
     }
