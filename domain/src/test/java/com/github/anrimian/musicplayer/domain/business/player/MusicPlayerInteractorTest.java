@@ -166,9 +166,9 @@ public class MusicPlayerInteractorTest {
 
         currentCompositionSubject.onNext(currentItem(1));
         inOrder.verify(musicPlayerController, never()).resume();
-        inOrder.verify(musicPlayerController).pause();
+        inOrder.verify(musicPlayerController).stop();
 
-        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
+        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 
     @Test
@@ -274,7 +274,7 @@ public class MusicPlayerInteractorTest {
 
         playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
         inOrder.verify(musicPlayerController, never()).resume();
-        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
+        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 
     @Test
@@ -421,8 +421,8 @@ public class MusicPlayerInteractorTest {
 
         currentCompositionSubject.onNext(new PlayQueueEvent(null));
 
-        verify(musicPlayerController).pause();
-        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
+        verify(musicPlayerController).stop();
+        playerStateSubscriber.assertValues(IDLE, PLAY, STOP);
     }
 
     @Test

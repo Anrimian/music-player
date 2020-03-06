@@ -102,7 +102,7 @@ public class MusicPlayerInteractor {
     }
 
     public void play() {
-        if (playerStateSubject.getValue() == PLAY || playerStateSubject.getValue() == STOP) {
+        if (playerStateSubject.getValue() == PLAY) {
             return;
         }
 
@@ -127,9 +127,6 @@ public class MusicPlayerInteractor {
         }
     }
 
-    /**
-     * Use it only with empty play queue as final result
-     */
     public void stop() {
         musicPlayerController.stop();
         playerStateSubject.onNext(STOP);
@@ -272,7 +269,7 @@ public class MusicPlayerInteractor {
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
             if (previousItem != null) {
-                pause();
+                stop();
             }
         } else {
             long trackPosition = compositionEvent.getTrackPosition();
@@ -328,7 +325,7 @@ public class MusicPlayerInteractor {
                 .andThen(playQueueRepository.isCurrentCompositionAtEndOfQueue())
                 .doOnSuccess(isLast -> {
                     if (isLast) {
-                        pause();//get current position called from wrong thread
+                        stop();
                     } else {
                         playQueueRepository.skipToNext().subscribe();
                     }
@@ -357,7 +354,7 @@ public class MusicPlayerInteractor {
 
     private void onAutoSkipNextFinished(int currentPosition) {
         if (currentPosition == 0 && !(settingsRepository.getRepeatMode() == RepeatMode.REPEAT_PLAY_LIST)) {
-            pause();
+            stop();
         }
     }
 

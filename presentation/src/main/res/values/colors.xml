@@ -40,6 +40,7 @@
     <color name="colorAccentDark">#03A9F4</color>
     <color name="darkColorPrimaryVariant">#F57C00</color>
 
+    <color name="dark_background_level_2">#292929</color>
     <color name="dark_background_level_1">#1D1D1D</color>
     <color name="dark_background_level_0">#121212</color>
 
