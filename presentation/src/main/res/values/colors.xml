@@ -28,6 +28,8 @@
     <color name="colorPrimaryDarkSecondary">#f5f5f5</color>
     <color name="selectionStatusBarColor">#848282</color>
 
+    <color name="light_background_level_1">#fafafa</color>
+
     <!--second theme-->
     <color name="secondColorPrimary">#3F51B5</color>
     <color name="secondColorPrimaryDark">#303F9F</color>
