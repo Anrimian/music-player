@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.ui.utils.slidr;
 
+import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -54,6 +56,40 @@ public class SlidrPanel {
 
         // Return the lock interface
         return panel.getDefaultInterface();
+    }
+
+    @NonNull
+    public static SlidrInterface attachWithNavBarChange(@NonNull Activity activity,
+                                                        @AttrRes int prevScreenColorAttr,
+                                                        @AttrRes int curScreenColorAttr) {
+
+        // Setup the slider panel and attach it to the decor
+        final SliderPanel panel = attachSliderPanel(activity, null);
+
+        // Set the panel slide listener for when it becomes closed or opened
+        panel.setOnPanelSlideListener(new ColorNavBarSlideListener(activity,
+                prevScreenColorAttr,
+                curScreenColorAttr)
+        );
+
+        // Return the lock interface
+        return panel.getDefaultInterface();
+    }
+
+    @NonNull
+    private static SliderPanel attachSliderPanel(@NonNull Activity activity, SlidrConfig config) {
+        // Hijack the decorview
+        ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+        View oldScreen = decorView.getChildAt(0);
+        decorView.removeViewAt(0);
+
+        // Setup the slider panel and attach it to the decor
+        SliderPanel panel = new SliderPanel(activity, oldScreen, config);
+        panel.setId(com.r0adkll.slidr.R.id.slidable_panel);
+        oldScreen.setId(com.r0adkll.slidr.R.id.slidable_content);
+        panel.addView(oldScreen);
+        decorView.addView(panel, 0);
+        return panel;
     }
 
     public interface SlideListener {

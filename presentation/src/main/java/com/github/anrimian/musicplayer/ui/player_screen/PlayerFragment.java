@@ -60,6 +60,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFrag
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
@@ -240,6 +241,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     .commit();
             return;
         }
+
+        AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground);
 
         toolbar.initializeViews(requireActivity().getWindow());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());

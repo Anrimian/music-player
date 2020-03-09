@@ -217,18 +217,19 @@ public class AndroidUtils {
         }
     }
 
-    //evaluate color on transition?
-    public static void setNavigationBarColor(Activity activity, @AttrRes int attrRes) {
+    public static void setNavigationBarColorAttr(Activity activity, @AttrRes int attrRes) {
+        setNavigationBarColor(activity, getColorFromAttr(activity, attrRes));
+    }
+
+    public static void setNavigationBarColor(Activity activity, @ColorInt int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             Window window = activity.getWindow();
 
-            int color = AndroidUtils.getColorFromAttr(activity, attrRes);
             window.setNavigationBarColor(color);
             if (ColorUtils.calculateLuminance(color) >= 0.5f) {//white
                 View decorView = window.getDecorView();
                 decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-
             }
         }
     }

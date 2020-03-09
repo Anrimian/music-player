@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFr
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.Slidr;
 
@@ -88,7 +89,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         setContentView(R.layout.activity_album_edit);
         ButterKnife.bind(this);
 
-        AndroidUtils.setNavigationBarColor(this, android.R.attr.colorBackground);
+        AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground);
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -102,7 +103,10 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeNameClickableArea, () -> copyText(tvName, tvNameHint));
 
-        Slidr.attach(this);
+        SlidrPanel.attachWithNavBarChange(this,
+                R.attr.playerPanelBackground,
+                android.R.attr.colorBackground
+        );
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,

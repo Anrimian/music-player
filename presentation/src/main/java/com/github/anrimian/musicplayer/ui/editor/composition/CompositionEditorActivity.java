@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.Slidr;
 
@@ -157,7 +158,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         setContentView(R.layout.activity_composition_edit);
         ButterKnife.bind(this);
 
-        AndroidUtils.setNavigationBarColor(this, android.R.attr.colorBackground);
+        AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground);
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -185,7 +186,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         onLongClick(changeAlbumClickableArea, () -> copyText(tvAlbum, tvAlbumHint));
         onLongClick(changeAlbumArtistClickableArea, () -> copyText(tvAlbumArtist, tvAlbumArtistHint));
 
-        Slidr.attach(this);
+        SlidrPanel.attachWithNavBarChange(this,
+                R.attr.playerPanelBackground,
+                android.R.attr.colorBackground
+        );
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
