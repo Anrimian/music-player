@@ -15,7 +15,7 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 public class CenteredImageSpan extends ImageSpan {
 
-    public CenteredImageSpan(@NonNull Context context, int resourceId) {
+    CenteredImageSpan(@NonNull Context context, int resourceId) {
         super(context, resourceId);
     }
 
@@ -76,10 +76,5 @@ public class CenteredImageSpan extends ImageSpan {
         canvas.translate(x, transY);
         drawable.draw(canvas);
         canvas.restore();
-    }
-
-    public void setColorFilter(@ColorInt int color) {
-        GradientDrawable gradientDrawable = (GradientDrawable) getDrawable();
-        gradientDrawable.setColor(color);
     }
 }

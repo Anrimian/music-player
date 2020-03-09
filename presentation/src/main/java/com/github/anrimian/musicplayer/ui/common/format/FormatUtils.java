@@ -90,13 +90,13 @@ public class FormatUtils {
 
     public static SpannableStringBuilder formatArtistAdditionalInfo(Context context,
                                                                     Artist artist) {
-        return formatArtistAdditionalInfo(context, artist, android.R.attr.textColorSecondary);
+        return formatArtistAdditionalInfo(context, artist, R.drawable.ic_description_text_circle);
     }
 
     public static SpannableStringBuilder formatArtistAdditionalInfo(Context context,
                                                                     Artist artist,
-                                                                    @AttrRes int textColorAttr) {
-        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, textColorAttr);
+                                                                    @DrawableRes int dividerDrawableRes) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, dividerDrawableRes);
         sb.append(formatCompositionsCount(context, artist.getCompositionsCount()));
         int albumsCount = artist.getAlbumsCount();
         if (albumsCount > 0) {
@@ -106,7 +106,13 @@ public class FormatUtils {
     }
 
     public static SpannableStringBuilder formatAlbumAdditionalInfo(Context context, Album album) {
-        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context);
+        return formatAlbumAdditionalInfo(context, album, R.drawable.ic_description_text_circle);
+    }
+
+    public static SpannableStringBuilder formatAlbumAdditionalInfo(Context context,
+                                                                   Album album,
+                                                                   @DrawableRes int dividerDrawableRes) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, dividerDrawableRes);
         String artist = album.getArtist();
         if (!isEmpty(artist)) {
             sb.append(artist);

@@ -1,44 +1,42 @@
 package com.github.anrimian.musicplayer.ui.common.format.description;
 
 import android.content.Context;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 
-import androidx.annotation.AttrRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 public class DescriptionSpannableStringBuilder extends SpannableStringBuilder {
 
+    private static final int DEFAULT_DIVIDER = R.drawable.ic_description_text_circle;
+
     private final Context context;
-    private final @AttrRes int textColorAttr;
+    private final @DrawableRes int dividerDrawableRes;
 
     public DescriptionSpannableStringBuilder(Context context) {
         this.context = context;
-        textColorAttr = android.R.attr.textColorSecondary;
+        dividerDrawableRes = DEFAULT_DIVIDER;
     }
 
-    public DescriptionSpannableStringBuilder(Context context, @AttrRes int textColorAttr) {
+    public DescriptionSpannableStringBuilder(Context context, @DrawableRes int dividerDrawableRes) {
         this.context = context;
-        this.textColorAttr = textColorAttr;
+        this.dividerDrawableRes = dividerDrawableRes;
     }
 
     public DescriptionSpannableStringBuilder(Context context, CharSequence text) {
         super(text);
         this.context = context;
-        textColorAttr = android.R.attr.textColorSecondary;
+        dividerDrawableRes = DEFAULT_DIVIDER;
     }
 
     public DescriptionSpannableStringBuilder(Context context, CharSequence text, int start, int end) {
         super(text, start, end);
         this.context = context;
-        textColorAttr = android.R.attr.textColorSecondary;
+        dividerDrawableRes = DEFAULT_DIVIDER;
     }
 
     @NonNull
@@ -48,8 +46,7 @@ public class DescriptionSpannableStringBuilder extends SpannableStringBuilder {
 //            super.append(" ● ");//just for compare
             super.append("  \u00A0");//3rd character not space for line break handling
 
-            CenteredImageSpan imageSpan = new CenteredImageSpan(context, R.drawable.ic_description_text_circle);
-            imageSpan.setColorFilter(AndroidUtils.getColorFromAttr(context, textColorAttr));
+            ImageSpan imageSpan = new CenteredImageSpan(context, dividerDrawableRes);
             setSpan(imageSpan, length() - 2, length() - 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         }
         return super.append(text);
