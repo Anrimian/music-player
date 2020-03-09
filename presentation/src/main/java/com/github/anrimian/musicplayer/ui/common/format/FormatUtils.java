@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.view.View;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
@@ -87,8 +88,15 @@ public class FormatUtils {
         return sb.toString();
     }
 
-    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context, Artist artist) {
-        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context);
+    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context,
+                                                                    Artist artist) {
+        return formatArtistAdditionalInfo(context, artist, android.R.attr.textColorSecondary);
+    }
+
+    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context,
+                                                                    Artist artist,
+                                                                    @AttrRes int textColorAttr) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, textColorAttr);
         sb.append(formatCompositionsCount(context, artist.getCompositionsCount()));
         int albumsCount = artist.getAlbumsCount();
         if (albumsCount > 0) {

@@ -5,9 +5,13 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.text.style.ImageSpan;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 public class CenteredImageSpan extends ImageSpan {
 
@@ -63,7 +67,6 @@ public class CenteredImageSpan extends ImageSpan {
                      int y,
                      int bottom,
                      Paint paint) {
-
         Drawable drawable = getDrawable();
         canvas.save();
         Paint.FontMetricsInt fmPaint = paint.getFontMetricsInt();
@@ -75,4 +78,8 @@ public class CenteredImageSpan extends ImageSpan {
         canvas.restore();
     }
 
+    public void setColorFilter(@ColorInt int color) {
+        GradientDrawable gradientDrawable = (GradientDrawable) getDrawable();
+        gradientDrawable.setColor(color);
+    }
 }
