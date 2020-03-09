@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.artists.items.adapter.albums;
 
+import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,6 +11,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
@@ -71,17 +73,16 @@ public class AlbumViewHolder extends BaseViewHolder {
     }
 
     private void showCompositionsCount() {
-        StringBuilder sb = new StringBuilder();
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(getContext());
         String artist = album.getArtist();
         if (!isEmpty(artist)) {
             sb.append(artist);
-            sb.append(" ● ");//TODO split problem • ●
         }
         sb.append(formatCompositionsCount(
                 getContext(),
                 album.getCompositionsCount())
         );
-        tvCompositionsCount.setText(sb.toString());
+        tvCompositionsCount.setText(sb);
     }
 
     private void showCover() {
