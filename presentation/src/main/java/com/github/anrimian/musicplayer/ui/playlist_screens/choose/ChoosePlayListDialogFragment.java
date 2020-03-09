@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
@@ -175,6 +176,8 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         if (fragment != null) {
             fragment.setOnCompleteListener(this::onPlayListMenuItemSelected);
         }
+
+        AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground);
     }
 
     @Override
