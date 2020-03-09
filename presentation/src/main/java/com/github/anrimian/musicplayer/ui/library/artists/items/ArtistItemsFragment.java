@@ -218,7 +218,10 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     @Override
     public void showArtistInfo(Artist artist) {
         toolbar.setTitle(artist.getName());
-        toolbar.setSubtitle(FormatUtils.formatArtistAdditionalInfo(getContext(), artist));
+        toolbar.setSubtitle(FormatUtils.formatArtistAdditionalInfo(requireContext(),
+                artist,
+                R.drawable.ic_description_text_circle_inverse
+        ));
     }
 
     @Override

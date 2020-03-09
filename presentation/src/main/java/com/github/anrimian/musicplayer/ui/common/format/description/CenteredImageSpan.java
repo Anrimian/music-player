@@ -5,13 +5,17 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.text.style.ImageSpan;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 public class CenteredImageSpan extends ImageSpan {
 
-    public CenteredImageSpan(@NonNull Context context, int resourceId) {
+    CenteredImageSpan(@NonNull Context context, int resourceId) {
         super(context, resourceId);
     }
 
@@ -63,7 +67,6 @@ public class CenteredImageSpan extends ImageSpan {
                      int y,
                      int bottom,
                      Paint paint) {
-
         Drawable drawable = getDrawable();
         canvas.save();
         Paint.FontMetricsInt fmPaint = paint.getFontMetricsInt();
@@ -74,5 +77,4 @@ public class CenteredImageSpan extends ImageSpan {
         drawable.draw(canvas);
         canvas.restore();
     }
-
 }

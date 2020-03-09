@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.view.View;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
@@ -87,8 +88,15 @@ public class FormatUtils {
         return sb.toString();
     }
 
-    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context, Artist artist) {
-        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context);
+    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context,
+                                                                    Artist artist) {
+        return formatArtistAdditionalInfo(context, artist, R.drawable.ic_description_text_circle);
+    }
+
+    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context,
+                                                                    Artist artist,
+                                                                    @DrawableRes int dividerDrawableRes) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, dividerDrawableRes);
         sb.append(formatCompositionsCount(context, artist.getCompositionsCount()));
         int albumsCount = artist.getAlbumsCount();
         if (albumsCount > 0) {
@@ -98,7 +106,13 @@ public class FormatUtils {
     }
 
     public static SpannableStringBuilder formatAlbumAdditionalInfo(Context context, Album album) {
-        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context);
+        return formatAlbumAdditionalInfo(context, album, R.drawable.ic_description_text_circle);
+    }
+
+    public static SpannableStringBuilder formatAlbumAdditionalInfo(Context context,
+                                                                   Album album,
+                                                                   @DrawableRes int dividerDrawableRes) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, dividerDrawableRes);
         String artist = album.getArtist();
         if (!isEmpty(artist)) {
             sb.append(artist);
