@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 
 import java.util.List;
 
@@ -117,10 +118,6 @@ public class CompositionItemWrapper {
         }
     }
 
-//    public void showNumber(int number) {//good idea
-//        tvAdditionalInfo.setText(String.valueOf(number) +" ● " + tvAdditionalInfo.getText());
-//    }
-
     public void showAsDraggingItem(boolean dragging) {
         if (this.isDragging != dragging) {
             this.isDragging = dragging;
@@ -184,17 +181,14 @@ public class CompositionItemWrapper {
     }
 
     private void showAdditionalInfo() {
-        SpannableStringBuilder sb = new SpannableStringBuilder();
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(getContext());
         sb.append(formatCompositionAuthor(composition, getContext()));
-        sb.append(" ● ");//TODO split problem • ●
         sb.append(formatMilliseconds(composition.getDuration()));
         String corruptionHint = getCorruptionTypeHint();
         if (corruptionHint != null) {
-            sb.append(" ● ");
-            int start = sb.length();
-            int end = start + corruptionHint.length();
-
             sb.append(corruptionHint);
+            int start = sb.length() - corruptionHint.length();
+            int end = sb.length();
 
             ForegroundColorSpan fcs = new ForegroundColorSpan(getColorFromAttr(getContext(), R.attr.colorError));
             sb.setSpan(fcs, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);

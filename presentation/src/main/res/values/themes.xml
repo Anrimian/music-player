@@ -20,7 +20,7 @@
         <item name="menuItemBackground">@color/menu_item_background_color_dark</item>
         <item name="dialogBackground">@color/menu_item_background_color_dark</item>
         <item name="playerPanelBackground">?attr/colorPrimary</item>
-        <item name="subToolbarBackground">@color/dark_background_level_1</item>
+        <item name="subToolbarBackground">@color/dark_background_level_2</item>
         <item name="snackbarBackground">@color/snackbar_color_dark</item>
 
         <!--text-->

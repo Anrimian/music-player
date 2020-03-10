@@ -42,7 +42,7 @@
 
         <!--background-->
         <item name="listBackground">@color/light_light_gray</item>
-        <item name="listItemBackground">@android:color/white</item>
+        <item name="listItemBackground">@color/light_background_level_1</item>
         <item name="playerPanelBackground">?attr/listItemBackground</item>
         <item name="android:itemBackground">@drawable/bg_menu_item</item>
         <item name="menuItemBackground">@android:color/white</item>
@@ -59,12 +59,17 @@
         <item name="android:listDivider">@drawable/divider</item>
     </style>
 
-    <style name="AppTheme.VersionSpecific" parent="AppTheme">
+    <style name="AppTheme.NightModeSpecific" parent="AppTheme">
+
+    </style>
+
+    <style name="AppTheme.VersionSpecific" parent="AppTheme.NightModeSpecific">
 
     </style>
 
     <style name="NavigationViewStyle">
         <item name="colorPrimary">?attr/navigationViewPrimaryColor</item>
+        <item name="android:windowBackground">?attr/listItemBackground</item>
     </style>
 
     <style name="SlidrActivityTheme">

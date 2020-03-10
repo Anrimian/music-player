@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.genres.list.adapter;
 
+import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -9,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
@@ -76,16 +78,15 @@ public class GenreViewHolder extends BaseViewHolder {
     }
 
     private void showAdditionalInfo() {
-        StringBuilder sb = new StringBuilder();
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(getContext());
         sb.append(formatCompositionsCount(
                 getContext(),
                 genre.getCompositionsCount())
         );
         long totalDuration = genre.getTotalDuration();
         if (totalDuration != 0) {
-            sb.append(" ● ");//TODO split problem • ●
             sb.append(formatMilliseconds(totalDuration));
         }
-        tvAdditionalInfo.setText(sb.toString());
+        tvAdditionalInfo.setText(sb);
     }
 }
