@@ -190,7 +190,10 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void showAlbumInfo(Album album) {
         toolbar.setTitle(album.getName());
-        toolbar.setSubtitle(FormatUtils.formatAlbumAdditionalInfo(getContext(), album));
+        toolbar.setSubtitle(FormatUtils.formatAlbumAdditionalInfo(getContext(),
+                album,
+                R.drawable.ic_description_text_circle_inverse
+        ));
     }
 
     @Override
