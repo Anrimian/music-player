@@ -490,12 +490,14 @@ public class FragmentNavigation {
     }
 
     private Fragment createFragment(FragmentMetaData metaData) {
-        return fragmentManagerProvider.getFragmentManager()//can be null?
+        Fragment fragment = fragmentManagerProvider.getFragmentManager()//can be null?
                 .getFragmentFactory()
-                .instantiate(jugglerView.getContext().getClassLoader(),
-                        metaData.getFragmentClassName(),
-                        metaData.getArguments()
-                );
+                .instantiate(jugglerView.getContext().getClassLoader(), metaData.getFragmentClassName());
+        Bundle args = metaData.getArguments();
+        if (args != null) {
+            fragment.setArguments(args);
+        }
+        return fragment;
     }
 
     private ArrayList<Bundle> getBundleScreens() {

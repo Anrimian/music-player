@@ -1,19 +1,26 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.domain.utils.java.CompositeCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteItemDecorator;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteTouchHelperCallback;
+
+import me.zhanghai.android.fastscroll.FastScroller;
+import me.zhanghai.android.fastscroll.FastScrollerBuilder;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -112,5 +119,32 @@ public class RecyclerViewUtils {
                 );
             }
         });
+    }
+
+    //attach if high amount of elements appeared? - seems working from box
+    //reduce size
+    //top and bottom paddings(conflicts with fab)
+    //add elevation? or color in light theme
+    //list performance on fast scrolling
+    public static void attachFastScroller(RecyclerView recyclerView) {
+        Context context = recyclerView.getContext();
+        Drawable trackDrawable = ContextCompat.getDrawable(context, R.drawable.drawable_empty);
+        assert trackDrawable != null;
+        Drawable thumbDrawable = ContextCompat.getDrawable(context, R.drawable.a_thumb_drawable);
+        assert thumbDrawable != null;
+
+        //padding at bottom doesn't match
+        //fab behavior too
+        Resources resources = context.getResources();
+        int thumbVerticalPadding = resources.getDimensionPixelSize(R.dimen.scrollbar_thumb_vertical_padding);
+        int fabSize = resources.getDimensionPixelSize(R.dimen.fab_expected_size);
+        int contentMargin = resources.getDimensionPixelSize(R.dimen.content_vertical_margin);
+
+        new FastScrollerBuilder(recyclerView)
+                .setTrackDrawable(trackDrawable)
+                .setThumbDrawable(thumbDrawable)
+                //seems not working correctly
+                .setPadding(0, thumbVerticalPadding, 0, contentMargin + thumbVerticalPadding + fabSize)
+                .build();
     }
 }

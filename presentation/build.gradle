@@ -62,6 +62,7 @@ dependencies {
     implementation deps.material
     implementation deps.cardView
     implementation deps.recyclerView
+    implementation deps.recyclerViewFastScroll
     implementation deps.constraintLayout
     implementation deps.supportMedia
     implementation deps.palette
