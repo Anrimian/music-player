@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.ui.common.snackbars;
 
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,7 @@ import androidx.annotation.StringRes;
 import androidx.core.view.ViewCompat;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressBarCountDownTimer;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -23,6 +26,12 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
 
     private TextView tvMessage;
     private Button tvAction;
+    private ProgressBar progressBar;
+
+    private boolean launchCountDownTimer = false;
+    private long durationMillis;
+
+    private CountDownTimer countDownTimer;
 
     public static AppSnackbar make(ViewGroup parent, String text) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -49,6 +58,9 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
         tvAction = content.findViewById(R.id.tv_action);
         tvAction.setVisibility(View.GONE);
 
+        progressBar = content.findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.GONE);
+
         setDurationMillis(DURATION_SHORT_MILLIS);
     }
 
@@ -68,6 +80,7 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
             listener.run();
             dismiss();
         });
+        launchCountDownTimer = true;
         return this;
     }
 
@@ -91,8 +104,28 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
     }
 
     public AppSnackbar setDurationMillis(int durationMillis) {
+        this.durationMillis = durationMillis;
         setDuration(durationMillis);
         return this;
+    }
+
+    @Override
+    public void show() {
+        super.show();
+        if (launchCountDownTimer && durationMillis < DURATION_INDEFINITE_MILLIS) {
+            progressBar.setVisibility(View.VISIBLE);
+            long totalTimeMs = durationMillis;
+            countDownTimer = new ProgressBarCountDownTimer(totalTimeMs, 50, progressBar);
+            countDownTimer.start();
+        }
+    }
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 
     private static class ContentViewCallback implements com.google.android.material.snackbar.ContentViewCallback {

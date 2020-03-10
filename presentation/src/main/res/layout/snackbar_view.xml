@@ -6,6 +6,21 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bg_snackbar">
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:progressDrawable="@drawable/bg_progress_circle"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginStart="@dimen/snackbar_padding_start"
+        android:layout_marginTop="@dimen/snackbar_padding_vertical"
+        android:layout_marginBottom="@dimen/snackbar_padding_vertical"
+        tools:visibility="visible"
+        tools:progress="60"/>
+
     <TextView
         style="@style/TextStyle.Snackbar"
         android:id="@+id/tv_message"

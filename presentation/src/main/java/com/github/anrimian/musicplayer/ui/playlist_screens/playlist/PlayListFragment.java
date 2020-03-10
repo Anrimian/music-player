@@ -267,8 +267,8 @@ public class PlayListFragment extends MvpAppCompatFragment
     public void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items) {
         String text = getDeletePlayListItemCompleteMessage(requireActivity(), playList, items);
         AppSnackbar.make(clListContainer, text)
-                .setAction(R.string.cancel, () -> presenter.onRestoreRemovedItemClicked())
-                .duration(Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.cancel, presenter::onRestoreRemovedItemClicked)
+                .duration(Snackbar.LENGTH_LONG)
                 .show();
 
 //        MessagesUtils.makeSnackbar(clListContainer, text, Snackbar.LENGTH_LONG)
