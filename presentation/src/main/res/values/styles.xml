@@ -68,6 +68,7 @@
 
     <style name="NavigationViewStyle">
         <item name="colorPrimary">?attr/navigationViewPrimaryColor</item>
+        <item name="android:windowBackground">?attr/listItemBackground</item>
     </style>
 
     <style name="SlidrActivityTheme">
