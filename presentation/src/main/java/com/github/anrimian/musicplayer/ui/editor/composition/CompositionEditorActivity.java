@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -61,7 +62,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     CompositionEditorPresenter presenter;
 
     @BindView(R.id.container)
-    View container;
+    ViewGroup container;
 
     @BindView(R.id.tv_author)
     TextView tvAuthor;
@@ -373,7 +374,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     public void showRemovedGenreMessage(ShortGenre genre) {
         String text = getString(R.string.genre_removed_message, genre.getName());
         MessagesUtils.makeSnackbar(container, text, Snackbar.LENGTH_LONG)
-                .setAction(R.string.cancel, v -> presenter.onRestoreRemovedGenreClicked())
+                .setAction(R.string.cancel, presenter::onRestoreRemovedGenreClicked)
                 .show();
     }
 

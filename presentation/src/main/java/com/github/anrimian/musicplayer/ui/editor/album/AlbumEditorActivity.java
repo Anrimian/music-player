@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -16,6 +17,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
@@ -44,7 +46,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     AlbumEditorPresenter presenter;
 
     @BindView(R.id.container)
-    View container;
+    ViewGroup container;
 
     @BindView(R.id.tv_author)
     TextView tvAuthor;
