@@ -20,7 +20,7 @@
         <item name="menuItemBackground">@color/menu_item_background_color_dark</item>
         <item name="dialogBackground">@color/menu_item_background_color_dark</item>
         <item name="playerPanelBackground">?attr/colorPrimary</item>
-        <item name="subToolbarBackground">@color/dark_background_level_1</item>
+        <item name="subToolbarBackground">@color/dark_background_level_2</item>
         <item name="snackbarBackground">@color/snackbar_color_dark</item>
 
         <!--text-->
@@ -39,6 +39,7 @@
         <item name="secondaryButtonColor">@color/secondary_button_color_dark</item>
         <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
         <item name="buttonColorInverse">@color/primary_button_color_dark</item>
+        <item name="colorControlHighlightInverse">@color/color_control_highlight_light</item>
 
         <!--navigation view-->
         <item name="navigationViewPrimaryColor">?android:attr/textColorPrimary</item>

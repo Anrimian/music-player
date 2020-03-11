@@ -555,7 +555,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public void showAddedIgnoredFolderMessage(IgnoredFolder folder) {
         String message = getString(R.string.ignored_folder_added, folder.getRelativePath());
         MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_LONG)
-                .setAction(R.string.cancel, v -> presenter.onRemoveIgnoredFolderClicked())
+                .setAction(R.string.cancel, presenter::onRemoveIgnoredFolderClicked)
                 .show();
     }
 

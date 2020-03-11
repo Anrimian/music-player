@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.ui.common.format;
 
 import android.content.Context;
+import android.text.SpannableStringBuilder;
 import android.view.View;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
@@ -16,6 +18,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 
 import java.util.Locale;
@@ -85,29 +88,40 @@ public class FormatUtils {
         return sb.toString();
     }
 
-    public static String formatArtistAdditionalInfo(Context context, Artist artist) {
-        StringBuilder sb = new StringBuilder();
+    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context,
+                                                                    Artist artist) {
+        return formatArtistAdditionalInfo(context, artist, R.drawable.ic_description_text_circle);
+    }
+
+    public static SpannableStringBuilder formatArtistAdditionalInfo(Context context,
+                                                                    Artist artist,
+                                                                    @DrawableRes int dividerDrawableRes) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, dividerDrawableRes);
         sb.append(formatCompositionsCount(context, artist.getCompositionsCount()));
         int albumsCount = artist.getAlbumsCount();
         if (albumsCount > 0) {
-            sb.append(" ● ");//TODO split problem • ●
             sb.append(formatAlbumsCount(context, albumsCount));
         }
-        return sb.toString();
+        return sb;
     }
 
-    public static String formatAlbumAdditionalInfo(Context context, Album album) {
-        StringBuilder sb = new StringBuilder();
+    public static SpannableStringBuilder formatAlbumAdditionalInfo(Context context, Album album) {
+        return formatAlbumAdditionalInfo(context, album, R.drawable.ic_description_text_circle);
+    }
+
+    public static SpannableStringBuilder formatAlbumAdditionalInfo(Context context,
+                                                                   Album album,
+                                                                   @DrawableRes int dividerDrawableRes) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, dividerDrawableRes);
         String artist = album.getArtist();
         if (!isEmpty(artist)) {
             sb.append(artist);
-            sb.append(" ● ");//TODO split problem • ●
         }
         sb.append(formatCompositionsCount(
                 context,
                 album.getCompositionsCount())
         );
-        return sb.toString();
+        return sb;
     }
 
     public static int getOrderTitle(OrderType orderType) {
