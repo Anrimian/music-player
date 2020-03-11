@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -45,8 +46,8 @@ public class CoverImageLoader {
         );
     }
 
-    public void displayImage(@NonNull ImageView imageView, @NonNull Composition composition) {
-        imageLoader.displayImage(imageView, new CompositionImage(composition));
+    public void displayImage(@NonNull ImageView imageView, @NonNull Composition data) {
+        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()));
     }
 
     public void displayImage(@NonNull ImageView imageView, @NonNull Album album) {
@@ -56,7 +57,7 @@ public class CoverImageLoader {
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull Composition data,
                              @DrawableRes int errorPlaceholder) {
-        imageLoader.displayImage(imageView, new CompositionImage(data), errorPlaceholder);
+        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()), errorPlaceholder);
     }
 
     public void displayImage(@NonNull ImageView imageView,
@@ -67,24 +68,27 @@ public class CoverImageLoader {
 
     @Nullable
     public Bitmap getImage(@Nonnull Composition data, long timeoutMillis) {
-        return imageLoader.getImage(new CompositionImage(data), timeoutMillis);
+        return imageLoader.getImage(new CompositionImage(data.getId(), data.getFilePath()), timeoutMillis);
     }
 
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
-        imageLoader.loadImage(new CompositionImage(data), onCompleted);
+        imageLoader.loadImage(new CompositionImage(data.getId(), data.getFilePath()), onCompleted);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
-                             @NonNull Composition data,
+                             AppWidgetManager appWidgetManager,
+                             int appWidgetId,
+                             long compositionId,
+                             String filePath,
                              @NonNull SimpleImageLoader.BitmapTransformer bitmapTransformer,
                              @DrawableRes int placeholder) {
-        imageLoader.displayImage(widgetView, viewId, new CompositionImage(data), bitmapTransformer, placeholder);
+        imageLoader.displayImage(widgetView, viewId, appWidgetManager, appWidgetId, new CompositionImage(compositionId, filePath), bitmapTransformer, placeholder);
     }
 
     private Bitmap getImage(ImageMetaData metaData) {
         if (metaData instanceof CompositionImage) {
-            return extractImageComposition(((CompositionImage) metaData).getComposition());
+            return extractImageComposition(((CompositionImage) metaData));
         }
         if (metaData instanceof AlbumImage) {
             return extractAlbumCover(((AlbumImage) metaData).getAlbum());
@@ -104,10 +108,9 @@ public class CoverImageLoader {
     }
 
     @Nullable
-    private Bitmap extractImageComposition(Composition composition) {
+    private Bitmap extractImageComposition(CompositionImage composition) {
         String filePath = composition.getFilePath();
 
-        //noinspection ConstantConditions
         if (filePath == null) {
             return null;
         }

@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.ui.utils.image.loader;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
@@ -41,6 +43,7 @@ public class SimpleImageLoader<K, T> {
     private final ImageCache<K> imageCache;
 
     private final WeakHashMap<Integer, Disposable> loadingTasks = new WeakHashMap<>();
+    private final WeakHashMap<Long, Disposable> remoteLoadingTasks = new WeakHashMap<>();
 
     private Drawable loadingPlaceholder;
 
@@ -109,9 +112,15 @@ public class SimpleImageLoader<K, T> {
 
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
+                             AppWidgetManager appWidgetManager,
+                             int appWidgetId,
                              @NonNull T data,
                              @NonNull BitmapTransformer bitmapTransformer,
                              @DrawableRes int placeholder) {
+        long targetKey = getTargetKeyForRemoteView(appWidgetId, viewId);
+        Disposable taskToCancel = remoteLoadingTasks.get(targetKey);
+        RxUtils.dispose(taskToCancel);
+
         Bitmap cachedBitmap = imageCache.getBitmap(keyFetcher.getKey(data));
         if (cachedBitmap != null) {
             widgetView.setImageViewBitmap(viewId, bitmapTransformer.transform(cachedBitmap));
@@ -123,13 +132,21 @@ public class SimpleImageLoader<K, T> {
         } else {
             widgetView.setImageViewResource(viewId, loadingPlaceholderId);
         }
-        Maybe.fromCallable(() -> getDataOrThrow(data))
+        Disposable disposable = getDataMaybe(data)
                 .timeout(timeoutMillis, TimeUnit.MILLISECONDS)
                 .map(bitmapTransformer::transform)
-                .doOnSuccess(bitmap -> widgetView.setImageViewBitmap(viewId, bitmap))
-                .doOnError(t -> widgetView.setImageViewResource(viewId, placeholder))
+                .doOnSuccess(bitmap -> {
+                    widgetView.setImageViewBitmap(viewId, bitmap);
+                    //can cause rare crashes
+                    appWidgetManager.updateAppWidget(appWidgetId, widgetView);
+                })
+                .doOnError(t -> {
+                    widgetView.setImageViewResource(viewId, placeholder);
+                    appWidgetManager.updateAppWidget(appWidgetId, widgetView);
+                })
                 .onErrorComplete()
                 .subscribe();
+        remoteLoadingTasks.put(targetKey, disposable);
     }
 
     private Drawable getPlaceholder(Context context) {
@@ -147,6 +164,10 @@ public class SimpleImageLoader<K, T> {
         return System.identityHashCode(imageView);
     }
 
+    private long getTargetKeyForRemoteView(int appWidgetId, int viewId) {
+        return (viewId & 0xFFFFFFFFL) | (long) appWidgetId << 32;
+    }
+
     private Maybe<Bitmap> getDataMaybe(T data) {
         return Maybe.fromCallable(() -> getDataOrThrow(data))
                 .subscribeOn(Schedulers.io());
@@ -154,6 +175,12 @@ public class SimpleImageLoader<K, T> {
 
     @Nonnull
     private Bitmap getDataOrThrow(T data) {
+//        try {
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         if (data == null) {
             throw new RuntimeException("data is null");
         }

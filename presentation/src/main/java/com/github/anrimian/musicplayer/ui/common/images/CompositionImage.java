@@ -4,19 +4,25 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 public class CompositionImage implements ImageMetaData {
 
-    private final Composition composition;
+    private final long id;
+    private final String filePath;
 
-    CompositionImage(Composition composition) {
-        this.composition = composition;
+    CompositionImage(long id, String filePath) {
+        this.id = id;
+        this.filePath = filePath;
     }
 
-    public Composition getComposition() {
-        return composition;
+    long getId() {
+        return id;
+    }
+
+    String getFilePath() {
+        return filePath;
     }
 
     @Override
     public String getKey() {
-        return "composition-" + composition.getId();
+        return "composition-" + id;
     }
 
 }

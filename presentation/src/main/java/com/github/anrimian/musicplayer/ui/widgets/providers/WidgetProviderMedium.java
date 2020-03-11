@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.widgets.providers;
 
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -26,7 +27,7 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
 
     @Override
     protected void applyViewLogic(RemoteViews widgetView,
-                                  Context context,
+                                  AppWidgetManager appWidgetManager, int widgetId, Context context,
                                   boolean play,
                                   String compositionName,
                                   String compositionAuthor,
@@ -38,7 +39,7 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                                   boolean randomPlayModeEnabled,
                                   int repeatMode) {
         super.applyViewLogic(widgetView,
-                context,
+                appWidgetManager, widgetId, context,
                 play,
                 compositionName,
                 compositionAuthor,
@@ -62,13 +63,13 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
         widgetView.setImageViewResource(R.id.iv_repeat_mode, iconRes);
 
         if (showCovers) {
-//            ImageFormatUtils.displayImage(widgetView, R.id.iv_cover, compositionFile, compositionId);
-
-
             Components.getAppComponent().imageLoader()
                     .displayImage(widgetView,
                             R.id.iv_cover,
-                            compositionForLoading(compositionId, compositionFile),
+                            appWidgetManager,
+                            widgetId,
+                            compositionId,
+                            compositionFile,
                             ImageUtils::toCircleBitmap,
                             R.drawable.ic_music_placeholder);
         } else {
@@ -95,20 +96,5 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
     @Override
     protected int getRemoteViewId() {
         return R.layout.widget_medium;
-    }
-
-    //not so clear, but leave it here
-    private Composition compositionForLoading(long id, String filePath) {
-        return new Composition(null,
-                null,
-                null,
-                filePath,
-                0,
-                0,
-                id,
-                null,
-                new Date(),
-                new Date(),
-                null);
     }
 }
