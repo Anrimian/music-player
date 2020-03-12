@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.snackbar.SnackbarContentLayout;
 
@@ -60,26 +61,16 @@ public class MessagesUtils {
         }
     }
 
-    public static Snackbar makeSnackbar(@NonNull View view,
-                                        @StringRes int text,
-                                        @Snackbar.Duration int duration) {
+    public static AppSnackbar makeSnackbar(@NonNull ViewGroup view,
+                                           @StringRes int text,
+                                           @Snackbar.Duration int duration) {
         return makeSnackbar(view, view.getContext().getString(text), duration);
     }
 
     @SuppressLint("RestrictedApi")
-    public static Snackbar makeSnackbar(@NonNull View view,
-                                        @NonNull CharSequence text,
-                                        @Snackbar.Duration int duration) {
-        Context context = view.getContext();
-        Snackbar snackbar = Snackbar.make(view, text, duration);
-        snackbar.setActionTextColor(getColorFromAttr(context, R.attr.colorAccent));
-
-        ViewGroup snackbarView = (ViewGroup) snackbar.getView();
-        SnackbarContentLayout contentLayout = (SnackbarContentLayout) snackbarView.getChildAt(0);
-        TextView tv = contentLayout.getMessageView();
-        tv.setTextColor(getColorFromAttr(context, android.R.attr.textColorPrimaryInverse));
-
-        snackbarView.setBackgroundColor(getColorFromAttr(context, R.attr.snackbarBackground));
-        return snackbar;
+    public static AppSnackbar makeSnackbar(@NonNull ViewGroup view,
+                                           @NonNull String text,
+                                           @Snackbar.Duration int duration) {
+        return AppSnackbar.make(view, text).duration(duration);
     }
 }

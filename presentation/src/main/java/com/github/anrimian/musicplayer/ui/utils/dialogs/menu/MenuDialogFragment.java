@@ -62,7 +62,7 @@ public class MenuDialogFragment extends DialogFragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        MenuAdapter menuAdapter = new MenuAdapter(getMenu());
+        MenuAdapter menuAdapter = new MenuAdapter(getMenu(), R.layout.item_dialog_menu);
         menuAdapter.setOnItemClickListener(this::onMenuItemClicked);
         recyclerView.setAdapter(menuAdapter);
 
@@ -72,7 +72,7 @@ public class MenuDialogFragment extends DialogFragment {
                 .create();
     }
 
-    public void setOnCompleteListener(OnCompleteListener<MenuItem> onCompleteListener) {
+    public void setOnCompleteListener(@Nullable OnCompleteListener<MenuItem> onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
     }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -16,8 +17,10 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.Slidr;
 
@@ -43,7 +46,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     AlbumEditorPresenter presenter;
 
     @BindView(R.id.container)
-    View container;
+    ViewGroup container;
 
     @BindView(R.id.tv_author)
     TextView tvAuthor;
@@ -88,6 +91,8 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         setContentView(R.layout.activity_album_edit);
         ButterKnife.bind(this);
 
+        AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground);
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -100,9 +105,10 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeNameClickableArea, () -> copyText(tvName, tvNameHint));
 
-        @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
-        Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
-        setStatusBarColor(getWindow(), statusBarColor);
+        SlidrPanel.attachWithNavBarChange(this,
+                R.attr.playerPanelBackground,
+                android.R.attr.colorBackground
+        );
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,

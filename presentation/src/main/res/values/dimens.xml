@@ -3,7 +3,7 @@
 
     <!--specific sizes-->
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
-    <item name="composition_action_dialog_height" type="dimen" format="float">0.5</item>
+    <item name="composition_action_dialog_height" type="dimen" format="float">0.6</item>
 
     <dimen name="music_control_button_padding_collapsed">12dp</dimen>
     <dimen name="music_control_button_padding_expanded">7dp</dimen>
@@ -38,6 +38,9 @@
     <!--list margins-->
     <dimen name="list_vertical_margin">14dp</dimen>
     <dimen name="content_vertical_spacing_margin">4dp</dimen>
+
+    <!--dialog margins-->
+    <dimen name="dialog_content_margin_start">20dp</dimen>
 
     <dimen name="subtitle_height">48dp</dimen>
 
@@ -104,4 +107,14 @@
 
     <!--notification-->
     <dimen name="notification_large_icon_size">300dp</dimen>
+
+    <!--snackbar-->
+    <integer name="snackbar_max_lines">3</integer>
+    <dimen name="snackbar_padding_start">16dp</dimen>
+    <dimen name="snackbar_padding_end">8dp</dimen>
+    <dimen name="snackbar_padding_vertical">16dp</dimen>
+    <dimen name="snackbar_margin_content">16dp</dimen>
+    <dimen name="snackbar_margin">8dp</dimen>
+    <dimen name="snackbar_corners">4dp</dimen>
+
 </resources>

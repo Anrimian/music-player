@@ -27,6 +27,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
@@ -266,7 +267,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     public void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items) {
         String text = getDeletePlayListItemCompleteMessage(requireActivity(), playList, items);
         MessagesUtils.makeSnackbar(clListContainer, text, Snackbar.LENGTH_LONG)
-                .setAction(R.string.cancel, v -> presenter.onRestoreRemovedItemClicked())
+                .setAction(R.string.cancel, presenter::onRestoreRemovedItemClicked)
                 .show();
     }
 

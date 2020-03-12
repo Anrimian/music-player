@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/windowBackground">
+    android:background="?attr/listItemBackground">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_music_icon"
