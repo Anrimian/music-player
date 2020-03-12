@@ -108,14 +108,14 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     fun onPlayNextFolderClicked(folder: FolderFileSource) {
         interactor.getAllCompositionsInFolder(folder.id)
-                .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
-                .justSubscribe(this::onDefaultError)
+                .flatMap(playerInteractor::addCompositionsToPlayNext)
+                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
     }
 
     fun onAddToQueueFolderClicked(folder: FolderFileSource) {
         interactor.getAllCompositionsInFolder(folder.id)
-                .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
-                .justSubscribe(this::onDefaultError)
+                .flatMap(playerInteractor::addCompositionsToEnd)
+                .subscribeOnUi(viewState:: onCompositionsAddedToQueue, this::onDefaultError)
     }
 
     fun onPlayAllButtonClicked() {
@@ -249,11 +249,13 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     fun onPlayNextSelectedSourcesClicked() {
         interactor.addCompositionsToPlayNext(ArrayList(selectedFiles))
+                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
         closeSelectionMode()
     }
 
     fun onAddToQueueSelectedSourcesClicked() {
         interactor.addCompositionsToEnd(ArrayList(selectedFiles))
+                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
         closeSelectionMode()
     }
 
@@ -361,12 +363,12 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     private fun addCompositionsToPlayNext(compositions: List<Composition>) {
         playerInteractor.addCompositionsToPlayNext(compositions)
-                .justSubscribe(this::onDefaultError)
+                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
     }
 
     private fun addCompositionsToEnd(compositions: List<Composition>) {
         playerInteractor.addCompositionsToEnd(compositions)
-                .justSubscribe( this::onDefaultError)
+                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
     }
 
     private fun onDefaultError(throwable: Throwable) {
