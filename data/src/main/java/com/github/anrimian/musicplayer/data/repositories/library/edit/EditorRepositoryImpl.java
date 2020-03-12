@@ -174,7 +174,10 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Completable.fromAction(() -> {
             String newPath = filesDataSource.renameCompositionFile(composition, fileName);
-            compositionsDao.updateFilePath(composition.getId(), newPath);
+            if (newPath != null) {
+                compositionsDao.updateFilePath(composition.getId(), newPath);
+            }
+            compositionsDao.updateCompositionFileName(composition.getId(), fileName);
         }).subscribeOn(scheduler);
     }
 

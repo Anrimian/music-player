@@ -254,6 +254,10 @@ public class CompositionsDaoWrapper {
         });
     }
 
+    public void updateCompositionFileName(long id, String fileName) {
+        compositionsDao.updateCompositionFileName(id, fileName);
+    }
+
     public void setCorruptionType(CorruptionType corruptionType, long id) {
         compositionsDao.setCorruptionType(corruptionType, id);
     }
@@ -307,4 +311,5 @@ public class CompositionsDaoWrapper {
     private List<Composition> selectAllCompositionsInFolder(Long folderId, Order order) {
         return getAllCompositionsInFolder(folderId, order);
     }
+
 }

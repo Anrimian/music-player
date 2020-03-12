@@ -59,14 +59,18 @@ public class StorageFilesDataSource {
     }
 
     public String renameCompositionFile(FullComposition composition, String fileName) {
-        String oldPath = composition.getFilePath();
+        Long storageId = composition.getStorageId();
+        if (storageId == null) {
+            return null;
+        }
+
+        String oldPath = storageMusicProvider.getCompositionFilePath(storageId);
         String newPath = FileUtils.getChangedFilePath(oldPath, fileName);
         renameFile(oldPath, newPath);
 
-        Long storageId = composition.getStorageId();
-        if (storageId != null) {
-            storageMusicProvider.updateCompositionFilePath(storageId, newPath);
-        }
+        storageMusicProvider.updateCompositionFilePath(storageId, newPath);
+        storageMusicProvider.updateCompositionFileName(storageId, fileName);
+
         return newPath;
     }
 

@@ -194,6 +194,10 @@ public class StorageMusicProvider {
         updateComposition(id, MediaStore.Audio.AudioColumns.TITLE, title);
     }
 
+    public void updateCompositionFileName(long id, String name) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.DISPLAY_NAME, name);
+    }
+
     public void updateCompositionFilePath(long id, String filePath) {
         updateComposition(id, MediaStore.Audio.AudioColumns.DATA, filePath);
     }
@@ -309,7 +313,7 @@ public class StorageMusicProvider {
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
         cv.put(key, value);
-        contentResolver.update(Media.EXTERNAL_CONTENT_URI,
+        contentResolver.update(getCompositionUri(id),
                 cv,
                 Media._ID + " = ?",
                 new String[] { String.valueOf(id) });
