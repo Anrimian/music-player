@@ -112,29 +112,6 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         return fragment;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void setWhiteNavigationBar(@NonNull Dialog dialog) {
-        Window window = dialog.getWindow();
-        if (window != null) {
-            DisplayMetrics metrics = new DisplayMetrics();
-            window.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-            GradientDrawable dimDrawable = new GradientDrawable();
-            // ...customize your dim effect here
-
-            GradientDrawable navigationBarDrawable = new GradientDrawable();
-            navigationBarDrawable.setShape(GradientDrawable.RECTANGLE);
-            navigationBarDrawable.setColor(AndroidUtils.getColorFromAttr(requireContext(), R.attr.dialogBackground));
-
-            Drawable[] layers = {dimDrawable, navigationBarDrawable};
-
-            LayerDrawable windowBackground = new LayerDrawable(layers);
-            windowBackground.setLayerInsetTop(1, metrics.heightPixels);
-
-            window.setBackgroundDrawable(windowBackground);
-        }
-    }
-
     @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(@NonNull Dialog dialog, int style) {
