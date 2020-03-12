@@ -187,6 +187,8 @@
     <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
     <string name="move_progress">Moving…</string>
     <string name="delete_progress">Deleting…</string>
+    <string name="play_next_message_single">Composition \"%s\" will be played next</string>
+    <string name="added_to_queue_message_single">Composition \"%s\" added to end of play queue</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
@@ -215,4 +217,19 @@
         <item quantity="many">%1$s albums</item>
         <item quantity="other">%1$s albums</item>
     </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s song will be played next</item>
+        <item quantity="few">%s songs will be played next</item>
+        <item quantity="many">%s songs will be played next</item>
+        <item quantity="other">%s songs will be played next</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s song added to end of play queue</item>
+        <item quantity="few">%s songs added to end of play queue</item>
+        <item quantity="many">%s songs added to end of play queue</item>
+        <item quantity="other">%s songs added to end of play queue</item>
+    </plurals>
+
 </resources>

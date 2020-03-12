@@ -179,6 +179,8 @@
     <string name="folder_with_this_name_already_exists_in_dest_folder">Папка с таким именем уже существует в целевой папке</string>
     <string name="move_progress">Перемещение…</string>
     <string name="delete_progress">Удаление…</string>
+    <string name="play_next_message_single">Композиция \"%s\" будет проиграна следующей</string>
+    <string name="added_to_queue_message_single">Композиция \"%s\" добавлена в конец очереди воспроизведения</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
@@ -200,4 +202,19 @@
         <item quantity="many">%1$s файлов</item>
         <item quantity="other">%1$s файлов</item>
     </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s композиция будет проиграна следующей</item>
+        <item quantity="few">%s композиции будут проиграны следующими</item>
+        <item quantity="many">%s композиций будут проиграны следующими</item>
+        <item quantity="other">%s композиций будут проиграны следующими</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s композиция добавлена в конец очереди воспроизведения</item>
+        <item quantity="few">%s композиции добавлены в конец очереди воспроизведения</item>
+        <item quantity="many">%s композиций добавлены в конец очереди воспроизведения</item>
+        <item quantity="other">%s композиций добавлены в конец очереди воспроизведения</item>
+    </plurals>
+
 </resources>
