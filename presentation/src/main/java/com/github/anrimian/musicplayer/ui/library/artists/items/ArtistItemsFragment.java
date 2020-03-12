@@ -373,6 +373,18 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     }
 
     @Override
+    public void onCompositionsAddedToPlayNext(List<Composition> compositions) {
+        String message = MessagesUtils.getPlayNextMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCompositionsAddedToQueue(List<Composition> compositions) {
+        String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void closeScreen() {
         //TODO (last artist) artists screen -> album screen -> rename last artist -> second goBack() failed
         FragmentNavigation.from(requireFragmentManager()).goBack();

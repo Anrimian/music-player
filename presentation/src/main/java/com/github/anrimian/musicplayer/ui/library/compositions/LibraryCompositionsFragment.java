@@ -35,7 +35,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayList
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
-import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -344,5 +343,17 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void showPlayState(boolean play) {
         adapter.showPlaying(play);
+    }
+
+    @Override
+    public void onCompositionsAddedToPlayNext(List<Composition> compositions) {
+        String message = MessagesUtils.getPlayNextMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCompositionsAddedToQueue(List<Composition> compositions) {
+        String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
     }
 }

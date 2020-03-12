@@ -90,16 +90,14 @@ public class LibraryFoldersInteractor {
                 .subscribe();
     }
 
-    public void addCompositionsToPlayNext(List<FileSource> fileSources) {
-        libraryRepository.getAllCompositionsInFolders(fileSources)
-                .flatMapCompletable(musicPlayerInteractor::addCompositionsToPlayNext)
-                .subscribe();
+    public Single<List<Composition>> addCompositionsToPlayNext(List<FileSource> fileSources) {
+        return libraryRepository.getAllCompositionsInFolders(fileSources)
+                .flatMap(musicPlayerInteractor::addCompositionsToPlayNext);
     }
 
-    public void addCompositionsToEnd(List<FileSource> fileSources) {
-        libraryRepository.getAllCompositionsInFolders(fileSources)
-                .flatMapCompletable(musicPlayerInteractor::addCompositionsToEnd)
-                .subscribe();
+    public Single<List<Composition>> addCompositionsToEnd(List<FileSource> fileSources) {
+        return libraryRepository.getAllCompositionsInFolders(fileSources)
+                .flatMap(musicPlayerInteractor::addCompositionsToEnd);
     }
 
     public Single<List<Composition>> deleteCompositions(List<FileSource> fileSources) {

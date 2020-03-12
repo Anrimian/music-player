@@ -329,6 +329,18 @@ public class PlayListFragment extends MvpAppCompatFragment
         MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onCompositionsAddedToPlayNext(List<Composition> compositions) {
+        String message = MessagesUtils.getPlayNextMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCompositionsAddedToQueue(List<Composition> compositions) {
+        String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
     private void onCompositionActionSelected(Composition composition,
                                              @MenuRes int menuItemId,
                                              Bundle extra) {
