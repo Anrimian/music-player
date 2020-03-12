@@ -167,7 +167,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     void onAddToQueueFolderClicked(FolderFileSource folder) {
         dispose(playActionDisposable, presenterDisposable);
         playActionDisposable = interactor.getAllCompositionsInFolder(folder.getId())
-                .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
+                .flatMapCompletable(playerInteractor::addCompositionsToEnd)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(playActionDisposable);
