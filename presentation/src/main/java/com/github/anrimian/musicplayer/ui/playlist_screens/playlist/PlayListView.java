@@ -84,4 +84,10 @@ public interface PlayListView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showEditPlayListNameDialog(PlayList playListInMenu);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToPlayNext(List<Composition> compositions);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToQueue(List<Composition> compositions);
 }

@@ -26,6 +26,7 @@
     <attr name="secondaryButtonColor" format="color"/>
     <attr name="brightButtonColor" format="color"/>
     <attr name="buttonColorInverse" format="color"/>
+    <attr name="colorControlHighlightInverse" format="color"/>
 
     <!--text-->
     <attr name="dialogTitleColor" format="color"/>

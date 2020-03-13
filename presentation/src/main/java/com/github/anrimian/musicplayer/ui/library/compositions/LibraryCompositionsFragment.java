@@ -76,9 +76,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     private CompositionsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
 
-    private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
-    private final MenuItemWrapper searchMenuItem = new MenuItemWrapper();
-
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
@@ -173,8 +170,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.library_compositions_menu, menu);
-        searchMenuItem.setMenuItem(menu, R.id.menu_search);
-        orderMenuItem.setMenuItem(menu, R.id.menu_order);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -213,39 +208,29 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 
     @Override
     public void showEmptyList() {
-        searchMenuItem.call(item -> item.setVisible(false));
-        orderMenuItem.call(item -> item.setVisible(false));
         fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_on_device_not_found);
     }
 
     @Override
     public void showEmptySearchResult() {
-        searchMenuItem.call(item -> item.setVisible(true));
-        orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_for_search_not_found);
     }
 
     @Override
     public void showList() {
-        searchMenuItem.call(item -> item.setVisible(true));
-        orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(View.VISIBLE);
         progressViewWrapper.hideAll();
     }
 
     @Override
     public void showLoading() {
-        searchMenuItem.call(item -> item.setVisible(false));
-        orderMenuItem.call(item -> item.setVisible(false));
         progressViewWrapper.showProgress();
     }
 
     @Override
     public void showLoadingError(ErrorCommand errorCommand) {
-        searchMenuItem.call(item -> item.setVisible(false));
-        orderMenuItem.call(item -> item.setVisible(false));
         progressViewWrapper.showMessage(errorCommand.getMessage(), true);
     }
 
@@ -364,5 +349,17 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void showPlayState(boolean play) {
         adapter.showPlaying(play);
+    }
+
+    @Override
+    public void onCompositionsAddedToPlayNext(List<Composition> compositions) {
+        String message = MessagesUtils.getPlayNextMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCompositionsAddedToQueue(List<Composition> compositions) {
+        String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
     }
 }

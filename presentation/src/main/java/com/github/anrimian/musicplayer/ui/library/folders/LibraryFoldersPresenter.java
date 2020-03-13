@@ -158,18 +158,18 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     void onPlayNextFolderClicked(FolderFileSource folder) {
         dispose(playActionDisposable, presenterDisposable);
         playActionDisposable = interactor.getAllCompositionsInFolder(folder.getId())
-                .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
+                .flatMap(playerInteractor::addCompositionsToPlayNext)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
         presenterDisposable.add(playActionDisposable);
     }
 
     void onAddToQueueFolderClicked(FolderFileSource folder) {
         dispose(playActionDisposable, presenterDisposable);
         playActionDisposable = interactor.getAllCompositionsInFolder(folder.getId())
-                .flatMapCompletable(playerInteractor::addCompositionsToPlayNext)
+                .flatMap(playerInteractor::addCompositionsToEnd)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToQueue, this::onDefaultError);
         presenterDisposable.add(playActionDisposable);
     }
 
@@ -315,13 +315,19 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         closeSelectionMode();
     }
 
+    @SuppressLint("CheckResult")
     void onPlayNextSelectedSourcesClicked() {
-        interactor.addCompositionsToPlayNext(new ArrayList<>(selectedFiles));
+        interactor.addCompositionsToPlayNext(new ArrayList<>(selectedFiles))
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
         closeSelectionMode();
     }
 
+    @SuppressLint("CheckResult")
     void onAddToQueueSelectedSourcesClicked() {
-        interactor.addCompositionsToEnd(new ArrayList<>(selectedFiles));
+        interactor.addCompositionsToEnd(new ArrayList<>(selectedFiles))
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::onCompositionsAddedToQueue, this::onDefaultError);
         closeSelectionMode();
     }
 
@@ -455,7 +461,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         dispose(playActionDisposable, presenterDisposable);
         playActionDisposable = playerInteractor.addCompositionsToPlayNext(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
         presenterDisposable.add(playActionDisposable);
     }
 
@@ -463,7 +469,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         dispose(playActionDisposable, presenterDisposable);
         playActionDisposable = playerInteractor.addCompositionsToEnd(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToQueue, this::onDefaultError);
         presenterDisposable.add(playActionDisposable);
     }
 

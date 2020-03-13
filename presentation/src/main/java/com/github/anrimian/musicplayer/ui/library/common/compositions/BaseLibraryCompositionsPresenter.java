@@ -248,13 +248,13 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
     private void addCompositionsToPlayNext(List<Composition> compositions) {
         playerInteractor.addCompositionsToPlayNext(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
     }
 
     private void addCompositionsToEnd(List<Composition> compositions) {
         playerInteractor.addCompositionsToEnd(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToQueue, this::onDefaultError);
     }
 
     private void playSelectedCompositions() {
