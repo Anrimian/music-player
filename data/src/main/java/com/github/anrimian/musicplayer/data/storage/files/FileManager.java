@@ -13,7 +13,6 @@ public class FileManager {
         file.delete();
     }
 
-
     public static void deleteEmptyDirectory(File fileOrDirectory) {
         if (fileOrDirectory.isDirectory()) {
             File[] files = fileOrDirectory.listFiles();
@@ -31,22 +30,4 @@ public class FileManager {
             }
         }
     }
-
-    //TODO think about this
-//    public void deleteEmptyDirectory(File fileOrDirectory) {
-//        if (fileOrDirectory.isDirectory()) {
-//            File[] files = fileOrDirectory.listFiles();
-//            if (files != null) {
-//                for (File child : files) {
-//                    if (fileOrDirectory.isDirectory()) {
-//                        deleteEmptyDirectory(child);
-//                    }
-//                }
-//            }
-//            if (files == null || files.length == 0) {
-//                //noinspection ResultOfMethodCallIgnored
-//                fileOrDirectory.delete();
-//            }
-//        }
-//    }
 }
