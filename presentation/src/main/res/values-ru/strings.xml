@@ -46,7 +46,6 @@
     <string name="add_to_playlist_error_template">Не удалось добавить композицию в плейлист: %1$s</string>
     <string name="delete_composition_error_template">Не удалось удалить композицию: %1$s</string>
     <string name="add_to_playlist_success_template">Композиция \"%1$s\" добавлена в плейлист \"%2$s\"</string>
-    <string name="add_to_playlist_count_success_template">%1$d композиций добавлены в плейлист \"%2$s\"</string>
     <string name="play_list_is_empty">Плейлист пуст</string>
     <string name="save_as_play_list">Сохранить как плейлист</string>
     <string name="cancel">Отмена</string>
@@ -63,7 +62,6 @@
     <string name="delete_empty_folder">Удалить папку \"%s\"? Это действие нельзя будет отменить.</string>
     <string name="delete_template">Удалить %1$s? Это действие нельзя будет отменить.</string>
     <string name="delete_composition_success">Композиция \"%1$s\" удалена</string>
-    <string name="delete_compositions_success">%1$d композиций удалено</string>
     <string name="search">Поиск</string>
     <string name="play_queue">Очередь воспроизведения</string>
     <string name="pause">Пауза</string>
@@ -76,7 +74,6 @@
     <string name="delete_from_play_list">Удалить из плейлиста</string>
     <string name="add_item_to_playlist_error_template">Не удалось добавить композицию в плейлист: %1$s</string>
     <string name="delete_from_playlist_success_template">Композиция \"%1$s\" удалена из плейлиста \"%2$s\"</string>
-    <string name="delete_from_playlist_count_success_template">%1$d композиций удалено из плейлиста \"%2$s\"</string>
     <string name="delete_playlist_template">Удалить плейлист \"%1$s\"?</string>
     <string name="play_list_delete_error">Не удалось удалить плейлист: %1$s </string>
     <string name="play_not_exists">плейлист не существует</string>
@@ -215,6 +212,27 @@
         <item quantity="few">%s композиции добавлены в конец очереди воспроизведения</item>
         <item quantity="many">%s композиций добавлены в конец очереди воспроизведения</item>
         <item quantity="other">%s композиций добавлены в конец очереди воспроизведения</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d композиция добавлены в плейлист \"%2$s\"</item>
+        <item quantity="few">%1$d композиции добавлены в плейлист \"%2$s\"</item>
+        <item quantity="many">%1$d композиций добавлены в плейлист \"%2$s\"</item>
+        <item quantity="other">%1$d композиций добавлены в плейлист \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d композиция удалено из плейлиста \"%2$s\"</item>
+        <item quantity="few">%1$d композиции удалено из плейлиста \"%2$s\"</item>
+        <item quantity="many">%1$d композиций удалено из плейлиста \"%2$s\"</item>
+        <item quantity="other">%1$d композиций удалено из плейлиста \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d композиция удалена</item>
+        <item quantity="few">%1$d композиции удалено</item>
+        <item quantity="many">%1$d композиций удалено</item>
+        <item quantity="other">%1$d композиций удалено</item>
     </plurals>
 
 </resources>
