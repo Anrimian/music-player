@@ -232,16 +232,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        //FIXME: possible here: start playing, hide app, revoke permission, open
-        RxPermissions rxPermissions = new RxPermissions(requireActivity());
-        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requireFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_activity_container, new StartFragment())
-                    .commit();
-            return;
-        }
-
         AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground);
 
         toolbar.initializeViews(requireActivity().getWindow());
@@ -340,6 +330,15 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         if (getArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
             getArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();
+        }
+
+        //TODO: start playing, hide app, revoke permission, open - UPD: not crash, but many "file not found". Check after file path refactoring
+        RxPermissions rxPermissions = new RxPermissions(requireActivity());
+        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            requireFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_activity_container, new StartFragment())
+                    .commit();
         }
     }
 
