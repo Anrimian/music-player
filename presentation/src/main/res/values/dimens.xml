@@ -38,6 +38,8 @@
     <!--list margins-->
     <dimen name="list_vertical_margin">14dp</dimen>
     <dimen name="content_vertical_spacing_margin">4dp</dimen>
+   <!--content_vertical_margin*2(32) + fab size(56) -->
+    <dimen name="list_bottom_padding_with_fab">88dp</dimen>
 
     <!--dialog margins-->
     <dimen name="dialog_content_margin_start">20dp</dimen>
@@ -56,7 +58,6 @@
     <!--controls-->
     <dimen name="radio_button_text_margin_start">16dp</dimen>
     <dimen name="radio_button_text_vertical_padding">15dp</dimen>
-    <dimen name="fab_expected_size">60dp</dimen>
 
     <!--player bottom sheet-->
     <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>

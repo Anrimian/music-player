@@ -46,33 +46,6 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     }
 
     @Override
-    public boolean layoutDependsOn(@NonNull CoordinatorLayout parent,
-                                   @NonNull FloatingActionButton child,
-                                   @NonNull View dependency) {
-        return dependency instanceof RecyclerView;
-    }
-
-    @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent,
-                                          FloatingActionButton child,
-                                          View dependency) {
-        if (!isAttachedToRecyclerView) {
-            RecyclerView recyclerView = (RecyclerView) dependency;
-
-            int height = child.getHeight();
-            int margin = child.getResources().getDimensionPixelSize(R.dimen.content_vertical_margin);
-            recyclerView.setPadding(recyclerView.getPaddingLeft(),
-                    recyclerView.getPaddingTop(),
-                    recyclerView.getPaddingRight(),
-                    height + margin * 2);
-            recyclerView.setClipToPadding(false);
-
-            isAttachedToRecyclerView = true;
-        }
-        return false;
-    }
-
-    @Override
     public void onNestedScroll(@NonNull CoordinatorLayout coordinatorLayout,
                                @NonNull FloatingActionButton fab,
                                @NonNull View target,

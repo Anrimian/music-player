@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.utils.views.recycler_view;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
@@ -37,9 +38,9 @@ public class RecyclerViewUtils {
     }
 
     public static void scrollToPosition(RecyclerView rv,
-                                            LinearLayoutManager lm,
-                                            int position,
-                                            boolean smooth) {
+                                        LinearLayoutManager lm,
+                                        int position,
+                                        boolean smooth) {
         Context context = rv.getContext();
         rv.post(() -> {
             if (smooth) {
@@ -121,30 +122,35 @@ public class RecyclerViewUtils {
         });
     }
 
-    //attach if high amount of elements appeared? - seems working from box
+
+    public static void attachFastScroller(RecyclerView recyclerView) {
+        attachFastScroller(recyclerView, false);
+    }
+
+    //attach if high amount of elements appeared? - seems working from the box
     //reduce size
-    //top and bottom paddings(conflicts with fab)
     //add elevation? or color in light theme
     //list performance on fast scrolling
-    public static void attachFastScroller(RecyclerView recyclerView) {
+    public static void attachFastScroller(RecyclerView recyclerView, boolean useFabPadding) {
         Context context = recyclerView.getContext();
         Drawable trackDrawable = ContextCompat.getDrawable(context, R.drawable.drawable_empty);
         assert trackDrawable != null;
         Drawable thumbDrawable = ContextCompat.getDrawable(context, R.drawable.a_thumb_drawable);
         assert thumbDrawable != null;
 
-        //padding at bottom doesn't match
-        //fab behavior too
         Resources resources = context.getResources();
         int thumbVerticalPadding = resources.getDimensionPixelSize(R.dimen.scrollbar_thumb_vertical_padding);
-        int fabSize = resources.getDimensionPixelSize(R.dimen.fab_expected_size);
-        int contentMargin = resources.getDimensionPixelSize(R.dimen.content_vertical_margin);
+        int listBottomPadding = useFabPadding? resources.getDimensionPixelSize(R.dimen.list_bottom_padding_with_fab) : 0;
+
+        Rect padding = new Rect(0,
+                thumbVerticalPadding + recyclerView.getPaddingTop(),
+                0,
+                thumbVerticalPadding + listBottomPadding);
 
         new FastScrollerBuilder(recyclerView)
                 .setTrackDrawable(trackDrawable)
                 .setThumbDrawable(thumbDrawable)
-                //seems not working correctly
-                .setPadding(0, thumbVerticalPadding, 0, contentMargin + thumbVerticalPadding + fabSize)
+                .setPadding(padding)
                 .build();
     }
 }

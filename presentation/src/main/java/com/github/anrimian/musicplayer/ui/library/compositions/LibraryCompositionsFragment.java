@@ -122,7 +122,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerViewUtils.attachFastScroller(recyclerView);
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new CompositionsAdapter(recyclerView,
                 presenter.getSelectedCompositions(),
