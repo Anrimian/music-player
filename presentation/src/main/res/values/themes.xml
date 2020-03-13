@@ -40,6 +40,7 @@
         <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
         <item name="buttonColorInverse">@color/primary_button_color_dark</item>
         <item name="colorControlHighlightInverse">@color/color_control_highlight_light</item>
+        <item name="colorControlThird">@color/menu_item_background_color_dark</item>
 
         <!--navigation view-->
         <item name="navigationViewPrimaryColor">?android:attr/textColorPrimary</item>

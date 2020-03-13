@@ -4,21 +4,17 @@
         <shape
             android:shape="rectangle">
 
-            <size android:width="36dp"
+            <size android:width="@dimen/scrollbar_width"
                 android:height="48dp"/>
 
-
-            <!--                android:topRightRadius="6dp"-->
-            <!--                android:bottomRightRadius="6dp"-->
             <corners
                 android:topLeftRadius="64dp"
                 android:bottomLeftRadius="64dp" />
 
-            <solid android:color="?attr/menuItemBackground" />
+            <solid android:color="?attr/colorControlThird" />
 
         </shape>
     </item>
     <item android:drawable="@drawable/ic_menu_swap"
-        android:right="10dp"
-        android:left="10dp"/>
+        android:left="3dp"/>
 </layer-list>

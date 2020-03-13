@@ -20,7 +20,6 @@ import com.github.anrimian.musicplayer.domain.utils.java.CompositeCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteItemDecorator;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteTouchHelperCallback;
 
-import me.zhanghai.android.fastscroll.FastScroller;
 import me.zhanghai.android.fastscroll.FastScrollerBuilder;
 
 import static android.view.View.GONE;
@@ -128,14 +127,12 @@ public class RecyclerViewUtils {
     }
 
     //attach if high amount of elements appeared? - seems working from the box
-    //reduce size
-    //add elevation? or color in light theme
     //list performance on fast scrolling
     public static void attachFastScroller(RecyclerView recyclerView, boolean useFabPadding) {
         Context context = recyclerView.getContext();
-        Drawable trackDrawable = ContextCompat.getDrawable(context, R.drawable.drawable_empty);
+        Drawable trackDrawable = ContextCompat.getDrawable(context, R.drawable.bg_transparent);
         assert trackDrawable != null;
-        Drawable thumbDrawable = ContextCompat.getDrawable(context, R.drawable.a_thumb_drawable);
+        Drawable thumbDrawable = ContextCompat.getDrawable(context, R.drawable.ic_scroller_thumb);
         assert thumbDrawable != null;
 
         Resources resources = context.getResources();

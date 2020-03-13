@@ -21,12 +21,13 @@
 
     <attr name="disabledColor" format="color"/>
 
-    <!--buttons-->
+    <!--controls-->
     <attr name="buttonColor" format="color"/>
     <attr name="secondaryButtonColor" format="color"/>
     <attr name="brightButtonColor" format="color"/>
     <attr name="buttonColorInverse" format="color"/>
     <attr name="colorControlHighlightInverse" format="color"/>
+    <attr name="colorControlThird" format="color"/>
 
     <!--text-->
     <attr name="dialogTitleColor" format="color"/>
