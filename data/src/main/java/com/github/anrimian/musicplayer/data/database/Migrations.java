@@ -37,9 +37,7 @@ class Migrations {
 
             //don't migrate folders, they will update automatically on next storage rescan
             Cursor c = database.query("SELECT * FROM compositions");
-            for (int i = 0; i < c.getCount(); i++) {
-                c.moveToPosition(i);
-
+            while (c.moveToNext()) {
                 ContentValues cv = new ContentValues();
 
                 cv.put("id", c.getLong(c.getColumnIndex("id")));
@@ -86,11 +84,8 @@ class Migrations {
                 Map<String, Long> artistCache = new HashMap<>();
                 Map<String, Long> albumsCache = new HashMap<>();
                 Cursor c = database.query("SELECT * FROM compositions");
-                for (int i = 0; i < c.getCount(); i++) {
-                    c.moveToPosition(i);
-
+                while (c.moveToNext()) {
                     ContentValues cv = new ContentValues();
-
 
                     //artists
                     String artist = c.getString(c.getColumnIndex("artist"));
