@@ -1,13 +1,16 @@
 package com.github.anrimian.musicplayer.data.database;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
+import androidx.core.content.ContextCompat;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
@@ -79,7 +82,12 @@ class Migrations {
 
                 StorageAlbumsProvider storageAlbumsProvider = new StorageAlbumsProvider(context);
                 StorageMusicProvider provider = new StorageMusicProvider(context, storageAlbumsProvider);
-                LongSparseArray<StorageFullComposition> storageCompositions = provider.getCompositions();
+                LongSparseArray<StorageFullComposition> storageCompositions;
+                if (hasFilePermission(context)) {
+                    storageCompositions = provider.getCompositions();
+                } else {
+                    storageCompositions = new LongSparseArray<>();
+                }
 
                 Map<String, Long> artistCache = new HashMap<>();
                 Map<String, Long> albumsCache = new HashMap<>();
@@ -258,5 +266,10 @@ class Migrations {
                 database.execSQL("CREATE  INDEX `index_play_queue_audioId` ON `play_queue` (`audioId`)");
             }
         };
+    }
+
+    private static boolean hasFilePermission(Context context) {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
     }
 }
