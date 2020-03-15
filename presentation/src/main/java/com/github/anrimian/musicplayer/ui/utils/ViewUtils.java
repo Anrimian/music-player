@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -14,11 +15,11 @@ import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
@@ -26,7 +27,6 @@ import androidx.annotation.ColorInt;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
@@ -57,19 +57,11 @@ public class ViewUtils {
     /**
      * workaround for very rarely app crush. hope it helps
      */
-    public static <V extends View> BottomSheetBehavior<V> findBottomSheetBehavior(V view) {
-        V target = view;
-        do {
-            ViewGroup.LayoutParams params = target.getLayoutParams();
-            if ((params instanceof CoordinatorLayout.LayoutParams)) {
-                return BottomSheetBehavior.from(target);
-            } else {
-                //noinspection unchecked
-                target = (V) target.getParent();
-            }
-        } while (target != null);
+    public static BottomSheetBehavior findBottomSheetBehavior(Dialog dialog) {
+//        dialog.show();
 
-        throw new IllegalArgumentException("View with coordinator layout in parent not found");
+        FrameLayout bottomSheet = dialog.findViewById(R.id.design_bottom_sheet);
+        return BottomSheetBehavior.from(bottomSheet);
     }
 
     public static void onCheckChanged(CheckBox checkBox, Callback<Boolean> listener) {

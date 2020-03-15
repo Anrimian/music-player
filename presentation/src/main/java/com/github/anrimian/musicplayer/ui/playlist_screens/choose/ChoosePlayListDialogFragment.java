@@ -138,7 +138,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         int minHeight = (int) (height * heightPercent);
         view.setMinimumHeight(minHeight);
 
-        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(view);
+        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
         bottomSheetBehavior.setPeekHeight(minHeight);
 
         ButterKnife.bind(this, view);
