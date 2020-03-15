@@ -168,7 +168,6 @@ public class CompositionsDaoWrapper {
             if (albumId == null && albumName != null) {
                 //TODO rare crash here
                 //unexisting artist id?
-                //empty album name?
                 albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
             }
 

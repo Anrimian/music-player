@@ -54,12 +54,7 @@ public class ViewUtils {
         }
     }
 
-    /**
-     * workaround for very rarely app crush. hope it helps
-     */
     public static BottomSheetBehavior findBottomSheetBehavior(Dialog dialog) {
-//        dialog.show();
-
         FrameLayout bottomSheet = dialog.findViewById(R.id.design_bottom_sheet);
         return BottomSheetBehavior.from(bottomSheet);
     }
