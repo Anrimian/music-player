@@ -100,4 +100,10 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void startEditCompositionScreen(long id);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showErrorMessage(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeletedItemMessage();
 }

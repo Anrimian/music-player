@@ -85,6 +85,9 @@ public interface PlayQueueDao {
     @Insert
     long[] insertItems(List<PlayQueueEntity> playQueueEntityList);
 
+    @Insert
+    long insertItem(PlayQueueEntity entity);
+
     @Query("DELETE FROM play_queue")
     void deletePlayQueue();
 
@@ -99,6 +102,9 @@ public interface PlayQueueDao {
 
     @Query("SELECT shuffledPosition FROM play_queue WHERE id = :id")
     int getShuffledPosition(long id);
+
+    @Query("SELECT * FROM play_queue WHERE id = :id")
+    PlayQueueEntity getItem(long id);
 
     @Query("SELECT position FROM play_queue WHERE id = :id")
     Observable<Integer> getPositionObservable(long id);

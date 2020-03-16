@@ -252,6 +252,10 @@ public class MusicPlayerInteractor {
         return playQueueRepository.removeQueueItem(item);
     }
 
+    public Completable restoreDeletedItem() {
+        return playQueueRepository.restoreDeletedItem();
+    }
+
     public void swapItems(PlayQueueItem firstItem,
                           PlayQueueItem secondItem) {
         playQueueRepository.swapItems(firstItem, secondItem).subscribe();

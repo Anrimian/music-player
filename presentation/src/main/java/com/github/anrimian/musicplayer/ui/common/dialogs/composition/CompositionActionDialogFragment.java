@@ -125,7 +125,7 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         int minHeight = (int) (height * heightPercent);
 
         slideDelegate = buildSlideDelegate();
-        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(view);
+        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
         bottomSheetBehavior.setPeekHeight(minHeight);
         bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {

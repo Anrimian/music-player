@@ -36,6 +36,8 @@ public interface PlayQueueRepository {
 
     Completable removeQueueItem(PlayQueueItem item);
 
+    Completable restoreDeletedItem();
+
     Completable swapItems(PlayQueueItem firstItem, PlayQueueItem secondItem);
 
     Completable addCompositionsToPlayNext(List<Composition> compositions);
