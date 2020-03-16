@@ -178,6 +178,7 @@
     <string name="delete_progress">Удаление…</string>
     <string name="play_next_message_single">Композиция \"%s\" будет проиграна следующей</string>
     <string name="added_to_queue_message_single">Композиция \"%s\" добавлена в конец очереди воспроизведения</string>
+    <string name="queue_item_removed">Элемент очереди удалён</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

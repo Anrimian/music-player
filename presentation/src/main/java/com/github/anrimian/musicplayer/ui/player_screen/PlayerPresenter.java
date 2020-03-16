@@ -241,6 +241,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().startEditCompositionScreen(currentItem.getComposition().getId());
     }
 
+    void onRestoreDeletedItemClicked() {
+        playerInteractor.restoreDeletedItem()
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+    }
+
     private void swapItems(int from, int to) {
         PlayQueueItem fromItem = playQueue.get(from);
         PlayQueueItem toItem = playQueue.get(to);
@@ -254,7 +260,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void deletePlayQueueItem(PlayQueueItem item) {
         playerInteractor.removeQueueItem(item)
                 .observeOn(uiScheduler)
-                .subscribe();
+                .subscribe(getViewState()::showDeletedItemMessage);
     }
 
     private void subscribeOnRepeatMode() {
@@ -392,4 +398,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
             getViewState().showCurrentQueueItem(currentItem, isCoversEnabled);
         }
     }
+
+    private void onDefaultError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showErrorMessage(errorCommand);
+    }
+
 }

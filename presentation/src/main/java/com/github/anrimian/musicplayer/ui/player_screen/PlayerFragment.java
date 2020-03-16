@@ -625,6 +625,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        MessagesUtils.makeSnackbar(clPlayQueueContainer, errorCommand.getMessage()).show();
+    }
+
+    @Override
+    public void showDeletedItemMessage() {
+        MessagesUtils.makeSnackbar(clPlayQueueContainer, R.string.queue_item_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.cancel, presenter::onRestoreDeletedItemClicked)
+                .show();
+    }
+
+    @Override
     public void showAddingToPlayListError(ErrorCommand errorCommand) {
         MessagesUtils.makeSnackbar(clPlayQueueContainer,
                 getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
