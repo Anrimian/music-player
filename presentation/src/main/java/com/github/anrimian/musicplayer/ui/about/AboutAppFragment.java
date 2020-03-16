@@ -52,7 +52,9 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
     public void onFragmentMovedOnTop() {
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.app_name);
-        toolbar.setSubtitle(getString(R.string.version_template, BuildConfig.VERSION_NAME));
+        toolbar.setSubtitle(getString(R.string.version_template,
+                BuildConfig.VERSION_NAME,
+                BuildConfig.VERSION_CODE));
         toolbar.setTitleClickListener(null);
     }
 
