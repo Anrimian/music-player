@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.albums.items;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.domain.business.library.LibraryAlbumsInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
@@ -48,6 +50,7 @@ public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumI
         subscribeOnAlbumInfo();
     }
 
+    @NonNull
     @Override
     protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
         return interactor.getAlbumItemsObservable(albumId);
@@ -64,8 +67,8 @@ public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumI
     }
 
     private void subscribeOnAlbumInfo() {
-        presenterDisposable.add(interactor.getAlbumObservable(albumId)
-                .observeOn(uiScheduler)
+        getPresenterDisposable().add(interactor.getAlbumObservable(albumId)
+                .observeOn(getUiScheduler())
                 .subscribe(this::onAlbumInfoReceived,
                         t -> getViewState().closeScreen(),
                         getViewState()::closeScreen));
