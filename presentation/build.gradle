@@ -87,6 +87,9 @@ dependencies {
     implementation deps.room
     annotationProcessor deps.roomCompiler
 
+    implementation deps.glide
+    annotationProcessor deps.glideCompiler
+
     implementation deps.slidr
 
     implementation deps.chipsLayoutManager

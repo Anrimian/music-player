@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
@@ -13,6 +14,12 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.NotificationTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
@@ -22,15 +29,20 @@ import com.github.anrimian.musicplayer.ui.utils.image.loader.SimpleImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nonnull;
 
 public class CoverImageLoader {
 
+    private final int defaultPlaceholder = R.drawable.ic_music_placeholder_simple;
+    private final int timeoutMillis = 5000;
+
     private final Context context;
     private final StorageAlbumsProvider storageAlbumsProvider;
 
     private final SimpleImageLoader<String, ImageMetaData> imageLoader;
+
 
     public CoverImageLoader(Context context, StorageAlbumsProvider storageAlbumsProvider) {
         this.context = context;
@@ -47,32 +59,81 @@ public class CoverImageLoader {
     }
 
     public void displayImage(@NonNull ImageView imageView, @NonNull Composition data) {
-        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()));
-    }
+        Glide.with(imageView)
+                .load(data)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(defaultPlaceholder)
+                .timeout(timeoutMillis)
+                .into(imageView);
 
-    public void displayImage(@NonNull ImageView imageView, @NonNull Album album) {
-        imageLoader.displayImage(imageView, new AlbumImage(album));
+//        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()));
     }
 
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull Composition data,
                              @DrawableRes int errorPlaceholder) {
-        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()), errorPlaceholder);
+        Glide.with(imageView)
+                .load(data)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(errorPlaceholder)
+                .timeout(timeoutMillis)
+                .into(imageView);
+
+//        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()), errorPlaceholder);
     }
 
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull Album album,
                              @DrawableRes int errorPlaceholder) {
-        imageLoader.displayImage(imageView, new AlbumImage(album), errorPlaceholder);
+        Glide.with(imageView)
+                .load(album)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(errorPlaceholder)
+                .timeout(timeoutMillis)
+                .into(imageView);
+
+//        imageLoader.displayImage(imageView, new AlbumImage(album), errorPlaceholder);
     }
 
     @Nullable
     public Bitmap getImage(@Nonnull Composition data, long timeoutMillis) {
-        return imageLoader.getImage(new CompositionImage(data.getId(), data.getFilePath()), timeoutMillis);
+        //not working properly
+        try {
+            return Glide.with(context)
+                    .asBitmap()
+                    .load(data)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .timeout((int) timeoutMillis)
+                    .submit()
+                    .get();
+        } catch (Exception ignored) {
+            return null;
+        }
+
+//        return imageLoader.getImage(new CompositionImage(data.getId(), data.getFilePath()), timeoutMillis);
     }
 
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
-        imageLoader.loadImage(new CompositionImage(data.getId(), data.getFilePath()), onCompleted);
+        Glide.with(context)
+                .asBitmap()
+                .load(data)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .timeout(timeoutMillis)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        onCompleted.call(resource);
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        onCompleted.call(null);
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                });
+//        imageLoader.loadImage(new CompositionImage(data.getId(), data.getFilePath()), onCompleted);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,

@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 
 import com.github.anrimian.musicplayer.data.repositories.source.SourceRepository;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
@@ -61,6 +62,7 @@ public interface AppComponent {
     UiStateRepository uiStateRepository();
     MediaScannerRepository mediaScannerRepository();
     SourceRepository sourceRepository();
+    StorageAlbumsProvider storageAlbumsProvider();
 
     CoverImageLoader imageLoader();
     WidgetUpdater widgetUpdater();
@@ -69,4 +71,5 @@ public interface AppComponent {
     ThemeController themeController();
 
     void inject(MusicService musicService);
+
 }

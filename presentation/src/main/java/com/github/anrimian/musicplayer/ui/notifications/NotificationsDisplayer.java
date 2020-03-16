@@ -182,6 +182,7 @@ public class NotificationsDisplayer {
 
             if (showCovers) {
                 Bitmap bitmap = ImageFormatUtils.getNotificationImage(composition);
+
                 builder.setLargeIcon(bitmap);
             }
 
