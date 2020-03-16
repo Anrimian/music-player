@@ -140,6 +140,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
+    public Completable restoreDeletedItem() {
+        return Completable.fromAction(playQueueDao::restoreDeletedItem)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Completable swapItems(PlayQueueItem firstItem,
                                  PlayQueueItem secondItem) {
         return Completable.fromRunnable(() -> playQueueDao.swapItems(firstItem,

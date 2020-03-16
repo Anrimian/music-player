@@ -115,6 +115,7 @@
     <dimen name="snackbar_padding_start">16dp</dimen>
     <dimen name="snackbar_padding_end">8dp</dimen>
     <dimen name="snackbar_padding_vertical">16dp</dimen>
+    <dimen name="snackbar_padding_button_vertical">8dp</dimen>
     <dimen name="snackbar_margin_content">16dp</dimen>
     <dimen name="snackbar_margin">8dp</dimen>
     <dimen name="snackbar_corners">4dp</dimen>

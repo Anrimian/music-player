@@ -16,8 +16,8 @@
         android:progressDrawable="@drawable/bg_progress_circle"
         android:layout_gravity="center_vertical|start"
         android:layout_marginStart="@dimen/snackbar_padding_start"
-        android:layout_marginTop="@dimen/snackbar_padding_vertical"
-        android:layout_marginBottom="@dimen/snackbar_padding_vertical"
+        android:layout_marginTop="@dimen/snackbar_padding_button_vertical"
+        android:layout_marginBottom="@dimen/snackbar_padding_button_vertical"
         tools:visibility="visible"
         tools:progress="60"/>
 
@@ -36,7 +36,7 @@
         android:textColor="?android:attr/textColorPrimaryInverse"
         android:maxLines="@integer/snackbar_max_lines"
         android:ellipsize="end"
-        tools:text="messagemessagemessagemessagemessagemessage"/>
+        tools:text="messaggemessagemessage"/>
 
     <Button
         style="@style/ButtonBorderlessStyle"
@@ -45,11 +45,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
         android:layout_marginEnd="@dimen/snackbar_padding_end"
-        android:layout_marginTop="@dimen/snackbar_padding_vertical"
-        android:layout_marginBottom="@dimen/snackbar_padding_vertical"
+        android:layout_marginTop="@dimen/snackbar_padding_button_vertical"
+        android:layout_marginBottom="@dimen/snackbar_padding_button_vertical"
         android:textColor="?attr/colorAccent"
         android:maxLines="1"
         android:ellipsize="end"
+        tools:visibility="visible"
         tools:text="retry"/>
 
 </LinearLayout>
