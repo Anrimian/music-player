@@ -38,6 +38,7 @@
     <!--list margins-->
     <dimen name="list_vertical_margin">14dp</dimen>
     <dimen name="content_vertical_spacing_margin">4dp</dimen>
+    <dimen name="list_content_margin_end">24dp</dimen>
    <!--content_vertical_margin*2(32) + fab size(56) -->
     <dimen name="list_bottom_padding_with_fab">88dp</dimen>
 
