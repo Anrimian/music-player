@@ -147,4 +147,10 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showAddedIgnoredFolderMessage(IgnoredFolder folder);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToPlayNext(List<Composition> compositions);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToQueue(List<Composition> compositions);
 }

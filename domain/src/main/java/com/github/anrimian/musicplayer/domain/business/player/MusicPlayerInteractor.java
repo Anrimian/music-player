@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
@@ -251,17 +252,23 @@ public class MusicPlayerInteractor {
         return playQueueRepository.removeQueueItem(item);
     }
 
+    public Completable restoreDeletedItem() {
+        return playQueueRepository.restoreDeletedItem();
+    }
+
     public void swapItems(PlayQueueItem firstItem,
                           PlayQueueItem secondItem) {
         playQueueRepository.swapItems(firstItem, secondItem).subscribe();
     }
 
-    public Completable addCompositionsToPlayNext(List<Composition> compositions) {
-        return playQueueRepository.addCompositionsToPlayNext(compositions);
+    public Single<List<Composition>> addCompositionsToPlayNext(List<Composition> compositions) {
+        return playQueueRepository.addCompositionsToPlayNext(compositions)
+                .toSingleDefault(compositions);
     }
 
-    public Completable addCompositionsToEnd(List<Composition> compositions) {
-        return playQueueRepository.addCompositionsToEnd(compositions);
+    public Single<List<Composition>> addCompositionsToEnd(List<Composition> compositions) {
+        return playQueueRepository.addCompositionsToEnd(compositions)
+                .toSingleDefault(compositions);
     }
 
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {

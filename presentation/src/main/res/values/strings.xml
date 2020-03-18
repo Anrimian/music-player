@@ -51,7 +51,6 @@
     <string name="add_to_playlist_error_template">Can not add song to playlist: %1$s</string>
     <string name="delete_composition_error_template">Can not delete song: %1$s</string>
     <string name="add_to_playlist_success_template">Song \"%1$s\" added to playlist \"%2$s\"</string>
-    <string name="add_to_playlist_count_success_template">%1$d songs added to playlist \"%2$s\"</string>
     <string name="play_list_is_empty">Playlist is empty</string>
     <string name="save_as_play_list">Save as playlist</string>
     <string name="cancel">Cancel</string>
@@ -64,7 +63,6 @@
     </string>
     <string name="delete_template">Delete \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_composition_success">Song \"%1$s\" deleted</string>
-    <string name="delete_compositions_success">%1$d songs deleted</string>
     <string name="search">Search</string>
     <string name="play_queue">Play queue</string>
     <string name="pause">Pause</string>
@@ -77,7 +75,6 @@
     <string name="delete_from_play_list">Delete from playlist</string>
     <string name="add_item_to_playlist_error_template">Can not add song to playlist: %1$s</string>
     <string name="delete_from_playlist_success_template">Song \"%1$s\" deleted from playlist \"%2$s\"</string>
-    <string name="delete_from_playlist_count_success_template">%1$d songs deleted from playlist \"%2$s\"</string>
     <string name="delete_playlist_template">Delete playlist \"%1$s\"?</string>
     <string name="play_list_delete_error">Can not delete playlist: %1$s </string>
     <string name="play_not_exists">Playlist don\'t exists</string>
@@ -117,7 +114,7 @@
     <string name="playing_error">Play error</string>
     <string name="no_file_permission">No file permission</string>
     <string name="about_app">About</string>
-    <string name="version_template">Version %s</string>
+    <string name="version_template">Version %1$s(%2$d)</string>
     <string name="about_app_text">Found a issue? Is the screen displayed incorrectly or slowly? Lacking any features? Write me about it, I will be appreciated for feedback.</string>
     <string name="send_email">Send email</string>
     <string name="theme">Theme</string>
@@ -187,6 +184,9 @@
     <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
     <string name="move_progress">Moving…</string>
     <string name="delete_progress">Deleting…</string>
+    <string name="play_next_message_single">Composition \"%s\" will be played next</string>
+    <string name="added_to_queue_message_single">Composition \"%s\" added to end of play queue</string>
+    <string name="queue_item_removed">Queue item removed</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
@@ -215,4 +215,40 @@
         <item quantity="many">%1$s albums</item>
         <item quantity="other">%1$s albums</item>
     </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s song will be played next</item>
+        <item quantity="few">%s songs will be played next</item>
+        <item quantity="many">%s songs will be played next</item>
+        <item quantity="other">%s songs will be played next</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s song added to end of play queue</item>
+        <item quantity="few">%s songs added to end of play queue</item>
+        <item quantity="many">%s songs added to end of play queue</item>
+        <item quantity="other">%s songs added to end of play queue</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d song added to playlist \"%2$s\"</item>
+        <item quantity="few">%1$d songs added to playlist \"%2$s\"</item>
+        <item quantity="many">%1$d songs added to playlist \"%2$s\"</item>
+        <item quantity="other">%1$d songs added to playlist \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d song deleted from playlist \"%2$s\"</item>
+        <item quantity="few">%1$d songs deleted from playlist \"%2$s\"</item>
+        <item quantity="many">%1$d songs deleted from playlist \"%2$s\"</item>
+        <item quantity="other">%1$d songs deleted from playlist \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d song deleted</item>
+        <item quantity="few">%1$d songs deleted</item>
+        <item quantity="many">%1$d songs deleted</item>
+        <item quantity="other">%1$d songs deleted</item>
+    </plurals>
+
 </resources>

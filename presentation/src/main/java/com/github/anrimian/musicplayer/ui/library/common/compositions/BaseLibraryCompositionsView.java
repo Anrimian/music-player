@@ -63,4 +63,9 @@ public interface BaseLibraryCompositionsView extends ListMvpView<Composition> {
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showPlayState(boolean play);
 
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToPlayNext(List<Composition> compositions);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToQueue(List<Composition> compositions);
 }
