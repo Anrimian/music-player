@@ -54,6 +54,11 @@ public class StorageMusicProvider {
         this.albumsProvider = albumsProvider;
     }
 
+    public void scanMedia(long id) {
+        String filePath = getCompositionFilePath(id);
+        scanMedia(filePath);
+    }
+
     public void scanMedia(String path) {
         File file = new File(path);
         Uri uri = Uri.fromFile(file);
