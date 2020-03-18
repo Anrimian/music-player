@@ -14,7 +14,6 @@ public interface CompositionSerializer {
     String TITLE = "title";
     String ALBUM = "album";
     String FILE_NAME = "file_name";
-    String FILE_PATH = "file_path";
     String DURATION = "duration";
     String SIZE = "size";
     String ID = "id";
@@ -29,7 +28,6 @@ public interface CompositionSerializer {
         bundle.putString(TITLE, composition.getTitle());
         bundle.putString(ALBUM, composition.getAlbum());
         bundle.putString(FILE_NAME, composition.getFileName());
-        bundle.putString(FILE_PATH, composition.getFilePath());
         bundle.putLong(SIZE, composition.getSize());
         bundle.putLong(ID, composition.getId());
         Long storageId = composition.getStorageId();
@@ -47,7 +45,6 @@ public interface CompositionSerializer {
                 bundle.getString(TITLE),
                 Objects.requireNonNull(bundle.getString(FILE_NAME)),
                 bundle.getString(ALBUM),
-                Objects.requireNonNull(bundle.getString(FILE_PATH)),
                 bundle.getLong(DURATION),
                 bundle.getLong(SIZE),
                 bundle.getLong(ID),

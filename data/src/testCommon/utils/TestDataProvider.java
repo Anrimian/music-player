@@ -48,16 +48,6 @@ public class TestDataProvider {
         return composition(artistId, albumId, title, null);
     }
 
-    public static List<Composition> getFakeCompositions() {
-        List<Composition> compositions = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
-            Composition composition = fakeComposition(i, "music-" + i);
-            compositions.add(composition);
-        }
-        return compositions;
-    }
-
-
     public static List<StoragePlayListItem> getFakeStoragePlayListItems() {
         List<StoragePlayListItem> items = new ArrayList<>();
         for (int i = 0; i < 100000; i++) {
@@ -85,38 +75,11 @@ public class TestDataProvider {
         return items;
     }
 
-    public static List<PlayListItem> getFakePlayListItems() {
-        List<PlayListItem> items = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
-            Composition composition = fakeComposition(i, "music-" + i);
-            PlayListItem item = new PlayListItem(i, composition);
-            items.add(item);
-        }
-        return items;
-    }
-
-    public static List<PlayQueueItem> getFakeItems() {
-        List<PlayQueueItem> items = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
-            Composition composition = fakeComposition(i, "music-" + i);
-            PlayQueueItem item = new PlayQueueItem(i, composition);
-            items.add(item);
-        }
-        return items;
-    }
-
-    public static List<PlayQueueItem> getReversedFakeItems() {
-        List<PlayQueueItem> items = getFakeItems();
-        Collections.reverse(items);
-        return items;
-    }
-
     public static Composition fakeComposition(long id) {
         return new Composition(null,
                 null,
                 "fileName",
                 null,
-                String.valueOf(id),
                 0,
                 0,
                 id,
@@ -128,24 +91,6 @@ public class TestDataProvider {
 
     public static StoragePlayListItem fakeStoragePlayListItem(int index) {
         return getFakeStoragePlayListItems().get(index);
-    }
-
-    public static PlayListItem fakePlayListItem(int index) {
-        return getFakePlayListItems().get(index);
-    }
-
-
-    public static PlayQueueItem fakeItem(int index) {
-        return getFakeItems().get(index);
-    }
-
-    public static Map<Long, Composition> getFakeCompositionsMap() {
-        Map<Long, Composition> compositions = new HashMap<>();
-        for (long i = 0; i < 100000; i++) {
-            Composition composition = fakeComposition(i, "music-" + i);
-            compositions.put(i, composition);
-        }
-        return compositions;
     }
 
     public static LongSparseArray<StorageComposition> getFakeStorageCompositionsMap() {
@@ -163,99 +108,6 @@ public class TestDataProvider {
 
     public static PlayQueueEvent currentItem(int itemId, int compositionId) {
         return new PlayQueueEvent(new PlayQueueItem(itemId, fakeComposition(compositionId)), 0L);
-    }
-
-    public static Composition fakeComposition(long id, String filePath, long createDate) {
-        return new Composition(null,
-                null,
-                "fileName",
-                null,
-                filePath,
-                0,
-                0,
-                id,
-                ++id,
-                new Date(createDate),
-                new Date(0),
-                null);
-    }
-
-    public static Composition fakeComposition(long id,
-                                              String filePath,
-                                              long createDate,
-                                              long modifyDate) {
-        return new Composition(null,
-                null,
-                "fileName",
-                null,
-                filePath,
-                0,
-                0,
-                id,
-                ++id,
-                new Date(createDate),
-                new Date(modifyDate),
-                null);
-    }
-
-    public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
-        return new Composition(null,
-                null,
-                "fileName",
-                null,
-                filePath,
-                0,
-                size,
-                id,
-                ++id,
-                new Date(0),
-                new Date(0),
-                null);
-    }
-
-    public static Composition fakeComposition(long id, long createDate) {
-        return new Composition(null,
-                null,
-                "fileName",
-                null,
-                String.valueOf(id),
-                0,
-                0,
-                id,
-                ++id,
-                new Date(createDate * 1000L),
-                new Date(0),
-                null);
-    }
-
-    public static Composition fakeComposition(long id, String filePath) {
-        return new Composition(null,
-                null,
-                "fileName",
-                null,
-                filePath,
-                0,
-                0,
-                id,
-                ++id,
-                new Date(0),
-                new Date(0),
-                null);
-    }
-
-    public static Composition fakeCompositionWithTitle(long id, String title) {
-        return new Composition(null,
-                title,
-                "fileName",
-                null,
-                String.valueOf(id),
-                0,
-                0,
-                id,
-                ++id,
-                new Date(0),
-                new Date(0),
-                null);
     }
 
     public static StoragePlayList storagePlayList(long i) {

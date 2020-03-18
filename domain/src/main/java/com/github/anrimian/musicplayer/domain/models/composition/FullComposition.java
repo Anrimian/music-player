@@ -22,10 +22,6 @@ public class FullComposition {
     @Nonnull
     private final String fileName;
 
-    @Nonnull
-    @Deprecated
-    private final String filePath;
-
     private final long duration;
     private final long size;
     private final long id;
@@ -47,7 +43,6 @@ public class FullComposition {
                            String album,
                            String albumArtist,
                            String fileName,
-                           String filePath,
                            long duration,
                            long size,
                            long id,
@@ -60,7 +55,6 @@ public class FullComposition {
         this.album = album;
         this.albumArtist = albumArtist;
         this.fileName = fileName;
-        this.filePath = filePath;
         this.duration = duration;
         this.size = size;
         this.id = id;
@@ -100,12 +94,6 @@ public class FullComposition {
         return fileName;
     }
 
-    @Deprecated
-    @Nonnull
-    public String getFilePath() {
-        return filePath;
-    }
-
     public long getDuration() {
         return duration;
     }
@@ -137,7 +125,7 @@ public class FullComposition {
     public String toString() {
         return "Composition{" +
                 "\n id=" + id +
-                "\n filePath='" + filePath + '\'' +
+                "\n fileName='" + fileName + '\'' +
                 "\n duration=" + duration +
                 "\n size=" + size +
                 "\n dateAdded=" + dateAdded +

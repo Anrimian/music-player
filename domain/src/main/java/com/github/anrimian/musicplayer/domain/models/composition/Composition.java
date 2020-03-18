@@ -21,9 +21,6 @@ public class Composition {
     private final String fileName;
     @Nullable
     private final String album;
-    @Nonnull
-    @Deprecated
-    private final String filePath;
 
     private final long duration;
     private final long size;
@@ -45,7 +42,6 @@ public class Composition {
                        String title,
                        String fileName,
                        String album,
-                       String filePath,
                        long duration,
                        long size,
                        long id,
@@ -57,7 +53,6 @@ public class Composition {
         this.title = title;
         this.fileName = fileName;
         this.album = album;
-        this.filePath = filePath;
         this.duration = duration;
         this.size = size;
         this.id = id;
@@ -92,12 +87,6 @@ public class Composition {
         return album;
     }
 
-    @Nonnull
-    @Deprecated
-    public String getFilePath() {
-        return filePath;
-    }
-
     public long getDuration() {
         return duration;
     }
@@ -129,7 +118,7 @@ public class Composition {
     public String toString() {
         return "Composition{" +
                 "\n id=" + id +
-                "\n filePath='" + filePath + '\'' +
+                "\n filename=" + fileName +
                 "\n duration=" + duration +
                 "\n size=" + size +
                 "\n dateAdded=" + dateAdded +

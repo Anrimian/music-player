@@ -57,7 +57,6 @@ public class TestBusinessDataProvider {
                 null,
                 "fileName",
                 null,
-                String.valueOf(id),
                 0,
                 0,
                 id,
@@ -93,72 +92,11 @@ public class TestBusinessDataProvider {
         return new PlayQueueEvent(new PlayQueueItem(itemId, fakeComposition(compositionId)), 0L);
     }
 
-    public static Composition fakeComposition(long id, String filePath, long createDate) {
+    public static Composition fakeComposition(long id, String fileName) {
         return new Composition(null,
                 null,
-                "fileName",
+                fileName,
                 null,
-                filePath,
-                0,
-                0,
-                id,
-                id,
-                new Date(createDate),
-                new Date(0),
-                null);
-    }
-
-    public static Composition fakeCompositionWithSize(long id, String filePath, long size) {
-        return new Composition(null,
-                null,
-                "fileName",
-                null,
-                filePath,
-                0,
-                size,
-                id,
-                id,
-                new Date(0),
-                new Date(0),
-                null);
-    }
-
-    public static Composition fakeComposition(long id, long createDate) {
-        return new Composition(null,
-                null,
-                "fileName",
-                null,
-                String.valueOf(id),
-                0,
-                0,
-                id,
-                id,
-                new Date(createDate * 1000L),
-                new Date(0),
-                null);
-    }
-
-    public static Composition fakeComposition(long id, String filePath) {
-        return new Composition(null,
-                null,
-                "fileName",
-                null,
-                filePath,
-                0,
-                0,
-                id,
-                id,
-                new Date(0),
-                new Date(0),
-                null);
-    }
-
-    public static Composition fakeCompositionWithTitle(long id, String title) {
-        return new Composition(null,
-                title,
-                "fileName",
-                null,
-                String.valueOf(id),
                 0,
                 0,
                 id,

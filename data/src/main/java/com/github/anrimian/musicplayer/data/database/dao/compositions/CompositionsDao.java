@@ -30,7 +30,6 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
-            "filePath as filePath, " +
             "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
@@ -58,7 +57,6 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
-            "compositions.filePath as filePath, " +
             "compositions.fileName as fileName, " +
             "compositions.duration as duration, " +
             "compositions.size as size, " +
@@ -144,7 +142,6 @@ public interface CompositionsDao {
                 "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
                 "(SELECT name FROM albums WHERE id = albumId) as album,  " +
                 "title as title,  " +
-                "filePath as filePath,  " +
                 "fileName as fileName, " +
                 "duration as duration,  " +
                 "size as size,  " +
