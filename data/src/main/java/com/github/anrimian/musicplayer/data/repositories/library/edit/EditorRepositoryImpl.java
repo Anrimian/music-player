@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
@@ -43,8 +44,7 @@ import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class EditorRepositoryImpl implements EditorRepository {
 
-    private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor();
-
+    private final CompositionSourceEditor sourceEditor;
     private final StorageFilesDataSource filesDataSource;
     private final CompositionsDaoWrapper compositionsDao;
     private final AlbumsDaoWrapper albumsDao;
@@ -56,7 +56,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final StateRepository stateRepository;
     private final Scheduler scheduler;
 
-    public EditorRepositoryImpl(StorageFilesDataSource filesDataSource,
+    public EditorRepositoryImpl(CompositionSourceEditor sourceEditor,
+                                StorageFilesDataSource filesDataSource,
                                 CompositionsDaoWrapper compositionsDao,
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
@@ -66,6 +67,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                                 StorageGenresProvider storageGenresProvider,
                                 StateRepository stateRepository,
                                 Scheduler scheduler) {
+        this.sourceEditor = sourceEditor;
         this.filesDataSource = filesDataSource;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
@@ -98,7 +100,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeCompositionGenre(FullComposition composition,
                                               ShortGenre oldGenre,
                                               String newGenre) {
-        return sourceEditor.changeCompositionGenre(composition.getFilePath(), oldGenre.getName(), newGenre)
+        return sourceEditor.changeCompositionGenre(composition, oldGenre.getName(), newGenre)
                 .doOnComplete(() -> {
                     genresDao.changeCompositionGenre(composition.getId(), oldGenre.getId(), newGenre);
                     runSystemRescan(composition);
@@ -109,7 +111,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable addCompositionGenre(FullComposition composition,
                                            String newGenre) {
-        return sourceEditor.addCompositionGenre(composition.getFilePath(), newGenre)
+        return sourceEditor.addCompositionGenre(composition, newGenre)
                 .doOnComplete(() -> {
                     genresDao.addCompositionToGenre(composition.getId(), newGenre);
                     runSystemRescan(composition);
@@ -119,7 +121,7 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable removeCompositionGenre(FullComposition composition, ShortGenre genre) {
-        return sourceEditor.removeCompositionGenre(composition.getFilePath(), genre.getName())
+        return sourceEditor.removeCompositionGenre(composition, genre.getName())
                 .doOnComplete(() -> {
                     genresDao.removeCompositionFromGenre(composition.getId(), genre.getId());
                     runSystemRescan(composition);
@@ -129,7 +131,7 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable changeCompositionAuthor(FullComposition composition, String newAuthor) {
-        return sourceEditor.setCompositionAuthor(composition.getFilePath(), newAuthor)
+        return sourceEditor.setCompositionAuthor(composition, newAuthor)
                 .doOnComplete(() -> {
                     compositionsDao.updateArtist(composition.getId(), newAuthor);
                     runSystemRescan(composition);
@@ -139,7 +141,7 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable changeCompositionAlbumArtist(FullComposition composition, String newAuthor) {
-        return sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), newAuthor)
+        return sourceEditor.setCompositionAlbumArtist(composition, newAuthor)
                 .doOnComplete(() -> {
                     compositionsDao.updateAlbumArtist(composition.getId(), newAuthor);
                     runSystemRescan(composition);
@@ -149,7 +151,7 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable changeCompositionAlbum(FullComposition composition, String newAlbum) {
-        return sourceEditor.setCompositionAlbum(composition.getFilePath(), newAlbum)
+        return sourceEditor.setCompositionAlbum(composition, newAlbum)
                 .doOnComplete(() -> {
                     compositionsDao.updateAlbum(composition.getId(), newAlbum);
                     runSystemRescan(composition);
@@ -159,7 +161,7 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable changeCompositionTitle(FullComposition composition, String title) {
-        return sourceEditor.setCompositionTitle(composition.getFilePath(), title)
+        return sourceEditor.setCompositionTitle(composition, title)
                 .doOnComplete(() -> {
                     compositionsDao.updateTitle(composition.getId(), title);
                     runSystemRescan(composition);
@@ -246,7 +248,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         return checkAlbumExists(name)
                 .andThen(Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId)))
                 .flatMap(compositions -> Observable.fromIterable(compositions)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition.getFilePath(), name))
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition, name))
                         .toSingleDefault(compositions))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumName(name, albumId);
@@ -262,7 +264,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable updateAlbumArtist(String newArtistName, long albumId) {
         return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
                 .flatMap(compositions -> Observable.fromIterable(compositions)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), newArtistName))// not working, we can't edit album artist?
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition, newArtistName))// not working, we can't edit album artist?
                         .toSingleDefault(compositions))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumArtist(albumId, newArtistName);
@@ -282,14 +284,14 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .andThen(Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId)))
                 .doOnSuccess(compositionsToScan::addAll)
                 .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name))
+                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition, name))
 
                 .andThen(Single.fromCallable(() -> albumsDao.getAllAlbumsForArtist(artistId)))
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(album -> Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(album.getId()))
                         .doOnSuccess(compositionsToScan::addAll)
                         .flatMapObservable(Observable::fromIterable)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name))
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition, name))
                 )
                 .doOnComplete(() -> {
                     artistsDao.updateArtistName(name, artistId);
@@ -307,7 +309,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .andThen(Single.fromCallable(() -> genresDao.getGenreName(genreId)))
                 .flatMapCompletable(oldName -> Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId))
                         .flatMapObservable(Observable::fromIterable)
-                        .flatMapCompletable(composition -> sourceEditor.changeCompositionGenre(composition.getFilePath(), oldName, name))
+                        .flatMapCompletable(composition -> sourceEditor.changeCompositionGenre(composition, oldName, name))
                         .doOnComplete(() -> {
                             genresDao.updateGenreName(name, genreId);
                             storageGenresProvider.updateGenreName(oldName, name);
@@ -318,13 +320,13 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Maybe<CompositionSourceTags> getCompositionFileTags(FullComposition composition) {
-        return sourceEditor.getFullTags(composition.getFilePath())
+        return sourceEditor.getFullTags(composition)
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Single<String[]> getCompositionFileGenres(FullComposition composition) {
-        return sourceEditor.getCompositionGenres(composition.getFilePath())
+        return sourceEditor.getCompositionGenres(composition)
                 .subscribeOn(scheduler);
     }
 

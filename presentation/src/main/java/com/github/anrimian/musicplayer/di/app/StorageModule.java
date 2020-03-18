@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
@@ -73,7 +74,16 @@ public class StorageModule {
 
     @Provides
     @Nonnull
-    EditorRepository compositionEditorRepository(StorageFilesDataSource filesDataSource,
+    @Singleton
+    CompositionSourceEditor compositionSourceEditor(StorageMusicProvider musicProvider) {
+        return new CompositionSourceEditor(musicProvider);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    EditorRepository compositionEditorRepository(CompositionSourceEditor sourceEditor,
+                                                 StorageFilesDataSource filesDataSource,
                                                  CompositionsDaoWrapper compositionsDao,
                                                  AlbumsDaoWrapper albumsDao,
                                                  ArtistsDaoWrapper artistsDao,
@@ -84,6 +94,7 @@ public class StorageModule {
                                                  StateRepository stateRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new EditorRepositoryImpl(
+                sourceEditor,
                 filesDataSource,
                 compositionsDao,
                 albumsDao,
