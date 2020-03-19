@@ -16,12 +16,11 @@ ext {
     androidCompileSdkVersion = 29
 
     //support libraries
-    androidXVersion = "1.1.0-alpha02"
-    googleMaterialVersion = "1.1.0-alpha01"
+    androidXVersion = "1.1.0"
+    googleMaterialVersion = "1.1.0"
     cardViewVersion = "1.0.0"
-    recyclerViewVersion = "1.0.0"
-    mediaCompatVersion = "1.0.0"
-    paletteVersion = "1.0.0"
+    recyclerViewVersion = "1.1.0"
+    mediaCompatVersion = "1.1.0"
 
     constraintLayoutVersion = "2.0.0-alpha2"
     rxJavaVersion = "2.2.11"
@@ -56,7 +55,6 @@ ext {
     cardView = "androidx.cardview:cardview:$cardViewVersion"
     recyclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     supportMedia = "androidx.media:media:$mediaCompatVersion"
-    palette = "androidx.palette:palette:$paletteVersion"
     constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
 
     rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
