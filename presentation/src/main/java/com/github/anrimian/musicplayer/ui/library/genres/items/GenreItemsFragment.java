@@ -37,6 +37,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -126,6 +127,8 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
         progressViewWrapper.hideAll();
+
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new CompositionsAdapter(recyclerView,
                 presenter.getSelectedCompositions(),

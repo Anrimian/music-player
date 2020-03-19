@@ -36,6 +36,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -108,6 +109,8 @@ public class AlbumsListFragment extends LibraryFragment implements
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerViewUtils.attachFastScroller(recyclerView);
 
         FragmentManager fm = getChildFragmentManager();
         albumMenuDialogRunner = new DialogFragmentRunner<>(fm,

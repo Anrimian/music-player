@@ -128,7 +128,6 @@ public class RecyclerViewUtils {
 
     //attach if high amount of elements appeared? - seems working from the box, hmm no
     //list performance on fast scrolling
-    //folders spacing conflict
     public static void attachFastScroller(RecyclerView recyclerView, boolean useFabPadding) {
         Context context = recyclerView.getContext();
         Drawable trackDrawable = ContextCompat.getDrawable(context, R.drawable.bg_transparent);

@@ -15,6 +15,4 @@
 
         </shape>
     </item>
-    <item android:drawable="@drawable/ic_menu_swap"
-        android:left="3dp"/>
 </layer-list>

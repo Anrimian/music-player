@@ -48,6 +48,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -171,6 +172,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new MusicFileSourceAdapter(recyclerView,
                 presenter.getSelectedFiles(),
