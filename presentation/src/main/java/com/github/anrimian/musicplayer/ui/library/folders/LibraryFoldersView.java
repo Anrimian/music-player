@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
@@ -106,9 +107,6 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(SkipStrategy.class)
     void goToMusicStorageScreen(Long folderId);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentPlayingComposition(Composition composition);
-
     @StateStrategyType(SkipStrategy.class)
     void showCompositionActionDialog(Composition composition);
 
@@ -142,9 +140,6 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(SkipStrategy.class)
     void showInputNewFolderNameDialog();
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showPlayState(boolean play);
-
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showAddedIgnoredFolderMessage(IgnoredFolder folder);
 
@@ -153,4 +148,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void onCompositionsAddedToQueue(List<Composition> compositions);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showCurrentComposition(CurrentComposition currentComposition);
 }

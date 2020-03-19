@@ -272,7 +272,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Log.d("KEK", "subscribeOnPlayInfo");
         if (playInfoDisposable.size() == 0) {
             Log.d("KEK", "really subscribeOnPlayInfo: ");
-            playInfoDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
+            playInfoDisposable.add(musicPlayerInteractor.getCurrentQueueItemObservable()
                     .observeOn(uiScheduler)
                     .subscribe(this::onCurrentCompositionReceived));
             playInfoDisposable.add(musicPlayerInteractor.getTrackPositionObservable()

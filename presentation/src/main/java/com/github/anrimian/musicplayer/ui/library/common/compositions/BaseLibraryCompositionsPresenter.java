@@ -284,7 +284,7 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
     }
 
     protected void subscribeOnCurrentComposition() {
-        currentCompositionDisposable = playerInteractor.getCurrentCompositionObservable()
+        currentCompositionDisposable = playerInteractor.getCurrentQueueItemObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onCurrentCompositionReceived, errorParser::logError);
         presenterBatterySafeDisposable.add(currentCompositionDisposable);

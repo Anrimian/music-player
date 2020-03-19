@@ -50,7 +50,7 @@ public class WidgetUpdater {
             return;
         }
         updateDisposable.add(musicPlayerInteractor
-                .getCurrentCompositionObservable()
+                .getCurrentQueueItemObservable()
                 .subscribe(this::onCurrentCompositionReceived));
 
         updateDisposable.add(musicPlayerInteractor

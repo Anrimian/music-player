@@ -5,12 +5,14 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 
 import java.util.List;
@@ -116,7 +118,18 @@ public class MusicFileViewHolder extends FileViewHolder {
         return fileSource;
     }
 
-    public void showAsCurrentComposition(boolean isCurrent) {
+    public void showCurrentComposition(@Nullable CurrentComposition currentComposition) {
+        boolean isCurrent = false;
+        boolean isPlaying = false;
+        if (currentComposition != null) {
+            isCurrent = fileSource.getComposition().equals(currentComposition.getComposition());
+            isPlaying = isCurrent && currentComposition.isPlaying();
+        }
+        showAsCurrentComposition(isCurrent);
+        compositionItemWrapper.showAsPlaying(isPlaying);
+    }
+
+    private void showAsCurrentComposition(boolean isCurrent) {
         if (this.isCurrent != isCurrent) {
             this.isCurrent = isCurrent;
             if (!selected) {
@@ -126,14 +139,6 @@ public class MusicFileViewHolder extends FileViewHolder {
                 animateBackgroundColor(clickableItem, endColor);
             }
         }
-    }
-
-    public void showAsPlaying(boolean playing) {
-        compositionItemWrapper.showAsPlaying(playing);
-    }
-
-    public Composition getComposition() {
-        return fileSource.getComposition();
     }
 
     private void selectImmediate() {
