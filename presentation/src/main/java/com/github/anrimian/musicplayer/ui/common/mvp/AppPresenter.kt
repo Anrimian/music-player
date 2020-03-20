@@ -19,6 +19,14 @@ abstract class AppPresenter<T : MvpView>(
                 .autoDispose()
     }
 
+    protected fun <K> Observable<K>.subscribeOnUi(onNext: (K) -> Unit,
+                                                  onError: (Throwable) -> Unit,
+                                                  onComplete: () -> Unit) {
+        this.observeOn(uiScheduler)
+                .subscribe(onNext, onError, onComplete)
+                .autoDispose()
+    }
+
     protected fun <K> Observable<K>.unsafeSubscribeOnUi(onNext: (K) -> Unit) {
         this.observeOn(uiScheduler)
                 .subscribe(onNext)
