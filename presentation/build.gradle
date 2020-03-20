@@ -76,7 +76,6 @@ dependencies {
     implementation deps.recyclerView
     implementation deps.constraintLayout
     implementation deps.supportMedia
-    implementation deps.palette
     implementation deps.circleImageView
 
     implementation deps.rxAndroid
