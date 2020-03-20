@@ -32,12 +32,6 @@ public interface AlbumsListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoadingError(ErrorCommand errorCommand);
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
-    void showRenameProgress();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
-    void hideRenameProgress();
-
     @StateStrategyType(ListStateStrategy.class)
     void submitList(List<Album> albums);
 
