@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
 import androidx.core.content.ContextCompat;
 import androidx.room.migration.Migration;
+import androidx.room.util.CursorUtil;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
@@ -67,8 +68,8 @@ class Migrations {
     };
 
     private static Long getLong(Cursor c, String columnName) {
-        int columnIndex = c.getColumnIndexOrThrow(columnName);
-        if (c.isNull(columnIndex)) {
+        int columnIndex = CursorUtil.getColumnIndex(c, columnName);
+        if (columnIndex < 0 || c.isNull(columnIndex)) {
             return null;
         } else {
             return c.getLong(columnIndex);
