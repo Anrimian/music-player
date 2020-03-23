@@ -32,6 +32,7 @@ import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialog
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -71,6 +72,7 @@ public class ArtistsListFragment extends LibraryFragment implements
     private DialogFragmentRunner<MenuDialogFragment> artistMenuDialogRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editArtistNameDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
     @ProvidePresenter
     ArtistsListPresenter providePresenter() {
@@ -126,6 +128,8 @@ public class ArtistsListFragment extends LibraryFragment implements
         selectOrderDialogRunner = new DialogFragmentRunner<>(fm,
                 ORDER_TAG,
                 f -> f.setOnCompleteListener(presenter::onOrderSelected));
+
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
     }
 
     @Override
@@ -204,16 +208,12 @@ public class ArtistsListFragment extends LibraryFragment implements
     @Override
     public void showRenameProgress() {
         ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.rename_progress);
-        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
+        progressDialogRunner.show(fragment);
     }
 
     @Override
     public void hideRenameProgress() {
-        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(PROGRESS_DIALOG_TAG);
-        if (fragment != null) {
-            fragment.dismissAllowingStateLoss();
-        }
+        progressDialogRunner.cancel();
     }
 
     @Override
