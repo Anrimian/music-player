@@ -110,10 +110,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
-        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
-        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
-                this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
@@ -157,6 +153,9 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.compositions);
+        toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
+        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
+                this::onActionModeItemClicked);
     }
 
     @Override
