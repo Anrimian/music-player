@@ -136,9 +136,6 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTitleClickListener(null);
-        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
-                this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
@@ -190,6 +187,9 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         presenter.onFragmentMovedToTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setupSearch(null, null);
+        toolbar.setTitleClickListener(null);
+        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
+                this::onActionModeItemClicked);
     }
 
     @Override
