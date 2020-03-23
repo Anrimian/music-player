@@ -40,8 +40,6 @@ public class StorageFilesDataSource {
 //        } else {
         //seems working for android <10, implement for scoped storage
         String newPath = FileUtils.getChangedFilePath(oldPath, newName);
-        renameFile(oldPath, newPath);
-
         for (Composition composition: compositions) {
             String oldFilePath = composition.getFilePath();
             String newFilePath = FileUtils.safeReplacePath(oldFilePath, oldPath, newPath);
@@ -52,6 +50,7 @@ public class StorageFilesDataSource {
                     newFilePath)
             );
         }
+        renameFile(oldPath, newPath);
 
         storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
         return FileUtils.getFileName(newPath);
