@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
 import androidx.core.content.ContextCompat;
 import androidx.room.migration.Migration;
+import androidx.room.util.CursorUtil;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
@@ -43,16 +44,16 @@ class Migrations {
             while (c.moveToNext()) {
                 ContentValues cv = new ContentValues();
 
-                cv.put("id", c.getLong(c.getColumnIndex("id")));
-                cv.put("artistId", c.getLong(c.getColumnIndex("artistId")));
-                cv.put("albumId", c.getLong(c.getColumnIndex("albumId")));
-                cv.put("storageId", c.getLong(c.getColumnIndex("storageId")));
+                cv.put("id", getLong(c, "id"));
+                cv.put("artistId", getLong(c, "artistId"));
+                cv.put("albumId", getLong(c, "albumId"));
+                cv.put("storageId", getLong(c, "storageId"));
                 cv.put("title", c.getString(c.getColumnIndex("title")));
                 cv.put("filePath", c.getString(c.getColumnIndex("filePath")));
-                cv.put("duration", c.getLong(c.getColumnIndex("duration")));
-                cv.put("size", c.getLong(c.getColumnIndex("size")));
-                cv.put("dateAdded", c.getLong(c.getColumnIndex("dateAdded")));
-                cv.put("dateModified", c.getLong(c.getColumnIndex("dateModified")));
+                cv.put("duration", getLong(c, "duration"));
+                cv.put("size", getLong(c, "size"));
+                cv.put("dateAdded", getLong(c, "dateAdded"));
+                cv.put("dateModified", getLong(c, "dateModified"));
                 cv.put("corruptionType", c.getString(c.getColumnIndex("corruptionType")));
                 database.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv);
             }
@@ -65,6 +66,15 @@ class Migrations {
             database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
         }
     };
+
+    private static Long getLong(Cursor c, String columnName) {
+        int columnIndex = CursorUtil.getColumnIndex(c, columnName);
+        if (columnIndex < 0 || c.isNull(columnIndex)) {
+            return null;
+        } else {
+            return c.getLong(columnIndex);
+        }
+    }
 
     static Migration getMigration3_4(Context context) {
         return new Migration(3, 4) {

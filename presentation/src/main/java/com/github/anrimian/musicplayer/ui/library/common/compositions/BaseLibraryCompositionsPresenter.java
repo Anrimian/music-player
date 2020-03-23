@@ -221,6 +221,11 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
         return selectedCompositions;
     }
 
+    @Nullable
+    public String getSearchText() {
+        return searchText;
+    }
+
     protected void onDefaultError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showErrorMessage(errorCommand);
