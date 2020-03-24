@@ -20,6 +20,8 @@ import org.jaudiotagger.tag.id3.ID3v24Tag;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -37,60 +39,73 @@ public class CompositionSourceEditor {
     }
 
     public Completable setCompositionTitle(FullComposition composition, String title) {
-        return setCompositionTitle(getPath(composition), title);
+        return getPath(composition)
+                .flatMapCompletable(path -> setCompositionTitle(path, title));
     }
 
     public Completable setCompositionAuthor(FullComposition composition, String author) {
-        return setCompositionAuthor(getPath(composition), author);
+        return getPath(composition)
+                .flatMapCompletable(path -> setCompositionAuthor(path, author));
     }
 
     public Completable setCompositionAuthor(Composition composition, String author) {
-        return setCompositionAuthor(getPath(composition), author);
+        return getPath(composition)
+                .flatMapCompletable(path -> setCompositionAuthor(path, author));
     }
 
     public Completable setCompositionAlbum(FullComposition composition, String author) {
-        return setCompositionAlbum(getPath(composition), author);
+        return getPath(composition)
+                .flatMapCompletable(path -> setCompositionAlbum(path, author));
     }
 
     public Completable setCompositionAlbum(Composition composition, String author) {
-        return setCompositionAlbum(getPath(composition), author);
+        return getPath(composition)
+                .flatMapCompletable(path -> setCompositionAlbum(path, author));
     }
 
     public Completable setCompositionAlbumArtist(FullComposition composition, String artist) {
-        return setCompositionAlbumArtist(getPath(composition), artist);
+        return getPath(composition)
+                .flatMapCompletable(path -> setCompositionAlbumArtist(path, artist));
     }
 
     public Completable setCompositionAlbumArtist(Composition composition, String artist) {
-        return setCompositionAlbumArtist(getPath(composition), artist);
+        return getPath(composition)
+                .flatMapCompletable(path -> setCompositionAlbumArtist(path, artist));
     }
 
     public Completable changeCompositionGenre(FullComposition composition,
                                               String oldGenre,
                                               String newGenre) {
-        return changeCompositionGenre(getPath(composition), oldGenre, newGenre);
+        return getPath(composition)
+                .flatMapCompletable(path -> changeCompositionGenre(path, oldGenre, newGenre));
     }
 
     public Completable changeCompositionGenre(Composition composition,
                                               String oldGenre,
                                               String newGenre) {
-        return changeCompositionGenre(getPath(composition), oldGenre, newGenre);
+        return getPath(composition)
+                .flatMapCompletable(path -> changeCompositionGenre(path, oldGenre, newGenre));
     }
 
-    public Completable addCompositionGenre(FullComposition fullComposition,
+    public Completable addCompositionGenre(FullComposition composition,
                                            String newGenre) {
-        return addCompositionGenre(getPath(fullComposition), newGenre);
+        return getPath(composition)
+                .flatMapCompletable(path -> addCompositionGenre(path, newGenre));
     }
 
-    public Completable removeCompositionGenre(FullComposition fullComposition, String genre) {
-        return removeCompositionGenre(getPath(fullComposition), genre);
+    public Completable removeCompositionGenre(FullComposition composition, String genre) {
+        return getPath(composition)
+                .flatMapCompletable(path -> removeCompositionGenre(path, genre));
     }
 
-    public Single<String[]> getCompositionGenres(FullComposition fullComposition) {
-        return getCompositionGenres(getPath(fullComposition));
+    public Single<String[]> getCompositionGenres(FullComposition composition) {
+        return getPath(composition)
+                .flatMap(this::getCompositionGenres);
     }
 
-    public Maybe<CompositionSourceTags> getFullTags(FullComposition fullComposition) {
-        return getFullTags(getPath(fullComposition));
+    public Maybe<CompositionSourceTags> getFullTags(FullComposition composition) {
+        return getPath(composition)
+                .flatMapMaybe(this::getFullTags);
     }
 
     //TODO genre not found case
@@ -211,20 +226,25 @@ public class CompositionSourceEditor {
         });
     }
 
-    private String getPath(Composition composition) {
-        Long storageId = composition.getStorageId();
-        if (storageId == null) {
-            throw new RuntimeException("composition not found");
-        }
-        return storageMusicProvider.getCompositionFilePath(storageId);
+    private Single<String> getPath(Composition composition) {
+        return getPath(composition.getStorageId());
     }
 
-    private String getPath(FullComposition composition) {
-        Long storageId = composition.getStorageId();
-        if (storageId == null) {
-            throw new RuntimeException("composition not found");
-        }
-        return storageMusicProvider.getCompositionFilePath(storageId);
+    private Single<String> getPath(FullComposition composition) {
+        return getPath(composition.getStorageId());
+    }
+
+    private Single<String> getPath(@Nullable Long storageId) {
+        return Single.fromCallable(() -> {
+            if (storageId == null) {
+                throw new RuntimeException("composition not found");
+            }
+            String path = storageMusicProvider.getCompositionFilePath(storageId);
+            if (path == null) {
+                throw new RuntimeException("composition path not found in system media store");
+            }
+            return storageMusicProvider.getCompositionFilePath(storageId);
+        });
     }
 
     private Tag getFileTag(String filePath) throws TagException, ReadOnlyFileException,

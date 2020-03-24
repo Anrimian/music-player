@@ -38,6 +38,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
@@ -56,7 +57,9 @@ public class StorageMusicProvider {
 
     public void scanMedia(long id) {
         String filePath = getCompositionFilePath(id);
-        scanMedia(filePath);
+        if (filePath != null) {
+            scanMedia(filePath);
+        }
     }
 
     public void scanMedia(String path) {
@@ -151,13 +154,15 @@ public class StorageMusicProvider {
                     Media._ID + " = ?",
                     new String[] { String.valueOf(storageId) },
                     null);
-            if (cursor == null) {
+            if (cursor == null || cursor.getCount() == 0) {
                 return null;
             }
 
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            cursor.moveToFirst();
-            return cursorWrapper.getString(Media.DATA);
+            if (cursor.moveToFirst()) {
+                return cursorWrapper.getString(Media.DATA);
+            }
+            return null;
         } finally {
             IOUtils.closeSilently(cursor);
         }
