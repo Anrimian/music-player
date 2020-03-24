@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -271,25 +272,27 @@ public class FragmentNavigation {
         return true;
     }
 
-    public void clearRootFragment(@AnimRes int exitAnimation) {
+    public void clearFragmentStack(@AnimRes int exitAnimation) {
         checkForInitialization();
         runForwardAction(() -> {
             if (screens.size() < 1) {
                 return;
             }
-            if (screens.size() > 1) {
-                throw new IllegalStateException("can not clear: fragment is not root");
-            }
             Fragment fragmentOnTop = getFragmentOnTop();
             if (fragmentOnTop == null) {
                 return;
             }
+            Fragment fragmentOnBottom = getFragmentOnBottom();
+
             screens.removeLast();
-            fragmentManagerProvider.getFragmentManager()
-                    .beginTransaction()
-                    .setCustomAnimations(0, exitAnimation)
-                    .remove(fragmentOnTop)
-                    .runOnCommit(this::notifyStackListeners)
+            FragmentTransaction ft = fragmentManagerProvider.getFragmentManager()
+                    .beginTransaction();
+            ft.setCustomAnimations(0, exitAnimation)
+                    .remove(fragmentOnTop);
+            if (fragmentOnBottom != null) {
+                ft.remove(fragmentOnBottom);
+            }
+            ft.runOnCommit(this::notifyStackListeners)
                     .commit();
         });
     }
