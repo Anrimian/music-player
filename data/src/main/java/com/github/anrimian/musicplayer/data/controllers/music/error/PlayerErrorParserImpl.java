@@ -35,6 +35,9 @@ public class PlayerErrorParserImpl implements PlayerErrorParser {
                 return ErrorType.UNSUPPORTED;
             }
         }
+        if (throwable instanceof SecurityException) {
+            return ErrorType.IGNORED;
+        }
         analytics.processNonFatalError(throwable);
         return ErrorType.UNKNOWN;
     }

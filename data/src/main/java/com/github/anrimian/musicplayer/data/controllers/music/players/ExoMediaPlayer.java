@@ -59,6 +59,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         this.playerErrorParser = playerErrorParser;
         this.sourceRepository = sourceRepository;
         this.scheduler = scheduler;
+        //init on main thread?
         player = ExoPlayerFactory.newSimpleInstance(
                 context,
                 new DefaultRenderersFactory(context),
@@ -182,6 +183,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private Single<MediaSource> prepareMediaSource(Composition composition) {
         return sourceRepository.getCompositionUri(composition.getId())
+                .observeOn(scheduler)
                 .map(uri -> {
                     DataSpec dataSpec = new DataSpec(uri);
                     final ContentDataSource dataSource = new ContentDataSource(context);

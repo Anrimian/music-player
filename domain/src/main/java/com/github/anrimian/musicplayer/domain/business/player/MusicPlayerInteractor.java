@@ -325,6 +325,11 @@ public class MusicPlayerInteractor {
     }
 
     private void handleErrorWithComposition(ErrorType errorType, Composition composition) {
+        if (errorType == ErrorType.IGNORED) {
+            //TODO: start playing, hide app, revoke permission, open - we are here. Prepare again?
+            pause();
+            return;
+        }
         CorruptionType corruptionType = toCorruptionType(errorType);
         musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
                 .doOnError(analytics::processNonFatalError)
