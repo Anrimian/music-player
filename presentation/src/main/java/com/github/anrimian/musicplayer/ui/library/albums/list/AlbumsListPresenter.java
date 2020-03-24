@@ -29,7 +29,6 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
     private Disposable albumsDisposable;
-    private Disposable changeDisposable;
 
     private List<Album> albums = new ArrayList<>();
 
@@ -48,7 +47,6 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         subscribeOnAlbumsList();
-        getViewState().hideRenameProgress();
     }
 
     @Override
@@ -74,15 +72,6 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
             searchText = text;
             subscribeOnAlbumsList();
         }
-    }
-
-    void onNewAlbumNameEntered(String name, long albumId) {
-        dispose(changeDisposable);
-        changeDisposable = interactor.updateAlbumName(name, albumId)
-                .observeOn(uiScheduler)
-                .doOnSubscribe(d -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideRenameProgress())
-                .subscribe(() -> {}, this::onDefaultError);
     }
 
     @Nullable
@@ -118,10 +107,5 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
         } else {
             getViewState().showList();
         }
-    }
-
-    private void onDefaultError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showErrorMessage(errorCommand);
     }
 }

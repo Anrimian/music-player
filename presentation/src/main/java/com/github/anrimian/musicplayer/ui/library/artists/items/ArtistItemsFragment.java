@@ -38,6 +38,7 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -92,6 +93,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editArtistNameDialogRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
     private SlidrInterface slidrInterface;
 
@@ -133,9 +135,6 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTitleClickListener(null);
-        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
-                this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
@@ -175,6 +174,8 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
                     presenter.onNewArtistNameEntered(name, extra.getLong(ID_ARG));
                 })
         );
+
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
     }
 
     @Override
@@ -183,6 +184,9 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         presenter.onFragmentMovedToTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setupSearch(null, null);
+        toolbar.setTitleClickListener(null);
+        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
+                this::onActionModeItemClicked);
     }
 
     @Override
@@ -408,16 +412,12 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     @Override
     public void showRenameProgress() {
         ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.rename_progress);
-        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
+        progressDialogRunner.show(fragment);
     }
 
     @Override
     public void hideRenameProgress() {
-        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(PROGRESS_DIALOG_TAG);
-        if (fragment != null) {
-            fragment.dismissAllowingStateLoss();
-        }
+        progressDialogRunner.cancel();
     }
 
     //scroll horizontally then scroll to bottom issue

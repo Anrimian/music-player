@@ -63,6 +63,10 @@ public class CompositionItemWrapper {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
+    @Nullable
+    @BindView(R.id.icon_clickable_area)
+    View iconClickableArea;
+
     private Composition composition;
 
     private boolean isCurrent;
@@ -72,8 +76,8 @@ public class CompositionItemWrapper {
                                   Callback<Composition> onIconClickListener,
                                   Callback<Composition> onClickListener) {
         ButterKnife.bind(this, itemView);
-        if (ivMusicIcon != null) {
-            ivMusicIcon.setOnClickListener(v -> onIconClickListener.call(composition));
+        if (iconClickableArea != null) {
+            iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
         }
         clickableItem.setOnClickListener(v -> onClickListener.call(composition));
     }

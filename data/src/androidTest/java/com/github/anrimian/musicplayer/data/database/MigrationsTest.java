@@ -68,6 +68,7 @@ public class MigrationsTest {
 
         ContentValues cv = new ContentValues();
         cv.put("storageId", 1L);
+        cv.put("artistId", (Long) null);
         cv.put("title", "titleHH");
         cv.put("filePath", "filePath");
         cv.put("duration", 13);

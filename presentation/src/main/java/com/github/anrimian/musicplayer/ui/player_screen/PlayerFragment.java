@@ -333,7 +333,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         //TODO: start playing, hide app, revoke permission, open - UPD: not crash, but many "file not found". Check after file path refactoring
-        RxPermissions rxPermissions = new RxPermissions(requireActivity());
+        RxPermissions rxPermissions = new RxPermissions(this);
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             requireFragmentManager()
                     .beginTransaction()
