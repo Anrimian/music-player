@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.database;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+@SuppressLint("RestrictedApi")
 class Migrations {
 
     static Migration MIGRATION_5_6 = new Migration(5, 6) {
@@ -36,11 +38,9 @@ class Migrations {
 
             //migrate file name
             Cursor c = database.query("SELECT id, filePath FROM compositions");
-            for (int i = 0; i < c.getCount(); i++) {
-                c.moveToPosition(i);
-
-                long id = c.getLong(c.getColumnIndex("id"));
-                String filePath = c.getString(c.getColumnIndex("filePath"));
+            while (c.moveToNext()) {
+                long id = c.getLong(CursorUtil.getColumnIndex(c,"id"));
+                String filePath = c.getString(CursorUtil.getColumnIndex(c,"filePath"));
 
                 String fileName = FileUtils.formatFileName(filePath, true);
 
@@ -198,7 +198,6 @@ class Migrations {
         return artistId;
     }
 
-    @Nullable
     private static Long insertAlbum(StorageAlbum album,
                                     Long albumArtistId,
                                     SupportSQLiteDatabase database,
