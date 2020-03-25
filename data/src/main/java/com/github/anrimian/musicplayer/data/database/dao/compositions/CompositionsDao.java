@@ -50,7 +50,7 @@ public interface CompositionsDao {
     Observable<List<Composition>> getAllInFolderObservable(SupportSQLiteQuery query);
 
     @RawQuery
-    List<Composition> getAllInFolder(SimpleSQLiteQuery sqlQuery);
+    List<Composition> executeQuery(SimpleSQLiteQuery sqlQuery);
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
