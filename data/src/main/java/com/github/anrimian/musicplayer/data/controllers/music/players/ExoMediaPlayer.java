@@ -10,14 +10,9 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
@@ -60,11 +55,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         this.sourceRepository = sourceRepository;
         this.scheduler = scheduler;
         //init on main thread?
-        player = ExoPlayerFactory.newSimpleInstance(
-                context,
-                new DefaultRenderersFactory(context),
-                new DefaultTrackSelector(),
-                new DefaultLoadControl());
+        player = new SimpleExoPlayer.Builder(context).build();
 
         PlayerEventListener playerEventListener = new PlayerEventListener(
                 () -> playerEventSubject.onNext(new FinishedEvent(currentComposition)),
@@ -190,8 +181,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                     dataSource.open(dataSpec);
 
                     DataSource.Factory factory = () -> dataSource;
-                    MediaSource mediaSource = new ExtractorMediaSource.Factory(factory)
-                            .setExtractorsFactory(new DefaultExtractorsFactory())
+                    MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory)
                             .createMediaSource(uri);
                     player.prepare(mediaSource);
                     return mediaSource;
