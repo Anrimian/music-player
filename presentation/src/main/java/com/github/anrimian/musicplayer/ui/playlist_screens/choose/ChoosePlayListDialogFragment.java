@@ -159,7 +159,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
         attachDynamicShadow(recyclerView, titleShadow);
 
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
+        bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 dismissAllowingStateLoss();
             }
@@ -293,7 +293,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
             onCompleteListener.onComplete(playList);
         }
         if (complexCompleteListener != null) {
-            complexCompleteListener.call(playList, getArguments().getBundle(EXTRA_DATA_ARG));
+            complexCompleteListener.call(playList, requireArguments().getBundle(EXTRA_DATA_ARG));
         }
         dismiss();
     }
