@@ -205,7 +205,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         return verifyFolderMove(fromFolderId, toFolderId, files)
                 .andThen(Single.zip(getFullFolderPath(fromFolderId),
                         getFullFolderPath(toFolderId),
-                        compositionsDao.extractAllCompositionsFromFiles(files),
+                        foldersDao.extractAllCompositionsFromFiles(files),
                         (fromPath, toPath, compositions) -> {
                             List<FilePathComposition> updateCompositions = filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);
                             compositionsDao.updateFilesPath(updateCompositions);
@@ -223,7 +223,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                                                String directoryName) {
         return Single.zip(getFullFolderPath(fromFolderId),
                 getFullFolderPath(targetParentFolderId),
-                compositionsDao.extractAllCompositionsFromFiles(files),
+                foldersDao.extractAllCompositionsFromFiles(files),
                 (fromPath, toParentPath, compositions) -> {
                     List<FilePathComposition> updatedCompositions = new LinkedList<>();
                     String name = filesDataSource.moveCompositionsToNewFolder(compositions,

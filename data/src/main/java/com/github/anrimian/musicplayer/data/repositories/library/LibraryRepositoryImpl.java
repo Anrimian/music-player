@@ -165,7 +165,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources) {
-        return compositionsDao.extractAllCompositionsFromFiles(fileSources, settingsPreferences.getFolderOrder())
+        return foldersDao.extractAllCompositionsFromFiles(fileSources, settingsPreferences.getFolderOrder())
                 .subscribeOn(scheduler);
     }
 
@@ -222,7 +222,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
-        return Single.fromCallable(() -> selectAllCompositionsInFolder(folder.getId()))
+        return Single.fromCallable(() -> compositionsDao.getAllCompositionsInFolder(folder.getId()))
                 .doOnSuccess(compositions -> {
                     storageFilesDataSource.deleteCompositionFiles(compositions);
                     foldersDao.deleteFolder(folder.getId(), compositions);
@@ -232,7 +232,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<Composition>> deleteFolders(List<FileSource> folders) {
-        return compositionsDao.extractAllCompositionsFromFiles(folders)
+        return foldersDao.extractAllCompositionsFromFiles(folders)
                 .doOnSuccess(compositions -> {
                     storageFilesDataSource.deleteCompositionFiles(compositions);
                     foldersDao.deleteFolders(extractFolderIds(folders), compositions);
@@ -257,7 +257,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     private List<Composition> selectAllCompositionsInFolder(Long folderId) {
-        return compositionsDao.getAllCompositionsInFolder(
+        return foldersDao.getAllCompositionsInFolder(
                 folderId,
                 settingsPreferences.getFolderOrder());
     }
