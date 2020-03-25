@@ -15,14 +15,14 @@ public class CurrentComposition {
     private final Composition composition;
     private final boolean isPlaying;
 
-    public CurrentComposition(PlayQueueEvent playQueueEvent, PlayerState state) {
+    public CurrentComposition(PlayQueueEvent playQueueEvent, boolean isPlaying) {
         PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
         if (queueItem != null) {
             composition = queueItem.getComposition();
         } else {
             composition = null;
         }
-        this.isPlaying = state == PlayerState.PLAY;
+        this.isPlaying = isPlaying;
     }
 
     public CurrentComposition(@Nullable Composition composition, boolean isPlaying) {
@@ -61,8 +61,8 @@ public class CurrentComposition {
     @Override
     public String toString() {
         return "CurrentComposition{" +
-                "composition=" + composition +
-                ", isPlaying=" + isPlaying +
+                "isPlaying=" + isPlaying +
+                ", composition=" + composition +
                 '}';
     }
 }

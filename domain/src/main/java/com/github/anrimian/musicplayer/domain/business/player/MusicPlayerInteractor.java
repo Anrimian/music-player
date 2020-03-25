@@ -84,15 +84,17 @@ public class MusicPlayerInteractor {
         this.musicProviderRepository = musicProviderRepository;
         this.analytics = analytics;
 
-        //called too often?
         currentCompositionObservable = Observable.combineLatest(
-                getCurrentQueueItemObservable(),
-                getPlayerStateObservable(),
+                getCurrentQueueItemObservable()
+                        .distinctUntilChanged(),
+                getPlayerStateObservable()
+                        .filter(state -> state != LOADING)
+                        .map(state -> state == PlayerState.PLAY)
+                        .distinctUntilChanged(),
                 CurrentComposition::new)
                 .distinctUntilChanged()
                 .replay(1)
                 .refCount();
-//                .doOnNext(o -> System.out.println("KEK3 subscribeOnCurrentComposition: " + o));
 
         playerDisposable.add(playQueueRepository.getCurrentQueueItemObservable()
                 .subscribe(this::onQueueItemChanged));
