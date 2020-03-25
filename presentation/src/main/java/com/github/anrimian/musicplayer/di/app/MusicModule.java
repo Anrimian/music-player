@@ -15,7 +15,7 @@ import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.LibraryRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.source.SourceRepository;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
@@ -96,11 +96,13 @@ class MusicModule {
     @Singleton
     MusicPlayerController provideMusicPlayerController(UiStateRepository uiStateRepository,
                                                        Context context,
+                                                       CompositionSourceProvider sourceRepository,
                                                        @Named(UI_SCHEDULER) Scheduler scheduler,
                                                        PlayerErrorParser playerErrorParser,
                                                        Analytics analytics) {
         return new MusicPlayerControllerImpl(uiStateRepository,
                 context,
+                sourceRepository,
                 scheduler,
                 playerErrorParser,
                 analytics);
@@ -138,17 +140,19 @@ class MusicModule {
     @Provides
     @Nonnull
     @Singleton
-    CoverImageLoader coverImageLoader(Context context, StorageAlbumsProvider storageAlbumsProvider) {
-        return new CoverImageLoader(context, storageAlbumsProvider);
+    CoverImageLoader coverImageLoader(Context context,
+                                      StorageAlbumsProvider storageAlbumsProvider,
+                                      CompositionSourceProvider compositionSourceProvider) {
+        return new CoverImageLoader(context, storageAlbumsProvider, compositionSourceProvider);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    SourceRepository sourceRepository(CompositionsDaoWrapper compositionsDao,
-                                      StorageMusicProvider storageMusicProvider,
-                                      @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new SourceRepository(compositionsDao, storageMusicProvider, scheduler);
+    CompositionSourceProvider sourceRepository(CompositionsDaoWrapper compositionsDao,
+                                               StorageMusicProvider storageMusicProvider,
+                                               @Named(DB_SCHEDULER) Scheduler scheduler) {
+        return new CompositionSourceProvider(compositionsDao, storageMusicProvider, scheduler);
     }
 
 }

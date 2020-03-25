@@ -190,6 +190,7 @@ public class StorageCompositionAnalyzer {
                 && Objects.equals(first.getFilePath(), second.getFilePath())
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
+                && Objects.equals(first.getFileName(), second.getFileName())
                 && Objects.equals(first.getArtist(), second.getArtist())
                 && Objects.equals(first.getAlbum(), newAlbumName)
                 && Objects.equals(first.getAlbumArtist(), newAlbumArtist));

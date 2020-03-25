@@ -25,7 +25,7 @@ public interface PlayQueueDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.title AS title, " +
-            "compositions.filePath AS filePath, " +
+            "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
             "compositions.dateAdded AS dateAdded, " +
@@ -42,7 +42,7 @@ public interface PlayQueueDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.title AS title, " +
-            "compositions.filePath AS filePath, " +
+            "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
             "compositions.dateAdded AS dateAdded, " +
@@ -71,7 +71,7 @@ public interface PlayQueueDao {
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.storageId AS storageId, " +
             "compositions.title AS title, " +
-            "compositions.filePath AS filePath, " +
+            "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
             "compositions.dateAdded AS dateAdded, " +

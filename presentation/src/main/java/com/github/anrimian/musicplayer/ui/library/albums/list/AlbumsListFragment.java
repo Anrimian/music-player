@@ -33,6 +33,7 @@ import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialog
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
@@ -69,9 +70,7 @@ public class AlbumsListFragment extends LibraryFragment implements
     private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<MenuDialogFragment> albumMenuDialogRunner;
-    private DialogFragmentRunner<InputTextDialogFragment> editAlbumNameDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
-
 
     @ProvidePresenter
     AlbumsListPresenter providePresenter() {
@@ -113,12 +112,6 @@ public class AlbumsListFragment extends LibraryFragment implements
         albumMenuDialogRunner = new DialogFragmentRunner<>(fm,
                 ALBUM_MENU_TAG,
                 fragment -> fragment.setComplexCompleteListener(this::onAlbumMenuClicked)
-        );
-        editAlbumNameDialogRunner = new DialogFragmentRunner<>(fm,
-                ALBUM_NAME_TAG,
-                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
-                    presenter.onNewAlbumNameEntered(name, extra.getLong(ID_ARG));
-                })
         );
         selectOrderDialogRunner = new DialogFragmentRunner<>(fm,
                 ORDER_TAG,
@@ -201,21 +194,6 @@ public class AlbumsListFragment extends LibraryFragment implements
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
         MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showRenameProgress() {
-        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.rename_progress);
-        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
-    }
-
-    @Override
-    public void hideRenameProgress() {
-        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(PROGRESS_DIALOG_TAG);
-        if (fragment != null) {
-            fragment.dismissAllowingStateLoss();
-        }
     }
 
     @Override

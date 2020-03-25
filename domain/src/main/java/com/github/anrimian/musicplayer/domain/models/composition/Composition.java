@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.domain.models.composition;
 
+import com.github.anrimian.musicplayer.domain.utils.Objects;
+
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -15,11 +17,10 @@ public class Composition {
     private final String artist;
     @Nullable
     private final String title;
+    @Nonnull
+    private final String fileName;
     @Nullable
     private final String album;
-    @Nonnull
-    @Deprecated
-    private final String filePath;
 
     private final long duration;
     private final long size;
@@ -39,8 +40,8 @@ public class Composition {
     @SuppressWarnings("NullableProblems")//annotations break room annotations processing
     public Composition(String artist,
                        String title,
+                       String fileName,
                        String album,
-                       String filePath,
                        long duration,
                        long size,
                        long id,
@@ -50,8 +51,8 @@ public class Composition {
                        CorruptionType corruptionType) {
         this.artist = artist;
         this.title = title;
+        this.fileName = fileName;
         this.album = album;
-        this.filePath = filePath;
         this.duration = duration;
         this.size = size;
         this.id = id;
@@ -59,20 +60,6 @@ public class Composition {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
-    }
-
-    public Composition copy(String newPath) {
-        return new Composition(artist,
-                title,
-                album,
-                newPath,
-                duration,
-                size,
-                id,
-                storageId,
-                dateAdded,
-                dateModified,
-                corruptionType);
     }
 
     @Nullable
@@ -90,15 +77,14 @@ public class Composition {
         return title;
     }
 
+    @Nonnull
+    public String getFileName() {
+        return fileName;
+    }
+
     @Nullable
     public String getAlbum() {
         return album;
-    }
-
-    @Nonnull
-    @Deprecated
-    public String getFilePath() {
-        return filePath;
     }
 
     public long getDuration() {
@@ -132,7 +118,7 @@ public class Composition {
     public String toString() {
         return "Composition{" +
                 "\n id=" + id +
-                "\n filePath='" + filePath + '\'' +
+                "\n filename=" + fileName +
                 "\n duration=" + duration +
                 "\n size=" + size +
                 "\n dateAdded=" + dateAdded +

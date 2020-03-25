@@ -77,6 +77,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -191,6 +192,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private SeekBarViewWrapper seekBarViewWrapper;
 
     private DrawerLockStateProcessor drawerLockStateProcessor;
+    private CompositeDisposable viewDisposable = new CompositeDisposable();
 
     private FragmentNavigation navigation;
 
@@ -246,8 +248,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
         drawerLockStateProcessor.setupWithNavigation(navigation);
-        toolbar.getSearchModeObservable().subscribe(drawerLockStateProcessor::onSearchModeChanged);
-        toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionModeChanged);
+        viewDisposable.add(toolbar.getSearchModeObservable()
+                .subscribe(drawerLockStateProcessor::onSearchModeChanged)
+        );
+        viewDisposable.add(toolbar.getSelectionModeObservable()
+                .subscribe(drawerLockStateProcessor::onSelectionModeChanged)
+        );
 
         if (mlBottomSheet == null) {
             playerPanelWrapper = new TabletPlayerPanelWrapper(view,
@@ -332,8 +338,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             openPlayQueue();
         }
 
-        //TODO: start playing, hide app, revoke permission, open - UPD: not crash, but many "file not found". Check after file path refactoring
-        RxPermissions rxPermissions = new RxPermissions(requireActivity());
+        RxPermissions rxPermissions = new RxPermissions(this);
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             requireFragmentManager()
                     .beginTransaction()
@@ -366,6 +371,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onDestroyView();
         toolbar.release();
         drawerLockStateProcessor.release();
+        viewDisposable.clear();
     }
 
     @Override
@@ -708,7 +714,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void clearFragment() {
-        navigation.clearRootFragment(R.anim.anim_alpha_disappear);
+        navigation.clearFragmentStack(R.anim.anim_alpha_disappear);
     }
 
     private void onCompositionMenuClicked(View view) {

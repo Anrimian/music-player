@@ -11,9 +11,11 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.io.File;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import io.reactivex.Maybe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
@@ -74,12 +76,11 @@ public class DialogUtils {
     }
 
     public static void shareComposition(Context context, Composition composition) {
-//        Components.getAppComponent().sourceRepository()
-//                .getCompositionUri(composition.getId())
-//                        .observeOn(AndroidSchedulers.mainThread())
-        Maybe.fromCallable(() -> createUri(context, composition.getFilePath()))
+        Components.getAppComponent().sourceRepository()
+                .getCompositionUri(composition.getId())
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess(uri -> shareComposition(context, uri))
-                .doOnError(t -> showShareCompositionErrorMessage(t, context, composition))
+                .doOnError(t -> showShareCompositionErrorMessage(t, context))
                 .ignoreElement()
                 .onErrorComplete()
                 .subscribe();
@@ -95,18 +96,17 @@ public class DialogUtils {
     }
 
     public static void shareCompositions(Context context, Collection<Composition> compositions) {
-        ArrayList<Uri> uris = new ArrayList<>();
-        for (Composition composition : compositions) {
-            Uri fileUri = createUri(context, composition.getFilePath());
-            if (fileUri == null) {
-                return;
-            }
-            uris.add(fileUri);
-        }
-        shareFiles(context, uris);
+        Components.getAppComponent().sourceRepository()
+                .getCompositionUris(compositions)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(uris -> shareCompositions(context, uris))
+                .doOnError(t -> showShareCompositionErrorMessage(t, context))
+                .ignoreElement()
+                .onErrorComplete()
+                .subscribe();
     }
 
-    public static void shareFiles(Context context, ArrayList<Uri> uris) {
+    public static void shareCompositions(Context context, ArrayList<Uri> uris) {
         Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
         intent.setType("audio/*");
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
@@ -150,12 +150,12 @@ public class DialogUtils {
         }
     }
 
-    private static void showShareCompositionErrorMessage(Throwable throwable,
-                                                         Context context,
-                                                         Composition composition) {
-        Toast.makeText(context,
-                context.getString(R.string.file_uri_extract_error, composition.getTitle()),
-                Toast.LENGTH_LONG).show();
+    private static void showShareCompositionErrorMessage(Throwable throwable, Context context) {
+        ErrorCommand errorCommand = Components.getAppComponent()
+                .errorParser()
+                .parseError(throwable);
+
+        Toast.makeText(context, errorCommand.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     private static String getDativCompositionsMessage(Context context, int count) {

@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
@@ -43,8 +44,7 @@ import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class EditorRepositoryImpl implements EditorRepository {
 
-    private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor();
-
+    private final CompositionSourceEditor sourceEditor;
     private final StorageFilesDataSource filesDataSource;
     private final CompositionsDaoWrapper compositionsDao;
     private final AlbumsDaoWrapper albumsDao;
@@ -56,7 +56,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final StateRepository stateRepository;
     private final Scheduler scheduler;
 
-    public EditorRepositoryImpl(StorageFilesDataSource filesDataSource,
+    public EditorRepositoryImpl(CompositionSourceEditor sourceEditor,
+                                StorageFilesDataSource filesDataSource,
                                 CompositionsDaoWrapper compositionsDao,
                                 AlbumsDaoWrapper albumsDao,
                                 ArtistsDaoWrapper artistsDao,
@@ -66,6 +67,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                                 StorageGenresProvider storageGenresProvider,
                                 StateRepository stateRepository,
                                 Scheduler scheduler) {
+        this.sourceEditor = sourceEditor;
         this.filesDataSource = filesDataSource;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
@@ -98,74 +100,71 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeCompositionGenre(FullComposition composition,
                                               ShortGenre oldGenre,
                                               String newGenre) {
-        return sourceEditor.changeCompositionGenre(composition.getFilePath(), oldGenre.getName(), newGenre)
+        return sourceEditor.changeCompositionGenre(composition, oldGenre.getName(), newGenre)
                 .doOnComplete(() -> {
                     genresDao.changeCompositionGenre(composition.getId(), oldGenre.getId(), newGenre);
-                    storageMusicProvider.scanMedia(composition.getFilePath());
+                    runSystemRescan(composition);
                 })
                 .subscribeOn(scheduler);
     }
-
+    
     @Override
     public Completable addCompositionGenre(FullComposition composition,
                                            String newGenre) {
-        return sourceEditor.addCompositionGenre(composition.getFilePath(), newGenre)
+        return sourceEditor.addCompositionGenre(composition, newGenre)
                 .doOnComplete(() -> {
                     genresDao.addCompositionToGenre(composition.getId(), newGenre);
-                    storageMusicProvider.scanMedia(composition.getFilePath());
+                    runSystemRescan(composition);
                 })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable removeCompositionGenre(FullComposition composition, ShortGenre genre) {
-        return sourceEditor.removeCompositionGenre(composition.getFilePath(), genre.getName())
+        return sourceEditor.removeCompositionGenre(composition, genre.getName())
                 .doOnComplete(() -> {
                     genresDao.removeCompositionFromGenre(composition.getId(), genre.getId());
-                    storageMusicProvider.scanMedia(composition.getFilePath());
+                    runSystemRescan(composition);
                 })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable changeCompositionAuthor(FullComposition composition, String newAuthor) {
-        return sourceEditor.setCompositionAuthor(composition.getFilePath(), newAuthor)
+        return sourceEditor.setCompositionAuthor(composition, newAuthor)
                 .doOnComplete(() -> {
                     compositionsDao.updateArtist(composition.getId(), newAuthor);
-                    storageMusicProvider.scanMedia(composition.getFilePath());
+                    runSystemRescan(composition);
                 })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable changeCompositionAlbumArtist(FullComposition composition, String newAuthor) {
-        return sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), newAuthor)
+        return sourceEditor.setCompositionAlbumArtist(composition, newAuthor)
                 .doOnComplete(() -> {
                     compositionsDao.updateAlbumArtist(composition.getId(), newAuthor);
-                    storageMusicProvider.scanMedia(composition.getFilePath());
+                    runSystemRescan(composition);
                 })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable changeCompositionAlbum(FullComposition composition, String newAlbum) {
-        return sourceEditor.setCompositionAlbum(composition.getFilePath(), newAlbum)
+        return sourceEditor.setCompositionAlbum(composition, newAlbum)
                 .doOnComplete(() -> {
                     compositionsDao.updateAlbum(composition.getId(), newAlbum);
-                    storageMusicProvider.scanMedia(composition.getFilePath());
+                    runSystemRescan(composition);
                 })
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable changeCompositionTitle(FullComposition composition, String title) {
-        return sourceEditor.setCompositionTitle(composition.getFilePath(), title)
+        return sourceEditor.setCompositionTitle(composition, title)
                 .doOnComplete(() -> {
-                    Long storageId = composition.getStorageId();
-                    if (storageId != null) {
-                        storageMusicProvider.updateCompositionTitle(storageId, title);
-                    }
                     compositionsDao.updateTitle(composition.getId(), title);
+                    runSystemRescan(composition);
                 })
                 .subscribeOn(scheduler);
     }
@@ -174,7 +173,10 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Completable.fromAction(() -> {
             String newPath = filesDataSource.renameCompositionFile(composition, fileName);
-            compositionsDao.updateFilePath(composition.getId(), newPath);
+            if (newPath != null) {
+                compositionsDao.updateFilePath(composition.getId(), newPath);
+            }
+            compositionsDao.updateCompositionFileName(composition.getId(), fileName);
         }).subscribeOn(scheduler);
     }
 
@@ -205,7 +207,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         return verifyFolderMove(fromFolderId, toFolderId, files)
                 .andThen(Single.zip(getFullFolderPath(fromFolderId),
                         getFullFolderPath(toFolderId),
-                        compositionsDao.extractAllCompositionsFromFiles(files),
+                        foldersDao.extractAllCompositionsFromFiles(files),
                         (fromPath, toPath, compositions) -> {
                             List<FilePathComposition> updateCompositions = filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);
                             compositionsDao.updateFilesPath(updateCompositions);
@@ -223,7 +225,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                                                String directoryName) {
         return Single.zip(getFullFolderPath(fromFolderId),
                 getFullFolderPath(targetParentFolderId),
-                compositionsDao.extractAllCompositionsFromFiles(files),
+                foldersDao.extractAllCompositionsFromFiles(files),
                 (fromPath, toParentPath, compositions) -> {
                     List<FilePathComposition> updatedCompositions = new LinkedList<>();
                     String name = filesDataSource.moveCompositionsToNewFolder(compositions,
@@ -246,12 +248,12 @@ public class EditorRepositoryImpl implements EditorRepository {
         return checkAlbumExists(name)
                 .andThen(Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId)))
                 .flatMap(compositions -> Observable.fromIterable(compositions)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition.getFilePath(), name))
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition, name))
                         .toSingleDefault(compositions))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumName(name, albumId);
                     for (Composition composition: compositions) {
-                        storageMusicProvider.scanMedia(composition.getFilePath());
+                        runSystemRescan(composition);
                     }
                 })
                 .ignoreElement()
@@ -262,12 +264,12 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable updateAlbumArtist(String newArtistName, long albumId) {
         return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
                 .flatMap(compositions -> Observable.fromIterable(compositions)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), newArtistName))// not working, we can't edit album artist?
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition, newArtistName))// not working, we can't edit album artist?
                         .toSingleDefault(compositions))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumArtist(albumId, newArtistName);
                     for (Composition composition: compositions) {
-                        storageMusicProvider.scanMedia(composition.getFilePath());
+                        runSystemRescan(composition);
                     }
                 })
                 .ignoreElement()
@@ -282,20 +284,20 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .andThen(Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId)))
                 .doOnSuccess(compositionsToScan::addAll)
                 .flatMapObservable(Observable::fromIterable)
-                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition.getFilePath(), name))
+                .flatMapCompletable(composition -> sourceEditor.setCompositionAuthor(composition, name))
 
                 .andThen(Single.fromCallable(() -> albumsDao.getAllAlbumsForArtist(artistId)))
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapCompletable(album -> Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(album.getId()))
                         .doOnSuccess(compositionsToScan::addAll)
                         .flatMapObservable(Observable::fromIterable)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition.getFilePath(), name))
+                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition, name))
                 )
                 .doOnComplete(() -> {
                     artistsDao.updateArtistName(name, artistId);
 
                     for (Composition composition: compositionsToScan) {
-                        storageMusicProvider.scanMedia(composition.getFilePath());
+                        runSystemRescan(composition);
                     }
                 })
                 .subscribeOn(scheduler);
@@ -307,7 +309,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .andThen(Single.fromCallable(() -> genresDao.getGenreName(genreId)))
                 .flatMapCompletable(oldName -> Single.fromCallable(() -> genresDao.getCompositionsInGenre(genreId))
                         .flatMapObservable(Observable::fromIterable)
-                        .flatMapCompletable(composition -> sourceEditor.changeCompositionGenre(composition.getFilePath(), oldName, name))
+                        .flatMapCompletable(composition -> sourceEditor.changeCompositionGenre(composition, oldName, name))
                         .doOnComplete(() -> {
                             genresDao.updateGenreName(name, genreId);
                             storageGenresProvider.updateGenreName(oldName, name);
@@ -318,13 +320,13 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Maybe<CompositionSourceTags> getCompositionFileTags(FullComposition composition) {
-        return sourceEditor.getFullTags(composition.getFilePath())
+        return sourceEditor.getFullTags(composition)
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Single<String[]> getCompositionFileGenres(FullComposition composition) {
-        return sourceEditor.getCompositionGenres(composition.getFilePath())
+        return sourceEditor.getCompositionGenres(composition)
                 .subscribeOn(scheduler);
     }
 
@@ -393,5 +395,19 @@ public class EditorRepositoryImpl implements EditorRepository {
             }
 
         });
+    }
+
+    private void runSystemRescan(Composition composition) {
+        Long storageId = composition.getStorageId();
+        if (storageId != null) {
+            storageMusicProvider.scanMedia(storageId);
+        }
+    }
+
+    private void runSystemRescan(FullComposition composition) {
+        Long storageId = composition.getStorageId();
+        if (storageId != null) {
+            storageMusicProvider.scanMedia(storageId);
+        }
     }
 }
