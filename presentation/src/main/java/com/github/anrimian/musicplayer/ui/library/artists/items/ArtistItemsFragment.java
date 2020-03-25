@@ -390,7 +390,6 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
     @Override
     public void closeScreen() {
-        //TODO (last artist) artists screen -> album screen -> rename last artist -> second goBack() failed
         FragmentNavigation.from(requireFragmentManager()).goBack();
     }
 
