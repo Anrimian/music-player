@@ -5,9 +5,11 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
@@ -86,16 +88,15 @@ public class MusicViewHolder extends SelectableViewHolder {
         }
     }
 
-    public void showAsCurrentComposition(boolean isCurrent) {
-        if (this.isCurrent != isCurrent) {
-            this.isCurrent = isCurrent;
-            if (!selected) {
-                int unselectedColor = Color.TRANSPARENT;
-                int selectedColor = getPlaySelectionColor();
-                int endColor = isCurrent ? selectedColor : unselectedColor;
-                animateBackgroundColor(clickableItem, endColor);
-            }
+    public void showCurrentComposition(@Nullable CurrentComposition currentComposition) {
+        boolean isCurrent = false;
+        boolean isPlaying = false;
+        if (currentComposition != null) {
+            isCurrent = composition.equals(currentComposition.getComposition());
+            isPlaying = isCurrent && currentComposition.isPlaying();
         }
+        showAsCurrentComposition(isCurrent);
+        compositionItemWrapper.showAsPlaying(isPlaying);
     }
 
     public void showAsPlaying(boolean playing) {
@@ -106,6 +107,17 @@ public class MusicViewHolder extends SelectableViewHolder {
         return composition;
     }
 
+    private void showAsCurrentComposition(boolean isCurrent) {
+        if (this.isCurrent != isCurrent) {
+            this.isCurrent = isCurrent;
+            if (!selected) {
+                int unselectedColor = Color.TRANSPARENT;
+                int selectedColor = getPlaySelectionColor();
+                int endColor = isCurrent ? selectedColor : unselectedColor;
+                animateBackgroundColor(clickableItem, endColor);
+            }
+        }
+    }
 
     private void selectImmediate() {
         clickableItem.setBackgroundColor(getSelectionColor());

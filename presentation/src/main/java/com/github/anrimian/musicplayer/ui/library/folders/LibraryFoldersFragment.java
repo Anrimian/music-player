@@ -34,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -469,11 +470,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showCurrentComposition(composition);
-    }
-
-    @Override
     public void showCompositionActionDialog(Composition composition) {
         @AttrRes int statusBarColor = toolbar.isInActionMode()?
                 R.attr.actionModeStatusBarColor: android.R.attr.statusBarColor;
@@ -550,8 +546,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showPlayState(boolean play) {
-        adapter.showPlaying(play);
+    public void showCurrentComposition(CurrentComposition currentComposition) {
+        adapter.showCurrentComposition(currentComposition);
     }
 
     @Override

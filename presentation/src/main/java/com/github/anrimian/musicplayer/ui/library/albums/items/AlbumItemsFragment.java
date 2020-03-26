@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
@@ -300,8 +301,8 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     }
 
     @Override
-    public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showCurrentComposition(composition);
+    public void showCurrentComposition(CurrentComposition currentComposition) {
+        adapter.showCurrentComposition(currentComposition);
     }
 
     @Override
@@ -327,11 +328,6 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
         MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showPlayState(boolean play) {
-        adapter.showPlaying(play);
     }
 
     @Override

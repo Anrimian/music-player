@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSour
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
@@ -44,8 +45,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
     private final OnPositionItemClickListener<Composition> compositionIconClickListener;
 
     @Nullable
-    private Composition currentComposition;
-    private boolean play;
+    private CurrentComposition currentComposition;
     private boolean isCoversEnabled;
 
     public MusicFileSourceAdapter(RecyclerView recyclerView,
@@ -106,11 +106,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
                 MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
                 CompositionFileSource musicFileSource = (CompositionFileSource) fileSource;
                 musicViewHolder.bind(musicFileSource, isCoversEnabled);
-
-                Composition composition = musicFileSource.getComposition();
-                boolean isCurrentComposition = composition.equals(currentComposition);
-                musicViewHolder.showAsCurrentComposition(isCurrentComposition);
-                musicViewHolder.showAsPlaying(isCurrentComposition && play);
+                musicViewHolder.showCurrentComposition(currentComposition);
                 break;
             }
             case TYPE_FILE: {
@@ -177,29 +173,12 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
         }
     }
 
-    public void showCurrentComposition(Composition currentComposition) {
+    public void showCurrentComposition(CurrentComposition currentComposition) {
         this.currentComposition = currentComposition;
         for (RecyclerView.ViewHolder holder: viewHolders) {
             if (holder instanceof MusicFileViewHolder) {
                 MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
-
-                Composition composition = musicViewHolder.getComposition();
-                boolean isCurrentComposition = composition.equals(currentComposition);
-                musicViewHolder.showAsCurrentComposition(isCurrentComposition);
-                musicViewHolder.showAsPlaying(isCurrentComposition && play);
-            }
-        }
-    }
-
-    public void showPlaying(boolean play) {
-        this.play = play;
-        for (RecyclerView.ViewHolder holder: viewHolders) {
-            if (holder instanceof MusicFileViewHolder) {
-                MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
-                Composition composition = musicViewHolder.getComposition();
-                boolean isCurrentComposition = composition.equals(currentComposition);
-                musicViewHolder.showAsCurrentComposition(isCurrentComposition);
-                musicViewHolder.showAsPlaying(isCurrentComposition && play);
+                musicViewHolder.showCurrentComposition(currentComposition);
             }
         }
     }

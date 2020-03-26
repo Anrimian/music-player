@@ -20,7 +20,6 @@ public interface Constants {
         String OPEN_PLAY_QUEUE_ARG = "open_play_queue_arg";
         String COMPOSITION_NAME_ARG = "composition_name_arg";
         String COMPOSITION_AUTHOR_ARG = "composition_author_arg";
-        String COMPOSITION_FILE_ARG = "composition_file_arg";
         String COMPOSITION_ID_ARG = "composition_id_arg";
         String ALBUM_ID_ARG = "album_id_arg";
         String PLAY_ARG = "play_arg";

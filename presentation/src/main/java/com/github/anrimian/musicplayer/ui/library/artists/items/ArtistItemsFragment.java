@@ -21,6 +21,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.java.BooleanConditionRunner;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
@@ -345,8 +346,8 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     }
 
     @Override
-    public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showCurrentComposition(composition);
+    public void showCurrentComposition(CurrentComposition currentComposition) {
+        adapter.showCurrentComposition(currentComposition);
     }
 
     @Override
@@ -375,11 +376,6 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     }
 
     @Override
-    public void showPlayState(boolean play) {
-        adapter.showPlaying(play);
-    }
-
-    @Override
     public void onCompositionsAddedToPlayNext(List<Composition> compositions) {
         String message = MessagesUtils.getPlayNextMessage(requireContext(), compositions);
         MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
@@ -393,7 +389,6 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
     @Override
     public void closeScreen() {
-        //TODO (last artist) artists screen -> album screen -> rename last artist -> second goBack() failed
         FragmentNavigation.from(requireFragmentManager()).goBack();
     }
 

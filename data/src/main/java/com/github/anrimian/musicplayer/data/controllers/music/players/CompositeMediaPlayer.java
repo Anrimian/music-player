@@ -114,7 +114,8 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         return Observable.create(emitter -> {
             // if error event, switch to another player and consume event
             if (event instanceof ErrorEvent) {
-                if (((ErrorEvent) event).getErrorType() != ErrorType.NOT_FOUND) {
+                ErrorType errorType = ((ErrorEvent) event).getErrorType();
+                if (errorType == ErrorType.UNSUPPORTED || errorType == ErrorType.NOT_FOUND) {
                     int newPlayerIndex = currentPlayerIndex + 1;
                     //don't switch player when we reached end of available players
                     if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.length) {
