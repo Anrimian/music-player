@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
 import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersScreenInteractor;
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
@@ -11,13 +12,11 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -115,7 +114,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     void onStart() {
         if (!sourceList.isEmpty()) {
             subscribeOnCurrentComposition();
-            subscribeOnPlayState();
         }
     }
 
@@ -139,7 +137,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             playerInteractor.playOrPause();
         } else {
             interactor.play(folderId, composition);
-            getViewState().showCurrentPlayingComposition(composition);
+            getViewState().showCurrentComposition(new CurrentComposition(composition, true));
         }
     }
 
@@ -577,7 +575,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
             if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
-                subscribeOnPlayState();
             }
         }
     }
@@ -594,14 +591,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         presenterBatterySafeDisposable.add(currentCompositionDisposable);
     }
 
-    private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
-        PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
-        if (queueItem != null) {
-            currentComposition = queueItem.getComposition();
-        } else {
-            currentComposition = null;
-        }
-        getViewState().showCurrentPlayingComposition(currentComposition);
+    private void onCurrentCompositionReceived(CurrentComposition currentComposition) {
+        this.currentComposition = currentComposition.getComposition();
+        getViewState().showCurrentComposition(currentComposition);
     }
 
     private void subscribeOnUiSettings() {
@@ -620,13 +612,4 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
                 .subscribe(getViewState()::showMoveFileMenu));
     }
 
-    private void subscribeOnPlayState() {
-        presenterBatterySafeDisposable.add(playerInteractor.getPlayerStateObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateReceived));
-    }
-
-    private void onPlayerStateReceived(PlayerState state) {
-        getViewState().showPlayState(state == PlayerState.PLAY);
-    }
 }

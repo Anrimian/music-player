@@ -251,7 +251,7 @@ public class MusicService extends Service {
 
     private void subscribeOnPlayInfo() {
         if (playInfoDisposable.size() == 0) {
-            playInfoDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
+            playInfoDisposable.add(musicPlayerInteractor.getCurrentQueueItemObservable()
                     .observeOn(uiScheduler)
                     .subscribe(this::onCurrentCompositionReceived));
             playInfoDisposable.add(musicPlayerInteractor.getTrackPositionObservable()

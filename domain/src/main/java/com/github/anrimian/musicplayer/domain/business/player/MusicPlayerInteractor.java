@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
@@ -31,6 +32,7 @@ import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
+import sun.rmi.runtime.Log;
 
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
@@ -65,6 +67,8 @@ public class MusicPlayerInteractor {
     @Nullable
     private PlayQueueItem currentItem;
 
+    private final Observable<CurrentComposition> currentCompositionObservable;
+
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  SettingsRepository settingsRepository,
                                  SystemMusicController systemMusicController,
@@ -79,6 +83,18 @@ public class MusicPlayerInteractor {
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
         this.analytics = analytics;
+
+        currentCompositionObservable = Observable.combineLatest(
+                getCurrentQueueItemObservable()
+                        .distinctUntilChanged(),
+                getPlayerStateObservable()
+                        .filter(state -> state != LOADING)
+                        .map(state -> state == PlayerState.PLAY)
+                        .distinctUntilChanged(),
+                CurrentComposition::new)
+                .distinctUntilChanged()
+                .replay(1)
+                .refCount();
 
         playerDisposable.add(playQueueRepository.getCurrentQueueItemObservable()
                 .subscribe(this::onQueueItemChanged));
@@ -228,8 +244,12 @@ public class MusicPlayerInteractor {
         return playerStateSubject.getValue();
     }
 
-    public Observable<PlayQueueEvent> getCurrentCompositionObservable() {
+    public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
         return playQueueRepository.getCurrentQueueItemObservable();
+    }
+
+    public Observable<CurrentComposition> getCurrentCompositionObservable() {
+        return currentCompositionObservable;
     }
 
     public Flowable<Integer> getCurrentItemPositionObservable() {

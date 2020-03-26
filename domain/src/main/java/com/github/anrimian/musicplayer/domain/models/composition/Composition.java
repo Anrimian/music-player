@@ -117,12 +117,9 @@ public class Composition {
     @Override
     public String toString() {
         return "Composition{" +
-                "\n id=" + id +
-                "\n filename=" + fileName +
-                "\n duration=" + duration +
-                "\n size=" + size +
-                "\n dateAdded=" + dateAdded +
-                "\n dateModified=" + dateModified +
+                "title='" + title + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", id=" + id +
                 '}';
     }
 
