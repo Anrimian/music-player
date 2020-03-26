@@ -324,7 +324,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     private void subscribeOnCurrentComposition() {
-        currentItemDisposable = playerInteractor.getCurrentCompositionObservable()
+        currentItemDisposable = playerInteractor.getCurrentQueueItemObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onCurrentCompositionReceived, errorParser::logError);
         presenterBatterySafeDisposable.add(currentItemDisposable);

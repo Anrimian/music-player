@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
@@ -84,7 +85,6 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
     public void onStart() {
         if (!compositions.isEmpty()) {
             subscribeOnCurrentComposition();
-            subscribeOnPlayState();
         }
     }
 
@@ -116,7 +116,7 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
             playerInteractor.playOrPause();
         } else {
             playerInteractor.startPlaying(compositions, position);
-            getViewState().showCurrentPlayingComposition(composition);
+            getViewState().showCurrentComposition(new CurrentComposition(composition, true));
         }
     }
 
@@ -221,6 +221,11 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
         return selectedCompositions;
     }
 
+    @Nullable
+    public String getSearchText() {
+        return searchText;
+    }
+
     protected void onDefaultError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showErrorMessage(errorCommand);
@@ -290,12 +295,6 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
         presenterBatterySafeDisposable.add(currentCompositionDisposable);
     }
 
-    protected void subscribeOnPlayState() {
-        presenterBatterySafeDisposable.add(playerInteractor.getPlayerStateObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateReceived));
-    }
-
     protected void subscribeOnCompositions() {
         if (compositions.isEmpty()) {
             getViewState().showLoading();
@@ -326,23 +325,13 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
 
             if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
-                subscribeOnPlayState();
             }
         }
     }
 
-    private void onPlayerStateReceived(PlayerState state) {
-        getViewState().showPlayState(state == PlayerState.PLAY);
-    }
-
-    private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
-        PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
-        if (queueItem != null) {
-            currentComposition = queueItem.getComposition();
-        } else {
-            currentComposition = null;
-        }
-        getViewState().showCurrentPlayingComposition(currentComposition);
+    private void onCurrentCompositionReceived(CurrentComposition currentComposition) {
+        this.currentComposition = currentComposition.getComposition();
+        getViewState().showCurrentComposition(currentComposition);
     }
 
     private void subscribeOnUiSettings() {

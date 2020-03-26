@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.repositories.source.SourceRepository;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
@@ -17,6 +18,7 @@ import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsI
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
@@ -61,12 +63,13 @@ public interface AppComponent {
 
     UiStateRepository uiStateRepository();
     MediaScannerRepository mediaScannerRepository();
-    SourceRepository sourceRepository();
+    CompositionSourceProvider sourceRepository();
     StorageAlbumsProvider storageAlbumsProvider();
 
     CoverImageLoader imageLoader();
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();
+    ErrorParser errorParser();
 
     ThemeController themeController();
 

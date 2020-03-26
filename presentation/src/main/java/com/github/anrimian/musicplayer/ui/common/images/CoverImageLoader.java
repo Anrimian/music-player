@@ -22,6 +22,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
@@ -40,13 +41,16 @@ public class CoverImageLoader {
 
     private final Context context;
     private final StorageAlbumsProvider storageAlbumsProvider;
+    private final CompositionSourceProvider compositionSourceProvider;
 
     private final SimpleImageLoader<String, ImageMetaData> imageLoader;
 
-
-    public CoverImageLoader(Context context, StorageAlbumsProvider storageAlbumsProvider) {
+    public CoverImageLoader(Context context,
+                            StorageAlbumsProvider storageAlbumsProvider,
+                            CompositionSourceProvider compositionSourceProvider) {
         this.context = context;
         this.storageAlbumsProvider = storageAlbumsProvider;
+        this.compositionSourceProvider = compositionSourceProvider;
 
         imageLoader = new SimpleImageLoader<>(
                 R.drawable.ic_music_placeholder_simple,
@@ -141,10 +145,9 @@ public class CoverImageLoader {
                              AppWidgetManager appWidgetManager,
                              int appWidgetId,
                              long compositionId,
-                             String filePath,
                              @NonNull SimpleImageLoader.BitmapTransformer bitmapTransformer,
                              @DrawableRes int placeholder) {
-        imageLoader.displayImage(widgetView, viewId, appWidgetManager, appWidgetId, new CompositionImage(compositionId, filePath), bitmapTransformer, placeholder);
+        imageLoader.displayImage(widgetView, viewId, appWidgetManager, appWidgetId, new CompositionImage(compositionId), bitmapTransformer, placeholder);
     }
 
     private Bitmap getImage(ImageMetaData metaData) {
@@ -170,16 +173,12 @@ public class CoverImageLoader {
 
     @Nullable
     private Bitmap extractImageComposition(CompositionImage composition) {
-        String filePath = composition.getFilePath();
-
-        if (filePath == null) {
-            return null;
-        }
+        long id = composition.getId();
 
         MediaMetadataRetriever mmr = null;
         try {
             mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(filePath);
+            mmr.setDataSource(compositionSourceProvider.getCompositionFileDescriptor(id));
             byte[] imageBytes = mmr.getEmbeddedPicture();
             mmr.release();
             if (imageBytes == null) {

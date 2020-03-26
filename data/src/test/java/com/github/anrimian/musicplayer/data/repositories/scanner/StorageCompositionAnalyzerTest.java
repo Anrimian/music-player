@@ -116,6 +116,7 @@ public class StorageCompositionAnalyzerTest {
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         StorageFullComposition changedComposition = new StorageFullComposition("new artist",
                 null,
+                "fileName",
                 "test",
                 "test",
                 0,
@@ -147,6 +148,7 @@ public class StorageCompositionAnalyzerTest {
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         StorageFullComposition changedComposition = new StorageFullComposition(null,
                 null,
+                "fileName",
                 "test",
                 "test",
                 0,
@@ -175,6 +177,7 @@ public class StorageCompositionAnalyzerTest {
         StorageComposition oldComposition = new StorageComposition(null,
                 "album artist",
                 null,
+                "fileName",
                 "test album",
                 "test",
                 0,
@@ -190,6 +193,7 @@ public class StorageCompositionAnalyzerTest {
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         StorageFullComposition changedComposition = new StorageFullComposition(null,
                 null,
+                "fileName",
                 "test",
                 "test",
                 0,

@@ -23,8 +23,8 @@ public class DatabaseManager {
                 .addMigrations(Migrations.getMigration1_2(context),
                         Migrations.MIGRATION_2_3,
                         Migrations.getMigration3_4(context),
-                        Migrations.MIGRATION_4_5)
-                .fallbackToDestructiveMigration()
+                        Migrations.MIGRATION_4_5,
+                        Migrations.MIGRATION_5_6)
                 .build();
     }
 }

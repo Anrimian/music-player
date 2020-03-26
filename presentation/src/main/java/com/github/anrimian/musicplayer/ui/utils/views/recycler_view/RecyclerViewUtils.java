@@ -21,6 +21,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteTouchHelperCallback;
 
 import me.zhanghai.android.fastscroll.FastScrollerBuilder;
+import me.zhanghai.android.fastscroll.PublicRecyclerViewHelper;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -126,7 +127,6 @@ public class RecyclerViewUtils {
         attachFastScroller(recyclerView, false);
     }
 
-    //attach if high amount of elements appeared? - seems working from the box
     //list performance on fast scrolling
     public static void attachFastScroller(RecyclerView recyclerView, boolean useFabPadding) {
         Context context = recyclerView.getContext();
@@ -148,6 +148,7 @@ public class RecyclerViewUtils {
                 .setTrackDrawable(trackDrawable)
                 .setThumbDrawable(thumbDrawable)
                 .setPadding(padding)
+                .setViewHelper(new PublicRecyclerViewHelper(recyclerView))
                 .build();
     }
 }

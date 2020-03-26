@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
@@ -33,10 +34,12 @@ import com.github.anrimian.musicplayer.ui.library.compositions.adapter.Compositi
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -80,6 +83,7 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editGenreNameDialogRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
     public static GenreItemsFragment newInstance(long genreId) {
         Bundle args = new Bundle();
@@ -119,13 +123,12 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTitleClickListener(null);
-        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
-                this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
         progressViewWrapper.hideAll();
+
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new CompositionsAdapter(recyclerView,
                 presenter.getSelectedCompositions(),
@@ -157,6 +160,8 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
                     presenter.onNewGenreNameEntered(name, extra.getLong(ID_ARG));
                 })
         );
+
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
     }
 
     @Override
@@ -165,6 +170,9 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         presenter.onFragmentMovedToTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setupSearch(null, null);
+        toolbar.setTitleClickListener(null);
+        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
+                this::onActionModeItemClicked);
     }
 
     @Override
@@ -307,8 +315,8 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     }
 
     @Override
-    public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showCurrentComposition(composition);
+    public void showCurrentComposition(CurrentComposition currentComposition) {
+        adapter.showCurrentComposition(currentComposition);
     }
 
     @Override
@@ -354,21 +362,12 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void showRenameProgress() {
         ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.rename_progress);
-        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
+        progressDialogRunner.show(fragment);
     }
 
     @Override
     public void hideRenameProgress() {
-        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(PROGRESS_DIALOG_TAG);
-        if (fragment != null) {
-            fragment.dismissAllowingStateLoss();
-        }
-    }
-
-    @Override
-    public void showPlayState(boolean play) {
-        adapter.showPlaying(play);
+        progressDialogRunner.cancel();
     }
 
     @Override

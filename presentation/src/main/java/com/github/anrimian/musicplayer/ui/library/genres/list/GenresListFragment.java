@@ -32,9 +32,11 @@ import com.github.anrimian.musicplayer.ui.library.genres.list.adapter.GenresAdap
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -70,6 +72,7 @@ public class GenresListFragment extends LibraryFragment implements
     private DialogFragmentRunner<MenuDialogFragment> genreMenuDialogRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editGenreNameDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
     @ProvidePresenter
     GenresListPresenter providePresenter() {
@@ -101,6 +104,8 @@ public class GenresListFragment extends LibraryFragment implements
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
         progressViewWrapper.hideAll();
 
+        RecyclerViewUtils.attachFastScroller(recyclerView);
+
         adapter = new GenresAdapter(recyclerView,
                 this::goToGenreScreen,
                 this::onGenreLongClick);
@@ -123,6 +128,7 @@ public class GenresListFragment extends LibraryFragment implements
                     presenter.onNewGenreNameEntered(name, extra.getLong(ID_ARG));
                 })
         );
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
     }
 
     @Override
@@ -201,16 +207,12 @@ public class GenresListFragment extends LibraryFragment implements
     @Override
     public void showRenameProgress() {
         ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.rename_progress);
-        fragment.show(getChildFragmentManager(), PROGRESS_DIALOG_TAG);
+        progressDialogRunner.show(fragment);
     }
 
     @Override
     public void hideRenameProgress() {
-        ProgressDialogFragment fragment = (ProgressDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(PROGRESS_DIALOG_TAG);
-        if (fragment != null) {
-            fragment.dismissAllowingStateLoss();
-        }
+        progressDialogRunner.cancel();
     }
 
     @Override

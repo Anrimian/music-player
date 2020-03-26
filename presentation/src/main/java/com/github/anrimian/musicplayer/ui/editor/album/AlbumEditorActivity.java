@@ -19,6 +19,8 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFr
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
@@ -33,6 +35,7 @@ import moxy.presenter.ProvidePresenter;
 import static com.github.anrimian.musicplayer.Constants.Arguments.ALBUM_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
@@ -71,6 +74,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
 
     private DialogFragmentRunner<InputTextDialogFragment> authorDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> nameDialogFragmentRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
     public static Intent newIntent(Context context, long albumId) {
         Intent intent = new Intent(context, AlbumEditorActivity.class);
@@ -119,6 +123,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
                 NAME_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewNameEntered));
 
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
     }
 
     @Override
@@ -146,6 +151,16 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
         makeSnackbar(container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showRenameProgress() {
+        progressDialogRunner.show(ProgressDialogFragment.newInstance(R.string.rename_progress));
+    }
+
+    @Override
+    public void hideRenameProgress() {
+        progressDialogRunner.cancel();
     }
 
     @Override

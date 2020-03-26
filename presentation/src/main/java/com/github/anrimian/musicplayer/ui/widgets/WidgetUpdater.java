@@ -16,7 +16,6 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
-import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_FILE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
@@ -50,7 +49,7 @@ public class WidgetUpdater {
             return;
         }
         updateDisposable.add(musicPlayerInteractor
-                .getCurrentCompositionObservable()
+                .getCurrentQueueItemObservable()
                 .subscribe(this::onCurrentCompositionReceived));
 
         updateDisposable.add(musicPlayerInteractor
@@ -87,32 +86,27 @@ public class WidgetUpdater {
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
         String compositionName = null;
         String compositionAuthor = null;
-        String compositionFile = null;
         long compositionId = 0;
         PlayQueueItem item = playQueueEvent.getPlayQueueItem();
         if (item != null) {
             compositionName = formatCompositionName(item.getComposition());
             compositionAuthor = formatCompositionAuthor(item.getComposition(), context).toString();
-            compositionFile = item.getComposition().getFilePath();
             compositionId = item.getComposition().getId();
         }
-        updateComposition(compositionName, compositionAuthor, compositionFile, compositionId);
+        updateComposition(compositionName, compositionAuthor, compositionId);
     }
 
     private void updateComposition(String compositionName,
                                    String compositionAuthor,
-                                   String compositionFile,
                                    long compositionId) {
         WidgetDataHolder.setCompositionName(context, compositionName);
         WidgetDataHolder.setCompositionAuthor(context, compositionAuthor);
-        WidgetDataHolder.setCompositionFile(context, compositionFile);
         WidgetDataHolder.setCompositionId(context, compositionId);
 
         updateWidgets(intent -> {
             intent.putExtra(WIDGET_ACTION, ACTION_UPDATE_COMPOSITION);
             intent.putExtra(COMPOSITION_NAME_ARG, compositionName);
             intent.putExtra(COMPOSITION_AUTHOR_ARG, compositionAuthor);
-            intent.putExtra(COMPOSITION_FILE_ARG, compositionFile);
             intent.putExtra(COMPOSITION_ID_ARG, compositionId);
         });
     }

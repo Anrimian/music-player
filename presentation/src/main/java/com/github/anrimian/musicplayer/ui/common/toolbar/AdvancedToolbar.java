@@ -296,16 +296,6 @@ public class AdvancedToolbar extends FrameLayout {
         setSearchModeEnabled(!isEmpty(text));
     }
 
-    @Deprecated
-    public void setTextChangeListener(Callback<String> textChangeListener) {
-        this.textChangeListener = textChangeListener;
-    }
-
-    @Deprecated
-    public void setTextConfirmListener(Callback<String> textConfirmListener) {
-        this.textConfirmListener = textConfirmListener;
-    }
-
     public Observable<Boolean> getSearchModeObservable() {
         return searchModeSubject;
     }

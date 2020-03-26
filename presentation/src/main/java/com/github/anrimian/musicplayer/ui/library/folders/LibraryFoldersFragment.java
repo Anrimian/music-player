@@ -34,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -48,6 +49,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -171,6 +173,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new MusicFileSourceAdapter(recyclerView,
                 presenter.getSelectedFiles(),
@@ -466,11 +470,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showCurrentComposition(composition);
-    }
-
-    @Override
     public void showCompositionActionDialog(Composition composition) {
         @AttrRes int statusBarColor = toolbar.isInActionMode()?
                 R.attr.actionModeStatusBarColor: android.R.attr.statusBarColor;
@@ -547,8 +546,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showPlayState(boolean play) {
-        adapter.showPlaying(play);
+    public void showCurrentComposition(CurrentComposition currentComposition) {
+        adapter.showCurrentComposition(currentComposition);
     }
 
     @Override

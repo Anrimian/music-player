@@ -304,7 +304,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnCurrentCompositionChanging() {
-        batterySafeDisposable.add(playerInteractor.getCurrentCompositionObservable()
+        batterySafeDisposable.add(playerInteractor.getCurrentQueueItemObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayQueueEventReceived));
     }

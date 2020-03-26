@@ -122,5 +122,5 @@
 
     <!--scrollbars-->
     <dimen name="scrollbar_thumb_vertical_padding">16dp</dimen>
-    <dimen name="scrollbar_width">24dp</dimen>
+    <dimen name="scrollbar_width">4dp</dimen>
 </resources>

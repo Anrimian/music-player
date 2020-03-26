@@ -33,7 +33,7 @@ public interface ArtistsDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "filePath as filePath, " +
+            "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
             "id as id, " +
@@ -49,7 +49,7 @@ public interface ArtistsDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "filePath as filePath, " +
+            "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
             "id as id, " +

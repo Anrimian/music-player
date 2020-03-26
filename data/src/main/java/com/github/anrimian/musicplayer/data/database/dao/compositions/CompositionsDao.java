@@ -30,7 +30,7 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
-            "filePath as filePath, " +
+            "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
             "id as id, " +
@@ -50,13 +50,14 @@ public interface CompositionsDao {
     Observable<List<Composition>> getAllInFolderObservable(SupportSQLiteQuery query);
 
     @RawQuery
-    List<Composition> getAllInFolder(SimpleSQLiteQuery sqlQuery);
+    List<Composition> executeQuery(SimpleSQLiteQuery sqlQuery);
 
     @Query("SELECT " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "compositions.fileName as fileName, " +
             "compositions.filePath as filePath, " +
             "compositions.duration as duration, " +
             "compositions.size as size, " +
@@ -76,6 +77,7 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET " +
             "title = :title, " +
+            "fileName = :fileName, " +
             "filePath = :filePath, " +
             "duration = :duration, " +
             "size = :size, " +
@@ -83,6 +85,7 @@ public interface CompositionsDao {
             "dateModified = :dateModified " +
             "WHERE storageId = :storageId")
     void update(String title,
+                String fileName,
                 String filePath,
                 long duration,
                 long size,
@@ -107,6 +110,9 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
+
+    @Query("UPDATE compositions SET fileName = :fileName WHERE id = :id")
+    void updateCompositionFileName(long id, String fileName);
 
     @Query("UPDATE compositions SET folderId = :folderId WHERE id = :id")
     void updateFolderId(long id, Long folderId);
@@ -137,7 +143,7 @@ public interface CompositionsDao {
                 "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
                 "(SELECT name FROM albums WHERE id = albumId) as album,  " +
                 "title as title,  " +
-                "filePath as filePath,  " +
+                "fileName as fileName, " +
                 "duration as duration,  " +
                 "size as size,  " +
                 "id as id,  " +
@@ -147,5 +153,4 @@ public interface CompositionsDao {
                 "corruptionType as corruptionType  " +
                 "FROM compositions";
     }
-
 }

@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
-import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
+import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
@@ -63,6 +63,10 @@ public class CompositionItemWrapper {
     @BindView(R.id.btn_actions_menu)
     View btnActionsMenu;
 
+    @Nullable
+    @BindView(R.id.icon_clickable_area)
+    View iconClickableArea;
+
     private Composition composition;
 
     private boolean isCurrent;
@@ -72,8 +76,8 @@ public class CompositionItemWrapper {
                                   Callback<Composition> onIconClickListener,
                                   Callback<Composition> onClickListener) {
         ButterKnife.bind(this, itemView);
-        if (ivMusicIcon != null) {
-            ivMusicIcon.setOnClickListener(v -> onIconClickListener.call(composition));
+        if (iconClickableArea != null) {
+            iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
         }
         clickableItem.setOnClickListener(v -> onClickListener.call(composition));
     }
@@ -95,7 +99,7 @@ public class CompositionItemWrapper {
                 //noinspection SingleStatementInBlock,unchecked
                 update(composition, (List) payload);
             }
-            if (payload == PATH || payload == TITLE) {
+            if (payload == FILE_NAME || payload == TITLE) {
                 showCompositionName();
             }
             if (payload == ARTIST || payload == DURATION) {

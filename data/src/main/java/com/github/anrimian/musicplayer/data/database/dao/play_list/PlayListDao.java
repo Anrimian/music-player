@@ -90,7 +90,7 @@ public interface PlayListDao {
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.storageId AS storageId, " +
             "compositions.title AS title, " +
-            "compositions.filePath AS filePath, " +
+            "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
             "compositions.dateAdded AS dateAdded, " +
