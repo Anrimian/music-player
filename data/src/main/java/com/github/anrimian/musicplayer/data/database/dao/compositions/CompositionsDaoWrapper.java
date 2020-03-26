@@ -270,6 +270,14 @@ public class CompositionsDaoWrapper {
                 orderQuery.append("dateAdded");
                 break;
             }
+            case SIZE: {
+                orderQuery.append("size");
+                break;
+            }
+            case DURATION: {
+                orderQuery.append("duration");
+                break;
+            }
             default: throw new IllegalStateException("unknown order type" + order);
         }
         orderQuery.append(" ");

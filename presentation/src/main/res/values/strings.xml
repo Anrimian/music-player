@@ -187,6 +187,8 @@
     <string name="play_next_message_single">Composition \"%s\" will be played next</string>
     <string name="added_to_queue_message_single">Composition \"%s\" added to end of play queue</string>
     <string name="queue_item_removed">Queue item removed</string>
+    <string name="by_size">By size</string>
+    <string name="largest_first">Largest first</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

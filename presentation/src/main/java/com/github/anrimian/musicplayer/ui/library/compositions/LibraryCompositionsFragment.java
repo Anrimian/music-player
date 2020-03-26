@@ -280,7 +280,9 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
                 OrderType.ALPHABETICAL,
-                OrderType.ADD_TIME);
+                OrderType.ADD_TIME,
+                OrderType.DURATION,
+                OrderType.SIZE);
         selectOrderDialogRunner.show(fragment);
     }
 

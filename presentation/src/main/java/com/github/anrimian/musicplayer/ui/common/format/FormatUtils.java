@@ -130,6 +130,7 @@ public class FormatUtils {
             case ADD_TIME: return R.string.add_date_order;
             case COMPOSITION_COUNT: return R.string.by_composition_count;
             case DURATION: return R.string.by_duration;
+            case SIZE: return R.string.by_size;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }
@@ -140,6 +141,7 @@ public class FormatUtils {
             case ADD_TIME: return R.string.add_date_order_desc_title;
             case COMPOSITION_COUNT: return R.string.more_first;
             case DURATION: return R.string.longest_first;
+            case SIZE: return R.string.largest_first;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }
