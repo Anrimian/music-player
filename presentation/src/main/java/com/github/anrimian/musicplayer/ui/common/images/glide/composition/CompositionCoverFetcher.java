@@ -12,17 +12,21 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.common.images.CompositionImage;
 
 public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
 
     private final Composition composition;
     private final Context context;
+    private final CompositionSourceProvider compositionSourceProvider;
 
-    CompositionCoverFetcher(Composition composition, Context context) {
+    CompositionCoverFetcher(Composition composition,
+                            Context context,
+                            CompositionSourceProvider compositionSourceProvider) {
         this.composition = composition;
         this.context = context;
+        this.compositionSourceProvider = compositionSourceProvider;
     }
 
     @Override
@@ -53,16 +57,12 @@ public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
 
     @Nullable
     private Bitmap extractImageComposition(Composition composition) {
-        String filePath = composition.getFilePath();
-
-        if (filePath == null) {
-            return null;
-        }
+        long id = composition.getId();
 
         MediaMetadataRetriever mmr = null;
         try {
             mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(filePath);
+            mmr.setDataSource(compositionSourceProvider.getCompositionFileDescriptor(id));
             byte[] imageBytes = mmr.getEmbeddedPicture();
             mmr.release();
             if (imageBytes == null) {

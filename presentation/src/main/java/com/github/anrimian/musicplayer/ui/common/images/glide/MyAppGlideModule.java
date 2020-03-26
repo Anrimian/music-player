@@ -11,6 +11,7 @@ import com.bumptech.glide.Registry;
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.load.engine.cache.LruResourceCache;
 import com.bumptech.glide.module.AppGlideModule;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.images.glide.album.AlbumCoverLoaderFactory;
@@ -28,7 +29,7 @@ public final class MyAppGlideModule extends AppGlideModule {
     public void registerComponents(@NonNull Context context,
                                    @NonNull Glide glide,
                                    @NonNull Registry registry) {
-        registry.prepend(Composition.class, Bitmap.class, new CompositionCoverLoaderFactory(context));
+        registry.prepend(Composition.class, Bitmap.class, new CompositionCoverLoaderFactory(context, Components.getAppComponent().sourceRepository()));
         registry.prepend(Album.class, Bitmap.class, new AlbumCoverLoaderFactory(context));
     }
 

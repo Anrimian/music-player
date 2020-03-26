@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import javax.annotation.Nonnull;
@@ -13,15 +14,17 @@ import javax.annotation.Nonnull;
 public class CompositionCoverLoaderFactory implements ModelLoaderFactory<Composition, Bitmap> {
 
     private final Context context;
+    private final CompositionSourceProvider compositionSourceProvider;
 
-    public CompositionCoverLoaderFactory(Context context) {
+    public CompositionCoverLoaderFactory(Context context, CompositionSourceProvider compositionSourceProvider) {
         this.context = context;
+        this.compositionSourceProvider = compositionSourceProvider;
     }
 
     @Nonnull
     @Override
     public ModelLoader<Composition, Bitmap> build(@Nonnull MultiModelLoaderFactory unused) {
-        return new CompositionCoverLoader(context);
+        return new CompositionCoverLoader(context, compositionSourceProvider);
     }
 
     @Override

@@ -8,14 +8,17 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.signature.ObjectKey;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 public final class CompositionCoverLoader implements ModelLoader<Composition, Bitmap> {
 
     private final Context context;
+    private final CompositionSourceProvider compositionSourceProvider;
 
-    CompositionCoverLoader(Context context) {
+    CompositionCoverLoader(Context context, CompositionSourceProvider compositionSourceProvider) {
         this.context = context;
+        this.compositionSourceProvider = compositionSourceProvider;
     }
 
     @NonNull
@@ -24,7 +27,8 @@ public final class CompositionCoverLoader implements ModelLoader<Composition, Bi
                                                       int width,
                                                       int height,
                                                       @NonNull Options options) {
-        return new LoadData<>(new ObjectKey(model.getId()), new CompositionCoverFetcher(model, context));
+        return new LoadData<>(new ObjectKey(model.getId()),
+                new CompositionCoverFetcher(model, context, compositionSourceProvider));
     }
 
     @Override
