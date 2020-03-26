@@ -220,6 +220,14 @@ public class FoldersDaoWrapper {
                 orderQuery.append("(SELECT max(dateAdded) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
                 break;
             }
+            case DURATION: {
+                orderQuery.append("(SELECT sum(duration) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
+                break;
+            }
+            case SIZE: {
+                orderQuery.append("(SELECT sum(size) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
+                break;
+            }
             default: throw new IllegalStateException("unknown order type" + order);
         }
         orderQuery.append(" ");
