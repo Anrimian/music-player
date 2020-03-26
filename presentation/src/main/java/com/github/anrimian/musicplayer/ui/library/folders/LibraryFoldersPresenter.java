@@ -114,7 +114,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     void onStart() {
         if (!sourceList.isEmpty()) {
             subscribeOnCurrentComposition();
-//            subscribeOnPlayState();
         }
     }
 
@@ -576,7 +575,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
             if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
-//                subscribeOnPlayState();
             }
         }
     }
