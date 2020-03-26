@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersScr
 import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
@@ -66,7 +67,6 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     fun onStart() {
         if (sourceList.isNotEmpty()) {
             subscribeOnCurrentComposition()
-            subscribeOnPlayState()
         }
     }
 
@@ -90,7 +90,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
             playerInteractor.playOrPause()
         } else {
             interactor.play(folderId, composition)
-            viewState.showCurrentPlayingComposition(composition)
+            viewState.showCurrentComposition(CurrentComposition(composition, true))
         }
     }
 
@@ -462,7 +462,6 @@ class LibraryFoldersPresenter(private val folderId: Long?,
             viewState.showList()
             if (RxUtils.isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition()
-                subscribeOnPlayState()
             }
         }
     }
@@ -479,10 +478,9 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         presenterBatterySafeDisposable.add(currentCompositionDisposable!!)
     }
 
-    private fun onCurrentCompositionReceived(playQueueEvent: PlayQueueEvent) {
-        val queueItem = playQueueEvent.playQueueItem
-        currentComposition = queueItem?.composition
-        viewState.showCurrentPlayingComposition(currentComposition)
+    private fun onCurrentCompositionReceived(currentComposition: CurrentComposition) {
+        this.currentComposition = currentComposition.composition
+        viewState.showCurrentComposition(currentComposition)
     }
 
     private fun subscribeOnUiSettings() {
@@ -497,13 +495,4 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     private fun subscribeOnMoveEnabledState() {
         interactor.moveModeObservable.unsafeSubscribeOnUi(viewState::showMoveFileMenu)
     }
-
-    private fun subscribeOnPlayState() {
-        playerInteractor.playerStateObservable.unsafeSubscribeOnUi(this::onPlayerStateReceived)
-    }
-
-    private fun onPlayerStateReceived(state: PlayerState) {
-        viewState.showPlayState(state === PlayerState.PLAY)
-    }
-
 }

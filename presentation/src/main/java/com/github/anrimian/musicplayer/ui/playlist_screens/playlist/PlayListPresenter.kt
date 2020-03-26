@@ -278,7 +278,7 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun subscribeOnCurrentComposition() {
-        currentItemDisposable = playerInteractor.currentCompositionObservable
+        currentItemDisposable = playerInteractor.currentQueueItemObservable
                 .observeOn(uiScheduler)
                 .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
         presenterBatterySafeDisposable.add(currentItemDisposable!!)

@@ -5,8 +5,7 @@ import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInterac
 import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
@@ -16,7 +15,6 @@ import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import moxy.MvpPresenter
 import java.util.*
 
 abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>(
@@ -55,7 +53,6 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     fun onStart() {
         if (compositions.isNotEmpty()) {
             subscribeOnCurrentComposition()
-            subscribeOnPlayState()
         }
     }
 
@@ -87,7 +84,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
             playerInteractor.playOrPause()
         } else {
             playerInteractor.startPlaying(compositions, position)
-            viewState.showCurrentPlayingComposition(composition)
+            viewState.showCurrentComposition(CurrentComposition(composition, true))
         }
     }
 
@@ -193,6 +190,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         return selectedCompositions
     }
 
+    fun getSearchText() = searchText
+
     protected fun subscribeOnCompositions() {
         if (compositions.isEmpty()) {
             viewState.showLoading()
@@ -268,12 +267,6 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         presenterBatterySafeDisposable.add(currentCompositionDisposable!!)
     }
 
-    private fun subscribeOnPlayState() {
-        presenterBatterySafeDisposable.add(playerInteractor.playerStateObservable
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateReceived))
-    }
-
     private fun onCompositionsReceivingError(throwable: Throwable) {
         val errorCommand = errorParser.parseError(throwable)
         viewState.showLoadingError(errorCommand)
@@ -292,19 +285,13 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
             viewState.showList()
             if (RxUtils.isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition()
-                subscribeOnPlayState()
             }
         }
     }
 
-    private fun onPlayerStateReceived(state: PlayerState) {
-        viewState.showPlayState(state === PlayerState.PLAY)
-    }
-
-    private fun onCurrentCompositionReceived(playQueueEvent: PlayQueueEvent) {
-        val queueItem = playQueueEvent.playQueueItem
-        currentComposition = queueItem?.composition
-        viewState.showCurrentPlayingComposition(currentComposition)
+    private fun onCurrentCompositionReceived(currentComposition: CurrentComposition) {
+        this.currentComposition = currentComposition.composition
+        viewState.showCurrentComposition(currentComposition)
     }
 
     private fun subscribeOnUiSettings() {
