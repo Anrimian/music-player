@@ -19,6 +19,8 @@ public class StorageComposition {
     private final String albumArtist;
     @Nullable
     private final String title;
+    @Nonnull
+    private final String fileName;
     @Nullable
     private final String album;
     @Nonnull
@@ -40,6 +42,7 @@ public class StorageComposition {
     public StorageComposition(@Nullable String artist,
                               @Nullable String albumArtist,
                               @Nullable String title,
+                              @Nonnull String fileName,
                               @Nullable String album,
                               @Nonnull String filePath,
                               long duration,
@@ -52,6 +55,7 @@ public class StorageComposition {
         this.artist = artist;
         this.albumArtist = albumArtist;
         this.title = title;
+        this.fileName = fileName;
         this.album = album;
         this.filePath = filePath;
         this.duration = duration;
@@ -85,6 +89,11 @@ public class StorageComposition {
     @Nullable
     public String getTitle() {
         return title;
+    }
+
+    @Nonnull
+    public String getFileName() {
+        return fileName;
     }
 
     @Nullable

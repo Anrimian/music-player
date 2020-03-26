@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.common.compositions;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.mvp.ListMvpView;
@@ -48,9 +49,6 @@ public interface BaseLibraryCompositionsView extends ListMvpView<Composition> {
     @StateStrategyType(SkipStrategy.class)
     void shareCompositions(Collection<Composition> selectedCompositions);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentPlayingComposition(Composition composition);
-
     @StateStrategyType(SkipStrategy.class)
     void showCompositionActionDialog(Composition composition, int position);
 
@@ -60,12 +58,12 @@ public interface BaseLibraryCompositionsView extends ListMvpView<Composition> {
     @StateStrategyType(AddToEndSingleStrategy.class)
     void setDisplayCoversEnabled(boolean isCoversEnabled);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showPlayState(boolean play);
-
     @StateStrategyType(OneExecutionStateStrategy.class)
     void onCompositionsAddedToPlayNext(List<Composition> compositions);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void onCompositionsAddedToQueue(List<Composition> compositions);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showCurrentComposition(CurrentComposition currentComposition);
 }

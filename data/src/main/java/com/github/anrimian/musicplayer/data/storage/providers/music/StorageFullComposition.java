@@ -20,6 +20,8 @@ public class StorageFullComposition {
     @Nullable
     private final String title;
     @Nonnull
+    private final String fileName;
+    @Nonnull
     private final String filePath;
 
     @Nonnull
@@ -38,6 +40,7 @@ public class StorageFullComposition {
 
     public StorageFullComposition(@Nullable String artist,
                                   @Nullable String title,
+                                  @Nonnull String fileName,
                                   @Nonnull String filePath,
                                   @Nonnull String relativePath,
                                   long duration,
@@ -48,6 +51,7 @@ public class StorageFullComposition {
                                   StorageAlbum storageAlbum) {
         this.artist = artist;
         this.title = title;
+        this.fileName = fileName;
         this.filePath = filePath;
         this.relativePath = relativePath;
         this.duration = duration;
@@ -80,6 +84,11 @@ public class StorageFullComposition {
     @Nonnull
     public String getFilePath() {
         return filePath;
+    }
+
+    @Nonnull
+    public String getFileName() {
+        return fileName;
     }
 
     public long getDuration() {

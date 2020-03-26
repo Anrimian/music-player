@@ -10,6 +10,7 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 
@@ -24,8 +25,10 @@ import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -35,6 +38,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
@@ -49,6 +53,13 @@ public class StorageMusicProvider {
         contentResolver = context.getContentResolver();
         this.context = context;
         this.albumsProvider = albumsProvider;
+    }
+
+    public void scanMedia(long id) {
+        String filePath = getCompositionFilePath(id);
+        if (filePath != null) {
+            scanMedia(filePath);
+        }
     }
 
     public void scanMedia(String path) {
@@ -71,6 +82,7 @@ public class StorageMusicProvider {
 //                query = new String[] {
 //                        Media.ARTIST,
 //                        Media.TITLE,
+//                        Media.DISPLAY_NAME,
 ////                            Media.ALBUM,
 //                        Media.DATA,
 //                        Media.RELATIVE_PATH,
@@ -86,6 +98,7 @@ public class StorageMusicProvider {
                 query = new String[] {
                         Media.ARTIST,
                         Media.TITLE,
+                        Media.DISPLAY_NAME,
 //                            Media.ALBUM,
                         Media.DATA,
                         Media.DURATION,
@@ -141,13 +154,15 @@ public class StorageMusicProvider {
                     Media._ID + " = ?",
                     new String[] { String.valueOf(storageId) },
                     null);
-            if (cursor == null) {
+            if (cursor == null || cursor.getCount() == 0) {
                 return null;
             }
 
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            cursor.moveToFirst();
-            return cursorWrapper.getString(Media.DATA);
+            if (cursor.moveToFirst()) {
+                return cursorWrapper.getString(Media.DATA);
+            }
+            return null;
         } finally {
             IOUtils.closeSilently(cursor);
         }
@@ -187,6 +202,10 @@ public class StorageMusicProvider {
 
     public void updateCompositionTitle(long id, String title) {
         updateComposition(id, MediaStore.Audio.AudioColumns.TITLE, title);
+    }
+
+    public void updateCompositionFileName(long id, String name) {
+        updateComposition(id, MediaStore.Audio.AudioColumns.DISPLAY_NAME, name);
     }
 
     public void updateCompositionFilePath(long id, String filePath) {
@@ -285,7 +304,6 @@ public class StorageMusicProvider {
     }
 
     public Uri getCompositionUri(long id) {
-        //not correct, we expect file uri
         return ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, id);
     }
 
@@ -293,10 +311,19 @@ public class StorageMusicProvider {
         return contentResolver.openInputStream(getCompositionUri(id));
     }
 
+    public FileDescriptor getFileDescriptor(long id) throws FileNotFoundException {
+        Uri uri = getCompositionUri(id);
+        ParcelFileDescriptor fd = contentResolver.openFileDescriptor(uri, "r");
+        if (fd == null) {
+            throw new RuntimeException("file descriptor not found");
+        }
+        return fd.getFileDescriptor();
+    }
+
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
         cv.put(key, value);
-        contentResolver.update(Media.EXTERNAL_CONTENT_URI,
+        contentResolver.update(getCompositionUri(id),
                 cv,
                 Media._ID + " = ?",
                 new String[] { String.valueOf(id) });
@@ -324,7 +351,10 @@ public class StorageMusicProvider {
         }
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
-//        String displayName = cursorWrapper.getString(DISPLAY_NAME);
+        String displayName = cursorWrapper.getString(Media.DISPLAY_NAME);
+        if (TextUtils.isEmpty(displayName)) {
+            displayName = "<unknown>";
+        }
 //        String mimeType = cursorWrapper.getString(Media.MIME_TYPE);
 
         long duration = cursorWrapper.getLong(Media.DURATION);
@@ -372,6 +402,7 @@ public class StorageMusicProvider {
         return new StorageFullComposition(
                 artist,
                 title,
+                displayName,
                 filePath,
                 relativePath,
                 duration,

@@ -12,6 +12,7 @@ import moxy.viewstate.strategy.StateStrategyType;
 public interface AlbumEditorView extends MvpView {
 
     String DISPLAY_ALBUM_STATE = "display_album_state";
+    String CHANGE_STATE = "change_state";
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void closeScreen();
@@ -21,6 +22,12 @@ public interface AlbumEditorView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = DISPLAY_ALBUM_STATE)
     void showAlbum(Album album);
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_STATE)
+    void showRenameProgress();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_STATE)
+    void hideRenameProgress();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);
