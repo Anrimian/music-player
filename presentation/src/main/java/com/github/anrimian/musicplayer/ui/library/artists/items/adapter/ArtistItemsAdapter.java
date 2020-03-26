@@ -70,9 +70,10 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
         switch (viewType) {
             case TYPE_COMPOSITIONS: {
                 return new MusicViewHolder(parent,
-                        onCompositionClickListener,
-                        onLongClickListener,
-                        iconClickListener);
+                        wrapPositionListener(onCompositionClickListener),
+                        wrapPositionListener(onLongClickListener),
+                        wrapPositionListener(iconClickListener)
+                );
             }
             case TYPE_ALBUMS: {
                 return new AlbumsViewHolder(parent, albumClickListener, albumsScrollStateCallback);
@@ -206,5 +207,10 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
             return CompositionHelper.getChangePayload((Composition) first, (Composition) second);
         }
         return null;
+    }
+
+    private OnPositionItemClickListener<Composition> wrapPositionListener(
+            OnPositionItemClickListener<Composition> listener) {
+        return (position, data) -> listener.onItemClick(--position, data);
     }
 }
