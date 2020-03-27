@@ -247,7 +247,6 @@ public class PlayQueueDaoWrapper {
         }
     }
 
-    //TODO don't select corrupted compositions
     public long getPreviousQueueItemId(long currentItemId, boolean isShuffled) {
         if (isShuffled) {
             Long id = playQueueDao.getPreviousShuffledQueueItemId(currentItemId);

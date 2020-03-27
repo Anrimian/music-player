@@ -201,7 +201,8 @@ public interface PlayQueueDao {
             "   (SELECT MAX(position) " +
             "   FROM play_queue " +
             "   WHERE position < " +
-            "       (SELECT position FROM play_queue WHERE id = :currentItemId))")
+            "       (SELECT position FROM play_queue WHERE id = :currentItemId)" +
+            "       AND (SELECT corruptionType FROM compositions WHERE id = audioId) IS NULL)")
     Long getPreviousQueueItemId(long currentItemId);
 
     @Query("SELECT id " +
@@ -210,6 +211,7 @@ public interface PlayQueueDao {
             "   (SELECT MAX(shuffledPosition) " +
             "   FROM play_queue " +
             "   WHERE shuffledPosition < " +
-            "       (SELECT shuffledPosition FROM play_queue WHERE id = :currentItemId))")
+            "       (SELECT shuffledPosition FROM play_queue WHERE id = :currentItemId)" +
+            "       AND (SELECT corruptionType FROM compositions WHERE id = audioId) IS NULL)")
     Long getPreviousShuffledQueueItemId(long currentItemId);
 }

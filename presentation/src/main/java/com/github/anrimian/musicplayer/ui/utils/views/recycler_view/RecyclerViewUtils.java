@@ -127,7 +127,6 @@ public class RecyclerViewUtils {
         attachFastScroller(recyclerView, false);
     }
 
-    //list performance on fast scrolling
     public static void attachFastScroller(RecyclerView recyclerView, boolean useFabPadding) {
         Context context = recyclerView.getContext();
         Drawable trackDrawable = ContextCompat.getDrawable(context, R.drawable.bg_transparent);
