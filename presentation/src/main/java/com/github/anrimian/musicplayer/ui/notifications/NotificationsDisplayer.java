@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,7 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
-import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 
@@ -50,10 +51,17 @@ public class NotificationsDisplayer {
     private final Context context;
     private final NotificationManager notificationManager;
     private final AppNotificationBuilder notificationBuilder;
+    private final CoverImageLoader coverImageLoader;
 
-    public NotificationsDisplayer(Context context, AppNotificationBuilder notificationBuilder) {
+    private Bitmap currentNotificationBitmap;
+    private Runnable cancellationRunnable;
+
+    public NotificationsDisplayer(Context context,
+                                  AppNotificationBuilder notificationBuilder,
+                                  CoverImageLoader coverImageLoader) {
         this.context = context;
         this.notificationBuilder = notificationBuilder;
+        this.coverImageLoader = coverImageLoader;
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -99,16 +107,23 @@ public class NotificationsDisplayer {
         notificationManager.cancel(ERROR_NOTIFICATION_ID);
     }
 
-    public Notification getForegroundNotification(boolean play,
-                                                  @Nullable PlayQueueItem composition,
-                                                  MediaSessionCompat mediaSession,
-                                                  @Nullable MusicNotificationSetting notificationSetting) {
-        return getDefaultMusicNotification(play, composition, mediaSession, notificationSetting)
+    public void startForegroundNotification(Service service,
+                                            boolean play,
+                                            @Nullable PlayQueueItem queueItem,
+                                            MediaSessionCompat mediaSession,
+                                            @Nullable MusicNotificationSetting notificationSetting) {
+        Notification notification = getDefaultMusicNotification(play,
+                queueItem,
+                mediaSession,
+                notificationSetting)
                 .build();
+        service.startForeground(FOREGROUND_NOTIFICATION_ID, notification);
+
+        showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
     }
 
     public void updateForegroundNotification(boolean play,
-                                             @Nullable PlayQueueItem composition,
+                                             @Nullable PlayQueueItem queueItem,
                                              MediaSessionCompat mediaSession,
                                              MusicNotificationSetting notificationSetting) {
         if (!isNotificationVisible(notificationManager, FOREGROUND_NOTIFICATION_ID)) {
@@ -116,11 +131,47 @@ public class NotificationsDisplayer {
         }
 
         Notification notification = getDefaultMusicNotification(play,
-                composition,
+                queueItem,
                 mediaSession,
                 notificationSetting)
                 .build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
+
+        showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
+    }
+
+    private void showMusicNotificationWithCover(boolean play,
+                                                @Nullable PlayQueueItem queueItem,
+                                                MediaSessionCompat mediaSession,
+                                                MusicNotificationSetting notificationSetting) {
+        if (cancellationRunnable != null) {
+            cancellationRunnable.run();
+        }
+
+        if (queueItem == null) {
+            return;
+        }
+
+        boolean showCovers = false;
+        if (notificationSetting != null) {
+            showCovers = notificationSetting.isShowCovers();
+        }
+        if (!showCovers) {
+            return;
+        }
+
+        Composition composition = queueItem.getComposition();
+
+        cancellationRunnable = coverImageLoader.loadNotificationImage(composition, bitmap -> {
+            NotificationCompat.Builder builder = getDefaultMusicNotification(play,
+                    queueItem,
+                    mediaSession,
+                    notificationSetting);
+
+            builder.setLargeIcon(bitmap);
+            currentNotificationBitmap = bitmap;
+            notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
+        });
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,
@@ -186,8 +237,10 @@ public class NotificationsDisplayer {
             Composition composition = queueItem.getComposition();
 
             if (showCovers) {
-                Bitmap bitmap = ImageFormatUtils.getNotificationImage(composition);
-
+                Bitmap bitmap = currentNotificationBitmap;
+                if (bitmap == null) {
+                    bitmap = coverImageLoader.getDefaultNotificationBitmap();
+                }
                 builder.setLargeIcon(bitmap);
             }
 

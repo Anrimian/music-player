@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsI
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
@@ -44,8 +45,9 @@ public class AppModule {
     @Nonnull
     @Singleton
     NotificationsDisplayer provideNotificationsController(Context context,
-                                                          AppNotificationBuilder notificationBuilder) {
-        return new NotificationsDisplayer(context, notificationBuilder);
+                                                          AppNotificationBuilder notificationBuilder,
+                                                          CoverImageLoader coverImageLoader) {
+        return new NotificationsDisplayer(context, notificationBuilder, coverImageLoader);
     }
 
     @Provides

@@ -66,7 +66,6 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
  * Created on 03.11.2017.
@@ -144,12 +143,11 @@ public class MusicService extends Service {
 
         serviceDisposable.add(playInfoDisposable);
 
-        startForeground(FOREGROUND_NOTIFICATION_ID,
-                notificationsDisplayer.getForegroundNotification(
-                        true,
-                        currentItem,
-                        mediaSession,
-                        notificationSetting));
+        notificationsDisplayer.startForegroundNotification(this,
+                true,
+                currentItem,
+                mediaSession,
+                notificationSetting);
 
         subscribeOnNotificationSettings();
         subscribeOnPlayerChanges();
@@ -222,12 +220,11 @@ public class MusicService extends Service {
         switch (playerState) {
             case PLAY: {
                 mediaSession.setActive(true);
-                startForeground(FOREGROUND_NOTIFICATION_ID,
-                        notificationsDisplayer.getForegroundNotification(
-                                true,
-                                currentItem,
-                                mediaSession,
-                                notificationSetting));
+                notificationsDisplayer.startForegroundNotification(this,
+                        true,
+                        currentItem,
+                        mediaSession,
+                        notificationSetting);
                 subscribeOnPlayInfo();
                 break;
             }

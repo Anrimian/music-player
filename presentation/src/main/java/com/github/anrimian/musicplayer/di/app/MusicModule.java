@@ -31,6 +31,7 @@ import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
+import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -142,8 +143,12 @@ class MusicModule {
     @Singleton
     CoverImageLoader coverImageLoader(Context context,
                                       StorageAlbumsProvider storageAlbumsProvider,
-                                      CompositionSourceProvider compositionSourceProvider) {
-        return new CoverImageLoader(context, storageAlbumsProvider, compositionSourceProvider);
+                                      CompositionSourceProvider compositionSourceProvider,
+                                      ThemeController themeController) {
+        return new CoverImageLoader(context,
+                storageAlbumsProvider,
+                compositionSourceProvider,
+                themeController);
     }
 
     @Provides

@@ -17,8 +17,6 @@ import androidx.annotation.Nullable;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.NotificationTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
@@ -26,31 +24,37 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProv
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.utils.image.loader.SimpleImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nonnull;
 
 public class CoverImageLoader {
 
-    private final int defaultPlaceholder = R.drawable.ic_music_placeholder_simple;
-    private final int timeoutMillis = 5000;
+    private static final int DEFAULT_PLACEHOLDER = R.drawable.ic_music_placeholder_simple;
+    private static final int TIMEOUT_MILLIS = 5000;
+    private static final int NOTIFICATION_IMAGE_TIMEOUT_MILLIS = 250;
 
     private final Context context;
     private final StorageAlbumsProvider storageAlbumsProvider;
     private final CompositionSourceProvider compositionSourceProvider;
+    private final ThemeController themeController;
+
+    private Bitmap defaultNotificationBitmap;
 
     private final SimpleImageLoader<String, ImageMetaData> imageLoader;
 
     public CoverImageLoader(Context context,
                             StorageAlbumsProvider storageAlbumsProvider,
-                            CompositionSourceProvider compositionSourceProvider) {
+                            CompositionSourceProvider compositionSourceProvider,
+                            ThemeController themeController) {
         this.context = context;
         this.storageAlbumsProvider = storageAlbumsProvider;
         this.compositionSourceProvider = compositionSourceProvider;
+        this.themeController = themeController;
 
         imageLoader = new SimpleImageLoader<>(
                 R.drawable.ic_music_placeholder_simple,
@@ -66,8 +70,8 @@ public class CoverImageLoader {
         Glide.with(imageView)
                 .load(data)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .placeholder(defaultPlaceholder)
-                .timeout(timeoutMillis)
+                .placeholder(DEFAULT_PLACEHOLDER)
+                .timeout(TIMEOUT_MILLIS)
                 .into(imageView);
 
 //        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()));
@@ -80,7 +84,7 @@ public class CoverImageLoader {
                 .load(data)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .placeholder(errorPlaceholder)
-                .timeout(timeoutMillis)
+                .timeout(TIMEOUT_MILLIS)
                 .into(imageView);
 
 //        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()), errorPlaceholder);
@@ -93,7 +97,7 @@ public class CoverImageLoader {
                 .load(album)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .placeholder(errorPlaceholder)
-                .timeout(timeoutMillis)
+                .timeout(TIMEOUT_MILLIS)
                 .into(imageView);
 
 //        imageLoader.displayImage(imageView, new AlbumImage(album), errorPlaceholder);
@@ -117,26 +121,42 @@ public class CoverImageLoader {
 //        return imageLoader.getImage(new CompositionImage(data.getId(), data.getFilePath()), timeoutMillis);
     }
 
+    public Runnable loadNotificationImage(@Nonnull Composition data,
+                                          Callback<Bitmap> onCompleted) {
+        CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
+            if (bitmap == null) {
+                bitmap = getDefaultNotificationBitmap();
+            }
+            onCompleted.call(bitmap);
+        });
+
+        Glide.with(context)
+                .asBitmap()
+                .load(data)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
+                .into(target);
+
+        return () -> Glide.with(context).clear(target);
+//        imageLoader.loadImage(new CompositionImage(data.getId(), data.getFilePath()), onCompleted);
+    }
+
+    public Bitmap getDefaultNotificationBitmap() {
+        if (defaultNotificationBitmap == null) {
+            defaultNotificationBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.RGB_565);
+        }
+        int color = themeController.getPrimaryThemeColor();
+        defaultNotificationBitmap.eraseColor(color);
+        return defaultNotificationBitmap;
+    }
+
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
         Glide.with(context)
                 .asBitmap()
                 .load(data)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .timeout(timeoutMillis)
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        onCompleted.call(resource);
-                    }
-
-                    @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        onCompleted.call(null);
-                    }
-
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {}
-                });
+                .timeout(TIMEOUT_MILLIS)
+                .into(simpleTarget(onCompleted));
 //        imageLoader.loadImage(new CompositionImage(data.getId(), data.getFilePath()), onCompleted);
     }
 
@@ -199,5 +219,22 @@ public class CoverImageLoader {
 
     private int getCoverSize() {
         return context.getResources().getDimensionPixelSize(R.dimen.notification_large_icon_size);
+    }
+
+    private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {
+        return new CustomTarget<T>() {
+            @Override
+            public void onResourceReady(@NonNull T resource, @Nullable Transition<? super T> transition) {
+                callback.call(resource);
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                callback.call(null);
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {}
+        };
     }
 }
