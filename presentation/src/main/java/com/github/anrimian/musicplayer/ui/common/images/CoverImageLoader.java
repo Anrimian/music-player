@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.target.AppWidgetTarget;
 import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
@@ -73,7 +74,6 @@ public class CoverImageLoader {
         );
     }
 
-    //blinking
     public void displayImage(@NonNull ImageView imageView, @NonNull Composition data) {
         Glide.with(imageView)
                 .load(new CompositionImage(data.getId()))
@@ -89,12 +89,13 @@ public class CoverImageLoader {
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull Composition data,
                              @DrawableRes int errorPlaceholder) {
-        Glide.with(imageView)
+        Glide.with(context)
                 .load(new CompositionImage(data.getId()))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
-                .into(imageView);
+                .into(imageViewTarget(imageView));
 
 //        imageLoader.displayImage(imageView, new CompositionImage(data.getId(), data.getFilePath()), errorPlaceholder);
     }
@@ -222,6 +223,29 @@ public class CoverImageLoader {
 
     private int getCoverSize() {
         return context.getResources().getDimensionPixelSize(R.dimen.notification_large_icon_size);
+    }
+
+    private ImageViewTarget<Drawable> imageViewTarget(ImageView imageView) {
+        return new ImageViewTarget<Drawable>(imageView) {
+            @Override
+            protected void setResource(@Nullable Drawable resource) {
+                view.setImageDrawable(resource);
+            }
+
+            @Override
+            public void onLoadStarted(@Nullable Drawable placeholder) {
+                if (view.getDrawable() == null) {
+                    super.onLoadStarted(placeholder);
+                }
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                if (view.getDrawable() == null) {
+                    super.onLoadCleared(placeholder);
+                }
+            }
+        };
     }
 
     private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {
