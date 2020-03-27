@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.service.notification.StatusBarNotification;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import androidx.annotation.Nullable;
@@ -110,6 +111,10 @@ public class NotificationsDisplayer {
                                              @Nullable PlayQueueItem composition,
                                              MediaSessionCompat mediaSession,
                                              MusicNotificationSetting notificationSetting) {
+        if (!isNotificationVisible(notificationManager, FOREGROUND_NOTIFICATION_ID)) {
+            return;
+        }
+
         Notification notification = getDefaultMusicNotification(play,
                 composition,
                 mediaSession,
@@ -190,6 +195,19 @@ public class NotificationsDisplayer {
                     .setContentText(formatCompositionAuthor(composition, context));
         }
         return builder;
+    }
+
+    private boolean isNotificationVisible(NotificationManager notificationManager,
+                                          int notificationId) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
+            for (StatusBarNotification notification : notifications) {
+                if (notification.getId() == notificationId) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private String getString(@StringRes int resId) {
