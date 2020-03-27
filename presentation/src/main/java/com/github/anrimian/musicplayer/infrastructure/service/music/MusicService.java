@@ -232,11 +232,7 @@ public class MusicService extends Service {
                 break;
             }
             case PAUSE: {
-                notificationsDisplayer.updateForegroundNotification(
-                        false,
-                        currentItem,
-                        mediaSession,
-                        notificationSetting);
+                updateForegroundNotification();
                 stopForeground(false);
                 break;
             }
@@ -260,7 +256,6 @@ public class MusicService extends Service {
         }
     }
 
-    //little td: don't display notification in the stop state and notification isn't visible(delete intent)
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
         if (queueItem == null) {
