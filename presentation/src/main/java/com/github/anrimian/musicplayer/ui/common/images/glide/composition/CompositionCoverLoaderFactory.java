@@ -8,10 +8,11 @@ import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.ui.common.images.CompositionImage;
 
 import javax.annotation.Nonnull;
 
-public class CompositionCoverLoaderFactory implements ModelLoaderFactory<Composition, Bitmap> {
+public class CompositionCoverLoaderFactory implements ModelLoaderFactory<CompositionImage, Bitmap> {
 
     private final Context context;
     private final CompositionSourceProvider compositionSourceProvider;
@@ -23,7 +24,7 @@ public class CompositionCoverLoaderFactory implements ModelLoaderFactory<Composi
 
     @Nonnull
     @Override
-    public ModelLoader<Composition, Bitmap> build(@Nonnull MultiModelLoaderFactory unused) {
+    public ModelLoader<CompositionImage, Bitmap> build(@Nonnull MultiModelLoaderFactory unused) {
         return new CompositionCoverLoader(context, compositionSourceProvider);
     }
 

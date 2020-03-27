@@ -42,11 +42,11 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 
 public class NotificationsDisplayer {
 
-    public static final int FOREGROUND_NOTIFICATION_ID = 1;
-    public static final int ERROR_NOTIFICATION_ID = 2;
+    private static final int FOREGROUND_NOTIFICATION_ID = 1;
+    private static final int ERROR_NOTIFICATION_ID = 2;
 
     public static final String FOREGROUND_CHANNEL_ID = "0";
-    public static final String ERROR_CHANNEL_ID = "1";
+    private static final String ERROR_CHANNEL_ID = "1";
 
     private final Context context;
     private final NotificationManager notificationManager;

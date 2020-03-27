@@ -14,14 +14,15 @@ import com.bumptech.glide.load.data.DataFetcher;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.ui.common.images.CompositionImage;
 
 public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
 
-    private final Composition composition;
+    private final CompositionImage composition;
     private final Context context;
     private final CompositionSourceProvider compositionSourceProvider;
 
-    CompositionCoverFetcher(Composition composition,
+    CompositionCoverFetcher(CompositionImage composition,
                             Context context,
                             CompositionSourceProvider compositionSourceProvider) {
         this.composition = composition;
@@ -56,7 +57,7 @@ public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
 
 
     @Nullable
-    private Bitmap extractImageComposition(Composition composition) {
+    private Bitmap extractImageComposition(CompositionImage composition) {
         long id = composition.getId();
 
         MediaMetadataRetriever mmr = null;

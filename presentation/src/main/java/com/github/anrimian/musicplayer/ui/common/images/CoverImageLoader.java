@@ -15,7 +15,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.Resource;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.target.AppWidgetTarget;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
@@ -24,11 +28,14 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProv
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.java.Processor;
+import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.utils.image.loader.SimpleImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
 
 import javax.annotation.Nonnull;
 
@@ -66,11 +73,13 @@ public class CoverImageLoader {
         );
     }
 
+    //blinking
     public void displayImage(@NonNull ImageView imageView, @NonNull Composition data) {
         Glide.with(imageView)
-                .load(data)
+                .load(new CompositionImage(data.getId()))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .placeholder(DEFAULT_PLACEHOLDER)
+                .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
                 .into(imageView);
 
@@ -81,9 +90,9 @@ public class CoverImageLoader {
                              @NonNull Composition data,
                              @DrawableRes int errorPlaceholder) {
         Glide.with(imageView)
-                .load(data)
+                .load(new CompositionImage(data.getId()))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .placeholder(errorPlaceholder)
+                .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
                 .into(imageView);
 
@@ -97,28 +106,11 @@ public class CoverImageLoader {
                 .load(album)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .placeholder(errorPlaceholder)
+                .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
                 .into(imageView);
 
 //        imageLoader.displayImage(imageView, new AlbumImage(album), errorPlaceholder);
-    }
-
-    @Nullable
-    public Bitmap getImage(@Nonnull Composition data, long timeoutMillis) {
-        //not working properly
-        try {
-            return Glide.with(context)
-                    .asBitmap()
-                    .load(data)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .timeout((int) timeoutMillis)
-                    .submit()
-                    .get();
-        } catch (Exception ignored) {
-            return null;
-        }
-
-//        return imageLoader.getImage(new CompositionImage(data.getId(), data.getFilePath()), timeoutMillis);
     }
 
     public Runnable loadNotificationImage(@Nonnull Composition data,
@@ -132,7 +124,7 @@ public class CoverImageLoader {
 
         Glide.with(context)
                 .asBitmap()
-                .load(data)
+                .load(new CompositionImage(data.getId()))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
@@ -153,7 +145,7 @@ public class CoverImageLoader {
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
         Glide.with(context)
                 .asBitmap()
-                .load(data)
+                .load(new CompositionImage(data.getId()))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .timeout(TIMEOUT_MILLIS)
                 .into(simpleTarget(onCompleted));
@@ -162,12 +154,23 @@ public class CoverImageLoader {
 
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
-                             AppWidgetManager appWidgetManager,
                              int appWidgetId,
                              long compositionId,
-                             @NonNull SimpleImageLoader.BitmapTransformer bitmapTransformer,
                              @DrawableRes int placeholder) {
-        imageLoader.displayImage(widgetView, viewId, appWidgetManager, appWidgetId, new CompositionImage(compositionId), bitmapTransformer, placeholder);
+        CustomAppWidgetTarget widgetTarget = new CustomAppWidgetTarget(context,
+                viewId,
+                widgetView,
+                placeholder,
+                appWidgetId);
+
+        Glide.with(context)
+                .asBitmap()
+                .load(new CompositionImage(compositionId))
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .transform(new CircleCrop())
+                .timeout(TIMEOUT_MILLIS)
+                .into(widgetTarget);
+//        imageLoader.displayImage(widgetView, viewId, appWidgetManager, appWidgetId, new CompositionImage(compositionId), bitmapTransformer, placeholder);
     }
 
     private Bitmap getImage(ImageMetaData metaData) {
