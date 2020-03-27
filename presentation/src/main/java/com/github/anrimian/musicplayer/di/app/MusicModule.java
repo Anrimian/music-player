@@ -141,14 +141,8 @@ class MusicModule {
     @Provides
     @Nonnull
     @Singleton
-    CoverImageLoader coverImageLoader(Context context,
-                                      StorageAlbumsProvider storageAlbumsProvider,
-                                      CompositionSourceProvider compositionSourceProvider,
-                                      ThemeController themeController) {
-        return new CoverImageLoader(context,
-                storageAlbumsProvider,
-                compositionSourceProvider,
-                themeController);
+    CoverImageLoader coverImageLoader(Context context, ThemeController themeController) {
+        return new CoverImageLoader(context, themeController);
     }
 
     @Provides
