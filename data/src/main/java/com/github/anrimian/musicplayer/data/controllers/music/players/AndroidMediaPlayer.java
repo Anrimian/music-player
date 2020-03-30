@@ -116,8 +116,8 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         if (!isPlaying) {
             return;
         }
-        mediaPlayer.pause();
         stopTracingTrackPosition();
+        mediaPlayer.pause();
         isPlaying = false;
         playWhenReady = false;
     }
@@ -166,7 +166,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(scheduler)
-                .map(o -> (long) mediaPlayer.getCurrentPosition())
+                .map(o -> getTrackPosition())
                 .subscribe(trackPositionSubject::onNext);
     }
 
