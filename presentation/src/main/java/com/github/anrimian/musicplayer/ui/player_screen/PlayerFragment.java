@@ -300,7 +300,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
                 ItemTouchHelper.START,
-                R.drawable.ic_delete_outline,
+                R.drawable.ic_remove_from_queue,
                 R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
