@@ -6,8 +6,7 @@ import android.os.Looper;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
-import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
-
+@SuppressWarnings("WeakerAccess")
 public class DialogFragmentDelayRunner {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -29,7 +28,7 @@ public class DialogFragmentDelayRunner {
     }
 
     public void show(DialogFragment fragment) {
-        handler.postDelayed(() -> fragment.show(fragmentManager, PROGRESS_DIALOG_TAG), delayMillis);
+        handler.postDelayed(() -> fragment.show(fragmentManager, tag), delayMillis);
     }
 
     public void cancel() {
