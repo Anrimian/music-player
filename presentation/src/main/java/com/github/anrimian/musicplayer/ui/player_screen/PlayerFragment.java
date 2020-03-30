@@ -473,7 +473,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showStopState() {
-        ivPlayPause.setImageResource(R.drawable.ic_play);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
         ivPlayPause.setContentDescription(getString(R.string.play));
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
         playQueueAdapter.showPlaying(false);
@@ -481,7 +481,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showPlayState() {
-        ivPlayPause.setImageResource(R.drawable.ic_pause);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
         ivPlayPause.setContentDescription(getString(R.string.pause));
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
         playQueueAdapter.showPlaying(true);
