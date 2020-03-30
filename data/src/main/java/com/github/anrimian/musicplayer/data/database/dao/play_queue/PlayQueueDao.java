@@ -25,7 +25,7 @@ public interface PlayQueueDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.title AS title, " +
-            "compositions.filePath AS filePath, " +
+            "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
             "compositions.dateAdded AS dateAdded, " +
@@ -42,7 +42,7 @@ public interface PlayQueueDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.title AS title, " +
-            "compositions.filePath AS filePath, " +
+            "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
             "compositions.dateAdded AS dateAdded, " +
@@ -71,7 +71,7 @@ public interface PlayQueueDao {
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "compositions.storageId AS storageId, " +
             "compositions.title AS title, " +
-            "compositions.filePath AS filePath, " +
+            "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +
             "compositions.size AS size, " +
             "compositions.dateAdded AS dateAdded, " +
@@ -84,6 +84,9 @@ public interface PlayQueueDao {
 
     @Insert
     long[] insertItems(List<PlayQueueEntity> playQueueEntityList);
+
+    @Insert
+    long insertItem(PlayQueueEntity entity);
 
     @Query("DELETE FROM play_queue")
     void deletePlayQueue();
@@ -99,6 +102,9 @@ public interface PlayQueueDao {
 
     @Query("SELECT shuffledPosition FROM play_queue WHERE id = :id")
     int getShuffledPosition(long id);
+
+    @Query("SELECT * FROM play_queue WHERE id = :id")
+    PlayQueueEntity getItem(long id);
 
     @Query("SELECT position FROM play_queue WHERE id = :id")
     Observable<Integer> getPositionObservable(long id);
@@ -195,7 +201,8 @@ public interface PlayQueueDao {
             "   (SELECT MAX(position) " +
             "   FROM play_queue " +
             "   WHERE position < " +
-            "       (SELECT position FROM play_queue WHERE id = :currentItemId))")
+            "       (SELECT position FROM play_queue WHERE id = :currentItemId)" +
+            "       AND (SELECT corruptionType FROM compositions WHERE id = audioId) IS NULL)")
     Long getPreviousQueueItemId(long currentItemId);
 
     @Query("SELECT id " +
@@ -204,6 +211,7 @@ public interface PlayQueueDao {
             "   (SELECT MAX(shuffledPosition) " +
             "   FROM play_queue " +
             "   WHERE shuffledPosition < " +
-            "       (SELECT shuffledPosition FROM play_queue WHERE id = :currentItemId))")
+            "       (SELECT shuffledPosition FROM play_queue WHERE id = :currentItemId)" +
+            "       AND (SELECT corruptionType FROM compositions WHERE id = audioId) IS NULL)")
     Long getPreviousShuffledQueueItemId(long currentItemId);
 }

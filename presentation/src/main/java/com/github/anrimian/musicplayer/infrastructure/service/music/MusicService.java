@@ -11,7 +11,6 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.annotation.Nullable;
@@ -45,8 +44,6 @@ import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM;
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ARTIST;
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DURATION;
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE;
-import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS;
-import static android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE;
@@ -69,14 +66,12 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
  * Created on 03.11.2017.
  */
 
-//TODO observe empty notification fixes and remove logs
-public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
+public class MusicService extends Service {
 
     public static final String REQUEST_CODE = "request_code";
 
@@ -124,8 +119,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("KEK", "onCreate");
-
         mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
 
         AppComponent appComponent = Components.getAppComponent();
@@ -138,7 +131,6 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         }
         appComponent.inject(this);
 
-        mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS | FLAG_HANDLES_TRANSPORT_CONTROLS);
         mediaSession.setCallback(mediaSessionCallback);
 
         Intent activityIntent = new Intent(this, MainActivity.class);
@@ -151,6 +143,12 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
 
         serviceDisposable.add(playInfoDisposable);
 
+        notificationsDisplayer.startForegroundNotification(this,
+                true,
+                currentItem,
+                mediaSession,
+                notificationSetting);
+
         subscribeOnNotificationSettings();
         subscribeOnPlayerChanges();
     }
@@ -158,12 +156,10 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
-        Log.d("KEK", "onStartCommand, req code:" + requestCode);
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
         } else {
             KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession, intent);
-            Log.d("KEK", "onStartCommand, keyEvent action: " + keyEvent);
             if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
                 handleMediaButtonAction(keyEvent);
             }
@@ -185,13 +181,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
-        Log.d("KEK", "handleMediaButtonAction, key code: " + keyEvent.getKeyCode());
-        switch (keyEvent.getKeyCode()) {
-            case KeyEvent.KEYCODE_MEDIA_PLAY: {
-                Log.d("KEK", "handleMediaButtonAction: play");
-                musicPlayerInteractor.play();
-                break;
-            }
+        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
+            musicPlayerInteractor.play();
         }
     }
 
@@ -217,45 +208,28 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayerChanges() {
-        //check how it works
-        startForeground(FOREGROUND_NOTIFICATION_ID,
-                notificationsDisplayer.getForegroundNotification(
-                        true,
-                        currentItem,
-                        mediaSession,
-                        notificationSetting));
-        //test it
-
-        Log.d("KEK", "subscribeOnPlayerChanges");
         serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onPlayerStateReceived));
     }
 
     private void onPlayerStateReceived(PlayerState playerState) {
-        Log.d("KEK", "onPlayerStateReceived: " + playerState);
         updateMediaSessionState(playerState, trackPosition);
 
         this.playerState = playerState;
         switch (playerState) {
             case PLAY: {
                 mediaSession.setActive(true);
-                Log.d("KEK", "startForeground, currentItem: " + currentItem);
-                startForeground(FOREGROUND_NOTIFICATION_ID,
-                        notificationsDisplayer.getForegroundNotification(
-                                true,
-                                currentItem,
-                                mediaSession,
-                                notificationSetting));
+                notificationsDisplayer.startForegroundNotification(this,
+                        true,
+                        currentItem,
+                        mediaSession,
+                        notificationSetting);
                 subscribeOnPlayInfo();
                 break;
             }
             case PAUSE: {
-                notificationsDisplayer.updateForegroundNotification(
-                        false,
-                        currentItem,
-                        mediaSession,
-                        notificationSetting);
+                updateForegroundNotification();
                 stopForeground(false);
                 break;
             }
@@ -269,10 +243,8 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
     }
 
     private void subscribeOnPlayInfo() {
-        Log.d("KEK", "subscribeOnPlayInfo");
         if (playInfoDisposable.size() == 0) {
-            Log.d("KEK", "really subscribeOnPlayInfo: ");
-            playInfoDisposable.add(musicPlayerInteractor.getCurrentCompositionObservable()
+            playInfoDisposable.add(musicPlayerInteractor.getCurrentQueueItemObservable()
                     .observeOn(uiScheduler)
                     .subscribe(this::onCurrentCompositionReceived));
             playInfoDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
@@ -281,17 +253,14 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         }
     }
 
-    //little td: don't display notification in the stop state and notification isn't visible(delete intent)
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
-        Log.d("KEK", "onCurrentCompositionReceived: " + queueItem);
         if (queueItem == null) {
             mediaSession.setActive(false);
             stopSelf();
             return;
         }
         if (!queueItem.equals(currentItem) || !areSourcesTheSame(currentItem, queueItem)) {
-            Log.d("KEK", "onCurrentCompositionReceived: set current");
             currentItem = queueItem;
             updateMediaSessionMetadata(currentItem.getComposition(), notificationSetting);
             updateMediaSessionState(playerState, 0);

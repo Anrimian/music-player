@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
@@ -74,6 +75,37 @@ public class FoldersDaoWrapper {
 
     public List<StorageFolder> getAllFolders() {
         return foldersDao.getAllFolders();
+    }
+
+    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources) {
+        return Observable.fromIterable(fileSources)
+                .flatMap(this::fileSourceToComposition)
+                .collect(ArrayList::new, List::add);
+    }
+
+    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources,
+                                                                     Order order) {
+        return Observable.fromIterable(fileSources)
+                .flatMap(fileSource -> fileSourceToComposition(fileSource, order))
+                .collect(ArrayList::new, List::add);
+    }
+
+    public List<Composition> getAllCompositionsInFolder(Long parentFolderId, Order order) {
+        List<Composition> result = new LinkedList<>();
+
+        String query = FoldersDao.getRecursiveFolderQuery(parentFolderId) +
+                "SELECT id " +
+                "FROM folders " +
+                "WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)";
+        query += getOrderQuery(order);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        List<Long> folders = foldersDao.getFoldersIds(sqlQuery);
+        for (Long id: folders) {
+            result.addAll(getAllCompositionsInFolder(id, order));
+        }
+
+        result.addAll(compositionsDao.getCompositionsInFolder(parentFolderId, order));
+        return result;
     }
 
     public IgnoredFolder insert(String path) {
@@ -188,6 +220,14 @@ public class FoldersDaoWrapper {
                 orderQuery.append("(SELECT max(dateAdded) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
                 break;
             }
+            case DURATION: {
+                orderQuery.append("(SELECT sum(duration) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
+                break;
+            }
+            case SIZE: {
+                orderQuery.append("(SELECT sum(size) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
+                break;
+            }
             default: throw new IllegalStateException("unknown order type" + order);
         }
         orderQuery.append(" ");
@@ -205,6 +245,31 @@ public class FoldersDaoWrapper {
         sb.append("%'");
 
         return sb.toString();
+    }
+
+    private Observable<Composition> fileSourceToComposition(FileSource fileSource, Order order) {
+        if (fileSource instanceof CompositionFileSource) {
+            return Observable.just(((CompositionFileSource) fileSource).getComposition());
+        }
+        if (fileSource instanceof FolderFileSource) {
+            return Observable.fromIterable(getAllCompositionsInFolder(
+                    ((FolderFileSource) fileSource).getId(),
+                    order
+            ));
+        }
+        throw new IllegalStateException("unexpected file source: " + fileSource);
+    }
+
+    private Observable<Composition> fileSourceToComposition(FileSource fileSource) {
+        if (fileSource instanceof CompositionFileSource) {
+            return Observable.just(((CompositionFileSource) fileSource).getComposition());
+        }
+        if (fileSource instanceof FolderFileSource) {
+            return Observable.fromIterable(compositionsDao.getAllCompositionsInFolder(
+                    ((FolderFileSource) fileSource).getId()
+            ));
+        }
+        throw new IllegalStateException("unexpected file source: " + fileSource);
     }
 
 }

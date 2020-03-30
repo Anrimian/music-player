@@ -61,6 +61,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFrag
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
@@ -77,6 +78,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -191,6 +193,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private SeekBarViewWrapper seekBarViewWrapper;
 
     private DrawerLockStateProcessor drawerLockStateProcessor;
+    private CompositeDisposable viewDisposable = new CompositeDisposable();
 
     private FragmentNavigation navigation;
 
@@ -232,15 +235,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        //FIXME: possible here: start playing, hide app, revoke permission, open
-        RxPermissions rxPermissions = new RxPermissions(requireActivity());
-        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requireFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_activity_container, new StartFragment())
-                    .commit();
-            return;
-        }
+        AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground);
 
         toolbar.initializeViews(requireActivity().getWindow());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
@@ -254,8 +249,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
         drawerLockStateProcessor.setupWithNavigation(navigation);
-        toolbar.getSearchModeObservable().subscribe(drawerLockStateProcessor::onSearchModeChanged);
-        toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionModeChanged);
+        viewDisposable.add(toolbar.getSearchModeObservable()
+                .subscribe(drawerLockStateProcessor::onSearchModeChanged)
+        );
+        viewDisposable.add(toolbar.getSelectionModeObservable()
+                .subscribe(drawerLockStateProcessor::onSelectionModeChanged)
+        );
 
         if (mlBottomSheet == null) {
             playerPanelWrapper = new TabletPlayerPanelWrapper(view,
@@ -339,6 +338,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             getArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();
         }
+
+        RxPermissions rxPermissions = new RxPermissions(this);
+        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            requireFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_activity_container, new StartFragment())
+                    .commit();
+        }
     }
 
     @Override
@@ -365,6 +372,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onDestroyView();
         toolbar.release();
         drawerLockStateProcessor.release();
+        viewDisposable.clear();
     }
 
     @Override
@@ -624,6 +632,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        MessagesUtils.makeSnackbar(clPlayQueueContainer, errorCommand.getMessage()).show();
+    }
+
+    @Override
+    public void showDeletedItemMessage() {
+        MessagesUtils.makeSnackbar(clPlayQueueContainer, R.string.queue_item_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.cancel, presenter::onRestoreDeletedItemClicked)
+                .show();
+    }
+
+    @Override
     public void showAddingToPlayListError(ErrorCommand errorCommand) {
         MessagesUtils.makeSnackbar(clPlayQueueContainer,
                 getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
@@ -695,7 +715,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void clearFragment() {
-        navigation.clearRootFragment(R.anim.anim_alpha_disappear);
+        navigation.clearFragmentStack(R.anim.anim_alpha_disappear);
     }
 
     private void onCompositionMenuClicked(View view) {

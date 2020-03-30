@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -16,8 +17,12 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.Slidr;
 
@@ -30,6 +35,7 @@ import moxy.presenter.ProvidePresenter;
 import static com.github.anrimian.musicplayer.Constants.Arguments.ALBUM_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
@@ -43,7 +49,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     AlbumEditorPresenter presenter;
 
     @BindView(R.id.container)
-    View container;
+    ViewGroup container;
 
     @BindView(R.id.tv_author)
     TextView tvAuthor;
@@ -68,6 +74,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
 
     private DialogFragmentRunner<InputTextDialogFragment> authorDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> nameDialogFragmentRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
     public static Intent newIntent(Context context, long albumId) {
         Intent intent = new Intent(context, AlbumEditorActivity.class);
@@ -88,6 +95,8 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         setContentView(R.layout.activity_album_edit);
         ButterKnife.bind(this);
 
+        AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground);
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -100,9 +109,10 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeNameClickableArea, () -> copyText(tvName, tvNameHint));
 
-        @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
-        Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
-        setStatusBarColor(getWindow(), statusBarColor);
+        SlidrPanel.attachWithNavBarChange(this,
+                R.attr.playerPanelBackground,
+                android.R.attr.colorBackground
+        );
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
@@ -113,6 +123,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
                 NAME_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewNameEntered));
 
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
     }
 
     @Override
@@ -140,6 +151,16 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
         makeSnackbar(container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showRenameProgress() {
+        progressDialogRunner.show(ProgressDialogFragment.newInstance(R.string.rename_progress));
+    }
+
+    @Override
+    public void hideRenameProgress() {
+        progressDialogRunner.cancel();
     }
 
     @Override

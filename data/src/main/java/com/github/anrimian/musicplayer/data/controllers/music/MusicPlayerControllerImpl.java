@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.data.controllers.music.players.AndroidMed
 import com.github.anrimian.musicplayer.data.controllers.music.players.AppMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.CompositeMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.ExoMediaPlayer;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
@@ -28,15 +29,16 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     public MusicPlayerControllerImpl(UiStateRepository uiStateRepository,
                                      Context context,
+                                     CompositionSourceProvider sourceRepository,
                                      Scheduler scheduler,
                                      PlayerErrorParser playerErrorParser,
                                      Analytics analytics) {
         this.uiStateRepository = uiStateRepository;
-        Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, scheduler, playerErrorParser);
-        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, playerErrorParser, analytics);
+        Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser);
+        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, sourceRepository, playerErrorParser, analytics);
         mediaPlayer = new CompositeMediaPlayer(exoMediaPlayer, androidMediaPlayer);
 
-//        mediaPlayer = new AndroidMediaPlayer(scheduler, playerErrorParser, analytics);
+//        mediaPlayer = new AndroidMediaPlayer(scheduler, sourceRepository, playerErrorParser, analytics);
 //        mediaPlayer = new ExoMediaPlayer(context, scheduler, playerErrorParser);
     }
 

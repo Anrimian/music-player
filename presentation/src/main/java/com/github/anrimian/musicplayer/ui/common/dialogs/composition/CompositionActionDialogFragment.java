@@ -3,16 +3,23 @@ package com.github.anrimian.musicplayer.ui.common.dialogs.composition;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +28,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.java.TripleCallback;
 import com.github.anrimian.musicplayer.ui.common.serialization.CompositionSerializer;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuAdapter;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
@@ -78,7 +86,6 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         return newInstance(composition, menu, android.R.attr.statusBarColor);
     }
 
-
     public static CompositionActionDialogFragment newInstance(Composition composition,
                                                               @MenuRes int menu,
                                                               @AttrRes int statusBarColorAttr) {
@@ -118,9 +125,9 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         int minHeight = (int) (height * heightPercent);
 
         slideDelegate = buildSlideDelegate();
-        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(view);
+        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
         bottomSheetBehavior.setPeekHeight(minHeight);
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
+        bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 dismissAllowingStateLoss();
             }
@@ -144,6 +151,8 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
 
         tvCompositionName.setText(formatCompositionName(composition));
         tvCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
+
+        AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground);
     }
 
     @Override

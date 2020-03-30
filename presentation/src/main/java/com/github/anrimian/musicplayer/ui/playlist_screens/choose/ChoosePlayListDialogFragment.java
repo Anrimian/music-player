@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
@@ -138,7 +139,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         int minHeight = (int) (height * heightPercent);
         view.setMinimumHeight(minHeight);
 
-        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(view);
+        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
         bottomSheetBehavior.setPeekHeight(minHeight);
 
         ButterKnife.bind(this, view);
@@ -158,7 +159,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
         attachDynamicShadow(recyclerView, titleShadow);
 
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
+        bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 dismissAllowingStateLoss();
             }
@@ -175,6 +176,8 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         if (fragment != null) {
             fragment.setOnCompleteListener(this::onPlayListMenuItemSelected);
         }
+
+        AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground);
     }
 
     @Override
@@ -290,7 +293,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
             onCompleteListener.onComplete(playList);
         }
         if (complexCompleteListener != null) {
-            complexCompleteListener.call(playList, getArguments().getBundle(EXTRA_DATA_ARG));
+            complexCompleteListener.call(playList, requireArguments().getBundle(EXTRA_DATA_ARG));
         }
         dismiss();
     }

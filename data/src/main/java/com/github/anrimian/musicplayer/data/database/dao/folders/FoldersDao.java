@@ -36,6 +36,9 @@ public interface FoldersDao {
     @RawQuery(observedEntities = { CompositionEntity.class, FolderEntity.class })
     Observable<List<FolderFileSource>> getFoldersObservable(SupportSQLiteQuery query);
 
+    @RawQuery
+    List<Long> getFoldersIds(SupportSQLiteQuery query);
+
     @Query("SELECT id, name, " +
             "0 as filesCount " +//we don't use it for now
             "FROM folders " +
@@ -61,7 +64,6 @@ public interface FoldersDao {
     @Query("UPDATE folders SET parentId = :toFolderId WHERE id = :id")
     void updateParentId(long id, Long toFolderId);
 
-    @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//room can't on recursive queries now
     @Query("WITH RECURSIVE path(level, name, parentId) AS (" +
             "    SELECT 0, name, parentId" +
             "    FROM folders" +
@@ -82,7 +84,6 @@ public interface FoldersDao {
             "FROM path_from_root")
     String getFullFolderPath(long folderId);
 
-    @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//room can't on recursive queries now
     @Query("WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
             "                SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)" +
             "                UNION" +
@@ -91,7 +92,6 @@ public interface FoldersDao {
             "SELECT childFolderId FROM allChildFolders")
     List<Long> getAllChildFoldersId(Long parentId);
 
-    @SuppressWarnings("AndroidUnresolvedRoomSqlReference")//room can't on recursive queries now
     @Query("WITH RECURSIVE path(level, id, parentId) AS (" +
             "    SELECT 0, id, parentId" +
             "    FROM folders" +

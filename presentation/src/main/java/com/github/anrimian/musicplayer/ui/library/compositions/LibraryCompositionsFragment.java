@@ -12,6 +12,7 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -36,6 +38,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -44,6 +47,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.zhanghai.android.fastscroll.FastScrollerBuilder;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
@@ -72,9 +76,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
-
-    private final MenuItemWrapper orderMenuItem = new MenuItemWrapper();
-    private final MenuItemWrapper searchMenuItem = new MenuItemWrapper();
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
@@ -110,10 +111,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTextChangeListener(presenter::onSearchTextChanged);
-        toolbar.setTextConfirmListener(presenter::onSearchTextChanged);
-        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
-                this::onActionModeItemClicked);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
@@ -121,6 +118,8 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new CompositionsAdapter(recyclerView,
                 presenter.getSelectedCompositions(),
@@ -157,6 +156,9 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.compositions);
+        toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
+        toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
+                this::onActionModeItemClicked);
     }
 
     @Override
@@ -168,8 +170,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.library_compositions_menu, menu);
-        searchMenuItem.setMenuItem(menu, R.id.menu_search);
-        orderMenuItem.setMenuItem(menu, R.id.menu_order);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -208,39 +208,29 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 
     @Override
     public void showEmptyList() {
-        searchMenuItem.call(item -> item.setVisible(false));
-        orderMenuItem.call(item -> item.setVisible(false));
         fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_on_device_not_found);
     }
 
     @Override
     public void showEmptySearchResult() {
-        searchMenuItem.call(item -> item.setVisible(true));
-        orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_for_search_not_found);
     }
 
     @Override
     public void showList() {
-        searchMenuItem.call(item -> item.setVisible(true));
-        orderMenuItem.call(item -> item.setVisible(true));
         fab.setVisibility(View.VISIBLE);
         progressViewWrapper.hideAll();
     }
 
     @Override
     public void showLoading() {
-        searchMenuItem.call(item -> item.setVisible(false));
-        orderMenuItem.call(item -> item.setVisible(false));
         progressViewWrapper.showProgress();
     }
 
     @Override
     public void showLoadingError(ErrorCommand errorCommand) {
-        searchMenuItem.call(item -> item.setVisible(false));
-        orderMenuItem.call(item -> item.setVisible(false));
         progressViewWrapper.showMessage(errorCommand.getMessage(), true);
     }
 
@@ -296,7 +286,9 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
                 OrderType.ALPHABETICAL,
-                OrderType.ADD_TIME);
+                OrderType.ADD_TIME,
+                OrderType.DURATION,
+                OrderType.SIZE);
         selectOrderDialogRunner.show(fragment);
     }
 
@@ -327,8 +319,8 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     }
 
     @Override
-    public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showCurrentComposition(composition);
+    public void showCurrentComposition(CurrentComposition currentComposition) {
+        adapter.showCurrentComposition(currentComposition);
     }
 
     @Override
@@ -357,7 +349,14 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     }
 
     @Override
-    public void showPlayState(boolean play) {
-        adapter.showPlaying(play);
+    public void onCompositionsAddedToPlayNext(List<Composition> compositions) {
+        String message = MessagesUtils.getPlayNextMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCompositionsAddedToQueue(List<Composition> compositions) {
+        String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
     }
 }

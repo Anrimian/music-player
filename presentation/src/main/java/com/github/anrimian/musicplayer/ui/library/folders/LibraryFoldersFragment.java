@@ -34,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -48,6 +49,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -171,6 +173,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new MusicFileSourceAdapter(recyclerView,
                 presenter.getSelectedFiles(),
@@ -406,7 +410,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public void showSelectOrderScreen(Order folderOrder) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder,
                 OrderType.ALPHABETICAL,
-                OrderType.ADD_TIME);
+                OrderType.ADD_TIME,
+                OrderType.DURATION,
+                OrderType.SIZE);
         fragment.setOnCompleteListener(presenter::onOrderSelected);
         fragment.show(getChildFragmentManager(), ORDER_TAG);
     }
@@ -463,11 +469,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public void goToMusicStorageScreen(Long folderId) {
         FragmentNavigation.from(requireFragmentManager())
                 .addNewFragment(LibraryFoldersFragment.newInstance(folderId));
-    }
-
-    @Override
-    public void showCurrentPlayingComposition(Composition composition) {
-        adapter.showCurrentComposition(composition);
     }
 
     @Override
@@ -547,16 +548,28 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void showPlayState(boolean play) {
-        adapter.showPlaying(play);
+    public void showCurrentComposition(CurrentComposition currentComposition) {
+        adapter.showCurrentComposition(currentComposition);
     }
 
     @Override
     public void showAddedIgnoredFolderMessage(IgnoredFolder folder) {
         String message = getString(R.string.ignored_folder_added, folder.getRelativePath());
         MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_LONG)
-                .setAction(R.string.cancel, v -> presenter.onRemoveIgnoredFolderClicked())
+                .setAction(R.string.cancel, presenter::onRemoveIgnoredFolderClicked)
                 .show();
+    }
+
+    @Override
+    public void onCompositionsAddedToPlayNext(List<Composition> compositions) {
+        String message = MessagesUtils.getPlayNextMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCompositionsAddedToQueue(List<Composition> compositions) {
+        String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

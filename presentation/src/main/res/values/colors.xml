@@ -28,6 +28,11 @@
     <color name="colorPrimaryDarkSecondary">#f5f5f5</color>
     <color name="selectionStatusBarColor">#848282</color>
 
+    <color name="color_control_highlight_light">#80BDBDBD</color>
+
+    <color name="light_background_level_1">#fafafa</color>
+    <color name="color_control_third">#CCCCCC</color>
+
     <!--second theme-->
     <color name="secondColorPrimary">#3F51B5</color>
     <color name="secondColorPrimaryDark">#303F9F</color>
@@ -61,10 +66,10 @@
 
     <color name="snackbar_color_dark">#ffff</color>
 
-
     <!--other-->
     <color name="startShadowColor">#00000000</color>
     <color name="endShadowColor">#33000000</color>
+    <color name="fakeShadowColor">#33000000</color>
 
     <!--light theme(indigo)-->
     <color name="colorBluePrimary">#3F51B5</color>

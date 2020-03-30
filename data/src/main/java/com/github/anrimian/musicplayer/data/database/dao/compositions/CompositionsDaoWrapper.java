@@ -31,7 +31,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class CompositionsDaoWrapper {
@@ -88,29 +87,25 @@ public class CompositionsDaoWrapper {
     }
 
     public List<Composition> getAllCompositionsInFolder(Long parentFolderId) {
-        return getAllCompositionsInFolder(parentFolderId, new Order(OrderType.ALPHABETICAL, false));
-    }
-
-    public List<Composition> getAllCompositionsInFolder(Long parentFolderId, Order order) {
         String query = FoldersDao.getRecursiveFolderQuery(parentFolderId);
         query += CompositionsDao.getCompositionQuery();
         query += " WHERE folderId IN (SELECT childFolderId FROM allChildFolders) ";
         query += "OR folderId = ";
         query += parentFolderId;
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        return compositionsDao.executeQuery(sqlQuery);
+    }
+
+    public List<Composition> getCompositionsInFolder(Long parentFolderId, Order order) {
+        String query = CompositionsDao.getCompositionQuery();
+        query += " WHERE folderId = ";
+        query += parentFolderId;
+        query += " OR (folderId IS NULL AND ";
+        query += parentFolderId;
+        query += " IS NULL)";
         query += getOrderQuery(order);
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
-        return compositionsDao.getAllInFolder(sqlQuery);
-    }
-
-    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources) {
-        return extractAllCompositionsFromFiles(fileSources, new Order(OrderType.ALPHABETICAL, false));
-    }
-
-    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources,
-                                                                      Order order) {
-        return Observable.fromIterable(fileSources)
-                .flatMap(fileSource -> fileSourceToComposition(fileSource, order))
-                .collect(ArrayList::new, List::add);
+        return compositionsDao.executeQuery(sqlQuery);
     }
 
     public LongSparseArray<StorageComposition> selectAllAsStorageCompositions() {
@@ -167,6 +162,8 @@ public class CompositionsDaoWrapper {
 
             // if album not exists - create album
             if (albumId == null && albumName != null) {
+                //TODO rare crash here
+                //unexisting artist id?
                 albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
             }
 
@@ -254,6 +251,10 @@ public class CompositionsDaoWrapper {
         });
     }
 
+    public void updateCompositionFileName(long id, String fileName) {
+        compositionsDao.updateCompositionFileName(id, fileName);
+    }
+
     public void setCorruptionType(CorruptionType corruptionType, long id) {
         compositionsDao.setCorruptionType(corruptionType, id);
     }
@@ -267,6 +268,14 @@ public class CompositionsDaoWrapper {
             }
             case ADD_TIME: {
                 orderQuery.append("dateAdded");
+                break;
+            }
+            case SIZE: {
+                orderQuery.append("size");
+                break;
+            }
+            case DURATION: {
+                orderQuery.append("duration");
                 break;
             }
             default: throw new IllegalStateException("unknown order type" + order);
@@ -289,22 +298,5 @@ public class CompositionsDaoWrapper {
         sb.append("%'");
 
         return sb.toString();
-    }
-
-    private Observable<Composition> fileSourceToComposition(FileSource fileSource, Order order) {
-        if (fileSource instanceof CompositionFileSource) {
-            return Observable.just(((CompositionFileSource) fileSource).getComposition());
-        }
-        if (fileSource instanceof FolderFileSource) {
-            return Observable.fromIterable(selectAllCompositionsInFolder(
-                    ((FolderFileSource) fileSource).getId(),
-                    order
-            ));
-        }
-        throw new IllegalStateException("unexpected file source: " + fileSource);
-    }
-
-    private List<Composition> selectAllCompositionsInFolder(Long folderId, Order order) {
-        return getAllCompositionsInFolder(folderId, order);
     }
 }

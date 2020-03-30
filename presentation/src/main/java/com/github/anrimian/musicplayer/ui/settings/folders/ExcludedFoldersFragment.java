@@ -99,8 +99,8 @@ public class ExcludedFoldersFragment extends MvpAppCompatFragment implements Exc
 
     @Override
     public void showRemovedFolderMessage(IgnoredFolder folder) {
-        MessagesUtils.makeSnackbar(clContainer, R.string.ignored_folder_removed, Snackbar.LENGTH_SHORT)
-                .setAction(R.string.cancel, v -> presenter.onRestoreRemovedFolderClicked())
+        MessagesUtils.makeSnackbar(clContainer, R.string.ignored_folder_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.cancel, presenter::onRestoreRemovedFolderClicked)
                 .show();
     }
 

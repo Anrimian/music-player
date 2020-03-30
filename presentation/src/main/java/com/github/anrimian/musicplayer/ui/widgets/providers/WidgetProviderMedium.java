@@ -27,11 +27,12 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
 
     @Override
     protected void applyViewLogic(RemoteViews widgetView,
-                                  AppWidgetManager appWidgetManager, int widgetId, Context context,
+                                  AppWidgetManager appWidgetManager,
+                                  int widgetId,
+                                  Context context,
                                   boolean play,
                                   String compositionName,
                                   String compositionAuthor,
-                                  String compositionFile,
                                   long compositionId,
                                   int queueSize,
                                   boolean enabled,
@@ -43,7 +44,6 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                 play,
                 compositionName,
                 compositionAuthor,
-                compositionFile,
                 compositionId,
                 queueSize,
                 enabled,
@@ -66,11 +66,8 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
             Components.getAppComponent().imageLoader()
                     .displayImage(widgetView,
                             R.id.iv_cover,
-                            appWidgetManager,
                             widgetId,
                             compositionId,
-                            compositionFile,
-                            ImageUtils::toCircleBitmap,
                             R.drawable.ic_music_placeholder);
         } else {
             widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);

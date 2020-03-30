@@ -141,7 +141,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         bottomSheetDelegate = createBottomSheetDelegate();
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
         mlBottomSheet.setClickable(true);
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
+        bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(
                 this::onBottomSheetStateChanged,
                 bottomSheetDelegate::onSlide
 

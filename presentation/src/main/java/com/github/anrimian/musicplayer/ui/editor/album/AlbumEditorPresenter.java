@@ -79,6 +79,8 @@ public class AlbumEditorPresenter extends MvpPresenter<AlbumEditorView> {
         dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.updateAlbumArtist(author, album.getId())
                 .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showRenameProgress())
+                .doFinally(() -> getViewState().hideRenameProgress())
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
@@ -91,6 +93,8 @@ public class AlbumEditorPresenter extends MvpPresenter<AlbumEditorView> {
         dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.updateAlbumName(name, album.getId())
                 .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showRenameProgress())
+                .doFinally(() -> getViewState().hideRenameProgress())
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }

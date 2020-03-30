@@ -11,7 +11,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.reactivex.Completable;
+import javax.annotation.Nonnull;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 
@@ -38,20 +38,23 @@ public class StorageFilesDataSource {
 //            storageMusicProvider.scanMedia(oldPath);
 //            storageMusicProvider.scanMedia(newPath);
 //        } else {
+
         //seems working for android <10, implement for scoped storage
         String newPath = FileUtils.getChangedFilePath(oldPath, newName);
-        renameFile(oldPath, newPath);
-
         for (Composition composition: compositions) {
-            String oldFilePath = composition.getFilePath();
-            String newFilePath = FileUtils.safeReplacePath(oldFilePath, oldPath, newPath);
+            Long storageId = composition.getStorageId();
+            if (storageId != null) {
+                String oldFilePath = getCompositionFilePath(storageId);
+                String newFilePath = FileUtils.safeReplacePath(oldFilePath, oldPath, newPath);
 
-            updatedCompositions.add(new FilePathComposition(
-                    composition.getId(),
-                    composition.getStorageId(),
-                    newFilePath)
-            );
+                updatedCompositions.add(new FilePathComposition(
+                        composition.getId(),
+                        composition.getStorageId(),
+                        newFilePath)
+                );
+            }
         }
+        renameFile(oldPath, newPath);
 
         storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
         return FileUtils.getFileName(newPath);
@@ -59,14 +62,18 @@ public class StorageFilesDataSource {
     }
 
     public String renameCompositionFile(FullComposition composition, String fileName) {
-        String oldPath = composition.getFilePath();
+        Long storageId = composition.getStorageId();
+        if (storageId == null) {
+            return null;
+        }
+
+        String oldPath = getCompositionFilePath(storageId);
         String newPath = FileUtils.getChangedFilePath(oldPath, fileName);
         renameFile(oldPath, newPath);
 
-        Long storageId = composition.getStorageId();
-        if (storageId != null) {
-            storageMusicProvider.updateCompositionFilePath(storageId, newPath);
-        }
+        storageMusicProvider.updateCompositionFilePath(storageId, newPath);
+        storageMusicProvider.updateCompositionFileName(storageId, fileName);
+
         return newPath;
     }
 
@@ -78,18 +85,21 @@ public class StorageFilesDataSource {
 
         List<FilePathComposition> updatedCompositions = new LinkedList<>();
         for (Composition composition: compositions) {
-            String oldPath = composition.getFilePath();
-            String newPath = FileUtils.safeReplacePath(oldPath, fromPath, toPath);
+            Long storageId = composition.getStorageId();
+            if (storageId != null) {
+                String oldPath = getCompositionFilePath(storageId);
+                String newPath = FileUtils.safeReplacePath(oldPath, fromPath, toPath);
 
 //            Log.d("KEK2", "rename file, oldPath: " + oldPath);
 //            Log.d("KEK2", "rename file, newPath: " + newPath);
 
-            moveFile(oldPath, newPath);
+                moveFile(oldPath, newPath);
 
-            updatedCompositions.add(new FilePathComposition(composition.getId(),
-                    composition.getStorageId(),
-                    newPath)
-            );
+                updatedCompositions.add(new FilePathComposition(composition.getId(),
+                        composition.getStorageId(),
+                        newPath)
+                );
+            }
         }
         storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
         return updatedCompositions;
@@ -104,15 +114,18 @@ public class StorageFilesDataSource {
         createDirectory(newFolderPath);
 
         for (Composition composition: compositions) {
-            String oldPath = composition.getFilePath();
-            String newPath = FileUtils.getChangedFilePath(oldPath, fromPath, newFolderPath);
+            Long storageId = composition.getStorageId();
+            if (storageId != null) {
+                String oldPath = getCompositionFilePath(storageId);
+                String newPath = FileUtils.getChangedFilePath(oldPath, fromPath, newFolderPath);
 
-            moveFile(oldPath, newPath);
+                moveFile(oldPath, newPath);
 
-            updatedCompositions.add(new FilePathComposition(composition.getId(),
-                    composition.getStorageId(),
-                    newPath)
-            );
+                updatedCompositions.add(new FilePathComposition(composition.getId(),
+                        composition.getStorageId(),
+                        newPath)
+                );
+            }
         }
         storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
         return FileUtils.getFileName(newFolderPath);
@@ -137,13 +150,28 @@ public class StorageFilesDataSource {
     }
 
     private void deleteFile(Composition composition) {
-        String filePath = composition.getFilePath();
+        Long storageId = composition.getStorageId();
+        if (storageId == null) {
+            return;
+        }
+        String filePath = storageMusicProvider.getCompositionFilePath(storageId);
+        if (filePath == null) {
+            return;
+        }
         File parentDirectory = new File(filePath).getParentFile();
-
         FileManager.deleteFile(filePath);
         if (parentDirectory != null) {
             FileManager.deleteEmptyDirectory(parentDirectory);
         }
+    }
+
+    @Nonnull
+    private String getCompositionFilePath(long storageId) {
+        String filePath = storageMusicProvider.getCompositionFilePath(storageId);
+        if (filePath == null) {
+            throw new RuntimeException("composition path not found in system media store");
+        }
+        return filePath;
     }
 
     private void createDirectory(String path) {
@@ -178,7 +206,7 @@ public class StorageFilesDataSource {
         }
     }
 
-    public static void renameFile(String oldPath, String newPath) {
+    private static void renameFile(String oldPath, String newPath) {
         File oldFile = new File(oldPath);
         if (!oldFile.exists()) {
             throw new RuntimeException("target file not exists");

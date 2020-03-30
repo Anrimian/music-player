@@ -208,13 +208,13 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private void addCompositionsToPlayNext(List<Composition> compositions) {
         playerInteractor.addCompositionsToPlayNext(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
     }
 
     private void addCompositionsToEnd(List<Composition> compositions) {
         playerInteractor.addCompositionsToEnd(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
     }
 
     private void onDefaultError(Throwable throwable) {
@@ -324,7 +324,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     private void subscribeOnCurrentComposition() {
-        currentItemDisposable = playerInteractor.getCurrentCompositionObservable()
+        currentItemDisposable = playerInteractor.getCurrentQueueItemObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onCurrentCompositionReceived, errorParser::logError);
         presenterBatterySafeDisposable.add(currentItemDisposable);

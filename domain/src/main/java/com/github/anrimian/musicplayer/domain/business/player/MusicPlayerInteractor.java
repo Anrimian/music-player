@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
@@ -27,9 +28,11 @@ import javax.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
+import sun.rmi.runtime.Log;
 
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
@@ -64,6 +67,8 @@ public class MusicPlayerInteractor {
     @Nullable
     private PlayQueueItem currentItem;
 
+    private final Observable<CurrentComposition> currentCompositionObservable;
+
     public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
                                  SettingsRepository settingsRepository,
                                  SystemMusicController systemMusicController,
@@ -78,6 +83,18 @@ public class MusicPlayerInteractor {
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
         this.analytics = analytics;
+
+        currentCompositionObservable = Observable.combineLatest(
+                getCurrentQueueItemObservable()
+                        .distinctUntilChanged(),
+                getPlayerStateObservable()
+                        .filter(state -> state != LOADING)
+                        .map(state -> state == PlayerState.PLAY)
+                        .distinctUntilChanged(),
+                CurrentComposition::new)
+                .distinctUntilChanged()
+                .replay(1)
+                .refCount();
 
         playerDisposable.add(playQueueRepository.getCurrentQueueItemObservable()
                 .subscribe(this::onQueueItemChanged));
@@ -109,8 +126,10 @@ public class MusicPlayerInteractor {
         systemEventsDisposable.clear();
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
+            if (playerStateSubject.getValue() != LOADING) {
+                musicPlayerController.resume();
+            }
             playerStateSubject.onNext(PLAY);
-            musicPlayerController.resume();
             systemServiceController.startMusicService();
 
             systemEventsDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
@@ -227,8 +246,12 @@ public class MusicPlayerInteractor {
         return playerStateSubject.getValue();
     }
 
-    public Observable<PlayQueueEvent> getCurrentCompositionObservable() {
+    public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
         return playQueueRepository.getCurrentQueueItemObservable();
+    }
+
+    public Observable<CurrentComposition> getCurrentCompositionObservable() {
+        return currentCompositionObservable;
     }
 
     public Flowable<Integer> getCurrentItemPositionObservable() {
@@ -251,17 +274,23 @@ public class MusicPlayerInteractor {
         return playQueueRepository.removeQueueItem(item);
     }
 
+    public Completable restoreDeletedItem() {
+        return playQueueRepository.restoreDeletedItem();
+    }
+
     public void swapItems(PlayQueueItem firstItem,
                           PlayQueueItem secondItem) {
         playQueueRepository.swapItems(firstItem, secondItem).subscribe();
     }
 
-    public Completable addCompositionsToPlayNext(List<Composition> compositions) {
-        return playQueueRepository.addCompositionsToPlayNext(compositions);
+    public Single<List<Composition>> addCompositionsToPlayNext(List<Composition> compositions) {
+        return playQueueRepository.addCompositionsToPlayNext(compositions)
+                .toSingleDefault(compositions);
     }
 
-    public Completable addCompositionsToEnd(List<Composition> compositions) {
-        return playQueueRepository.addCompositionsToEnd(compositions);
+    public Single<List<Composition>> addCompositionsToEnd(List<Composition> compositions) {
+        return playQueueRepository.addCompositionsToEnd(compositions)
+                .toSingleDefault(compositions);
     }
 
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
@@ -312,12 +341,18 @@ public class MusicPlayerInteractor {
     }
 
     private void onCompositionPrepared() {
-        if (playerStateSubject.getValue() == PLAY) {
+        PlayerState state = playerStateSubject.getValue();
+        if (state == PLAY || state == LOADING) {
             musicPlayerController.resume();
         }
     }
 
     private void handleErrorWithComposition(ErrorType errorType, Composition composition) {
+        if (errorType == ErrorType.IGNORED) {
+            //TODO: start playing, hide app, revoke permission, open - we are here. Prepare again?
+            pause();
+            return;
+        }
         CorruptionType corruptionType = toCorruptionType(errorType);
         musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
                 .doOnError(analytics::processNonFatalError)

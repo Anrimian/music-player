@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
@@ -25,6 +27,9 @@ public class PlayQueueDaoWrapper {
 
     private final AppDatabase appDatabase;
     private final PlayQueueDao playQueueDao;
+
+    @Nullable
+    private PlayQueueEntity deletedItem;
 
     public PlayQueueDaoWrapper(AppDatabase appDatabase, PlayQueueDao playQueueDao) {
         this.appDatabase = appDatabase;
@@ -115,7 +120,14 @@ public class PlayQueueDaoWrapper {
     }
 
     public void deleteItem(long itemId) {
+        deletedItem = playQueueDao.getItem(itemId);
         playQueueDao.deleteItem(itemId);
+    }
+
+    public void restoreDeletedItem() {
+        if (deletedItem != null) {
+            playQueueDao.insertItem(deletedItem);
+        }
     }
 
     public void swapItems(PlayQueueItem firstItem, PlayQueueItem secondItem, boolean shuffleMode) {
@@ -235,7 +247,6 @@ public class PlayQueueDaoWrapper {
         }
     }
 
-    //TODO don't select corrupted compositions
     public long getPreviousQueueItemId(long currentItemId, boolean isShuffled) {
         if (isShuffled) {
             Long id = playQueueDao.getPreviousShuffledQueueItemId(currentItemId);

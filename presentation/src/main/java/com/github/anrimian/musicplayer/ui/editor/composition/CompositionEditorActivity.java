@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,6 +26,7 @@ import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.Slidr;
 
@@ -60,7 +62,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     CompositionEditorPresenter presenter;
 
     @BindView(R.id.container)
-    View container;
+    ViewGroup container;
 
     @BindView(R.id.tv_author)
     TextView tvAuthor;
@@ -157,6 +159,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         setContentView(R.layout.activity_composition_edit);
         ButterKnife.bind(this);
 
+        AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground);
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -183,9 +187,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         onLongClick(changeAlbumClickableArea, () -> copyText(tvAlbum, tvAlbumHint));
         onLongClick(changeAlbumArtistClickableArea, () -> copyText(tvAlbumArtist, tvAlbumArtistHint));
 
-        @ColorInt int statusBarColor = getColorFromAttr(this, R.attr.colorPrimaryDark);
-        Slidr.attach(this, getWindow().getStatusBarColor(), statusBarColor);
-        setStatusBarColor(getWindow(), statusBarColor);
+        SlidrPanel.attachWithNavBarChange(this,
+                R.attr.playerPanelBackground,
+                android.R.attr.colorBackground
+        );
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
@@ -258,7 +263,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         tvAlbumArtist.setText(composition.getAlbumArtist());
 
         tvAuthor.setText(formatAuthor(composition.getArtist(), this));
-        tvFileName.setText(formatFileName(composition.getFilePath(), true));
+        tvFileName.setText(formatFileName(composition.getFileName(), true));
     }
 
     @Override
@@ -337,7 +342,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 R.string.change,
                 R.string.cancel,
                 R.string.filename,
-                formatFileName(composition.getFilePath()),
+                formatFileName(composition.getFileName()),
                 false);
         filenameDialogFragmentRunner.show(fragment);
     }
@@ -369,7 +374,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     public void showRemovedGenreMessage(ShortGenre genre) {
         String text = getString(R.string.genre_removed_message, genre.getName());
         MessagesUtils.makeSnackbar(container, text, Snackbar.LENGTH_LONG)
-                .setAction(R.string.cancel, v -> presenter.onRestoreRemovedGenreClicked())
+                .setAction(R.string.cancel, presenter::onRestoreRemovedGenreClicked)
                 .show();
     }
 

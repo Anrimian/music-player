@@ -1,14 +1,19 @@
 package com.github.anrimian.musicplayer.data.database;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
+import androidx.core.content.ContextCompat;
 import androidx.room.migration.Migration;
+import androidx.room.util.CursorUtil;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
@@ -17,12 +22,40 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+@SuppressLint("RestrictedApi")
 class Migrations {
+
+    static Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE compositions ADD COLUMN fileName TEXT");
+
+            //migrate file name
+            Cursor c = database.query("SELECT id, filePath FROM compositions");
+            while (c.moveToNext()) {
+                long id = c.getLong(CursorUtil.getColumnIndex(c,"id"));
+                String filePath = c.getString(CursorUtil.getColumnIndex(c,"filePath"));
+
+                String fileName = FileUtils.formatFileName(filePath, true);
+
+                ContentValues cv = new ContentValues();
+                cv.put("fileName", fileName);
+
+                database.update("compositions",
+                        SQLiteDatabase.CONFLICT_REPLACE,
+                        cv,
+                        "id = ?",
+                        new String[]{ String.valueOf(id) }
+                );
+            }
+        }
+    };
 
     static Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
@@ -37,21 +70,19 @@ class Migrations {
 
             //don't migrate folders, they will update automatically on next storage rescan
             Cursor c = database.query("SELECT * FROM compositions");
-            for (int i = 0; i < c.getCount(); i++) {
-                c.moveToPosition(i);
-
+            while (c.moveToNext()) {
                 ContentValues cv = new ContentValues();
 
-                cv.put("id", c.getLong(c.getColumnIndex("id")));
-                cv.put("artistId", c.getLong(c.getColumnIndex("artistId")));
-                cv.put("albumId", c.getLong(c.getColumnIndex("albumId")));
-                cv.put("storageId", c.getLong(c.getColumnIndex("storageId")));
+                cv.put("id", getLong(c, "id"));
+                cv.put("artistId", getLong(c, "artistId"));
+                cv.put("albumId", getLong(c, "albumId"));
+                cv.put("storageId", getLong(c, "storageId"));
                 cv.put("title", c.getString(c.getColumnIndex("title")));
                 cv.put("filePath", c.getString(c.getColumnIndex("filePath")));
-                cv.put("duration", c.getLong(c.getColumnIndex("duration")));
-                cv.put("size", c.getLong(c.getColumnIndex("size")));
-                cv.put("dateAdded", c.getLong(c.getColumnIndex("dateAdded")));
-                cv.put("dateModified", c.getLong(c.getColumnIndex("dateModified")));
+                cv.put("duration", getLong(c, "duration"));
+                cv.put("size", getLong(c, "size"));
+                cv.put("dateAdded", getLong(c, "dateAdded"));
+                cv.put("dateModified", getLong(c, "dateModified"));
                 cv.put("corruptionType", c.getString(c.getColumnIndex("corruptionType")));
                 database.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv);
             }
@@ -64,6 +95,15 @@ class Migrations {
             database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
         }
     };
+
+    private static Long getLong(Cursor c, String columnName) {
+        int columnIndex = CursorUtil.getColumnIndex(c, columnName);
+        if (columnIndex < 0 || c.isNull(columnIndex)) {
+            return null;
+        } else {
+            return c.getLong(columnIndex);
+        }
+    }
 
     static Migration getMigration3_4(Context context) {
         return new Migration(3, 4) {
@@ -81,16 +121,18 @@ class Migrations {
 
                 StorageAlbumsProvider storageAlbumsProvider = new StorageAlbumsProvider(context);
                 StorageMusicProvider provider = new StorageMusicProvider(context, storageAlbumsProvider);
-                LongSparseArray<StorageFullComposition> storageCompositions = provider.getCompositions();
+                LongSparseArray<StorageFullComposition> storageCompositions;
+                if (hasFilePermission(context)) {
+                    storageCompositions = provider.getCompositions();
+                } else {
+                    storageCompositions = new LongSparseArray<>();
+                }
 
                 Map<String, Long> artistCache = new HashMap<>();
                 Map<String, Long> albumsCache = new HashMap<>();
                 Cursor c = database.query("SELECT * FROM compositions");
-                for (int i = 0; i < c.getCount(); i++) {
-                    c.moveToPosition(i);
-
+                while (c.moveToNext()) {
                     ContentValues cv = new ContentValues();
-
 
                     //artists
                     String artist = c.getString(c.getColumnIndex("artist"));
@@ -156,7 +198,6 @@ class Migrations {
         return artistId;
     }
 
-    @Nullable
     private static Long insertAlbum(StorageAlbum album,
                                     Long albumArtistId,
                                     SupportSQLiteDatabase database,
@@ -263,5 +304,10 @@ class Migrations {
                 database.execSQL("CREATE  INDEX `index_play_queue_audioId` ON `play_queue` (`audioId`)");
             }
         };
+    }
+
+    private static boolean hasFilePermission(Context context) {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
     }
 }

@@ -79,12 +79,12 @@ public class LibraryFoldersScreenInteractor {
         foldersInteractor.play(folderId, composition);
     }
 
-    public void addCompositionsToPlayNext(List<FileSource> fileSources) {
-        foldersInteractor.addCompositionsToPlayNext(fileSources);
+    public Single<List<Composition>> addCompositionsToPlayNext(List<FileSource> fileSources) {
+        return foldersInteractor.addCompositionsToPlayNext(fileSources);
     }
 
-    public void addCompositionsToEnd(List<FileSource> fileSources) {
-        foldersInteractor.addCompositionsToEnd(fileSources);
+    public Single<List<Composition>> addCompositionsToEnd(List<FileSource> fileSources) {
+        return foldersInteractor.addCompositionsToEnd(fileSources);
     }
 
     public Single<List<Composition>> deleteFiles(List<FileSource> fileSources) {
