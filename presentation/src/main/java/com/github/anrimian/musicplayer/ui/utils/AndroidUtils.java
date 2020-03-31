@@ -275,11 +275,21 @@ public class AndroidUtils {
         }
     }
 
-    //don't play animation if this drawable is already set
     public static void setAnimatedVectorDrawable(ImageView imageView, @DrawableRes int drawableRes) {
+        setAnimatedVectorDrawable(imageView, drawableRes, true);
+    }
+
+    public static void setAnimatedVectorDrawable(ImageView imageView,
+                                                 @DrawableRes int drawableRes,
+                                                 boolean animate) {
         Drawable drawable = AppCompatResources.getDrawable(imageView.getContext(), drawableRes);
+        Integer tag = (Integer) imageView.getTag();
+        if (tag != null && tag == drawableRes) {
+            return;
+        }
+        imageView.setTag(drawableRes);
         imageView.setImageDrawable(drawable);
-        if (drawable instanceof Animatable) {
+        if (animate && tag != null && drawable instanceof Animatable) {
             ((Animatable) drawable).start();
         }
     }

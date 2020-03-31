@@ -70,7 +70,7 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
         boolean selected = selectedCompositions.contains(composition);
         holder.setSelected(selected);
 
-        holder.showCurrentComposition(currentComposition);
+        holder.showCurrentComposition(currentComposition, false);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
     public void showCurrentComposition(CurrentComposition currentComposition) {
         this.currentComposition = currentComposition;
         for (MusicViewHolder holder: viewHolders) {
-            holder.showCurrentComposition(currentComposition);
+            holder.showCurrentComposition(currentComposition, true);
         }
     }
 

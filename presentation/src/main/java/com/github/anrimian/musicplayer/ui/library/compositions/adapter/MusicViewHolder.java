@@ -88,7 +88,8 @@ public class MusicViewHolder extends SelectableViewHolder {
         }
     }
 
-    public void showCurrentComposition(@Nullable CurrentComposition currentComposition) {
+    public void showCurrentComposition(@Nullable CurrentComposition currentComposition,
+                                       boolean animate) {
         boolean isCurrent = false;
         boolean isPlaying = false;
         if (currentComposition != null) {
@@ -96,11 +97,7 @@ public class MusicViewHolder extends SelectableViewHolder {
             isPlaying = isCurrent && currentComposition.isPlaying();
         }
         showAsCurrentComposition(isCurrent);
-        compositionItemWrapper.showAsPlaying(isPlaying);
-    }
-
-    public void showAsPlaying(boolean playing) {
-        compositionItemWrapper.showAsPlaying(playing);
+        compositionItemWrapper.showAsPlaying(isPlaying, animate);
     }
 
     public Composition getComposition() {
