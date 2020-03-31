@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
+import com.github.anrimian.musicplayer.utils.filelog.FileLog;
 
 import javax.inject.Singleton;
 
@@ -69,6 +70,7 @@ public interface AppComponent {
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();
     ErrorParser errorParser();
+    FileLog fileLog();
 
     ThemeController themeController();
 

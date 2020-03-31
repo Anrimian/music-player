@@ -181,6 +181,11 @@
     <string name="queue_item_removed">Элемент очереди удалён</string>
     <string name="by_size">По размеру</string>
     <string name="largest_first">Сперва большие</string>
+    <string name="log_info_text">Произошли некоторые нефатальные ошибки и информация о них была записана в файл логов. Приложение не отсылает логи автоматически, но вы можете отослать их сами. Это поможет улучшить качество приложения. Текущий размер файла логов: %d KB</string>
+    <string name="view_file">Просмотреть файл</string>
+    <string name="send_file">Отправить файл</string>
+    <string name="delete_file">Удалить файл</string>
+    <string name="log_file_deleted">Файл удалён</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
