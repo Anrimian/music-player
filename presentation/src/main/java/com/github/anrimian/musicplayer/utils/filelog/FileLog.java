@@ -17,6 +17,7 @@ import java.io.StringWriter;
 
 import static java.io.File.separator;
 
+@SuppressWarnings("WeakerAccess")
 public class FileLog {
 
     private static final String LOG_FILE_NAME = "log.txt";
@@ -48,19 +49,30 @@ public class FileLog {
         writeLog(sb.toString());
     }
 
+    public void initFatalErrorRecorder() {
+        Thread.UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(
+                (thread, e) -> {
+                    writeFatalException(e);
+                    if (handler != null) {
+                        handler.uncaughtException(thread, e);
+                    }
+                });
+    }
+
+    public void writeFatalException(Throwable throwable) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Fatal error:\n");
+        appendSystemInfo(sb);
+        writeStackTrace(sb, throwable);
+        writeLog(sb.toString());
+    }
+
     public void writeException(Throwable throwable) {
         StringBuilder sb = new StringBuilder();
         sb.append("Non fatal error:\n");
         appendSystemInfo(sb);
-
-        sb.append("Stacktrace: ");
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        throwable.printStackTrace(pw);
-        String stackTrace = sw.toString();
-        sb.append(stackTrace);
-        sb.append("\n");
-
+        writeStackTrace(sb, throwable);
         writeLog(sb.toString());
     }
 
@@ -95,6 +107,16 @@ public class FileLog {
 
         sb.append("Device: ");
         sb.append(Build.MODEL);
+        sb.append("\n");
+    }
+
+    private void writeStackTrace(StringBuilder sb, Throwable throwable) {
+        sb.append("Stacktrace: ");
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        sb.append(stackTrace);
         sb.append("\n");
     }
 
