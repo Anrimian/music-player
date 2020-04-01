@@ -112,11 +112,9 @@ public class FileLog {
         } else if (logFile.length() > MAX_FILE_SIZE) {
             return;
         }
-        try {
-            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+        try (BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true))) {
             buf.append(text);
             buf.newLine();
-            buf.close();
         } catch (IOException ignored) {}
     }
 
