@@ -88,7 +88,6 @@ public class MusicPlayerInteractor {
                 getCurrentQueueItemObservable()
                         .distinctUntilChanged(),
                 getPlayerStateObservable()
-                        .filter(state -> state != LOADING)
                         .map(state -> state == PlayerState.PLAY)
                         .distinctUntilChanged(),
                 CurrentComposition::new)
@@ -239,6 +238,7 @@ public class MusicPlayerInteractor {
 
     public Observable<PlayerState> getPlayerStateObservable() {
         return playerStateSubject.map(PlayerState::toBaseState)
+                .filter(state -> state != LOADING)
                 .distinctUntilChanged();
     }
 

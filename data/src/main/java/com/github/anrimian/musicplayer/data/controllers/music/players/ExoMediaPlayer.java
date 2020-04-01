@@ -178,7 +178,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .map(uri -> {
                     DataSpec dataSpec = new DataSpec(uri);
                     final ContentDataSource dataSource = new ContentDataSource(context);
-                    dataSource.open(dataSpec);
+                    dataSource.open(dataSpec);//random error here
 
                     DataSource.Factory factory = () -> dataSource;
                     MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory)
