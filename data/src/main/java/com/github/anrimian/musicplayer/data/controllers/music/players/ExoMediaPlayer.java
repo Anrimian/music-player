@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
@@ -177,11 +178,14 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .observeOn(scheduler)
                 .map(uri -> {
                     DataSpec dataSpec = new DataSpec(uri);
-                    final ContentDataSource dataSource = new ContentDataSource(context);
-                    dataSource.open(dataSpec);//random error here
+                    ContentDataSource dataSource = new ContentDataSource(context);
+                    dataSource.open(dataSpec);
 
                     DataSource.Factory factory = () -> dataSource;
-                    MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory)
+
+                    //ProgressiveMediaSource doesn't work stable enough
+                    //noinspection deprecation
+                    MediaSource mediaSource = new ExtractorMediaSource.Factory(factory)
                             .createMediaSource(uri);
                     player.prepare(mediaSource);
                     return mediaSource;
