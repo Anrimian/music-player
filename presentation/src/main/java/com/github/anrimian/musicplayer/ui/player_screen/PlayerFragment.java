@@ -301,7 +301,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
                 ItemTouchHelper.START,
-                R.drawable.ic_delete_outline,
+                R.drawable.ic_remove_from_queue,
                 R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
@@ -474,7 +474,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showStopState() {
-        ivPlayPause.setImageResource(R.drawable.ic_play);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
         ivPlayPause.setContentDescription(getString(R.string.play));
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
         playQueueAdapter.showPlaying(false);
@@ -482,7 +482,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showPlayState() {
-        ivPlayPause.setImageResource(R.drawable.ic_pause);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
         ivPlayPause.setContentDescription(getString(R.string.pause));
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
         playQueueAdapter.showPlaying(true);

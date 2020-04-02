@@ -8,6 +8,8 @@
     <dimen name="music_control_button_padding_collapsed">12dp</dimen>
     <dimen name="music_control_button_padding_expanded">7dp</dimen>
 
+    <!--animation-->
+    <integer name="button_animation_duration">300</integer>
 
     <dimen name="text_size_xxsmall">12sp</dimen>
     <dimen name="text_size_xsmall">13sp</dimen>

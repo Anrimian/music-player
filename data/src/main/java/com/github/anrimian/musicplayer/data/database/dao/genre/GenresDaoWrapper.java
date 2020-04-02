@@ -22,6 +22,7 @@ import java.util.Set;
 
 import io.reactivex.Observable;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
@@ -64,9 +65,9 @@ public class GenresDaoWrapper {
                 "(SELECT count() FROM genre_entries WHERE genreId = genres.id) as compositionsCount, " +
                 "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM genre_entries WHERE genreId = genres.id)) as totalDuration " +
                 "FROM genres";
-        query += getSearchQuery(searchText);
+        query += getSearchQuery();
         query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 2));
         return genreDao.getAllObservable(sqlQuery);
     }
 
@@ -200,16 +201,8 @@ public class GenresDaoWrapper {
         return orderQuery.toString();
     }
 
-    private String getSearchQuery(String searchText) {
-        if (isEmpty(searchText)) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(" WHERE ");
-        sb.append("name LIKE '%");
-        sb.append(searchText);
-        sb.append("%'");
-
-        return sb.toString();
+    private String getSearchQuery() {
+        return " WHERE (? IS NULL OR name LIKE ?)";
     }
 
 }

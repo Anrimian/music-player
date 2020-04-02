@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -30,6 +31,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.AttrRes;
@@ -41,6 +43,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
@@ -272,4 +275,22 @@ public class AndroidUtils {
         }
     }
 
+    public static void setAnimatedVectorDrawable(ImageView imageView, @DrawableRes int drawableRes) {
+        setAnimatedVectorDrawable(imageView, drawableRes, true);
+    }
+
+    public static void setAnimatedVectorDrawable(ImageView imageView,
+                                                 @DrawableRes int drawableRes,
+                                                 boolean animate) {
+        Drawable drawable = AppCompatResources.getDrawable(imageView.getContext(), drawableRes);
+        Integer tag = (Integer) imageView.getTag();
+        if (tag != null && tag == drawableRes) {
+            return;
+        }
+        imageView.setTag(drawableRes);
+        imageView.setImageDrawable(drawable);
+        if (animate && tag != null && drawable instanceof Animatable) {
+            ((Animatable) drawable).start();
+        }
+    }
 }

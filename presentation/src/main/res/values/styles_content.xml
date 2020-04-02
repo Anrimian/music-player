@@ -32,6 +32,9 @@
         <item name="android:background">@drawable/bg_click_inverse</item>
     </style>
 
+    <style name="ButtonBrightStyle" parent="@style/Widget.AppCompat.Button.Colored">
+    </style>
+
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
 
     </style>

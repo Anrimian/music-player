@@ -53,18 +53,19 @@
                 app:barrierDirection="right"
                 app:constraint_referenced_ids="tv_title, tv_subtitle"/>
 
-            <View
+            <ImageView
                 android:id="@+id/action_icon"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/ic_triangle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_drop_down"
+                android:scaleType="center"
+                android:contentDescription="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/titles_barrier"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.6" />
+                app:layout_constraintVertical_bias="0.6"/>
 
             <FrameLayout
                 android:id="@+id/fl_title_area"

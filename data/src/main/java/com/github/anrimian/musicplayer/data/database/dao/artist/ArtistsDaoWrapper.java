@@ -10,6 +10,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class ArtistsDaoWrapper {
@@ -26,9 +27,9 @@ public class ArtistsDaoWrapper {
                 "(SELECT count() FROM compositions WHERE artistId = artists.id) as compositionsCount, " +
                 "(SELECT count() FROM albums WHERE artistId = artists.id) as albumsCount " +
                 "FROM artists";
-        query += getSearchQuery(searchText);
+        query += getSearchQuery();
         query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 2));
         return artistsDao.getAllObservable(sqlQuery);
     }
 
@@ -76,16 +77,8 @@ public class ArtistsDaoWrapper {
         return orderQuery.toString();
     }
 
-    private String getSearchQuery(String searchText) {
-        if (isEmpty(searchText)) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(" WHERE ");
-        sb.append("name LIKE '%");
-        sb.append(searchText);
-        sb.append("%'");
-
-        return sb.toString();
+    private String getSearchQuery() {
+        return " WHERE (? IS NULL OR name LIKE ?)";
     }
 
 }

@@ -73,8 +73,8 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
         compositionItemWrapper.showAsCurrentComposition(show);
     }
 
-    void showAsPlaying(boolean playing) {
-        compositionItemWrapper.showAsPlaying(playing);
+    void showAsPlaying(boolean playing, boolean animate) {
+        compositionItemWrapper.showAsPlaying(playing, animate);
     }
 
     PlayQueueItem getPlayQueueItem() {

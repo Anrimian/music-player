@@ -106,7 +106,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
                 MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
                 CompositionFileSource musicFileSource = (CompositionFileSource) fileSource;
                 musicViewHolder.bind(musicFileSource, isCoversEnabled);
-                musicViewHolder.showCurrentComposition(currentComposition);
+                musicViewHolder.showCurrentComposition(currentComposition, false);
                 break;
             }
             case TYPE_FILE: {
@@ -178,7 +178,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
         for (RecyclerView.ViewHolder holder: viewHolders) {
             if (holder instanceof MusicFileViewHolder) {
                 MusicFileViewHolder musicViewHolder = (MusicFileViewHolder) holder;
-                musicViewHolder.showCurrentComposition(currentComposition);
+                musicViewHolder.showCurrentComposition(currentComposition, true);
             }
         }
     }
