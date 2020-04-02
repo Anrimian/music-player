@@ -2,10 +2,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="?attr/colorAccent">
+    android:background="@drawable/bg_popup">
 
-    <FrameLayout
-        android:layout_width="100dp"
-        android:layout_height="300dp"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"/>
 
 </FrameLayout>

@@ -43,6 +43,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.AppPopupMenu;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
@@ -719,32 +720,54 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onCompositionMenuClicked(View view) {
-        AppPopupMenu.showPopupWindow(view);
+        PopupMenuWindow.showPopup(view,
+                R.menu.composition_short_actions_menu,
+                item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_add_to_playlist: {
+                            presenter.onAddCurrentCompositionToPlayListButtonClicked();
+                            return true;
+                        }
+                        case R.id.menu_share: {
+                            presenter.onShareCompositionButtonClicked();
+                            return true;
+                        }
+                        case R.id.menu_delete: {
+                            presenter.onDeleteCurrentCompositionButtonClicked();
+                            return true;
+                        }
+                        case R.id.menu_edit: {
+                            presenter.onEditCompositionButtonClicked();
+                            return true;
+                        }
+                    }
+                    return false;
+                });
 
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.composition_short_actions_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddCurrentCompositionToPlayListButtonClicked();
-                    return true;
-                }
-                case R.id.menu_share: {
-                    presenter.onShareCompositionButtonClicked();
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCurrentCompositionButtonClicked();
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    presenter.onEditCompositionButtonClicked();
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
+//        PopupMenu popup = new PopupMenu(requireContext(), view);
+//        popup.inflate(R.menu.composition_short_actions_menu);
+//        popup.setOnMenuItemClickListener(item -> {
+//            switch (item.getItemId()) {
+//                case R.id.menu_add_to_playlist: {
+//                    presenter.onAddCurrentCompositionToPlayListButtonClicked();
+//                    return true;
+//                }
+//                case R.id.menu_share: {
+//                    presenter.onShareCompositionButtonClicked();
+//                    return true;
+//                }
+//                case R.id.menu_delete: {
+//                    presenter.onDeleteCurrentCompositionButtonClicked();
+//                    return true;
+//                }
+//                case R.id.menu_edit: {
+//                    presenter.onEditCompositionButtonClicked();
+//                    return true;
+//                }
+//            }
+//            return false;
+//        });
+//        popup.show();
     }
 
     private DrawerArrowDrawable createDrawerArrowDrawable() {
@@ -781,60 +804,110 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onPlayItemMenuClicked(View view, PlayQueueItem playQueueItem) {
         Composition composition = playQueueItem.getComposition();
 
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.play_queue_item_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddQueueItemToPlayListButtonClicked(composition);
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
-                    return true;
-                }
-                case R.id.menu_share: {
-                    onShareCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_delete_from_queue: {
-                    presenter.onDeleteQueueItemClicked(playQueueItem);
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(composition);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.play_queue_item_menu,
+                item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_add_to_playlist: {
+                            presenter.onAddQueueItemToPlayListButtonClicked(composition);
+                            return true;
+                        }
+                        case R.id.menu_edit: {
+                            startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                            return true;
+                        }
+                        case R.id.menu_share: {
+                            onShareCompositionClicked(composition);
+                            return true;
+                        }
+                        case R.id.menu_delete_from_queue: {
+                            presenter.onDeleteQueueItemClicked(playQueueItem);
+                            return true;
+                        }
+                        case R.id.menu_delete: {
+                            presenter.onDeleteCompositionButtonClicked(composition);
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+//
+//        PopupMenu popup = new PopupMenu(requireContext(), view);
+//        popup.inflate(R.menu.play_queue_item_menu);
+//        popup.setOnMenuItemClickListener(item -> {
+//            switch (item.getItemId()) {
+//                case R.id.menu_add_to_playlist: {
+//                    presenter.onAddQueueItemToPlayListButtonClicked(composition);
+//                    return true;
+//                }
+//                case R.id.menu_edit: {
+//                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+//                    return true;
+//                }
+//                case R.id.menu_share: {
+//                    onShareCompositionClicked(composition);
+//                    return true;
+//                }
+//                case R.id.menu_delete_from_queue: {
+//                    presenter.onDeleteQueueItemClicked(playQueueItem);
+//                    return true;
+//                }
+//                case R.id.menu_delete: {
+//                    presenter.onDeleteCompositionButtonClicked(composition);
+//                    return true;
+//                }
+//            }
+//            return false;
+//        });
+//        popup.show();
     }
 
     private void onRepeatModeButtonClicked(View view) {
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.repeat_mode_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            int repeatMode = RepeatMode.NONE;
-            switch (item.getItemId()) {
-                case R.id.menu_repeat_playlist: {
-                    repeatMode = RepeatMode.REPEAT_PLAY_LIST;
-                    break;
-                }
-                case R.id.menu_repeat_composition: {
-                    repeatMode = RepeatMode.REPEAT_COMPOSITION;
-                    break;
-                }
-                case R.id.menu_do_not_repeat: {
-                    repeatMode = RepeatMode.NONE;
-                    break;
-                }
-            }
-            presenter.onRepeatModeChanged(repeatMode);
-            return true;
-        });
-        insertMenuItemIcons(requireContext(), popup);
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.repeat_mode_menu,
+                item -> {
+                    int repeatMode = RepeatMode.NONE;
+                    switch (item.getItemId()) {
+                        case R.id.menu_repeat_playlist: {
+                            repeatMode = RepeatMode.REPEAT_PLAY_LIST;
+                            break;
+                        }
+                        case R.id.menu_repeat_composition: {
+                            repeatMode = RepeatMode.REPEAT_COMPOSITION;
+                            break;
+                        }
+                        case R.id.menu_do_not_repeat: {
+                            repeatMode = RepeatMode.NONE;
+                            break;
+                        }
+                    }
+                    presenter.onRepeatModeChanged(repeatMode);
+                    return true;
+                });
+
+//        PopupMenu popup = new PopupMenu(requireContext(), view);
+//        popup.inflate(R.menu.repeat_mode_menu);
+//        popup.setOnMenuItemClickListener(item -> {
+//            int repeatMode = RepeatMode.NONE;
+//            switch (item.getItemId()) {
+//                case R.id.menu_repeat_playlist: {
+//                    repeatMode = RepeatMode.REPEAT_PLAY_LIST;
+//                    break;
+//                }
+//                case R.id.menu_repeat_composition: {
+//                    repeatMode = RepeatMode.REPEAT_COMPOSITION;
+//                    break;
+//                }
+//                case R.id.menu_do_not_repeat: {
+//                    repeatMode = RepeatMode.NONE;
+//                    break;
+//                }
+//            }
+//            presenter.onRepeatModeChanged(repeatMode);
+//            return true;
+//        });
+//        insertMenuItemIcons(requireContext(), popup);
+//        popup.show();
     }
 
     private void onShareCompositionClicked(Composition composition) {

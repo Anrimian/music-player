@@ -1,11 +1,9 @@
 package com.github.anrimian.musicplayer.ui.common.menu;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
@@ -19,16 +17,12 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class AppPopupMenu {
 
-    //calculate show location
-    //to override overflow button click
-    //draw menu
-    public static void showPopupWindow(View anchorView) {
+    //override overflow button click
+    //screen offset
+    //window doesn't fit into screen case
+    public static PopupWindow showPopupWindow(View anchorView, View popupView) {
         Context context = anchorView.getContext();
         Resources resources = context.getResources();
-
-        LayoutInflater inflater = LayoutInflater.from(context);
-        @SuppressLint("InflateParams")
-        View popupView = inflater.inflate(R.layout.menu_popup, null);
 
         PopupWindow popupWindow = new PopupWindow(popupView,
                 WRAP_CONTENT,
@@ -60,21 +54,30 @@ public class AppPopupMenu {
         int screenHeight = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
-        int yTouchOffset = 0;//resources.getDimensionPixelSize(R.dimen.popup_y_touch_offset);
+        int yTouchOffset = resources.getDimensionPixelSize(R.dimen.popup_y_touch_offset);
+        int screenMargin = resources.getDimensionPixelSize(R.dimen.popup_screen_margin);
 
         int xOff = viewWidth * -1;
-        int yOff = (anchorView.getMeasuredHeight() + yTouchOffset) * -1;
-        popupWindow.showAsDropDown(anchorView, xOff, yOff, Gravity.START | Gravity.TOP);
+
+        int viewNotFitHeight = (anchorY + viewHeight) - screenHeight;
+        if (viewNotFitHeight < 0) {
+            viewNotFitHeight = 0;
+        }
+
+        int yOff = (anchorView.getMeasuredHeight() + yTouchOffset + viewNotFitHeight) * -1;
 
         //cut at bottom
-        int bottomPadding = resources.getDimensionPixelSize(R.dimen.popup_y_bottom_padding);
         int bottomYPos = anchorY + yOff + viewHeight;
         int deltaBottomPos = bottomYPos - screenHeight;
         if (deltaBottomPos > 0) {
             ViewGroup.LayoutParams params = popupView.getLayoutParams();
-            params.height = viewHeight - deltaBottomPos - bottomPadding;
+            params.height = viewHeight - deltaBottomPos - screenMargin;
             popupView.setLayoutParams(params);
         }
+
+        popupWindow.showAsDropDown(anchorView, xOff, yOff, Gravity.START | Gravity.TOP);
+
+        return popupWindow;
     }
 
 }
