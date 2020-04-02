@@ -53,6 +53,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private boolean playWhenReady = false;
     private boolean isPlaying = false;
 
+    //non-repeat mode - unexpected player error after reaching to end of last composition, stop+skip.
     public AndroidMediaPlayer(Scheduler scheduler,
                               PlayerErrorParser playerErrorParser,
                               Analytics analytics) {
@@ -95,7 +96,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         }
         seekTo(0);
         stopTracingTrackPosition();
-        mediaPlayer.stop();
+        mediaPlayer.pause();
         isPlaying = false;
         playWhenReady = false;
     }
