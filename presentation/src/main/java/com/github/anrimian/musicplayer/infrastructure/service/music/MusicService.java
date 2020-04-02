@@ -148,15 +148,18 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
-
-        serviceDisposable.add(playInfoDisposable);
-
-        subscribeOnNotificationSettings();
-        subscribeOnPlayerChanges();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        //observe fix, if not, remove if() and return block back in onCreate()
+        if (serviceDisposable.size() == 0) {
+            subscribeOnNotificationSettings();
+            subscribeOnPlayerChanges();
+
+            serviceDisposable.add(playInfoDisposable);
+        }
+
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         Log.d("KEK", "onStartCommand, req code:" + requestCode);
         if (requestCode != -1) {
@@ -241,6 +244,7 @@ public class MusicService extends Service/*MediaBrowserServiceCompat*/ {
             case PLAY: {
                 mediaSession.setActive(true);
                 Log.d("KEK", "startForeground, currentItem: " + currentItem);
+                //issue with long delay so startForeground() could not call?
                 startForeground(FOREGROUND_NOTIFICATION_ID,
                         notificationsDisplayer.getForegroundNotification(
                                 true,
