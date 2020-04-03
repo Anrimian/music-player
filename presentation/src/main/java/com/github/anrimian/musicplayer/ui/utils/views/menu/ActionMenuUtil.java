@@ -1,9 +1,11 @@
 package com.github.anrimian.musicplayer.ui.utils.views.menu;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.view.MenuItem;
 
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.MenuRes;
@@ -15,19 +17,27 @@ import androidx.appcompat.widget.PublicActionMenuPresenter;
 
 public class ActionMenuUtil {
 
-    public static void setupMenu(ActionMenuView actionMenuView,
+    public static void setupMenu(Activity activity,
+                                 ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  NavigationView.OnNavigationItemSelectedListener listener) {
-        setupMenu(actionMenuView, menuRes, listener, 0);
+        setupMenu(activity, actionMenuView, menuRes, listener, 0);
     }
 
     @SuppressLint("RestrictedApi")
-    public static void setupMenu(ActionMenuView actionMenuView,
+    public static void setupMenu(Activity activity,
+                                 ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  NavigationView.OnNavigationItemSelectedListener listener,
                                  int extraItemsCount) {
         Context context = actionMenuView.getContext();
-        PublicActionMenuPresenter actionMenuPresenter = new PublicActionMenuPresenter(context);
+        PublicActionMenuPresenter actionMenuPresenter = new PublicActionMenuPresenter(context,
+                (anchorView, menuItems) -> {
+                    PopupMenuWindow.showPopup(activity,
+                            anchorView,
+                            menuItems,
+                            listener::onNavigationItemSelected);
+                });
 //        actionMenuPresenter.setReserveOverflow(false);
 //        actionMenuPresenter.setWidthLimit(context.getResources().getDisplayMetrics().widthPixels, true);
 //        actionMenuPresenter.setItemLimit(Integer.MAX_VALUE);

@@ -1,8 +1,12 @@
 package com.github.anrimian.musicplayer.ui.common.menu;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Point;
+import android.os.Build;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.MeasureSpec;
@@ -18,9 +22,11 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class AppPopupMenu {
 
     //override overflow button click
-    //screen offset
-    //window doesn't fit into screen case
-    public static PopupWindow showPopupWindow(View anchorView, View popupView) {
+    //screen offset:
+    // top, - horizontal orientation - doesn't fit(bottom offset breaks)
+    // start,
+    // end
+    public static PopupWindow showPopupWindow(Activity activity, View anchorView, View popupView) {
         Context context = anchorView.getContext();
         Resources resources = context.getResources();
 
@@ -29,9 +35,6 @@ public class AppPopupMenu {
                 WRAP_CONTENT,
                 true);
         popupWindow.setElevation(6f);
-        popupView.setOnClickListener(v -> {
-            Toast.makeText(context, "Wow, popup action button", Toast.LENGTH_SHORT).show();
-        });
 
         popupView.measure(
                 makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
@@ -50,24 +53,45 @@ public class AppPopupMenu {
         int viewWidth = popupView.getMeasuredWidth();
         int viewHeight = popupView.getMeasuredHeight();
 
-        DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();
-        int screenHeight = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
-
         int yTouchOffset = resources.getDimensionPixelSize(R.dimen.popup_y_touch_offset);
         int screenMargin = resources.getDimensionPixelSize(R.dimen.popup_screen_margin);
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenHeight = displayMetrics.heightPixels;
+        int screenWidth = displayMetrics.widthPixels;
+
         int xOff = viewWidth * -1;
 
-        int viewNotFitHeight = (anchorY + viewHeight) - screenHeight;
+        //move window to top to fit it
+        int viewBottomY = anchorY + viewHeight;
+        int viewNotFitHeight = viewBottomY - screenHeight;
         if (viewNotFitHeight < 0) {
             viewNotFitHeight = 0;
         }
+        int yOffsetAdditional = Math.max(yTouchOffset, viewNotFitHeight);
+        int yOff = (anchorHeight + yOffsetAdditional) * -1;
 
-        int yOff = (anchorView.getMeasuredHeight() + yTouchOffset + viewNotFitHeight) * -1;
+        //add screen margin at bottom
+        int bottomOffset = (viewBottomY + yOff - screenHeight);
+        if (bottomOffset < 0) {
+            bottomOffset = 0;
+        }
+        if (bottomOffset < screenMargin) {
+            yOff -= screenMargin - bottomOffset;
+        }
 
-        //cut at bottom
-        int bottomYPos = anchorY + yOff + viewHeight;
+        //add screen margin at top
+        int viewTopY = anchorY + yOff;
+        if (viewTopY < 0) {
+            viewTopY = 0;
+        }
+        if (viewTopY < screenMargin) {
+            yOff += screenMargin - viewTopY;
+        }
+
+        //cut at bottom if necessary
+        int bottomYPos = viewBottomY + yOff;
         int deltaBottomPos = bottomYPos - screenHeight;
         if (deltaBottomPos > 0) {
             ViewGroup.LayoutParams params = popupView.getLayoutParams();

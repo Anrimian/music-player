@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.common.toolbar;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -60,6 +61,7 @@ public class AdvancedToolbar extends FrameLayout {
     private final FragmentStackListener stackChangeListener = new StackChangeListenerImpl();
 
     private Window window;
+    private Activity activity;
 
     private Toolbar toolbar;
     private View clTitleContainer;
@@ -113,8 +115,9 @@ public class AdvancedToolbar extends FrameLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    public void initializeViews(Window window) {
+    public void initializeViews(Window window, Activity activity) {
         this.window = window;
+        this.activity = activity;
         toolbar = findViewById(R.id.toolbar_internal);
         clTitleContainer = findViewById(R.id.title_container);
         tvTitle = findViewById(R.id.tv_title);
@@ -371,7 +374,8 @@ public class AdvancedToolbar extends FrameLayout {
 
     public void setupSelectionModeMenu(@MenuRes int menuResource,
                                        NavigationView.OnNavigationItemSelectedListener listener) {
-        setupMenu(acvSelection,
+        setupMenu(activity,
+                acvSelection,
                 menuResource,
                 listener,
                 1);

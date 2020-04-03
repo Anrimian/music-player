@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.AppCompatSeekBar;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
@@ -42,7 +41,6 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.menu.AppPopupMenu;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
@@ -97,7 +95,6 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 
 /**
@@ -238,7 +235,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground);
 
-        toolbar.initializeViews(requireActivity().getWindow());
+        toolbar.initializeViews(requireActivity().getWindow(), requireActivity());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
 
         navigation = FragmentNavigation.from(getChildFragmentManager());
@@ -279,7 +276,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawer.addDrawerListener(new SimpleDrawerListener(this::onDrawerClosed));
 
-        setupMenu(acvPlayQueueMenu, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
+        setupMenu(requireActivity(), acvPlayQueueMenu, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
         toolbar.setupWithNavigation(navigation,
                 drawerArrowDrawable,
@@ -720,7 +717,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onCompositionMenuClicked(View view) {
-        PopupMenuWindow.showPopup(view,
+        PopupMenuWindow.showPopup(requireActivity(),
+                view,
                 R.menu.composition_short_actions_menu,
                 item -> {
                     switch (item.getItemId()) {
@@ -804,7 +802,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onPlayItemMenuClicked(View view, PlayQueueItem playQueueItem) {
         Composition composition = playQueueItem.getComposition();
 
-        PopupMenuWindow.showPopup(view,
+        PopupMenuWindow.showPopup(requireActivity(),
+                view,
                 R.menu.play_queue_item_menu,
                 item -> {
                     switch (item.getItemId()) {
@@ -863,7 +862,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onRepeatModeButtonClicked(View view) {
-        PopupMenuWindow.showPopup(view,
+        PopupMenuWindow.showPopup(requireActivity(),
+                view,
                 R.menu.repeat_mode_menu,
                 item -> {
                     int repeatMode = RepeatMode.NONE;
