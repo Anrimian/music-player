@@ -178,14 +178,11 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .observeOn(scheduler)
                 .map(uri -> {
                     DataSpec dataSpec = new DataSpec(uri);
-                    ContentDataSource dataSource = new ContentDataSource(context);
-                    dataSource.open(dataSpec);
+                    final ContentDataSource dataSource = new ContentDataSource(context);
+                    dataSource.open(dataSpec);//random error here, prepare again?
 
                     DataSource.Factory factory = () -> dataSource;
-
-                    //ProgressiveMediaSource doesn't work stable enough
-                    //noinspection deprecation
-                    MediaSource mediaSource = new ExtractorMediaSource.Factory(factory)
+                    MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory)
                             .createMediaSource(uri);
                     player.prepare(mediaSource);
                     return mediaSource;
