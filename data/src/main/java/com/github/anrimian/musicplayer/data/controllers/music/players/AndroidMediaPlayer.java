@@ -97,9 +97,13 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         if (!isPlaying) {
             return;
         }
-        seekTo(0);
+        if (isSourcePrepared) {
+            seekTo(0);
+        }
         stopTracingTrackPosition();
-        mediaPlayer.stop();
+        if (isSourcePrepared) {
+            mediaPlayer.pause();
+        }
         isPlaying = false;
         playWhenReady = false;
     }

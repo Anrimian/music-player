@@ -140,21 +140,24 @@ public class MusicService extends Service {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
-
-        serviceDisposable.add(playInfoDisposable);
-
-        notificationsDisplayer.startForegroundNotification(this,
-                true,
-                currentItem,
-                mediaSession,
-                notificationSetting);
-
-        subscribeOnNotificationSettings();
-        subscribeOnPlayerChanges();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        //observe fix, if not, remove if() and return block back in onCreate()
+        if (serviceDisposable.size() == 0) {
+            serviceDisposable.add(playInfoDisposable);
+
+            notificationsDisplayer.startForegroundNotification(this,
+                    true,
+                    currentItem,
+                    mediaSession,
+                    notificationSetting);
+
+            subscribeOnNotificationSettings();
+            subscribeOnPlayerChanges();
+        }
+
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
@@ -220,6 +223,7 @@ public class MusicService extends Service {
         switch (playerState) {
             case PLAY: {
                 mediaSession.setActive(true);
+                //issue with long delay so startForeground() could not call?
                 notificationsDisplayer.startForegroundNotification(this,
                         true,
                         currentItem,
