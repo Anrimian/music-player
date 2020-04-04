@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.Loader;
 
 import java.util.concurrent.TimeUnit;
 
@@ -150,6 +151,11 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     private void sendErrorEvent(Throwable throwable) {
+        //ignore this error and observe how it works
+        if (throwable instanceof Loader.UnexpectedLoaderException) {
+            return;
+        }
+
         if (currentComposition != null) {
             playerEventSubject.onNext(new ErrorEvent(
                     playerErrorParser.getErrorType(throwable),
@@ -179,7 +185,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .map(uri -> {
                     DataSpec dataSpec = new DataSpec(uri);
                     final ContentDataSource dataSource = new ContentDataSource(context);
-                    dataSource.open(dataSpec);//random error here, prepare again?
+                    dataSource.open(dataSpec);
 
                     DataSource.Factory factory = () -> dataSource;
                     MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory)
