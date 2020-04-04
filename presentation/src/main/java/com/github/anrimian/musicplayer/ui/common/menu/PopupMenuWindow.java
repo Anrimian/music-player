@@ -60,7 +60,7 @@ public class PopupMenuWindow {
         });
         recyclerView.setAdapter(menuAdapter);
 
-        popupWindow.set(AppPopupMenu.showPopupWindow(activity, anchorView, popupView));
+        popupWindow.set(AppPopupMenu.showPopupWindow(activity, anchorView, popupView, false));
     }
 
     public static void showPopup(Activity activity,
@@ -86,6 +86,6 @@ public class PopupMenuWindow {
         });
         recyclerView.setAdapter(menuAdapter);
 
-        popupWindow.set(AppPopupMenu.showPopupWindow(activity, anchorView, popupView));
+        popupWindow.set(AppPopupMenu.showPopupWindow(activity, anchorView, popupView, true));
     }
 }
