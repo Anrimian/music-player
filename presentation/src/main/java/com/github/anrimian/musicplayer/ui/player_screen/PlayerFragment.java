@@ -93,6 +93,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
@@ -405,6 +406,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onStop();
         //battery saving
         presenter.onStop();
+
+        clearVectorAnimationInfo(ivPlayPause);
     }
 
     @Override

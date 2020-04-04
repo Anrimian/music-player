@@ -275,6 +275,10 @@ public class AndroidUtils {
         }
     }
 
+    public static void clearVectorAnimationInfo(ImageView imageView) {
+        imageView.setTag(null);
+    }
+
     public static void setAnimatedVectorDrawable(ImageView imageView, @DrawableRes int drawableRes) {
         setAnimatedVectorDrawable(imageView, drawableRes, true);
     }
