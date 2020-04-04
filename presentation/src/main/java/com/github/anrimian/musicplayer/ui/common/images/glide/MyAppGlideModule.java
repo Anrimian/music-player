@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Registry;
 import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
 import com.bumptech.glide.load.engine.cache.LruResourceCache;
 import com.bumptech.glide.module.AppGlideModule;
 import com.github.anrimian.musicplayer.di.Components;
@@ -23,7 +24,12 @@ public final class MyAppGlideModule extends AppGlideModule {
 
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
-        builder.setMemoryCache(new LruResourceCache(2 * 1024 * 1024));
+        int memoryCacheSizeBytes = 2 * 1024 * 1024;//2 MB
+        builder.setMemoryCache(new LruResourceCache(memoryCacheSizeBytes));
+
+        int diskCacheSizeBytes = 2 * 1024 * 1024; // 2 MB
+        String diskCacheDirectory = "image_cache";
+        builder.setDiskCache(new InternalCacheDiskCacheFactory(context, diskCacheDirectory, diskCacheSizeBytes));
     }
 
     @Override

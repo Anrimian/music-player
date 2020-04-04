@@ -45,7 +45,6 @@ public class CoverImageLoader {
     public void displayImage(@NonNull ImageView imageView, @NonNull Composition data) {
         Glide.with(imageView)
                 .load(new CompositionImage(data.getId()))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
@@ -57,7 +56,6 @@ public class CoverImageLoader {
                              @DrawableRes int errorPlaceholder) {
         Glide.with(context)
                 .load(new CompositionImage(data.getId()))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
@@ -69,7 +67,6 @@ public class CoverImageLoader {
                              @DrawableRes int errorPlaceholder) {
         Glide.with(imageView)
                 .load(album)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
@@ -88,7 +85,6 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(new CompositionImage(data.getId()))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
@@ -108,7 +104,6 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(new CompositionImage(data.getId()))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .timeout(TIMEOUT_MILLIS)
                 .into(simpleTarget(onCompleted));
     }
@@ -127,7 +122,6 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(new CompositionImage(compositionId))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
                 .into(widgetTarget);
