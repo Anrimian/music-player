@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
-import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
@@ -56,7 +55,6 @@ public class ViewUtils {
         }
     }
 
-    @Nullable
     public static BottomSheetBehavior findBottomSheetBehavior(Dialog dialog) {
         BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) dialog;
         return bottomSheetDialog.getBehavior();
