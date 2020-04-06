@@ -19,7 +19,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
@@ -31,6 +30,7 @@ import androidx.appcompat.widget.PopupMenu;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 
 import static android.view.View.VISIBLE;
@@ -55,8 +55,8 @@ public class ViewUtils {
     }
 
     public static BottomSheetBehavior findBottomSheetBehavior(Dialog dialog) {
-        FrameLayout bottomSheet = dialog.findViewById(R.id.design_bottom_sheet);
-        return BottomSheetBehavior.from(bottomSheet);
+        BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) dialog;
+        return bottomSheetDialog.getBehavior();
     }
 
     public static void onCheckChanged(CheckBox checkBox, Callback<Boolean> listener) {
@@ -143,8 +143,8 @@ public class ViewUtils {
     }
 
     public static Animator getBackgroundAnimatorAttr(View view,
-                                                 @AttrRes int from,
-                                                 @AttrRes int to) {
+                                                     @AttrRes int from,
+                                                     @AttrRes int to) {
         ValueAnimator animator = getAttrColorAnimator(view.getContext(), from, to);
         animator.addUpdateListener(animation ->
                 view.setBackgroundColor((Integer) animation.getAnimatedValue())
