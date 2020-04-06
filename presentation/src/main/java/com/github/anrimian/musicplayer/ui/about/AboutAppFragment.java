@@ -38,8 +38,8 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.sendEmail;
 
 public class AboutAppFragment extends Fragment implements FragmentLayerListener {
 
-    @BindView(R.id.fl_container)
-    View flContainer;
+    @BindView(R.id.container_view)
+    View containerView;
 
     @BindView(R.id.log_actions_container)
     View logActionsContainer;
@@ -89,7 +89,7 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
         btnView.setOnClickListener(v -> startViewLogScreen());
         btnSend.setOnClickListener(v -> startSendLogScreen());
 
-        SlidrPanel.simpleSwipeBack(flContainer, this, toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(containerView, this, toolbar::onStackFragmentSlided);
     }
 
     @Override
