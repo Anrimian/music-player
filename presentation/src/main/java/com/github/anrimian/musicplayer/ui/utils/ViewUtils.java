@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
@@ -37,6 +38,7 @@ import static android.view.View.VISIBLE;
 import static androidx.core.view.ViewCompat.isLaidOut;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
+@SuppressWarnings("WeakerAccess")
 public class ViewUtils {
 
     public static void onLongClick(View view, Runnable onClick) {
@@ -54,8 +56,12 @@ public class ViewUtils {
         }
     }
 
+    @Nullable
     public static BottomSheetBehavior findBottomSheetBehavior(Dialog dialog) {
         FrameLayout bottomSheet = dialog.findViewById(R.id.design_bottom_sheet);
+        if (bottomSheet == null) {
+            return null;
+        }
         return BottomSheetBehavior.from(bottomSheet);
     }
 

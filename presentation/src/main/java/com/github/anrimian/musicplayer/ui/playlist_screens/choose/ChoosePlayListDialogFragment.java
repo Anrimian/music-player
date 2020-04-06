@@ -138,9 +138,6 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         int minHeight = (int) (height * heightPercent);
         view.setMinimumHeight(minHeight);
 
-        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
-        bottomSheetBehavior.setPeekHeight(minHeight);
-
         ButterKnife.bind(this, view);
 
         progressViewWrapper = new ProgressViewWrapper(view);
@@ -158,11 +155,15 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
         attachDynamicShadow(recyclerView, titleShadow);
 
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
-            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismissAllowingStateLoss();
-            }
-        }, presenter::onBottomSheetSlided));
+        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
+        if (bottomSheetBehavior != null) {
+            bottomSheetBehavior.setPeekHeight(minHeight);
+            bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    dismissAllowingStateLoss();
+                }
+            }, presenter::onBottomSheetSlided));
+        }
 
         slideDelegate = buildSlideDelegate();
 

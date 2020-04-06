@@ -119,12 +119,14 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
 
         slideDelegate = buildSlideDelegate();
         BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
-        bottomSheetBehavior.setPeekHeight(minHeight);
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
-            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismissAllowingStateLoss();
-            }
-        }, this::showBottomSheetSlided));
+        if (bottomSheetBehavior != null) {
+            bottomSheetBehavior.setPeekHeight(minHeight);
+            bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    dismissAllowingStateLoss();
+                }
+            }, this::showBottomSheetSlided));
+        }
 
         ButterKnife.bind(this, view);
 
