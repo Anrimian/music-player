@@ -87,7 +87,7 @@ public class MenuDialogFragment extends DialogFragment {
         if (complexCompleteListener != null) {
             complexCompleteListener.call(menuItem, getArguments().getBundle(EXTRA_DATA_ARG));
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     private Menu getMenu() {

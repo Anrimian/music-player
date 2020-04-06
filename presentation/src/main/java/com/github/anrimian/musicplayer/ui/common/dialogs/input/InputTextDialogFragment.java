@@ -161,7 +161,7 @@ public class InputTextDialogFragment extends DialogFragment {
                 complexCompleteListener.call(text, getArguments().getBundle(EXTRA_DATA_ARG));
             }
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     private boolean isEnterButtonEnabled(String text) {

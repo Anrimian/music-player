@@ -293,7 +293,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         if (complexCompleteListener != null) {
             complexCompleteListener.call(playList, getArguments().getBundle(EXTRA_DATA_ARG));
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     private void onCreatePlayListButtonClicked() {
