@@ -201,7 +201,7 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
                     menuItem.getItemId(),
                     getArguments().getBundle(EXTRA_DATA_ARG));
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     private SlideDelegate buildSlideDelegate() {

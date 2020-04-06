@@ -115,7 +115,7 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
         if (!getOrder().equals(order) && onCompleteListener != null) {
             onCompleteListener.onComplete(order);
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     public void setOnCompleteListener(@Nullable OnCompleteListener<Order> onCompleteListener) {

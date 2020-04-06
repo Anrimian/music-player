@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
@@ -152,8 +151,10 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private void sendErrorEvent(Throwable throwable) {
         //ignore this error and observe how it works
-        if (throwable instanceof Loader.UnexpectedLoaderException) {
-            return;
+        if (throwable instanceof NullPointerException) {
+            if (throwable.getCause() instanceof Loader.UnexpectedLoaderException) {
+                return;
+            }
         }
 
         if (currentComposition != null) {
