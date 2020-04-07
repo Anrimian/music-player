@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,6 +48,9 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
     @BindView(R.id.log_divider)
     View logDivider;
 
+    @BindView(R.id.tv_about)
+    TextView tvAbout;
+
     @BindView(R.id.tv_log_info)
     TextView tvLogInfo;
 
@@ -85,6 +89,8 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
             tvLogInfo.setText(getString(R.string.log_info_text, fileLog.getFileSize() / 1024));
         }
 
+        tvAbout.setMovementMethod(LinkMovementMethod.getInstance());
+
         btnDelete.setOnClickListener(v -> deleteLogFile());
         btnView.setOnClickListener(v -> startViewLogScreen());
         btnSend.setOnClickListener(v -> startSendLogScreen());
@@ -100,24 +106,6 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
                 BuildConfig.VERSION_NAME,
                 BuildConfig.VERSION_CODE));
         toolbar.setTitleClickListener(null);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.about_app_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_email: {
-                sendEmail(requireContext(), getString(R.string.feedback_email));
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
     }
 
     private void deleteLogFile() {
