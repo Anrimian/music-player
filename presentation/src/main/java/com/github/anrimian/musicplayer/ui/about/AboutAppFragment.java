@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -89,6 +90,10 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
             tvLogInfo.setText(getString(R.string.log_info_text, fileLog.getFileSize() / 1024));
         }
 
+        String aboutText = getString(R.string.about_app_text,
+                linkify("mailto:", R.string.about_app_text_write, R.string.feedback_email),
+                linkify("", R.string.about_app_text_here, R.string.translations_repository));
+        tvAbout.setText(Html.fromHtml(aboutText));//format and /n missed
         tvAbout.setMovementMethod(LinkMovementMethod.getInstance());
 
         btnDelete.setOnClickListener(v -> deleteLogFile());
@@ -160,5 +165,9 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
                     Toast.LENGTH_LONG).show();
             return null;
         }
+    }
+
+    private String linkify(String schema, int textResId, int linkResId) {
+        return "<a href=\"" + schema + getString(linkResId) + "\">" + getString(textResId) + "</a>";
     }
 }

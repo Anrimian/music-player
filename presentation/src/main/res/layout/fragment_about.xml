@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/container_view"
@@ -79,7 +80,7 @@
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
                 android:layout_marginTop="@dimen/content_vertical_margin"
                 android:layout_marginBottom="@dimen/content_vertical_margin"
-                android:text="@string/about_app_text"/>
+                tools:text="@string/about_app_text"/>
 
             <!--<View-->
             <!--style="@style/Divider.Horizontal"-->

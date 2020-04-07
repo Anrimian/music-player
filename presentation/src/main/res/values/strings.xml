@@ -1,17 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE resources [
-    <!ENTITY feedback_email "smusicplayer.feedback@gmail.com">
-    <!ENTITY translations_repository "https://stackoverflow.com">
-    ]>
-
 <resources>
-
 
     <string name="file_provider_authorities" translatable="false">
         com.github.anrimian.simplemusicplayer.share_file_provider
     </string>
-    <string name="feedback_email" translatable="false">&feedback_email;</string>
+    <string name="feedback_email" translatable="false">smusicplayer.feedback@gmail.com</string>
     <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
+    <string name="translations_repository" translatable="false">https://stackoverflow.com</string>
 
     <string name="app_name" translatable="false">Music Player</string>
     <string name="open_drawer">Open drawer</string>
@@ -126,8 +120,8 @@
     <string name="version_template">Version %1$s(Build %2$d)</string>
     <string name="about_app_text"><big><b>What is this app?</b></big>
         \nThis is music player that I wrote for myself, in accordance with my vision of how a music player should look.
-        \nIf you found error, <a href="mailto:&feedback_email;">write</a> me about it.
-        \nIf you are missing some features, <a href="mailto:&feedback_email;">write</a> me about it, but I can\'t promise that I necessarily implement it. Usually I do after a while.
+        \nIf you found error, %1$s me about it.
+        \nIf you are missing some features, %1$s me about it, but I can\'t promise that I necessarily implement it. Usually I do after a while.
         \n
         \n<big><b>Is this app completely free?</b></big>
         \nYes, no any purchases or ads. Perhaps if this app become highly popular I could implement some paid unimportant features, but I definitely won\'t add ads or lock existing functionality.
@@ -136,8 +130,10 @@
         \nNo analytics or something else. This app even hasn\'t internet connection permission. (At least until implementation features that requires internet connection.)
         \n
         \n<big><b>Translations</b></big>
-        \nIf you found error in app texts or want to submit translation to your language, you can submit changes to app text repository <a href="&translations_repository;">here</a>.
+        \nIf you found error in app texts or want to submit translation to your language, you can submit changes to app text repository %2$s.
     </string>
+    <string name="about_app_text_write">write</string>
+    <string name="about_app_text_here">here</string>
     <string name="send_email">Send email</string>
     <string name="theme">Theme</string>
     <string name="white_purple_theme">White(Purple)</string>
