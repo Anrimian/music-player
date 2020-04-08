@@ -8,9 +8,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -36,7 +33,6 @@ import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.sendEmail;
 
 public class AboutAppFragment extends Fragment implements FragmentLayerListener {
 
@@ -93,7 +89,7 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
         String aboutText = getString(R.string.about_app_text,
                 linkify("mailto:", R.string.about_app_text_write, R.string.feedback_email),
                 linkify("", R.string.about_app_text_here, R.string.translations_repository));
-        tvAbout.setText(Html.fromHtml(aboutText));//format and /n missed
+        tvAbout.setText(Html.fromHtml(aboutText));
         tvAbout.setMovementMethod(LinkMovementMethod.getInstance());
 
         btnDelete.setOnClickListener(v -> deleteLogFile());
