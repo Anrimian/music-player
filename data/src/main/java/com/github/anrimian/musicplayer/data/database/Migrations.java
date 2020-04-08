@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.database;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -67,6 +68,7 @@ class Migrations {
         }
     };
 
+    @SuppressLint("RestrictedApi")
     private static Long getLong(Cursor c, String columnName) {
         int columnIndex = CursorUtil.getColumnIndex(c, columnName);
         if (columnIndex < 0 || c.isNull(columnIndex)) {
@@ -267,6 +269,19 @@ class Migrations {
 
                 //play queue
                 database.execSQL("CREATE TABLE IF NOT EXISTS `play_queue_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `audioId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `shuffledPosition` INTEGER NOT NULL, FOREIGN KEY(`audioId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+                Cursor c = database.query("SELECT id, (SELECT id FROM compositions WHERE storageId = audioId), position, shuffledPosition FROM play_queue");
+                while (c.moveToNext()) {
+                    ContentValues cv = new ContentValues();
+                    cv.put("id", getLong(c, "id"));
+                    Long audioId = getLong(c, "audioId");
+                    if (audioId == null || audioId < 1) {
+                        continue;
+                    }
+                    cv.put("audioId", audioId);
+                    cv.put("position", getLong(c, "position"));
+                    cv.put("shuffledPosition", getLong(c, "shuffledPosition"));
+                    database.insert("play_queue_new", SQLiteDatabase.CONFLICT_REPLACE, cv);
+                }
                 database.execSQL("INSERT INTO `play_queue_new` (id, audioId, position, shuffledPosition) " +
                         "SELECT id, (SELECT id FROM compositions WHERE storageId = audioId), position, shuffledPosition " +
                         "FROM play_queue");//select and replace old audio id with new?
