@@ -20,45 +20,54 @@
             android:layout_marginTop="@dimen/content_vertical_margin"
             android:text="@string/log_info_text"/>
 
-        <LinearLayout
-            android:id="@+id/log_actions_container"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:overScrollMode="ifContentScrolls"
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_delete"
-                style="@style/ButtonBrightStyle"
+            <LinearLayout
+                android:id="@+id/log_actions_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/delete_file"
-                android:layout_marginStart="@dimen/content_horizontal_margin"
-                android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:layout_marginTop="@dimen/content_vertical_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+                android:orientation="horizontal"
+                android:layout_gravity="end"
+                android:gravity="end">
 
-            <Button
-                android:id="@+id/btn_view"
-                style="@style/ButtonBrightStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/view_file"
-                android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:layout_marginTop="@dimen/content_vertical_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+                <Button
+                    android:id="@+id/btn_delete"
+                    style="@style/ButtonBrightStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/delete_file"
+                    android:layout_marginStart="@dimen/content_horizontal_margin"
+                    android:layout_marginEnd="@dimen/content_horizontal_margin"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginBottom="@dimen/content_vertical_margin"/>
 
-            <Button
-                android:id="@+id/btn_send"
-                style="@style/ButtonBrightStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/send_file"
-                android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:layout_marginTop="@dimen/content_vertical_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+                <Button
+                    android:id="@+id/btn_view"
+                    style="@style/ButtonBrightStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/view_file"
+                    android:layout_marginEnd="@dimen/content_horizontal_margin"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginBottom="@dimen/content_vertical_margin"/>
 
-        </LinearLayout>
+                <Button
+                    android:id="@+id/btn_send"
+                    style="@style/ButtonBrightStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/send_file"
+                    android:layout_marginEnd="@dimen/content_horizontal_margin"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginBottom="@dimen/content_vertical_margin"/>
+
+            </LinearLayout>
+
+        </ScrollView>
 
         <View
             android:id="@+id/log_divider"
