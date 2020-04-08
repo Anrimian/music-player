@@ -127,6 +127,5 @@
     <dimen name="scrollbar_width">4dp</dimen>
 
     <!--popup-->
-    <dimen name="popup_y_touch_offset">48dp</dimen>
     <dimen name="popup_screen_margin">16dp</dimen>
 </resources>

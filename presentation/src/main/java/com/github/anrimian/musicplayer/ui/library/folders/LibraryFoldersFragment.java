@@ -14,7 +14,6 @@ import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
@@ -34,7 +34,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -668,43 +668,42 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     private void onFolderMenuClicked(View view, FolderFileSource folder) {
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.folder_item_menu);
-
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_play_next: {
-                    presenter.onPlayNextFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_add_to_queue: {
-                    presenter.onAddToQueueFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddFolderToPlayListButtonClicked(folder);
-                    return true;
-                }
-                case R.id.menu_rename_folder: {
-                    presenter.onRenameFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_share: {
-                    presenter.onShareFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_hide: {
-                    presenter.onExcludeFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteFolderButtonClicked(folder);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
+        PopupMenuWindow.showPopup(requireActivity(),
+                view,
+                R.menu.folder_item_menu,
+                item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_play_next: {
+                            presenter.onPlayNextFolderClicked(folder);
+                            return true;
+                        }
+                        case R.id.menu_add_to_queue: {
+                            presenter.onAddToQueueFolderClicked(folder);
+                            return true;
+                        }
+                        case R.id.menu_add_to_playlist: {
+                            presenter.onAddFolderToPlayListButtonClicked(folder);
+                            return true;
+                        }
+                        case R.id.menu_rename_folder: {
+                            presenter.onRenameFolderClicked(folder);
+                            return true;
+                        }
+                        case R.id.menu_share: {
+                            presenter.onShareFolderClicked(folder);
+                            return true;
+                        }
+                        case R.id.menu_hide: {
+                            presenter.onExcludeFolderClicked(folder);
+                            return true;
+                        }
+                        case R.id.menu_delete: {
+                            presenter.onDeleteFolderButtonClicked(folder);
+                            return true;
+                        }
+                    }
+                    return false;
+                });
     }
 
     @SuppressWarnings("ConstantConditions")
