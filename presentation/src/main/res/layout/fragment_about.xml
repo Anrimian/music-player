@@ -24,11 +24,18 @@
                 android:layout_marginTop="@dimen/content_vertical_margin"
                 android:text="@string/log_info_text"/>
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="ifContentScrolls"
+            android:orientation="horizontal">
+
             <LinearLayout
                 android:id="@+id/log_actions_container"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_gravity="end"
                 android:gravity="end">
 
                 <Button
@@ -64,11 +71,13 @@
 
             </LinearLayout>
 
-            <View
-                android:id="@+id/log_divider"
-                style="@style/Divider.Horizontal"
-                android:layout_marginStart="@dimen/content_horizontal_margin"
-                android:layout_marginEnd="@dimen/content_horizontal_margin"/>
+        </ScrollView>
+
+        <View
+            android:id="@+id/log_divider"
+            style="@style/Divider.Horizontal"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"/>
 
             <TextView
                 android:id="@+id/tv_about"

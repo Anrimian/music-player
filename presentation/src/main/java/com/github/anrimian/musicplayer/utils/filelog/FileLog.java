@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.util.Date;
 
 import static java.io.File.separator;
 
@@ -107,6 +109,10 @@ public class FileLog {
 
         sb.append("Device: ");
         sb.append(Build.MODEL);
+        sb.append("\n");
+
+        sb.append("Log time: ");
+        sb.append(DateFormat.getDateTimeInstance().format(new Date()));
         sb.append("\n");
     }
 
