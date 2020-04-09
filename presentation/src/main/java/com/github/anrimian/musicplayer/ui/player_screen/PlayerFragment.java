@@ -505,7 +505,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             tvCurrentCompositionAuthor.setText(R.string.unknown_author);
             ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             String noCompositionMessage = getString(R.string.no_current_composition);
-            topBottomSheetPanel.setContentDescription(noCompositionMessage);
+            topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, noCompositionMessage));
             rvPlayList.setContentDescription(noCompositionMessage);
             sbTrackState.setContentDescription(noCompositionMessage);
         } else {
