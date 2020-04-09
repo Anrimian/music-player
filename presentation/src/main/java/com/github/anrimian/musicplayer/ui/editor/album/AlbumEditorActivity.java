@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -14,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
@@ -63,6 +65,12 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     @BindView(R.id.change_name_clickable_area)
     View changeNameClickableArea;
 
+    @BindView(R.id.iv_name_edit)
+    ImageView ivNameEdit;
+
+    @BindView(R.id.iv_author_edit)
+    ImageView ivAuthorEdit;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -94,6 +102,9 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(R.string.edit_album_tags);
         }
+
+        CompatUtils.setMainButtonStyle(ivNameEdit);
+        CompatUtils.setMainButtonStyle(ivAuthorEdit);
 
         changeAuthorClickableArea.setOnClickListener(v -> presenter.onChangeAuthorClicked());
         changeNameClickableArea.setOnClickListener(v -> presenter.onChangeNameClicked());

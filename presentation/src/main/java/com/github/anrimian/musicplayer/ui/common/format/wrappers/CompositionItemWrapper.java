@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class CompositionItemWrapper {
 
     @Nullable
     @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
+    ImageView btnActionsMenu;
 
     private Composition composition;
 
@@ -75,6 +76,10 @@ public class CompositionItemWrapper {
             ivMusicIcon.setOnClickListener(v -> onIconClickListener.call(composition));
         }
         clickableItem.setOnClickListener(v -> onClickListener.call(composition));
+
+        if (btnActionsMenu != null) {
+            CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+        }
     }
 
     public void bind(Composition composition, boolean showCovers) {
