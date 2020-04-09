@@ -25,7 +25,7 @@ public class AppPopupMenu {
     public static PopupWindow showPopupWindow(Activity activity,
                                               View anchorView,
                                               View popupView,
-                                              boolean coverAnchor) {
+                                              int gravity) {
         Context context = anchorView.getContext();
         Resources resources = context.getResources();
 
@@ -66,8 +66,20 @@ public class AppPopupMenu {
         int screenHeight = displayMetrics.heightPixels;
         int screenWidth = displayMetrics.widthPixels;
 
-        int showX = anchorX - viewWidth + (coverAnchor? anchorWidth: 0) - screenMargin;
+        int showX = anchorX - viewWidth - screenMargin;
         int showY = anchorY - screenMargin;
+
+        switch (gravity) {
+            case Gravity.CENTER: {
+                showX += anchorWidth;
+                break;
+            }
+            case Gravity.BOTTOM: {
+                showX += viewWidth;
+                showY += anchorHeight;
+                break;
+            }
+        }
 
         popupWindow.showAtLocation(anchorView, Gravity.START | Gravity.TOP, showX, showY);
 

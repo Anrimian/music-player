@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.common.menu;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,9 +38,26 @@ public class PopupMenuWindow {
         showPopup(activity, anchorView, menuResId, (Callback<MenuItem>) listener::onMenuItemClick);
     }
 
+    @Deprecated
     public static void showPopup(Activity activity,
                                  View anchorView,
                                  @MenuRes int menuResId,
+                                 int gravity,
+                                 PopupMenu.OnMenuItemClickListener listener) {
+        showPopup(activity, anchorView, menuResId, gravity, (Callback<MenuItem>) listener::onMenuItemClick);
+    }
+
+    public static void showPopup(Activity activity,
+                                 View anchorView,
+                                 @MenuRes int menuResId,
+                                 Callback<MenuItem> listener) {
+        showPopup(activity, anchorView, menuResId, Gravity.START, listener);
+    }
+
+    public static void showPopup(Activity activity,
+                                 View anchorView,
+                                 @MenuRes int menuResId,
+                                 int gravity,
                                  Callback<MenuItem> listener) {
         Context context = anchorView.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -60,7 +78,7 @@ public class PopupMenuWindow {
         });
         recyclerView.setAdapter(menuAdapter);
 
-        popupWindow.set(AppPopupMenu.showPopupWindow(activity, anchorView, popupView, false));
+        popupWindow.set(AppPopupMenu.showPopupWindow(activity, anchorView, popupView, gravity));
     }
 
     public static void showPopup(Activity activity,
@@ -86,6 +104,6 @@ public class PopupMenuWindow {
         });
         recyclerView.setAdapter(menuAdapter);
 
-        popupWindow.set(AppPopupMenu.showPopupWindow(activity, anchorView, popupView, true));
+        popupWindow.set(AppPopupMenu.showPopupWindow(activity, anchorView, popupView,  Gravity.CENTER));
     }
 }
