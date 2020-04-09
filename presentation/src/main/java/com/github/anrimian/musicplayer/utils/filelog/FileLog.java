@@ -15,7 +15,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static java.io.File.separator;
 
@@ -112,7 +114,7 @@ public class FileLog {
         sb.append("\n");
 
         sb.append("Log time: ");
-        sb.append(DateFormat.getDateTimeInstance().format(new Date()));
+        sb.append(new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()).format(new Date()));
         sb.append("\n");
     }
 

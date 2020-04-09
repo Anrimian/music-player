@@ -80,8 +80,6 @@
 
     <style name="WindowAnimationTransition" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in_right</item>
-        <item name="android:activityOpenExitAnimation">@anim/anim_slide_out_right</item>
-        <item name="android:activityCloseEnterAnimation">@anim/anim_slide_in_right</item>
         <item name="android:activityCloseExitAnimation">@anim/anim_slide_out_right</item>
     </style>
 
