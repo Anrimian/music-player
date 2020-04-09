@@ -79,12 +79,6 @@ public class GenresListFragment extends LibraryFragment implements
         return Components.genresComponent().genresListPresenter();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -137,32 +131,7 @@ public class GenresListFragment extends LibraryFragment implements
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.genres);
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.library_genres_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_order: {
-                presenter.onOrderMenuItemClicked();
-                return true;
-            }
-            case R.id.menu_search: {
-                toolbar.setSearchModeEnabled(true);
-                return true;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.library_genres_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -265,5 +234,24 @@ public class GenresListFragment extends LibraryFragment implements
     private void goToGenreScreen(Genre genre) {
         FragmentNavigation.from(requireFragmentManager())
                 .addNewFragment(GenreItemsFragment.newInstance(genre.getId()));
+    }
+
+    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                return true;
+            }
+            case R.id.menu_search: {
+                toolbar.setSearchModeEnabled(true);
+                return true;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 }

@@ -82,6 +82,9 @@ public class LibraryFoldersRootFragment extends LibraryFragment
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.folders);
+
+        FragmentNavigation folderNavigation = FragmentNavigation.from(getChildFragmentManager());
+        folderNavigation.dispatchMovedToTop();
     }
 
     @Override
@@ -100,7 +103,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
-        navigationWrapper.call(navigation -> navigation.setVisible(menuVisible));
+        navigationWrapper.call(navigation -> navigation.setMenuVisible(menuVisible));
     }
 
     @Override

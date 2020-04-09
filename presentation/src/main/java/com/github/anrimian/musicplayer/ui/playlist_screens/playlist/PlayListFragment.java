@@ -153,29 +153,10 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void onFragmentMovedOnTop() {
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setupOptionsMenu(R.menu.play_list_menu, this::onOptionsItemClicked);
+
         presenter.onFragmentMovedToTop();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.play_list_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_change_play_list_name: {
-                presenter.onChangePlayListNameButtonClicked();
-                return true;
-            }
-            case R.id.menu_delete_play_list: {
-                presenter.onDeletePlayListButtonClicked();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -213,7 +194,6 @@ public class PlayListFragment extends MvpAppCompatFragment
                 R.plurals.compositions_count,
                 playList.getCompositionsCount(),
                 playList.getCompositionsCount()));
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -390,5 +370,20 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     private long getPlayListId() {
         return Objects.requireNonNull(getArguments()).getLong(PLAY_LIST_ID_ARG);
+    }
+
+    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_change_play_list_name: {
+                presenter.onChangePlayListNameButtonClicked();
+                return true;
+            }
+            case R.id.menu_delete_play_list: {
+                presenter.onDeletePlayListButtonClicked();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 }

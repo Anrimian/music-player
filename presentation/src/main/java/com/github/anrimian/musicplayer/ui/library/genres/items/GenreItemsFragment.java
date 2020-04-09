@@ -103,12 +103,6 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         return presenter;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -173,23 +167,7 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         toolbar.setTitleClickListener(null);
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.genre_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_rename: {
-                presenter.onRenameGenreClicked();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.genre_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -389,5 +367,15 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     private long getGenreId() {
         return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
+    }
+
+    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_rename: {
+                presenter.onRenameGenreClicked();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 }

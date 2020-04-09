@@ -100,6 +100,7 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
                 BuildConfig.VERSION_NAME,
                 BuildConfig.VERSION_CODE));
         toolbar.setTitleClickListener(null);
+        toolbar.clearOptionsMenu();
     }
 
     @Override

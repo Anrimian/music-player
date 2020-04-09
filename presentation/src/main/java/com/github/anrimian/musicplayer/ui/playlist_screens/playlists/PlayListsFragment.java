@@ -59,12 +59,6 @@ public class PlayListsFragment extends MvpAppCompatFragment
         return Components.getAppComponent().playListsPresenter();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -106,6 +100,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
         toolbar.setTitle(R.string.play_lists);
         toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
+        toolbar.clearOptionsMenu();
 
         presenter.onFragmentMovedToTop();
     }

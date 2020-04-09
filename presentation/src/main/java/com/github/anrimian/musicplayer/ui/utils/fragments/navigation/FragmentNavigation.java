@@ -132,7 +132,7 @@ public class FragmentNavigation {
                         }
 
                     })
-                    .commit();
+                    .commitAllowingStateLoss();
         });
     }
 
@@ -367,7 +367,7 @@ public class FragmentNavigation {
         return isVisible;
     }
 
-    public void setVisible(boolean visible) {
+    public void setMenuVisible(boolean visible) {
         isVisible = visible;
         Fragment fragment = getFragmentOnTop();
         if (fragment != null) {
@@ -375,8 +375,15 @@ public class FragmentNavigation {
         }
     }
 
+    public void dispatchMovedToTop() {
+        Fragment fragment = getFragmentOnTop();
+        if (fragment != null) {
+            notifyFragmentMovedToTop(fragment);
+        }
+    }
+
     private void notifyFragmentMovedToTop(Fragment fragment) {
-        if (fragment instanceof FragmentLayerListener) {
+        if (isVisible && fragment instanceof FragmentLayerListener) {
             ((FragmentLayerListener) fragment).onFragmentMovedOnTop();
         }
     }

@@ -12,7 +12,6 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,7 +36,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayList
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
-import com.github.anrimian.musicplayer.ui.utils.views.menu.MenuItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
@@ -47,7 +45,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import me.zhanghai.android.fastscroll.FastScrollerBuilder;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
@@ -89,12 +86,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     protected BaseLibraryCompositionsPresenter getBasePresenter() {
         return presenter;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -159,38 +150,13 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
+        toolbar.setupOptionsMenu(R.menu.library_compositions_menu, this::onOptionsItemClicked);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         presenter.onStop();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.library_compositions_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_order: {
-                presenter.onOrderMenuItemClicked();
-                return true;
-            }
-            case R.id.menu_search: {
-                toolbar.setSearchModeEnabled(true);
-                return true;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -358,5 +324,24 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     public void onCompositionsAddedToQueue(List<Composition> compositions) {
         String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
         MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                return true;
+            }
+            case R.id.menu_search: {
+                toolbar.setSearchModeEnabled(true);
+                return true;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 }

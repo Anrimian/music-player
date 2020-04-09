@@ -144,12 +144,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         return Components.getLibraryFolderComponent(getFolderId()).storageLibraryPresenter();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -278,38 +272,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         AdvancedToolbar toolbar = act.findViewById(R.id.toolbar);
         toolbar.setupSelectionModeMenu(R.menu.library_folders_selection_menu,
                 this::onActionModeItemClicked);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.library_files_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_order: {
-                presenter.onOrderMenuItemClicked();
-                return true;
-            }
-            case R.id.menu_excluded_folders: {
-                //noinspection ConstantConditions
-                FragmentNavigation.from(getParentFragment().requireFragmentManager())
-                        .addNewFragment(new ExcludedFoldersFragment());
-                return true;
-            }
-            case R.id.menu_search: {
-                presenter.onSearchButtonClicked();
-                return true;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.library_files_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -711,6 +674,31 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private Long getFolderId() {
         long value = getArguments().getLong(ID_ARG);
         return value == 0? null: value;
+    }
+
+    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                return true;
+            }
+            case R.id.menu_excluded_folders: {
+                //noinspection ConstantConditions
+                FragmentNavigation.from(getParentFragment().requireFragmentManager())
+                        .addNewFragment(new ExcludedFoldersFragment());
+                return true;
+            }
+            case R.id.menu_search: {
+                presenter.onSearchButtonClicked();
+                return true;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 
 }

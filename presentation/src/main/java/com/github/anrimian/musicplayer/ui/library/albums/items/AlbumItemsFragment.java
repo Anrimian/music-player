@@ -98,12 +98,6 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         return presenter;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -159,23 +153,7 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         toolbar.setTitleClickListener(null);
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.album_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_edit: {
-                presenter.onEditAlbumClicked();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.album_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -354,5 +332,15 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     private long getAlbumId() {
         return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
+    }
+
+    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_edit: {
+                presenter.onEditAlbumClicked();
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 }
