@@ -28,7 +28,6 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class LibraryFoldersRootFragment extends LibraryFragment
@@ -84,7 +83,9 @@ public class LibraryFoldersRootFragment extends LibraryFragment
         toolbar.setSubtitle(R.string.folders);
 
         FragmentNavigation folderNavigation = FragmentNavigation.from(getChildFragmentManager());
-        folderNavigation.dispatchMovedToTop();
+        if (folderNavigation.isInitialized()) {
+            folderNavigation.dispatchMovedToTop();
+        }
     }
 
     @Override
