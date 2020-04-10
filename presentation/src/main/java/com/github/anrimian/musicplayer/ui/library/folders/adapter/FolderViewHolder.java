@@ -1,14 +1,15 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
 import android.graphics.Color;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
@@ -43,7 +44,7 @@ class FolderViewHolder extends FileViewHolder {
     TextView tvCompositionsCount;
 
     @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
+    ImageView btnActionsMenu;
 
     private FolderFileSource folder;
     private String path;
@@ -71,6 +72,7 @@ class FolderViewHolder extends FileViewHolder {
             });
         }
         btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));
+        CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
     }
 
     @Override

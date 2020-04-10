@@ -37,6 +37,7 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
@@ -320,6 +321,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart);
         seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
 
+        CompatUtils.setMainButtonStyle(ivPlayPause);
+        CompatUtils.setMainButtonStyle(ivSkipToNext);
+        CompatUtils.setMainButtonStyle(ivSkipToPrevious);
+        CompatUtils.setMainButtonStyle(btnRandomPlay);
+        CompatUtils.setMainButtonStyle(btnRepeatMode);
+        CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+
         ChoosePlayListDialogFragment fragment = (ChoosePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (fragment != null) {
@@ -515,7 +523,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             tvCurrentCompositionAuthor.setText(R.string.unknown_author);
             ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             String noCompositionMessage = getString(R.string.no_current_composition);
-            topBottomSheetPanel.setContentDescription(noCompositionMessage);
+            topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, noCompositionMessage));
             rvPlayList.setContentDescription(noCompositionMessage);
             sbTrackState.setContentDescription(noCompositionMessage);
         } else {

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.settings.display;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,8 @@ public class DisplaySettingsFragment extends MvpAppCompatFragment implements Dis
         toolbar.setTitleClickListener(null);
 
         SlidrPanel.simpleSwipeBack(nsvContainer, this, toolbar::onStackFragmentSlided);
+
+        cbColoredNotification.setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O? View.VISIBLE: View.GONE);
 
         onCheckChanged(cbCovers, presenter::onCoversChecked);
         onCheckChanged(cbCoversInNotification, presenter::onCoversInNotificationChecked);

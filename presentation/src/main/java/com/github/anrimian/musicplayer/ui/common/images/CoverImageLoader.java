@@ -2,7 +2,9 @@ package com.github.anrimian.musicplayer.ui.common.images;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 
@@ -12,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.ImageViewTarget;
@@ -92,11 +93,17 @@ public class CoverImageLoader {
     }
 
     public Bitmap getDefaultNotificationBitmap() {
-        if (defaultNotificationBitmap == null) {
-            defaultNotificationBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.RGB_565);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (defaultNotificationBitmap == null) {
+                defaultNotificationBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.RGB_565);
+            }
+            int color = themeController.getPrimaryThemeColor();
+            defaultNotificationBitmap.eraseColor(color);
+        } else {
+            if (defaultNotificationBitmap == null) {
+                defaultNotificationBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_music_box);
+            }
         }
-        int color = themeController.getPrimaryThemeColor();
-        defaultNotificationBitmap.eraseColor(color);
         return defaultNotificationBitmap;
     }
 
