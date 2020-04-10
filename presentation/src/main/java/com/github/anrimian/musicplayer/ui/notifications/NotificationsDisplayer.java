@@ -166,7 +166,6 @@ public class NotificationsDisplayer {
 
         NotificationCompat.Builder builder = notificationBuilder.buildMusicNotification(context)
                 .setColorized(coloredNotification)
-                .setColor(getColor(context, R.color.default_notification_color))
                 .setSmallIcon(R.drawable.ic_music_box)
                 .setContentIntent(pIntent)
                 .addAction(R.drawable.ic_skip_previous, getString(R.string.previous_track), pIntentSkipToPrevious)
