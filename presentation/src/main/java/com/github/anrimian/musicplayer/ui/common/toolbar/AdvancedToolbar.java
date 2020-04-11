@@ -8,7 +8,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,18 +27,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.widget.ActionMenuView;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentStackListener;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil;
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher;
-import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,12 +201,8 @@ public class AdvancedToolbar extends FrameLayout {
         }
     }
 
-    public void setupOptionsMenu(@MenuRes int menuResId,
-                                 NavigationView.OnNavigationItemSelectedListener listener) {
-        ActionMenuUtil.setupMenu(activity,
-                actionMenuView,
-                menuResId,
-                listener);
+    public void setupOptionsMenu(@MenuRes int menuResId, Callback<MenuItem> listener) {
+        ActionMenuUtil.setupMenu(activity, actionMenuView, menuResId, listener);
     }
 
     public void clearOptionsMenu() {
@@ -379,13 +371,8 @@ public class AdvancedToolbar extends FrameLayout {
         drawerArrowDrawable.setColor(color);
     }
 
-    public void setupSelectionModeMenu(@MenuRes int menuResource,
-                                       NavigationView.OnNavigationItemSelectedListener listener) {
-        setupMenu(activity,
-                acvSelection,
-                menuResource,
-                listener,
-                1);
+    public void setupSelectionModeMenu(@MenuRes int menuResource, Callback<MenuItem> listener) {
+        setupMenu(activity, acvSelection, menuResource, listener, 1);
     }
 
     public void editActionMenu(Callback<Menu> callback) {

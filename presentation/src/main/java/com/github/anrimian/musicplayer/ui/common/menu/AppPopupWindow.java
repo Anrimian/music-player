@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.common.menu;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -15,21 +14,15 @@ import com.github.anrimian.musicplayer.R;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class AppPopupMenu {
+@SuppressWarnings("WeakerAccess")
+public class AppPopupWindow {
 
-    //override overflow button click
-    //screen offset:
-    // top, - horizontal orientation - doesn't fit(bottom offset breaks)
-    // start,
-    // end
     public static PopupWindow showPopupWindow(Activity activity,
                                               View anchorView,
                                               View popupView,
-                                              int gravity) {
+                                              int gravity,
+                                              int screenMargin) {
         Context context = anchorView.getContext();
-        Resources resources = context.getResources();
-
-        int screenMargin = resources.getDimensionPixelSize(R.dimen.popup_screen_margin);
 
         //margins
         FrameLayout popupViewWrapper = new FrameLayout(context);

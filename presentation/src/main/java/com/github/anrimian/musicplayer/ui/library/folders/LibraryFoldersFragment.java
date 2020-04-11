@@ -3,8 +3,6 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -596,38 +594,37 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         }
     }
 
-    private boolean onActionModeItemClicked(MenuItem menuItem) {
+    private void onActionModeItemClicked(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_play: {
                 presenter.onPlayAllSelectedClicked();
-                return true;
+                break;
             }
             case R.id.menu_select_all: {
                 presenter.onSelectAllButtonClicked();
-                return true;
+                break;
             }
             case R.id.menu_play_next: {
                 presenter.onPlayNextSelectedSourcesClicked();
-                return true;
+                break;
             }
             case R.id.menu_add_to_queue: {
                 presenter.onAddToQueueSelectedSourcesClicked();
-                return true;
+                break;
             }
             case R.id.menu_add_to_playlist: {
                 presenter.onAddSelectedSourcesToPlayListClicked();
-                return true;
+                break;
             }
             case R.id.menu_share: {
                 presenter.onShareSelectedSourcesClicked();
-                return true;
+                break;
             }
             case R.id.menu_delete: {
                 presenter.onDeleteSelectedCompositionButtonClicked();
-                return true;
+                break;
             }
         }
-        return false;
     }
 
     private void onFolderMenuClicked(View view, FolderFileSource folder) {
@@ -638,66 +635,63 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                     switch (item.getItemId()) {
                         case R.id.menu_play_next: {
                             presenter.onPlayNextFolderClicked(folder);
-                            return true;
+                            break;
                         }
                         case R.id.menu_add_to_queue: {
                             presenter.onAddToQueueFolderClicked(folder);
-                            return true;
+                            break;
                         }
                         case R.id.menu_add_to_playlist: {
                             presenter.onAddFolderToPlayListButtonClicked(folder);
-                            return true;
+                            break;
                         }
                         case R.id.menu_rename_folder: {
                             presenter.onRenameFolderClicked(folder);
-                            return true;
+                            break;
                         }
                         case R.id.menu_share: {
                             presenter.onShareFolderClicked(folder);
-                            return true;
+                            break;
                         }
                         case R.id.menu_hide: {
                             presenter.onExcludeFolderClicked(folder);
-                            return true;
+                            break;
                         }
                         case R.id.menu_delete: {
                             presenter.onDeleteFolderButtonClicked(folder);
-                            return true;
+                            break;
                         }
                     }
-                    return false;
                 });
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Nullable
     private Long getFolderId() {
-        long value = getArguments().getLong(ID_ARG);
+        long value = requireArguments().getLong(ID_ARG);
         return value == 0? null: value;
     }
 
-    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_order: {
                 presenter.onOrderMenuItemClicked();
-                return true;
+                break;
             }
             case R.id.menu_excluded_folders: {
                 //noinspection ConstantConditions
                 FragmentNavigation.from(getParentFragment().requireFragmentManager())
                         .addNewFragment(new ExcludedFoldersFragment());
-                return true;
+                break;
             }
             case R.id.menu_search: {
                 presenter.onSearchButtonClicked();
-                return true;
+                break;
             }
             case R.id.menu_rescan_storage: {
                 Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
+                break;
             }
-            default: return super.onOptionsItemSelected(item);
         }
     }
 

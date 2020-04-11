@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.genres.items;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -369,13 +367,12 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
         return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
     }
 
-    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_rename: {
                 presenter.onRenameGenreClicked();
-                return true;
+                break;
             }
-            default: return super.onOptionsItemSelected(item);
         }
     }
 }

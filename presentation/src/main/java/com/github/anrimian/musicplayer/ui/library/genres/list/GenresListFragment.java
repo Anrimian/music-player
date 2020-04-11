@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.genres.list;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
-import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
@@ -236,22 +234,21 @@ public class GenresListFragment extends LibraryFragment implements
                 .addNewFragment(GenreItemsFragment.newInstance(genre.getId()));
     }
 
-    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_order: {
                 presenter.onOrderMenuItemClicked();
-                return true;
+                break;
             }
             case R.id.menu_search: {
                 toolbar.setSearchModeEnabled(true);
-                return true;
+                break;
             }
             case R.id.menu_rescan_storage: {
                 Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
+                break;
             }
-            default: return super.onOptionsItemSelected(item);
         }
     }
 }

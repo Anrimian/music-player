@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.artists.items;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -414,13 +412,12 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
                 .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));
     }
 
-    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_rename: {
                 presenter.onRenameArtistClicked();
-                return true;
+                break;
             }
-            default: return super.onOptionsItemSelected(item);
         }
     }
 }

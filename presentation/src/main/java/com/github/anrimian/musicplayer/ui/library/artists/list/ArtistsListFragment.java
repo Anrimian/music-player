@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.artists.list;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -237,22 +235,21 @@ public class ArtistsListFragment extends LibraryFragment implements
         artistMenuDialogRunner.show(fragment);
     }
 
-    private boolean onOptionsItemClicked(@NonNull MenuItem item) {
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_order: {
                 presenter.onOrderMenuItemClicked();
-                return true;
+                break;
             }
             case R.id.menu_search: {
                 toolbar.setSearchModeEnabled(true);
-                return true;
+                break;
             }
             case R.id.menu_rescan_storage: {
                 Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
+                break;
             }
-            default: return super.onOptionsItemSelected(item);
         }
     }
 }

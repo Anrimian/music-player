@@ -52,37 +52,36 @@ public abstract class BaseLibraryCompositionsFragment extends LibraryFragment {
         }
     }
 
-    protected boolean onActionModeItemClicked(MenuItem menuItem) {
+    protected void onActionModeItemClicked(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_play: {
                 getBasePresenter().onPlayAllSelectedClicked();
-                return true;
+                break;
             }
             case R.id.menu_select_all: {
                 getBasePresenter().onSelectAllButtonClicked();
-                return true;
+                break;
             }
             case R.id.menu_play_next: {
                 getBasePresenter().onPlayNextSelectedCompositionsClicked();
-                return true;
+                break;
             }
             case R.id.menu_add_to_queue: {
                 getBasePresenter().onAddToQueueSelectedCompositionsClicked();
-                return true;
+                break;
             }
             case R.id.menu_add_to_playlist: {
                 getBasePresenter().onAddSelectedCompositionToPlayListClicked();
-                return true;
+                break;
             }
             case R.id.menu_share: {
                 getBasePresenter().onShareSelectedCompositionsClicked();
-                return true;
+                break;
             }
             case R.id.menu_delete: {
                 getBasePresenter().onDeleteSelectedCompositionButtonClicked();
-                return true;
+                break;
             }
         }
-        return false;
     }
 }

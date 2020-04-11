@@ -5,9 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.view.MenuItem;
 
-import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
-import com.google.android.material.navigation.NavigationView;
-
 import androidx.annotation.MenuRes;
 import androidx.appcompat.view.ActionBarPolicy;
 import androidx.appcompat.view.SupportMenuInflater;
@@ -15,12 +12,15 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.PublicActionMenuPresenter;
 
+import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
+
 public class ActionMenuUtil {
 
     public static void setupMenu(Activity activity,
                                  ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
-                                 NavigationView.OnNavigationItemSelectedListener listener) {
+                                 Callback<MenuItem> listener) {
         setupMenu(activity, actionMenuView, menuRes, listener, 0);
     }
 
@@ -28,16 +28,15 @@ public class ActionMenuUtil {
     public static void setupMenu(Activity activity,
                                  ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
-                                 NavigationView.OnNavigationItemSelectedListener listener,
+                                 Callback<MenuItem> listener,
                                  int extraItemsCount) {
         Context context = actionMenuView.getContext();
         PublicActionMenuPresenter actionMenuPresenter = new PublicActionMenuPresenter(context,
-                (anchorView, menuItems) -> {
-                    PopupMenuWindow.showPopup(activity,
-                            anchorView,
-                            menuItems,
-                            listener::onNavigationItemSelected);
-                });
+                (anchorView, menuItems) -> PopupMenuWindow.showActionBarPopup(activity,
+                        anchorView,
+                        menuItems,
+                        listener)
+        );
 //        actionMenuPresenter.setReserveOverflow(false);
 //        actionMenuPresenter.setWidthLimit(context.getResources().getDisplayMetrics().widthPixels, true);
 //        actionMenuPresenter.setItemLimit(Integer.MAX_VALUE);
@@ -50,7 +49,8 @@ public class ActionMenuUtil {
         menuBuilder.setCallback(new MenuBuilder.Callback() {
             @Override
             public boolean onMenuItemSelected(MenuBuilder menu, MenuItem item) {
-                return listener.onNavigationItemSelected(item);
+                listener.call(item);
+                return true;
             }
 
             @Override
