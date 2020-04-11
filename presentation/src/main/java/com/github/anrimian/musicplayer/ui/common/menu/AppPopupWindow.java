@@ -30,11 +30,12 @@ public class AppPopupWindow {
         params.setMargins(screenMargin, screenMargin, screenMargin, screenMargin);
         popupViewWrapper.addView(popupView, params);
 
+        popupView.setElevation(5f);
+
         PopupWindow popupWindow = new PopupWindow(popupViewWrapper,
                 WRAP_CONTENT,
                 WRAP_CONTENT,
                 true);
-        popupWindow.setElevation(4f);
         popupWindow.setAnimationStyle(R.style.PopupAnimationStyle);
 
         popupView.measure(
