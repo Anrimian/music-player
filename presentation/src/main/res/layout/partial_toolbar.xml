@@ -12,9 +12,6 @@
         android:id="@+id/toolbar_internal"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:minHeight="?attr/actionBarSize"
-        app:titleTextColor="?attr/toolbarTextColorPrimary"
-        app:subtitleTextColor="?attr/toolbarTextColorSecondary"
         tools:navigationIcon="@drawable/ic_menu">
 
         <androidx.constraintlayout.widget.ConstraintLayout

@@ -147,14 +147,13 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     public void setupWithActivity(AppCompatActivity activity) {
-        toolbar.setTitle("");//replace null to prevent auto title setting from action bar
+        //now its only using for back button
         activity.setSupportActionBar(toolbar);
         ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
     }
 
