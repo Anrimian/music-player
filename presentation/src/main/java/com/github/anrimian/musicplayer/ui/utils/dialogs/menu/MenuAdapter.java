@@ -17,14 +17,14 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getMenuItems
 
 public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
 
-    private final List<MenuItem> items;
+    private final List<? extends MenuItem> items;
 
     @LayoutRes
     private final int menuViewRes;
 
     private OnItemClickListener<MenuItem> onItemClickListener;
 
-    public MenuAdapter(List<MenuItem> items, @LayoutRes int menuViewRes) {
+    public MenuAdapter(List<? extends MenuItem> items, @LayoutRes int menuViewRes) {
         this.items = items;
         this.menuViewRes = menuViewRes;
     }

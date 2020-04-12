@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.java.Callback;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuAdapter;
@@ -50,14 +49,13 @@ public class PopupMenuWindow {
                                           View anchorView,
                                           ArrayList<MenuItemImpl> items,
                                           Callback<MenuItem> listener) {
-        List<MenuItem> menuItems = ListUtils.mapList(items, item -> item);
         int screenMargin = activity.getResources().getDimensionPixelSize(R.dimen.action_bar_popup_screen_margin);
-        showPopup(activity, anchorView, menuItems, listener, Gravity.CENTER, screenMargin);
+        showPopup(activity, anchorView, items, listener, Gravity.CENTER, screenMargin);
     }
 
     private static void showPopup(Activity activity,
                                   View anchorView,
-                                  List<MenuItem> menuItems,
+                                  List<? extends MenuItem> menuItems,
                                   Callback<MenuItem> listener,
                                   int gravity,
                                   int screenMargin) {
