@@ -72,7 +72,7 @@ public class PopupMenuWindow {
 
         AtomicReference<PopupWindow> popupWindow = new AtomicReference<>();
 
-        MenuAdapter menuAdapter = new MenuAdapter(menuItems, R.layout.item_dialog_menu);
+        MenuAdapter menuAdapter = new MenuAdapter(menuItems, R.layout.item_popup_menu);
         menuAdapter.setOnItemClickListener(item -> {
             listener.call(item);
             popupWindow.get().dismiss();

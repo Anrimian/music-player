@@ -73,6 +73,8 @@
 
     <style name="TextStyleDialogItem" parent="@style/TextStyle">
         <item name="android:textSize">15sp</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">
