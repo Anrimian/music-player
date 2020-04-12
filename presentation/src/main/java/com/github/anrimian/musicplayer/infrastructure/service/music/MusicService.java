@@ -11,7 +11,6 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.annotation.Nullable;
@@ -67,7 +66,6 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
  * Created on 03.11.2017.
