@@ -38,7 +38,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
@@ -70,8 +69,20 @@ public class StorageMusicProvider {
     }
 
     public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable() {
-        return RxContentObserver.getObservable(contentResolver, Media.EXTERNAL_CONTENT_URI)
-                .map(o -> getCompositions());
+        Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, Media.EXTERNAL_CONTENT_URI);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            //on new composition content observer not called on android 10
+            //but for some reason content observer is called for playlist items when new file added
+            //so we create observer for non-existing playlist(!) and it works
+
+            Observable<Object> playListChangeObservable = RxContentObserver.getObservable(
+                    contentResolver,
+                    MediaStore.Audio.Playlists.Members.getContentUri("external", 0)
+            );
+            //maybe filter often events?
+            storageChangeObservable = Observable.merge(storageChangeObservable, playListChangeObservable);
+        }
+        return storageChangeObservable.map(o -> getCompositions());
     }
 
     public LongSparseArray<StorageFullComposition> getCompositions() {
@@ -95,20 +106,20 @@ public class StorageMusicProvider {
 //                        Media.DATE_MODIFIED
 //                };
 //            } else {
-                query = new String[] {
-                        Media.ARTIST,
-                        Media.TITLE,
-                        Media.DISPLAY_NAME,
+            query = new String[] {
+                    Media.ARTIST,
+                    Media.TITLE,
+                    Media.DISPLAY_NAME,
 //                            Media.ALBUM,
-                        Media.DATA,
-                        Media.DURATION,
-                        Media.SIZE,
-                        Media._ID,
+                    Media.DATA,
+                    Media.DURATION,
+                    Media.SIZE,
+                    Media._ID,
 //                            Media.ARTIST_ID,
-                        Media.ALBUM_ID,
-                        Media.DATE_ADDED,
-                        Media.DATE_MODIFIED
-                };
+                    Media.ALBUM_ID,
+                    Media.DATE_ADDED,
+                    Media.DATE_MODIFIED
+            };
 //            }
 
             cursor = contentResolver.query(
@@ -144,9 +155,9 @@ public class StorageMusicProvider {
         Cursor cursor = null;
         try {
             String[] query;
-                query = new String[] {
-                        Media.DATA,
-                };
+            query = new String[] {
+                    Media.DATA,
+            };
 
             cursor = contentResolver.query(
                     Media.EXTERNAL_CONTENT_URI,
@@ -344,7 +355,7 @@ public class StorageMusicProvider {
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 //            relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
 //        } else {
-            relativePath = FileUtils.getParentDirPath(filePath);
+        relativePath = FileUtils.getParentDirPath(filePath);
 //        }
         if (isEmpty(relativePath)) {
             return null;
