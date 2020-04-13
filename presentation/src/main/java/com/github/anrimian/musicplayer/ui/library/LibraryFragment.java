@@ -42,8 +42,7 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
     }
 
     private void onLibraryTitleClicked(View view) {
-        PopupMenuWindow.showPopup(requireActivity(),
-                view,
+        PopupMenuWindow.showPopup(view,
                 R.menu.library_categories_menu,
                 Gravity.BOTTOM,
                 item -> {

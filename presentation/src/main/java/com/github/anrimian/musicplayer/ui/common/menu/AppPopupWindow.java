@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.menu;
 
-import android.app.Activity;
 import android.content.Context;
-import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.MeasureSpec;
@@ -17,8 +15,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 @SuppressWarnings("WeakerAccess")
 public class AppPopupWindow {
 
-    public static PopupWindow showPopupWindow(Activity activity,
-                                              View anchorView,
+    public static PopupWindow showPopupWindow(View anchorView,
                                               View popupView,
                                               int gravity,
                                               int screenMargin) {
@@ -54,11 +51,6 @@ public class AppPopupWindow {
 
         int viewWidth = popupView.getMeasuredWidth();
         int viewHeight = popupView.getMeasuredHeight();
-
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int screenHeight = displayMetrics.heightPixels;
-        int screenWidth = displayMetrics.widthPixels;
 
         int showX = anchorX - viewWidth - screenMargin;
         int showY = anchorY - screenMargin;

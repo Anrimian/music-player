@@ -237,7 +237,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground);
 
-        toolbar.initializeViews(requireActivity().getWindow(), requireActivity());
+        toolbar.initializeViews(requireActivity().getWindow());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
 
         navigation = FragmentNavigation.from(getChildFragmentManager());
@@ -278,7 +278,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawer.addDrawerListener(new SimpleDrawerListener(this::onDrawerClosed));
 
-        setupMenu(requireActivity(), acvPlayQueueMenu, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
+        setupMenu(acvPlayQueueMenu, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
 
         toolbar.setupWithNavigation(navigation,
                 drawerArrowDrawable,
@@ -728,8 +728,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onCompositionMenuClicked(View view) {
-        PopupMenuWindow.showPopup(requireActivity(),
-                view,
+        PopupMenuWindow.showPopup(view,
                 R.menu.composition_short_actions_menu,
                 item -> {
                     switch (item.getItemId()) {
@@ -787,8 +786,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onPlayItemMenuClicked(View view, PlayQueueItem playQueueItem) {
         Composition composition = playQueueItem.getComposition();
 
-        PopupMenuWindow.showPopup(requireActivity(),
-                view,
+        PopupMenuWindow.showPopup(view,
                 R.menu.play_queue_item_menu,
                 item -> {
                     switch (item.getItemId()) {
@@ -817,8 +815,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onRepeatModeButtonClicked(View view) {
-        PopupMenuWindow.showPopup(requireActivity(),
-                view,
+        PopupMenuWindow.showPopup(view,
                 R.menu.repeat_mode_menu,
                 item -> {
                     int repeatMode = RepeatMode.NONE;

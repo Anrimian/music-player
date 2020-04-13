@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.views.menu;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.view.MenuItem;
 
@@ -17,23 +16,20 @@ import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 
 public class ActionMenuUtil {
 
-    public static void setupMenu(Activity activity,
-                                 ActionMenuView actionMenuView,
+    public static void setupMenu(ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  Callback<MenuItem> listener) {
-        setupMenu(activity, actionMenuView, menuRes, listener, 0);
+        setupMenu(actionMenuView, menuRes, listener, 0);
     }
 
     @SuppressLint("RestrictedApi")
-    public static void setupMenu(Activity activity,
-                                 ActionMenuView actionMenuView,
+    public static void setupMenu(ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  Callback<MenuItem> listener,
                                  int extraItemsCount) {
         Context context = actionMenuView.getContext();
         PublicActionMenuPresenter actionMenuPresenter = new PublicActionMenuPresenter(context,
-                (anchorView, menuItems) -> PopupMenuWindow.showActionBarPopup(activity,
-                        anchorView,
+                (anchorView, menuItems) -> PopupMenuWindow.showActionBarPopup(anchorView,
                         menuItems,
                         listener)
         );

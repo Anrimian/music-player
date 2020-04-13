@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.ui.common.toolbar;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -62,7 +61,6 @@ public class AdvancedToolbar extends FrameLayout {
     private final FragmentStackListener stackChangeListener = new StackChangeListenerImpl();
 
     private Window window;
-    private Activity activity;
 
     private Toolbar toolbar;
     private View clTitleContainer;
@@ -116,9 +114,8 @@ public class AdvancedToolbar extends FrameLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    public void initializeViews(Window window, Activity activity) {
+    public void initializeViews(Window window) {
         this.window = window;
-        this.activity = activity;
         toolbar = findViewById(R.id.toolbar_internal);
         actionMenuView = findViewById(R.id.acv_main);
         clTitleContainer = findViewById(R.id.title_container);
@@ -201,18 +198,11 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     public void setupOptionsMenu(@MenuRes int menuResId, Callback<MenuItem> listener) {
-        ActionMenuUtil.setupMenu(activity, actionMenuView, menuResId, listener);
+        ActionMenuUtil.setupMenu(actionMenuView, menuResId, listener);
     }
 
     public void clearOptionsMenu() {
-        ActionMenuUtil.setupMenu(activity,
-                actionMenuView,
-                R.menu.empty_stub_menu,
-                null);
-    }
-
-    public void setOptionsMenuVisible(boolean menuVisible) {
-        actionMenuView.setVisibility(menuVisible? VISIBLE: GONE);
+        ActionMenuUtil.setupMenu(actionMenuView, R.menu.empty_stub_menu, null);
     }
 
     public void release() {
@@ -371,7 +361,7 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     public void setupSelectionModeMenu(@MenuRes int menuResource, Callback<MenuItem> listener) {
-        setupMenu(activity, acvSelection, menuResource, listener, 1);
+        setupMenu(acvSelection, menuResource, listener, 1);
     }
 
     public void editActionMenu(Callback<Menu> callback) {

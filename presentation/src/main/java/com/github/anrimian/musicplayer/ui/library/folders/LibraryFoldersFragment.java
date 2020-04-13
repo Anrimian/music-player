@@ -628,8 +628,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     private void onFolderMenuClicked(View view, FolderFileSource folder) {
-        PopupMenuWindow.showPopup(requireActivity(),
-                view,
+        PopupMenuWindow.showPopup(view,
                 R.menu.folder_item_menu,
                 item -> {
                     switch (item.getItemId()) {

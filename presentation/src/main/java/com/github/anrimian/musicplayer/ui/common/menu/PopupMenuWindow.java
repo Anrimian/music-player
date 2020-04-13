@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.menu;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -28,33 +27,29 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getMenuItems
 
 public class PopupMenuWindow {
 
-    public static void showPopup(Activity activity,
-                                 View anchorView,
+    public static void showPopup(View anchorView,
                                  @MenuRes int menuResId,
                                  Callback<MenuItem> listener) {
-        showPopup(activity, anchorView, menuResId, Gravity.START, listener);
+        showPopup(anchorView, menuResId, Gravity.START, listener);
     }
 
-    public static void showPopup(Activity activity,
-                                 View anchorView,
+    public static void showPopup(View anchorView,
                                  @MenuRes int menuResId,
                                  int gravity,
                                  Callback<MenuItem> listener) {
-        Menu menu = AndroidUtils.createMenu(activity, menuResId);
-        int screenMargin = activity.getResources().getDimensionPixelSize(R.dimen.popup_screen_margin);
-        showPopup(activity, anchorView, getMenuItems(menu), listener, gravity, screenMargin);
+        Menu menu = AndroidUtils.createMenu(anchorView.getContext(), menuResId);
+        int screenMargin = anchorView.getResources().getDimensionPixelSize(R.dimen.popup_screen_margin);
+        showPopup(anchorView, getMenuItems(menu), listener, gravity, screenMargin);
     }
 
-    public static void showActionBarPopup(Activity activity,
-                                          View anchorView,
+    public static void showActionBarPopup(View anchorView,
                                           ArrayList<MenuItemImpl> items,
                                           Callback<MenuItem> listener) {
-        int screenMargin = activity.getResources().getDimensionPixelSize(R.dimen.action_bar_popup_screen_margin);
-        showPopup(activity, anchorView, items, listener, Gravity.CENTER, screenMargin);
+        int screenMargin = anchorView.getResources().getDimensionPixelSize(R.dimen.action_bar_popup_screen_margin);
+        showPopup(anchorView, items, listener, Gravity.CENTER, screenMargin);
     }
 
-    private static void showPopup(Activity activity,
-                                  View anchorView,
+    private static void showPopup(View anchorView,
                                   List<? extends MenuItem> menuItems,
                                   Callback<MenuItem> listener,
                                   int gravity,
@@ -77,6 +72,6 @@ public class PopupMenuWindow {
         });
         recyclerView.setAdapter(menuAdapter);
 
-        popupWindow.set(AppPopupWindow.showPopupWindow(activity, anchorView, popupView, gravity, screenMargin));
+        popupWindow.set(AppPopupWindow.showPopupWindow(anchorView, popupView, gravity, screenMargin));
     }
 }
