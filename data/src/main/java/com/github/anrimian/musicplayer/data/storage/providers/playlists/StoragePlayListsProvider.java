@@ -49,14 +49,11 @@ public class StoragePlayListsProvider {
     }
 
     public LongSparseArray<StoragePlayList> getPlayLists() {
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(
-                    Playlists.EXTERNAL_CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null);
+        try(Cursor cursor = contentResolver.query(Playlists.EXTERNAL_CONTENT_URI,
+                null,
+                null,
+                null,
+                null)) {
             if (cursor == null) {
                 return new LongSparseArray<>();
             }
@@ -71,8 +68,6 @@ public class StoragePlayListsProvider {
                 }
             }
             return map;
-        } finally {
-            IOUtils.closeSilently(cursor);
         }
     }
 
@@ -85,7 +80,7 @@ public class StoragePlayListsProvider {
         if (uri == null || isEmpty(uri.getLastPathSegment())) {
             return null;
         }
-        long id = Long.valueOf(uri.getLastPathSegment());
+        long id = Long.parseLong(uri.getLastPathSegment());
         StoragePlayList playList = findPlayList(id);
         if (playList == null) {
             return null;
@@ -101,7 +96,7 @@ public class StoragePlayListsProvider {
         if (uri == null || isEmpty(uri.getLastPathSegment())) {
             throw new PlayListNotCreatedException();
         }
-        long id = Long.valueOf(uri.getLastPathSegment());
+        long id = Long.parseLong(uri.getLastPathSegment());
         StoragePlayList playList = findPlayList(id);
         if (playList == null) {
             throw new PlayListNotCreatedException();
