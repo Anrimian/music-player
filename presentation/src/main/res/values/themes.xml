@@ -17,8 +17,8 @@
         <item name="android:colorBackground">@color/dark_background_level_1</item>
         <item name="listBackground">@color/dark_background_level_0</item>
         <item name="listItemBackground">@color/dark_background_level_1</item>
-        <item name="menuItemBackground">@color/menu_item_background_color_dark</item>
-        <item name="dialogBackground">@color/menu_item_background_color_dark</item>
+        <item name="popupMenuBackgroundColor">@color/popup_menu_background_color_dark</item>
+        <item name="dialogBackground">@color/dialog_background_color_dark</item>
         <item name="playerPanelBackground">?attr/colorPrimary</item>
         <item name="subToolbarBackground">@color/dark_background_level_2</item>
         <item name="snackbarBackground">@color/snackbar_color_dark</item>
@@ -40,7 +40,7 @@
         <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
         <item name="buttonColorInverse">@color/primary_button_color_dark</item>
         <item name="colorControlHighlightInverse">@color/color_control_highlight_light</item>
-        <item name="colorControlThird">@color/menu_item_background_color_dark</item>
+        <item name="colorControlThird">@color/dialog_background_color_dark</item>
 
         <!--navigation view-->
         <item name="navigationViewPrimaryColor">?android:attr/textColorPrimary</item>

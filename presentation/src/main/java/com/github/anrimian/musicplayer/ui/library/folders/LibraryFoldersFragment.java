@@ -3,8 +3,6 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,6 @@ import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
@@ -34,7 +32,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -142,12 +140,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @ProvidePresenter
     LibraryFoldersPresenter providePresenter() {
         return Components.getLibraryFolderComponent(getFolderId()).storageLibraryPresenter();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -278,38 +270,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         AdvancedToolbar toolbar = act.findViewById(R.id.toolbar);
         toolbar.setupSelectionModeMenu(R.menu.library_folders_selection_menu,
                 this::onActionModeItemClicked);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.library_files_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_order: {
-                presenter.onOrderMenuItemClicked();
-                return true;
-            }
-            case R.id.menu_excluded_folders: {
-                //noinspection ConstantConditions
-                FragmentNavigation.from(getParentFragment().requireFragmentManager())
-                        .addNewFragment(new ExcludedFoldersFragment());
-                return true;
-            }
-            case R.id.menu_search: {
-                presenter.onSearchButtonClicked();
-                return true;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.library_files_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -633,85 +594,104 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         }
     }
 
-    private boolean onActionModeItemClicked(MenuItem menuItem) {
+    private void onActionModeItemClicked(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_play: {
                 presenter.onPlayAllSelectedClicked();
-                return true;
+                break;
             }
             case R.id.menu_select_all: {
                 presenter.onSelectAllButtonClicked();
-                return true;
+                break;
             }
             case R.id.menu_play_next: {
                 presenter.onPlayNextSelectedSourcesClicked();
-                return true;
+                break;
             }
             case R.id.menu_add_to_queue: {
                 presenter.onAddToQueueSelectedSourcesClicked();
-                return true;
+                break;
             }
             case R.id.menu_add_to_playlist: {
                 presenter.onAddSelectedSourcesToPlayListClicked();
-                return true;
+                break;
             }
             case R.id.menu_share: {
                 presenter.onShareSelectedSourcesClicked();
-                return true;
+                break;
             }
             case R.id.menu_delete: {
                 presenter.onDeleteSelectedCompositionButtonClicked();
-                return true;
+                break;
             }
         }
-        return false;
     }
 
     private void onFolderMenuClicked(View view, FolderFileSource folder) {
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.folder_item_menu);
-
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_play_next: {
-                    presenter.onPlayNextFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_add_to_queue: {
-                    presenter.onAddToQueueFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddFolderToPlayListButtonClicked(folder);
-                    return true;
-                }
-                case R.id.menu_rename_folder: {
-                    presenter.onRenameFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_share: {
-                    presenter.onShareFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_hide: {
-                    presenter.onExcludeFolderClicked(folder);
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteFolderButtonClicked(folder);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.folder_item_menu,
+                item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_play_next: {
+                            presenter.onPlayNextFolderClicked(folder);
+                            break;
+                        }
+                        case R.id.menu_add_to_queue: {
+                            presenter.onAddToQueueFolderClicked(folder);
+                            break;
+                        }
+                        case R.id.menu_add_to_playlist: {
+                            presenter.onAddFolderToPlayListButtonClicked(folder);
+                            break;
+                        }
+                        case R.id.menu_rename_folder: {
+                            presenter.onRenameFolderClicked(folder);
+                            break;
+                        }
+                        case R.id.menu_share: {
+                            presenter.onShareFolderClicked(folder);
+                            break;
+                        }
+                        case R.id.menu_hide: {
+                            presenter.onExcludeFolderClicked(folder);
+                            break;
+                        }
+                        case R.id.menu_delete: {
+                            presenter.onDeleteFolderButtonClicked(folder);
+                            break;
+                        }
+                    }
+                });
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Nullable
     private Long getFolderId() {
-        long value = getArguments().getLong(ID_ARG);
+        long value = requireArguments().getLong(ID_ARG);
         return value == 0? null: value;
+    }
+
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                break;
+            }
+            case R.id.menu_excluded_folders: {
+                //noinspection ConstantConditions
+                FragmentNavigation.from(getParentFragment().requireFragmentManager())
+                        .addNewFragment(new ExcludedFoldersFragment());
+                break;
+            }
+            case R.id.menu_search: {
+                presenter.onSearchButtonClicked();
+                break;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
+                break;
+            }
+        }
     }
 
 }

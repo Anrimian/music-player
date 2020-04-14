@@ -125,4 +125,9 @@
     <!--scrollbars-->
     <dimen name="scrollbar_thumb_vertical_padding">16dp</dimen>
     <dimen name="scrollbar_width">4dp</dimen>
+
+    <!--popup-->
+    <dimen name="popup_screen_margin">16dp</dimen>
+    <dimen name="action_bar_popup_screen_margin">8dp</dimen>
+    <dimen name="popup_item_horizontal_margin">16dp</dimen>
 </resources>

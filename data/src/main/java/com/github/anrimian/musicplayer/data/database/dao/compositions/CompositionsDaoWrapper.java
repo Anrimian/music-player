@@ -26,7 +26,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Observable;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class CompositionsDaoWrapper {
 
@@ -153,7 +152,7 @@ public class CompositionsDaoWrapper {
 
             // if album not exists - create album
             if (albumId == null && albumName != null) {
-                //TODO rare crash here
+                //single crash here
                 //unexisting artist id?
                 albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
             }

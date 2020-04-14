@@ -20,7 +20,6 @@ import androidx.collection.LongSparseArray;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
-import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -38,7 +37,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
@@ -70,14 +68,24 @@ public class StorageMusicProvider {
     }
 
     public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable() {
-        return RxContentObserver.getObservable(contentResolver, Media.EXTERNAL_CONTENT_URI)
-                .map(o -> getCompositions());
+        Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, Media.EXTERNAL_CONTENT_URI);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            //on new composition content observer not called on android 10
+            //but for some reason content observer is called for playlist items when new file added
+            //so we create observer for non-existing playlist(!) and it works
+
+            Observable<Object> playListChangeObservable = RxContentObserver.getObservable(
+                    contentResolver,
+                    MediaStore.Audio.Playlists.Members.getContentUri("external", 0)
+            );
+            //maybe filter often events?
+            storageChangeObservable = Observable.merge(storageChangeObservable, playListChangeObservable);
+        }
+        return storageChangeObservable.map(o -> getCompositions());
     }
 
     public LongSparseArray<StorageFullComposition> getCompositions() {
-        Cursor cursor = null;
-        try {
-            String[] query;
+        String[] query;
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 //                query = new String[] {
 //                        Media.ARTIST,
@@ -95,28 +103,28 @@ public class StorageMusicProvider {
 //                        Media.DATE_MODIFIED
 //                };
 //            } else {
-                query = new String[] {
-                        Media.ARTIST,
-                        Media.TITLE,
-                        Media.DISPLAY_NAME,
+        query = new String[] {
+                Media.ARTIST,
+                Media.TITLE,
+                Media.DISPLAY_NAME,
 //                            Media.ALBUM,
-                        Media.DATA,
-                        Media.DURATION,
-                        Media.SIZE,
-                        Media._ID,
+                Media.DATA,
+                Media.DURATION,
+                Media.SIZE,
+                Media._ID,
 //                            Media.ARTIST_ID,
-                        Media.ALBUM_ID,
-                        Media.DATE_ADDED,
-                        Media.DATE_MODIFIED
-                };
+                Media.ALBUM_ID,
+                Media.DATE_ADDED,
+                Media.DATE_MODIFIED
+        };
 //            }
 
-            cursor = contentResolver.query(
-                    Media.EXTERNAL_CONTENT_URI,
-                    query,
-                    Media.IS_MUSIC + " = ?",
-                    new String[] { String.valueOf(1) },
-                    null);
+        try(Cursor cursor = contentResolver.query(
+                Media.EXTERNAL_CONTENT_URI,
+                query,
+                Media.IS_MUSIC + " = ?",
+                new String[] { String.valueOf(1) },
+                null)) {
             if (cursor == null) {
                 return new LongSparseArray<>();
             }
@@ -134,26 +142,22 @@ public class StorageMusicProvider {
                 }
             }
             return compositions;
-        } finally {
-            IOUtils.closeSilently(cursor);
         }
     }
 
     @Nullable
     public String getCompositionFilePath(long storageId) {
-        Cursor cursor = null;
-        try {
-            String[] query;
-                query = new String[] {
-                        Media.DATA,
-                };
+        String[] query;
+        query = new String[] {
+                Media.DATA,
+        };
 
-            cursor = contentResolver.query(
-                    Media.EXTERNAL_CONTENT_URI,
-                    query,
-                    Media._ID + " = ?",
-                    new String[] { String.valueOf(storageId) },
-                    null);
+        try(Cursor cursor = contentResolver.query(
+                Media.EXTERNAL_CONTENT_URI,
+                query,
+                Media._ID + " = ?",
+                new String[] { String.valueOf(storageId) },
+                null)) {
             if (cursor == null || cursor.getCount() == 0) {
                 return null;
             }
@@ -163,8 +167,6 @@ public class StorageMusicProvider {
                 return cursorWrapper.getString(Media.DATA);
             }
             return null;
-        } finally {
-            IOUtils.closeSilently(cursor);
         }
     }
 
@@ -344,7 +346,7 @@ public class StorageMusicProvider {
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 //            relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
 //        } else {
-            relativePath = FileUtils.getParentDirPath(filePath);
+        relativePath = FileUtils.getParentDirPath(filePath);
 //        }
         if (isEmpty(relativePath)) {
             return null;

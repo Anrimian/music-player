@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.artists.items;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.utils.java.BooleanConditionRunner;
+import com.github.anrimian.musicplayer.domain.utils.functions.BooleanConditionRunner;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
@@ -117,12 +115,6 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         return presenter;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -191,23 +183,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         toolbar.setTitleClickListener(null);
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.artist_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_rename: {
-                presenter.onRenameArtistClicked();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.artist_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -434,5 +410,14 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     private void onAlbumClicked(Album album) {
         FragmentNavigation.from(requireFragmentManager())
                 .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));
+    }
+
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_rename: {
+                presenter.onRenameArtistClicked();
+                break;
+            }
+        }
     }
 }

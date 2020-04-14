@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
 import android.content.Context;
 
+import androidx.core.util.Pair;
 import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -13,10 +14,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Date;
 
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+import static java.util.Collections.emptyList;
 
 public class PlayListsDaoWrapperTest {
 
@@ -51,12 +52,13 @@ public class PlayListsDaoWrapperTest {
                 "test1",
                 new Date(),
                 new Date());
-        daoWrapper.applyChanges(asList(playList1, playList2), Collections.emptyList());
+        daoWrapper.applyChanges(asList(new Pair<>(playList1, emptyList()), new Pair<>(playList2, emptyList())),
+                emptyList());
         StoragePlayList duplicatePlayList = new StoragePlayList(2L,
                 "test",
                 new Date(),
                 new Date());
-        daoWrapper.applyChanges(Collections.emptyList(), asList(duplicatePlayList));
+        daoWrapper.applyChanges(emptyList(), asList(duplicatePlayList));
 
     }
 }

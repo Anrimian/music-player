@@ -23,7 +23,7 @@ ext {
     recyclerViewFastScrollVersion = "1.1.1"
     mediaCompatVersion = "1.1.0"
 
-    constraintLayoutVersion = "2.0.0-alpha2"
+    constraintLayoutVersion = "2.0.0-beta4"
     rxJavaVersion = "2.2.19"
     rxAndroidVersion = "2.1.1"
     rxPermissionsVersion = "0.10.2"

@@ -2,10 +2,10 @@ package com.github.anrimian.musicplayer.di.app.library;
 
 import androidx.annotation.NonNull;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersInteractor;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.player.PlayerScreenInteractor;
-import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;

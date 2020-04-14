@@ -1,9 +1,9 @@
 package com.github.anrimian.musicplayer.di.app.library.compositions;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryCompositionsInteractor;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;

@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.genres.list;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
-import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
@@ -79,12 +77,6 @@ public class GenresListFragment extends LibraryFragment implements
         return Components.genresComponent().genresListPresenter();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -137,32 +129,7 @@ public class GenresListFragment extends LibraryFragment implements
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.genres);
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.library_genres_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_order: {
-                presenter.onOrderMenuItemClicked();
-                return true;
-            }
-            case R.id.menu_search: {
-                toolbar.setSearchModeEnabled(true);
-                return true;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.library_genres_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -265,5 +232,23 @@ public class GenresListFragment extends LibraryFragment implements
     private void goToGenreScreen(Genre genre) {
         FragmentNavigation.from(requireFragmentManager())
                 .addNewFragment(GenreItemsFragment.newInstance(genre.getId()));
+    }
+
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                break;
+            }
+            case R.id.menu_search: {
+                toolbar.setSearchModeEnabled(true);
+                break;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
+                break;
+            }
+        }
     }
 }

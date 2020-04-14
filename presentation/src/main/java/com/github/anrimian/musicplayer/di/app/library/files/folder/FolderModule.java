@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.di.app.library.files.folder;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersScreenInteractor;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersPresenter;
 

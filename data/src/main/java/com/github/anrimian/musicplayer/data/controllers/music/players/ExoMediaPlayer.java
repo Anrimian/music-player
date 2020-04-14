@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
-import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;

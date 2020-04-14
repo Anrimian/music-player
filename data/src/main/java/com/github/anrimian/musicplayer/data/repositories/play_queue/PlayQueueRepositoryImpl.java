@@ -7,7 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
-import com.github.anrimian.musicplayer.domain.utils.java.Optional;
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 
 import java.util.List;
 

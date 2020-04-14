@@ -2,22 +2,15 @@ package com.github.anrimian.musicplayer.data.repositories.scanner;
 
 import androidx.collection.LongSparseArray;
 
-import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
-import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,28 +27,27 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final StorageMusicProvider musicProvider;
     private final StoragePlayListsProvider playListsProvider;
     private final StorageGenresProvider genresProvider;
-    private final PlayListsDaoWrapper playListsDao;
     private final GenresDaoWrapper genresDao;
     private final StorageCompositionAnalyzer compositionAnalyzer;
+    private final StoragePlaylistAnalyzer playlistAnalyzer;
     private final Scheduler scheduler;
 
     private CompositeDisposable mediaStoreDisposable = new CompositeDisposable();
-    private LongSparseArray<Disposable> playListEntriesDisposable = new LongSparseArray<>();
     private LongSparseArray<Disposable> genreEntriesDisposable = new LongSparseArray<>();
 
     public MediaScannerRepositoryImpl(StorageMusicProvider musicProvider,
                                       StoragePlayListsProvider playListsProvider,
                                       StorageGenresProvider genresProvider,
-                                      PlayListsDaoWrapper playListsDao,
                                       GenresDaoWrapper genresDao,
                                       StorageCompositionAnalyzer compositionAnalyzer,
+                                      StoragePlaylistAnalyzer playlistAnalyzer,
                                       Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.playListsProvider = playListsProvider;
         this.genresProvider = genresProvider;
-        this.playListsDao = playListsDao;
         this.genresDao = genresDao;
         this.compositionAnalyzer = compositionAnalyzer;
+        this.playlistAnalyzer = playlistAnalyzer;
         this.scheduler = scheduler;
     }
 
@@ -82,8 +74,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 .subscribe(compositionAnalyzer::applyCompositionsData));
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)
-                .subscribe(this::onStoragePlayListReceived));
-        subscribeOnPlaylistData();
+                .subscribe(playlistAnalyzer::applyPlayListData));
+
         //genre in files and genre in media store are ofter different, we need deep file scanner for them
         //<return genres after deep scan implementation>
 //        mediaStoreDisposable.add(genresProvider.getGenresObservable()
@@ -95,14 +87,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private Completable runRescanStorage() {
         return Completable.fromAction(() -> {
             compositionAnalyzer.applyCompositionsData(musicProvider.getCompositions());
-            applyPlayListData(playListsProvider.getPlayLists());
+            playlistAnalyzer.applyPlayListData(playListsProvider.getPlayLists());
 
-            List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
-            for (IdPair playListIds: allPlayLists) {
-                long storageId = playListIds.getStorageId();
-                long dbId = playListIds.getDbId();
-                applyPlayListItemsData(dbId, playListsProvider.getPlayListItems(storageId));
-            }
             //<return genres after deep scan implementation>
 //            applyGenresData(genresProvider.getGenres());
 //            List<IdPair> genresIds = genresDao.getGenresIds();
@@ -112,11 +98,6 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 //                applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
 //            }
         }).subscribeOn(scheduler);
-    }
-
-    private void onStoragePlayListReceived(LongSparseArray<StoragePlayList> newPlayLists) {
-        applyPlayListData(newPlayLists);
-        subscribeOnPlaylistData();
     }
 
     private void onStorageGenresReceived(Map<String, StorageGenre> newGenres) {
@@ -136,35 +117,6 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                         .subscribe(entries -> applyGenreItemsData(dbId, entries));
                 genreEntriesDisposable.put(dbId, disposable);
             }
-        }
-    }
-
-    //can items change order on merge?
-    private synchronized void applyPlayListItemsData(long playListId,
-                                                     List<StoragePlayListItem> newItems) {
-        if (!playListsDao.isPlayListExists(playListId)) {
-            playListEntriesDisposable.remove(playListId);
-            return;
-        }
-        List<StoragePlayListItem> currentItems = playListsDao.getPlayListItemsAsStorageItems(playListId);
-        LongSparseArray<StoragePlayListItem> currentItemsMap = AndroidCollectionUtils.mapToSparseArray(
-                currentItems,
-                StoragePlayListItem::getItemId);
-
-        LongSparseArray<StoragePlayListItem> newItemsMap = AndroidCollectionUtils.mapToSparseArray(
-                newItems,
-                StoragePlayListItem::getItemId);
-
-        List<StoragePlayListItem> addedItems = new ArrayList<>();
-        boolean hasChanges = AndroidCollectionUtils.processChanges(currentItemsMap,
-                newItemsMap,
-                (o1, o2) -> false,
-                item -> {},
-                addedItems::add,
-                item -> {});
-
-        if (hasChanges) {
-            playListsDao.insertPlayListItems(addedItems, playListId);
         }
     }
 
@@ -190,40 +142,6 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         }
     }
 
-    private synchronized void applyPlayListData(LongSparseArray<StoragePlayList> newPlayLists) {
-        List<StoragePlayList> currentPlayLists = playListsDao.getAllAsStoragePlayLists();
-        LongSparseArray<StoragePlayList> currentPlayListsMap = AndroidCollectionUtils.mapToSparseArray(currentPlayLists,
-                StoragePlayList::getId);
-
-        List<StoragePlayList> addedPlayLists = new ArrayList<>();
-        List<StoragePlayList> changedPlayLists = new ArrayList<>();
-        boolean hasChanges = AndroidCollectionUtils.processChanges(currentPlayListsMap,
-                newPlayLists,
-                this::hasActualChanges,
-                playList -> {},
-                addedPlayLists::add,
-                changedPlayLists::add);
-
-        if (hasChanges) {
-            playListsDao.applyChanges(addedPlayLists, changedPlayLists);
-        }
-    }
-
-    private void subscribeOnPlaylistData() {
-        List<IdPair> allPlayLists = playListsDao.getPlayListsIds();
-        for (IdPair playListIds: allPlayLists) {
-            long storageId = playListIds.getStorageId();
-            long dbId = playListIds.getDbId();
-            if (!playListEntriesDisposable.containsKey(dbId)) {
-                Disposable disposable = playListsProvider.getPlayListEntriesObservable(storageId)
-                        .startWith(playListsProvider.getPlayListItems(storageId))
-                        .subscribeOn(scheduler)
-                        .subscribe(entries -> applyPlayListItemsData(dbId, entries));
-                playListEntriesDisposable.put(dbId, disposable);
-            }
-        }
-    }
-
     private synchronized void applyGenresData(Map<String, StorageGenre> newGenres) {
         Set<String> currentGenres = genresDao.selectAllGenreNames();
 
@@ -240,12 +158,5 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         if (hasChanges) {
             genresDao.applyChanges(addedGenres);
         }
-    }
-
-    private boolean hasActualChanges(StoragePlayList first, StoragePlayList second) {
-        return (!Objects.equals(first.getName(), second.getName())
-                || !Objects.equals(first.getDateAdded(), second.getDateAdded())
-                || !Objects.equals(first.getDateModified(), second.getDateModified()))
-                && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
     }
 }

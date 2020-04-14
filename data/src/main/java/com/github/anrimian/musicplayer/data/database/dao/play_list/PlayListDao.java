@@ -47,7 +47,6 @@ public interface PlayListDao {
     //can we cache duplicates?
     @Query("SELECT " +
             "play_lists.id as id, " +
-            "play_lists.storageId as storageId, " +
             "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
@@ -73,7 +72,6 @@ public interface PlayListDao {
 
     @Query("SELECT " +
             "play_lists.id as id, " +
-            "play_lists.storageId as storageId, " +
             "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
@@ -145,6 +143,10 @@ public interface PlayListDao {
     @Nullable
     @Query("SELECT storageId FROM play_lists WHERE id = :id")
     Long selectStorageId(long id);
+
+    @Nullable
+    @Query("SELECT storageItemId FROM play_lists_entries WHERE itemId = :itemId")
+    Long selectStorageItemId(long itemId);
 
     @Query("UPDATE play_lists SET storageId = :storageId WHERE id = :id")//update entries?
     void updateStorageId(long id, Long storageId);

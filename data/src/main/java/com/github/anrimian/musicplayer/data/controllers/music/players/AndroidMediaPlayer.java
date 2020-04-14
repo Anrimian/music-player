@@ -5,15 +5,14 @@ import android.media.MediaPlayer;
 
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
-import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.concurrent.TimeUnit;
 

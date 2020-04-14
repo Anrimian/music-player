@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.ui.settings.folders;
 
 import android.annotation.SuppressLint;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
