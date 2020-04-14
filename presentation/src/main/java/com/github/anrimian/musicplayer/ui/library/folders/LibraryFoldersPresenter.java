@@ -1,12 +1,12 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersScreenInteractor;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
@@ -16,7 +16,6 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

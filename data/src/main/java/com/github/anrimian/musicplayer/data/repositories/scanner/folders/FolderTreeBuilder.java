@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.folders;
 
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
-import com.github.anrimian.musicplayer.domain.utils.java.Mapper;
+import com.github.anrimian.musicplayer.domain.utils.functions.Mapper;
 
 import java.util.ArrayList;
 import java.util.List;

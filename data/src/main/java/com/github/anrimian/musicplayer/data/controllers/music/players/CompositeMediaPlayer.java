@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
-import com.github.anrimian.musicplayer.domain.utils.java.Function;
+import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;

@@ -6,13 +6,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.widget.RemoteViews;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.bumptech.glide.util.Preconditions;
-import com.github.anrimian.musicplayer.domain.utils.java.Processor;
 
 /**
  * This class is used in order to display downloaded Bitmap inside an ImageView of an AppWidget

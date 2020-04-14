@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
-import com.github.anrimian.musicplayer.domain.utils.java.TripleCallback;
+import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
+import com.github.anrimian.musicplayer.domain.utils.functions.TripleCallback;
 import com.github.anrimian.musicplayer.ui.common.serialization.CompositionSerializer;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;

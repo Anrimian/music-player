@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.root;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersInteractor;
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersScreenInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 

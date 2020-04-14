@@ -25,7 +25,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenr
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
-import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
