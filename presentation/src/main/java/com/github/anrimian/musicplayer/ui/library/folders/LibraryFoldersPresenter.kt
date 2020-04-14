@@ -1,9 +1,9 @@
 package com.github.anrimian.musicplayer.ui.library.folders
 
 import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFoldersScreenInteractor
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
@@ -11,8 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.domain.models.order.Order
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
@@ -310,7 +308,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     fun onNewFileNameForPasteEntered(name: String?) {
         interactor.moveFilesToNewFolder(folderId, name)
                 .observeOn(uiScheduler)
-                .doOnSubscribe { o: Disposable? -> viewState.showMoveProgress() }
+                .doOnSubscribe { viewState.showMoveProgress() }
                 .doFinally { viewState.hideProgressDialog() }
                 .subscribeOnUi(viewState::updateMoveFilesList, this::onDefaultError)
     }

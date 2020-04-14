@@ -1,15 +1,14 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
 import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor
-import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
-import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.model.Item
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
@@ -17,7 +16,6 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import moxy.InjectViewState
-import moxy.MvpPresenter
 import java.util.*
 
 @InjectViewState
