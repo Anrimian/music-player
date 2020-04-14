@@ -5,7 +5,7 @@ import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQue
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.utils.java.Optional;
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -247,7 +247,6 @@ public class PlayQueueDaoWrapper {
         }
     }
 
-    //TODO don't select corrupted compositions
     public long getPreviousQueueItemId(long currentItemId, boolean isShuffled) {
         if (isShuffled) {
             Long id = playQueueDao.getPreviousShuffledQueueItemId(currentItemId);

@@ -58,8 +58,6 @@ public class StoragePlayListProviderTest {
                 storagePlayListsProvider.deletePlayList(playList.getId());
             }
         }
-
-        playListsObserver.assertValueCount(1);
     }
 
     @Test

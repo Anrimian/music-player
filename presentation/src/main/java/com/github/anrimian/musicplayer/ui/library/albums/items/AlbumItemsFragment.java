@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.albums.items;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +36,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -97,12 +96,6 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         return presenter;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -121,6 +114,8 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
         progressViewWrapper.hideAll();
+
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new CompositionsAdapter(recyclerView,
                 presenter.getSelectedCompositions(),
@@ -156,23 +151,7 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         toolbar.setTitleClickListener(null);
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.album_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_edit: {
-                presenter.onEditAlbumClicked();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.album_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -351,5 +330,14 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     private long getAlbumId() {
         return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
+    }
+
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_edit: {
+                presenter.onEditAlbumClicked();
+                break;
+            }
+        }
     }
 }

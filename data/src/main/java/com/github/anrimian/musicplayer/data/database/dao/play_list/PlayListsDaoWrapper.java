@@ -2,6 +2,8 @@ package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
 import android.database.sqlite.SQLiteConstraintException;
 
+import androidx.core.util.Pair;
+
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
@@ -37,20 +39,21 @@ public class PlayListsDaoWrapper {
         this.appDatabase = appDatabase;
     }
 
-    public void applyChanges(List<StoragePlayList> addedPlayLists,
+    public void applyChanges(List<Pair<StoragePlayList, List<StoragePlayListItem>>> addedPlayLists,
                              List<StoragePlayList> changedPlayLists) {
         appDatabase.runInTransaction(() -> {
             //add
-            List<PlayListEntity> entities = new ArrayList<>(addedPlayLists.size());
-            for (StoragePlayList storagePlayList: addedPlayLists) {
-                entities.add(new PlayListEntity(
+            for (Pair<StoragePlayList, List<StoragePlayListItem>> addedPlaylist: addedPlayLists) {
+                StoragePlayList storagePlayList = addedPlaylist.first;
+                assert storagePlayList != null;
+                long id = playListDao.insertPlayListEntity(new PlayListEntity(
                         storagePlayList.getId(),
                         getUniquePlayListName(storagePlayList.getName()),
                         storagePlayList.getDateAdded(),
                         storagePlayList.getDateModified()
                 ));
+                insertPlayListItems(addedPlaylist.second, id);
             }
-            playListDao.insertPlayListEntities(entities);
 
             //update
             for (StoragePlayList playList: changedPlayLists) {
@@ -189,6 +192,10 @@ public class PlayListsDaoWrapper {
 
     public Long selectStorageId(long id) {
         return playListDao.selectStorageId(id);
+    }
+
+    public Long selectStorageItemId(long id) {
+        return playListDao.selectStorageItemId(id);
     }
 
     public void moveItems(long playListId, int fromPos, int toPos) {

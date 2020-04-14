@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
@@ -103,6 +104,18 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.iv_genre_edit)
     ImageView ivGenreEdit;
 
+    @BindView(R.id.iv_filename_edit)
+    ImageView ivFilenameEdit;
+
+    @BindView(R.id.iv_title_edit)
+    ImageView ivTitleEdit;
+
+    @BindView(R.id.iv_author_edit)
+    ImageView ivAuthorEdit;
+
+    @BindView(R.id.iv_album_edit)
+    ImageView ivAlbumEdit;
+
     @BindView(R.id.change_author_clickable_area)
     View changeAuthorClickableArea;
 
@@ -122,7 +135,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     View changeGenreClickableArea;
 
     @BindView(R.id.iv_album_artist)
-    View ivAlbumArtist;
+    ImageView ivAlbumArtist;
 
     @BindView(R.id.divider_album_artist)
     View dividerAlbumArtist;
@@ -191,6 +204,13 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 R.attr.playerPanelBackground,
                 android.R.attr.colorBackground
         );
+
+        CompatUtils.setMainButtonStyle(ivFilenameEdit);
+        CompatUtils.setMainButtonStyle(ivTitleEdit);
+        CompatUtils.setMainButtonStyle(ivAuthorEdit);
+        CompatUtils.setMainButtonStyle(ivAlbumEdit);
+        CompatUtils.setMainButtonStyle(ivAlbumArtist);
+        CompatUtils.setMainButtonStyle(ivGenreEdit);
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,

@@ -118,7 +118,8 @@ public class MusicFileViewHolder extends FileViewHolder {
         return fileSource;
     }
 
-    public void showCurrentComposition(@Nullable CurrentComposition currentComposition) {
+    public void showCurrentComposition(@Nullable CurrentComposition currentComposition,
+                                       boolean animate) {
         boolean isCurrent = false;
         boolean isPlaying = false;
         if (currentComposition != null) {
@@ -126,7 +127,7 @@ public class MusicFileViewHolder extends FileViewHolder {
             isPlaying = isCurrent && currentComposition.isPlaying();
         }
         showAsCurrentComposition(isCurrent);
-        compositionItemWrapper.showAsPlaying(isPlaying);
+        compositionItemWrapper.showAsPlaying(isPlaying, animate);
     }
 
     private void showAsCurrentComposition(boolean isCurrent) {

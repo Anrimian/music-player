@@ -25,6 +25,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
@@ -203,9 +204,9 @@ public class FoldersDaoWrapper {
                 "FROM folders " +
                 "WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)";
 
-        query += getSearchQuery(searchText);
+        query += getSearchQuery();
         query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 2));
         return foldersDao.getFoldersObservable(sqlQuery);
     }
 
@@ -220,6 +221,14 @@ public class FoldersDaoWrapper {
                 orderQuery.append("(SELECT max(dateAdded) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
                 break;
             }
+            case DURATION: {
+                orderQuery.append("(SELECT sum(duration) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
+                break;
+            }
+            case SIZE: {
+                orderQuery.append("(SELECT sum(size) FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))");
+                break;
+            }
             default: throw new IllegalStateException("unknown order type" + order);
         }
         orderQuery.append(" ");
@@ -227,16 +236,8 @@ public class FoldersDaoWrapper {
         return orderQuery.toString();
     }
 
-    private String getSearchQuery(String searchText) {
-        if (isEmpty(searchText)) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(" AND ");
-        sb.append("name NOTNULL AND name LIKE '%");
-        sb.append(searchText);
-        sb.append("%'");
-
-        return sb.toString();
+    private String getSearchQuery() {
+        return " AND (? IS NULL OR (name NOTNULL AND name LIKE ?))";
     }
 
     private Observable<Composition> fileSourceToComposition(FileSource fileSource, Order order) {

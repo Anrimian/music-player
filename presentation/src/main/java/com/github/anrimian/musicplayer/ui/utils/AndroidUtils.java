@@ -12,7 +12,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -24,12 +24,14 @@ import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.AttrRes;
@@ -39,19 +41,18 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
-import com.github.anrimian.musicplayer.R;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
 import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
-import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
-import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 /**
  * Created on 16.02.2017.
@@ -210,6 +211,14 @@ public class AndroidUtils {
         return menu;
     }
 
+    public static List<MenuItem> getMenuItems(Menu menu) {
+        List<MenuItem> items = new ArrayList<>(menu.size());
+        for (int i = 0; i < menu.size(); i++) {
+            items.add(menu.getItem(i));
+        }
+        return items;
+    }
+
     public static void playShortVibration(Context context) {
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (v == null) {
@@ -272,4 +281,26 @@ public class AndroidUtils {
         }
     }
 
+    public static void clearVectorAnimationInfo(ImageView imageView) {
+        imageView.setTag(null);
+    }
+
+    public static void setAnimatedVectorDrawable(ImageView imageView, @DrawableRes int drawableRes) {
+        setAnimatedVectorDrawable(imageView, drawableRes, true);
+    }
+
+    public static void setAnimatedVectorDrawable(ImageView imageView,
+                                                 @DrawableRes int drawableRes,
+                                                 boolean animate) {
+        Drawable drawable = AppCompatResources.getDrawable(imageView.getContext(), drawableRes);
+        Integer tag = (Integer) imageView.getTag();
+        if (tag != null && tag == drawableRes) {
+            return;
+        }
+        imageView.setTag(drawableRes);
+        imageView.setImageDrawable(drawable);
+        if (animate && tag != null && drawable instanceof Animatable) {
+            ((Animatable) drawable).start();
+        }
+    }
 }

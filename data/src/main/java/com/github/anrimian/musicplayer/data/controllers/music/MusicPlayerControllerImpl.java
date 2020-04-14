@@ -7,13 +7,13 @@ import com.github.anrimian.musicplayer.data.controllers.music.players.AppMediaPl
 import com.github.anrimian.musicplayer.data.controllers.music.players.CompositeMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.ExoMediaPlayer;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
-import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
-import com.github.anrimian.musicplayer.domain.utils.java.Function;
+import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;

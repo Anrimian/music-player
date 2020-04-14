@@ -3,9 +3,9 @@ package com.github.anrimian.musicplayer.data.utils.collections;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
-import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.domain.utils.java.Mapper;
+import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Mapper;
 
 import java.util.List;
 import java.util.Map;

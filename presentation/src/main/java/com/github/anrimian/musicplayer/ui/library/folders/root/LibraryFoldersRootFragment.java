@@ -28,7 +28,6 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class LibraryFoldersRootFragment extends LibraryFragment
@@ -82,6 +81,11 @@ public class LibraryFoldersRootFragment extends LibraryFragment
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.folders);
+
+        FragmentNavigation folderNavigation = FragmentNavigation.from(getChildFragmentManager());
+        if (folderNavigation.isInitialized()) {
+            folderNavigation.dispatchMovedToTop();
+        }
     }
 
     @Override
@@ -100,7 +104,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
-        navigationWrapper.call(navigation -> navigation.setVisible(menuVisible));
+        navigationWrapper.call(navigation -> navigation.setMenuVisible(menuVisible));
     }
 
     @Override

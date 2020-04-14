@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
+import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 
 import butterknife.BindView;
@@ -87,7 +87,7 @@ public class MenuDialogFragment extends DialogFragment {
         if (complexCompleteListener != null) {
             complexCompleteListener.call(menuItem, getArguments().getBundle(EXTRA_DATA_ARG));
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     private Menu getMenu() {

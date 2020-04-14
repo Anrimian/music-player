@@ -20,9 +20,10 @@ ext {
     googleMaterialVersion = "1.1.0"
     cardViewVersion = "1.0.0"
     recyclerViewVersion = "1.1.0"
+    recyclerViewFastScrollVersion = "1.1.1"
     mediaCompatVersion = "1.1.0"
 
-    constraintLayoutVersion = "2.0.0-alpha2"
+    constraintLayoutVersion = "2.0.0-beta4"
     rxJavaVersion = "2.2.19"
     rxAndroidVersion = "2.1.1"
     rxPermissionsVersion = "0.10.2"
@@ -36,6 +37,7 @@ ext {
     jTaggerVersion = '2.0.3'
     circleImageViewVersion = "3.1.0"
     chipsLayoutManagerVersion = "0.3.7"
+    glideVersion = "4.11.0"
 
     //Testing
     jUnitVersion = '4.13'
@@ -57,6 +59,7 @@ ext {
     material = "com.google.android.material:material:$googleMaterialVersion"
     cardView = "androidx.cardview:cardview:$cardViewVersion"
     recyclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    recyclerViewFastScroll = "me.zhanghai.android.fastscroll:library:$recyclerViewFastScrollVersion"
     supportMedia = "androidx.media:media:$mediaCompatVersion"
     constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
 
@@ -90,6 +93,9 @@ ext {
     roomRx = "androidx.room:room-rxjava2:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
     roomTest = "android.arch.persistence.room:testing:$roomVersion"
+
+    glide = "com.github.bumptech.glide:glide:$glideVersion"
+    glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
 
     //develop
     javaxAnnotation = "com.google.code.findbugs:jsr305:$javaxAnnotationVersion"

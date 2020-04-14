@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.albums.list;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +18,6 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
-import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.AlbumSerializer;
@@ -30,13 +27,12 @@ import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
-import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -47,11 +43,8 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
-import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_MENU_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 
 public class AlbumsListFragment extends LibraryFragment implements
         AlbumsListView, FragmentLayerListener, BackButtonListener {
@@ -75,12 +68,6 @@ public class AlbumsListFragment extends LibraryFragment implements
     @ProvidePresenter
     AlbumsListPresenter providePresenter() {
         return Components.albumsComponent().albumsListPresenter();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -108,6 +95,8 @@ public class AlbumsListFragment extends LibraryFragment implements
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        RecyclerViewUtils.attachFastScroller(recyclerView);
+
         FragmentManager fm = getChildFragmentManager();
         albumMenuDialogRunner = new DialogFragmentRunner<>(fm,
                 ALBUM_MENU_TAG,
@@ -124,32 +113,7 @@ public class AlbumsListFragment extends LibraryFragment implements
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.albums);
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.library_albums_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_order: {
-                presenter.onOrderMenuItemClicked();
-                return true;
-            }
-            case R.id.menu_search: {
-                toolbar.setSearchModeEnabled(true);
-                return true;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
+        toolbar.setupOptionsMenu(R.menu.library_albums_menu, this::onOptionsItemClicked);
     }
 
     @Override
@@ -227,5 +191,23 @@ public class AlbumsListFragment extends LibraryFragment implements
                 extra
         );
         albumMenuDialogRunner.show(fragment);
+    }
+
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                break;
+            }
+            case R.id.menu_search: {
+                toolbar.setSearchModeEnabled(true);
+                break;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
+                break;
+            }
+        }
     }
 }

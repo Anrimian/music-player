@@ -66,10 +66,8 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
             Components.getAppComponent().imageLoader()
                     .displayImage(widgetView,
                             R.id.iv_cover,
-                            appWidgetManager,
                             widgetId,
                             compositionId,
-                            ImageUtils::toCircleBitmap,
                             R.drawable.ic_music_placeholder);
         } else {
             widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);

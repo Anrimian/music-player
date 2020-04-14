@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.folders.view.ExcludedFolderAdapter;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
@@ -30,7 +31,7 @@ import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
-public class ExcludedFoldersFragment extends MvpAppCompatFragment implements ExcludedFoldersView {
+public class ExcludedFoldersFragment extends MvpAppCompatFragment implements ExcludedFoldersView, FragmentLayerListener {
 
     @InjectPresenter
     ExcludedFoldersPresenter presenter;
@@ -75,6 +76,12 @@ public class ExcludedFoldersFragment extends MvpAppCompatFragment implements Exc
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         SlidrPanel.simpleSwipeBack(clContainer, this, toolbar::onStackFragmentSlided);
+    }
+
+    @Override
+    public void onFragmentMovedOnTop() {
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.clearOptionsMenu();
     }
 
     @Override

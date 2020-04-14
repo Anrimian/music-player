@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Artists;
 
-import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
@@ -60,15 +59,12 @@ public class StorageArtistsProvider {
     }
 
     public void updateArtistName(String oldName, String name) {
-
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(
-                    Artists.EXTERNAL_CONTENT_URI,
-                    null,
-                    Artists.ARTIST + " = ?",
-                    new String[] { oldName },
-                    null);
+        try(Cursor cursor = contentResolver.query(
+                Artists.EXTERNAL_CONTENT_URI,
+                null,
+                Artists.ARTIST + " = ?",
+                new String[] { oldName },
+                null)) {
             if (cursor == null || cursor.getCount() == 0) {
                 return;
             }
@@ -88,8 +84,6 @@ public class StorageArtistsProvider {
 //                    Artists._ID + " = ?",
 //                    new String[] { String.valueOf(id) });
             contentResolver.insert(Artists.EXTERNAL_CONTENT_URI, cv);
-        } finally {
-            IOUtils.closeSilently(cursor);
         }
 
 /*        ContentValues cv = new ContentValues();

@@ -32,6 +32,9 @@
         <item name="android:background">@drawable/bg_click_inverse</item>
     </style>
 
+    <style name="ButtonBrightStyle" parent="@style/Widget.AppCompat.Button.Colored">
+    </style>
+
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
 
     </style>
@@ -70,6 +73,8 @@
 
     <style name="TextStyleDialogItem" parent="@style/TextStyle">
         <item name="android:textSize">15sp</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">

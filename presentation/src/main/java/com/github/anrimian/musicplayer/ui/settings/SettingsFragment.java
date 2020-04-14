@@ -82,5 +82,6 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
         toolbar.setTitle(R.string.settings);
         toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
+        toolbar.clearOptionsMenu();
     }
 }

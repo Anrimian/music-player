@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.di.app.editor.album;
 
-import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorPresenter;
 

@@ -10,7 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.MusicViewHolder;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
@@ -94,7 +94,7 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
             holder.bind(composition, isCoversEnabled);
             boolean selected = selectedCompositions.contains(composition);
             holder.setSelected(selected);
-            holder.showCurrentComposition(currentComposition);
+            holder.showCurrentComposition(currentComposition, false);
             return;
         }
         if (item instanceof ArtistAlbumsPresenter) {
@@ -168,7 +168,7 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
     public void showCurrentComposition(CurrentComposition currentComposition) {
         this.currentComposition = currentComposition;
         for (MusicViewHolder holder: viewHolders) {
-            holder.showCurrentComposition(currentComposition);
+            holder.showCurrentComposition(currentComposition, true);
         }
     }
 

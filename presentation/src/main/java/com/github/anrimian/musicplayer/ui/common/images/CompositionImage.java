@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-
-public class CompositionImage implements ImageMetaData {
+public class CompositionImage {
 
     private final long id;
 
@@ -10,13 +8,7 @@ public class CompositionImage implements ImageMetaData {
         this.id = id;
     }
 
-    long getId() {
+    public long getId() {
         return id;
     }
-
-    @Override
-    public String getKey() {
-        return "composition-" + id;
-    }
-
 }

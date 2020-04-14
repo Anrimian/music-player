@@ -74,6 +74,7 @@ dependencies {
     implementation deps.material
     implementation deps.cardView
     implementation deps.recyclerView
+    implementation deps.recyclerViewFastScroll
     implementation deps.constraintLayout
     implementation deps.supportMedia
     implementation deps.circleImageView
@@ -96,6 +97,9 @@ dependencies {
 
     implementation deps.room
     kapt deps.roomCompiler
+
+    implementation deps.glide
+    annotationProcessor deps.glideCompiler
 
     implementation deps.slidr
 

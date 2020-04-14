@@ -14,17 +14,18 @@ import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
+import com.github.anrimian.musicplayer.data.repositories.scanner.StoragePlaylistAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
@@ -126,16 +127,16 @@ public class StorageModule {
     MediaScannerRepository mediaScannerRepository(StorageMusicProvider musicProvider,
                                                   StoragePlayListsProvider playListsProvider,
                                                   StorageGenresProvider genresProvider,
-                                                  PlayListsDaoWrapper playListsDao,
                                                   GenresDaoWrapper genresDao,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
+                                                  StoragePlaylistAnalyzer storagePlaylistAnalyzer,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
                 genresProvider,
-                playListsDao,
                 genresDao,
                 compositionAnalyzer,
+                storagePlaylistAnalyzer,
                 scheduler);
     }
 
@@ -149,6 +150,13 @@ public class StorageModule {
                 foldersDaoWrapper,
                 stateRepository,
                 compositionsInserter);
+    }
+
+    @Provides
+    @Nonnull
+    StoragePlaylistAnalyzer storagePlaylistAnalyzer(PlayListsDaoWrapper playListsDao,
+                                                    StoragePlayListsProvider playListsProvider) {
+        return new StoragePlaylistAnalyzer(playListsDao, playListsProvider);
     }
 
     @Provides

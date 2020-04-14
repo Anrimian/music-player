@@ -30,7 +30,12 @@
 
     <color name="color_control_highlight_light">#80BDBDBD</color>
 
+    <color name="popup_menu_background_color">#fff</color>
+<!-- leave for future ideas  -->
+<!--    <color name="player_panel_background">#F6F6F6</color>-->
+
     <color name="light_background_level_1">#fafafa</color>
+    <color name="color_control_third">#CCCCCC</color>
 
     <!--second theme-->
     <color name="secondColorPrimary">#3F51B5</color>
@@ -56,7 +61,8 @@
     <color name="secondary_button_color_dark">#B1B1B1</color>
     <color name="color_control_highlight_dark">#4DFFFFFF</color>
 
-    <color name="menu_item_background_color_dark">#3D3D3D</color>
+    <color name="dialog_background_color_dark">#3D3D3D</color>
+    <color name="popup_menu_background_color_dark">#474646</color>
 
     <color name="actionModeStatusBarColorDark">#5C5B5B</color>
     <color name="actionModeBackgroundColorDark">#3D3D3D</color>
@@ -65,10 +71,10 @@
 
     <color name="snackbar_color_dark">#ffff</color>
 
-
     <!--other-->
     <color name="startShadowColor">#00000000</color>
     <color name="endShadowColor">#33000000</color>
+    <color name="fakeShadowColor">#33000000</color>
 
     <!--light theme(indigo)-->
     <color name="colorBluePrimary">#3F51B5</color>

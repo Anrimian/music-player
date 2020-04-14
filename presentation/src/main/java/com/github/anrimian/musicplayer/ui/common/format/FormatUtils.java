@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.view.View;
 
-import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
@@ -17,7 +16,7 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 
@@ -130,6 +129,7 @@ public class FormatUtils {
             case ADD_TIME: return R.string.add_date_order;
             case COMPOSITION_COUNT: return R.string.by_composition_count;
             case DURATION: return R.string.by_duration;
+            case SIZE: return R.string.by_size;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }
@@ -140,6 +140,7 @@ public class FormatUtils {
             case ADD_TIME: return R.string.add_date_order_desc_title;
             case COMPOSITION_COUNT: return R.string.more_first;
             case DURATION: return R.string.longest_first;
+            case SIZE: return R.string.largest_first;
             default: throw new IllegalStateException("can not find title for order: " + orderType);
         }
     }

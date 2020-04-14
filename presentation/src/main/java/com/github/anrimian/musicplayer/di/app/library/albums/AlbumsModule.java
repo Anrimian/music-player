@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.di.app.library.albums;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryAlbumsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;

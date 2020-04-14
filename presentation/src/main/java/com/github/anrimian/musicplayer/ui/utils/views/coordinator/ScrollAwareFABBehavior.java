@@ -46,13 +46,6 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     }
 
     @Override
-    public boolean layoutDependsOn(@NonNull CoordinatorLayout parent,
-                                   @NonNull FloatingActionButton child,
-                                   @NonNull View dependency) {
-        return dependency instanceof RecyclerView;
-    }
-
-    @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent,
                                           @NonNull FloatingActionButton child,
                                           View dependency) {

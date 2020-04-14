@@ -15,7 +15,6 @@ import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDel
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotModifiedException;
-import com.github.anrimian.musicplayer.data.utils.IOUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -49,14 +48,11 @@ public class StoragePlayListsProvider {
     }
 
     public LongSparseArray<StoragePlayList> getPlayLists() {
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(
-                    Playlists.EXTERNAL_CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null);
+        try(Cursor cursor = contentResolver.query(Playlists.EXTERNAL_CONTENT_URI,
+                null,
+                null,
+                null,
+                null)) {
             if (cursor == null) {
                 return new LongSparseArray<>();
             }
@@ -71,8 +67,6 @@ public class StoragePlayListsProvider {
                 }
             }
             return map;
-        } finally {
-            IOUtils.closeSilently(cursor);
         }
     }
 
@@ -85,7 +79,7 @@ public class StoragePlayListsProvider {
         if (uri == null || isEmpty(uri.getLastPathSegment())) {
             return null;
         }
-        long id = Long.valueOf(uri.getLastPathSegment());
+        long id = Long.parseLong(uri.getLastPathSegment());
         StoragePlayList playList = findPlayList(id);
         if (playList == null) {
             return null;
@@ -101,7 +95,7 @@ public class StoragePlayListsProvider {
         if (uri == null || isEmpty(uri.getLastPathSegment())) {
             throw new PlayListNotCreatedException();
         }
-        long id = Long.valueOf(uri.getLastPathSegment());
+        long id = Long.parseLong(uri.getLastPathSegment());
         StoragePlayList playList = findPlayList(id);
         if (playList == null) {
             throw new PlayListNotCreatedException();
@@ -130,14 +124,12 @@ public class StoragePlayListsProvider {
     }
 
     public List<StoragePlayListItem> getPlayListItems(long playListId) {
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(
-                    getContentUri("external", playListId),
-                    new String[] {AUDIO_ID, _ID},
-                    null,
-                    null,
-                    Playlists.Members.PLAY_ORDER);
+        try(Cursor cursor = contentResolver.query(
+                getContentUri("external", playListId),
+                new String[] {AUDIO_ID, _ID},
+                null,
+                null,
+                Playlists.Members.PLAY_ORDER)) {
             if (cursor == null) {
                 return emptyList();
             }
@@ -150,8 +142,6 @@ public class StoragePlayListsProvider {
                 items.add(item);
             }
             return items;
-        } finally {
-            IOUtils.closeSilently(cursor);
         }
     }
 
@@ -237,21 +227,17 @@ public class StoragePlayListsProvider {
 
     @Nullable
     private StoragePlayList findPlayList(long id) {
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(
-                    Playlists.EXTERNAL_CONTENT_URI,
-                    null,
-                    Playlists._ID + " = ?",
-                    new String[] { String.valueOf(id) },
-                    Playlists.DATE_ADDED + " DESC");
+        try(Cursor cursor = contentResolver.query(
+                Playlists.EXTERNAL_CONTENT_URI,
+                null,
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(id) },
+                Playlists.DATE_ADDED + " DESC")) {
             if (cursor != null && cursor.moveToFirst()) {
                 CursorWrapper cursorWrapper = new CursorWrapper(cursor);
                 return getPlayListFromCursor(cursorWrapper);
             }
             return null;
-        } finally {
-            IOUtils.closeSilently(cursor);
         }
     }
 

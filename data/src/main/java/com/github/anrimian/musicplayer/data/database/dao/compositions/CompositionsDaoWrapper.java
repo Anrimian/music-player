@@ -16,22 +16,16 @@ import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionU
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
-import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 
 public class CompositionsDaoWrapper {
 
@@ -59,9 +53,9 @@ public class CompositionsDaoWrapper {
     public Observable<List<Composition>> getAllObservable(Order order,
                                                           @Nullable String searchText) {
         String query = CompositionsDao.getCompositionQuery();
-        query += getSearchQuery(searchText);
+        query += getSearchQuery();
         query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 3));
         return compositionsDao.getAllObservable(sqlQuery);
     }
 
@@ -69,20 +63,16 @@ public class CompositionsDaoWrapper {
                                                                            Order order,
                                                                            @Nullable String searchText) {
         StringBuilder query = new StringBuilder(CompositionsDao.getCompositionQuery());
-        String searchQuery = getSearchQuery(searchText);
+        String searchQuery = getSearchQuery();
         query.append(searchQuery);
-        if (isEmpty(searchQuery)) {
-            query.append(" WHERE ");
-        } else {
-            query.append(" AND ");
-        }
+        query.append(" AND ");
         query.append("folderId = ");
         query.append(folderId);
         query.append(" OR (folderId IS NULL AND ");
         query.append(folderId);
         query.append(" IS NULL)");
         query.append(getOrderQuery(order));
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString());
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 3));
         return compositionsDao.getAllInFolderObservable(sqlQuery);
     }
 
@@ -162,7 +152,7 @@ public class CompositionsDaoWrapper {
 
             // if album not exists - create album
             if (albumId == null && albumName != null) {
-                //TODO rare crash here
+                //single crash here
                 //unexisting artist id?
                 albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
             }
@@ -270,6 +260,14 @@ public class CompositionsDaoWrapper {
                 orderQuery.append("dateAdded");
                 break;
             }
+            case SIZE: {
+                orderQuery.append("size");
+                break;
+            }
+            case DURATION: {
+                orderQuery.append("duration");
+                break;
+            }
             default: throw new IllegalStateException("unknown order type" + order);
         }
         orderQuery.append(" ");
@@ -277,18 +275,7 @@ public class CompositionsDaoWrapper {
         return orderQuery.toString();
     }
 
-    private String getSearchQuery(String searchText) {
-        if (isEmpty(searchText)) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(" WHERE ");
-        sb.append("title LIKE '%");
-        sb.append(searchText);
-        sb.append("%'");
-        sb.append(" OR artist NOTNULL AND artist LIKE '%");
-        sb.append(searchText);
-        sb.append("%'");
-
-        return sb.toString();
+    private String getSearchQuery() {
+        return " WHERE (? IS NULL OR title LIKE ? OR (artist NOTNULL AND artist LIKE ?))";
     }
 }

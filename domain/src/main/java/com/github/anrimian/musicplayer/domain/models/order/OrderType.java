@@ -8,7 +8,8 @@ public enum OrderType {
     ALPHABETICAL(1),
     ADD_TIME(3),
     COMPOSITION_COUNT(5),
-    DURATION(7);
+    DURATION(7),
+    SIZE(9);
 
     private static Map<Integer, OrderType> map = new HashMap<>();
 

@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.albums.list;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryAlbumsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;

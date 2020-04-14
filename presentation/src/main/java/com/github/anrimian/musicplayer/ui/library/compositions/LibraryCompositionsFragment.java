@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.library.compositions;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayList
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -87,12 +86,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         return presenter;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -114,6 +107,8 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
         adapter = new CompositionsAdapter(recyclerView,
                 presenter.getSelectedCompositions(),
@@ -153,38 +148,13 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
+        toolbar.setupOptionsMenu(R.menu.library_compositions_menu, this::onOptionsItemClicked);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         presenter.onStop();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.library_compositions_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_order: {
-                presenter.onOrderMenuItemClicked();
-                return true;
-            }
-            case R.id.menu_search: {
-                toolbar.setSearchModeEnabled(true);
-                return true;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -280,7 +250,9 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
                 OrderType.ALPHABETICAL,
-                OrderType.ADD_TIME);
+                OrderType.ADD_TIME,
+                OrderType.DURATION,
+                OrderType.SIZE);
         selectOrderDialogRunner.show(fragment);
     }
 
@@ -350,5 +322,23 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     public void onCompositionsAddedToQueue(List<Composition> compositions) {
         String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
         MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_order: {
+                presenter.onOrderMenuItemClicked();
+                break;
+            }
+            case R.id.menu_search: {
+                toolbar.setSearchModeEnabled(true);
+                break;
+            }
+            case R.id.menu_rescan_storage: {
+                Components.getAppComponent().mediaScannerRepository().rescanStorage();
+                break;
+            }
+        }
     }
 }

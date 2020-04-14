@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayList
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -58,12 +59,6 @@ public class PlayListsFragment extends MvpAppCompatFragment
         return Components.getAppComponent().playListsPresenter();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -82,6 +77,8 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerViewUtils.attachFastScroller(recyclerView);
 
         adapter = new PlayListsAdapter(
                 recyclerView,
@@ -103,6 +100,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
         toolbar.setTitle(R.string.play_lists);
         toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
+        toolbar.clearOptionsMenu();
 
         presenter.onFragmentMovedToTop();
     }

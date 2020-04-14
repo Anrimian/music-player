@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.AppCompatSeekBar;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
@@ -38,10 +37,12 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
@@ -93,9 +94,9 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 
 /**
@@ -300,7 +301,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 getColorFromAttr(requireContext(), R.attr.listBackground),
                 presenter::onItemSwipedToDelete,
                 ItemTouchHelper.START,
-                R.drawable.ic_delete_outline,
+                R.drawable.ic_remove_from_queue,
                 R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
@@ -319,6 +320,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);
         seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart);
         seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
+
+        CompatUtils.setMainButtonStyle(ivPlayPause);
+        CompatUtils.setMainButtonStyle(ivSkipToNext);
+        CompatUtils.setMainButtonStyle(ivSkipToPrevious);
+        CompatUtils.setMainButtonStyle(btnRandomPlay);
+        CompatUtils.setMainButtonStyle(btnRepeatMode);
+        CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
 
         ChoosePlayListDialogFragment fragment = (ChoosePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
@@ -405,6 +413,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onStop();
         //battery saving
         presenter.onStop();
+
+        clearVectorAnimationInfo(ivPlayPause);
     }
 
     @Override
@@ -473,7 +483,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showStopState() {
-        ivPlayPause.setImageResource(R.drawable.ic_play);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
         ivPlayPause.setContentDescription(getString(R.string.play));
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
         playQueueAdapter.showPlaying(false);
@@ -481,7 +491,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showPlayState() {
-        ivPlayPause.setImageResource(R.drawable.ic_pause);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
         ivPlayPause.setContentDescription(getString(R.string.pause));
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
         playQueueAdapter.showPlaying(true);
@@ -513,7 +523,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             tvCurrentCompositionAuthor.setText(R.string.unknown_author);
             ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             String noCompositionMessage = getString(R.string.no_current_composition);
-            topBottomSheetPanel.setContentDescription(noCompositionMessage);
+            topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, noCompositionMessage));
             rvPlayList.setContentDescription(noCompositionMessage);
             sbTrackState.setContentDescription(noCompositionMessage);
         } else {
@@ -718,30 +728,28 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void onCompositionMenuClicked(View view) {
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.composition_short_actions_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddCurrentCompositionToPlayListButtonClicked();
-                    return true;
-                }
-                case R.id.menu_share: {
-                    presenter.onShareCompositionButtonClicked();
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCurrentCompositionButtonClicked();
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    presenter.onEditCompositionButtonClicked();
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.composition_short_actions_menu,
+                item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_add_to_playlist: {
+                            presenter.onAddCurrentCompositionToPlayListButtonClicked();
+                            break;
+                        }
+                        case R.id.menu_share: {
+                            presenter.onShareCompositionButtonClicked();
+                            break;
+                        }
+                        case R.id.menu_delete: {
+                            presenter.onDeleteCurrentCompositionButtonClicked();
+                            break;
+                        }
+                        case R.id.menu_edit: {
+                            presenter.onEditCompositionButtonClicked();
+                            break;
+                        }
+                    }
+                });
     }
 
     private DrawerArrowDrawable createDrawerArrowDrawable() {
@@ -778,60 +786,55 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onPlayItemMenuClicked(View view, PlayQueueItem playQueueItem) {
         Composition composition = playQueueItem.getComposition();
 
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.play_queue_item_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddQueueItemToPlayListButtonClicked(composition);
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
-                    return true;
-                }
-                case R.id.menu_share: {
-                    onShareCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_delete_from_queue: {
-                    presenter.onDeleteQueueItemClicked(playQueueItem);
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(composition);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.play_queue_item_menu,
+                item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_add_to_playlist: {
+                            presenter.onAddQueueItemToPlayListButtonClicked(composition);
+                            break;
+                        }
+                        case R.id.menu_edit: {
+                            startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                            break;
+                        }
+                        case R.id.menu_share: {
+                            onShareCompositionClicked(composition);
+                            break;
+                        }
+                        case R.id.menu_delete_from_queue: {
+                            presenter.onDeleteQueueItemClicked(playQueueItem);
+                            break;
+                        }
+                        case R.id.menu_delete: {
+                            presenter.onDeleteCompositionButtonClicked(composition);
+                            break;
+                        }
+                    }
+                });
     }
 
     private void onRepeatModeButtonClicked(View view) {
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.repeat_mode_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            int repeatMode = RepeatMode.NONE;
-            switch (item.getItemId()) {
-                case R.id.menu_repeat_playlist: {
-                    repeatMode = RepeatMode.REPEAT_PLAY_LIST;
-                    break;
-                }
-                case R.id.menu_repeat_composition: {
-                    repeatMode = RepeatMode.REPEAT_COMPOSITION;
-                    break;
-                }
-                case R.id.menu_do_not_repeat: {
-                    repeatMode = RepeatMode.NONE;
-                    break;
-                }
-            }
-            presenter.onRepeatModeChanged(repeatMode);
-            return true;
-        });
-        insertMenuItemIcons(requireContext(), popup);
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.repeat_mode_menu,
+                item -> {
+                    int repeatMode = RepeatMode.NONE;
+                    switch (item.getItemId()) {
+                        case R.id.menu_repeat_playlist: {
+                            repeatMode = RepeatMode.REPEAT_PLAY_LIST;
+                            break;
+                        }
+                        case R.id.menu_repeat_composition: {
+                            repeatMode = RepeatMode.REPEAT_COMPOSITION;
+                            break;
+                        }
+                        case R.id.menu_do_not_repeat: {
+                            repeatMode = RepeatMode.NONE;
+                            break;
+                        }
+                    }
+                    presenter.onRepeatModeChanged(repeatMode);
+                });
     }
 
     private void onShareCompositionClicked(Composition composition) {

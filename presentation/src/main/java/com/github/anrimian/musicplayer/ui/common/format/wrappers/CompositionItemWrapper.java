@@ -15,8 +15,10 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 import java.util.List;
 
@@ -61,7 +63,7 @@ public class CompositionItemWrapper {
 
     @Nullable
     @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
+    ImageView btnActionsMenu;
 
     @Nullable
     @BindView(R.id.icon_clickable_area)
@@ -80,6 +82,10 @@ public class CompositionItemWrapper {
             iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
         }
         clickableItem.setOnClickListener(v -> onClickListener.call(composition));
+
+        if (btnActionsMenu != null) {
+            CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+        }
     }
 
     public void bind(Composition composition, boolean showCovers) {
@@ -89,7 +95,7 @@ public class CompositionItemWrapper {
         showCorrupted();
         showCompositionImage(showCovers);
 
-        showAsPlaying(false);
+        showAsPlaying(false, false);
     }
 
     public void update(Composition composition, List<Object> payloads) {
@@ -142,9 +148,11 @@ public class CompositionItemWrapper {
         }
     }
 
-    public void showAsPlaying(boolean isPlaying) {
+    public void showAsPlaying(boolean isPlaying, boolean animate) {
         if (ivPlay != null) {
-            ivPlay.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play);
+            AndroidUtils.setAnimatedVectorDrawable(ivPlay,
+                    isPlaying? R.drawable.anim_play_to_pause: R.drawable.anim_pause_to_play,
+                    animate);
         }
     }
 

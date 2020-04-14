@@ -8,6 +8,8 @@
     <dimen name="music_control_button_padding_collapsed">12dp</dimen>
     <dimen name="music_control_button_padding_expanded">7dp</dimen>
 
+    <!--animation-->
+    <integer name="button_animation_duration">300</integer>
 
     <dimen name="text_size_xxsmall">12sp</dimen>
     <dimen name="text_size_xsmall">13sp</dimen>
@@ -38,6 +40,8 @@
     <!--list margins-->
     <dimen name="list_vertical_margin">14dp</dimen>
     <dimen name="content_vertical_spacing_margin">4dp</dimen>
+   <!--content_vertical_margin*2(32) + fab size(56) -->
+    <dimen name="list_bottom_padding_with_fab">88dp</dimen>
 
     <!--dialog margins-->
     <dimen name="dialog_content_margin_start">20dp</dimen>
@@ -118,4 +122,12 @@
     <dimen name="snackbar_margin">8dp</dimen>
     <dimen name="snackbar_corners">4dp</dimen>
 
+    <!--scrollbars-->
+    <dimen name="scrollbar_thumb_vertical_padding">16dp</dimen>
+    <dimen name="scrollbar_width">4dp</dimen>
+
+    <!--popup-->
+    <dimen name="popup_screen_margin">16dp</dimen>
+    <dimen name="action_bar_popup_screen_margin">8dp</dimen>
+    <dimen name="popup_item_horizontal_margin">16dp</dimen>
 </resources>

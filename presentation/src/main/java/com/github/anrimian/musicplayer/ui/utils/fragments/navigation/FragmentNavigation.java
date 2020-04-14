@@ -8,7 +8,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import androidx.annotation.AnimRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -132,7 +131,7 @@ public class FragmentNavigation {
                         }
 
                     })
-                    .commit();
+                    .commitAllowingStateLoss();
         });
     }
 
@@ -367,7 +366,7 @@ public class FragmentNavigation {
         return isVisible;
     }
 
-    public void setVisible(boolean visible) {
+    public void setMenuVisible(boolean visible) {
         isVisible = visible;
         Fragment fragment = getFragmentOnTop();
         if (fragment != null) {
@@ -375,8 +374,19 @@ public class FragmentNavigation {
         }
     }
 
+    public void dispatchMovedToTop() {
+        Fragment fragment = getFragmentOnTop();
+        if (fragment != null) {
+            notifyFragmentMovedToTop(fragment);
+        }
+    }
+
+    public boolean isInitialized() {
+        return jugglerView != null;
+    }
+
     private void notifyFragmentMovedToTop(Fragment fragment) {
-        if (fragment instanceof FragmentLayerListener) {
+        if (isVisible && fragment instanceof FragmentLayerListener) {
             ((FragmentLayerListener) fragment).onFragmentMovedOnTop();
         }
     }
@@ -520,7 +530,10 @@ public class FragmentNavigation {
         Fragment fragment = fragmentManagerProvider.getFragmentManager()//can be null?
                 .getFragmentFactory()
                 .instantiate(jugglerView.getContext().getClassLoader(), metaData.getFragmentClassName());
-        fragment.setArguments(metaData.getArguments());
+        Bundle args = metaData.getArguments();
+        if (args != null) {
+            fragment.setArguments(args);
+        }
         return fragment;
     }
 

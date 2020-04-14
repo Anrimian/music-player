@@ -108,7 +108,7 @@ public class CompositionSourceEditor {
                 .flatMapMaybe(this::getFullTags);
     }
 
-    //TODO genre not found case
+    //genre not found case
     Completable changeCompositionGenre(String filePath,
                                        String oldGenre,
                                        String newGenre) {

@@ -17,8 +17,8 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.DialogFragment;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -161,7 +161,7 @@ public class InputTextDialogFragment extends DialogFragment {
                 complexCompleteListener.call(text, getArguments().getBundle(EXTRA_DATA_ARG));
             }
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     private boolean isEnterButtonEnabled(String text) {

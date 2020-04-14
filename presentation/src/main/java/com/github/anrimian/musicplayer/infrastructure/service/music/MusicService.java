@@ -19,8 +19,8 @@ import androidx.media.session.MediaButtonReceiver;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.player.MusicServiceInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
@@ -66,7 +66,6 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer.FOREGROUND_NOTIFICATION_ID;
 
 /**
  * Created on 03.11.2017.
@@ -75,6 +74,7 @@ import static com.github.anrimian.musicplayer.ui.notifications.NotificationsDisp
 public class MusicService extends Service {
 
     public static final String REQUEST_CODE = "request_code";
+    public static final String START_FOREGROUND_SIGNAL = "start_foreground_signal";
 
     private NotificationsDisplayer notificationsDisplayer;
 
@@ -144,12 +144,11 @@ public class MusicService extends Service {
 
         serviceDisposable.add(playInfoDisposable);
 
-        startForeground(FOREGROUND_NOTIFICATION_ID,
-                notificationsDisplayer.getForegroundNotification(
-                        true,
-                        currentItem,
-                        mediaSession,
-                        notificationSetting));
+        notificationsDisplayer.startForegroundNotification(this,
+                true,
+                currentItem,
+                mediaSession,
+                notificationSetting);
 
         subscribeOnNotificationSettings();
         subscribeOnPlayerChanges();
@@ -158,6 +157,14 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
+        int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
+        if (startForegroundSignal != -1) {
+            notificationsDisplayer.startForegroundNotification(this,
+                    true,
+                    currentItem,
+                    mediaSession,
+                    notificationSetting);
+        }
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
         } else {
@@ -222,21 +229,12 @@ public class MusicService extends Service {
         switch (playerState) {
             case PLAY: {
                 mediaSession.setActive(true);
-                startForeground(FOREGROUND_NOTIFICATION_ID,
-                        notificationsDisplayer.getForegroundNotification(
-                                true,
-                                currentItem,
-                                mediaSession,
-                                notificationSetting));
+                updateForegroundNotification();
                 subscribeOnPlayInfo();
                 break;
             }
             case PAUSE: {
-                notificationsDisplayer.updateForegroundNotification(
-                        false,
-                        currentItem,
-                        mediaSession,
-                        notificationSetting);
+                updateForegroundNotification();
                 stopForeground(false);
                 break;
             }
@@ -260,7 +258,6 @@ public class MusicService extends Service {
         }
     }
 
-    //little td: don't display notification in the stop state and notification isn't visible(delete intent)
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
         if (queueItem == null) {

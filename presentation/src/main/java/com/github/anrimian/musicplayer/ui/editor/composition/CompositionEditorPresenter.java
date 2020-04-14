@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.editor.composition;
 
-import com.github.anrimian.musicplayer.domain.business.editor.EditorInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;

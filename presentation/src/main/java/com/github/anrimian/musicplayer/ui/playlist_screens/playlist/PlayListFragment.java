@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +25,6 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
@@ -37,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
@@ -126,6 +124,8 @@ public class PlayListFragment extends MvpAppCompatFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
+
         adapter = new PlayListItemAdapter(recyclerView,
                 presenter.isCoversEnabled(),
                 presenter::onCompositionClicked,
@@ -150,29 +150,10 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void onFragmentMovedOnTop() {
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setupOptionsMenu(R.menu.play_list_menu, this::onOptionsItemClicked);
+
         presenter.onFragmentMovedToTop();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.play_list_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_change_play_list_name: {
-                presenter.onChangePlayListNameButtonClicked();
-                return true;
-            }
-            case R.id.menu_delete_play_list: {
-                presenter.onDeletePlayListButtonClicked();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -210,7 +191,6 @@ public class PlayListFragment extends MvpAppCompatFragment
                 R.plurals.compositions_count,
                 playList.getCompositionsCount(),
                 playList.getCompositionsCount()));
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -387,5 +367,19 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     private long getPlayListId() {
         return Objects.requireNonNull(getArguments()).getLong(PLAY_LIST_ID_ARG);
+    }
+
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_change_play_list_name: {
+                presenter.onChangePlayListNameButtonClicked();
+                break;
+            }
+            case R.id.menu_delete_play_list: {
+                presenter.onDeletePlayListButtonClicked();
+                break;
+            }
+        }
     }
 }

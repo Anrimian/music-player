@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
@@ -11,8 +12,8 @@ import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
@@ -24,6 +25,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
+import com.github.anrimian.musicplayer.utils.filelog.FileLog;
 
 import javax.inject.Singleton;
 
@@ -62,13 +64,16 @@ public interface AppComponent {
     UiStateRepository uiStateRepository();
     MediaScannerRepository mediaScannerRepository();
     CompositionSourceProvider sourceRepository();
+    StorageAlbumsProvider storageAlbumsProvider();
 
     CoverImageLoader imageLoader();
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();
     ErrorParser errorParser();
+    FileLog fileLog();
 
     ThemeController themeController();
 
     void inject(MusicService musicService);
+
 }

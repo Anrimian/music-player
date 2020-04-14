@@ -3,6 +3,7 @@
         com.github.anrimian.simplemusicplayer.share_file_provider
     </string>
     <string name="feedback_email" translatable="false">anrimian.developer@gmail.com</string>
+    <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
 
     <string name="app_name" translatable="false">Music Player</string>
     <string name="open_drawer">Open drawer</string>
@@ -187,6 +188,13 @@
     <string name="play_next_message_single">Composition \"%s\" will be played next</string>
     <string name="added_to_queue_message_single">Composition \"%s\" added to end of play queue</string>
     <string name="queue_item_removed">Queue item removed</string>
+    <string name="by_size">By size</string>
+    <string name="largest_first">Largest first</string>
+    <string name="log_info_text">Some non-fatal errors occurred and info about them recorded into log file. Application doesn\'t send logs automatically, but you can send them manually. That will help to improve app quality. Current log file size: %d KB</string>
+    <string name="view_file">View file</string>
+    <string name="send_file">Send file</string>
+    <string name="delete_file">Delete file</string>
+    <string name="log_file_deleted">Log file deleted</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
