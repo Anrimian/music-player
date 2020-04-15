@@ -64,13 +64,13 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         getViewState().setSkipToNextButtonEnabled(true);
-        getViewState().showRandomPlayingButton(playerInteractor.isRandomPlayingEnabled());
         if (playerScreenInteractor.isPlayerPanelOpen()) {
             getViewState().expandBottomPanel();
         } else {
             getViewState().collapseBottomPanel();
         }
         subscribeOnUiSettings();
+        subscribeOnRandomMode();
     }
 
     @Override
@@ -142,7 +142,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onRandomPlayingButtonClicked(boolean enable) {
         playerInteractor.setRandomPlayingEnabled(enable);
-        getViewState().showRandomPlayingButton(enable);
     }
 
     void onShareCompositionButtonClicked() {
@@ -391,5 +390,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (currentItem != null) {
             getViewState().showCurrentQueueItem(currentItem, isCoversEnabled);
         }
+    }
+
+    private void subscribeOnRandomMode() {
+        presenterDisposable.add(playerInteractor.getRandomPlayingObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showRandomPlayingButton));
     }
 }
