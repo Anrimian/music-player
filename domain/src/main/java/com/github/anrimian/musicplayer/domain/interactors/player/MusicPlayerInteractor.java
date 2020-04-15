@@ -124,8 +124,8 @@ public class MusicPlayerInteractor {
         if (audioFocusObservable != null) {
             if (playerStateSubject.getValue() != LOADING) {
                 musicPlayerController.resume();
+                playerStateSubject.onNext(PLAY);
             }
-            playerStateSubject.onNext(PLAY);
             systemServiceController.startMusicService();
 
             systemEventsDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
@@ -340,6 +340,9 @@ public class MusicPlayerInteractor {
 
     private void onCompositionPrepared() {
         PlayerState state = playerStateSubject.getValue();
+        if (state == LOADING) {
+            playerStateSubject.onNext(PLAY);
+        }
         if (state == PLAY || state == LOADING) {
             musicPlayerController.resume();
         }

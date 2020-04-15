@@ -116,7 +116,7 @@ public class MusicPlayerInteractorTest {
         verify(playQueueRepository).setPlayQueue(getFakeCompositions(), 0);
         verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(0)), anyLong());
         verify(musicPlayerController, never()).resume();
-        playerStateSubscriber.assertValues(IDLE, PLAY);
+        playerStateSubscriber.assertValues(IDLE);
     }
 
     @Test
