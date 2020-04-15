@@ -5,7 +5,6 @@
     </string>
     <string name="feedback_email" translatable="false">smusicplayer.feedback@gmail.com</string>
     <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
-    <string name="translations_repository" translatable="false">https://stackoverflow.com</string>
 
     <string name="app_name" translatable="false">Music Player</string>
     <string name="open_drawer">Open drawer</string>
@@ -119,21 +118,21 @@
     <string name="about_app">About</string>
     <string name="version_template">Version %1$s(Build %2$d)</string>
     <string name="about_app_text"><![CDATA[<big><b>What is this app?</b></big>
-        <br/>This is music player that I wrote for myself, in accordance with my vision of how a music player should look.
-        <br/>If you found error, %1$s me about it.
-        <br/>If you are missing some features, %1$s me about it, but I can\'t promise that I necessarily implement it. Usually I do after a while.
+        <br/>This is a music player that I wrote for myself, in accordance with my vision of how a music player should look like.
+        <br/>If you find an error, %1$s about it.
+        <br/>If you feel that some features are missing, %1$s about it, but I can\'t promise that I necessarily implement it. Usually I do after a while.
         <br/>
         <br/><big><b>Is this app completely free?</b></big>
-        <br/>Yes, no any purchases or ads. Perhaps if this app become highly popular I could implement some paid unimportant features, but I definitely won\'t add ads or lock existing functionality.
+        <br/>Yes, no ads, no in-app purchases. Perhaps if this app become highly popular I could implement some paid non-essential features, but I definitely won\'t add ads or lock existing functionality.
         <br/>
         <br/><big><b>Has this app any analytics or data collection?</b></big>
         <br/>No analytics or something else. This app even hasn\'t internet connection permission. (At least until implementation features that requires internet connection.)
         <br/>
         <br/><big><b>Translations</b></big>
-        <br/>If you found error in app texts or want to submit translation to your language, you can submit changes to app text repository %2$s.]]>
+        <br/>If you find an error in app texts or want to offer translation to your language, %2$s about it.]]>
     </string>
-    <string name="about_app_text_write">write</string>
-    <string name="about_app_text_here">here</string>
+    <string name="about_app_text_write">email me</string>
+    <string name="about_app_text_here">email me</string>
     <string name="send_email">Send email</string>
     <string name="theme">Theme</string>
     <string name="white_purple_theme">White(Purple)</string>
