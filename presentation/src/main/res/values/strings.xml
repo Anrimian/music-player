@@ -195,6 +195,7 @@
     <string name="send_file">Send file</string>
     <string name="delete_file">Delete file</string>
     <string name="log_file_deleted">Log file deleted</string>
+    <string name="pick_email_app_to_send">Pick a email app to send</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

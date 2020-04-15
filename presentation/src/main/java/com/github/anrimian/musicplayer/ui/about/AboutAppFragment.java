@@ -139,17 +139,17 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
         }
     }
 
-    //file doesn't attach
+    //
     private void startSendLogScreen() {
         Uri uri = createUri(requireContext(), fileLog.getFile());
-        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
+        Intent intent = new Intent(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_SUBJECT, "Log info");
         intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.setType("file/txt");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{ getString(R.string.log_email) });
-        intent.putExtra(Intent.EXTRA_TEXT, fileLog.getLogText());
         try {
-            startActivity(intent);
+            startActivity(Intent.createChooser(intent, getString(R.string.pick_email_app_to_send)));
         } catch (ActivityNotFoundException e) {
             Toast.makeText(requireContext(), "Mail app not found", Toast.LENGTH_SHORT).show();
         }
