@@ -4,7 +4,7 @@
         android:title="@string/add_to_playlist"
         android:icon="@drawable/ic_playlist_plus"/>
     <item android:id="@+id/menu_edit"
-        android:title="@string/edit"
+        android:title="@string/edit_tags"
         android:icon="@drawable/ic_circle_edit_outline"/>
     <item android:id="@+id/menu_share"
         android:title="@string/share"
