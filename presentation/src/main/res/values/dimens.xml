@@ -130,4 +130,8 @@
     <dimen name="popup_screen_margin">16dp</dimen>
     <dimen name="action_bar_popup_screen_margin">8dp</dimen>
     <dimen name="popup_item_horizontal_margin">16dp</dimen>
+
+    <!--seekbar-->
+    <dimen name="seekbar_height">2dp</dimen>
+    <dimen name="seekbar_corner_radius">6dp</dimen>
 </resources>
