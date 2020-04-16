@@ -141,8 +141,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Completable restoreDeletedItem() {
-        return Completable.fromAction(playQueueDao::restoreDeletedItem)
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() -> {
+            Long restoredId = playQueueDao.restoreDeletedItem();
+            if (uiStatePreferences.getCurrentQueueItemId() == NO_ITEM && restoredId != null) {
+                setCurrentItem(restoredId);
+            }
+        }).subscribeOn(scheduler);
     }
 
     @Override
