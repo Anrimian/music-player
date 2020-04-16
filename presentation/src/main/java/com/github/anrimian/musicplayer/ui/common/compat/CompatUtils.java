@@ -14,7 +14,7 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFrom
 public class CompatUtils {
 
     public static void setMainButtonStyle(ImageView imageView) {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             Context context = imageView.getContext();
             int[][] states = new int[][]{
                     new int[]{-android.R.attr.state_enabled},
@@ -34,7 +34,7 @@ public class CompatUtils {
     }
 
     public static void setSecondaryButtonStyle(ImageView imageView) {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             Context context = imageView.getContext();
             int[][] states = new int[][]{
                     new int[]{-android.R.attr.state_enabled},
