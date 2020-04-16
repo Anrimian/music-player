@@ -128,7 +128,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void seekTo(long position) {
-        mediaPlayer.seekTo((int) position);
+        try {
+            mediaPlayer.seekTo((int) position);
+        } catch (IllegalStateException ignored) {}
         trackPositionSubject.onNext(position);
     }
 
@@ -147,7 +149,11 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         if (currentComposition == null) {
             return 0;
         }
-        return mediaPlayer.getCurrentPosition();
+        try {
+            return mediaPlayer.getCurrentPosition();
+        } catch (IllegalStateException e) {
+            return 0;
+        }
     }
 
     @Override
