@@ -124,10 +124,12 @@ public class PlayQueueDaoWrapper {
         playQueueDao.deleteItem(itemId);
     }
 
-    public void restoreDeletedItem() {
+    @Nullable
+    public Long restoreDeletedItem() {
         if (deletedItem != null) {
-            playQueueDao.insertItem(deletedItem);
+           return playQueueDao.insertItem(deletedItem);
         }
+        return null;
     }
 
     public void swapItems(PlayQueueItem firstItem, PlayQueueItem secondItem, boolean shuffleMode) {

@@ -237,7 +237,7 @@ public class NotificationsDisplayer {
 
             if (showCovers) {
                 Bitmap bitmap = currentNotificationBitmap;
-                if (bitmap == null) {
+                if (bitmap == null || bitmap.isRecycled()) {
                     bitmap = coverImageLoader.getDefaultNotificationBitmap();
                 }
                 builder.setLargeIcon(bitmap);

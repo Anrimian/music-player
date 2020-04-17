@@ -245,10 +245,15 @@ public class AndroidUtils {
             Window window = activity.getWindow();
 
             window.setNavigationBarColor(color);
+
+            View decorView = window.getDecorView();
+            int flags = decorView.getSystemUiVisibility();
             if (ColorUtils.calculateLuminance(color) >= 0.5f) {//white
-                View decorView = window.getDecorView();
-                decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                flags |= SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            } else if ((flags & SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) == SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) {
+                flags = flags ^ SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
             }
+            decorView.setSystemUiVisibility(flags);
         }
     }
 

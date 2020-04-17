@@ -632,6 +632,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 R.menu.folder_item_menu,
                 item -> {
                     switch (item.getItemId()) {
+                        case R.id.menu_play: {
+                            presenter.onPlayFolderClicked(folder);
+                            break;
+                        }
                         case R.id.menu_play_next: {
                             presenter.onPlayNextFolderClicked(folder);
                             break;

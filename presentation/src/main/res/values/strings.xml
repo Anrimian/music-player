@@ -1,8 +1,9 @@
 <resources>
+
     <string name="file_provider_authorities" translatable="false">
         com.github.anrimian.simplemusicplayer.share_file_provider
     </string>
-    <string name="feedback_email" translatable="false">anrimian.developer@gmail.com</string>
+    <string name="feedback_email" translatable="false">smusicplayer.feedback@gmail.com</string>
     <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
 
     <string name="app_name" translatable="false">Music Player</string>
@@ -69,7 +70,7 @@
     <string name="pause">Pause</string>
     <string name="play">Play</string>
     <string name="play_all">Play all</string>
-    <string name="repeat_playlist">Repeat playlist</string>
+    <string name="repeat_playlist">Repeat play queue</string>
     <string name="repeat_composition">Repeat song</string>
     <string name="do_not_repeat">Do not repeat</string>
     <string name="delete_from_queue">Delete from play queue</string>
@@ -115,8 +116,23 @@
     <string name="playing_error">Play error</string>
     <string name="no_file_permission">No file permission</string>
     <string name="about_app">About</string>
-    <string name="version_template">Version %1$s(%2$d)</string>
-    <string name="about_app_text">Found a issue? Is the screen displayed incorrectly or slowly? Lacking any features? Write me about it, I will be appreciated for feedback.</string>
+    <string name="version_template">Version %1$s(Build %2$d)</string>
+    <string name="about_app_text"><![CDATA[<big><b>What is this app?</b></big>
+        <br/>This is a music player that I wrote for myself, in accordance with my vision of how a music player should look like.
+        <br/>If you find an error, %1$s about it.
+        <br/>If you feel that some features are missing, %1$s about it, but I can\'t promise that I necessarily implement it. Usually I do after a while.
+        <br/>
+        <br/><big><b>Is this app completely free?</b></big>
+        <br/>Yes, no ads, no in-app purchases. Perhaps if this app becomes highly popular I could implement some paid non-essential features, but I definitely won\'t add ads or lock existing functionality.
+        <br/>
+        <br/><big><b>Has this app any analytics or data collection?</b></big>
+        <br/>No analytics or something else. This app even hasn\'t internet connection permission. (At least until implementation features that requires internet connection.)
+        <br/>
+        <br/><big><b>Translations</b></big>
+        <br/>If you find an error in app texts or want to offer translation to your language, %2$s about it.]]>
+    </string>
+    <string name="about_app_text_write">email me</string>
+    <string name="about_app_text_here">email me</string>
     <string name="send_email">Send email</string>
     <string name="theme">Theme</string>
     <string name="white_purple_theme">White(Purple)</string>
@@ -195,6 +211,7 @@
     <string name="send_file">Send file</string>
     <string name="delete_file">Delete file</string>
     <string name="log_file_deleted">Log file deleted</string>
+    <string name="pick_email_app_to_send">Pick a email app to send</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
