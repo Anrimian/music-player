@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.utils.FolderHelper;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
@@ -42,7 +43,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
     private final OnPositionItemClickListener<FolderFileSource> onFolderClickListener;
     private final OnPositionItemClickListener<FileSource> onLongClickListener;
     private final OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener;
-    private final OnPositionItemClickListener<Composition> compositionIconClickListener;
+    private final Callback<Composition> compositionIconClickListener;
 
     @Nullable
     private CurrentComposition currentComposition;
@@ -55,7 +56,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
                                   OnPositionItemClickListener<FolderFileSource> onFolderClickListener,
                                   OnPositionItemClickListener<FileSource> onLongClickListener,
                                   OnViewItemClickListener<FolderFileSource> onFolderMenuClickListener,
-                                  OnPositionItemClickListener<Composition> compositionIconClickListener) {
+                                  Callback<Composition> compositionIconClickListener) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 FolderHelper::areSourcesTheSame,
                 FolderHelper::getChangePayload)

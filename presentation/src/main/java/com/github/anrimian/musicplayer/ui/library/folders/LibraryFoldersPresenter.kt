@@ -83,7 +83,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
     }
 
-    fun onCompositionIconClicked(position: Int, composition: Composition) {
+    fun onCompositionIconClicked(composition: Composition) {
         if (composition == currentComposition) {
             playerInteractor.playOrPause()
         } else {
@@ -102,6 +102,10 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     fun onAddToQueueCompositionClicked(composition: Composition) {
         addCompositionsToEnd(ListUtils.asList(composition))
+    }
+
+    fun onPlayFolderClicked(folder: FolderFileSource) {
+        interactor.play(listOf(folder))
     }
 
     fun onPlayNextFolderClicked(folder: FolderFileSource) {
