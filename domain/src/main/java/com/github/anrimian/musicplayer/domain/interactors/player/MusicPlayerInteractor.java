@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.List;
 
@@ -38,6 +39,7 @@ import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.I
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_PREPARE_ERROR;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.hasSourceChanges;
@@ -55,6 +57,7 @@ public class MusicPlayerInteractor {
     private final SettingsRepository settingsRepository;
     private final PlayQueueRepository playQueueRepository;
     private final LibraryRepository musicProviderRepository;
+    private final UiStateRepository uiStateRepository;
     private final Analytics analytics;
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
@@ -74,6 +77,7 @@ public class MusicPlayerInteractor {
                                  SystemServiceController systemServiceController,
                                  PlayQueueRepository playQueueRepository,
                                  LibraryRepository musicProviderRepository,
+                                 UiStateRepository uiStateRepository,
                                  Analytics analytics) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
@@ -81,6 +85,7 @@ public class MusicPlayerInteractor {
         this.systemServiceController = systemServiceController;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
+        this.uiStateRepository = uiStateRepository;
         this.analytics = analytics;
 
         currentCompositionObservable = getCurrentQueueItemObservable()
@@ -117,6 +122,12 @@ public class MusicPlayerInteractor {
     public void play() {
         if (playerStateSubject.getValue() == PLAY) {
             return;
+        }
+        if (playerStateSubject.getValue() == PAUSED_PREPARE_ERROR && currentItem != null) {
+            musicPlayerController.prepareToPlay(
+                    currentItem.getComposition(),
+                    uiStateRepository.getTrackPosition()
+            );
         }
 
         systemEventsDisposable.clear();
@@ -350,8 +361,9 @@ public class MusicPlayerInteractor {
 
     private void handleErrorWithComposition(ErrorType errorType, Composition composition) {
         if (errorType == ErrorType.IGNORED) {
-            //TODO: start playing, hide app, revoke permission, open - we are here. Prepare again?
-            pause();
+            musicPlayerController.pause();
+            playerStateSubject.onNext(PAUSED_PREPARE_ERROR);
+            systemEventsDisposable.clear();
             return;
         }
         CorruptionType corruptionType = toCorruptionType(errorType);
