@@ -46,9 +46,7 @@ public class StoragePlaylistAnalyzer {
     }
 
     private boolean hasActualChanges(StoragePlayList first, StoragePlayList second) {
-        return (!Objects.equals(first.getName(), second.getName())
-                || !Objects.equals(first.getDateAdded(), second.getDateAdded())
-                || !Objects.equals(first.getDateModified(), second.getDateModified()))
+        return (!Objects.equals(first.getName(), second.getName()))
                 && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
     }
 }
