@@ -25,6 +25,8 @@
 
     <color name="light_light_gray">#e9e7e7</color>
 
+    <color name="list_item_bottom_background_light">#A0A0A0</color>
+
     <color name="colorPrimaryDarkSecondary">#f5f5f5</color>
     <color name="selectionStatusBarColor">#848282</color>
 

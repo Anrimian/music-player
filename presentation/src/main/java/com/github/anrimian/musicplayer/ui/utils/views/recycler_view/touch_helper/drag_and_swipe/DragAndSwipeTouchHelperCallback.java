@@ -255,7 +255,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
             float left = dX > 0? itemView.getLeft() : itemView.getRight() + dX;
             float right = dX > 0? dX : itemView.getRight();
             float centerY = top + (itemView.getHeight()/2f);
-            float centerX = panelWidth / 2;
+            float centerX = panelWidth >> 1;
 
             boolean draggedFromSwipeEdge = Math.abs(dX) > itemView.getWidth() * getSwipeThreshold(viewHolder);
             if (this.swipedFromSwipeEdge == null) {
@@ -295,6 +295,9 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                 }
             }
 
+            c.clipRect(left, top, right, bottom);
+
+
             //draw bg
             c.drawRect(left, top, right, bottom, bgPaint);
 
@@ -304,7 +307,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
             //draw icon
             c.save();
-            c.translate(itemView.getRight() - ((centerX + panelEndPadding) + (iconSize/2)), centerY - iconSize);
+            c.translate(itemView.getRight() - ((centerX + panelEndPadding) + (iconSize >> 1)), centerY - iconSize);
             icon.draw(c);
             c.restore();
 
