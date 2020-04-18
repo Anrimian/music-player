@@ -63,7 +63,7 @@ public class StoragePlayListsProvider {
                 cursor.moveToPosition(i);
                 StoragePlayList playList = getPlayListFromCursor(cursorWrapper);
                 if (playList != null) {
-                    map.put(playList.getId(), playList);
+                    map.put(playList.getStorageId(), playList);
                 }
             }
             return map;
@@ -84,7 +84,7 @@ public class StoragePlayListsProvider {
         if (playList == null) {
             return null;
         }
-        return playList.getId();
+        return playList.getStorageId();
     }
 
     public StoragePlayList createPlayList(String name) {

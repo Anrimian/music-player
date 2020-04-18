@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
+import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
@@ -40,14 +41,14 @@ public class PlayListsDaoWrapper {
     }
 
     public void applyChanges(List<Pair<StoragePlayList, List<StoragePlayListItem>>> addedPlayLists,
-                             List<StoragePlayList> changedPlayLists) {
+                             List<Change<StoragePlayList, StoragePlayList>> changedPlayLists) {
         appDatabase.runInTransaction(() -> {
             //add
             for (Pair<StoragePlayList, List<StoragePlayListItem>> addedPlaylist: addedPlayLists) {
                 StoragePlayList storagePlayList = addedPlaylist.first;
                 assert storagePlayList != null;
                 long id = playListDao.insertPlayListEntity(new PlayListEntity(
-                        storagePlayList.getId(),
+                        storagePlayList.getStorageId(),
                         getUniquePlayListName(storagePlayList.getName()),
                         storagePlayList.getDateAdded(),
                         storagePlayList.getDateModified()
@@ -56,12 +57,19 @@ public class PlayListsDaoWrapper {
             }
 
             //update
-            for (StoragePlayList playList: changedPlayLists) {
-                long id = playList.getId();
-                playListDao.updatePlayListModifyTimeByStorageId(id, playList.getDateModified());
-                playListDao.updatePlayListNameByStorageId(id,
-                        getUniquePlayListName(playList.getName())
-                );
+            for (Change<StoragePlayList, StoragePlayList> change: changedPlayLists) {
+                StoragePlayList oldItem = change.getOld();
+                StoragePlayList newItem = change.getObj();
+                long id = newItem.getStorageId();
+
+                Date newDateModified = newItem.getDateModified();
+                if (!oldItem.getDateModified().equals(newDateModified)) {
+                    playListDao.updatePlayListModifyTimeByStorageId(id, newDateModified);
+                }
+                String newName = newItem.getName();
+                if (!oldItem.getName().equals(newName)) {
+                    playListDao.updatePlayListNameByStorageId(id, getUniquePlayListName(newName));
+                }
             }
         });
     }
@@ -81,7 +89,7 @@ public class PlayListsDaoWrapper {
 
     public long insertPlayList(StoragePlayList playList) {
         PlayListEntity entity = new PlayListEntity(
-                playList.getId(),
+                playList.getStorageId(),
                 playList.getName(),
                 playList.getDateAdded(),
                 playList.getDateModified());

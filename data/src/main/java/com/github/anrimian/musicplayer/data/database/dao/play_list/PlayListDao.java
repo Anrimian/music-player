@@ -57,11 +57,12 @@ public interface PlayListDao {
     Observable<List<PlayList>> getPlayListsObservable();
 
     @Query("SELECT " +
-            "play_lists.storageId as id, " +
+            "play_lists.storageId as storageId, " +
             "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified " +
-            "FROM play_lists")
+            "FROM play_lists " +
+            "WHERE storageId IS NOT NULL")
     List<StoragePlayList> getAllAsStoragePlayLists();
 
     @Query("SELECT " +
