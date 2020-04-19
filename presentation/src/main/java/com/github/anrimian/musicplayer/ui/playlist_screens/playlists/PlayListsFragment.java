@@ -18,11 +18,13 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
+import com.github.anrimian.musicplayer.ui.common.serialization.PlaylistSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
@@ -53,6 +55,8 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     private PlayListsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
+
+    private DialogFragmentRunner<MenuDialogFragment> menuDialogRunner;
 
     @ProvidePresenter
     PlayListsPresenter providePresenter() {
@@ -87,11 +91,12 @@ public class PlayListsFragment extends MvpAppCompatFragment
         );
         recyclerView.setAdapter(adapter);
 
-        MenuDialogFragment fragment = (MenuDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(PLAY_LIST_MENU);
-        if (fragment != null) {
-            fragment.setOnCompleteListener(this::onPlayListMenuItemSelected);
-        }
+        menuDialogRunner = new DialogFragmentRunner<>(getChildFragmentManager(),
+                PLAY_LIST_MENU,
+                fragment -> fragment.setComplexCompleteListener((menuItem, extra) -> {
+                    PlayList playList = PlaylistSerializer.deserialize(extra);
+                    onPlayListMenuItemSelected(menuItem, playList);
+                }));
     }
 
     @Override
@@ -128,16 +133,18 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     @Override
     public void showPlayListMenu(PlayList playList) {
-        MenuDialogFragment fragment = MenuDialogFragment.newInstance(R.menu.play_list_menu, playList.getName());
-        fragment.setOnCompleteListener(this::onPlayListMenuItemSelected);
-        fragment.show(getChildFragmentManager(), PLAY_LIST_MENU);
+        Bundle extra = PlaylistSerializer.serialize(playList);
+        MenuDialogFragment fragment = MenuDialogFragment.newInstance(R.menu.play_list_menu,
+                playList.getName(),
+                extra);
+        menuDialogRunner.show(fragment);
     }
 
     @Override
     public void showConfirmDeletePlayListDialog(PlayList playList) {
         DialogUtils.showConfirmDeleteDialog(requireContext(),
                 playList,
-                presenter::onDeletePlayListDialogConfirmed);
+                () -> presenter.onDeletePlayListDialogConfirmed(playList));
     }
 
     @Override
@@ -163,14 +170,14 @@ public class PlayListsFragment extends MvpAppCompatFragment
         fragment.show(getChildFragmentManager(), null);
     }
 
-    private void onPlayListMenuItemSelected(MenuItem menuItem) {
+    private void onPlayListMenuItemSelected(MenuItem menuItem, PlayList playList) {
         switch (menuItem.getItemId()) {
             case R.id.menu_change_play_list_name: {
-                presenter.onChangePlayListNameButtonClicked();
+                presenter.onChangePlayListNameButtonClicked(playList);
                 break;
             }
             case R.id.menu_delete_play_list: {
-                presenter.onDeletePlayListButtonClicked();
+                presenter.onDeletePlayListButtonClicked(playList);
                 break;
             }
         }
