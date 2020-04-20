@@ -84,6 +84,8 @@
     <!--toolbar-->
     <dimen name="toolbar_content_start">72dp</dimen>
     <dimen name="toolbar_control_offset">0dp</dimen>
+    <!--toolbar has own offset on large screens, remove after toolbar removing-->
+    <dimen name="toolbar_control_offset_2">0dp</dimen>
 
     <!--widgets-->
     <dimen name="widget_content_margin_vertical">4dp</dimen>
