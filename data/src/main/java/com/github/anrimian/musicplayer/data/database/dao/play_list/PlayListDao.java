@@ -157,4 +157,7 @@ public interface PlayListDao {
 
     @Query("SELECT exists(SELECT 1 FROM play_lists WHERE id = :playListId LIMIT 1)")
     boolean isPlayListExists(long playListId);
+
+    @Query("SELECT exists(SELECT 1 FROM play_lists WHERE storageId = :storageId LIMIT 1)")
+    boolean isPlayListExistsByStorageId(long storageId);
 }

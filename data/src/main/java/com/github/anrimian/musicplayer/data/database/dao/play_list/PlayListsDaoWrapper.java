@@ -47,8 +47,13 @@ public class PlayListsDaoWrapper {
             for (Pair<StoragePlayList, List<StoragePlayListItem>> addedPlaylist: addedPlayLists) {
                 StoragePlayList storagePlayList = addedPlaylist.first;
                 assert storagePlayList != null;
+                long storageId = storagePlayList.getStorageId();
+                if (playListDao.isPlayListExistsByStorageId(storageId)) {
+                    continue;
+                }
+
                 long id = playListDao.insertPlayListEntity(new PlayListEntity(
-                        storagePlayList.getStorageId(),
+                        storageId,
                         getUniquePlayListName(storagePlayList.getName()),
                         storagePlayList.getDateAdded(),
                         storagePlayList.getDateModified()

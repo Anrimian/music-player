@@ -11,9 +11,7 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotMovedException;
-import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
-import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotModifiedException;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
@@ -104,17 +102,9 @@ public class StoragePlayListsProvider {
     }
 
     public void deletePlayList(long id) {
-        int deletedRows = contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
+        contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
                 Playlists._ID + " = ?",
                 new String[] { String.valueOf(id) });
-
-        if (deletedRows == 0) {
-            StoragePlayList storagePlayList = findPlayList(id);
-            if (storagePlayList == null) {
-                throw new PlayListAlreadyDeletedException();
-            }
-            throw new PlayListNotDeletedException();
-        }
     }
 
     public Observable<List<StoragePlayListItem>> getPlayListEntriesObservable(long playListId) {
