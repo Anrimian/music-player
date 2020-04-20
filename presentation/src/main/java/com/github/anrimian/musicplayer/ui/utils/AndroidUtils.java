@@ -239,8 +239,9 @@ public class AndroidUtils {
     }
 
     public static void setNavigationBarColor(Activity activity, @ColorInt int color) {
+        Configuration configuration = activity.getResources().getConfiguration();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                && activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                && configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
 
             Window window = activity.getWindow();
 
@@ -258,7 +259,10 @@ public class AndroidUtils {
     }
 
     public static void setDialogNavigationBarColorAttr(@NonNull Dialog dialog, @AttrRes int attrRes) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        Configuration configuration = dialog.getContext().getResources().getConfiguration();
+        boolean isSmartphone = configuration.smallestScreenWidthDp < 600;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                !(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && !isSmartphone)) {
             Window window = dialog.getWindow();
             if (window != null) {
                 int color = AndroidUtils.getColorFromAttr(dialog.getContext(), attrRes);
