@@ -34,10 +34,6 @@ public class AppPopupWindow {
                 WRAP_CONTENT,
                 true);
 
-        if (popupWindow.isShowing()) {
-            return popupWindow;
-        }
-
         popupWindow.setAnimationStyle(R.style.PopupAnimationStyle);
 
         popupView.measure(

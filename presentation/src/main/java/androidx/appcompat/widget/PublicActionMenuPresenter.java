@@ -6,6 +6,8 @@ import android.view.View;
 
 import androidx.appcompat.view.menu.MenuItemImpl;
 
+import com.github.anrimian.musicplayer.ui.utils.views.ViewClickUtil;
+
 import java.util.ArrayList;
 
 public class PublicActionMenuPresenter extends ActionMenuPresenter {
@@ -27,7 +29,10 @@ public class PublicActionMenuPresenter extends ActionMenuPresenter {
         if (overflowMenuAction == null) {
             return super.showOverflowMenu();
         } else {
-            overflowMenuAction.call(mOverflowButton, mMenu.getNonActionItems());
+            //we can't send usual 'callback' to super class so just filter often calls
+            ViewClickUtil.filterFastClick(
+                    () -> overflowMenuAction.call(mOverflowButton, mMenu.getNonActionItems()),
+                    500);
             return true;
         }
     }
