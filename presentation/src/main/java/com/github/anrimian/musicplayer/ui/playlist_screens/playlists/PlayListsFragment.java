@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.PlaylistSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
@@ -52,6 +53,9 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     @BindView(R.id.list_container)
     CoordinatorLayout clListContainer;
+
+    @BindView(R.id.fab)
+    View fab;
 
     private PlayListsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
@@ -90,6 +94,8 @@ public class PlayListsFragment extends MvpAppCompatFragment
                 presenter::onPlayListLongClick
         );
         recyclerView.setAdapter(adapter);
+
+        fab.setOnClickListener(v -> onCreatePlayListButtonClicked());
 
         menuDialogRunner = new DialogFragmentRunner<>(getChildFragmentManager(),
                 PLAY_LIST_MENU,
@@ -181,6 +187,11 @@ public class PlayListsFragment extends MvpAppCompatFragment
                 break;
             }
         }
+    }
+
+    private void onCreatePlayListButtonClicked() {
+        CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
+        fragment.show(getChildFragmentManager(), null);
     }
 
     private void goToPlayListScreen(PlayList playList) {
