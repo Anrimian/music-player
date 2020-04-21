@@ -8,11 +8,15 @@
     android:background="?attr/colorPrimary"
     app:theme="@style/ToolbarStyle">
 
+
+    <!--margin end fixes offset on tablets-->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_internal"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        tools:navigationIcon="@drawable/ic_menu">
+        android:paddingEnd="0dp"
+        tools:navigationIcon="@drawable/ic_menu"
+        tools:ignore="RtlSymmetry">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/title_container"
