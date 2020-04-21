@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -119,6 +118,9 @@ public class FileLog {
     }
 
     private void writeStackTrace(StringBuilder sb, Throwable throwable) {
+        sb.append("Message: ");
+        sb.append(throwable.getMessage());
+        sb.append("\n");
         sb.append("Stacktrace: ");
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
