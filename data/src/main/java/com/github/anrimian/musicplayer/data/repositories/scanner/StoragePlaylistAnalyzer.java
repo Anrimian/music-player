@@ -4,6 +4,7 @@ import androidx.collection.LongSparseArray;
 import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
+import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
@@ -28,16 +29,16 @@ public class StoragePlaylistAnalyzer {
     public synchronized void applyPlayListData(LongSparseArray<StoragePlayList> newPlayLists) {
         List<StoragePlayList> currentPlayLists = playListsDao.getAllAsStoragePlayLists();
         LongSparseArray<StoragePlayList> currentPlayListsMap = AndroidCollectionUtils.mapToSparseArray(currentPlayLists,
-                StoragePlayList::getId);
+                StoragePlayList::getStorageId);
 
         List<Pair<StoragePlayList, List<StoragePlayListItem>>> addedPlayLists = new ArrayList<>();
-        List<StoragePlayList> changedPlayLists = new ArrayList<>();
-        boolean hasChanges = AndroidCollectionUtils.processChanges(currentPlayListsMap,
+        List<Change<StoragePlayList, StoragePlayList>> changedPlayLists = new ArrayList<>();
+        boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentPlayListsMap,
                 newPlayLists,
                 this::hasActualChanges,
                 playList -> {},
-                item -> addedPlayLists.add(new Pair<>(item, playListsProvider.getPlayListItems(item.getId()))),
-                changedPlayLists::add);
+                item -> addedPlayLists.add(new Pair<>(item, playListsProvider.getPlayListItems(item.getStorageId()))),
+                (old, item) -> changedPlayLists.add(new Change<>(old, item)));
 
         if (hasChanges) {
             playListsDao.applyChanges(addedPlayLists, changedPlayLists);
@@ -45,9 +46,7 @@ public class StoragePlaylistAnalyzer {
     }
 
     private boolean hasActualChanges(StoragePlayList first, StoragePlayList second) {
-        return (!Objects.equals(first.getName(), second.getName())
-                || !Objects.equals(first.getDateAdded(), second.getDateAdded())
-                || !Objects.equals(first.getDateModified(), second.getDateModified()))
+        return (!Objects.equals(first.getName(), second.getName()))
                 && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
     }
 }

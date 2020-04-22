@@ -43,6 +43,7 @@
 
         <!--background-->
         <item name="listBackground">@color/light_light_gray</item>
+        <item name="listItemBottomBackground">@color/list_item_bottom_background_light</item>
         <item name="listItemBackground">@color/light_background_level_1</item>
         <item name="playerPanelBackground">?attr/listItemBackground</item>
         <item name="popupMenuBackgroundColor">@color/popup_menu_background_color</item>

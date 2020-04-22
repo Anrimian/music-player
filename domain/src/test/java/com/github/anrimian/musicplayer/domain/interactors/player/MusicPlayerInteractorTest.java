@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +39,7 @@ import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.I
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
+import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.IGNORED;
 import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.NOT_FOUND;
 import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.UNKNOWN;
 import static org.mockito.Matchers.any;
@@ -60,6 +62,7 @@ public class MusicPlayerInteractorTest {
     private LibraryRepository musicProviderRepository = mock(LibraryRepository.class);
     private SystemMusicController systemMusicController = mock(SystemMusicController.class);
     private SystemServiceController systemServiceController = mock(SystemServiceController.class);
+    private UiStateRepository uiStateRepository = mock(UiStateRepository.class);
     private Analytics analytics = mock(Analytics.class);
 
     private MusicPlayerInteractor musicPlayerInteractor;
@@ -103,6 +106,7 @@ public class MusicPlayerInteractorTest {
                 systemServiceController,
                 playQueueRepository,
                 musicProviderRepository,
+                uiStateRepository,
                 analytics);
 
         playerStateSubscriber = musicPlayerInteractor.getPlayerStateObservable()
@@ -248,6 +252,26 @@ public class MusicPlayerInteractorTest {
         inOrder.verify(musicPlayerController).prepareToPlay(eq(getFakeCompositions().get(1)), anyLong());
 
         playerStateSubscriber.assertValues(IDLE, PLAY);
+    }
+
+    @Test
+    public void onCompositionIgnoredErrorTest() {
+        musicPlayerInteractor.play();
+
+        when(playQueueRepository.isCurrentCompositionAtEndOfQueue()).thenReturn(Single.just(false));
+
+        Composition composition = getFakeCompositions().get(0);
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
+
+        playerEventSubject.onNext(new ErrorEvent(IGNORED, composition));
+
+        inOrder.verify(musicPlayerController).pause();
+
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
+
+        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE, PLAY);
     }
 
     @Test

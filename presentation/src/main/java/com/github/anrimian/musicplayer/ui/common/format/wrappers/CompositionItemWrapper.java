@@ -170,6 +170,9 @@ public class CompositionItemWrapper {
         String compositionName = formatCompositionName(composition);
         tvMusicName.setText(compositionName);
         clickableItem.setContentDescription(compositionName);
+        if (iconClickableArea != null) {
+            iconClickableArea.setContentDescription(compositionName);
+        }
     }
 
     private void showCorrupted() {

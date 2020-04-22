@@ -110,7 +110,7 @@ public class PlayListFragment extends MvpAppCompatFragment
         progressViewWrapper.hideAll();
 
         DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(recyclerView,
-                getColorFromAttr(requireContext(), R.attr.listBackground),
+                getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
                 presenter::onItemSwipedToDelete,
                 ItemTouchHelper.START,
                 R.drawable.ic_playlist_remove,

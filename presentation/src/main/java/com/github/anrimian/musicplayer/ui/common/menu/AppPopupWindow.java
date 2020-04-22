@@ -33,6 +33,7 @@ public class AppPopupWindow {
                 WRAP_CONTENT,
                 WRAP_CONTENT,
                 true);
+
         popupWindow.setAnimationStyle(R.style.PopupAnimationStyle);
 
         popupView.measure(

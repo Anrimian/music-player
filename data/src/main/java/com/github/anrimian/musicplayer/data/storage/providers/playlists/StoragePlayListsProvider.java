@@ -9,12 +9,7 @@ import android.provider.MediaStore.Audio.Playlists;
 
 import androidx.collection.LongSparseArray;
 
-import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotDeletedException;
-import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotMovedException;
-import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
-import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotDeletedException;
-import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotModifiedException;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -63,7 +58,7 @@ public class StoragePlayListsProvider {
                 cursor.moveToPosition(i);
                 StoragePlayList playList = getPlayListFromCursor(cursorWrapper);
                 if (playList != null) {
-                    map.put(playList.getId(), playList);
+                    map.put(playList.getStorageId(), playList);
                 }
             }
             return map;
@@ -84,7 +79,7 @@ public class StoragePlayListsProvider {
         if (playList == null) {
             return null;
         }
-        return playList.getId();
+        return playList.getStorageId();
     }
 
     public StoragePlayList createPlayList(String name) {
@@ -104,17 +99,9 @@ public class StoragePlayListsProvider {
     }
 
     public void deletePlayList(long id) {
-        int deletedRows = contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
+        contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
                 Playlists._ID + " = ?",
                 new String[] { String.valueOf(id) });
-
-        if (deletedRows == 0) {
-            StoragePlayList storagePlayList = findPlayList(id);
-            if (storagePlayList == null) {
-                throw new PlayListAlreadyDeletedException();
-            }
-            throw new PlayListNotDeletedException();
-        }
     }
 
     public Observable<List<StoragePlayListItem>> getPlayListEntriesObservable(long playListId) {
@@ -151,10 +138,7 @@ public class StoragePlayListsProvider {
         values.put(Playlists.Members.AUDIO_ID, compositionId);
         values.put(Playlists.Members.PLAYLIST_ID, playListId);
 
-        Uri uri = contentResolver.insert(getContentUri("external", playListId), values);
-        if (uri == null) {
-            throw new PlayListNotModifiedException();
-        }
+        contentResolver.insert(getContentUri("external", playListId), values);
         updateModifyTime(playListId);
     }
 
@@ -175,41 +159,30 @@ public class StoragePlayListsProvider {
         }
 
         try {
-            int inserted = contentResolver.bulkInsert(
+            contentResolver.bulkInsert(
                     getContentUri("external", playListId),
                     valuesList
             );
-            if (inserted == 0) {
-                throw new PlayListNotModifiedException();
-            }
             updateModifyTime(playListId);
         } catch (SecurityException ignored) {}
     }
 
     public void deleteItemFromPlayList(long itemId, long playListId) {
-        int deletedRows = contentResolver.delete(
+        contentResolver.delete(
                 getContentUri("external", playListId),
                 Playlists.Members._ID + " = ?",
                 new String[] { String.valueOf(itemId) }
         );
-
-        if (deletedRows == 0) {
-            throw new CompositionNotDeletedException();
-        }
     }
 
     public void moveItemInPlayList(long playListId, int from, int to) {
-        boolean moved = Playlists.Members.moveItem(contentResolver, playListId, from, to);
-        if (!moved) {
-            throw new CompositionNotMovedException();
-        }
+        Playlists.Members.moveItem(contentResolver, playListId, from, to);
     }
 
     public void updatePlayListName(long playListId, String name) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
-        //update time or not?
-//        contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
+        contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
         contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
                 contentValues,
                 Playlists._ID + " = ?",

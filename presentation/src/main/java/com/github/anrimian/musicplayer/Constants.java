@@ -35,6 +35,7 @@ public interface Constants {
         String MENU_ARG = "menu_arg";
         String POSITION_ARG = "position_arg";
         String HINTS_ARG = "hints_arg";
+        String PLAYLIST_ARG = "playlist_arg";
     }
 
     interface Tags {

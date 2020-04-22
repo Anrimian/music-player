@@ -60,14 +60,15 @@ class MusicModule {
                                                 SystemServiceController systemServiceController,
                                                 PlayQueueRepository playQueueRepository,
                                                 LibraryRepository musicProviderRepository,
-                                                Analytics analytics,
-                                                PlayerErrorParser playerErrorParser) {
+                                                UiStateRepository uiStateRepository,
+                                                Analytics analytics) {
         return new MusicPlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
                 systemServiceController,
                 playQueueRepository,
                 musicProviderRepository,
+                uiStateRepository,
                 analytics);
     }
 

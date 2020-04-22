@@ -16,6 +16,7 @@
         <!--<item name="android:windowBackground">@color/dark_background_level_1</item>-->
         <item name="android:colorBackground">@color/dark_background_level_1</item>
         <item name="listBackground">@color/dark_background_level_0</item>
+        <item name="listItemBottomBackground">@color/dark_background_level_0</item>
         <item name="listItemBackground">@color/dark_background_level_1</item>
         <item name="popupMenuBackgroundColor">@color/popup_menu_background_color_dark</item>
         <item name="dialogBackground">@color/dialog_background_color_dark</item>

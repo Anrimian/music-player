@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
+import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 
 import org.junit.After;
@@ -58,7 +59,6 @@ public class PlayListsDaoWrapperTest {
                 "test",
                 new Date(),
                 new Date());
-        daoWrapper.applyChanges(emptyList(), asList(duplicatePlayList));
-
+        daoWrapper.applyChanges(emptyList(), asList(new Change<>(playList1, duplicatePlayList)));
     }
 }

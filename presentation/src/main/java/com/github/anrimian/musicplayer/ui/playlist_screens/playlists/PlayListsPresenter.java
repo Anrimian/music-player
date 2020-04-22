@@ -21,9 +21,6 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
 
-    private PlayList playListInMenu;
-    private PlayList playListToDelete;
-
     public PlayListsPresenter(PlayListsInteractor playListsInteractor,
                               Scheduler uiScheduler,
                               ErrorParser errorParser) {
@@ -45,39 +42,34 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
     }
 
     void onPlayListLongClick(PlayList playList) {
-        playListInMenu = playList;
         getViewState().showPlayListMenu(playList);
     }
 
-    void onDeletePlayListButtonClicked() {
-        playListToDelete = playListInMenu;
-        getViewState().showConfirmDeletePlayListDialog(playListToDelete);
-        playListInMenu = null;
+    void onDeletePlayListButtonClicked(PlayList playList) {
+        getViewState().showConfirmDeletePlayListDialog(playList);
     }
 
-    void onDeletePlayListDialogConfirmed() {
-        playListsInteractor.deletePlayList(playListToDelete.getId())
+    void onDeletePlayListDialogConfirmed(PlayList playList) {
+        playListsInteractor.deletePlayList(playList.getId())
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayListDeleted, this::onPlayListDeletingError);
+                .subscribe(() -> onPlayListDeleted(playList), this::onPlayListDeletingError);
     }
 
     void onFragmentMovedToTop() {
         playListsInteractor.setSelectedPlayListScreen(0);
     }
 
-    void onChangePlayListNameButtonClicked() {
-        getViewState().showEditPlayListNameDialog(playListInMenu);
+    void onChangePlayListNameButtonClicked(PlayList playList) {
+        getViewState().showEditPlayListNameDialog(playList);
     }
 
     private void onPlayListDeletingError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showDeletePlayListError(errorCommand);
-        playListToDelete = null;
     }
 
-    private void onPlayListDeleted() {
-        getViewState().showPlayListDeleteSuccess(playListToDelete);
-        playListToDelete = null;
+    private void onPlayListDeleted(PlayList playList) {
+        getViewState().showPlayListDeleteSuccess(playList);
     }
 
     private void subscribeOnPlayLists() {

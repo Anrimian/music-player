@@ -207,7 +207,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             }
             default: {
                 analytics.logMessage("unknown player error, what: " + what + ", extra: " + playerError);
-                return ErrorType.UNKNOWN;
+                return ErrorType.IGNORED;
             }
         }
     }

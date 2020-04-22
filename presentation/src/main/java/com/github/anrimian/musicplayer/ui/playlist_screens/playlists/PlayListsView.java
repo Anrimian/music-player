@@ -31,7 +31,7 @@ public interface PlayListsView extends MvpView {
     void showPlayListMenu(PlayList playList);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showConfirmDeletePlayListDialog(PlayList playListToDelete);
+    void showConfirmDeletePlayListDialog(PlayList playList);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showPlayListDeleteSuccess(PlayList playListToDelete);
