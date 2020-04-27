@@ -43,6 +43,18 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.main.SimplePlayerActivity"
+            android:launchMode="singleInstance"
+            android:theme="@style/AppTheme.VersionSpecific">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <!--<category android:name="android.intent.category.BROWSABLE"/>-->
+                <data android:scheme="content"/>
+                <data android:mimeType="audio/*"/>
+            </intent-filter>
+        </activity>
+
         <activity android:name=".ui.editor.composition.CompositionEditorActivity"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/SlidrActivityTheme"/>
