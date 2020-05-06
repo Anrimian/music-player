@@ -152,6 +152,12 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private void sendErrorEvent(Throwable throwable) {
         if (currentComposition != null) {
+            //workaround for prepareError in newest exo player versions
+            if (isStrangeLoaderException(throwable)) {
+                prepareToPlay(currentComposition, player.getCurrentPosition());
+                return;
+            }
+
             playerEventSubject.onNext(new ErrorEvent(
                     playerErrorParser.getErrorType(throwable),
                     currentComposition)
@@ -180,7 +186,6 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .timeout(2, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
                 .observeOn(scheduler)
                 .doOnSuccess(player::prepare)
-                .retry(15, this::isStrangeLoaderException)
                 .ignoreElement();
     }
 
