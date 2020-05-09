@@ -10,6 +10,8 @@ import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorModule;
+import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerComponent;
+import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.library.albums.AlbumsComponent;
@@ -33,6 +35,7 @@ import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsMod
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 
 import javax.annotation.Nullable;
 
@@ -126,6 +129,10 @@ public class Components {
 
     public static SettingsComponent getSettingsComponent() {
         return getAppComponent().settingsComponent();
+    }
+
+    public static ExternalPlayerComponent getExternalPlayerComponent(CompositionSource compositionSource) {
+        return getAppComponent().externalPlayerComponent(new ExternalPlayerModule(compositionSource));
     }
 
     private LibraryComponent buildLibraryComponent() {

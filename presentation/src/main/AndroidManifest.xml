@@ -43,7 +43,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.main.SimplePlayerActivity"
+        <activity android:name=".ui.main.external_player.ExternalPlayerActivity"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme.VersionSpecific">
             <intent-filter>
