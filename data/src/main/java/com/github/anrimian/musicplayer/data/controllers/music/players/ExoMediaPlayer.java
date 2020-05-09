@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
@@ -75,8 +76,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     public void prepareToPlay(Composition composition, long startPosition) {
         this.currentComposition = composition;
         Single.fromCallable(() -> composition)
-                .flatMap(this::prepareMediaSource)
-                .ignoreElement()
+                .flatMapCompletable(this::prepareMediaSource)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
                 .subscribeOn(scheduler)
@@ -151,14 +151,13 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     private void sendErrorEvent(Throwable throwable) {
-        //ignore this error and observe how it works
-        if (throwable instanceof ExoPlaybackException) {
-            if (throwable.getCause() instanceof Loader.UnexpectedLoaderException) {
+        if (currentComposition != null) {
+            //workaround for prepareError in newest exo player versions
+            if (isStrangeLoaderException(throwable)) {
+                prepareToPlay(currentComposition, player.getCurrentPosition());
                 return;
             }
-        }
 
-        if (currentComposition != null) {
             playerEventSubject.onNext(new ErrorEvent(
                     playerErrorParser.getErrorType(throwable),
                     currentComposition)
@@ -181,19 +180,31 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         }
     }
 
-    private Single<MediaSource> prepareMediaSource(Composition composition) {
+    private Completable prepareMediaSource(Composition composition) {
         return sourceRepository.getCompositionUri(composition.getId())
+                .flatMap(this::createMediaSource)
+                .timeout(2, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
                 .observeOn(scheduler)
-                .map(uri -> {
-                    DataSpec dataSpec = new DataSpec(uri);
-                    final ContentDataSource dataSource = new ContentDataSource(context);
-                    dataSource.open(dataSpec);
+                .doOnSuccess(player::prepare)
+                .ignoreElement();
+    }
 
-                    DataSource.Factory factory = () -> dataSource;
-                    MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory)
-                            .createMediaSource(uri);
-                    player.prepare(mediaSource);
-                    return mediaSource;
-                });
+    private boolean isStrangeLoaderException(Throwable throwable) {
+        if (throwable instanceof ExoPlaybackException) {
+            Throwable cause = throwable.getCause();
+            return cause instanceof Loader.UnexpectedLoaderException;
+        }
+        return false;
+    }
+
+    private Single<MediaSource> createMediaSource(Uri uri) {
+        return Single.fromCallable(() -> {
+            DataSpec dataSpec = new DataSpec(uri);
+            final ContentDataSource dataSource = new ContentDataSource(context);
+            dataSource.open(dataSpec);
+
+            DataSource.Factory factory = () -> dataSource;
+            return new ProgressiveMediaSource.Factory(factory).createMediaSource(uri);
+        });
     }
 }

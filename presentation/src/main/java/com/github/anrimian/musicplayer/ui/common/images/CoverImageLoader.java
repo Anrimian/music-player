@@ -173,7 +173,9 @@ public class CoverImageLoader {
             }
 
             @Override
-            public void onLoadCleared(@Nullable Drawable placeholder) {}
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                callback.call(null);
+            }
         };
     }
 }

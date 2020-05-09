@@ -89,6 +89,7 @@ public class MusicPlayerInteractor {
         this.analytics = analytics;
 
         currentCompositionObservable = getCurrentQueueItemObservable()
+                .distinctUntilChanged()
                 .switchMap(event -> getPlayerStateObservable()
                         .map(state -> state == PlayerState.PLAY)
                         .distinctUntilChanged()
@@ -255,8 +256,7 @@ public class MusicPlayerInteractor {
     }
 
     public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
-        return playQueueRepository.getCurrentQueueItemObservable()
-                .distinctUntilChanged();
+        return playQueueRepository.getCurrentQueueItemObservable();
     }
 
     public Observable<CurrentComposition> getCurrentCompositionObservable() {
@@ -300,6 +300,10 @@ public class MusicPlayerInteractor {
     public Single<List<Composition>> addCompositionsToEnd(List<Composition> compositions) {
         return playQueueRepository.addCompositionsToEnd(compositions)
                 .toSingleDefault(compositions);
+    }
+
+    public void clearPlayQueue() {
+        playQueueRepository.clearPlayQueue();
     }
 
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
