@@ -19,13 +19,12 @@ import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import moxy.InjectViewState
 import java.util.*
 
 /**
  * Created on 23.10.2017.
  */
-@InjectViewState
+
 class LibraryFoldersPresenter(private val folderId: Long?,
                               private val interactor: LibraryFoldersScreenInteractor,
                               private val playerInteractor: MusicPlayerInteractor,

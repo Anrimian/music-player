@@ -15,10 +15,9 @@ import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import moxy.InjectViewState
 import java.util.*
 
-@InjectViewState
+
 class PlayListPresenter(private val playListId: Long,
                         private val playerInteractor: MusicPlayerInteractor,
                         private val playListsInteractor: PlayListsInteractor,
