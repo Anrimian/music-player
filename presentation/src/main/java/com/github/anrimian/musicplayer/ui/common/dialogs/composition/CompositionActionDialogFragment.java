@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,11 +30,10 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDel
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import javax.annotation.Nonnull;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.MENU_ARG;
@@ -46,7 +44,6 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.createMenu;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getContentView;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getFloat;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getStatusBarHeight;
 import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils.attachDynamicShadow;
 
@@ -112,38 +109,38 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         View view = View.inflate(getContext(), R.layout.dialog_composition_menu, null);
         dialog.setContentView(view);
 
-        DisplayMetrics displayMetrics = requireActivity().getResources().getDisplayMetrics();
-        int height = displayMetrics.heightPixels;
-        float heightPercent = getFloat(getResources(), R.dimen.composition_action_dialog_height);
-        int minHeight = (int) (height * heightPercent);
-
-        slideDelegate = buildSlideDelegate();
-        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
-        bottomSheetBehavior.setPeekHeight(minHeight);
-        bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
-            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismissAllowingStateLoss();
-            }
-        }, this::showBottomSheetSlided));
-
         ButterKnife.bind(this, view);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         attachDynamicShadow(recyclerView, titleShadow);
 
-        //noinspection ConstantConditions
-        @Nonnull Bundle args = getArguments();
+        Bundle args = requireArguments();
         //noinspection ConstantConditions
         composition = CompositionSerializer.deserialize(args.getBundle(COMPOSITION_ARG));
 
-        Menu menu = createMenu(requireContext(), getArguments().getInt(MENU_ARG));
+        Menu menu = createMenu(requireContext(), args.getInt(MENU_ARG));
         MenuAdapter menuAdapter = new MenuAdapter(menu, R.layout.item_menu);
         menuAdapter.setOnItemClickListener(this::onActionItemClicked);
         recyclerView.setAdapter(menuAdapter);
 
         tvCompositionName.setText(formatCompositionName(composition));
         tvCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
+
+        view.measure(
+                makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        );
+
+        slideDelegate = buildSlideDelegate();
+        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
+        bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                dismissAllowingStateLoss();
+            }
+        }, this::showBottomSheetSlided));//slide offset not working as expected, strange values
+        bottomSheetBehavior.setPeekHeight(view.getMeasuredHeight());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
         AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground);
     }
