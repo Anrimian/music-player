@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.functions.TripleCallback;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.common.serialization.CompositionSerializer;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
@@ -41,6 +43,8 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COL
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.setupBottomSheetDialogMaxWidth;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatSize;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.createMenu;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getContentView;
@@ -59,7 +63,7 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
     TextView tvCompositionName;
 
     @BindView(R.id.tv_composition_author)
-    TextView tvCompositionAuthor;
+    TextView tvCompositionInfo;
 
     @BindView(R.id.list_container)
     View listContainer;
@@ -125,7 +129,12 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         recyclerView.setAdapter(menuAdapter);
 
         tvCompositionName.setText(formatCompositionName(composition));
-        tvCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
+
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(requireContext());
+        sb.append(formatCompositionAuthor(composition, requireContext()));
+        sb.append(formatMilliseconds(composition.getDuration()));
+        sb.append(formatSize(requireContext(), composition.getSize()));
+        tvCompositionInfo.setText(sb);
 
         view.measure(
                 makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
