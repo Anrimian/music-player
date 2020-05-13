@@ -28,6 +28,6 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        finish();
+//        finish();
     }
 }

@@ -10,7 +10,7 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProv
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
@@ -35,10 +35,10 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                                      Analytics analytics) {
         this.uiStateRepository = uiStateRepository;
         Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser);
-        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(scheduler, sourceRepository, playerErrorParser, analytics);
+        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics);
         mediaPlayer = new CompositeMediaPlayer(exoMediaPlayer, androidMediaPlayer);
 
-//        mediaPlayer = new AndroidMediaPlayer(scheduler, sourceRepository, playerErrorParser, analytics);
+//        mediaPlayer = new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics);
 //        mediaPlayer = new ExoMediaPlayer(context, scheduler, playerErrorParser);
     }
 
@@ -48,7 +48,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public void prepareToPlay(Composition composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition, long startPosition) {
         mediaPlayer.prepareToPlay(composition, startPosition);
     }
 

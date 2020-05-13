@@ -3,10 +3,12 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.content.Context;
 import android.net.Uri;
 
+import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
@@ -47,7 +49,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     @Nullable
     private Disposable trackPositionDisposable;
 
-    private Composition currentComposition;
+    private CompositionSource currentComposition;
 
     public ExoMediaPlayer(Context context,
                           CompositionSourceProvider sourceRepository,
@@ -73,7 +75,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(Composition composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition, long startPosition) {
         this.currentComposition = composition;
         Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)
@@ -180,13 +182,24 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         }
     }
 
-    private Completable prepareMediaSource(Composition composition) {
-        return sourceRepository.getCompositionUri(composition.getId())
+    private Completable prepareMediaSource(CompositionSource composition) {
+        return getCompositionUri(composition)
                 .flatMap(this::createMediaSource)
                 .timeout(2, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
                 .observeOn(scheduler)
                 .doOnSuccess(player::prepare)
                 .ignoreElement();
+    }
+
+    private Single<Uri> getCompositionUri(CompositionSource composition) {
+        if (composition instanceof LibraryCompositionSource) {
+            long id = ((LibraryCompositionSource) composition).getComposition().getId();
+            return sourceRepository.getCompositionUri(id);
+        }
+        if (composition instanceof UriCompositionSource) {
+            return Single.fromCallable(((UriCompositionSource) composition)::getUri);
+        }
+        throw new IllegalArgumentException("unknown composition source");
     }
 
     private boolean isStrangeLoaderException(Throwable throwable) {

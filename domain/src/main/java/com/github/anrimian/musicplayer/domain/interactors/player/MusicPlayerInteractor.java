@@ -7,6 +7,8 @@ import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
@@ -120,13 +122,26 @@ public class MusicPlayerInteractor {
                 .subscribe();
     }
 
+    public void startPlaying(CompositionSource compositionSource) {
+        if (playerStateSubject.getValue() == PLAY) {
+            pause();
+        }
+        Completable.fromAction(() -> musicPlayerController.prepareToPlay(compositionSource, 0))
+                .doOnComplete(this::play)
+                .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
+                .doOnError(t -> playerStateSubject.onNext(STOP))
+                .doOnError(analytics::processNonFatalError)
+                .onErrorComplete()
+                .subscribe();
+    }
+
     public void play() {
         if (playerStateSubject.getValue() == PLAY) {
             return;
         }
         if (playerStateSubject.getValue() == PAUSED_PREPARE_ERROR && currentItem != null) {
             musicPlayerController.prepareToPlay(
-                    currentItem.getComposition(),
+                    new LibraryCompositionSource(currentItem.getComposition()),
                     uiStateRepository.getTrackPosition()
             );
         }
@@ -324,7 +339,10 @@ public class MusicPlayerInteractor {
                 trackPosition = musicPlayerController.getTrackPosition();
             }
 
-            musicPlayerController.prepareToPlay(currentItem.getComposition(), trackPosition);
+            musicPlayerController.prepareToPlay(
+                    new LibraryCompositionSource(currentItem.getComposition()),
+                    trackPosition
+            );
         }
     }
 
@@ -334,12 +352,15 @@ public class MusicPlayerInteractor {
         } else if (playerEvent instanceof FinishedEvent) {
             FinishedEvent finishedEvent = (FinishedEvent) playerEvent;
             onCompositionPlayFinished();
-            Composition composition = finishedEvent.getComposition();
-            if (composition.getCorruptionType() != null) {
-                musicProviderRepository.writeErrorAboutComposition(null, composition)
-                        .doOnError(analytics::processNonFatalError)
-                        .onErrorComplete()
-                        .subscribe();
+            CompositionSource compositionSource = finishedEvent.getComposition();
+            if (compositionSource instanceof LibraryCompositionSource) {
+                Composition composition = ((LibraryCompositionSource) compositionSource).getComposition();
+                if (composition.getCorruptionType() != null) {
+                    musicProviderRepository.writeErrorAboutComposition(null, composition)
+                            .doOnError(analytics::processNonFatalError)
+                            .onErrorComplete()
+                            .subscribe();
+                }
             }
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;
@@ -363,13 +384,17 @@ public class MusicPlayerInteractor {
         }
     }
 
-    private void handleErrorWithComposition(ErrorType errorType, Composition composition) {
+    private void handleErrorWithComposition(ErrorType errorType, CompositionSource compositionSource) {
         if (errorType == ErrorType.IGNORED) {
             musicPlayerController.pause();
             playerStateSubject.onNext(PAUSED_PREPARE_ERROR);
             systemEventsDisposable.clear();
             return;
         }
+        if (!(compositionSource instanceof LibraryCompositionSource)) {
+            return;
+        }
+        Composition composition = ((LibraryCompositionSource) compositionSource).getComposition();
         CorruptionType corruptionType = toCorruptionType(errorType);
         musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
                 .doOnError(analytics::processNonFatalError)

@@ -31,7 +31,7 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
 
-        //interactor.startPlaying(compositionsSource);
+        interactor.startPlaying(compositionSource);
     }
 
     @Override
