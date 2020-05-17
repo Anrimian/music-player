@@ -142,17 +142,6 @@ public class MusicService extends Service {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
-
-        serviceDisposable.add(playInfoDisposable);
-
-        notificationsDisplayer.startForegroundNotification(this,
-                true,
-                currentItem,
-                mediaSession,
-                notificationSetting);
-
-        subscribeOnNotificationSettings();
-        subscribeOnPlayerChanges();
     }
 
     @Override
@@ -165,6 +154,7 @@ public class MusicService extends Service {
                     currentItem,
                     mediaSession,
                     notificationSetting);
+            subscribeOnPlayerEvents();
         }
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
@@ -217,10 +207,18 @@ public class MusicService extends Service {
         }
     }
 
-    private void subscribeOnPlayerChanges() {
-        serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateReceived));
+    private void subscribeOnPlayerEvents() {
+        if (serviceDisposable.size() == 0) {
+            serviceDisposable.add(Observable.combineLatest(
+                    musicServiceInteractor.getNotificationSettingObservable(),
+                    themeController.getAppThemeObservable(),
+                    (setting, theme) -> setting)
+                    .observeOn(uiScheduler)
+                    .subscribe(this::onNotificationSettingReceived));
+            serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+                    .observeOn(uiScheduler)
+                    .subscribe(this::onPlayerStateReceived));
+        }
     }
 
     private void onPlayerStateReceived(PlayerState playerState) {
@@ -235,8 +233,8 @@ public class MusicService extends Service {
                 break;
             }
             case PAUSE: {
-                updateForegroundNotification();
                 stopForeground(false);
+                updateForegroundNotification();
                 break;
             }
             case STOP: {
@@ -250,6 +248,7 @@ public class MusicService extends Service {
 
     private void subscribeOnPlayInfo() {
         if (playInfoDisposable.size() == 0) {
+            serviceDisposable.add(playInfoDisposable);
             playInfoDisposable.add(musicPlayerInteractor.getCurrentQueueItemObservable()
                     .observeOn(uiScheduler)
                     .subscribe(this::onCurrentCompositionReceived));
@@ -277,14 +276,6 @@ public class MusicService extends Service {
     private void onTrackPositionReceived(long position) {
         this.trackPosition = position;
         updateMediaSessionState(playerState, trackPosition);
-    }
-
-    private void subscribeOnNotificationSettings() {
-        serviceDisposable.add(Observable.combineLatest(
-                musicServiceInteractor.getNotificationSettingObservable(),
-                themeController.getAppThemeObservable(),
-                (setting, theme) -> setting)
-                .subscribe(this::onNotificationSettingReceived));
     }
 
     private void onNotificationSettingReceived(MusicNotificationSetting setting) {
