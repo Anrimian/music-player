@@ -63,6 +63,7 @@ import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
@@ -307,7 +308,7 @@ public class MusicService extends Service {
 
     private void updateMediaSessionMetadata(Composition composition, MusicNotificationSetting setting) {
         MediaMetadataCompat.Builder builder = metadataBuilder
-                .putString(METADATA_KEY_TITLE, composition.getTitle())
+                .putString(METADATA_KEY_TITLE, formatCompositionName(composition))
                 .putString(METADATA_KEY_ALBUM, composition.getAlbum())
                 .putString(METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
                 .putLong(METADATA_KEY_DURATION, composition.getDuration());
