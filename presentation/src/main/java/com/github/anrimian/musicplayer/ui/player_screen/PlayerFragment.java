@@ -45,6 +45,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
@@ -705,6 +706,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
                 fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
                 fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
+                break;
+            }
+            case R.id.menu_equalizer: {
+                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_clear_play_queue: {

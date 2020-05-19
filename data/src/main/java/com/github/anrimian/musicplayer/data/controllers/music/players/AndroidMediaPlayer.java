@@ -53,6 +53,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private boolean playWhenReady = false;
     private boolean isPlaying = false;
 
+    @Deprecated
+    public static MediaPlayer player1;
+
     //problem with error case(file not found), multiple error events
     public AndroidMediaPlayer(Scheduler scheduler,
                               CompositionSourceProvider sourceRepository,
@@ -72,6 +75,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             sendErrorEvent(what, extra);
             return false;
         });
+        player1 = mediaPlayer;
     }
 
     @Override

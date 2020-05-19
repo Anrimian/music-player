@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
+import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -49,6 +50,9 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private Composition currentComposition;
 
+    @Deprecated
+    public static Function<Integer> player1;
+
     public ExoMediaPlayer(Context context,
                           CompositionSourceProvider sourceRepository,
                           Scheduler scheduler,
@@ -59,6 +63,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         this.scheduler = scheduler;
         //init on main thread?
         player = new SimpleExoPlayer.Builder(context).build();
+        player1 = player::getAudioSessionId;
 
         PlayerEventListener playerEventListener = new PlayerEventListener(
                 () -> playerEventSubject.onNext(new FinishedEvent(currentComposition)),

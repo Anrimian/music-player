@@ -26,6 +26,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -333,6 +334,10 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
             }
             case R.id.menu_search: {
                 toolbar.setSearchModeEnabled(true);
+                break;
+            }
+            case R.id.menu_equalizer: {
+                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_rescan_storage: {

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/dialog_margin_content_vertical"
+        android:layout_marginBottom="@dimen/content_internal_margin">
+
+        <RadioButton
+            android:id="@+id/rb_use_system_equalizer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_text_primary"
+            android:paddingStart="@dimen/radio_button_text_margin_start"
+            android:paddingEnd="@dimen/radio_button_text_margin_start"
+            android:paddingTop="@dimen/radio_button_text_vertical_padding"
+            android:paddingBottom="@dimen/radio_button_text_vertical_padding"
+            android:layout_marginLeft="@dimen/content_horizontal_margin"
+            android:layout_marginRight="@dimen/content_horizontal_margin"
+            android:text="@string/system_equalizer"/>
+
+        <RadioButton
+            android:id="@+id/rb_disable_equalizer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_text_primary"
+            android:paddingStart="@dimen/radio_button_text_margin_start"
+            android:paddingEnd="@dimen/radio_button_text_margin_start"
+            android:paddingTop="@dimen/radio_button_text_vertical_padding"
+            android:paddingBottom="@dimen/radio_button_text_vertical_padding"
+            android:layout_marginLeft="@dimen/content_horizontal_margin"
+            android:layout_marginRight="@dimen/content_horizontal_margin"
+            android:text="@string/no_equalizer"/>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

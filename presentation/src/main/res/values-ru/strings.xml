@@ -203,6 +203,9 @@
     <string name="log_file_deleted">Файл удалён</string>
     <string name="pick_email_app_to_send">Выберите приложение email для отправки</string>
     <string name="clear_play_queue">Очистить очередь воспроизведения</string>
+    <string name="equalizer">Эквалайзер</string>
+    <string name="system_equalizer">Системный эквалайзер</string>
+    <string name="no_equalizer">Не использовать</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

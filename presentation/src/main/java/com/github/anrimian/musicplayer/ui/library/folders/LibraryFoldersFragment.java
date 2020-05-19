@@ -35,6 +35,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
@@ -685,6 +686,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 //noinspection ConstantConditions
                 FragmentNavigation.from(getParentFragment().requireFragmentManager())
                         .addNewFragment(new ExcludedFoldersFragment());
+                break;
+            }
+            case R.id.menu_equalizer: {
+                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_search: {
