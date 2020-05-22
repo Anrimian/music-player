@@ -14,7 +14,7 @@ import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -57,7 +57,7 @@ public interface AppComponent {
     AlbumEditorComponent albumEditorComponent(AlbumEditorModule module);
     ExternalPlayerComponent externalPlayerComponent(ExternalPlayerModule module);
 
-    MusicPlayerInteractor musicPlayerInteractor();
+    LibraryPlayerInteractor musicPlayerInteractor();
     DisplaySettingsInteractor displaySettingsInteractor();
 
     PlayListsPresenter playListsPresenter();

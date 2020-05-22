@@ -81,6 +81,7 @@ public class LibraryPlayerInteractor {
     public void startPlaying(List<Composition> compositions, int firstPosition) {
         playQueueRepository.setPlayQueue(compositions, firstPosition)
                 .doOnComplete(musicPlayerInteractor::play)
+                .doOnSubscribe(o -> musicPlayerInteractor.setInLoadingState())//fixes music gap and state blinking
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
                 .subscribe();

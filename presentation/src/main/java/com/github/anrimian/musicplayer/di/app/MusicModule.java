@@ -22,9 +22,10 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -54,21 +55,32 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerInteractor musicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                                SettingsRepository settingsRepository,
-                                                SystemMusicController systemMusicController,
-                                                SystemServiceController systemServiceController,
-                                                PlayQueueRepository playQueueRepository,
-                                                LibraryRepository musicProviderRepository,
-                                                UiStateRepository uiStateRepository,
-                                                Analytics analytics) {
-        return new MusicPlayerInteractor(musicPlayerController,
+    PlayerInteractor playerInteractor(MusicPlayerController musicPlayerController,
+                                      SettingsRepository settingsRepository,
+                                      SystemMusicController systemMusicController,
+                                      SystemServiceController systemServiceController,
+                                      UiStateRepository uiStateRepository,
+                                      Analytics analytics) {
+        return new PlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
                 systemServiceController,
+                uiStateRepository,
+                analytics);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    LibraryPlayerInteractor libraryPlayerInteractor(PlayerInteractor musicPlayerInteractor,
+                                                    SettingsRepository settingsRepository,
+                                                    PlayQueueRepository playQueueRepository,
+                                                    LibraryRepository musicProviderRepository,
+                                                    Analytics analytics) {
+        return new LibraryPlayerInteractor(musicPlayerInteractor,
+                settingsRepository,
                 playQueueRepository,
                 musicProviderRepository,
-                uiStateRepository,
                 analytics);
     }
 

@@ -81,7 +81,7 @@ public class PlayerInteractorTest {
 
     @Test
     public void prepareToPlayTest() {
-        musicPlayerInteractor.prepareToPlay(fakeCompositionSource(0), 0).subscribe();
+        musicPlayerInteractor.prepareToPlay(fakeCompositionSource(0), 0);
 
         verify(musicPlayerController).prepareToPlay(eq(fakeCompositionSource(0)), anyLong());
         verify(musicPlayerController, never()).resume();

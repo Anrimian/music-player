@@ -19,7 +19,7 @@ import androidx.media.session.MediaButtonReceiver;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
@@ -80,7 +80,7 @@ public class MusicService extends Service {
     private NotificationsDisplayer notificationsDisplayer;
 
     @Inject
-    MusicPlayerInteractor musicPlayerInteractor;
+    LibraryPlayerInteractor musicPlayerInteractor;
 
     @Inject
     MusicServiceInteractor musicServiceInteractor;

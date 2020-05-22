@@ -16,7 +16,6 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -69,25 +68,22 @@ public class PlayerInteractor {
                 .subscribe(this::onVolumeChanged));
     }
 
-    public Completable prepareToPlay(CompositionSource compositionSource) {
-        return prepareToPlay(compositionSource, 0);
-    }
-
-    public Completable prepareToPlay(CompositionSource compositionSource, long startPosition) {
-        this.currentSource = compositionSource;
-        return Completable.fromAction(() -> musicPlayerController.prepareToPlay(compositionSource, startPosition))
-                .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
-                .doOnError(throwable -> {
-                    playerStateSubject.onNext(STOP);
-                    analytics.processNonFatalError(throwable);
-                });
-    }
-
     public void startPlaying(CompositionSource compositionSource) {
-        prepareToPlay(compositionSource)
-                .doOnComplete(this::play)
-                .onErrorComplete()
-                .subscribe();
+        prepareToPlay(compositionSource);
+        play();
+    }
+
+    public void prepareToPlay(CompositionSource compositionSource) {
+        prepareToPlay(compositionSource, 0);
+    }
+
+    public void prepareToPlay(CompositionSource compositionSource, long startPosition) {
+        this.currentSource = compositionSource;
+        musicPlayerController.prepareToPlay(compositionSource, startPosition);
+    }
+
+    public void playAfterReady() {
+
     }
 
     public void play() {
@@ -157,7 +153,7 @@ public class PlayerInteractor {
 
     public Observable<PlayerState> getPlayerStateObservable() {
         return playerStateSubject.map(PlayerState::toBaseState)
-                .filter(state -> state != LOADING)//hmmm
+                .filter(state -> state != LOADING)
                 .distinctUntilChanged();
     }
 
@@ -171,6 +167,10 @@ public class PlayerInteractor {
 
     public Observable<PlayerEvent> getPlayerEventsObservable() {
         return playerEventsSubject;
+    }
+
+    public void setInLoadingState() {
+        playerStateSubject.onNext(LOADING);
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
