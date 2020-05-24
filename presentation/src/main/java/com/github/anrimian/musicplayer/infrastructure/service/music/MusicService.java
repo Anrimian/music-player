@@ -143,13 +143,21 @@ public class MusicService extends Service {
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
 
+        //reduce chance to show first notification without info
+        currentItem = musicPlayerInteractor.getCurrentItem();
+        notificationSetting = musicServiceInteractor.getNotificationSettings();
+
         //we must start foreground in onCreate, strange ANR otherwise
-        //initialize currentItem, media session, settings here
         notificationsDisplayer.startForegroundNotification(this,
                 true,
                 currentItem,
                 mediaSession,
                 notificationSetting);
+        //update state that depends on current item and settings to keep it actual
+        if (currentItem != null) {
+            updateMediaSessionMetadata();
+            updateMediaSessionAlbumArt();
+        }
 
         subscribeOnServiceState();
     }
@@ -234,11 +242,16 @@ public class MusicService extends Service {
         long newTrackPosition = serviceState.trackPosition;
 
         if (newQueueItem == null || newPlayerState == PlayerState.STOP) {
+            currentItem = null;
+            trackPosition = 0;
+            notificationsDisplayer.cancelCoverLoadingForForegroundNotification();
             mediaSession.setActive(false);
-            //cancel cover loading!
             stopForeground(true);
             stopSelf();
             return;
+        }
+        if (!mediaSession.isActive()) {
+            mediaSession.setActive(true);
         }
 
         boolean updateNotification = false;
@@ -272,6 +285,7 @@ public class MusicService extends Service {
         MusicNotificationSetting newSettings = serviceState.settings;
         if (!newSettings.equals(this.notificationSetting)) {
             this.notificationSetting = newSettings;
+            //can be optimized
             updateNotification = true;
             updateMediaSessionAlbumArt = true;
         }
@@ -282,6 +296,7 @@ public class MusicService extends Service {
 
         if (updateNotification) {
             //blink on start-stop
+            //recolorize after settings changing?
             updateForegroundNotification();
         }
         if (updateMediaSessionState) {
@@ -328,10 +343,6 @@ public class MusicService extends Service {
 
     private void onPlayerStateChanged(PlayerState playerState) {
         switch (playerState) {
-            case PLAY: {
-                mediaSession.setActive(true);
-                break;
-            }
             case PAUSE: {
                 stopForeground(false);
                 break;

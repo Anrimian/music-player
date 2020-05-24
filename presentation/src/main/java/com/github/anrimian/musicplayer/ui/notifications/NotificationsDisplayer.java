@@ -140,13 +140,17 @@ public class NotificationsDisplayer {
         showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
     }
 
+    public void cancelCoverLoadingForForegroundNotification() {
+        if (cancellationRunnable != null) {
+            cancellationRunnable.run();
+        }
+    }
+
     private void showMusicNotificationWithCover(boolean play,
                                                 @Nullable PlayQueueItem queueItem,
                                                 MediaSessionCompat mediaSession,
                                                 MusicNotificationSetting notificationSetting) {
-        if (cancellationRunnable != null) {
-            cancellationRunnable.run();
-        }
+        cancelCoverLoadingForForegroundNotification();
 
         if (queueItem == null) {
             return;
