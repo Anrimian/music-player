@@ -110,8 +110,7 @@ public class MusicService extends Service {
 
     private MediaSessionCompat mediaSession;
 
-    @Nullable
-    private PlayerState playerState;
+    private PlayerState playerState = PlayerState.PLAY;
     @Nullable
     private PlayQueueItem currentItem;
     private long trackPosition;
@@ -149,12 +148,14 @@ public class MusicService extends Service {
 
         //we must start foreground in onCreate, strange ANR otherwise
         notificationsDisplayer.startForegroundNotification(this,
-                true,
+                playerState == PlayerState.PLAY,
                 currentItem,
                 mediaSession,
-                notificationSetting);
+                notificationSetting,
+                true);
         //update state that depends on current item and settings to keep it actual
         if (currentItem != null) {
+            updateMediaSessionState();
             updateMediaSessionMetadata();
             updateMediaSessionAlbumArt();
         }
@@ -168,10 +169,11 @@ public class MusicService extends Service {
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
             notificationsDisplayer.startForegroundNotification(this,
-                    true,
+                    playerState == PlayerState.PLAY,
                     currentItem,
                     mediaSession,
-                    notificationSetting);
+                    notificationSetting,
+                    false);
         }
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
@@ -284,20 +286,24 @@ public class MusicService extends Service {
 
         MusicNotificationSetting newSettings = serviceState.settings;
         if (!newSettings.equals(this.notificationSetting)) {
+            if (notificationSetting.isCoversOnLockScreen() != newSettings.isCoversOnLockScreen()) {
+                updateMediaSessionAlbumArt = true;
+            }
+            if (notificationSetting.isShowCovers() != newSettings.isShowCovers()
+                    || notificationSetting.isColoredNotification() != newSettings.isColoredNotification()) {
+                updateNotification = true;
+            }
             this.notificationSetting = newSettings;
-            //can be optimized
-            updateNotification = true;
-            updateMediaSessionAlbumArt = true;
         }
         if (serviceState.appTheme != currentAppTheme) {
             currentAppTheme = serviceState.appTheme;
             updateNotification = true;
         }
 
+        //blink on night mode change
+        //seekbar values on cover setting change
         if (updateNotification) {
-            //blink on start-stop
-            //recolorize after settings changing?
-            updateForegroundNotification();
+            updateForegroundNotification(updateMediaSessionAlbumArt);
         }
         if (updateMediaSessionState) {
             updateMediaSessionState();
@@ -350,12 +356,13 @@ public class MusicService extends Service {
         }
     }
 
-    private void updateForegroundNotification() {
+    private void updateForegroundNotification(boolean reloadCover) {
         notificationsDisplayer.updateForegroundNotification(
                 playerState == PlayerState.PLAY,
                 currentItem,
                 mediaSession,
-                notificationSetting);
+                notificationSetting,
+                reloadCover);
     }
 
     private static class ServiceState {
