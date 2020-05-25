@@ -76,13 +76,14 @@ public class CoverImageLoader {
     }
 
     public Runnable loadNotificationImage(@Nonnull Composition data,
-                                          Callback<Bitmap> onCompleted) {
+                                          Callback<Bitmap> onCompleted,
+                                          Runnable onClear) {
         CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
             if (bitmap == null) {
                 bitmap = getDefaultNotificationBitmap();
             }
             onCompleted.call(bitmap);
-        });
+        }, onClear);
 
         Glide.with(context)
                 .asBitmap()
@@ -113,7 +114,7 @@ public class CoverImageLoader {
                 .asBitmap()
                 .load(new CompositionImage(data.getId()))
                 .timeout(TIMEOUT_MILLIS)
-                .into(simpleTarget(onCompleted));
+                .into(simpleTarget(onCompleted, () -> onCompleted.call(null)));
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
@@ -160,7 +161,7 @@ public class CoverImageLoader {
         };
     }
 
-    private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {
+    private <T> CustomTarget<T> simpleTarget(Callback<T> callback, Runnable onClear) {
         return new CustomTarget<T>() {
             @Override
             public void onResourceReady(@NonNull T resource, @Nullable Transition<? super T> transition) {
@@ -174,7 +175,7 @@ public class CoverImageLoader {
 
             @Override
             public void onLoadCleared(@Nullable Drawable placeholder) {
-                callback.call(null);
+                onClear.run();
             }
         };
     }
