@@ -300,8 +300,7 @@ public class MusicService extends Service {
             updateNotification = true;
         }
 
-        //blink on night mode change
-        //seekbar values on cover setting change
+        //seekbar values on cover settings change
         if (updateNotification) {
             updateForegroundNotification(updateMediaSessionAlbumArt);
         }
