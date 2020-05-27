@@ -191,64 +191,46 @@
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
-        <item quantity="few">%1$s songs</item>
-        <item quantity="many">%1$s songs</item>
         <item quantity="other">%1$s songs</item>
     </plurals>
 
     <plurals name="compositions_count_dativ">
         <item quantity="one">%1$s song</item>
-        <item quantity="few">%1$s songs</item>
-        <item quantity="many">%1$s songs</item>
         <item quantity="other">%1$s songs</item>
     </plurals>
 
     <plurals name="files_count">
         <item quantity="one">%1$s file</item>
-        <item quantity="few">%1$s files</item>
-        <item quantity="many">%1$s files</item>
         <item quantity="other">%1$s files</item>
     </plurals>
 
     <plurals name="albums_count">
         <item quantity="one">%1$s album</item>
-        <item quantity="few">%1$s albums</item>
-        <item quantity="many">%1$s albums</item>
         <item quantity="other">%1$s albums</item>
     </plurals>
 
     <plurals name="play_next_message">
         <item quantity="one">%s song will be played next</item>
-        <item quantity="few">%s songs will be played next</item>
-        <item quantity="many">%s songs will be played next</item>
         <item quantity="other">%s songs will be played next</item>
     </plurals>
 
     <plurals name="added_to_queue_message">
         <item quantity="one">%s song added to end of play queue</item>
-        <item quantity="few">%s songs added to end of play queue</item>
-        <item quantity="many">%s songs added to end of play queue</item>
         <item quantity="other">%s songs added to end of play queue</item>
     </plurals>
 
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d song added to playlist \"%2$s\"</item>
-        <item quantity="few">%1$d songs added to playlist \"%2$s\"</item>
-        <item quantity="many">%1$d songs added to playlist \"%2$s\"</item>
         <item quantity="other">%1$d songs added to playlist \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d song deleted from playlist \"%2$s\"</item>
-        <item quantity="few">%1$d songs deleted from playlist \"%2$s\"</item>
-        <item quantity="many">%1$d songs deleted from playlist \"%2$s\"</item>
         <item quantity="other">%1$d songs deleted from playlist \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d song deleted</item>
-        <item quantity="few">%1$d songs deleted</item>
-        <item quantity="many">%1$d songs deleted</item>
         <item quantity="other">%1$d songs deleted</item>
     </plurals>
 
