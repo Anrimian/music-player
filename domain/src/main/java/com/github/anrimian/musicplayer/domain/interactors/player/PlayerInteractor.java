@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 
 import javax.annotation.Nullable;
 
@@ -42,6 +43,7 @@ public class PlayerInteractor {
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final PublishSubject<PlayerEvent> playerEventsSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
+    private final BehaviorSubject<Optional<CompositionSource>> currentSourceSubject = BehaviorSubject.create();
 
     private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
@@ -77,8 +79,10 @@ public class PlayerInteractor {
         prepareToPlay(compositionSource, 0);
     }
 
+    //blink sound from previous composition
     public void prepareToPlay(CompositionSource compositionSource, long startPosition) {
         this.currentSource = compositionSource;
+        currentSourceSubject.onNext(new Optional<>(currentSource));
         musicPlayerController.prepareToPlay(compositionSource, startPosition);
     }
 
@@ -171,6 +175,15 @@ public class PlayerInteractor {
 
     public void setInLoadingState() {
         playerStateSubject.onNext(LOADING);
+    }
+
+    public Observable<Optional<CompositionSource>> getCurrentSourceObservable() {
+        return currentSourceSubject;
+    }
+
+    @Nullable
+    public CompositionSource getCurrentSource() {
+        return currentSource;
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {

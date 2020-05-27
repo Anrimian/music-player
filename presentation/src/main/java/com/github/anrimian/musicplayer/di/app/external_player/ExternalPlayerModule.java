@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.di.app.external_player;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerPresenter;
@@ -25,7 +25,7 @@ public class ExternalPlayerModule {
 
     @Provides
     @Nonnull
-    ExternalPlayerPresenter externalPlayerPresenter(LibraryPlayerInteractor interactor,
+    ExternalPlayerPresenter externalPlayerPresenter(PlayerInteractor interactor,
                                                     @Named(UI_SCHEDULER) Scheduler uiScheduler,
                                                     ErrorParser errorParser) {
         return new ExternalPlayerPresenter(compositionSource, interactor, uiScheduler, errorParser);

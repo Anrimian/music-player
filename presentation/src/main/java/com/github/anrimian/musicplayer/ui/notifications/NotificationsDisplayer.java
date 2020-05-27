@@ -17,9 +17,9 @@ import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
+import com.github.anrimian.musicplayer.infrastructure.service.music.CompositionSourceModelHelper;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
@@ -31,9 +31,7 @@ import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 
 /**
@@ -109,24 +107,24 @@ public class NotificationsDisplayer {
 
     public void startForegroundNotification(Service service,
                                             boolean play,
-                                            @Nullable PlayQueueItem queueItem,
+                                            @Nullable CompositionSource source,
                                             MediaSessionCompat mediaSession,
                                             @Nullable MusicNotificationSetting notificationSetting,
                                             boolean reloadCover) {
         Notification notification = getDefaultMusicNotification(play,
-                queueItem,
+                source,
                 mediaSession,
                 notificationSetting)
                 .build();
         service.startForeground(FOREGROUND_NOTIFICATION_ID, notification);
 
         if (reloadCover) {
-            showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
+            showMusicNotificationWithCover(play, source, mediaSession, notificationSetting);
         }
     }
 
     public void updateForegroundNotification(boolean play,
-                                             @Nullable PlayQueueItem queueItem,
+                                             @Nullable CompositionSource source,
                                              MediaSessionCompat mediaSession,
                                              MusicNotificationSetting notificationSetting,
                                              boolean reloadCover) {
@@ -135,14 +133,14 @@ public class NotificationsDisplayer {
         }
 
         Notification notification = getDefaultMusicNotification(play,
-                queueItem,
+                source,
                 mediaSession,
                 notificationSetting)
                 .build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
 
         if (reloadCover) {
-            showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
+            showMusicNotificationWithCover(play, source, mediaSession, notificationSetting);
         }
     }
 
@@ -153,12 +151,12 @@ public class NotificationsDisplayer {
     }
 
     private void showMusicNotificationWithCover(boolean play,
-                                                @Nullable PlayQueueItem queueItem,
+                                                @Nullable CompositionSource source,
                                                 MediaSessionCompat mediaSession,
                                                 MusicNotificationSetting notificationSetting) {
         cancelCoverLoadingForForegroundNotification();
 
-        if (queueItem == null) {
+        if (source == null) {
             return;
         }
 
@@ -170,22 +168,24 @@ public class NotificationsDisplayer {
             return;
         }
 
-        Composition composition = queueItem.getComposition();
+        cancellationRunnable = CompositionSourceModelHelper.getCompositionSourceCover(
+                source,
+                bitmap -> {
+                    NotificationCompat.Builder builder = getDefaultMusicNotification(play,
+                            source,
+                            mediaSession,
+                            notificationSetting);
 
-        cancellationRunnable = coverImageLoader.loadNotificationImage(composition, bitmap -> {
-            NotificationCompat.Builder builder = getDefaultMusicNotification(play,
-                    queueItem,
-                    mediaSession,
-                    notificationSetting);
-
-            builder.setLargeIcon(bitmap);
-            currentNotificationBitmap = bitmap;
-            notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
-        }, () -> currentNotificationBitmap = null);
+                    builder.setLargeIcon(bitmap);
+                    currentNotificationBitmap = bitmap;
+                    notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
+                },
+                () -> currentNotificationBitmap = null,
+                coverImageLoader);
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,
-                                                                   @Nullable PlayQueueItem queueItem,
+                                                                   @Nullable CompositionSource source,
                                                                    MediaSessionCompat mediaSession,
                                                                    @Nullable MusicNotificationSetting notificationSetting) {
         int requestCode = play? PAUSE : PLAY;
@@ -242,20 +242,18 @@ public class NotificationsDisplayer {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
-        if (queueItem != null) {
-            Composition composition = queueItem.getComposition();
-
-            if (showCovers) {
-                Bitmap bitmap = currentNotificationBitmap;
-                if (bitmap == null || bitmap.isRecycled()) {
-                    bitmap = coverImageLoader.getDefaultNotificationBitmap();
-                }
-                builder.setLargeIcon(bitmap);
-            }
-
-            builder = builder.setContentTitle(formatCompositionName(composition))
-                    .setContentText(formatCompositionAuthor(composition, context));
+        if (source != null) {
+            CompositionSourceModelHelper.formatCompositionSource(source, builder, context);
         }
+
+        if (showCovers) {
+            Bitmap bitmap = currentNotificationBitmap;
+            if (bitmap == null || bitmap.isRecycled()) {
+                bitmap = coverImageLoader.getDefaultNotificationBitmap();
+            }
+            builder.setLargeIcon(bitmap);
+        }
+
         return builder;
     }
 

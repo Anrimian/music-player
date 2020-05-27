@@ -4,13 +4,19 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 public class LibraryCompositionSource implements CompositionSource {
     private final Composition composition;
+    private final long trackPosition;
 
-    public LibraryCompositionSource(Composition composition) {
+    public LibraryCompositionSource(Composition composition, long trackPosition) {
         this.composition = composition;
+        this.trackPosition = trackPosition;
     }
 
     public Composition getComposition() {
         return composition;
+    }
+
+    public long getTrackPosition() {
+        return trackPosition;
     }
 
     @Override

@@ -259,7 +259,7 @@ public class LibraryPlayerInteractor {
             }
 
             musicPlayerInteractor.prepareToPlay(
-                    new LibraryCompositionSource(currentItem.getComposition()),
+                    new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
                     trackPosition
             );
         }

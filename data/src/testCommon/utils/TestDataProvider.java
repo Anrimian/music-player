@@ -76,7 +76,7 @@ public class TestDataProvider {
     }
 
     public static CompositionSource fakeCompositionSource(long id) {
-        return new LibraryCompositionSource(fakeComposition(id));
+        return new LibraryCompositionSource(fakeComposition(id), trackPosition);
     }
 
     public static Composition fakeComposition(long id) {
