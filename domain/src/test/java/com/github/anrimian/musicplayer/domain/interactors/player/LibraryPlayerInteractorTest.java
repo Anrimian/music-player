@@ -30,7 +30,6 @@ import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorTy
 import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.UNKNOWN;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -40,6 +39,7 @@ import static org.mockito.Mockito.when;
 public class LibraryPlayerInteractorTest {
 
     private PlayerInteractor musicPlayerInteractor = mock(PlayerInteractor.class);
+    private PlayerCoordinatorInteractor playerCoordinatorInteractor = mock(PlayerCoordinatorInteractor.class);
     private SettingsRepository settingsRepository = mock(SettingsRepository.class);
     private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
     private LibraryRepository musicProviderRepository = mock(LibraryRepository.class);
@@ -52,6 +52,7 @@ public class LibraryPlayerInteractorTest {
 
     private InOrder inOrder = Mockito.inOrder(playQueueRepository,
             musicPlayerInteractor,
+            playerCoordinatorInteractor,
             musicProviderRepository);
 
     @Before
@@ -72,6 +73,7 @@ public class LibraryPlayerInteractorTest {
 
         libraryPlayerInteractor = new LibraryPlayerInteractor(
                 musicPlayerInteractor,
+                playerCoordinatorInteractor,
                 settingsRepository,
                 playQueueRepository,
                 musicProviderRepository,
@@ -84,14 +86,14 @@ public class LibraryPlayerInteractorTest {
         libraryPlayerInteractor.startPlaying(getFakeCompositions(), 0);
 
         verify(playQueueRepository).setPlayQueue(getFakeCompositions(), 0);
-        verify(musicPlayerInteractor).prepareToPlay(eq(fakeCompositionSource(0)), anyLong());
+        verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(0)), any());
     }
 
     @Test
     public void playWithoutPreparingTest() {
         libraryPlayerInteractor.play();
 
-        verify(musicPlayerInteractor).prepareToPlay(any(), anyLong());
+        verify(playerCoordinatorInteractor).prepareToPlay(any(), any());
     }
 
     @Test
@@ -99,14 +101,14 @@ public class LibraryPlayerInteractorTest {
         libraryPlayerInteractor.play();
 
         CompositionSource composition = fakeCompositionSource(0);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(composition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(composition), any());
 
         playerEventSubject.onNext(new FinishedEvent(composition));
         inOrder.verify(playQueueRepository).skipToNext();
 
         currentCompositionSubject.onNext(currentItem(1));
         CompositionSource nextComposition = fakeCompositionSource(1);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(nextComposition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(nextComposition), any());
 
         playerEventSubject.onNext(new PreparedEvent(nextComposition));
     }
@@ -118,13 +120,13 @@ public class LibraryPlayerInteractorTest {
         libraryPlayerInteractor.play();
 
         CompositionSource composition = fakeCompositionSource(0);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(composition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(composition), any());
 
         playerEventSubject.onNext(new FinishedEvent(composition));
         inOrder.verify(playQueueRepository).skipToNext();
 
         currentCompositionSubject.onNext(currentItem(1));
-        inOrder.verify(musicPlayerInteractor).stop();
+        inOrder.verify(playerCoordinatorInteractor).stop(any());
     }
 
     @Test
@@ -135,14 +137,14 @@ public class LibraryPlayerInteractorTest {
         libraryPlayerInteractor.play();
 
         CompositionSource composition = fakeCompositionSource(0);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(composition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(composition), any());
 
         playerEventSubject.onNext(new FinishedEvent(composition));
         inOrder.verify(playQueueRepository).skipToNext();
 
         currentCompositionSubject.onNext(currentItem(1));
         CompositionSource nextComposition = fakeCompositionSource(1);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(nextComposition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(nextComposition), any());
     }
 
     @Test
@@ -150,8 +152,8 @@ public class LibraryPlayerInteractorTest {
         libraryPlayerInteractor.play();
         libraryPlayerInteractor.stop();
 
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(any(), anyLong());
-        inOrder.verify(musicPlayerInteractor).stop();
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(any(), any());
+        inOrder.verify(playerCoordinatorInteractor).stop(any());
 
         CompositionSource composition = fakeCompositionSource(0);
         playerEventSubject.onNext(new FinishedEvent(composition));
@@ -161,7 +163,7 @@ public class LibraryPlayerInteractorTest {
         currentCompositionSubject.onNext(currentItem(1));
 
         CompositionSource nextComposition = fakeCompositionSource(1);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(nextComposition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(nextComposition), any());
     }
 
     @Test
@@ -171,7 +173,7 @@ public class LibraryPlayerInteractorTest {
         when(playQueueRepository.isCurrentCompositionAtEndOfQueue()).thenReturn(Single.just(false));
 
         CompositionSource composition = fakeCompositionSource(0);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(composition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(composition), any());
 
         playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
 
@@ -181,7 +183,7 @@ public class LibraryPlayerInteractorTest {
 
         currentCompositionSubject.onNext(currentItem(1));
 
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(fakeCompositionSource(1)), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(1)), any());
     }
 
     @Test
@@ -191,7 +193,7 @@ public class LibraryPlayerInteractorTest {
         libraryPlayerInteractor.play();
 
         CompositionSource composition = fakeCompositionSource(0);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(composition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(composition), any());
 
         playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
 
@@ -202,7 +204,7 @@ public class LibraryPlayerInteractorTest {
         when(playQueueRepository.isCurrentCompositionAtEndOfQueue()).thenReturn(Single.just(true));
 
         currentCompositionSubject.onNext(currentItem(1));
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(fakeCompositionSource(1)), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(1)), any());
 
         playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
         inOrder.verify(musicPlayerInteractor, never()).play();
@@ -215,7 +217,7 @@ public class LibraryPlayerInteractorTest {
         libraryPlayerInteractor.play();
 
         CompositionSource composition = fakeCompositionSource(0);
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(composition), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(composition), any());
 
         playerEventSubject.onNext(new ErrorEvent(NOT_FOUND, composition));
 
@@ -230,14 +232,14 @@ public class LibraryPlayerInteractorTest {
 
         currentCompositionSubject.onNext(new PlayQueueEvent(null));
 
-        verify(musicPlayerInteractor).stop();
+        verify(playerCoordinatorInteractor).stop(any());
     }
 
     @Test
     public void skipToPreviousTest() {
         libraryPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerInteractor).prepareToPlay(eq(fakeCompositionSource(0)), anyLong());
+        inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(0)), any());
 
         when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
         when(musicPlayerInteractor.getTrackPosition()).thenReturn(10L);

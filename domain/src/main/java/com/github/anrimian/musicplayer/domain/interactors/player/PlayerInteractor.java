@@ -70,20 +70,16 @@ public class PlayerInteractor {
                 .subscribe(this::onVolumeChanged));
     }
 
-    public void startPlaying(CompositionSource compositionSource) {
+    void startPlaying(CompositionSource compositionSource) {
         prepareToPlay(compositionSource);
         play();
     }
 
-    public void prepareToPlay(CompositionSource compositionSource) {
-        prepareToPlay(compositionSource, 0);
-    }
-
     //blink sound from previous composition
-    public void prepareToPlay(CompositionSource compositionSource, long startPosition) {
+    void prepareToPlay(CompositionSource compositionSource) {
         this.currentSource = compositionSource;
         currentSourceSubject.onNext(new Optional<>(currentSource));
-        musicPlayerController.prepareToPlay(compositionSource, startPosition);
+        musicPlayerController.prepareToPlay(compositionSource);
     }
 
     public void playAfterReady() {
@@ -95,7 +91,7 @@ public class PlayerInteractor {
             return;
         }
         if (playerStateSubject.getValue() == PAUSED_PREPARE_ERROR && currentSource != null) {
-            musicPlayerController.prepareToPlay(currentSource, uiStateRepository.getTrackPosition());
+            musicPlayerController.prepareToPlay(currentSource/*, uiStateRepository.getTrackPosition()*/);//check how it works
         }
 
         systemEventsDisposable.clear();

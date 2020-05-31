@@ -19,7 +19,6 @@ import androidx.media.session.MediaButtonReceiver;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
@@ -75,9 +74,6 @@ public class MusicService extends Service {
 
     @Inject
     PlayerInteractor playerInteractor;
-
-    @Inject
-    LibraryPlayerInteractor libraryPlayerInteractor;
 
     @Inject
     MusicServiceInteractor musicServiceInteractor;
@@ -212,11 +208,11 @@ public class MusicService extends Service {
                 break;
             }
             case SKIP_TO_NEXT: {
-                libraryPlayerInteractor.skipToNext();
+                musicServiceInteractor.skipToNext();
                 break;
             }
             case SKIP_TO_PREVIOUS: {
-                libraryPlayerInteractor.skipToPrevious();
+                musicServiceInteractor.skipToPrevious();
                 break;
             }
         }
@@ -390,12 +386,12 @@ public class MusicService extends Service {
 
         @Override
         public void onSkipToNext() {
-            libraryPlayerInteractor.skipToNext();
+            musicServiceInteractor.skipToNext();
         }
 
         @Override
         public void onSkipToPrevious() {
-            libraryPlayerInteractor.skipToPrevious();
+            musicServiceInteractor.skipToPrevious();
         }
 
         @Override
@@ -427,12 +423,12 @@ public class MusicService extends Service {
                     appRepeatMode = RepeatMode.NONE;
                 }
             }
-            libraryPlayerInteractor.setRepeatMode(appRepeatMode);
+            musicServiceInteractor.setRepeatMode(appRepeatMode);
         }
 
         @Override
         public void onSetShuffleMode(int shuffleMode) {
-            libraryPlayerInteractor.setRandomPlayingEnabled(shuffleMode != SHUFFLE_MODE_NONE);
+            musicServiceInteractor.setRandomPlayingEnabled(shuffleMode != SHUFFLE_MODE_NONE);
         }
 
         //next - not implemented

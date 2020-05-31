@@ -29,11 +29,13 @@ import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
+import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.hasSourceChanges;
 
 public class LibraryPlayerInteractor {
 
     private final PlayerInteractor musicPlayerInteractor;
+    private final PlayerCoordinatorInteractor playerCoordinatorInteractor;
     private final SettingsRepository settingsRepository;
     private final PlayQueueRepository playQueueRepository;
     private final LibraryRepository musicProviderRepository;
@@ -47,11 +49,13 @@ public class LibraryPlayerInteractor {
     private final Observable<CurrentComposition> currentCompositionObservable;
 
     public LibraryPlayerInteractor(PlayerInteractor musicPlayerInteractor,
+                                   PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                    SettingsRepository settingsRepository,
                                    PlayQueueRepository playQueueRepository,
                                    LibraryRepository musicProviderRepository,
                                    Analytics analytics) {
         this.musicPlayerInteractor = musicPlayerInteractor;
+        this.playerCoordinatorInteractor = playerCoordinatorInteractor;
         this.settingsRepository = settingsRepository;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
@@ -80,7 +84,7 @@ public class LibraryPlayerInteractor {
 
     public void startPlaying(List<Composition> compositions, int firstPosition) {
         playQueueRepository.setPlayQueue(compositions, firstPosition)
-                .doOnComplete(musicPlayerInteractor::play)
+                .doOnComplete(() -> playerCoordinatorInteractor.play(LIBRARY))
                 .doOnSubscribe(o -> musicPlayerInteractor.setInLoadingState())//fixes music gap and state blinking
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
@@ -88,22 +92,23 @@ public class LibraryPlayerInteractor {
     }
 
     public void play() {
-        musicPlayerInteractor.play();
+        playerCoordinatorInteractor.play(LIBRARY);
     }
 
     public void playOrPause() {
-        musicPlayerInteractor.playOrPause();
+        playerCoordinatorInteractor.playOrPause(LIBRARY);
     }
 
     public void stop() {
-        musicPlayerInteractor.stop();
+        playerCoordinatorInteractor.stop(LIBRARY);
     }
 
     public void pause() {
-        musicPlayerInteractor.pause();
+        playerCoordinatorInteractor.pause(LIBRARY);
     }
 
     public void skipToPrevious() {
+        //move if block to player
         if (musicPlayerInteractor.getTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
             musicPlayerInteractor.seekTo(0);
             return;
@@ -173,15 +178,15 @@ public class LibraryPlayerInteractor {
     }
 
     public Observable<Long> getTrackPositionObservable() {
-        return musicPlayerInteractor.getTrackPositionObservable();
+        return playerCoordinatorInteractor.getTrackPositionObservable(LIBRARY);
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
-        return musicPlayerInteractor.getPlayerStateObservable();
+        return playerCoordinatorInteractor.getPlayerStateObservable(LIBRARY);
     }
 
     public PlayerState getPlayerState() {
-        return musicPlayerInteractor.getPlayerState();
+        return playerCoordinatorInteractor.getPlayerState(LIBRARY);
     }
 
     public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
@@ -235,11 +240,6 @@ public class LibraryPlayerInteractor {
         playQueueRepository.clearPlayQueue();
     }
 
-    @Nullable
-    public PlayQueueItem getCurrentItem() {
-        return currentItem;
-    }
-
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
@@ -258,9 +258,9 @@ public class LibraryPlayerInteractor {
                 trackPosition = musicPlayerInteractor.getTrackPosition();
             }
 
-            musicPlayerInteractor.prepareToPlay(
+            playerCoordinatorInteractor.prepareToPlay(
                     new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
-                    trackPosition
+                    LIBRARY
             );
         }
     }

@@ -13,7 +13,7 @@ public interface MusicPlayerController {
 
     Observable<PlayerEvent> getEventsObservable();
 
-    void prepareToPlay(CompositionSource composition, long startPosition);
+    void prepareToPlay(CompositionSource composition);
 
     void stop();
 

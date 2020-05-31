@@ -29,7 +29,6 @@ import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.I
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.IGNORED;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -81,9 +80,9 @@ public class PlayerInteractorTest {
 
     @Test
     public void prepareToPlayTest() {
-        musicPlayerInteractor.prepareToPlay(fakeCompositionSource(0), 0);
+        musicPlayerInteractor.prepareToPlay(fakeCompositionSource(0));
 
-        verify(musicPlayerController).prepareToPlay(eq(fakeCompositionSource(0)), anyLong());
+        verify(musicPlayerController).prepareToPlay(eq(fakeCompositionSource(0)));
         verify(musicPlayerController, never()).resume();
         playerStateSubscriber.assertValues(IDLE);
     }
@@ -103,7 +102,7 @@ public class PlayerInteractorTest {
         CompositionSource composition = fakeCompositionSource(0);
         musicPlayerInteractor.startPlaying(composition);
 
-        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition));
 
         playerEventSubject.onNext(new PreparedEvent(composition));
         playerEventSubject.onNext(new ErrorEvent(IGNORED, composition));
@@ -112,7 +111,7 @@ public class PlayerInteractorTest {
 
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition), anyLong());
+        inOrder.verify(musicPlayerController).prepareToPlay(eq(composition));
 
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE, PLAY);
     }

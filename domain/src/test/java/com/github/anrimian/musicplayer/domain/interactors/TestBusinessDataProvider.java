@@ -20,7 +20,7 @@ import java.util.Map;
 public class TestBusinessDataProvider {
 
     public static CompositionSource fakeCompositionSource(long id) {
-        return new LibraryCompositionSource(fakeComposition(id), trackPosition);
+        return new LibraryCompositionSource(fakeComposition(id), 0);
     }
 
     public static List<Composition> getFakeCompositions() {

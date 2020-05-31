@@ -5,12 +5,40 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import io.reactivex.Observable;
 
+import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
+
 public class MusicServiceInteractor {
 
+    private final PlayerCoordinatorInteractor playerCoordinatorInteractor;
+    private final LibraryPlayerInteractor libraryPlayerInteractor;
     private final SettingsRepository settingsRepository;
 
-    public MusicServiceInteractor(SettingsRepository settingsRepository) {
+    public MusicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
+                                  LibraryPlayerInteractor libraryPlayerInteractor,
+                                  SettingsRepository settingsRepository) {
+        this.playerCoordinatorInteractor = playerCoordinatorInteractor;
+        this.libraryPlayerInteractor = libraryPlayerInteractor;
         this.settingsRepository = settingsRepository;
+    }
+
+    public void skipToNext() {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
+            libraryPlayerInteractor.skipToNext();
+        }
+    }
+
+    public void skipToPrevious() {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
+            libraryPlayerInteractor.skipToPrevious();
+        }
+    }
+
+    public void setRepeatMode(int appRepeatMode) {
+        libraryPlayerInteractor.setRepeatMode(appRepeatMode);
+    }
+
+    public void setRandomPlayingEnabled(boolean isEnabled) {
+        libraryPlayerInteractor.setRandomPlayingEnabled(isEnabled);
     }
 
     public Observable<MusicNotificationSetting> getNotificationSettingObservable() {

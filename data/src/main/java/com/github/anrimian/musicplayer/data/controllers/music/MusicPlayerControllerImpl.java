@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.controllers.music;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.controllers.music.players.AndroidMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.AppMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.CompositeMediaPlayer;
@@ -9,8 +10,8 @@ import com.github.anrimian.musicplayer.data.controllers.music.players.ExoMediaPl
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
@@ -48,8 +49,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition, long startPosition) {
-        mediaPlayer.prepareToPlay(composition, startPosition);
+    public void prepareToPlay(CompositionSource composition) {
+        mediaPlayer.prepareToPlay(composition, getStartTrackPosition(composition));
     }
 
     @Override
@@ -88,5 +89,12 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public long getTrackPosition() {
         return mediaPlayer.getTrackPosition();
+    }
+
+    private long getStartTrackPosition(CompositionSource source) {
+        if (source instanceof LibraryCompositionSource) {
+            return ((LibraryCompositionSource) source).getTrackPosition();
+        }
+        return 0;
     }
 }
