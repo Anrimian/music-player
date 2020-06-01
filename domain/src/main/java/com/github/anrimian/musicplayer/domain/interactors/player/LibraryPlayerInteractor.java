@@ -27,6 +27,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
@@ -42,6 +43,8 @@ public class LibraryPlayerInteractor {
     private final Analytics analytics;
 
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
+
+    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
 
     @Nullable
     private PlayQueueItem currentItem;
@@ -108,12 +111,14 @@ public class LibraryPlayerInteractor {
     }
 
     public void skipToPrevious() {
-        //move if block to player
-        if (musicPlayerInteractor.getTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
-            musicPlayerInteractor.seekTo(0);
-            return;
+//        if (musicPlayerController.getTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
+//            musicPlayerController.seekTo(0);
+//            return true;
+//        }
+//        return false;
+        if (!playerCoordinatorInteractor.processPreviousCommand(LIBRARY)) {
+            playQueueRepository.skipToPrevious();
         }
-        playQueueRepository.skipToPrevious();
     }
 
     public void skipToNext() {
@@ -145,15 +150,15 @@ public class LibraryPlayerInteractor {
     }
 
     public void onSeekStarted() {
-        musicPlayerInteractor.onSeekStarted();
+        playerCoordinatorInteractor.onSeekStarted(LIBRARY);
     }
 
     public void seekTo(long position) {
-        musicPlayerInteractor.seekTo(position);
+        trackPositionSubject.onNext(position);
     }
 
     public void onSeekFinished(long position) {
-        musicPlayerInteractor.onSeekFinished(position);
+        playerCoordinatorInteractor.onSeekFinished(position, LIBRARY);
     }
 
     public void setRepeatMode(int mode) {
@@ -178,7 +183,8 @@ public class LibraryPlayerInteractor {
     }
 
     public Observable<Long> getTrackPositionObservable() {
-        return playerCoordinatorInteractor.getTrackPositionObservable(LIBRARY);
+        return playerCoordinatorInteractor.getTrackPositionObservable(LIBRARY)
+                .mergeWith(trackPositionSubject);
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
@@ -316,7 +322,7 @@ public class LibraryPlayerInteractor {
 
     private void onCompositionPlayFinished() {
         if (settingsRepository.getRepeatMode() == RepeatMode.REPEAT_COMPOSITION) {
-            musicPlayerInteractor.onSeekFinished(0);
+            playerCoordinatorInteractor.onSeekFinished(0, LIBRARY);
             return;
         }
         playQueueRepository.skipToNext()

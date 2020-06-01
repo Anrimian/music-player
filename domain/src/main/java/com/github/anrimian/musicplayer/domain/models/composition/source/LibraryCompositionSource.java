@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 public class LibraryCompositionSource implements CompositionSource {
     private final Composition composition;
-    private final long trackPosition;
+    private long trackPosition;
 
     public LibraryCompositionSource(Composition composition, long trackPosition) {
         this.composition = composition;
@@ -17,6 +17,10 @@ public class LibraryCompositionSource implements CompositionSource {
 
     public long getTrackPosition() {
         return trackPosition;
+    }
+
+    public void setTrackPosition(long trackPosition) {
+        this.trackPosition = trackPosition;
     }
 
     @Override

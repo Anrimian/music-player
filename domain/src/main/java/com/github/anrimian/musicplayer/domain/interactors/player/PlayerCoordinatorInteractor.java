@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 
 import java.util.HashMap;
@@ -17,12 +18,15 @@ public class PlayerCoordinatorInteractor {
     //set and unset active state - ok
     //filter player state - ok
     //filter seekbar state - ok
+    //play from inactive player - ok
 
-    //play from inactive player - ok, but position lost if we changed it after prepare
+    //"skip to from" inactive player - ok, but position is blinking
+    //"seek to" inactive player - ok, and save position
 
-    //"skip to from" inactive player - ok, but position blinking
-    //"seek to" inactive player - seek and save, but do not affect current composition
+    //save position only for library
     //filter player events
+    //sound blinks
+    //skip to previous - processed wrong position
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }
@@ -79,6 +83,27 @@ public class PlayerCoordinatorInteractor {
         }
     }
 
+    public void onSeekStarted(PlayerType playerType) {
+        if (activePlayerType == playerType) {
+            playerInteractor.onSeekStarted();
+        }
+    }
+
+    public void onSeekFinished(long position, PlayerType playerType) {
+        if (activePlayerType == playerType) {
+            playerInteractor.onSeekFinished(position);
+        } else {
+            CompositionSource source = preparedSourcesMap.get(playerType);
+            if (source != null) {
+                applyPositionChange(source, position);
+            }
+        }
+    }
+
+    public boolean processPreviousCommand(PlayerType playerType) {
+        return isPlayerTypeActive(playerType) && playerInteractor.processPreviousCommand();
+    }
+
     public Observable<Long> getTrackPositionObservable(PlayerType playerType) {
         return playerInteractor.getTrackPositionObservable()
                 .filter(o -> isPlayerTypeActive(playerType));
@@ -95,5 +120,11 @@ public class PlayerCoordinatorInteractor {
 
     public PlayerState getPlayerState(PlayerType playerType) {
         return isPlayerTypeActive(playerType)? playerInteractor.getPlayerState() : PlayerState.PAUSE;
+    }
+
+    private void applyPositionChange(CompositionSource source, long position) {
+        if (source instanceof LibraryCompositionSource) {
+            ((LibraryCompositionSource) source).setTrackPosition(position);
+        }
     }
 }

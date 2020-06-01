@@ -241,19 +241,17 @@ public class LibraryPlayerInteractorTest {
 
         inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(0)), any());
 
-        when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
-        when(musicPlayerInteractor.getTrackPosition()).thenReturn(10L);
+        when(playerCoordinatorInteractor.processPreviousCommand(any())).thenReturn(false);
 
         libraryPlayerInteractor.skipToPrevious();
 
         inOrder.verify(playQueueRepository).skipToPrevious();
 
-        when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
-        when(musicPlayerInteractor.getTrackPosition()).thenReturn(30L);
+        when(playerCoordinatorInteractor.processPreviousCommand(any())).thenReturn(true);
 
         libraryPlayerInteractor.skipToPrevious();
 
-        inOrder.verify(musicPlayerInteractor).seekTo(0);
+        inOrder.verify(playQueueRepository, never()).skipToPrevious();
     }
 
 }

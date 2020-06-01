@@ -40,7 +40,6 @@ public class PlayerInteractor {
     private final UiStateRepository uiStateRepository;
     private final Analytics analytics;
 
-    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final PublishSubject<PlayerEvent> playerEventsSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
     private final BehaviorSubject<Optional<CompositionSource>> currentSourceSubject = BehaviorSubject.create();
@@ -80,6 +79,14 @@ public class PlayerInteractor {
         this.currentSource = compositionSource;
         currentSourceSubject.onNext(new Optional<>(currentSource));
         musicPlayerController.prepareToPlay(compositionSource);
+    }
+
+    boolean processPreviousCommand() {
+        if (musicPlayerController.getTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
+            musicPlayerController.seekTo(0);
+            return true;
+        }
+        return false;
     }
 
     public void playAfterReady() {
@@ -135,10 +142,6 @@ public class PlayerInteractor {
         }
     }
 
-    public void seekTo(long position) {
-        trackPositionSubject.onNext(position);
-    }
-
     public void onSeekFinished(long position) {
         if (playerStateSubject.getValue() == PLAY) {
             musicPlayerController.resume();
@@ -147,8 +150,7 @@ public class PlayerInteractor {
     }
 
     public Observable<Long> getTrackPositionObservable() {
-        return musicPlayerController.getTrackPositionObservable()
-                .mergeWith(trackPositionSubject);
+        return musicPlayerController.getTrackPositionObservable();
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
