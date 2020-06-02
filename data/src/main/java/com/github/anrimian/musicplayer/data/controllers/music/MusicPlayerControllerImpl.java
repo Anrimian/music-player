@@ -55,8 +55,13 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void prepareToPlay(CompositionSource source) {
+        long trackPosition = getStartTrackPosition(source);
+        if (currentSource != null) {
+            //to prevent irrelevant position events
+            mediaPlayer.seekTo(trackPosition);
+        }
         currentSource = source;
-        mediaPlayer.prepareToPlay(source, getStartTrackPosition(source));
+        mediaPlayer.prepareToPlay(source, trackPosition);
     }
 
     @Override

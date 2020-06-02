@@ -22,11 +22,11 @@ public class PlayerCoordinatorInteractor {
     //save position only for library - ok
     //"seek to" inactive player - ok
     //skip to previous - ok
-
-    //"skip to from" inactive player - ok, but position is blinking
+    //"skip to from" - play(inactive player) - ok
 
     //sound blinks
     //filter player events
+    //external player randomly(?) doesn't start playing. After position change?
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }
@@ -90,14 +90,15 @@ public class PlayerCoordinatorInteractor {
     }
 
     public boolean onSeekFinished(long position, PlayerType playerType) {
+        CompositionSource source = preparedSourcesMap.get(playerType);
+        if (source != null) {
+            applyPositionChange(source, position);
+        }
+
         if (activePlayerType == playerType) {
             playerInteractor.onSeekFinished(position);
             return true;
         } else {
-            CompositionSource source = preparedSourcesMap.get(playerType);
-            if (source != null) {
-                applyPositionChange(source, position);
-            }
             return false;
         }
     }
@@ -108,8 +109,7 @@ public class PlayerCoordinatorInteractor {
 
     public Observable<Long> getTrackPositionObservable(PlayerType playerType) {
         return playerInteractor.getTrackPositionObservable()
-                .filter(o -> isPlayerTypeActive(playerType))
-                .doOnNext(o -> System.out.println("getTrackPositionObservable: " + o));
+                .filter(o -> isPlayerTypeActive(playerType));
     }
 
     public Observable<PlayerState> getPlayerStateObservable(PlayerType playerType) {

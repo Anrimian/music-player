@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.state;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.Screens;
@@ -66,6 +67,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
 
     @Override
     public void setTrackPosition(long position) {
+        Log.d("KEK", "setTrackPosition: " + position);
         preferences.putLong(TRACK_POSITION, position);
     }
 
