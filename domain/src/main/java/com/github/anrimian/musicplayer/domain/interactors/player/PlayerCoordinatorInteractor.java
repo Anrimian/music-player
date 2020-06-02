@@ -24,7 +24,7 @@ public class PlayerCoordinatorInteractor {
     //skip to previous - ok
     //"skip to from" - play(inactive player) - ok
 
-    //sound blinks
+    //sound blinks - exo media player only
     //filter player events
     //external player randomly(?) doesn't start playing. After position change?
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
@@ -32,34 +32,17 @@ public class PlayerCoordinatorInteractor {
     }
 
     public void startPlaying(CompositionSource compositionSource, PlayerType playerType) {
-        if (activePlayerType != playerType) {
-            playerInteractor.pause();
-        }
-        activePlayerType = playerType;
+        applyPlayerType(playerType);
         playerInteractor.startPlaying(compositionSource);
     }
 
     public void play(PlayerType playerType) {
-        if (activePlayerType != playerType) {
-            playerInteractor.pause();
-            CompositionSource source = preparedSourcesMap.get(playerType);
-            if (source != null) {
-                playerInteractor.prepareToPlay(source);
-            }
-        }
-        activePlayerType = playerType;
+        applyPlayerType(playerType);
         playerInteractor.play();
     }
 
     public void playOrPause(PlayerType playerType) {
-        if (activePlayerType != playerType) {
-            playerInteractor.pause();
-            CompositionSource source = preparedSourcesMap.get(playerType);
-            if (source != null) {
-                playerInteractor.prepareToPlay(source);
-            }
-        }
-        activePlayerType = playerType;
+        applyPlayerType(playerType);
         playerInteractor.playOrPause();
     }
 
@@ -90,15 +73,14 @@ public class PlayerCoordinatorInteractor {
     }
 
     public boolean onSeekFinished(long position, PlayerType playerType) {
-        CompositionSource source = preparedSourcesMap.get(playerType);
-        if (source != null) {
-            applyPositionChange(source, position);
-        }
-
         if (activePlayerType == playerType) {
             playerInteractor.onSeekFinished(position);
             return true;
         } else {
+            CompositionSource source = preparedSourcesMap.get(playerType);
+            if (source != null) {
+                applyPositionChange(source, position);
+            }
             return false;
         }
     }
@@ -123,6 +105,22 @@ public class PlayerCoordinatorInteractor {
 
     public PlayerState getPlayerState(PlayerType playerType) {
         return isPlayerTypeActive(playerType)? playerInteractor.getPlayerState() : PlayerState.PAUSE;
+    }
+
+    private void applyPlayerType(PlayerType playerType) {
+        if (activePlayerType != playerType) {
+            playerInteractor.pause();
+            CompositionSource source = preparedSourcesMap.get(playerType);
+            if (source != null) {
+                playerInteractor.prepareToPlay(source);
+            }
+            CompositionSource oldSource = preparedSourcesMap.get(activePlayerType);
+            if (oldSource != null) {
+                applyPositionChange(oldSource, playerInteractor.getTrackPosition());
+            }
+
+        }
+        activePlayerType = playerType;
     }
 
     private void applyPositionChange(CompositionSource source, long position) {
