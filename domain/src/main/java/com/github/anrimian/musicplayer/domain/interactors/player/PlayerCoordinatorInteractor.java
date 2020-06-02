@@ -19,14 +19,14 @@ public class PlayerCoordinatorInteractor {
     //filter player state - ok
     //filter seekbar state - ok
     //play from inactive player - ok
+    //save position only for library - ok
+    //"seek to" inactive player - ok
+    //skip to previous - ok
 
     //"skip to from" inactive player - ok, but position is blinking
-    //"seek to" inactive player - ok, and save position
 
-    //save position only for library
-    //filter player events
     //sound blinks
-    //skip to previous - processed wrong position
+    //filter player events
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }
@@ -89,24 +89,27 @@ public class PlayerCoordinatorInteractor {
         }
     }
 
-    public void onSeekFinished(long position, PlayerType playerType) {
+    public boolean onSeekFinished(long position, PlayerType playerType) {
         if (activePlayerType == playerType) {
             playerInteractor.onSeekFinished(position);
+            return true;
         } else {
             CompositionSource source = preparedSourcesMap.get(playerType);
             if (source != null) {
                 applyPositionChange(source, position);
             }
+            return false;
         }
     }
 
-    public boolean processPreviousCommand(PlayerType playerType) {
-        return isPlayerTypeActive(playerType) && playerInteractor.processPreviousCommand();
+    public long getActualTrackPosition(PlayerType playerType) {
+        return isPlayerTypeActive(playerType)? playerInteractor.getTrackPosition(): -1;
     }
 
     public Observable<Long> getTrackPositionObservable(PlayerType playerType) {
         return playerInteractor.getTrackPositionObservable()
-                .filter(o -> isPlayerTypeActive(playerType));
+                .filter(o -> isPlayerTypeActive(playerType))
+                .doOnNext(o -> System.out.println("getTrackPositionObservable: " + o));
     }
 
     public Observable<PlayerState> getPlayerStateObservable(PlayerType playerType) {

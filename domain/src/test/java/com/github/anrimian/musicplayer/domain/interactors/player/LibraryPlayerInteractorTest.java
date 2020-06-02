@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +44,7 @@ public class LibraryPlayerInteractorTest {
     private SettingsRepository settingsRepository = mock(SettingsRepository.class);
     private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
     private LibraryRepository musicProviderRepository = mock(LibraryRepository.class);
+    private UiStateRepository uiStateRepository = mock(UiStateRepository.class);
     private Analytics analytics = mock(Analytics.class);
 
     private LibraryPlayerInteractor libraryPlayerInteractor;
@@ -77,6 +79,7 @@ public class LibraryPlayerInteractorTest {
                 settingsRepository,
                 playQueueRepository,
                 musicProviderRepository,
+                uiStateRepository,
                 analytics
         );
     }
@@ -241,17 +244,15 @@ public class LibraryPlayerInteractorTest {
 
         inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(0)), any());
 
-        when(playerCoordinatorInteractor.processPreviousCommand(any())).thenReturn(false);
-
+        when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
+        when(playerCoordinatorInteractor.getActualTrackPosition(any())).thenReturn(10L);
         libraryPlayerInteractor.skipToPrevious();
-
         inOrder.verify(playQueueRepository).skipToPrevious();
 
-        when(playerCoordinatorInteractor.processPreviousCommand(any())).thenReturn(true);
-
+        when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
+        when(playerCoordinatorInteractor.getActualTrackPosition(any())).thenReturn(30L);
         libraryPlayerInteractor.skipToPrevious();
-
-        inOrder.verify(playQueueRepository, never()).skipToPrevious();
+        inOrder.verify(playerCoordinatorInteractor).onSeekFinished(eq(0L), any());
     }
 
 }

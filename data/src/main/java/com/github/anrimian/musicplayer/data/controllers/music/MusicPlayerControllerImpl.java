@@ -16,6 +16,8 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 
@@ -27,6 +29,9 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     private final AppMediaPlayer mediaPlayer;
     private final UiStateRepository uiStateRepository;
+
+    @Nullable
+    CompositionSource currentSource;
 
     public MusicPlayerControllerImpl(UiStateRepository uiStateRepository,
                                      Context context,
@@ -49,26 +54,27 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition) {
-        mediaPlayer.prepareToPlay(composition, getStartTrackPosition(composition));
+    public void prepareToPlay(CompositionSource source) {
+        currentSource = source;
+        mediaPlayer.prepareToPlay(source, getStartTrackPosition(source));
     }
 
     @Override
     public void stop() {
         mediaPlayer.stop();
-        uiStateRepository.setTrackPosition(0);
+        saveTrackPosition(0);
     }
 
     @Override
     public void pause() {
-        uiStateRepository.setTrackPosition(mediaPlayer.getTrackPosition());
+        saveTrackPosition(mediaPlayer.getTrackPosition());
         mediaPlayer.pause();
     }
 
     @Override
     public void seekTo(long position) {
         mediaPlayer.seekTo(position);
-        uiStateRepository.setTrackPosition(position);
+        saveTrackPosition(position);
     }
 
     @Override
@@ -89,6 +95,12 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public long getTrackPosition() {
         return mediaPlayer.getTrackPosition();
+    }
+
+    private void saveTrackPosition(long position) {
+        if (currentSource instanceof LibraryCompositionSource) {
+            uiStateRepository.setTrackPosition(position);
+        }
     }
 
     private long getStartTrackPosition(CompositionSource source) {

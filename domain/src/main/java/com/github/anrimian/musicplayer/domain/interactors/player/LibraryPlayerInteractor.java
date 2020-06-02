@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class LibraryPlayerInteractor {
     private final SettingsRepository settingsRepository;
     private final PlayQueueRepository playQueueRepository;
     private final LibraryRepository musicProviderRepository;
+    private final UiStateRepository uiStateRepository;
     private final Analytics analytics;
 
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
@@ -56,12 +58,14 @@ public class LibraryPlayerInteractor {
                                    SettingsRepository settingsRepository,
                                    PlayQueueRepository playQueueRepository,
                                    LibraryRepository musicProviderRepository,
+                                   UiStateRepository uiStateRepository,
                                    Analytics analytics) {
         this.musicPlayerInteractor = musicPlayerInteractor;
         this.playerCoordinatorInteractor = playerCoordinatorInteractor;
         this.settingsRepository = settingsRepository;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
+        this.uiStateRepository = uiStateRepository;
         this.analytics = analytics;
 
         currentCompositionObservable = getCurrentQueueItemObservable()
@@ -111,14 +115,11 @@ public class LibraryPlayerInteractor {
     }
 
     public void skipToPrevious() {
-//        if (musicPlayerController.getTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
-//            musicPlayerController.seekTo(0);
-//            return true;
-//        }
-//        return false;
-        if (!playerCoordinatorInteractor.processPreviousCommand(LIBRARY)) {
-            playQueueRepository.skipToPrevious();
+        if (getActualTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
+            onSeekFinished(0);
+            return;
         }
+        playQueueRepository.skipToPrevious();
     }
 
     public void skipToNext() {
@@ -158,7 +159,11 @@ public class LibraryPlayerInteractor {
     }
 
     public void onSeekFinished(long position) {
-        playerCoordinatorInteractor.onSeekFinished(position, LIBRARY);
+        boolean processed = playerCoordinatorInteractor.onSeekFinished(position, LIBRARY);
+        if (!processed) {
+            uiStateRepository.setTrackPosition(position);
+            trackPositionSubject.onNext(position);
+        }
     }
 
     public void setRepeatMode(int mode) {
@@ -261,7 +266,7 @@ public class LibraryPlayerInteractor {
                 if (!hasSourceChanges(previousItem, currentItem)) {
                     return;
                 }
-                trackPosition = musicPlayerInteractor.getTrackPosition();
+                trackPosition = getActualTrackPosition();
             }
 
             playerCoordinatorInteractor.prepareToPlay(
@@ -269,6 +274,14 @@ public class LibraryPlayerInteractor {
                     LIBRARY
             );
         }
+    }
+
+    private long getActualTrackPosition() {
+        long position = playerCoordinatorInteractor.getActualTrackPosition(LIBRARY);
+        if (position == -1) {
+            return uiStateRepository.getTrackPosition();
+        }
+        return position;
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
@@ -322,7 +335,7 @@ public class LibraryPlayerInteractor {
 
     private void onCompositionPlayFinished() {
         if (settingsRepository.getRepeatMode() == RepeatMode.REPEAT_COMPOSITION) {
-            playerCoordinatorInteractor.onSeekFinished(0, LIBRARY);
+            onSeekFinished(0);
             return;
         }
         playQueueRepository.skipToNext()

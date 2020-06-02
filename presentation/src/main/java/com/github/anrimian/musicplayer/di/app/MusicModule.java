@@ -85,12 +85,14 @@ class MusicModule {
                                                     SettingsRepository settingsRepository,
                                                     PlayQueueRepository playQueueRepository,
                                                     LibraryRepository musicProviderRepository,
+                                                    UiStateRepository uiStateRepository,
                                                     Analytics analytics) {
         return new LibraryPlayerInteractor(musicPlayerInteractor,
                 playerCoordinatorInteractor,
                 settingsRepository,
                 playQueueRepository,
                 musicProviderRepository,
+                uiStateRepository,
                 analytics);
     }
 

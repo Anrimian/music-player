@@ -81,14 +81,6 @@ public class PlayerInteractor {
         musicPlayerController.prepareToPlay(compositionSource);
     }
 
-    boolean processPreviousCommand() {
-        if (musicPlayerController.getTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
-            musicPlayerController.seekTo(0);
-            return true;
-        }
-        return false;
-    }
-
     public void playAfterReady() {
 
     }
