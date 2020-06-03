@@ -80,15 +80,13 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    LibraryPlayerInteractor libraryPlayerInteractor(PlayerInteractor musicPlayerInteractor,
-                                                    PlayerCoordinatorInteractor playerCoordinatorInteractor,
+    LibraryPlayerInteractor libraryPlayerInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                                     SettingsRepository settingsRepository,
                                                     PlayQueueRepository playQueueRepository,
                                                     LibraryRepository musicProviderRepository,
                                                     UiStateRepository uiStateRepository,
                                                     Analytics analytics) {
-        return new LibraryPlayerInteractor(musicPlayerInteractor,
-                playerCoordinatorInteractor,
+        return new LibraryPlayerInteractor(playerCoordinatorInteractor,
                 settingsRepository,
                 playQueueRepository,
                 musicProviderRepository,

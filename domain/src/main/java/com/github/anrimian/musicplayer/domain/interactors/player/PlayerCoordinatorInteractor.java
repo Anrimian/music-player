@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.interactors.player;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import java.util.HashMap;
 
@@ -24,9 +25,9 @@ public class PlayerCoordinatorInteractor {
     //skip to previous - ok
     //"skip to from" - play(inactive player) - ok
     //sound blinks - exo media player only - ok
+    //filter player events - ok (after external play => play and composition skipped?(check how it works))
 
-    //filter player events - (after external play => play and composition skipped?)
-    //external player randomly(?) doesn't start playing. After position change?
+    //external player randomly(?) doesn't start playing
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }
@@ -92,6 +93,11 @@ public class PlayerCoordinatorInteractor {
 
     public long getActualTrackPosition(PlayerType playerType) {
         return isPlayerTypeActive(playerType)? playerInteractor.getTrackPosition(): -1;
+    }
+
+    public Observable<PlayerEvent> getPlayerEventsObservable(PlayerType playerType) {
+        return playerInteractor.getPlayerEventsObservable()
+                .filter(o -> isPlayerTypeActive(playerType));
     }
 
     public Observable<Long> getTrackPositionObservable(PlayerType playerType) {

@@ -36,7 +36,6 @@ import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemH
 
 public class LibraryPlayerInteractor {
 
-    private final PlayerInteractor musicPlayerInteractor;
     private final PlayerCoordinatorInteractor playerCoordinatorInteractor;
     private final SettingsRepository settingsRepository;
     private final PlayQueueRepository playQueueRepository;
@@ -53,14 +52,12 @@ public class LibraryPlayerInteractor {
     @Nullable
     private PlayQueueItem currentItem;
 
-    public LibraryPlayerInteractor(PlayerInteractor musicPlayerInteractor,
-                                   PlayerCoordinatorInteractor playerCoordinatorInteractor,
+    public LibraryPlayerInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                    SettingsRepository settingsRepository,
                                    PlayQueueRepository playQueueRepository,
                                    LibraryRepository musicProviderRepository,
                                    UiStateRepository uiStateRepository,
                                    Analytics analytics) {
-        this.musicPlayerInteractor = musicPlayerInteractor;
         this.playerCoordinatorInteractor = playerCoordinatorInteractor;
         this.settingsRepository = settingsRepository;
         this.playQueueRepository = playQueueRepository;
@@ -81,7 +78,7 @@ public class LibraryPlayerInteractor {
         playerDisposable.add(playQueueRepository.getCurrentQueueItemObservable()
                 .subscribe(this::onQueueItemChanged));
 
-        playerDisposable.add(musicPlayerInteractor.getPlayerEventsObservable()
+        playerDisposable.add(playerCoordinatorInteractor.getPlayerEventsObservable(LIBRARY)
                 .subscribe(this::onMusicPlayerEventReceived));
     }
 

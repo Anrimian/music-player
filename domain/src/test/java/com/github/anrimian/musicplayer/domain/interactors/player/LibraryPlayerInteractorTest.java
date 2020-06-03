@@ -39,7 +39,6 @@ import static org.mockito.Mockito.when;
 
 public class LibraryPlayerInteractorTest {
 
-    private PlayerInteractor musicPlayerInteractor = mock(PlayerInteractor.class);
     private PlayerCoordinatorInteractor playerCoordinatorInteractor = mock(PlayerCoordinatorInteractor.class);
     private SettingsRepository settingsRepository = mock(SettingsRepository.class);
     private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
@@ -53,7 +52,6 @@ public class LibraryPlayerInteractorTest {
     private BehaviorSubject<PlayQueueEvent> currentCompositionSubject = BehaviorSubject.createDefault(currentItem(0));
 
     private InOrder inOrder = Mockito.inOrder(playQueueRepository,
-            musicPlayerInteractor,
             playerCoordinatorInteractor,
             musicProviderRepository);
 
@@ -65,7 +63,7 @@ public class LibraryPlayerInteractorTest {
                 .thenReturn(currentCompositionSubject);
         when(playQueueRepository.skipToNext()).thenReturn(Single.just(1));
 
-        when(musicPlayerInteractor.getPlayerEventsObservable()).thenReturn(playerEventSubject);
+        when(playerCoordinatorInteractor.getPlayerEventsObservable(any())).thenReturn(playerEventSubject);
 
         when(musicProviderRepository.writeErrorAboutComposition(any(), any()))
                 .thenReturn(Completable.complete());
@@ -74,7 +72,6 @@ public class LibraryPlayerInteractorTest {
         when(settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled()).thenReturn(true);
 
         libraryPlayerInteractor = new LibraryPlayerInteractor(
-                musicPlayerInteractor,
                 playerCoordinatorInteractor,
                 settingsRepository,
                 playQueueRepository,
@@ -210,7 +207,7 @@ public class LibraryPlayerInteractorTest {
         inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(1)), any());
 
         playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
-        inOrder.verify(musicPlayerInteractor, never()).play();
+        inOrder.verify(playerCoordinatorInteractor, never()).play(any());
     }
 
     @Test
