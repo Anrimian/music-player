@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -45,6 +46,10 @@ public class CoverImageLoader {
     }
 
     public void displayImage(@NonNull ImageView imageView, @NonNull Composition data) {
+        if (!isValidContextForGlide(imageView)) {
+            return;
+        }
+
         Glide.with(imageView)
                 .load(new CompositionImage(data.getId()))
                 .placeholder(DEFAULT_PLACEHOLDER)
@@ -56,6 +61,10 @@ public class CoverImageLoader {
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull Composition data,
                              @DrawableRes int errorPlaceholder) {
+        if (!isValidContextForGlide(imageView)) {
+            return;
+        }
+
         Glide.with(context)
                 .load(new CompositionImage(data.getId()))
                 .placeholder(errorPlaceholder)
@@ -67,6 +76,10 @@ public class CoverImageLoader {
     public void displayImage(@NonNull ImageView imageView,
                              @NonNull Album album,
                              @DrawableRes int errorPlaceholder) {
+        if (!isValidContextForGlide(imageView)) {
+            return;
+        }
+
         Glide.with(imageView)
                 .load(album)
                 .placeholder(errorPlaceholder)
@@ -159,6 +172,21 @@ public class CoverImageLoader {
                 }
             }
         };
+    }
+
+    private static boolean isValidContextForGlide(ImageView imageView) {
+        return isValidContextForGlide(imageView.getContext());
+    }
+
+    private static boolean isValidContextForGlide(Context context) {
+        if (context == null) {
+            return false;
+        }
+        if (context instanceof Activity) {
+            final Activity activity = (Activity) context;
+            return !activity.isDestroyed() && !activity.isFinishing();
+        }
+        return true;
     }
 
     private <T> CustomTarget<T> simpleTarget(Callback<T> callback, Runnable onClear) {
