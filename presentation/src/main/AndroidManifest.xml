@@ -45,7 +45,8 @@
 
         <activity android:name=".ui.main.external_player.ExternalPlayerActivity"
             android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.VersionSpecific">
+            android:theme="@style/DialogActivityTheme"
+            android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
+import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.di.Components;
 
@@ -26,7 +27,11 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Components.getAppComponent().themeController().applyCurrentTheme(this);
+        getTheme().applyStyle(R.style.DialogActivityTheme, true);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_external_player);
+
 
 //        finish();
     }

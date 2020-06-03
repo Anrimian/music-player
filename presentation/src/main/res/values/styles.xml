@@ -78,6 +78,17 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <!--  +animations -->
+    <style name="DialogActivityTheme" parent="@style/DialogStyle">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="WindowAnimationTransition" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in_right</item>
         <item name="android:activityCloseExitAnimation">@anim/anim_slide_out_right</item>
