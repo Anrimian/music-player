@@ -51,6 +51,9 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private CompositionSource currentComposition;
 
+    private boolean isPreparing = false;
+    private boolean playAfterPrepare = false;
+
     public ExoMediaPlayer(Context context,
                           CompositionSourceProvider sourceRepository,
                           Scheduler scheduler,
@@ -76,6 +79,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void prepareToPlay(CompositionSource composition, long startPosition) {
+        isPreparing = true;
         this.currentComposition = composition;
         Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)
@@ -96,10 +100,11 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void resume() {
-        Completable.fromRunnable(() -> {
-            player.setPlayWhenReady(true);
-            startTracingTrackPosition();
-        }).subscribeOn(scheduler).subscribe();
+        if (isPreparing) {
+            playAfterPrepare = true;
+            return;
+        }
+        startPlayWhenReady();
     }
 
     @Override
@@ -141,10 +146,22 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         player.release();
     }
 
+    private void startPlayWhenReady() {
+        Completable.fromRunnable(() -> {
+            player.setPlayWhenReady(true);
+            startTracingTrackPosition();
+        }).subscribeOn(scheduler).subscribe();
+    }
+
     private void onCompositionPrepared(Throwable throwable, long startPosition) {
+        isPreparing = false;
         if (throwable == null) {
             seekTo(startPosition);
             playerEventSubject.onNext(new PreparedEvent(currentComposition));
+            if (playAfterPrepare) {
+                playAfterPrepare = false;
+                startPlayWhenReady();
+            }
         } else {
             seekTo(0);
             player.setPlayWhenReady(false);

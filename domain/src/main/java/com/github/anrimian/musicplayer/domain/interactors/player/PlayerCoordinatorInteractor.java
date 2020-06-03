@@ -23,9 +23,9 @@ public class PlayerCoordinatorInteractor {
     //"seek to" inactive player - ok
     //skip to previous - ok
     //"skip to from" - play(inactive player) - ok
+    //sound blinks - exo media player only - ok
 
-    //sound blinks - exo media player only
-    //filter player events
+    //filter player events - (after external play => play and composition skipped?)
     //external player randomly(?) doesn't start playing. After position change?
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
@@ -39,6 +39,12 @@ public class PlayerCoordinatorInteractor {
     public void play(PlayerType playerType) {
         applyPlayerType(playerType);
         playerInteractor.play();
+    }
+
+    public void setInLoadingState(PlayerType playerType) {
+        if (playerType == activePlayerType) {
+            playerInteractor.setInLoadingState();
+        }
     }
 
     public void playOrPause(PlayerType playerType) {
@@ -58,7 +64,6 @@ public class PlayerCoordinatorInteractor {
         }
     }
 
-    //blink sound from previous composition
     public void prepareToPlay(CompositionSource compositionSource, PlayerType playerType) {
         preparedSourcesMap.put(playerType, compositionSource);
         if (playerType == activePlayerType) {

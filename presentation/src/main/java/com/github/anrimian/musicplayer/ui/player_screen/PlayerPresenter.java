@@ -157,8 +157,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (playQueueItem.equals(currentItem)) {
             playerInteractor.playOrPause();
         } else {
-            playerInteractor.play();
             onCompositionItemClicked(position, playQueueItem);
+            playerInteractor.play();
         }
     }
 

@@ -74,15 +74,10 @@ public class PlayerInteractor {
         play();
     }
 
-    //blink sound from previous composition
     void prepareToPlay(CompositionSource compositionSource) {
         this.currentSource = compositionSource;
         currentSourceSubject.onNext(new Optional<>(currentSource));
         musicPlayerController.prepareToPlay(compositionSource);
-    }
-
-    public void playAfterReady() {
-
     }
 
     public void play() {

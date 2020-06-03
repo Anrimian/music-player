@@ -48,10 +48,10 @@ public class LibraryPlayerInteractor {
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
 
+    private final Observable<CurrentComposition> currentCompositionObservable;
+
     @Nullable
     private PlayQueueItem currentItem;
-
-    private final Observable<CurrentComposition> currentCompositionObservable;
 
     public LibraryPlayerInteractor(PlayerInteractor musicPlayerInteractor,
                                    PlayerCoordinatorInteractor playerCoordinatorInteractor,
@@ -92,7 +92,8 @@ public class LibraryPlayerInteractor {
     public void startPlaying(List<Composition> compositions, int firstPosition) {
         playQueueRepository.setPlayQueue(compositions, firstPosition)
                 .doOnComplete(() -> playerCoordinatorInteractor.play(LIBRARY))
-                .doOnSubscribe(o -> musicPlayerInteractor.setInLoadingState())//fixes music gap and state blinking
+                //fixes music gap and state blinking(prepare new queue from stop state)
+                .doOnSubscribe(o -> playerCoordinatorInteractor.setInLoadingState(LIBRARY))
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
                 .subscribe();
