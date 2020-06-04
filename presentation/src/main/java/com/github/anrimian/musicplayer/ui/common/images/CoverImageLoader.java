@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.widget.ImageView;
@@ -18,7 +19,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.ImageViewTarget;
+import com.bumptech.glide.request.target.DrawableImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
@@ -58,14 +59,14 @@ public class CoverImageLoader {
                 .into(imageView);
     }
 
-    public void displayImage(@NonNull ImageView imageView,
-                             @NonNull Composition data,
-                             @DrawableRes int errorPlaceholder) {
+    public void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                             @NonNull Composition data,
+                                             @DrawableRes int errorPlaceholder) {
         if (!isValidContextForGlide(imageView)) {
             return;
         }
 
-        Glide.with(context)
+        Glide.with(imageView)
                 .load(new CompositionImage(data.getId()))
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
@@ -151,13 +152,8 @@ public class CoverImageLoader {
                 .into(widgetTarget);
     }
 
-    private ImageViewTarget<Drawable> imageViewTarget(ImageView imageView) {
-        return new ImageViewTarget<Drawable>(imageView) {
-            @Override
-            protected void setResource(@Nullable Drawable resource) {
-                view.setImageDrawable(resource);
-            }
-
+    private DrawableImageViewTarget imageViewTarget(ImageView imageView) {
+        return new DrawableImageViewTarget(imageView) {
             @Override
             public void onLoadStarted(@Nullable Drawable placeholder) {
                 if (view.getDrawable() == null) {
@@ -167,8 +163,13 @@ public class CoverImageLoader {
 
             @Override
             public void onLoadCleared(@Nullable Drawable placeholder) {
-                if (view.getDrawable() == null) {
+                //glide can't replace previous image without blinking, hacky solution
+                Drawable previousDrawable = view.getDrawable();
+                if (previousDrawable == null) {
                     super.onLoadCleared(placeholder);
+                } else {
+                    Drawable safeDrawable = copy(previousDrawable);
+                    super.onLoadCleared(safeDrawable == null ? placeholder : safeDrawable);
                 }
             }
         };
@@ -206,5 +207,18 @@ public class CoverImageLoader {
                 onClear.run();
             }
         };
+    }
+
+    private Drawable copy(Drawable drawable) {
+        Bitmap bitmap = null;
+        if (drawable instanceof BitmapDrawable) {
+            bitmap = ((BitmapDrawable)drawable).getBitmap();
+        }
+        if (bitmap != null) {
+            bitmap = bitmap.copy(bitmap.getConfig(), bitmap.isMutable());
+            return new BitmapDrawable(context.getResources(), bitmap);
+        } else {
+            return null;
+        }
     }
 }
