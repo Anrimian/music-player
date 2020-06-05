@@ -23,6 +23,7 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerCoordinatorInteractor;
@@ -75,6 +76,13 @@ class MusicModule {
     @Singleton
     PlayerCoordinatorInteractor playerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         return new PlayerCoordinatorInteractor(playerInteractor);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    ExternalPlayerInteractor externalPlayerInteractor(PlayerCoordinatorInteractor interactor) {
+        return new ExternalPlayerInteractor(interactor);
     }
 
     @Provides

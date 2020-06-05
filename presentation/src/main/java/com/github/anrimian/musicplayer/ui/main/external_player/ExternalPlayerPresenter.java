@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.main.external_player;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.PlayerCoordinatorInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.PlayerType;
+import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -12,14 +11,14 @@ import moxy.MvpPresenter;
 public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
 
     private final CompositionSource compositionSource;
-    private final PlayerCoordinatorInteractor interactor;
+    private final ExternalPlayerInteractor interactor;
     private final Scheduler uiScheduler;
     private final ErrorParser errorParser;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
 
     public ExternalPlayerPresenter(CompositionSource compositionSource,
-                                   PlayerCoordinatorInteractor interactor,
+                                   ExternalPlayerInteractor interactor,
                                    Scheduler uiScheduler,
                                    ErrorParser errorParser) {
         this.compositionSource = compositionSource;
@@ -32,7 +31,7 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
 
-        interactor.startPlaying(compositionSource, PlayerType.EXTERNAL);
+        interactor.startPlaying(compositionSource);
     }
 
     @Override
