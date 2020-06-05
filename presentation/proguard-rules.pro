@@ -50,7 +50,11 @@
 #kotlin
 -dontwarn kotlin.**
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
-    static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
+        public static void checkExpressionValueIsNotNull(...);
+        public static void checkNotNullExpressionValue(...);
+        public static void checkReturnedValueIsNotNull(...);
+        public static void checkFieldIsNotNull(...);
+        public static void checkParameterIsNotNull(...);
 }
 
 
