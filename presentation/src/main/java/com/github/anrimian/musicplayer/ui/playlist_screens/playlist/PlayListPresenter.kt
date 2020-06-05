@@ -169,7 +169,7 @@ class PlayListPresenter(private val playListId: Long,
 
     private fun addCompositionsToEnd(compositions: List<Composition>) {
         playerInteractor.addCompositionsToEnd(compositions)
-                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
+                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
     }
 
     private fun onDefaultError(throwable: Throwable) {
