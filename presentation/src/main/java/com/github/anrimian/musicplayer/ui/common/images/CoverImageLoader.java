@@ -24,6 +24,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
@@ -60,14 +61,26 @@ public class CoverImageLoader {
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                             @NonNull FullComposition data,
+                                             @DrawableRes int errorPlaceholder) {
+        displayImageInReusableTarget(imageView, new CompositionImage(data.getId()), errorPlaceholder);
+    }
+
+    public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull Composition data,
+                                             @DrawableRes int errorPlaceholder) {
+        displayImageInReusableTarget(imageView, new CompositionImage(data.getId()), errorPlaceholder);
+    }
+
+    public void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                             @NonNull CompositionImage data,
                                              @DrawableRes int errorPlaceholder) {
         if (!isValidContextForGlide(imageView)) {
             return;
         }
 
         Glide.with(imageView)
-                .load(new CompositionImage(data.getId()))
+                .load(data)
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)

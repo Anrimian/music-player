@@ -203,6 +203,10 @@
     <string name="log_file_deleted">Файл удалён</string>
     <string name="pick_email_app_to_send">Выберите приложение email для отправки</string>
     <string name="clear_play_queue">Очистить очередь воспроизведения</string>
+    <string name="cover">Обложка</string>
+    <string name="change_cover">Изменить обложку</string>
+    <string name="pick_from_gallery">Выбрать из галереи</string>
+    <string name="remove_cover">Убрать обложку</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

@@ -188,6 +188,10 @@
     <string name="log_file_deleted">Log file deleted</string>
     <string name="pick_email_app_to_send">Pick a email app to send</string>
     <string name="clear_play_queue">Clear play queue</string>
+    <string name="cover">Cover</string>
+    <string name="change_cover">Change cover</string>
+    <string name="pick_from_gallery">Pick from gallery</string>
+    <string name="remove_cover">Remove cover</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

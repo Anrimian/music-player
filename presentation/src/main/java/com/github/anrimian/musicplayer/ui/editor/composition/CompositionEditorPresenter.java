@@ -251,6 +251,21 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         getViewState().copyFileNameText(composition.getFileName());
     }
 
+    void onChangeCoverClicked() {
+        if (composition == null) {
+            return;
+        }
+        getViewState().showCoverActionsDialog();
+    }
+
+    void onClearCoverClicked() {
+
+    }
+
+    void onNewCoverSelected() {
+
+    }
+
     private void onDefaultError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showErrorMessage(errorCommand);

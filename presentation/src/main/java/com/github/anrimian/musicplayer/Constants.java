@@ -62,6 +62,7 @@ public interface Constants {
         String MESSAGE_ARG = "message_arg";
         String MESSAGE_RES_ARG = "message_res_arg";
         String PROGRESS_DIALOG_TAG = "progress_dialog_arg";
+        String EDIT_COVER_TAG = "edit_cover_tag";
     }
 
     interface Animation {

@@ -3,12 +3,12 @@ package com.github.anrimian.musicplayer.ui.editor.composition;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.ColorInt;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
@@ -26,10 +26,10 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
-import com.r0adkll.slidr.Slidr;
 
 import java.util.List;
 
@@ -46,14 +46,13 @@ import static com.github.anrimian.musicplayer.Constants.Tags.ADD_GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_ARTIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.EDIT_COVER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.EDIT_GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setStatusBarColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class CompositionEditorActivity extends MvpAppCompatActivity
@@ -143,6 +142,12 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
+    @BindView(R.id.iv_cover)
+    ImageView ivCover;
+
+    @BindView(R.id.change_cover_clickable_area)
+    View changeCoverArea;
+
     private DialogFragmentRunner<InputTextDialogFragment> authorDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> titleDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> filenameDialogFragmentRunner;
@@ -150,6 +155,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     private DialogFragmentRunner<InputTextDialogFragment> albumArtistDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> addGenreDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editGenreDialogFragmentRunner;
+    private DialogFragmentRunner<MenuDialogFragment> coverMenuDialogRunner;
 
     private ShortGenresAdapter genresAdapter;
 
@@ -194,6 +200,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         changeAlbumClickableArea.setOnClickListener(v -> presenter.onChangeAlbumClicked());
         changeAlbumArtistClickableArea.setOnClickListener(v -> presenter.onChangeAlbumArtistClicked());
         changeGenreClickableArea.setOnClickListener(v -> presenter.onAddGenreItemClicked());
+        changeCoverArea.setOnClickListener(v -> presenter.onChangeCoverClicked());
         onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
         onLongClick(changeTitleClickableArea, () -> copyText(tvTitle, tvTitleHint));
         onLongClick(changeFilenameClickableArea, presenter::onCopyFileNameClicked);
@@ -243,6 +250,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                     presenter.onNewGenreNameEntered(name, GenreSerializer.deserializeShort(extra));
                 })
         );
+        coverMenuDialogRunner = new DialogFragmentRunner<>(fm,
+                EDIT_COVER_TAG,
+                fragment -> fragment.setOnCompleteListener(this::onCoverActionSelected)
+        );
 
         //<return genres after deep scan implementation>
         dividerAlbumArtist.setVisibility(View.INVISIBLE);
@@ -284,6 +295,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
         tvAuthor.setText(formatAuthor(composition.getArtist(), this));
         tvFileName.setText(formatFileName(composition.getFileName(), true));
+
+        Components.getAppComponent()
+                .imageLoader()
+                .displayImageInReusableTarget(ivCover, composition, R.drawable.ic_music_placeholder);
     }
 
     @Override
@@ -396,6 +411,28 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         MessagesUtils.makeSnackbar(container, text, Snackbar.LENGTH_LONG)
                 .setAction(R.string.cancel, presenter::onRestoreRemovedGenreClicked)
                 .show();
+    }
+
+    @Override
+    public void showCoverActionsDialog() {
+        MenuDialogFragment fragment = MenuDialogFragment.newInstance(
+                R.menu.cover_actions_menu,
+                getString(R.string.change_cover)
+        );
+        coverMenuDialogRunner.show(fragment);
+    }
+
+    private void onCoverActionSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_pick_from_gallery: {
+                //start pick activity
+                break;
+            }
+            case R.id.menu_clear: {
+                presenter.onClearCoverClicked();
+                break;
+            }
+        }
     }
 
     private void onGenreItemLongClicked(ShortGenre genre) {

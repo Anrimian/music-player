@@ -33,6 +33,58 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/tv_cover_hint"
+                    style="@style/TextStyle.Subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cover"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginEnd="@dimen/content_horizontal_margin"
+                    android:layout_marginStart="@dimen/toolbar_content_start"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/iv_cover"
+                    style="@style/ImageStyle"
+                    android:layout_marginTop="@dimen/content_internal_margin"
+                    android:importantForAccessibility="no"
+                    app:layout_constraintStart_toStartOf="@+id/tv_cover_hint"
+                    app:layout_constraintTop_toBottomOf="@id/tv_cover_hint"
+                    tools:src="@drawable/ic_music_placeholder"/>
+
+                <ImageView
+                    android:id="@+id/iv_cover_edit"
+                    style="@style/ButtonStyle"
+                    android:contentDescription="@string/cover"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_cover_hint"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_cover_hint"
+                    app:srcCompat="@drawable/ic_circle_edit_outline"/>
+
+                <View
+                    android:id="@+id/divider_cover"
+                    style="@style/Divider.Horizontal.Constraint"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginStart="@dimen/toolbar_content_start"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/iv_cover"
+                    app:layout_constraintBottom_toTopOf="@id/tv_filename_hint"/>
+
+                <FrameLayout
+                    android:id="@+id/change_cover_clickable_area"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:foreground="?selectableItemBackground"
+                    android:contentDescription="@string/change_cover"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/divider_cover"/>
+
+                <TextView
                     android:id="@+id/tv_filename_hint"
                     style="@style/TextStyle.Subtitle"
                     android:layout_width="0dp"
@@ -41,7 +93,7 @@
                     android:layout_marginTop="@dimen/content_vertical_margin"
                     android:layout_marginEnd="@dimen/content_horizontal_margin"
                     android:layout_marginStart="@dimen/toolbar_content_start"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider_cover"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -81,7 +133,7 @@
                     android:layout_height="0dp"
                     android:foreground="?selectableItemBackground"
                     android:contentDescription="@string/change_file_name"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider_cover"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/divider_filename"/>

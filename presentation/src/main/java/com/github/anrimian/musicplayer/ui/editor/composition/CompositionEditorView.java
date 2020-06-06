@@ -58,4 +58,7 @@ public interface CompositionEditorView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showRemovedGenreMessage(ShortGenre genre);
+
+    @StateStrategyType(SkipStrategy.class)
+    void showCoverActionsDialog();
 }
