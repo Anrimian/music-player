@@ -181,7 +181,7 @@ public class NotificationsDisplayer {
             builder.setLargeIcon(bitmap);
             currentNotificationBitmap = bitmap;
             notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
-        }, () -> currentNotificationBitmap = null);
+        }, () -> currentNotificationBitmap);
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,
