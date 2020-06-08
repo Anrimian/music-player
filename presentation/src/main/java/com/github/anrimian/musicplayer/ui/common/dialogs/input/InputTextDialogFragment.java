@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
@@ -17,11 +18,9 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.DialogFragment;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.DialogCommonInputSimpleBinding;
 import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.Constants.Arguments.CAN_BE_EMPTY_ARG;
@@ -38,8 +37,7 @@ import static com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTex
 
 public class InputTextDialogFragment extends DialogFragment {
 
-    @BindView(R.id.edit_text)
-    AutoCompleteTextView editText;
+    private AutoCompleteTextView editText;
 
     @Nullable
     private Callback<String> onCompleteListener;
@@ -91,9 +89,11 @@ public class InputTextDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = View.inflate(getActivity(), R.layout.dialog_common_input_simple, null);
-
-        ButterKnife.bind(this, view);
+        DialogCommonInputSimpleBinding binding = DialogCommonInputSimpleBinding.inflate(
+                LayoutInflater.from(requireActivity())
+        );
+        View view = binding.getRoot();
+        editText = binding.editText;
 
         Bundle args = getArguments();
         assert args != null;
@@ -153,12 +153,12 @@ public class InputTextDialogFragment extends DialogFragment {
 
     private void onCompleteButtonClicked() {
         String text = editText.getText().toString();
-        if (!TextUtils.equals(text, getArguments().getString(EDIT_TEXT_VALUE))) {
+        if (!TextUtils.equals(text, requireArguments().getString(EDIT_TEXT_VALUE))) {
             if (onCompleteListener != null) {
                 onCompleteListener.call(text);
             }
             if (complexCompleteListener != null) {
-                complexCompleteListener.call(text, getArguments().getBundle(EXTRA_DATA_ARG));
+                complexCompleteListener.call(text, requireArguments().getBundle(EXTRA_DATA_ARG));
             }
         }
         dismissAllowingStateLoss();

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentExcludedFoldersBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
@@ -25,7 +26,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
@@ -36,11 +36,9 @@ public class ExcludedFoldersFragment extends MvpAppCompatFragment implements Exc
     @InjectPresenter
     ExcludedFoldersPresenter presenter;
 
-    @BindView(R.id.cl_container)
-    CoordinatorLayout clContainer;
-
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
+    private FragmentExcludedFoldersBinding viewBinding;
+    private CoordinatorLayout clContainer;
+    private RecyclerView recyclerView;
 
     private ExcludedFolderAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
@@ -55,7 +53,10 @@ public class ExcludedFoldersFragment extends MvpAppCompatFragment implements Exc
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_excluded_folders, container, false);
+        viewBinding = FragmentExcludedFoldersBinding.inflate(inflater, container, false);
+        clContainer = viewBinding.clContainer;
+        recyclerView = viewBinding.recyclerView;
+        return viewBinding.getRoot();
     }
 
     @Override
