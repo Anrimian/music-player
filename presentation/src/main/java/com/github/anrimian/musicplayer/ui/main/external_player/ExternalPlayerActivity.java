@@ -5,7 +5,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -26,76 +25,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     @ProvidePresenter
     ExternalPlayerPresenter providePresenter() {
         Uri uriToPlay = getIntent().getData();
-        String[] query = new String[] {
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DISPLAY_NAME,
-//                            Media.ALBUM,
-//                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.SIZE,
-//                MediaStore.Audio.Media._ID,
-//                            Media.ARTIST_ID,
-//                MediaStore.Audio.Media.ALBUM_ID,
-//                MediaStore.Audio.Media.DATE_ADDED,
-//                MediaStore.Audio.Media.DATE_MODIFIED
-        };
-//            }
-
-        try(Cursor cursor = getContentResolver().query(
-                uriToPlay,
-                query,
-                null,
-                null,
-                null)) {
-            if (cursor == null || cursor.getCount() == 0) {
-                return null;
-            }
-
-            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            if (cursor.moveToFirst()) {
-                String artist = cursorWrapper.getString(MediaStore.Audio.Media.ARTIST);
-                Log.d("KEK", "artist: " + artist);
-
-                String title = cursorWrapper.getString(MediaStore.Audio.Media.TITLE);
-                Log.d("KEK", "title: " + title);
-
-                String displayName = cursorWrapper.getString(MediaStore.Audio.Media.DISPLAY_NAME);
-                Log.d("KEK", "displayName: " + displayName);
-
-                long duration = cursorWrapper.getLong(MediaStore.Audio.Media.DURATION);
-                Log.d("KEK", "duration: " + duration);
-
-                long size = cursorWrapper.getLong(MediaStore.Audio.Media.SIZE);
-                Log.d("KEK", "size: " + size);
-            }
-        }
-
-//        MediaMetadataRetriever..METADATA_KEY_DURATION
-
-        MediaMetadataRetriever mmr = null;
-        try {
-            mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(this, uriToPlay);
-
-            String mmrArtist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-            Log.d("KEK", "mmrArtist: " + mmrArtist);
-            String mmrTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            Log.d("KEK", "mmrTitle: " + mmrTitle);
-            String mmrDuration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            Log.d("KEK", "mmrDuration: " + mmrDuration);
-
-
-        } catch (Exception ignored) {
-            return null;
-        } finally {
-            if (mmr != null) {
-                mmr.release();
-            }
-        }
-
-
-        UriCompositionSource source = new UriCompositionSource(uriToPlay);
+        UriCompositionSource source = createCompositionSource(uriToPlay);
         return Components.getExternalPlayerComponent(source).externalPlayerPresenter();
     }
 
@@ -105,8 +35,69 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         getTheme().applyStyle(R.style.DialogActivityTheme, true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_external_player);
+    }
+
+    //async creation?
+    private UriCompositionSource createCompositionSource(Uri uri) {
+        String displayName = null;
+        String title = null;
+        String artist = null;
+        String album = null;
+        long duration = 0;
+        long size = 0;
+        byte[] imageBytes = null;
+
+        try (Cursor cursor = getContentResolver().query(
+                uri,
+                new String[] {
+                        MediaStore.Audio.Media.DISPLAY_NAME,
+                        MediaStore.Audio.Media.SIZE
+                },
+                null,
+                null,
+                null)) {
+            if (cursor == null || cursor.getCount() == 0) {
+                return null;
+            }
+
+            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+            if (cursor.moveToFirst()) {
+                displayName = cursorWrapper.getString(MediaStore.Audio.Media.DISPLAY_NAME);
+                size = cursorWrapper.getLong(MediaStore.Audio.Media.SIZE);
+            }
+        }
+
+        MediaMetadataRetriever mmr = null;
+        try {
+            mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(this, uri);
+
+            artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            //we can't read image from uri later, read as first as possible
+            imageBytes = mmr.getEmbeddedPicture();
+            try {
+                duration = Long.parseLong(durationStr);
+            } catch (NumberFormatException ignored) {}
 
 
-//        finish();
+        } catch (Exception ignored) {
+
+        } finally {
+            if (mmr != null) {
+                mmr.release();
+            }
+        }
+
+        return new UriCompositionSource(uri,
+                displayName == null? "unknown name" : displayName,
+                title,
+                artist,
+                album,
+                duration,
+                size,
+                imageBytes);
     }
 }

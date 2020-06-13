@@ -9,8 +9,7 @@ import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.signature.ObjectKey;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.common.images.CompositionImage;
+import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 
 public final class CompositionCoverLoader implements ModelLoader<CompositionImage, Bitmap> {
 

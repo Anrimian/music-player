@@ -22,10 +22,13 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.DrawableImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
+import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
+import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 
 import javax.annotation.Nonnull;
@@ -92,6 +95,26 @@ public class CoverImageLoader {
     public Runnable loadNotificationImage(@Nonnull Composition data,
                                           Callback<Bitmap> onCompleted,
                                           Runnable onClear) {
+        return loadNotificationImage(
+                new CompositionImage(data.getId()),
+                onCompleted,
+                onClear
+        );
+    }
+
+    public Runnable loadNotificationImage(@Nonnull UriCompositionSource source,
+                                          Callback<Bitmap> onCompleted,
+                                          Runnable onClear) {
+        return loadNotificationImage(
+                new UriCompositionImage(source),
+                onCompleted,
+                onClear
+        );
+    }
+
+    public Runnable loadNotificationImage(Object compositionImage,
+                                          Callback<Bitmap> onCompleted,
+                                          Runnable onClear) {
         CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
             if (bitmap == null) {
                 bitmap = getDefaultNotificationBitmap();
@@ -101,7 +124,7 @@ public class CoverImageLoader {
 
         Glide.with(context)
                 .asBitmap()
-                .load(new CompositionImage(data.getId()))
+                .load(compositionImage)
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
@@ -123,12 +146,12 @@ public class CoverImageLoader {
         return defaultNotificationBitmap;
     }
 
+    public void loadImage(@Nonnull UriCompositionSource data, Callback<Bitmap> onCompleted) {
+        loadImage(new UriCompositionImage(data), onCompleted);
+    }
+
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
-        Glide.with(context)
-                .asBitmap()
-                .load(new CompositionImage(data.getId()))
-                .timeout(TIMEOUT_MILLIS)
-                .into(simpleTarget(onCompleted, () -> onCompleted.call(null)));
+        loadImage(new CompositionImage(data.getId()), onCompleted);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
@@ -150,6 +173,14 @@ public class CoverImageLoader {
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
                 .into(widgetTarget);
+    }
+
+    private void loadImage(@Nonnull Object data, Callback<Bitmap> onCompleted) {
+        Glide.with(context)
+                .asBitmap()
+                .load(data)
+                .timeout(TIMEOUT_MILLIS)
+                .into(simpleTarget(onCompleted, () -> onCompleted.call(null)));
     }
 
     private DrawableImageViewTarget imageViewTarget(ImageView imageView) {

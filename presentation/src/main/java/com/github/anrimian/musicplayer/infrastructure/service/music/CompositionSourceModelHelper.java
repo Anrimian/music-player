@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.infrastructure.service.music;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadata;
-import android.net.Uri;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
@@ -22,6 +21,7 @@ import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import javax.annotation.Nonnull;
 
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 public class CompositionSourceModelHelper {
@@ -55,9 +55,12 @@ public class CompositionSourceModelHelper {
                         });
             }
             if (source instanceof UriCompositionSource) {
-                Uri uri = ((UriCompositionSource) source).getUri();
-                metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, uri.toString());
-                mediaSession.setMetadata(metadataBuilder.build());
+                Components.getAppComponent()
+                        .imageLoader()
+                        .loadImage((UriCompositionSource) source, bitmap -> {
+                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
+                            mediaSession.setMetadata(metadataBuilder.build());
+                        });
             }
         } else {
             metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, null);
@@ -79,11 +82,13 @@ public class CompositionSourceModelHelper {
             mediaSession.setMetadata(builder.build());
         }
         if (source instanceof UriCompositionSource) {
+            UriCompositionSource uriSource = (UriCompositionSource) source;
+
             MediaMetadataCompat.Builder builder = metadataBuilder
-                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "title not implemented")
-                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "album not implemented")
-                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "artist not implemented")
-                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0);
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, formatCompositionName(uriSource.getTitle(), uriSource.getDisplayName()))
+                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, uriSource.getAlbum())
+                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatAuthor(uriSource.getArtist(), context).toString())
+                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, uriSource.getDuration());
             mediaSession.setMetadata(builder.build());
         }
     }
@@ -97,8 +102,9 @@ public class CompositionSourceModelHelper {
                     .setContentText(formatCompositionAuthor(composition, context));
         }
         if (source instanceof UriCompositionSource) {
-            builder.setContentTitle("title not implemented")
-                    .setContentText("artist not implemented");
+            UriCompositionSource uriSource = (UriCompositionSource) source;
+            builder.setContentTitle(formatCompositionName(uriSource.getTitle(), uriSource.getDisplayName()))
+                    .setContentText(formatAuthor(uriSource.getArtist(), context));
         }
     }
 
@@ -121,8 +127,7 @@ public class CompositionSourceModelHelper {
             return coverImageLoader.loadNotificationImage(composition, onCompleted, onClear);
         }
         if (source instanceof UriCompositionSource) {
-            onCompleted.call(coverImageLoader.getDefaultNotificationBitmap());
-            return () -> {};
+            return coverImageLoader.loadNotificationImage((UriCompositionSource) source, onCompleted, onClear);
         }
         throw new IllegalStateException();
     }

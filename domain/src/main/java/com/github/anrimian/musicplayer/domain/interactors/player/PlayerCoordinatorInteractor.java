@@ -28,6 +28,7 @@ public class PlayerCoordinatorInteractor {
     //filter player events - ok (after external play => play and composition skipped?(check how it works))
 
     //external player randomly(?) doesn't start playing
+    //external player - seek to end, play internal => auto skip to next composition
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }
