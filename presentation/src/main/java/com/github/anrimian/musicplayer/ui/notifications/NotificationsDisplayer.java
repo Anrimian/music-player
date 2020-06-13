@@ -78,14 +78,23 @@ public class NotificationsDisplayer {
     }
 
     public void showErrorNotification(@StringRes int errorMessageId) {
+        notificationManager.notify(ERROR_NOTIFICATION_ID, getErrorNotification(errorMessageId));
+    }
+
+    public void startForegroundErrorNotification(Service service,
+                                                 @StringRes int errorMessageId) {
+        Notification notification = getErrorNotification(errorMessageId);
+        service.startForeground(ERROR_NOTIFICATION_ID, notification);
+    }
+
+    public Notification getErrorNotification(@StringRes int errorMessageId) {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context,
                 0,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-
-        Notification notification = new NotificationCompat.Builder(context, ERROR_CHANNEL_ID)
+        return new NotificationCompat.Builder(context, ERROR_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.playing_error))
                 .setContentText(context.getString(errorMessageId))
                 .setColor(getColor(context, R.color.default_notification_color))
@@ -96,9 +105,6 @@ public class NotificationsDisplayer {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .build();
-
-        notificationManager.notify(ERROR_NOTIFICATION_ID, notification);
-
     }
 
     public void removeErrorNotification() {
@@ -176,12 +182,10 @@ public class NotificationsDisplayer {
                             mediaSession,
                             notificationSetting);
 
-                    builder.setLargeIcon(bitmap);
-                    currentNotificationBitmap = bitmap;
-                    notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
-                },
-                () -> currentNotificationBitmap = null,
-                coverImageLoader);
+            builder.setLargeIcon(bitmap);
+            currentNotificationBitmap = bitmap;
+            notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
+        }, () -> currentNotificationBitmap);
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,

@@ -118,7 +118,8 @@ public class MusicService extends Service {
         notificationsDisplayer = appComponent.notificationDisplayer();
 
         if (!Permissions.hasFilePermission(this)) {
-            notificationsDisplayer.showErrorNotification(R.string.no_file_permission);//test it
+            notificationsDisplayer.startForegroundErrorNotification(this, R.string.no_file_permission);
+            stopForeground(true);
             stopSelf();
             return;
         }

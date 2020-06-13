@@ -26,6 +26,7 @@ import com.github.anrimian.musicplayer.data.models.composition.source.UriComposi
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
@@ -94,33 +95,33 @@ public class CoverImageLoader {
 
     public Runnable loadNotificationImage(@Nonnull Composition data,
                                           Callback<Bitmap> onCompleted,
-                                          Runnable onClear) {
+                                          Function<Bitmap> currentBitmap) {
         return loadNotificationImage(
                 new CompositionImage(data.getId()),
                 onCompleted,
-                onClear
+                currentBitmap
         );
     }
 
     public Runnable loadNotificationImage(@Nonnull UriCompositionSource source,
                                           Callback<Bitmap> onCompleted,
-                                          Runnable onClear) {
+                                          Function<Bitmap> currentBitmap) {
         return loadNotificationImage(
                 new UriCompositionImage(source),
                 onCompleted,
-                onClear
+                currentBitmap
         );
     }
 
     public Runnable loadNotificationImage(Object compositionImage,
                                           Callback<Bitmap> onCompleted,
-                                          Runnable onClear) {
+                                          Function<Bitmap> currentBitmap) {
         CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
             if (bitmap == null) {
                 bitmap = getDefaultNotificationBitmap();
             }
             onCompleted.call(bitmap);
-        }, onClear);
+        }, currentBitmap);
 
         Glide.with(context)
                 .asBitmap()
@@ -180,7 +181,7 @@ public class CoverImageLoader {
                 .asBitmap()
                 .load(data)
                 .timeout(TIMEOUT_MILLIS)
-                .into(simpleTarget(onCompleted, () -> onCompleted.call(null)));
+                .into(simpleTarget(onCompleted, () -> null));
     }
 
     private DrawableImageViewTarget imageViewTarget(ImageView imageView) {
@@ -206,6 +207,7 @@ public class CoverImageLoader {
         };
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean isValidContextForGlide(ImageView imageView) {
         return isValidContextForGlide(imageView.getContext());
     }
@@ -221,10 +223,11 @@ public class CoverImageLoader {
         return true;
     }
 
-    private <T> CustomTarget<T> simpleTarget(Callback<T> callback, Runnable onClear) {
-        return new CustomTarget<T>() {
+    private CustomTarget<Bitmap> simpleTarget(Callback<Bitmap> callback,
+                                              Function<Bitmap> currentBitmapFunction) {
+        return new CustomTarget<Bitmap>() {
             @Override
-            public void onResourceReady(@NonNull T resource, @Nullable Transition<? super T> transition) {
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                 callback.call(resource);
             }
 
@@ -235,7 +238,13 @@ public class CoverImageLoader {
 
             @Override
             public void onLoadCleared(@Nullable Drawable placeholder) {
-                onClear.run();
+                //glide can't replace previous image without blinking, hacky solution
+                Bitmap currentBitmap = currentBitmapFunction.call();
+                if (currentBitmap != null) {
+                    callback.call(currentBitmap.copy(currentBitmap.getConfig(), currentBitmap.isMutable()));
+                } else {
+                    callback.call(null);
+                }
             }
         };
     }
