@@ -182,10 +182,12 @@ public class NotificationsDisplayer {
                             mediaSession,
                             notificationSetting);
 
-            builder.setLargeIcon(bitmap);
-            currentNotificationBitmap = bitmap;
-            notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
-        }, () -> currentNotificationBitmap);
+                    builder.setLargeIcon(bitmap);
+                    currentNotificationBitmap = bitmap;
+                    notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
+                },
+                () -> currentNotificationBitmap,
+                coverImageLoader);
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,

@@ -113,25 +113,6 @@ public class CoverImageLoader {
         );
     }
 
-    public Runnable loadNotificationImage(Object compositionImage,
-                                          Callback<Bitmap> onCompleted,
-                                          Function<Bitmap> currentBitmap) {
-        CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
-            if (bitmap == null) {
-                bitmap = getDefaultNotificationBitmap();
-            }
-            onCompleted.call(bitmap);
-        }, currentBitmap);
-
-        Glide.with(context)
-                .asBitmap()
-                .load(compositionImage)
-                .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
-                .into(target);
-
-        return () -> Glide.with(context).clear(target);
-    }
-
     public Bitmap getDefaultNotificationBitmap() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (defaultNotificationBitmap == null) {
@@ -174,6 +155,25 @@ public class CoverImageLoader {
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
                 .into(widgetTarget);
+    }
+
+    private Runnable loadNotificationImage(Object compositionImage,
+                                           Callback<Bitmap> onCompleted,
+                                           Function<Bitmap> currentBitmap) {
+        CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
+            if (bitmap == null) {
+                bitmap = getDefaultNotificationBitmap();
+            }
+            onCompleted.call(bitmap);
+        }, currentBitmap);
+
+        Glide.with(context)
+                .asBitmap()
+                .load(compositionImage)
+                .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
+                .into(target);
+
+        return () -> Glide.with(context).clear(target);
     }
 
     private void loadImage(@Nonnull Object data, Callback<Bitmap> onCompleted) {
