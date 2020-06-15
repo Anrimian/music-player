@@ -79,4 +79,14 @@ public interface SettingsRepository {
     boolean isDecreaseVolumeOnAudioFocusLossEnabled();
 
     void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled);
+
+    void setExternalPlayerRepeatMode(int mode);
+
+    int getExternalPlayerRepeatMode();
+
+    Observable<Integer> getExternalPlayerRepeatModeObservable();
+
+    void setExternalPlayerKeepInBackground(boolean enabled);
+
+    boolean isExternalPlayerKeepInBackground();
 }

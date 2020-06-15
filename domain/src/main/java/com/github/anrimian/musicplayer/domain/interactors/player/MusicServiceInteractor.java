@@ -11,13 +11,16 @@ public class MusicServiceInteractor {
 
     private final PlayerCoordinatorInteractor playerCoordinatorInteractor;
     private final LibraryPlayerInteractor libraryPlayerInteractor;
+    private final ExternalPlayerInteractor externalPlayerInteractor;
     private final SettingsRepository settingsRepository;
 
     public MusicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                   LibraryPlayerInteractor libraryPlayerInteractor,
+                                  ExternalPlayerInteractor externalPlayerInteractor,
                                   SettingsRepository settingsRepository) {
         this.playerCoordinatorInteractor = playerCoordinatorInteractor;
         this.libraryPlayerInteractor = libraryPlayerInteractor;
+        this.externalPlayerInteractor = externalPlayerInteractor;
         this.settingsRepository = settingsRepository;
     }
 
@@ -34,7 +37,19 @@ public class MusicServiceInteractor {
     }
 
     public void setRepeatMode(int appRepeatMode) {
-        libraryPlayerInteractor.setRepeatMode(appRepeatMode);
+        if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
+            libraryPlayerInteractor.setRepeatMode(appRepeatMode);
+        } else {
+            externalPlayerInteractor.setExternalPlayerRepeatMode(appRepeatMode);
+        }
+    }
+
+    public void changeRepeatMode() {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
+            libraryPlayerInteractor.changeRepeatMode();
+        } else {
+            externalPlayerInteractor.changeExternalPlayerRepeatMode();
+        }
     }
 
     public void setRandomPlayingEnabled(boolean isEnabled) {

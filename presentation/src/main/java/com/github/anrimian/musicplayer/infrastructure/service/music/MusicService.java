@@ -231,7 +231,6 @@ public class MusicService extends Service {
     }
 
     private void onServiceStateReceived(ServiceState serviceState) {
-//        Optional<CompositionSource> compositionSource = serviceState.compositionSource;
         CompositionSource newCompositionSource = serviceState.compositionSource.getValue();
         PlayerState newPlayerState = serviceState.playerState;
         long newTrackPosition = serviceState.trackPosition;

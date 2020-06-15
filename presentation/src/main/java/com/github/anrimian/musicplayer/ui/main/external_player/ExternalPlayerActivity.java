@@ -1,10 +1,13 @@
 package com.github.anrimian.musicplayer.ui.main.external_player;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -35,6 +38,13 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         getTheme().applyStyle(R.style.DialogActivityTheme, true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_external_player);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d("KEK", "onNewIntent");
+        Toast.makeText(this, "onNewIntent", Toast.LENGTH_LONG).show();
     }
 
     //async creation?

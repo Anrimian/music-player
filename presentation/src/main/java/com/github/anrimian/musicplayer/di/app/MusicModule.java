@@ -81,8 +81,9 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    ExternalPlayerInteractor externalPlayerInteractor(PlayerCoordinatorInteractor interactor) {
-        return new ExternalPlayerInteractor(interactor);
+    ExternalPlayerInteractor externalPlayerInteractor(PlayerCoordinatorInteractor interactor,
+                                                      SettingsRepository settingsRepository) {
+        return new ExternalPlayerInteractor(interactor, settingsRepository);
     }
 
     @Provides
@@ -166,8 +167,12 @@ class MusicModule {
     @Singleton
     MusicServiceInteractor musicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                                   LibraryPlayerInteractor libraryPlayerInteractor,
+                                                  ExternalPlayerInteractor externalPlayerInteractor,
                                                   SettingsRepository settingsRepository) {
-        return new MusicServiceInteractor(playerCoordinatorInteractor, libraryPlayerInteractor, settingsRepository);
+        return new MusicServiceInteractor(playerCoordinatorInteractor,
+                libraryPlayerInteractor,
+                externalPlayerInteractor,
+                settingsRepository);
     }
 
     @Provides
