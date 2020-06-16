@@ -54,6 +54,7 @@ import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_I
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE;
 import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE;
+import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
@@ -106,6 +107,7 @@ public class MusicService extends Service {
     @Nullable
     private CompositionSource currentSource;
     private long trackPosition;
+    private int repeatMode = RepeatMode.NONE;
     private MusicNotificationSetting notificationSetting;
     private AppTheme currentAppTheme;
 
@@ -144,6 +146,7 @@ public class MusicService extends Service {
                 playerState == PlayerState.PLAY,
                 currentSource,
                 mediaSession,
+                repeatMode,
                 notificationSetting,
                 true);
         //update state that depends on current item and settings to keep it actual
@@ -165,6 +168,7 @@ public class MusicService extends Service {
                     playerState == PlayerState.PLAY,
                     currentSource,
                     mediaSession,
+                    repeatMode,
                     notificationSetting,
                     false);
         }
@@ -216,6 +220,10 @@ public class MusicService extends Service {
                 musicServiceInteractor.skipToPrevious();
                 break;
             }
+            case CHANGE_REPEAT_MODE: {
+                musicServiceInteractor.changeRepeatMode();
+                break;
+            }
         }
     }
 
@@ -223,6 +231,7 @@ public class MusicService extends Service {
         serviceDisposable.add(Observable.combineLatest(playerInteractor.getPlayerStateObservable(),
                 playerInteractor.getCurrentSourceObservable(),
                 playerInteractor.getTrackPositionObservable(),
+                musicServiceInteractor.getRepeatModeObservable(),
                 musicServiceInteractor.getNotificationSettingObservable(),
                 themeController.getAppThemeObservable(),
                 serviceState::set)
@@ -273,6 +282,11 @@ public class MusicService extends Service {
 
         if (this.trackPosition != newTrackPosition) {
             this.trackPosition = newTrackPosition;
+            updateMediaSessionState = true;
+        }
+
+        if (this.repeatMode != serviceState.repeatMode) {
+            this.repeatMode = serviceState.repeatMode;
             updateMediaSessionState = true;
         }
 
@@ -342,6 +356,7 @@ public class MusicService extends Service {
                 playerState == PlayerState.PLAY,
                 currentSource,
                 mediaSession,
+                repeatMode,
                 notificationSetting,
                 reloadCover);
     }
@@ -350,17 +365,20 @@ public class MusicService extends Service {
         PlayerState playerState;
         Optional<CompositionSource> compositionSource;
         long trackPosition;
+        int repeatMode;
         MusicNotificationSetting settings;
         AppTheme appTheme;
 
         private ServiceState set(PlayerState playerState,
                                  Optional<CompositionSource> compositionSource,
                                  long trackPosition,
+                                 int repeatMode,
                                  MusicNotificationSetting settings,
                                  AppTheme appTheme) {
             this.playerState = playerState;
             this.compositionSource = compositionSource;
             this.trackPosition = trackPosition;
+            this.repeatMode = repeatMode;
             this.settings = settings;
             this.appTheme = appTheme;
             return this;

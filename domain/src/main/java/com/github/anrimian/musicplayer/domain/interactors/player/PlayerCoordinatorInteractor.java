@@ -25,10 +25,9 @@ public class PlayerCoordinatorInteractor {
     //skip to previous - ok
     //"skip to from" - play(inactive player) - ok
     //sound blinks - exo media player only - ok
-    //filter player events - ok (after external play => play and composition skipped?(check how it works))
+    //filter player events - ok
 
-    //external player randomly(?) doesn't start playing
-    //external player - seek to end, play internal => auto skip to next composition
+    //external player - handle onNewIntent
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }

@@ -6,8 +6,6 @@ import android.media.MediaMetadata;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
-import androidx.core.app.NotificationCompat;
-
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -91,21 +89,6 @@ public class CompositionSourceModelHelper {
                     .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatAuthor(uriSource.getArtist(), context).toString())
                     .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, uriSource.getDuration());
             mediaSession.setMetadata(builder.build());
-        }
-    }
-
-    public static void formatCompositionSource(@Nonnull CompositionSource source,
-                                               NotificationCompat.Builder builder,
-                                               Context context) {
-        if (source instanceof LibraryCompositionSource) {
-            Composition composition = ((LibraryCompositionSource) source).getComposition();
-            builder.setContentTitle(formatCompositionName(composition))
-                    .setContentText(formatCompositionAuthor(composition, context));
-        }
-        if (source instanceof UriCompositionSource) {
-            UriCompositionSource uriSource = (UriCompositionSource) source;
-            builder.setContentTitle(formatCompositionName(uriSource.getTitle(), uriSource.getDisplayName()))
-                    .setContentText(formatAuthor(uriSource.getArtist(), context));
         }
     }
 

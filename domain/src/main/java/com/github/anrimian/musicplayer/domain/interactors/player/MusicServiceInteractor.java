@@ -56,6 +56,11 @@ public class MusicServiceInteractor {
         libraryPlayerInteractor.setRandomPlayingEnabled(isEnabled);
     }
 
+    public Observable<Integer> getRepeatModeObservable() {
+        //we don't support library player repeat mode for now
+        return externalPlayerInteractor.getExternalPlayerRepeatModeObservable();
+    }
+
     public Observable<MusicNotificationSetting> getNotificationSettingObservable() {
         return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
                 getColoredNotificationEnabledObservable(),
