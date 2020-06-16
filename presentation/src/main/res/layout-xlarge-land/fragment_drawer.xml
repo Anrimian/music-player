@@ -93,9 +93,6 @@
                 android:id="@+id/cl_music_panel"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/bottom_sheet_expand_height"
-                app:behavior_hideable="false"
-                app:behavior_peekHeight="@dimen/bottom_sheet_height"
-                app:layout_behavior="@string/bottom_sheet_behavior"
                 app:layout_constraintStart_toStartOf="@id/guideline_center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>

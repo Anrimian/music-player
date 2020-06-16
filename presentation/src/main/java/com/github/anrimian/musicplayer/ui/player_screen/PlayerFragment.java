@@ -112,6 +112,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     PlayerPresenter presenter;
 
     private FragmentDrawerBinding viewBinding;
+    private PartialDetailedMusicBinding panelBinding;
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private RecyclerView rvPlayList;
@@ -191,7 +192,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         drawer = viewBinding.drawer;
         acvPlayQueueMenu = viewBinding.toolbarPlayQueue.acvPlayQueue;
 
-        PartialDetailedMusicBinding panelBinding = viewBinding.clMusicPanel;
+        panelBinding = viewBinding.clMusicPanel;
         assert panelBinding != null;
         ivSkipToPrevious = panelBinding.ivSkipToPrevious;
         ivSkipToNext = panelBinding.ivSkipToNext;
@@ -243,6 +244,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     drawerLockStateProcessor::onBottomSheetOpened);
         } else {
             playerPanelWrapper = new PlayerPanelWrapperImpl(view,
+                    viewBinding,
+                    panelBinding,
+                    mlBottomSheet,
                     requireActivity(),
                     savedInstanceState,
                     presenter::onBottomPanelCollapsed,
