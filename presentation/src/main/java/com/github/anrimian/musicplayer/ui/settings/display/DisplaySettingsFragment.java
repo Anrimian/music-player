@@ -15,7 +15,6 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 
-import butterknife.ButterKnife;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -47,7 +46,6 @@ public class DisplaySettingsFragment extends MvpAppCompatFragment implements Dis
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.settings);

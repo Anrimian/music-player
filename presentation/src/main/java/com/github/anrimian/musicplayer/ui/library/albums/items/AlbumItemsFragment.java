@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
@@ -106,7 +105,6 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
 

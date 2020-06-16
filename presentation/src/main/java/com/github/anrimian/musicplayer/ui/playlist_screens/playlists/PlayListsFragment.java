@@ -34,7 +34,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import butterknife.ButterKnife;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -71,7 +70,6 @@ public class PlayListsFragment extends MvpAppCompatFragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.hideAll();

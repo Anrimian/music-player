@@ -82,9 +82,6 @@ dependencies {
     implementation deps.moxyMaterial
     annotationProcessor deps.moxyCompiler
 
-    implementation deps.butterKnife
-    annotationProcessor deps.butterKnifeCompiler
-
     implementation deps.dagger
     annotationProcessor deps.daggerCompiler
 

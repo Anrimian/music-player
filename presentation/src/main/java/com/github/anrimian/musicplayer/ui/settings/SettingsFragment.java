@@ -21,8 +21,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLay
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 
-import butterknife.ButterKnife;
-
 /**
  * Created on 19.10.2017.
  */
@@ -45,7 +43,6 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
 
