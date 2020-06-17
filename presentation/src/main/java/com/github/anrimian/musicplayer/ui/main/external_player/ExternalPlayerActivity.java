@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
@@ -14,6 +15,7 @@ import com.github.anrimian.musicplayer.data.models.composition.source.UriComposi
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
@@ -24,6 +26,10 @@ import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
 
 public class ExternalPlayerActivity extends MvpAppCompatActivity implements ExternalPlayerView {
 
@@ -57,6 +63,8 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
 
         viewBinding.ivPlayPause.setOnClickListener(v -> presenter.onPlayPauseClicked());
+        viewBinding.ivRepeatMode.setOnClickListener(v -> presenter.onRepeatModeButtonClicked());
+        onCheckChanged(viewBinding.cbKeepPlayingAfterClose, presenter::onKeepPlayerInBackgroundChecked);
     }
 
     @Override
@@ -96,8 +104,37 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         seekBarViewWrapper.setProgress(currentPosition);
         String formattedTime = formatMilliseconds(currentPosition);
         viewBinding.sbTrackState.setContentDescription(getString(R.string.position_template, formattedTime));
-
         viewBinding.tvPlayedTime.setText(formattedTime);
+    }
+
+    @Override
+    public void showRepeatMode(int mode) {
+        @DrawableRes int iconRes = getRepeatModeIcon(mode);
+        viewBinding.ivRepeatMode.setImageResource(iconRes);
+        String description = getString(getRepeatModeText(mode));
+        viewBinding.ivRepeatMode.setContentDescription(description);
+    }
+
+    @Override
+    public void showPlayErrorEvent(@Nullable ErrorType errorType) {
+        viewBinding.tvError.setText(getErrorEventText(errorType));
+    }
+
+    @Override
+    public void showKeepPlayerInBackground(boolean externalPlayerKeepInBackground) {
+        setChecked(viewBinding.cbKeepPlayingAfterClose, externalPlayerKeepInBackground);
+    }
+
+    @Nullable
+    private String getErrorEventText(@Nullable ErrorType errorType) {
+        if (errorType == null) {
+            return null;
+        }
+        switch (errorType) {
+            case UNSUPPORTED: return getString(R.string.unsupported_format_hint);
+            case NOT_FOUND: return getString(R.string.file_not_found);
+            default: return null;
+        }
     }
 
     //async creation?

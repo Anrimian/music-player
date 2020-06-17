@@ -42,6 +42,10 @@ public class ExternalPlayerInteractor {
         playerCoordinatorInteractor.playOrPause(EXTERNAL);
     }
 
+    public void stop() {
+        playerCoordinatorInteractor.stop(EXTERNAL);
+    }
+
     public void onSeekStarted() {
         playerCoordinatorInteractor.onSeekStarted(EXTERNAL);
     }

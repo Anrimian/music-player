@@ -30,14 +30,22 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
+        getViewState().showKeepPlayerInBackground(interactor.isExternalPlayerKeepInBackground());
 
         subscribeOnPlayerStateChanges();
         subscribeOnTrackPositionChanging();
+        subscribeOnRepeatMode();
+        subscribeOnErrorEvents();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (!interactor.isExternalPlayerKeepInBackground()) {
+            //and stop service?
+            interactor.stop();
+        }
+
         presenterDisposable.dispose();
     }
 
@@ -48,6 +56,7 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
     }
 
     void onPlayPauseClicked() {
+        getViewState().showPlayErrorEvent(null);
         interactor.playOrPause();
     }
 
@@ -61,6 +70,26 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
 
     void onSeekStop(int progress) {
         interactor.onSeekFinished(progress);
+    }
+
+    void onRepeatModeButtonClicked() {
+        interactor.changeExternalPlayerRepeatMode();
+    }
+
+    void onKeepPlayerInBackgroundChecked(boolean checked) {
+        interactor.setExternalPlayerKeepInBackground(checked);
+    }
+
+    private void subscribeOnErrorEvents() {
+        presenterDisposable.add(interactor.getErrorEventsObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showPlayErrorEvent));
+    }
+
+    private void subscribeOnRepeatMode() {
+        presenterDisposable.add(interactor.getExternalPlayerRepeatModeObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showRepeatMode));
     }
 
     private void subscribeOnTrackPositionChanging() {

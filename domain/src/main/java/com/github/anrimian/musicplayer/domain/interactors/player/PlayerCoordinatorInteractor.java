@@ -27,6 +27,8 @@ public class PlayerCoordinatorInteractor {
     //sound blinks - exo media player only - ok
     //filter player events - ok
     //external player - handle onNewIntent - ok
+
+    //play unsupported format - service stuck in foreground mode
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }

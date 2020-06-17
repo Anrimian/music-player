@@ -188,6 +188,7 @@
     <string name="log_file_deleted">Log file deleted</string>
     <string name="pick_email_app_to_send">Pick a email app to send</string>
     <string name="clear_play_queue">Clear play queue</string>
+    <string name="keep_playing_after_window_close">Keep playing after window closing</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

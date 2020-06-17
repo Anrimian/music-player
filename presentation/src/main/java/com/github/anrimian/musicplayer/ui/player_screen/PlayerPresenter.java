@@ -265,9 +265,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnRepeatMode() {
-        playerInteractor.getRepeatModeObservable()
+        batterySafeDisposable.add(playerInteractor.getRepeatModeObservable()
                 .observeOn(uiScheduler)
-                .subscribe(getViewState()::showRepeatMode);
+                .subscribe(getViewState()::showRepeatMode));
     }
 
     private void addPreparedCompositionsToPlayList(PlayList playList) {
