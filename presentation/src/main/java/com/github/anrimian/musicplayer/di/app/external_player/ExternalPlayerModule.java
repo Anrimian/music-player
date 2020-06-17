@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.di.app.external_player;
 
 import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerPresenter;
 
@@ -17,17 +16,11 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 @Module
 public class ExternalPlayerModule {
 
-    private final CompositionSource compositionSource;
-
-    public ExternalPlayerModule(CompositionSource compositionSource) {
-        this.compositionSource = compositionSource;
-    }
-
     @Provides
     @Nonnull
     ExternalPlayerPresenter externalPlayerPresenter(ExternalPlayerInteractor interactor,
                                                     @Named(UI_SCHEDULER) Scheduler uiScheduler,
                                                     ErrorParser errorParser) {
-        return new ExternalPlayerPresenter(compositionSource, interactor, uiScheduler, errorParser);
+        return new ExternalPlayerPresenter(interactor, uiScheduler, errorParser);
     }
 }

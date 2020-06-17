@@ -78,8 +78,15 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <!--  +animations -->
-    <style name="DialogActivityTheme" parent="@style/DialogStyle">
+    <style name="DialogActivityTheme">
+        <item name="android:windowMinWidthMajor">@dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/dialog_min_width_minor</item>
+        <item name="android:windowElevation">@dimen/floating_window_z</item>
+
+        <!--  + custom animations -->
+        <item name="android:windowAnimationStyle">@style/Animation.AppCompat.Dialog</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
@@ -87,6 +94,8 @@
         <item name="android:backgroundDimEnabled">false</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
     </style>
 
     <style name="WindowAnimationTransition" parent="@android:style/Animation.Activity">

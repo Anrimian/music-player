@@ -90,7 +90,7 @@ public class ExternalPlayerInteractor {
                 .mergeWith(trackPositionSubject);
     }
 
-    public Observable<PlayerState> getPlayPauseObservable() {
+    public Observable<PlayerState> getPlayerStateObservable() {
         return playerCoordinatorInteractor.getPlayerStateObservable(EXTERNAL);
     }
 

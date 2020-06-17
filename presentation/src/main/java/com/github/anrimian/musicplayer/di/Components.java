@@ -35,7 +35,6 @@ import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsMod
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 
 import javax.annotation.Nullable;
 
@@ -131,8 +130,8 @@ public class Components {
         return getAppComponent().settingsComponent();
     }
 
-    public static ExternalPlayerComponent getExternalPlayerComponent(CompositionSource compositionSource) {
-        return getAppComponent().externalPlayerComponent(new ExternalPlayerModule(compositionSource));
+    public static ExternalPlayerComponent getExternalPlayerComponent() {
+        return getAppComponent().externalPlayerComponent(new ExternalPlayerModule());
     }
 
     private LibraryComponent buildLibraryComponent() {

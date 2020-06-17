@@ -6,30 +6,41 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
+import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
+
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 
 public class ExternalPlayerActivity extends MvpAppCompatActivity implements ExternalPlayerView {
 
     @InjectPresenter
     ExternalPlayerPresenter presenter;
 
+    private ActivityExternalPlayerBinding viewBinding;
+
+    private SeekBarViewWrapper seekBarViewWrapper;
+
     @ProvidePresenter
     ExternalPlayerPresenter providePresenter() {
         Uri uriToPlay = getIntent().getData();
         UriCompositionSource source = createCompositionSource(uriToPlay);
-        return Components.getExternalPlayerComponent(source).externalPlayerPresenter();
+        ExternalPlayerPresenter presenter = Components.getExternalPlayerComponent().externalPlayerPresenter();
+        presenter.onSourceForPlayingReceived(source);
+        return presenter;
     }
 
     @Override
@@ -37,14 +48,56 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         Components.getAppComponent().themeController().applyCurrentTheme(this);
         getTheme().applyStyle(R.style.DialogActivityTheme, true);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_external_player);
+        viewBinding = ActivityExternalPlayerBinding.inflate(getLayoutInflater());
+        setContentView(viewBinding.getRoot());
+
+        seekBarViewWrapper = new SeekBarViewWrapper(viewBinding.sbTrackState);
+        seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);
+        seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart);
+        seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
+
+        viewBinding.ivPlayPause.setOnClickListener(v -> presenter.onPlayPauseClicked());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.d("KEK", "onNewIntent");
-        Toast.makeText(this, "onNewIntent", Toast.LENGTH_LONG).show();
+
+        Uri uriToPlay = intent.getData();
+        UriCompositionSource source = createCompositionSource(uriToPlay);
+        presenter.onSourceForPlayingReceived(source);
+    }
+
+    @Override
+    public void displayComposition(UriCompositionSource source) {
+        viewBinding.tvComposition.setText(formatCompositionName(source.getTitle(), source.getDisplayName()));
+        viewBinding.tvCompositionAuthor.setText(FormatUtils.formatAuthor(source.getArtist(), this));
+        seekBarViewWrapper.setMax(source.getDuration());
+        viewBinding.tvTotalTime.setText(formatMilliseconds(source.getDuration()));
+        Components.getAppComponent()
+                .imageLoader()
+                .displayImageInReusableTarget(viewBinding.ivMusicIcon, source, R.drawable.ic_music_placeholder);
+    }
+
+    @Override
+    public void showStopState() {
+        AndroidUtils.setAnimatedVectorDrawable(viewBinding.ivPlayPause, R.drawable.anim_pause_to_play);
+        viewBinding.ivPlayPause.setContentDescription(getString(R.string.play));
+    }
+
+    @Override
+    public void showPlayState() {
+        AndroidUtils.setAnimatedVectorDrawable(viewBinding.ivPlayPause, R.drawable.anim_play_to_pause);
+        viewBinding.ivPlayPause.setContentDescription(getString(R.string.pause));
+    }
+
+    @Override
+    public void showTrackState(long currentPosition, long duration) {
+        seekBarViewWrapper.setProgress(currentPosition);
+        String formattedTime = formatMilliseconds(currentPosition);
+        viewBinding.sbTrackState.setContentDescription(getString(R.string.position_template, formattedTime));
+
+        viewBinding.tvPlayedTime.setText(formattedTime);
     }
 
     //async creation?

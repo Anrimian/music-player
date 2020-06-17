@@ -64,18 +64,15 @@ public class CoverImageLoader {
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                             @NonNull UriCompositionSource data,
+                                             @DrawableRes int errorPlaceholder) {
+        displayImageInReusableTarget(imageView, new UriCompositionImage(data), errorPlaceholder);
+    }
+
+    public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull Composition data,
                                              @DrawableRes int errorPlaceholder) {
-        if (!isValidContextForGlide(imageView)) {
-            return;
-        }
-
-        Glide.with(imageView)
-                .load(new CompositionImage(data.getId()))
-                .placeholder(errorPlaceholder)
-                .error(errorPlaceholder)
-                .timeout(TIMEOUT_MILLIS)
-                .into(imageViewTarget(imageView));
+        displayImageInReusableTarget(imageView, new CompositionImage(data.getId()), errorPlaceholder);
     }
 
     public void displayImage(@NonNull ImageView imageView,
@@ -155,6 +152,21 @@ public class CoverImageLoader {
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
                 .into(widgetTarget);
+    }
+
+    private void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                              @NonNull Object data,
+                                              @DrawableRes int errorPlaceholder) {
+        if (!isValidContextForGlide(imageView)) {
+            return;
+        }
+
+        Glide.with(imageView)
+                .load(data)
+                .placeholder(errorPlaceholder)
+                .error(errorPlaceholder)
+                .timeout(TIMEOUT_MILLIS)
+                .into(imageViewTarget(imageView));
     }
 
     private Runnable loadNotificationImage(Object compositionImage,

@@ -26,8 +26,7 @@ public class PlayerCoordinatorInteractor {
     //"skip to from" - play(inactive player) - ok
     //sound blinks - exo media player only - ok
     //filter player events - ok
-
-    //external player - handle onNewIntent
+    //external player - handle onNewIntent - ok
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }
