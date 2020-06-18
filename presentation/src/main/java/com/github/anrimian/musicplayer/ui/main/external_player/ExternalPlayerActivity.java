@@ -133,7 +133,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         switch (errorType) {
             case UNSUPPORTED: return getString(R.string.unsupported_format_hint);
             case NOT_FOUND: return getString(R.string.file_not_found);
-            default: return null;
+            default: return getString(R.string.unknown_play_error);
         }
     }
 

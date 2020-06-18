@@ -130,9 +130,8 @@ public class PlayerCoordinatorInteractor {
             if (oldSource != null) {
                 applyPositionChange(oldSource, playerInteractor.getTrackPosition());
             }
-
+            activePlayerType = playerType;
         }
-        activePlayerType = playerType;
     }
 
     private void applyPositionChange(CompositionSource source, long position) {

@@ -45,7 +45,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         mediaPlayer = new CompositeMediaPlayer(exoMediaPlayer, androidMediaPlayer);
 
 //        mediaPlayer = new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics);
-//        mediaPlayer = new ExoMediaPlayer(context, scheduler, playerErrorParser);
+//        mediaPlayer = new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser);
     }
 
     @Override

@@ -138,7 +138,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     @Override
     public void seekTo(long position) {
         try {
-            mediaPlayer.seekTo((int) position);
+            if (isSourcePrepared) {
+                mediaPlayer.seekTo((int) position);
+            }
         } catch (IllegalStateException ignored) {}
         trackPositionSubject.onNext(position);
     }

@@ -85,7 +85,7 @@ public class PlayerInteractor {
             return;
         }
         if (playerStateSubject.getValue() == PAUSED_PREPARE_ERROR && currentSource != null) {
-            musicPlayerController.prepareToPlay(currentSource/*, uiStateRepository.getTrackPosition()*/);//check how it works
+            musicPlayerController.prepareToPlay(currentSource);
         }
 
         systemEventsDisposable.clear();
