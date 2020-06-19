@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.domain.interactors.player;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
-import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
@@ -12,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 
 import javax.annotation.Nullable;
@@ -37,8 +35,6 @@ public class PlayerInteractor {
     private final SystemMusicController systemMusicController;
     private final SystemServiceController systemServiceController;
     private final SettingsRepository settingsRepository;
-    private final UiStateRepository uiStateRepository;
-    private final Analytics analytics;
 
     private final PublishSubject<PlayerEvent> playerEventsSubject = PublishSubject.create();
     private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
@@ -53,15 +49,11 @@ public class PlayerInteractor {
     public PlayerInteractor(MusicPlayerController musicPlayerController,
                             SettingsRepository settingsRepository,
                             SystemMusicController systemMusicController,
-                            SystemServiceController systemServiceController,
-                            UiStateRepository uiStateRepository,
-                            Analytics analytics) {
+                            SystemServiceController systemServiceController) {
         this.musicPlayerController = musicPlayerController;
         this.systemMusicController = systemMusicController;
         this.settingsRepository = settingsRepository;
         this.systemServiceController = systemServiceController;
-        this.uiStateRepository = uiStateRepository;
-        this.analytics = analytics;
 
         playerDisposable.add(musicPlayerController.getEventsObservable()
                 .subscribe(this::onMusicPlayerEventReceived));

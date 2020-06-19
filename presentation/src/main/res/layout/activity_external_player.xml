@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/content_vertical_margin"
+    android:paddingBottom="@dimen/content_internal_margin"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -120,13 +120,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:srcCompat="@drawable/ic_repeat" />
 
+    <View
+        android:id="@+id/divider_settings"
+        style="@style/Divider.Horizontal.Constraint"
+        android:layout_marginTop="@dimen/content_internal_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_play_pause"/>
+
     <CheckBox
         style="@style/CheckboxStyle"
         android:id="@+id/cb_keep_playing_after_close"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/keep_playing_after_window_close"
+        android:layout_marginTop="@dimen/content_internal_margin"
         app:layout_constraintStart_toStartOf="@id/iv_music_icon"
-        app:layout_constraintTop_toBottomOf="@id/iv_play_pause"/>
+        app:layout_constraintTop_toBottomOf="@id/divider_settings"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

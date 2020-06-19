@@ -16,19 +16,6 @@ public class PlayerCoordinatorInteractor {
     private PlayerType activePlayerType = PlayerType.LIBRARY;
     private HashMap<PlayerType, CompositionSource> preparedSourcesMap = new HashMap<>();
 
-    //set and unset active state - ok
-    //filter player state - ok
-    //filter seekbar state - ok
-    //play from inactive player - ok
-    //save position only for library - ok
-    //"seek to" inactive player - ok
-    //skip to previous - ok
-    //"skip to from" - play(inactive player) - ok
-    //sound blinks - exo media player only - ok
-    //filter player events - ok
-    //external player - handle onNewIntent - ok
-
-    //play unsupported format - service stuck in foreground mode
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
         this.playerInteractor = playerInteractor;
     }

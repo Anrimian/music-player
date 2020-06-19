@@ -60,15 +60,11 @@ class MusicModule {
     PlayerInteractor playerInteractor(MusicPlayerController musicPlayerController,
                                       SettingsRepository settingsRepository,
                                       SystemMusicController systemMusicController,
-                                      SystemServiceController systemServiceController,
-                                      UiStateRepository uiStateRepository,
-                                      Analytics analytics) {
+                                      SystemServiceController systemServiceController) {
         return new PlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
-                systemServiceController,
-                uiStateRepository,
-                analytics);
+                systemServiceController);
     }
 
     @Provides

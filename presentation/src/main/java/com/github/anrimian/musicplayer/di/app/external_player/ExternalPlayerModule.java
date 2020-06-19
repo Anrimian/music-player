@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.di.app.external_player;
 
 import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerPresenter;
 
 import javax.annotation.Nonnull;
@@ -19,8 +18,7 @@ public class ExternalPlayerModule {
     @Provides
     @Nonnull
     ExternalPlayerPresenter externalPlayerPresenter(ExternalPlayerInteractor interactor,
-                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler,
-                                                    ErrorParser errorParser) {
-        return new ExternalPlayerPresenter(interactor, uiScheduler, errorParser);
+                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+        return new ExternalPlayerPresenter(interactor, uiScheduler);
     }
 }

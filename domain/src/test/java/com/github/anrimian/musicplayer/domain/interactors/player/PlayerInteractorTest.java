@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.domain.interactors.player;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
-import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
@@ -11,7 +10,6 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,8 +39,6 @@ public class PlayerInteractorTest {
     private SettingsRepository settingsRepository = mock(SettingsRepository.class);
     private SystemMusicController systemMusicController = mock(SystemMusicController.class);
     private SystemServiceController systemServiceController = mock(SystemServiceController.class);
-    private UiStateRepository uiStateRepository = mock(UiStateRepository.class);
-    private Analytics analytics = mock(Analytics.class);
 
     private PlayerInteractor musicPlayerInteractor;
 
@@ -70,9 +66,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor = new PlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
-                systemServiceController,
-                uiStateRepository,
-                analytics);
+                systemServiceController);
 
         playerStateSubscriber = musicPlayerInteractor.getPlayerStateObservable()
                 .test();
