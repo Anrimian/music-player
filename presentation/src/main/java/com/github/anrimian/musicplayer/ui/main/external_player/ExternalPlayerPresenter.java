@@ -38,10 +38,8 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
     public void onDestroy() {
         super.onDestroy();
         if (!interactor.isExternalPlayerKeepInBackground()) {
-            //and stop service?
             interactor.stop();
         }
-
         presenterDisposable.dispose();
     }
 
