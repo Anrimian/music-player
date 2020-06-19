@@ -135,6 +135,8 @@
         android:layout_height="wrap_content"
         android:text="@string/keep_playing_after_window_close"
         android:layout_marginTop="@dimen/content_internal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/iv_music_icon"
         app:layout_constraintTop_toBottomOf="@id/divider_settings"/>
 
