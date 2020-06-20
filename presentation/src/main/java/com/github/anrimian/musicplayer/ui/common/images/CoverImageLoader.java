@@ -22,11 +22,14 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.DrawableImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
+import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
+import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 
 import javax.annotation.Nonnull;
@@ -61,18 +64,15 @@ public class CoverImageLoader {
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                             @NonNull UriCompositionSource data,
+                                             @DrawableRes int errorPlaceholder) {
+        displayImageInReusableTarget(imageView, new UriCompositionImage(data), errorPlaceholder);
+    }
+
+    public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull Composition data,
                                              @DrawableRes int errorPlaceholder) {
-        if (!isValidContextForGlide(imageView)) {
-            return;
-        }
-
-        Glide.with(imageView)
-                .load(new CompositionImage(data.getId()))
-                .placeholder(errorPlaceholder)
-                .error(errorPlaceholder)
-                .timeout(TIMEOUT_MILLIS)
-                .into(imageViewTarget(imageView));
+        displayImageInReusableTarget(imageView, new CompositionImage(data.getId()), errorPlaceholder);
     }
 
     public void displayImage(@NonNull ImageView imageView,
@@ -93,20 +93,21 @@ public class CoverImageLoader {
     public Runnable loadNotificationImage(@Nonnull Composition data,
                                           Callback<Bitmap> onCompleted,
                                           Function<Bitmap> currentBitmap) {
-        CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
-            if (bitmap == null) {
-                bitmap = getDefaultNotificationBitmap();
-            }
-            onCompleted.call(bitmap);
-        }, currentBitmap);
+        return loadNotificationImage(
+                new CompositionImage(data.getId()),
+                onCompleted,
+                currentBitmap
+        );
+    }
 
-        Glide.with(context)
-                .asBitmap()
-                .load(new CompositionImage(data.getId()))
-                .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
-                .into(target);
-
-        return () -> Glide.with(context).clear(target);
+    public Runnable loadNotificationImage(@Nonnull UriCompositionSource source,
+                                          Callback<Bitmap> onCompleted,
+                                          Function<Bitmap> currentBitmap) {
+        return loadNotificationImage(
+                new UriCompositionImage(source),
+                onCompleted,
+                currentBitmap
+        );
     }
 
     public Bitmap getDefaultNotificationBitmap() {
@@ -124,12 +125,12 @@ public class CoverImageLoader {
         return defaultNotificationBitmap;
     }
 
+    public void loadImage(@Nonnull UriCompositionSource data, Callback<Bitmap> onCompleted) {
+        loadImage(new UriCompositionImage(data), onCompleted);
+    }
+
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
-        Glide.with(context)
-                .asBitmap()
-                .load(new CompositionImage(data.getId()))
-                .timeout(TIMEOUT_MILLIS)
-                .into(simpleTarget(onCompleted, () -> null));
+        loadImage(new CompositionImage(data.getId()), onCompleted);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
@@ -151,6 +152,48 @@ public class CoverImageLoader {
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
                 .into(widgetTarget);
+    }
+
+    private void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                              @NonNull Object data,
+                                              @DrawableRes int errorPlaceholder) {
+        if (!isValidContextForGlide(imageView)) {
+            return;
+        }
+
+        Glide.with(imageView)
+                .load(data)
+                .placeholder(errorPlaceholder)
+                .error(errorPlaceholder)
+                .timeout(TIMEOUT_MILLIS)
+                .into(imageViewTarget(imageView));
+    }
+
+    private Runnable loadNotificationImage(Object compositionImage,
+                                           Callback<Bitmap> onCompleted,
+                                           Function<Bitmap> currentBitmap) {
+        CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
+            if (bitmap == null) {
+                bitmap = getDefaultNotificationBitmap();
+            }
+            onCompleted.call(bitmap);
+        }, currentBitmap);
+
+        Glide.with(context)
+                .asBitmap()
+                .load(compositionImage)
+                .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
+                .into(target);
+
+        return () -> Glide.with(context).clear(target);
+    }
+
+    private void loadImage(@Nonnull Object data, Callback<Bitmap> onCompleted) {
+        Glide.with(context)
+                .asBitmap()
+                .load(data)
+                .timeout(TIMEOUT_MILLIS)
+                .into(simpleTarget(onCompleted, () -> null));
     }
 
     private DrawableImageViewTarget imageViewTarget(ImageView imageView) {
