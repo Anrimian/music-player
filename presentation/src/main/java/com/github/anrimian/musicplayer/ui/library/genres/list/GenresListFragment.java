@@ -8,12 +8,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentBaseListBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
@@ -41,8 +41,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
@@ -58,11 +56,8 @@ public class GenresListFragment extends LibraryFragment implements
     @InjectPresenter
     GenresListPresenter presenter;
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.list_container)
-    CoordinatorLayout clListContainer;
+    private FragmentBaseListBinding viewBinding;
+    private RecyclerView recyclerView;
 
     private AdvancedToolbar toolbar;
     private GenresAdapter adapter;
@@ -83,13 +78,14 @@ public class GenresListFragment extends LibraryFragment implements
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_base_list, container, false);
+        viewBinding = FragmentBaseListBinding.inflate(inflater, container, false);
+        recyclerView = viewBinding.recyclerView;
+        return viewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
 
@@ -185,7 +181,7 @@ public class GenresListFragment extends LibraryFragment implements
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+        MessagesUtils.makeSnackbar(viewBinding.listContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

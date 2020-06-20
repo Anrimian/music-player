@@ -38,6 +38,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
 
+    private static final String EXTERNAL_PLAYER_REPEAT_MODE = "external_player_repeat_mode";
+    private static final String EXTERNAL_PLAYER_KEEP_IN_BACKGROUND = "external_player_keep_in_background";
+
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Order> folderOrderSubject = BehaviorSubject.create();
@@ -48,6 +51,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
+
+    private final BehaviorSubject<Integer> externalPlayerRepeatModeSubject = BehaviorSubject.create();
 
     private SharedPreferencesHelper preferences;
 
@@ -253,6 +258,32 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled) {
         preferences.putBoolean(DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS, enabled);
+    }
+
+    @Override
+    public void setExternalPlayerRepeatMode(int mode) {
+        preferences.putInt(EXTERNAL_PLAYER_REPEAT_MODE, mode);
+        externalPlayerRepeatModeSubject.onNext(mode);
+    }
+
+    @Override
+    public int getExternalPlayerRepeatMode() {
+        return preferences.getInt(EXTERNAL_PLAYER_REPEAT_MODE, RepeatMode.NONE);
+    }
+
+    @Override
+    public Observable<Integer> getExternalPlayerRepeatModeObservable() {
+        return withDefaultValue(externalPlayerRepeatModeSubject, this::getExternalPlayerRepeatMode);
+    }
+
+    @Override
+    public void setExternalPlayerKeepInBackground(boolean enabled) {
+        preferences.putBoolean(EXTERNAL_PLAYER_KEEP_IN_BACKGROUND, enabled);
+    }
+
+    @Override
+    public boolean isExternalPlayerKeepInBackground() {
+        return preferences.getBoolean(EXTERNAL_PLAYER_KEEP_IN_BACKGROUND, true);
     }
 
     private Order orderFromInt(int order) {

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
+import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
@@ -22,9 +23,11 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerCoordinatorInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -54,18 +57,42 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    MusicPlayerInteractor musicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                                SettingsRepository settingsRepository,
-                                                SystemMusicController systemMusicController,
-                                                SystemServiceController systemServiceController,
-                                                PlayQueueRepository playQueueRepository,
-                                                LibraryRepository musicProviderRepository,
-                                                UiStateRepository uiStateRepository,
-                                                Analytics analytics) {
-        return new MusicPlayerInteractor(musicPlayerController,
+    PlayerInteractor playerInteractor(MusicPlayerController musicPlayerController,
+                                      SettingsRepository settingsRepository,
+                                      SystemMusicController systemMusicController,
+                                      SystemServiceController systemServiceController) {
+        return new PlayerInteractor(musicPlayerController,
                 settingsRepository,
                 systemMusicController,
-                systemServiceController,
+                systemServiceController);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    PlayerCoordinatorInteractor playerCoordinatorInteractor(PlayerInteractor playerInteractor) {
+        return new PlayerCoordinatorInteractor(playerInteractor);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    ExternalPlayerInteractor externalPlayerInteractor(PlayerCoordinatorInteractor interactor,
+                                                      SettingsRepository settingsRepository) {
+        return new ExternalPlayerInteractor(interactor, settingsRepository);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    LibraryPlayerInteractor libraryPlayerInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
+                                                    SettingsRepository settingsRepository,
+                                                    PlayQueueRepository playQueueRepository,
+                                                    LibraryRepository musicProviderRepository,
+                                                    UiStateRepository uiStateRepository,
+                                                    Analytics analytics) {
+        return new LibraryPlayerInteractor(playerCoordinatorInteractor,
+                settingsRepository,
                 playQueueRepository,
                 musicProviderRepository,
                 uiStateRepository,
@@ -134,8 +161,14 @@ class MusicModule {
     @Provides
     @Nonnull
     @Singleton
-    MusicServiceInteractor musicServiceInteractor(SettingsRepository settingsRepository) {
-        return new MusicServiceInteractor(settingsRepository);
+    MusicServiceInteractor musicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
+                                                  LibraryPlayerInteractor libraryPlayerInteractor,
+                                                  ExternalPlayerInteractor externalPlayerInteractor,
+                                                  SettingsRepository settingsRepository) {
+        return new MusicServiceInteractor(playerCoordinatorInteractor,
+                libraryPlayerInteractor,
+                externalPlayerInteractor,
+                settingsRepository);
     }
 
     @Provides
