@@ -6,43 +6,35 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.RadioButton;
+import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.controllers.music.players.ExoMediaPlayer;
+import com.github.anrimian.musicplayer.databinding.DialogEqualizerChooserBinding;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.MvpAppCompatDialogFragment;
 
 public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
 
-    @BindView(R.id.rb_use_system_equalizer)
-    RadioButton rbSystemEqualizer;
-
-    @BindView(R.id.rb_disable_equalizer)
-    RadioButton rbDisableEqualizer;
+    private DialogEqualizerChooserBinding viewBinding;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = View.inflate(getActivity(), R.layout.dialog_equalizer_chooser, null);
-
-        ButterKnife.bind(this, view);
+        viewBinding = DialogEqualizerChooserBinding.inflate(LayoutInflater.from(getContext()));
 
         AlertDialog dialog = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.equalizer)
-                .setView(view)
+                .setView(viewBinding.getRoot())
                 .setNegativeButton(R.string.close, (dialog1, which) -> {})
                 .create();
         dialog.show();
 
-        rbSystemEqualizer.setOnClickListener(v -> openSystemEqualizer());
-        rbDisableEqualizer.setOnClickListener(v -> disableEqualizer());
+        viewBinding.rbUseSystemEqualizer.setOnClickListener(v -> openSystemEqualizer());
+        viewBinding.rbDisableEqualizer.setOnClickListener(v -> disableEqualizer());
 
         return dialog;
     }
@@ -63,7 +55,7 @@ public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
                 effects.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
                 startActivityForResult(effects, 0);
 
-                rbDisableEqualizer.setChecked(false);
+                viewBinding.rbDisableEqualizer.setChecked(false);
             } catch (@NonNull final ActivityNotFoundException notFound) {
                 //check on dialog start and show message
                 Toast.makeText(requireContext(), "There is no equalizer", Toast.LENGTH_SHORT).show();
@@ -80,7 +72,7 @@ public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
         intent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
         requireContext().sendBroadcast(intent);
 
-        rbSystemEqualizer.setChecked(false);
+        viewBinding.rbUseSystemEqualizer.setChecked(false);
     }
 
 }
