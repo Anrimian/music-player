@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
@@ -127,13 +128,15 @@ class MusicModule {
                                                        CompositionSourceProvider sourceRepository,
                                                        @Named(UI_SCHEDULER) Scheduler scheduler,
                                                        PlayerErrorParser playerErrorParser,
-                                                       Analytics analytics) {
+                                                       Analytics analytics,
+                                                       EqualizerController equalizerController) {
         return new MusicPlayerControllerImpl(uiStateRepository,
                 context,
                 sourceRepository,
                 scheduler,
                 playerErrorParser,
-                analytics);
+                analytics,
+                equalizerController);
     }
 
     @Provides
@@ -185,6 +188,13 @@ class MusicModule {
                                                StorageMusicProvider storageMusicProvider,
                                                @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new CompositionSourceProvider(compositionsDao, storageMusicProvider, scheduler);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    EqualizerController equalizerController(SettingsRepository settingsRepository) {
+        return new EqualizerController(settingsRepository);
     }
 
 }

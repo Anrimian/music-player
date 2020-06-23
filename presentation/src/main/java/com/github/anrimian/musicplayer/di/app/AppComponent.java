@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
@@ -76,6 +77,7 @@ public interface AppComponent {
     FileLog fileLog();
 
     ThemeController themeController();
+    EqualizerController equalizerController();
 
     void inject(MusicService musicService);
 

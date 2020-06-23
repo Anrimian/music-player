@@ -89,4 +89,8 @@ public interface SettingsRepository {
     void setExternalPlayerKeepInBackground(boolean enabled);
 
     boolean isExternalPlayerKeepInBackground();
+
+    void setSelectedEqualizerType(int type);
+
+    int getSelectedEqualizerType();
 }

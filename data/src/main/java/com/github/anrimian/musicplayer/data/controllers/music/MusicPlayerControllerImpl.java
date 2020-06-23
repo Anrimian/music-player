@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.controllers.music;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.controllers.music.players.AndroidMediaPlayer;
 import com.github.anrimian.musicplayer.data.controllers.music.players.AppMediaPlayer;
@@ -38,9 +39,10 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                                      CompositionSourceProvider sourceRepository,
                                      Scheduler scheduler,
                                      PlayerErrorParser playerErrorParser,
-                                     Analytics analytics) {
+                                     Analytics analytics,
+                                     EqualizerController equalizerController) {
         this.uiStateRepository = uiStateRepository;
-        Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser);
+        Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser, equalizerController);
         Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics);
         mediaPlayer = new CompositeMediaPlayer(exoMediaPlayer, androidMediaPlayer);
 
