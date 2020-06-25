@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-class ExternalEqualizer {
+public class ExternalEqualizer {
 
     public static void attachExternalEqualizer(Context context, int audioSessionId) {
         Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
@@ -27,8 +25,12 @@ class ExternalEqualizer {
         context.sendBroadcast(intent);
     }
 
+    public static boolean isExternalEqualizerExists(Context context) {
+        Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+        return intent.resolveActivity(context.getPackageManager()) != null;
+    }
+
     public static void launchExternalEqualizerSetup(Activity activity, int audioSessionId) {
-        Toast.makeText(activity, "sessionId: " + audioSessionId, Toast.LENGTH_LONG).show();
         if (audioSessionId == AudioEffect.ERROR_BAD_VALUE) {
             Toast.makeText(activity, "No Session Id", Toast.LENGTH_LONG).show();
         } else {
@@ -38,10 +40,7 @@ class ExternalEqualizer {
                 intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId);
                 intent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
                 activity.startActivityForResult(intent, 0);
-            } catch (@NonNull final ActivityNotFoundException notFound) {
-                //check on dialog start and show message
-                Toast.makeText(activity, "There is no equalizer", Toast.LENGTH_SHORT).show();
-            }
+            } catch (ActivityNotFoundException ignored) { }
         }
     }
 

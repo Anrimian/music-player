@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerTypes;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.ExternalEqualizer;
 import com.github.anrimian.musicplayer.databinding.DialogEqualizerChooserBinding;
 import com.github.anrimian.musicplayer.di.Components;
 
@@ -35,12 +36,37 @@ public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
                 .create();
         dialog.show();
 
-        viewBinding.rbUseSystemEqualizer.setOnClickListener(v -> openSystemEqualizer());
+        viewBinding.rbUseSystemEqualizer.setOnClickListener(v -> enableSystemEqualizer());
+        viewBinding.btnOpenSystemEqualizer.setOnClickListener(v -> openSystemEqualizer());
         viewBinding.rbDisableEqualizer.setOnClickListener(v -> disableEqualizer());
 
         showActiveEqualizer(equalizerController.getSelectedEqualizerType());
 
         return dialog;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        int textResId;
+        boolean enabled;
+        if (ExternalEqualizer.isExternalEqualizerExists(requireContext())) {
+            textResId = R.string.external_equalizer_description;
+            enabled = true;
+        } else {
+            textResId = R.string.external_equalizer_not_found;
+            enabled = false;
+        }
+        viewBinding.btnOpenSystemEqualizer.setEnabled(enabled);
+        viewBinding.rbUseSystemEqualizer.setEnabled(enabled);
+        viewBinding.tvSystemEqualizerDescription.setEnabled(enabled);
+        viewBinding.tvSystemEqualizerDescription.setText(textResId);
+    }
+
+    private void enableSystemEqualizer() {
+        equalizerController.enableExternalEqualizer(getActivity(), EqualizerTypes.EXTERNAL);
+        showActiveEqualizer(EqualizerTypes.EXTERNAL);
     }
 
     private void openSystemEqualizer() {

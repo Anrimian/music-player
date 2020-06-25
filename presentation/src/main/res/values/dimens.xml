@@ -60,9 +60,10 @@
     <dimen name="dialog_margin_content_vertical">12dp</dimen>
     <dimen name="dialog_margin_content_horizontal">8dp</dimen>
 
-    <!--controls-->
+    <!--radio button-->
     <dimen name="radio_button_text_margin_start">16dp</dimen>
     <dimen name="radio_button_text_vertical_padding">15dp</dimen>
+    <dimen name="radio_button_description_padding">48dp</dimen>
 
     <!--player bottom sheet-->
     <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>

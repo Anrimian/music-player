@@ -193,6 +193,9 @@
     <string name="equalizer">Equalizer</string>
     <string name="system_equalizer">System equalizer</string>
     <string name="no_equalizer">None</string>
+    <string name="external_equalizer_description">System equalizer work depends on external equalizer application and may not work with some applications</string>
+    <string name="external_equalizer_not_found">External equalizer application not found</string>
+    <string name="open">Open</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
