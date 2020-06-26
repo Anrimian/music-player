@@ -253,7 +253,7 @@ public class CoverImageLoader {
                 //glide can't replace previous image without blinking, hacky solution
                 Bitmap currentBitmap = currentBitmapFunction.call();
                 if (currentBitmap != null) {
-                    callback.call(currentBitmap.copy(currentBitmap.getConfig(), currentBitmap.isMutable()));
+                    callback.call(safeCopy(currentBitmap));
                 } else {
                     callback.call(null);
                 }
@@ -267,9 +267,20 @@ public class CoverImageLoader {
             bitmap = ((BitmapDrawable)drawable).getBitmap();
         }
         if (bitmap != null) {
-            bitmap = bitmap.copy(bitmap.getConfig(), bitmap.isMutable());
+            bitmap = safeCopy(bitmap);
+        }
+        if (bitmap != null) {
             return new BitmapDrawable(context.getResources(), bitmap);
         } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    private Bitmap safeCopy(Bitmap bitmap) {
+        try {
+            return bitmap.copy(bitmap.getConfig(), bitmap.isMutable());
+        } catch (Exception e) {
             return null;
         }
     }
