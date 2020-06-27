@@ -43,11 +43,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                                      EqualizerController equalizerController) {
         this.uiStateRepository = uiStateRepository;
         Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser, equalizerController);
-        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics);
+        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
         mediaPlayer = new CompositeMediaPlayer(exoMediaPlayer, androidMediaPlayer);
 
-//        mediaPlayer = new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics);
-//        mediaPlayer = new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser);
+//        mediaPlayer = new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
+//        mediaPlayer = new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser, equalizerController);
     }
 
     @Override

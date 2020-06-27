@@ -13,7 +13,7 @@
         android:layout_marginBottom="@dimen/content_internal_margin">
 
         <RadioButton
-            android:id="@+id/rb_use_system_equalizer"
+            android:id="@+id/rbUseSystemEqualizer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@color/color_text_primary"
@@ -37,7 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginEnd="@dimen/content_horizontal_margin"
-            app:layout_constraintBottom_toBottomOf="@id/rb_use_system_equalizer"/>
+            app:layout_constraintBottom_toBottomOf="@id/tvSystemEqualizerDescription"/>
 
         <TextView
             android:id="@+id/tvSystemEqualizerDescription"
@@ -47,14 +47,14 @@
             android:layout_marginStart="@dimen/content_horizontal_margin"
             android:layout_marginEnd="@dimen/content_internal_margin"
             android:paddingStart="@dimen/radio_button_description_padding"
-            app:layout_constraintTop_toBottomOf="@id/rb_use_system_equalizer"
+            app:layout_constraintTop_toBottomOf="@id/rbUseSystemEqualizer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnOpenSystemEqualizer"
             tools:text="descriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescription"
             tools:ignore="RtlSymmetry"/>
 
         <RadioButton
-            android:id="@+id/rb_disable_equalizer"
+            android:id="@+id/rbDisableEqualizer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@color/color_text_primary"

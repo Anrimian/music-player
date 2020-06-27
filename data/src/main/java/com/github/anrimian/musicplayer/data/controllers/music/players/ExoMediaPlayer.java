@@ -146,6 +146,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void release() {
+        pausePlayer();
         stopTracingTrackPosition();
         player.release();
     }

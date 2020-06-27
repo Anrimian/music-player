@@ -61,16 +61,16 @@ public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
         viewBinding.btnOpenSystemEqualizer.setEnabled(enabled);
         viewBinding.rbUseSystemEqualizer.setEnabled(enabled);
         viewBinding.tvSystemEqualizerDescription.setEnabled(enabled);
-        viewBinding.tvSystemEqualizerDescription.setText(textResId);
+        viewBinding.tvSystemEqualizerDescription.setText(getString(textResId));
     }
 
     private void enableSystemEqualizer() {
-        equalizerController.enableExternalEqualizer(getActivity(), EqualizerTypes.EXTERNAL);
+        equalizerController.enableExternalEqualizer(getActivity());
         showActiveEqualizer(EqualizerTypes.EXTERNAL);
     }
 
     private void openSystemEqualizer() {
-        equalizerController.launchExternalEqualizerSetup(getActivity(), EqualizerTypes.EXTERNAL);
+        equalizerController.launchExternalEqualizerSetup(getActivity());
         showActiveEqualizer(EqualizerTypes.EXTERNAL);
     }
 

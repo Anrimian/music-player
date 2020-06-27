@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
@@ -41,6 +42,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private final CompositionSourceProvider sourceRepository;
     private final PlayerErrorParser playerErrorParser;
     private final Analytics analytics;
+    private final EqualizerController equalizerController;
 
     private final MediaPlayer mediaPlayer;
 
@@ -57,20 +59,19 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private boolean playWhenReady = false;
     private boolean isPlaying = false;
 
-    @Deprecated
-    public static MediaPlayer player1;
-
     //problem with error case(file not found), multiple error events
     public AndroidMediaPlayer(Context context,
                               Scheduler scheduler,
                               CompositionSourceProvider sourceRepository,
                               PlayerErrorParser playerErrorParser,
-                              Analytics analytics) {
+                              Analytics analytics,
+                              EqualizerController equalizerController) {
         this.context = context;
         this.scheduler = scheduler;
         this.sourceRepository = sourceRepository;
         this.playerErrorParser = playerErrorParser;
         this.analytics = analytics;
+        this.equalizerController = equalizerController;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnCompletionListener(mediaPlayer -> {
             if (currentComposition != null) {
@@ -81,7 +82,6 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             sendErrorEvent(what, extra);
             return false;
         });
-        player1 = mediaPlayer;
     }
 
     @Override
@@ -111,7 +111,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         }
         stopTracingTrackPosition();
         if (isSourcePrepared) {
-            mediaPlayer.pause();
+            pausePlayer();
         }
         isPlaying = false;
         playWhenReady = false;
@@ -134,7 +134,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             return;
         }
         stopTracingTrackPosition();
-        mediaPlayer.pause();
+        pausePlayer();
         isPlaying = false;
         playWhenReady = false;
     }
@@ -173,6 +173,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void release() {
+        pausePlayer();
         stopTracingTrackPosition();
         mediaPlayer.release();
     }
@@ -198,7 +199,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             playerEventSubject.onNext(new PreparedEvent(currentComposition));
         } else {
             seekTo(0);
-            mediaPlayer.pause();
+            pausePlayer();
             sendErrorEvent(throwable);
         }
     }
@@ -272,7 +273,13 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         isSourcePrepared = true;
     }
 
+    private void pausePlayer() {
+        equalizerController.detachEqualizer(context);
+        mediaPlayer.pause();
+    }
+
     private void start() {
+        equalizerController.attachEqualizer(context, mediaPlayer.getAudioSessionId());
         mediaPlayer.start();
         startTracingTrackPosition();
         isPlaying = true;
