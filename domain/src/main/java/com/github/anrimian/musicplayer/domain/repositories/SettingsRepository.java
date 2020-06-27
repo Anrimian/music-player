@@ -93,4 +93,6 @@ public interface SettingsRepository {
     void setSelectedEqualizerType(int type);
 
     int getSelectedEqualizerType();
+
+    Observable<Integer> getSelectedEqualizerTypeObservable();
 }

@@ -53,6 +53,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
 
     private final BehaviorSubject<Integer> externalPlayerRepeatModeSubject = BehaviorSubject.create();
 
@@ -291,11 +292,17 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setSelectedEqualizerType(int type) {
         preferences.putInt(SELECTED_EQUALIZER_TYPE, type);
+        selectedEqualizerSubject.onNext(type);
     }
 
     @Override
     public int getSelectedEqualizerType() {
         return preferences.getInt(SELECTED_EQUALIZER_TYPE, EqualizerTypes.NONE);
+    }
+
+    @Override
+    public Observable<Integer> getSelectedEqualizerTypeObservable() {
+        return withDefaultValue(selectedEqualizerSubject, this::getSelectedEqualizerType);
     }
 
     private Order orderFromInt(int order) {

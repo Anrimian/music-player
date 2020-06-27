@@ -9,9 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerTypes;
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 
 import moxy.MvpAppCompatFragment;
@@ -54,11 +56,34 @@ public class PlayerSettingsFragment extends MvpAppCompatFragment implements Play
         SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided);
 
         onCheckChanged(viewBinding.cbDecreaseVolume, presenter::onDecreaseVolumeOnAudioFocusLossChecked);
+
+        viewBinding.flEqualizerClickableArea.setOnClickListener(v -> showEqualizerDialog());
     }
 
     @Override
     public void showDecreaseVolumeOnAudioFocusLossEnabled(boolean checked) {
         setChecked(viewBinding.cbDecreaseVolume, checked);
+    }
+
+    @Override
+    public void showSelectedEqualizerType(int type) {
+        viewBinding.tvEqualizerState.setText(getEqualizerTypeDescription(type));
+    }
+
+    private int getEqualizerTypeDescription(int type) {
+        switch (type) {
+            case EqualizerTypes.NONE: {
+                return R.string.no_equalizer;
+            }
+            case EqualizerTypes.EXTERNAL: {
+                return R.string.system_equalizer;
+            }
+            default: return R.string.no_equalizer;
+        }
+    }
+
+    private void showEqualizerDialog() {
+        new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
     }
 
 }
