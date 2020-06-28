@@ -14,20 +14,16 @@ public class WidgetDataHolder {
     private static final String CURRENT_QUEUE_SIZE = "current_queue_size";
     private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
 
-
-    static void setCompositionName(Context context, String compositionName) {
-        SharedPreferencesHelper preferences = getPreferences(context);
-        preferences.putString(CURRENT_COMPOSITION, compositionName);
-    }
-
-    static void setCompositionAuthor(Context context, String author) {
-        SharedPreferencesHelper preferences = getPreferences(context);
-        preferences.putString(CURRENT_COMPOSITION_AUTHOR, author);
-    }
-
-    static void setCompositionId(Context context, long compositionId) {
-        SharedPreferencesHelper preferences = getPreferences(context);
-        preferences.putLong(CURRENT_COMPOSITION_ID, compositionId);
+    static void setCompositionInfo(Context context,
+                                   String compositionName,
+                                   String author,
+                                   long compositionId) {
+        SharedPreferences preferences = getWidgetPreferences(context);
+        preferences.edit()
+                .putString(CURRENT_COMPOSITION, compositionName)
+                .putString(CURRENT_COMPOSITION_AUTHOR, author)
+                .putLong(CURRENT_COMPOSITION_ID, compositionId)
+                .apply();
     }
 
     static void setCurrentQueueSize(Context context, int size) {
@@ -56,7 +52,11 @@ public class WidgetDataHolder {
     }
 
     private static SharedPreferencesHelper getPreferences(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(WIDGET_STATE, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getWidgetPreferences(context);
         return new SharedPreferencesHelper(preferences);
+    }
+
+    private static SharedPreferences getWidgetPreferences(Context context) {
+        return context.getSharedPreferences(WIDGET_STATE, Context.MODE_PRIVATE);
     }
 }

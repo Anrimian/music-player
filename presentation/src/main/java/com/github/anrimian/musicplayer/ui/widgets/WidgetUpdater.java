@@ -99,9 +99,7 @@ public class WidgetUpdater {
     private void updateComposition(String compositionName,
                                    String compositionAuthor,
                                    long compositionId) {
-        WidgetDataHolder.setCompositionName(context, compositionName);
-        WidgetDataHolder.setCompositionAuthor(context, compositionAuthor);
-        WidgetDataHolder.setCompositionId(context, compositionId);
+        WidgetDataHolder.setCompositionInfo(context, compositionName, compositionAuthor, compositionId);
 
         updateWidgets(intent -> {
             intent.putExtra(WIDGET_ACTION, ACTION_UPDATE_COMPOSITION);
