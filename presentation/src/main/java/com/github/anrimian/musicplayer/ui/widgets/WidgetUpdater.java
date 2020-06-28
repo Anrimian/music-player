@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.ui.widgets;
 import android.content.Context;
 import android.content.Intent;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
@@ -31,13 +31,13 @@ public class WidgetUpdater {
     public static final String ACTION_UPDATE_QUEUE = "action_update_queue";
 
     private final Context context;
-    private final MusicPlayerInteractor musicPlayerInteractor;
+    private final LibraryPlayerInteractor musicPlayerInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
 
     private final CompositeDisposable updateDisposable = new CompositeDisposable();
 
     public WidgetUpdater(Context context,
-                         MusicPlayerInteractor musicPlayerInteractor,
+                         LibraryPlayerInteractor musicPlayerInteractor,
                          DisplaySettingsInteractor displaySettingsInteractor) {
         this.context = context;
         this.musicPlayerInteractor = musicPlayerInteractor;
@@ -99,9 +99,7 @@ public class WidgetUpdater {
     private void updateComposition(String compositionName,
                                    String compositionAuthor,
                                    long compositionId) {
-        WidgetDataHolder.setCompositionName(context, compositionName);
-        WidgetDataHolder.setCompositionAuthor(context, compositionAuthor);
-        WidgetDataHolder.setCompositionId(context, compositionId);
+        WidgetDataHolder.setCompositionInfo(context, compositionName, compositionAuthor, compositionId);
 
         updateWidgets(intent -> {
             intent.putExtra(WIDGET_ACTION, ACTION_UPDATE_COMPOSITION);

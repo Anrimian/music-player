@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -29,7 +29,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
-    private final MusicPlayerInteractor playerInteractor;
+    private final LibraryPlayerInteractor playerInteractor;
     private final PlayListsInteractor playListsInteractor;
     private final PlayerScreenInteractor playerScreenInteractor;
     private final ErrorParser errorParser;
@@ -46,7 +46,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
 
-    public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
+    public PlayerPresenter(LibraryPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
                            PlayerScreenInteractor playerScreenInteractor,
                            ErrorParser errorParser,
@@ -157,8 +157,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (playQueueItem.equals(currentItem)) {
             playerInteractor.playOrPause();
         } else {
-            playerInteractor.play();
             onCompositionItemClicked(position, playQueueItem);
+            playerInteractor.play();
         }
     }
 
@@ -265,9 +265,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnRepeatMode() {
-        playerInteractor.getRepeatModeObservable()
+        batterySafeDisposable.add(playerInteractor.getRepeatModeObservable()
                 .observeOn(uiScheduler)
-                .subscribe(getViewState()::showRepeatMode);
+                .subscribe(getViewState()::showRepeatMode));
     }
 
     private void addPreparedCompositionsToPlayList(PlayList playList) {

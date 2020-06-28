@@ -22,11 +22,15 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.DrawableImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
+import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
+import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 
 import javax.annotation.Nonnull;
@@ -61,6 +65,12 @@ public class CoverImageLoader {
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                             @NonNull UriCompositionSource data,
+                                             @DrawableRes int errorPlaceholder) {
+        displayImageInReusableTarget(imageView, new UriCompositionImage(data), errorPlaceholder);
+    }
+
+    public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull FullComposition data,
                                              @DrawableRes int errorPlaceholder) {
         displayImageInReusableTarget(imageView, new CompositionImage(data.getId()), errorPlaceholder);
@@ -70,21 +80,6 @@ public class CoverImageLoader {
                                              @NonNull Composition data,
                                              @DrawableRes int errorPlaceholder) {
         displayImageInReusableTarget(imageView, new CompositionImage(data.getId()), errorPlaceholder);
-    }
-
-    public void displayImageInReusableTarget(@NonNull ImageView imageView,
-                                             @NonNull CompositionImage data,
-                                             @DrawableRes int errorPlaceholder) {
-        if (!isValidContextForGlide(imageView)) {
-            return;
-        }
-
-        Glide.with(imageView)
-                .load(data)
-                .placeholder(errorPlaceholder)
-                .error(errorPlaceholder)
-                .timeout(TIMEOUT_MILLIS)
-                .into(imageViewTarget(imageView));
     }
 
     public void displayImage(@NonNull ImageView imageView,
@@ -104,21 +99,22 @@ public class CoverImageLoader {
 
     public Runnable loadNotificationImage(@Nonnull Composition data,
                                           Callback<Bitmap> onCompleted,
-                                          Runnable onClear) {
-        CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
-            if (bitmap == null) {
-                bitmap = getDefaultNotificationBitmap();
-            }
-            onCompleted.call(bitmap);
-        }, onClear);
+                                          Function<Bitmap> currentBitmap) {
+        return loadNotificationImage(
+                new CompositionImage(data.getId()),
+                onCompleted,
+                currentBitmap
+        );
+    }
 
-        Glide.with(context)
-                .asBitmap()
-                .load(new CompositionImage(data.getId()))
-                .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
-                .into(target);
-
-        return () -> Glide.with(context).clear(target);
+    public Runnable loadNotificationImage(@Nonnull UriCompositionSource source,
+                                          Callback<Bitmap> onCompleted,
+                                          Function<Bitmap> currentBitmap) {
+        return loadNotificationImage(
+                new UriCompositionImage(source),
+                onCompleted,
+                currentBitmap
+        );
     }
 
     public Bitmap getDefaultNotificationBitmap() {
@@ -136,12 +132,12 @@ public class CoverImageLoader {
         return defaultNotificationBitmap;
     }
 
+    public void loadImage(@Nonnull UriCompositionSource data, Callback<Bitmap> onCompleted) {
+        loadImage(new UriCompositionImage(data), onCompleted);
+    }
+
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
-        Glide.with(context)
-                .asBitmap()
-                .load(new CompositionImage(data.getId()))
-                .timeout(TIMEOUT_MILLIS)
-                .into(simpleTarget(onCompleted, () -> onCompleted.call(null)));
+        loadImage(new CompositionImage(data.getId()), onCompleted);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
@@ -163,6 +159,48 @@ public class CoverImageLoader {
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
                 .into(widgetTarget);
+    }
+
+    private void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                              @NonNull Object data,
+                                              @DrawableRes int errorPlaceholder) {
+        if (!isValidContextForGlide(imageView)) {
+            return;
+        }
+
+        Glide.with(imageView)
+                .load(data)
+                .placeholder(errorPlaceholder)
+                .error(errorPlaceholder)
+                .timeout(TIMEOUT_MILLIS)
+                .into(imageViewTarget(imageView));
+    }
+
+    private Runnable loadNotificationImage(Object compositionImage,
+                                           Callback<Bitmap> onCompleted,
+                                           Function<Bitmap> currentBitmap) {
+        CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
+            if (bitmap == null) {
+                bitmap = getDefaultNotificationBitmap();
+            }
+            onCompleted.call(bitmap);
+        }, currentBitmap);
+
+        Glide.with(context)
+                .asBitmap()
+                .load(compositionImage)
+                .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
+                .into(target);
+
+        return () -> Glide.with(context).clear(target);
+    }
+
+    private void loadImage(@Nonnull Object data, Callback<Bitmap> onCompleted) {
+        Glide.with(context)
+                .asBitmap()
+                .load(data)
+                .timeout(TIMEOUT_MILLIS)
+                .into(simpleTarget(onCompleted, () -> null));
     }
 
     private DrawableImageViewTarget imageViewTarget(ImageView imageView) {
@@ -188,6 +226,7 @@ public class CoverImageLoader {
         };
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean isValidContextForGlide(ImageView imageView) {
         return isValidContextForGlide(imageView.getContext());
     }
@@ -203,10 +242,11 @@ public class CoverImageLoader {
         return true;
     }
 
-    private <T> CustomTarget<T> simpleTarget(Callback<T> callback, Runnable onClear) {
-        return new CustomTarget<T>() {
+    private CustomTarget<Bitmap> simpleTarget(Callback<Bitmap> callback,
+                                              Function<Bitmap> currentBitmapFunction) {
+        return new CustomTarget<Bitmap>() {
             @Override
-            public void onResourceReady(@NonNull T resource, @Nullable Transition<? super T> transition) {
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                 callback.call(resource);
             }
 
@@ -217,7 +257,13 @@ public class CoverImageLoader {
 
             @Override
             public void onLoadCleared(@Nullable Drawable placeholder) {
-                onClear.run();
+                //glide can't replace previous image without blinking, hacky solution
+                Bitmap currentBitmap = currentBitmapFunction.call();
+                if (currentBitmap != null) {
+                    callback.call(safeCopy(currentBitmap));
+                } else {
+                    callback.call(null);
+                }
             }
         };
     }
@@ -228,9 +274,20 @@ public class CoverImageLoader {
             bitmap = ((BitmapDrawable)drawable).getBitmap();
         }
         if (bitmap != null) {
-            bitmap = bitmap.copy(bitmap.getConfig(), bitmap.isMutable());
+            bitmap = safeCopy(bitmap);
+        }
+        if (bitmap != null) {
             return new BitmapDrawable(context.getResources(), bitmap);
         } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    private Bitmap safeCopy(Bitmap bitmap) {
+        try {
+            return bitmap.copy(bitmap.getConfig(), bitmap.isMutable());
+        } catch (Exception e) {
             return null;
         }
     }

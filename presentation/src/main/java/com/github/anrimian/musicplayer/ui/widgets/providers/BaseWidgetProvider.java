@@ -13,7 +13,7 @@ import androidx.annotation.LayoutRes;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
@@ -70,7 +70,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         boolean randomPlayModeEnabled = false;
         int repeatMode = RepeatMode.NONE;
         if (Permissions.hasFilePermission(context)) {
-            MusicPlayerInteractor musicPlayerInteractor = appComponent.musicPlayerInteractor();
+            LibraryPlayerInteractor musicPlayerInteractor = appComponent.musicPlayerInteractor();
             play = musicPlayerInteractor.getPlayerState() == PlayerState.PLAY;
             randomPlayModeEnabled = musicPlayerInteractor.isRandomPlayingEnabled();
             repeatMode = musicPlayerInteractor.getRepeatMode();

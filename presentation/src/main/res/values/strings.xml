@@ -188,6 +188,14 @@
     <string name="log_file_deleted">Log file deleted</string>
     <string name="pick_email_app_to_send">Pick a email app to send</string>
     <string name="clear_play_queue">Clear play queue</string>
+    <string name="keep_playing_after_window_close">Keep playing after window closing</string>
+    <string name="unknown_play_error">Unknown play error</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="system_equalizer">System equalizer</string>
+    <string name="no_equalizer">None</string>
+    <string name="external_equalizer_description">System equalizer work depends on external equalizer application and may not work with some applications</string>
+    <string name="external_equalizer_not_found">External equalizer application not found</string>
+    <string name="open">Open</string>
     <string name="cover">Cover</string>
     <string name="change_cover">Change cover</string>
     <string name="pick_from_gallery">Pick from gallery</string>
