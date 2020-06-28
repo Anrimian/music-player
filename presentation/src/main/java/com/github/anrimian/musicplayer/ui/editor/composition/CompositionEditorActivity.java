@@ -110,7 +110,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         viewBinding.changeAlbumClickableArea.setOnClickListener(v -> presenter.onChangeAlbumClicked());
         viewBinding.changeAlbumArtistClickableArea.setOnClickListener(v -> presenter.onChangeAlbumArtistClicked());
         viewBinding.changeGenreClickableArea.setOnClickListener(v -> presenter.onAddGenreItemClicked());
-        changeCoverArea.setOnClickListener(v -> presenter.onChangeCoverClicked());
+        viewBinding.changeCoverClickableArea.setOnClickListener(v -> presenter.onChangeCoverClicked());
         onLongClick(viewBinding.changeAuthorClickableArea, () -> copyText(viewBinding.tvAuthor, viewBinding.tvAuthorHint));
         onLongClick(viewBinding.changeTitleClickableArea, () -> copyText(viewBinding.tvTitle, viewBinding.tvTitleHint));
         onLongClick(viewBinding.changeFilenameClickableArea, presenter::onCopyFileNameClicked);
@@ -208,7 +208,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
         Components.getAppComponent()
                 .imageLoader()
-                .displayImageInReusableTarget(ivCover, composition, R.drawable.ic_music_placeholder);
+                .displayImageInReusableTarget(viewBinding.ivCover, composition, R.drawable.ic_music_placeholder);
     }
 
     @Override
