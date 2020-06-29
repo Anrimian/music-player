@@ -2,16 +2,19 @@ package com.github.anrimian.musicplayer.ui.editor.composition;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.FragmentManager;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.models.image.UriImageSource;
 import com.github.anrimian.musicplayer.databinding.ActivityCompositionEditBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -37,6 +40,7 @@ import moxy.presenter.ProvidePresenter;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.RequestCodes.PICK_IMAGE_REQUEST_CODE;
 import static com.github.anrimian.musicplayer.Constants.Tags.ADD_GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_ARTIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_TAG;
@@ -177,6 +181,23 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case PICK_IMAGE_REQUEST_CODE: {
+                if (data == null) {
+                    return;
+                }
+                Uri uri = data.getData();
+                if (uri == null) {
+                    return;
+                }
+                presenter.onNewImageForCoverSelected(new UriImageSource(uri));
+            }
+            default: super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -332,10 +353,19 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         coverMenuDialogRunner.show(fragment);
     }
 
+    @Override
+    public void showSelectImageFromGalleryScreen() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST_CODE);
+    }
+
     private void onCoverActionSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_pick_from_gallery: {
-                //start pick activity
+                presenter.onNewCoverSelected();
                 break;
             }
             case R.id.menu_clear: {

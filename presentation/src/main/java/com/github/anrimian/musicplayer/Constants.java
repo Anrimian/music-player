@@ -65,6 +65,10 @@ public interface Constants {
         String EDIT_COVER_TAG = "edit_cover_tag";
     }
 
+    interface RequestCodes {
+        int PICK_IMAGE_REQUEST_CODE = 1;
+    }
+
     interface Animation {
         int TOOLBAR_ARROW_ANIMATION_TIME = 200;
     }

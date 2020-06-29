@@ -61,4 +61,7 @@ public interface CompositionEditorView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void showCoverActionsDialog();
+
+    @StateStrategyType(SkipStrategy.class)
+    void showSelectImageFromGalleryScreen();
 }

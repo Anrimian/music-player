@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
@@ -103,6 +104,14 @@ public class EditorInteractor {
 
     public Single<String[]> getGenreNames() {
         return musicProviderRepository.getGenreNames();
+    }
+
+    public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
+        return editorRepository.changeCompositionAlbumArt(composition, imageSource);
+    }
+
+    public Completable removeCompositionAlbumArt(FullComposition composition) {
+        return editorRepository.removeCompositionAlbumArt(composition);
     }
 
     private Completable getDiffTasksFromSource(FullComposition fullComposition,

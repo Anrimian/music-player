@@ -18,10 +18,11 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
@@ -327,6 +328,18 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Single<String[]> getCompositionFileGenres(FullComposition composition) {
         return sourceEditor.getCompositionGenres(composition)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
+        return sourceEditor.changeCompositionAlbumArt(composition, imageSource)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable removeCompositionAlbumArt(FullComposition composition) {
+        return sourceEditor.removeCompositionAlbumArt(composition)
                 .subscribeOn(scheduler);
     }
 

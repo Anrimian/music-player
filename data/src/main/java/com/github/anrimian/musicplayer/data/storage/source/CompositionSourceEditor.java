@@ -1,9 +1,11 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -15,10 +17,12 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.TagOptionSingleton;
+import org.jaudiotagger.tag.datatype.Artwork;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
@@ -31,9 +35,12 @@ public class CompositionSourceEditor {
     private static final char GENRE_DIVIDER = '\u0000';
 
     private final StorageMusicProvider storageMusicProvider;
+    private final FileSourceProvider fileSourceProvider;
 
-    public CompositionSourceEditor(StorageMusicProvider storageMusicProvider) {
+    public CompositionSourceEditor(StorageMusicProvider storageMusicProvider,
+                                   FileSourceProvider fileSourceProvider) {
         this.storageMusicProvider = storageMusicProvider;
+        this.fileSourceProvider = fileSourceProvider;
 
         TagOptionSingleton.getInstance().setAndroid(true);
     }
@@ -101,6 +108,17 @@ public class CompositionSourceEditor {
     public Single<String[]> getCompositionGenres(FullComposition composition) {
         return getPath(composition)
                 .flatMap(this::getCompositionGenres);
+    }
+
+    public Completable changeCompositionAlbumArt(FullComposition composition,
+                                                 ImageSource imageSource) {
+        return getPath(composition)
+                .flatMapCompletable(path -> changeCompositionAlbumArt(path, imageSource));
+    }
+
+    public Completable removeCompositionAlbumArt(FullComposition composition) {
+        return getPath(composition)
+                .flatMapCompletable(this::removeCompositionAlbumArt);
     }
 
     public Maybe<CompositionSourceTags> getFullTags(FullComposition composition) {
@@ -197,6 +215,43 @@ public class CompositionSourceEditor {
 
     Maybe<String> getCompositionGenre(String filePath) {
         return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.GENRE));
+    }
+
+    //working, but needs update all existing views
+    private Completable changeCompositionAlbumArt(String filePath, ImageSource imageSource) {
+        return Completable.fromAction(() -> {
+            AudioFile file = AudioFileIO.read(new File(filePath));
+            Tag tag = file.getTag();
+            if (tag == null) {
+                tag = new ID3v24Tag();
+                file.setTag(tag);
+            }
+
+            try (InputStream stream = fileSourceProvider.getImageStream(imageSource)) {
+                if (stream == null) {
+                    return;
+                }
+                byte[] data = FileUtils.toByteArray(stream);
+                Artwork artwork = new Artwork();
+                artwork.setBinaryData(data);
+                tag.addField(artwork);
+                AudioFileIO.write(file);
+            }
+        });
+    }
+
+    //not working?
+    private Completable removeCompositionAlbumArt(String filePath) {
+        return Completable.fromAction(() -> {
+            AudioFile file = AudioFileIO.read(new File(filePath));
+            Tag tag = file.getTag();
+            if (tag == null) {
+                tag = new ID3v24Tag();
+                file.setTag(tag);
+            }
+            tag.deleteArtworkField();
+            AudioFileIO.write(file);
+        });
     }
 
     private Completable setCompositionAuthor(String filePath, String author) {

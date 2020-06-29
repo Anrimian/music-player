@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.editor.composition;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -259,11 +260,26 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     }
 
     void onClearCoverClicked() {
-
+        if (composition == null) {
+            return;
+        }
+        changeDisposable = editorInteractor.removeCompositionAlbumArt(composition)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
     }
 
     void onNewCoverSelected() {
+        getViewState().showSelectImageFromGalleryScreen();
+    }
 
+    void onNewImageForCoverSelected(ImageSource imageSource) {
+        if (composition == null) {
+            return;
+        }
+        //show progress?
+        changeDisposable = editorInteractor.changeCompositionAlbumArt(composition, imageSource)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
     }
 
     private void onDefaultError(Throwable throwable) {
