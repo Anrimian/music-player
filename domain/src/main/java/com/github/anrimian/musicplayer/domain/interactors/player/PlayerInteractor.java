@@ -72,6 +72,11 @@ public class PlayerInteractor {
         musicPlayerController.prepareToPlay(compositionSource);
     }
 
+    public void updateSource(CompositionSource source) {
+        this.currentSource = source;
+        currentSourceSubject.onNext(new Optional<>(currentSource));
+    }
+
     public void play() {
         if (playerStateSubject.getValue() == PLAY) {
             return;
