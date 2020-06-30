@@ -240,7 +240,6 @@ public class CompositionSourceEditor {
         });
     }
 
-    //not working?
     private Completable removeCompositionAlbumArt(String filePath) {
         return Completable.fromAction(() -> {
             AudioFile file = AudioFileIO.read(new File(filePath));

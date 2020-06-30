@@ -24,6 +24,7 @@ import java.util.List;
 
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
 import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
@@ -52,6 +53,7 @@ public class CompositionItemWrapper {
     private View iconClickableArea;
 
     private Composition composition;
+    private boolean showCovers;
 
     private boolean isCurrent;
     private boolean isDragging;
@@ -80,6 +82,8 @@ public class CompositionItemWrapper {
 
     public void bind(Composition composition, boolean showCovers) {
         this.composition = composition;
+        this.showCovers = showCovers;
+
         showCompositionName();
         showAdditionalInfo();
         showCorrupted();
@@ -100,6 +104,9 @@ public class CompositionItemWrapper {
             }
             if (payload == ARTIST || payload == DURATION) {
                 showAdditionalInfo();
+            }
+            if (payload == DATE_MODIFIED) {
+                showCompositionImage(showCovers);
             }
             if (payload == CORRUPTED) {
                 showCorrupted();

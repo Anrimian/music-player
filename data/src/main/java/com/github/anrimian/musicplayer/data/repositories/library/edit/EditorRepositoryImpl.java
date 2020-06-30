@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -334,13 +335,20 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
         return sourceEditor.changeCompositionAlbumArt(composition, imageSource)
+                .doOnComplete(() -> updateCompositionModifyTime(composition))
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable removeCompositionAlbumArt(FullComposition composition) {
         return sourceEditor.removeCompositionAlbumArt(composition)
+                .doOnComplete(() -> updateCompositionModifyTime(composition))
                 .subscribeOn(scheduler);
+    }
+
+    private void updateCompositionModifyTime(FullComposition composition) {
+        compositionsDao.updateModifyTime(composition.getId(), new Date());
+        runSystemRescan(composition);
     }
 
     private Completable checkAlbumExists(String name) {

@@ -26,7 +26,9 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
@@ -48,6 +50,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.EDIT_COVER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.EDIT_GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
@@ -70,6 +73,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     private DialogFragmentRunner<InputTextDialogFragment> addGenreDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editGenreDialogFragmentRunner;
     private DialogFragmentRunner<MenuDialogFragment> coverMenuDialogRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
     private ShortGenresAdapter genresAdapter;
 
@@ -168,6 +172,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 EDIT_COVER_TAG,
                 fragment -> fragment.setOnCompleteListener(this::onCoverActionSelected)
         );
+
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
 
         //<return genres after deep scan implementation>
         viewBinding.dividerAlbumArtist.setVisibility(View.INVISIBLE);
@@ -360,6 +366,17 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST_CODE);
+    }
+
+    @Override
+    public void showChangeCoverProgress() {
+        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.changing_cover_progress);
+        progressDialogRunner.show(fragment);
+    }
+
+    @Override
+    public void hideChangeCoverProgress() {
+        progressDialogRunner.cancel();
     }
 
     private void onCoverActionSelected(MenuItem menuItem) {

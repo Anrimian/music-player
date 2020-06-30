@@ -243,6 +243,10 @@ public class CompositionsDaoWrapper {
         });
     }
 
+    public void updateModifyTime(long id, Date date) {
+        compositionsDao.setUpdateTime(id, date);
+    }
+
     public void updateCompositionFileName(long id, String fileName) {
         compositionsDao.updateCompositionFileName(id, fileName);
     }

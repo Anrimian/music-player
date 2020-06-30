@@ -21,6 +21,7 @@ public interface Constants {
         String COMPOSITION_NAME_ARG = "composition_name_arg";
         String COMPOSITION_AUTHOR_ARG = "composition_author_arg";
         String COMPOSITION_ID_ARG = "composition_id_arg";
+        String COMPOSITION_UPDATE_TIME_ARG = "composition_update_time_arg";
         String ALBUM_ID_ARG = "album_id_arg";
         String PLAY_ARG = "play_arg";
         String QUEUE_SIZE_ARG = "queue_size_arg";

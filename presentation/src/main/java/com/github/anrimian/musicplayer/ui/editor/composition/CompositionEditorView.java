@@ -16,6 +16,7 @@ import moxy.viewstate.strategy.StateStrategyType;
 public interface CompositionEditorView extends MvpView {
 
     String DISPLAY_COMPOSITION_STATE = "display_composition_state";
+    String CHANGE_COVER_STATE = "change_cover_state";
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void closeScreen();
@@ -25,6 +26,12 @@ public interface CompositionEditorView extends MvpView {
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = DISPLAY_COMPOSITION_STATE)
     void showComposition(FullComposition composition);
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_COVER_STATE)
+    void showChangeCoverProgress();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_COVER_STATE)
+    void hideChangeCoverProgress();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showErrorMessage(ErrorCommand errorCommand);

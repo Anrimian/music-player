@@ -263,9 +263,13 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         if (composition == null) {
             return;
         }
+        dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.removeCompositionAlbumArt(composition)
                 .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showChangeCoverProgress())
+                .doFinally(() -> getViewState().hideChangeCoverProgress())
                 .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
     }
 
     void onNewCoverSelected() {
@@ -276,10 +280,13 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         if (composition == null) {
             return;
         }
-        //show progress?
+        dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.changeCompositionAlbumArt(composition, imageSource)
                 .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showChangeCoverProgress())
+                .doFinally(() -> getViewState().hideChangeCoverProgress())
                 .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
     }
 
     private void onDefaultError(Throwable throwable) {
@@ -317,7 +324,6 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         presenterDisposable.add(editorInteractor.updateTagsFromSource(composition)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError));
-
     }
 
     private void onCompositionLoadingError(Throwable throwable) {
