@@ -4,14 +4,12 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RawQuery;
-import androidx.room.Update;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
@@ -137,6 +135,9 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET dateModified = :date WHERE id = :id")
     void setUpdateTime(long id, Date date);
+
+    @Query("UPDATE compositions SET dateModified = :date, size = :size WHERE id = :id")
+    void setModifyTimeAndSize(long id, long size, Date date);
 
     static String getCompositionQuery() {
         return "SELECT " +

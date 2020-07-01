@@ -217,7 +217,6 @@ public class CompositionSourceEditor {
         return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.GENRE));
     }
 
-    //working, but needs update all existing views
     private Completable changeCompositionAlbumArt(String filePath, ImageSource imageSource) {
         return Completable.fromAction(() -> {
             AudioFile file = AudioFileIO.read(new File(filePath));

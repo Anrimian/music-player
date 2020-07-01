@@ -247,6 +247,10 @@ public class CompositionsDaoWrapper {
         compositionsDao.setUpdateTime(id, date);
     }
 
+    public void updateModifyTimeAndSize(long id, long size, Date date) {
+        compositionsDao.setModifyTimeAndSize(id, size, date);
+    }
+
     public void updateCompositionFileName(long id, String fileName) {
         compositionsDao.updateCompositionFileName(id, fileName);
     }

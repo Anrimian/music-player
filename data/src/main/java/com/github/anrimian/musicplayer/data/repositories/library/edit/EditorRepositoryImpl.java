@@ -339,7 +339,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
         return sourceEditor.changeCompositionAlbumArt(composition, imageSource)
-                .doOnComplete(() -> updateCompositionModifyTime(composition))
+                .doOnComplete(() -> onCompositionFileChanged(composition))
                 .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
     }
@@ -347,13 +347,16 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable removeCompositionAlbumArt(FullComposition composition) {
         return sourceEditor.removeCompositionAlbumArt(composition)
-                .doOnComplete(() -> updateCompositionModifyTime(composition))
+                .doOnComplete(() -> onCompositionFileChanged(composition))
                 .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
     }
 
-    private void updateCompositionModifyTime(FullComposition composition) {
-        compositionsDao.updateModifyTime(composition.getId(), new Date());
+    private void onCompositionFileChanged(FullComposition composition) {
+        long size = filesDataSource.getCompositionFileSize(composition);
+        if (size > 0) {
+            compositionsDao.updateModifyTimeAndSize(composition.getId(), size, new Date());
+        }
         runSystemRescan(composition);
     }
 
