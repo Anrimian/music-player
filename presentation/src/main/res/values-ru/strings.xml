@@ -215,6 +215,8 @@
     <string name="change_cover">Изменить обложку</string>
     <string name="pick_from_gallery">Выбрать из галереи</string>
     <string name="remove_cover">Убрать обложку</string>
+    <string name="changing_cover_progress">Смена обложки…</string>
+    <string name="editor_timeout_error">Время ожидания редактора тэгов истекло. Возможно, формат файла неподдерживается</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

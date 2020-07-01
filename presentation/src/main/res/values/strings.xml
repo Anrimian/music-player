@@ -200,7 +200,8 @@
     <string name="change_cover">Change cover</string>
     <string name="pick_from_gallery">Pick from gallery</string>
     <string name="remove_cover">Remove cover</string>
-    <string name="changing_cover_progress">Changing cover...</string>
+    <string name="changing_cover_progress">Changing cover…</string>
+    <string name="editor_timeout_error">Tag editor timed out. Perhaps file format is unsupported</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

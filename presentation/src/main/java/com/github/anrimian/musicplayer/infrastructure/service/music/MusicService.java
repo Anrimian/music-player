@@ -274,6 +274,8 @@ public class MusicService extends Service {
             if (!newCompositionSource.equals(currentSource)) {
                 newTrackPosition = CompositionSourceModelHelper.getTrackPosition(newCompositionSource);
                 updateMediaSessionAlbumArt = true;
+            } else if (!CompositionSourceModelHelper.areSourcesTheSame(currentSource, newCompositionSource)) {
+                updateMediaSessionAlbumArt = true;
             }
             this.currentSource = newCompositionSource;
             updateNotification = true;

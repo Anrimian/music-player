@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.EditorTimeoutException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
@@ -33,6 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -45,6 +47,8 @@ import io.reactivex.Single;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class EditorRepositoryImpl implements EditorRepository {
+
+    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 2000;
 
     private final CompositionSourceEditor sourceEditor;
     private final StorageFilesDataSource filesDataSource;
@@ -336,6 +340,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
         return sourceEditor.changeCompositionAlbumArt(composition, imageSource)
                 .doOnComplete(() -> updateCompositionModifyTime(composition))
+                .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
     }
 
@@ -343,6 +348,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable removeCompositionAlbumArt(FullComposition composition) {
         return sourceEditor.removeCompositionAlbumArt(composition)
                 .doOnComplete(() -> updateCompositionModifyTime(composition))
+                .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
     }
 
