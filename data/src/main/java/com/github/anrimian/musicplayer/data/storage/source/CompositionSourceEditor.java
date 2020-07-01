@@ -33,6 +33,7 @@ import io.reactivex.Single;
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';
+    private static final int MAX_COVER_SIZE = 1024;
 
     private final StorageMusicProvider storageMusicProvider;
     private final FileSourceProvider fileSourceProvider;
@@ -230,10 +231,11 @@ public class CompositionSourceEditor {
                 if (stream == null) {
                     return;
                 }
-                byte[] data = FileUtils.toByteArray(stream);
+                byte[] data = FileUtils.getScaledBitmapByteArray(stream, MAX_COVER_SIZE);
                 Artwork artwork = new Artwork();
                 artwork.setBinaryData(data);
-                tag.addField(artwork);
+                tag.deleteArtworkField();
+                tag.setField(artwork);
                 AudioFileIO.write(file);
             }
         });
