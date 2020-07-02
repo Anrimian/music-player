@@ -45,9 +45,10 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/iv_cover"
                     style="@style/ImageStyle"
+                    android:scaleType="centerCrop"
                     android:layout_marginTop="@dimen/content_internal_margin"
                     android:importantForAccessibility="no"
                     app:layout_constraintStart_toStartOf="@+id/tv_cover_hint"
