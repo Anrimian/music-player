@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
@@ -56,6 +57,9 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         super.onCreate(savedInstanceState);
         viewBinding = ActivityExternalPlayerBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
+
+        CompatUtils.setMainButtonStyle(viewBinding.ivPlayPause);
+        CompatUtils.setMainButtonStyle(viewBinding.ivRepeatMode);
 
         seekBarViewWrapper = new SeekBarViewWrapper(viewBinding.sbTrackState);
         seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);

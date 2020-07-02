@@ -130,6 +130,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 android.R.attr.colorBackground
         );
 
+        CompatUtils.setMainButtonStyle(viewBinding.ivCoverEdit);
         CompatUtils.setMainButtonStyle(viewBinding.ivFilenameEdit);
         CompatUtils.setMainButtonStyle(viewBinding.ivTitleEdit);
         CompatUtils.setMainButtonStyle(viewBinding.ivAuthorEdit);
