@@ -179,7 +179,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         boundDelegateManager
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(queueToolbarBinding.getRoot())))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarVisibilityDelegate(toolbar))))
-                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
+                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(toolbarBinding.toolbarContentContainer))))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
                 .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(viewBinding.drawerFragmentContainer))))
