@@ -322,18 +322,21 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem newItem = playQueueEvent.getPlayQueueItem();
-        if (currentItem == null || !currentItem.equals(newItem)
+        if (currentItem == null
+                || !currentItem.equals(newItem)
                 || !areSourcesTheSame(newItem.getComposition(), currentItem.getComposition())) {
             onCurrentCompositionChanged(newItem, playQueueEvent.getTrackPosition());
         }
     }
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
-        this.currentItem = newItem;
         getViewState().showCurrentQueueItem(newItem, isCoversEnabled);
-        if (newItem != null) {
+        if (newItem != null
+                && (!newItem.equals(currentItem) || newItem.getComposition().getDuration() != currentItem.getComposition().getDuration())) {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
         }
+
+        this.currentItem = newItem;
     }
 
     private void subscribeOnPlayerStateChanges() {
