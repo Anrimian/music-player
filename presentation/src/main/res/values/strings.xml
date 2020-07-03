@@ -170,7 +170,6 @@
     <string name="ignored_folder_added">Folder \'%s\' added to excluded folder list</string>
     <string name="excluded_folders">Excluded folders</string>
     <string name="remove_excluded_folder">Remove excluded folder</string>
-    <string name="no_excluded_folders">No excluded folders</string>
     <string name="ignored_folder_removed">Excluded folder removed</string>
     <string name="moving_and_destination_folders_matches">Moving and destination folders matches</string>
     <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
@@ -188,6 +187,7 @@
     <string name="log_file_deleted">Log file deleted</string>
     <string name="pick_email_app_to_send">Pick a email app to send</string>
     <string name="clear_play_queue">Clear play queue</string>
+    <string name="no_excluded_folders">Folders excluded from scanning will be appear here</string>
     <string name="keep_playing_after_window_close">Keep playing after window closing</string>
     <string name="unknown_play_error">Unknown play error</string>
     <string name="equalizer">Equalizer</string>

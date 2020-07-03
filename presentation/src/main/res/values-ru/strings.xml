@@ -185,7 +185,6 @@
     <string name="ignored_folder_added">Папка \'%s\' добавлена в список игнорируемых папок</string>
     <string name="excluded_folders">Игнорируемые папки</string>
     <string name="remove_excluded_folder">Убрать игнорируемую папку</string>
-    <string name="no_excluded_folders">Нет игнорируемых папок</string>
     <string name="ignored_folder_removed">Игнорируемая папка убрана</string>
     <string name="moving_and_destination_folders_matches">Перемещаемая и целевая папка совпадает</string>
     <string name="folder_with_this_name_already_exists_in_dest_folder">Папка с таким именем уже существует в целевой папке</string>
@@ -203,6 +202,7 @@
     <string name="log_file_deleted">Файл удалён</string>
     <string name="pick_email_app_to_send">Выберите приложение email для отправки</string>
     <string name="clear_play_queue">Очистить очередь воспроизведения</string>
+    <string name="no_excluded_folders">Папки, исключённые из медиа сканера, будут появляться здесь</string>
     <string name="keep_playing_after_window_close">Продолжать воспроизведение после закрытия окна</string>
     <string name="unknown_play_error">Неизвестная ошибка воспроизведения</string>
     <string name="equalizer">Эквалайзер</string>
