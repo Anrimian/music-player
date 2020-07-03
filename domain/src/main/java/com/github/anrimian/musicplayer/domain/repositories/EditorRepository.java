@@ -33,6 +33,8 @@ public interface EditorRepository {
 
     Completable changeCompositionTitle(FullComposition composition, String title);
 
+    Completable changeCompositionLyrics(FullComposition composition, String text);
+
     Completable changeCompositionFileName(FullComposition composition, String fileName);
 
     Completable changeFolderName(long folderId, String folderName);

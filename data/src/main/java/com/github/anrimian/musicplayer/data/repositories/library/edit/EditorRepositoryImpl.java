@@ -176,6 +176,16 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
+    public Completable changeCompositionLyrics(FullComposition composition, String text) {
+        return sourceEditor.setCompositionLyrics(composition, text)
+                .doOnComplete(() -> {
+                    compositionsDao.updateLyrics(composition.getId(), text);
+                    runSystemRescan(composition);
+                })
+                .subscribeOn(scheduler);
+    }
+
+    @Override
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Completable.fromAction(() -> {
             String newPath = filesDataSource.renameCompositionFile(composition, fileName);

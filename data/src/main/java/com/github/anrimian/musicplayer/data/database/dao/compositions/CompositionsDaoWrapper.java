@@ -243,6 +243,13 @@ public class CompositionsDaoWrapper {
         });
     }
 
+    public void updateLyrics(long id, String text) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.updateLyrics(id, text);
+            compositionsDao.setUpdateTime(id, new Date());
+        });
+    }
+
     public void updateModifyTime(long id, Date date) {
         compositionsDao.setUpdateTime(id, date);
     }

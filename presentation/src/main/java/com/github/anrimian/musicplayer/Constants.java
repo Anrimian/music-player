@@ -31,6 +31,7 @@ public interface Constants {
         String EDIT_TEXT_HINT = "edit_text_hint";
         String EDIT_TEXT_VALUE = "edit_text_value";
         String CAN_BE_EMPTY_ARG = "can_be_empty_arg";
+        String COMPLETE_ON_ENTER_ARG = "complete_on_enter_arg";
         String EXTRA_DATA_ARG = "extra_data_arg";
         String COMPOSITION_ARG = "composition_arg";
         String MENU_ARG = "menu_arg";
@@ -52,6 +53,7 @@ public interface Constants {
         String FILE_NAME_TAG = "file_name_tag";
         String ALBUM_TAG = "album_tag";
         String ALBUM_ARTIST_TAG = "album_artist_tag";
+        String LYRICS = "lyrics_tag";
         String ADD_GENRE_TAG = "add_genre_tag";
         String EDIT_GENRE_TAG = "edit_genre_tag";
         String NEW_FOLDER_NAME_TAG = "new_folder_name_tag";

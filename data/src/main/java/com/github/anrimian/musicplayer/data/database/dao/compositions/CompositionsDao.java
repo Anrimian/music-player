@@ -28,6 +28,7 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "lyrics as lyrics, " +
             "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
@@ -108,6 +109,9 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
+
+    @Query("UPDATE compositions SET lyrics = :lyrics WHERE id = :id")
+    void updateLyrics(long id, String lyrics);
 
     @Query("UPDATE compositions SET fileName = :fileName WHERE id = :id")
     void updateCompositionFileName(long id, String fileName);

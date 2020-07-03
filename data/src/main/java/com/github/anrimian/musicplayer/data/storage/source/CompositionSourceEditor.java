@@ -81,6 +81,11 @@ public class CompositionSourceEditor {
                 .flatMapCompletable(path -> setCompositionAlbumArtist(path, artist));
     }
 
+    public Completable setCompositionLyrics(FullComposition composition, String text) {
+        return getPath(composition)
+                .flatMapCompletable(path -> setCompositionLyrics(path, text));
+    }
+
     public Completable changeCompositionGenre(FullComposition composition,
                                               String oldGenre,
                                               String newGenre) {
@@ -148,6 +153,10 @@ public class CompositionSourceEditor {
 
     Completable setCompositionTitle(String filePath, String title) {
         return Completable.fromAction(() -> editFile(filePath, FieldKey.TITLE, title));
+    }
+
+    Completable setCompositionLyrics(String filePath, String text) {
+        return Completable.fromAction(() -> editFile(filePath, FieldKey.LYRICS, text));
     }
 
     Completable addCompositionGenre(String filePath,
@@ -218,6 +227,10 @@ public class CompositionSourceEditor {
         return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.GENRE));
     }
 
+    Maybe<String> getCompositionLyrics(String filePath) {
+        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.LYRICS));
+    }
+
     private Completable changeCompositionAlbumArt(String filePath, ImageSource imageSource) {
         return Completable.fromAction(() -> {
             AudioFile file = AudioFileIO.read(new File(filePath));
@@ -277,7 +290,8 @@ public class CompositionSourceEditor {
             return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
                     tag.getFirst(FieldKey.ARTIST),
                     tag.getFirst(FieldKey.ALBUM),
-                    tag.getFirst(FieldKey.ALBUM_ARTIST));
+                    tag.getFirst(FieldKey.ALBUM_ARTIST),
+                    tag.getFirst(FieldKey.LYRICS));
         });
     }
 

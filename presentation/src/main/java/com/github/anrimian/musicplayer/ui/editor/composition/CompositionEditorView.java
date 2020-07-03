@@ -55,6 +55,9 @@ public interface CompositionEditorView extends MvpView {
     void showEnterAlbumArtistDialog(FullComposition composition, String[] hints);
 
     @StateStrategyType(SkipStrategy.class)
+    void showEnterLyricsDialog(FullComposition composition);
+
+    @StateStrategyType(SkipStrategy.class)
     void showAddGenreDialog(String[] genres);
 
     @StateStrategyType(SkipStrategy.class)

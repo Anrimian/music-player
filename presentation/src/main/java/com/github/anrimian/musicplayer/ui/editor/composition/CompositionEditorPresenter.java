@@ -77,6 +77,13 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         getViewState().showEnterTitleDialog(composition);
     }
 
+    void onChangeLyricsClicked() {
+        if (composition == null) {
+            return;
+        }
+        getViewState().showEnterLyricsDialog(composition);
+    }
+
     void onChangeFileNameClicked() {
         if (composition == null) {
             return;
@@ -240,6 +247,18 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
 
         dispose(changeDisposable, presenterDisposable);
         changeDisposable = editorInteractor.editCompositionFileName(composition, fileName)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
+
+    void onNewLyricsEntered(String text) {
+        if (composition == null) {
+            return;
+        }
+
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.editCompositionLyrics(composition, text)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
