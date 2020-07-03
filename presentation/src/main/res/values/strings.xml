@@ -204,6 +204,7 @@
     <string name="editor_timeout_error">Tag editor timed out. Perhaps file format is unsupported</string>
     <string name="change_lyrics">Change lyrics</string>
     <string name="lyrics">Lyrics</string>
+    <string name="check_tags_error">Failed to check composition tags: %s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

@@ -362,6 +362,12 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
+    public void showCheckTagsErrorMessage(ErrorCommand errorCommand) {
+        String message = getString(R.string.check_tags_error, errorCommand.getMessage());
+        makeSnackbar(viewBinding.container, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
     public void copyFileNameText(String filePath) {
         AndroidUtils.copyText(this, formatFileName(filePath), getString(R.string.filename));
         onTextCopied();

@@ -342,7 +342,12 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     private void checkCompositionTagsInSource(FullComposition composition) {
         presenterDisposable.add(editorInteractor.updateTagsFromSource(composition)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError));
+                .subscribe(() -> {}, this::onTagCheckError));
+    }
+
+    private void onTagCheckError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showCheckTagsErrorMessage(errorCommand);
     }
 
     private void onCompositionLoadingError(Throwable throwable) {

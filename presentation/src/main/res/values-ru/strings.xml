@@ -219,6 +219,7 @@
     <string name="editor_timeout_error">Время ожидания редактора тэгов истекло. Возможно, формат файла неподдерживается</string>
     <string name="change_lyrics">Изменить текст композиции</string>
     <string name="lyrics">Текст композиции</string>
+    <string name="check_tags_error">Не удалось проверить теги композиции: %s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
