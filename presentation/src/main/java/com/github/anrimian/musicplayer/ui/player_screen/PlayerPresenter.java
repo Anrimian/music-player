@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -249,6 +250,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void swapItems(int from, int to) {
+        if (!ListUtils.isIndexInRange(playQueue, from) && !ListUtils.isIndexInRange(playQueue, to)) {
+            return;
+        }
         PlayQueueItem fromItem = playQueue.get(from);
         PlayQueueItem toItem = playQueue.get(to);
 
