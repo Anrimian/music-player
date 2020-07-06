@@ -90,7 +90,7 @@ public class ListUtils {
     }
 
     public static boolean isIndexInRange(List<?> list, int index) {
-        return index > 0 && index < list.size();
+        return index >= 0 && index < list.size();
     }
 
     public interface MapperFunction<T, E> {
