@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.compositions;
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -24,7 +24,7 @@ public class LibraryCompositionsPresenter
 
     public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
                                         PlayListsInteractor playListsInteractor,
-                                        MusicPlayerInteractor playerInteractor,
+                                        LibraryPlayerInteractor playerInteractor,
                                         DisplaySettingsInteractor displaySettingsInteractor,
                                         ErrorParser errorParser,
                                         Scheduler uiScheduler) {
