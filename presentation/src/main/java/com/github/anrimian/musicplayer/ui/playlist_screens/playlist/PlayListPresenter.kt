@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
 import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
@@ -19,7 +19,7 @@ import java.util.*
 
 
 class PlayListPresenter(private val playListId: Long,
-                        private val playerInteractor: MusicPlayerInteractor,
+                        private val playerInteractor: LibraryPlayerInteractor,
                         private val playListsInteractor: PlayListsInteractor,
                         private val displaySettingsInteractor: DisplaySettingsInteractor,
                         errorParser: ErrorParser,

@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.ui.library.folders
 
 import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
@@ -27,7 +27,7 @@ import java.util.*
 
 class LibraryFoldersPresenter(private val folderId: Long?,
                               private val interactor: LibraryFoldersScreenInteractor,
-                              private val playerInteractor: MusicPlayerInteractor,
+                              private val playerInteractor: LibraryPlayerInteractor,
                               private val displaySettingsInteractor: DisplaySettingsInteractor,
                               errorParser: ErrorParser,
                               uiScheduler: Scheduler)
