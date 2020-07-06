@@ -250,7 +250,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void swapItems(int from, int to) {
-        if (!ListUtils.isIndexInRange(playQueue, from) && !ListUtils.isIndexInRange(playQueue, to)) {
+        if (!ListUtils.isIndexInRange(playQueue, from) || !ListUtils.isIndexInRange(playQueue, to)) {
             return;
         }
         PlayQueueItem fromItem = playQueue.get(from);
