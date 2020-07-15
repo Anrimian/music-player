@@ -2,15 +2,19 @@ package com.github.anrimian.musicplayer.ui.editor.composition;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.FragmentManager;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.models.image.UriImageSource;
 import com.github.anrimian.musicplayer.databinding.ActivityCompositionEditBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -22,6 +26,9 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
@@ -35,12 +42,16 @@ import moxy.presenter.ProvidePresenter;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.RequestCodes.PICK_IMAGE_REQUEST_CODE;
 import static com.github.anrimian.musicplayer.Constants.Tags.ADD_GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_ARTIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.EDIT_COVER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.EDIT_GENRE_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.LYRICS;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.TITLE_TAG;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
@@ -62,6 +73,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     private DialogFragmentRunner<InputTextDialogFragment> albumArtistDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> addGenreDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editGenreDialogFragmentRunner;
+    private DialogFragmentRunner<InputTextDialogFragment> lyricsDialogFragmentRunner;
+    private DialogFragmentRunner<MenuDialogFragment> coverMenuDialogRunner;
+    private DialogFragmentDelayRunner progressDialogRunner;
 
     private ShortGenresAdapter genresAdapter;
 
@@ -106,22 +120,27 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         viewBinding.changeAlbumClickableArea.setOnClickListener(v -> presenter.onChangeAlbumClicked());
         viewBinding.changeAlbumArtistClickableArea.setOnClickListener(v -> presenter.onChangeAlbumArtistClicked());
         viewBinding.changeGenreClickableArea.setOnClickListener(v -> presenter.onAddGenreItemClicked());
+        viewBinding.changeCoverClickableArea.setOnClickListener(v -> presenter.onChangeCoverClicked());
+        viewBinding.changeLyricsClickableArea.setOnClickListener(v -> presenter.onChangeLyricsClicked());
         onLongClick(viewBinding.changeAuthorClickableArea, () -> copyText(viewBinding.tvAuthor, viewBinding.tvAuthorHint));
         onLongClick(viewBinding.changeTitleClickableArea, () -> copyText(viewBinding.tvTitle, viewBinding.tvTitleHint));
         onLongClick(viewBinding.changeFilenameClickableArea, presenter::onCopyFileNameClicked);
         onLongClick(viewBinding.changeAlbumClickableArea, () -> copyText(viewBinding.tvAlbum, viewBinding.tvAlbumHint));
         onLongClick(viewBinding.changeAlbumArtistClickableArea, () -> copyText(viewBinding.tvAlbumArtist, viewBinding.tvAlbumAuthorHint));
+        onLongClick(viewBinding.changeLyricsClickableArea, () -> copyText(viewBinding.tvLyricsHint, viewBinding.tvLyrics));
 
         SlidrPanel.attachWithNavBarChange(this,
                 R.attr.playerPanelBackground,
                 android.R.attr.colorBackground
         );
 
+        CompatUtils.setMainButtonStyle(viewBinding.ivCoverEdit);
         CompatUtils.setMainButtonStyle(viewBinding.ivFilenameEdit);
         CompatUtils.setMainButtonStyle(viewBinding.ivTitleEdit);
         CompatUtils.setMainButtonStyle(viewBinding.ivAuthorEdit);
         CompatUtils.setMainButtonStyle(viewBinding.ivAlbumEdit);
         CompatUtils.setMainButtonStyle(viewBinding.ivAlbumArtist);
+        CompatUtils.setMainButtonStyle(viewBinding.ivLyrics);
         CompatUtils.setMainButtonStyle(viewBinding.ivGenreEdit);
 
         FragmentManager fm = getSupportFragmentManager();
@@ -149,15 +168,25 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 ADD_GENRE_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewGenreEntered));
 
+        lyricsDialogFragmentRunner = new DialogFragmentRunner<>(fm,
+                LYRICS,
+                fragment -> fragment.setOnCompleteListener(presenter::onNewLyricsEntered));
+
         editGenreDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 EDIT_GENRE_TAG,
                 fragment -> fragment.setComplexCompleteListener((name, extra) -> {
                     presenter.onNewGenreNameEntered(name, GenreSerializer.deserializeShort(extra));
                 })
         );
+        coverMenuDialogRunner = new DialogFragmentRunner<>(fm,
+                EDIT_COVER_TAG,
+                fragment -> fragment.setOnCompleteListener(this::onCoverActionSelected)
+        );
+
+        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
 
         //<return genres after deep scan implementation>
-        viewBinding.dividerAlbumArtist.setVisibility(View.INVISIBLE);
+        viewBinding.dividerLyrics.setVisibility(View.INVISIBLE);
         viewBinding.tvGenreHint.setVisibility(GONE);
         viewBinding.ivGenreEdit.setVisibility(GONE);
         viewBinding.changeGenreClickableArea.setVisibility(GONE);
@@ -168,6 +197,23 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case PICK_IMAGE_REQUEST_CODE: {
+                if (data == null) {
+                    return;
+                }
+                Uri uri = data.getData();
+                if (uri == null) {
+                    return;
+                }
+                presenter.onNewImageForCoverSelected(new UriImageSource(uri));
+            }
+            default: super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -190,12 +236,18 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         viewBinding.tvAlbumArtist.setVisibility(albumArtistVisibility);
         viewBinding.tvAlbumAuthorHint.setVisibility(albumArtistVisibility);
         viewBinding.ivAlbumArtist.setVisibility(albumArtistVisibility);
+        viewBinding.dividerAlbumArtist.setVisibility(albumArtistVisibility);
         //<return genres after deep scan implementation>
-//        dividerAlbumArtist.setVisibility(albumArtistVisibility);
+//        dividerLyrics.setVisibility(albumArtistVisibility);
         viewBinding.tvAlbumArtist.setText(composition.getAlbumArtist());
+        viewBinding.tvLyrics.setText(composition.getLyrics());
 
         viewBinding.tvAuthor.setText(formatAuthor(composition.getArtist(), this));
         viewBinding.tvFilename.setText(formatFileName(composition.getFileName(), true));
+
+        Components.getAppComponent()
+                .imageLoader()
+                .displayImageInReusableTarget(viewBinding.ivCover, composition, R.drawable.ic_music_placeholder);
     }
 
     @Override
@@ -227,6 +279,19 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                 .hints(hints)
                 .build();
         albumArtistDialogFragmentRunner.show(fragment);
+    }
+
+    @Override
+    public void showEnterLyricsDialog(FullComposition composition) {
+        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(
+                R.string.change_lyrics,
+                R.string.change,
+                R.string.cancel,
+                R.string.lyrics,
+                composition.getLyrics())
+                .completeOnEnterButton(false)
+                .build();
+        lyricsDialogFragmentRunner.show(fragment);
     }
 
     @Override
@@ -297,6 +362,12 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
+    public void showCheckTagsErrorMessage(ErrorCommand errorCommand) {
+        String message = getString(R.string.check_tags_error, errorCommand.getMessage());
+        makeSnackbar(viewBinding.container, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
     public void copyFileNameText(String filePath) {
         AndroidUtils.copyText(this, formatFileName(filePath), getString(R.string.filename));
         onTextCopied();
@@ -308,6 +379,48 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         MessagesUtils.makeSnackbar(viewBinding.container, text, Snackbar.LENGTH_LONG)
                 .setAction(R.string.cancel, presenter::onRestoreRemovedGenreClicked)
                 .show();
+    }
+
+    @Override
+    public void showCoverActionsDialog() {
+        MenuDialogFragment fragment = MenuDialogFragment.newInstance(
+                R.menu.cover_actions_menu,
+                getString(R.string.change_cover)
+        );
+        coverMenuDialogRunner.show(fragment);
+    }
+
+    @Override
+    public void showSelectImageFromGalleryScreen() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST_CODE);
+    }
+
+    @Override
+    public void showChangeCoverProgress() {
+        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.changing_cover_progress);
+        progressDialogRunner.show(fragment);
+    }
+
+    @Override
+    public void hideChangeCoverProgress() {
+        progressDialogRunner.cancel();
+    }
+
+    private void onCoverActionSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_pick_from_gallery: {
+                presenter.onNewCoverSelected();
+                break;
+            }
+            case R.id.menu_clear: {
+                presenter.onClearCoverClicked();
+                break;
+            }
+        }
     }
 
     private void onGenreItemLongClicked(ShortGenre genre) {

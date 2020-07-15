@@ -32,6 +32,7 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
+import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.hasSourceChanges;
 
 public class LibraryPlayerInteractor {
@@ -261,10 +262,18 @@ public class LibraryPlayerInteractor {
 
             //if items are equal and content changed -> restart play
             if (previousItem != null && previousItem.equals(currentItem)) {
+                trackPosition = getActualTrackPosition();
+
                 if (!hasSourceChanges(previousItem, currentItem)) {
+
+                    //if other fields was changed - update source
+                    if (!areSourcesTheSame(previousItem, currentItem)) {
+                        playerCoordinatorInteractor.updateSource(
+                                new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
+                                LIBRARY);
+                    }
                     return;
                 }
-                trackPosition = getActualTrackPosition();
             }
 
             playerCoordinatorInteractor.prepareToPlay(

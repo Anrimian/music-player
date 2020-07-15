@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.data.controllers.music.equalizer.Equalize
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.ExternalEqualizer;
 import com.github.anrimian.musicplayer.databinding.DialogEqualizerChooserBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 
 import moxy.MvpAppCompatDialogFragment;
 
@@ -41,6 +42,8 @@ public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
         viewBinding.rbDisableEqualizer.setOnClickListener(v -> disableEqualizer());
 
         showActiveEqualizer(equalizerController.getSelectedEqualizerType());
+
+        CompatUtils.setOutlineButtonStyle(viewBinding.btnOpenSystemEqualizer);
 
         return dialog;
     }

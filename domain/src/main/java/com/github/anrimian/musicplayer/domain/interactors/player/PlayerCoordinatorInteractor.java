@@ -36,6 +36,16 @@ public class PlayerCoordinatorInteractor {
         }
     }
 
+    public void updateSource(CompositionSource source, PlayerType playerType) {
+        CompositionSource currentSource = preparedSourcesMap.get(playerType);
+        if (source.equals(currentSource)) {
+            preparedSourcesMap.put(playerType, source);
+        }
+        if (playerType == activePlayerType) {
+            playerInteractor.updateSource(source);
+        }
+    }
+
     public void playOrPause(PlayerType playerType) {
         applyPlayerType(playerType);
         playerInteractor.playOrPause();

@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -249,6 +250,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void swapItems(int from, int to) {
+        if (!ListUtils.isIndexInRange(playQueue, from) || !ListUtils.isIndexInRange(playQueue, to)) {
+            return;
+        }
         PlayQueueItem fromItem = playQueue.get(from);
         PlayQueueItem toItem = playQueue.get(to);
 
@@ -322,18 +326,21 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem newItem = playQueueEvent.getPlayQueueItem();
-        if (currentItem == null || !currentItem.equals(newItem)
+        if (currentItem == null
+                || !currentItem.equals(newItem)
                 || !areSourcesTheSame(newItem.getComposition(), currentItem.getComposition())) {
             onCurrentCompositionChanged(newItem, playQueueEvent.getTrackPosition());
         }
     }
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
-        this.currentItem = newItem;
         getViewState().showCurrentQueueItem(newItem, isCoversEnabled);
-        if (newItem != null) {
+        if (newItem != null
+                && (!newItem.equals(currentItem) || newItem.getComposition().getDuration() != currentItem.getComposition().getDuration())) {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
         }
+
+        this.currentItem = newItem;
     }
 
     private void subscribeOnPlayerStateChanges() {

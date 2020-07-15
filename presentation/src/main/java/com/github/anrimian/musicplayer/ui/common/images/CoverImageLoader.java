@@ -25,12 +25,15 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
+
+import java.util.Date;
 
 import javax.annotation.Nonnull;
 
@@ -56,7 +59,7 @@ public class CoverImageLoader {
         }
 
         Glide.with(imageView)
-                .load(new CompositionImage(data.getId()))
+                .load(new CompositionImage(data.getId(), data.getDateModified()))
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
@@ -70,9 +73,15 @@ public class CoverImageLoader {
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
+                                             @NonNull FullComposition data,
+                                             @DrawableRes int errorPlaceholder) {
+        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), errorPlaceholder);
+    }
+
+    public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull Composition data,
                                              @DrawableRes int errorPlaceholder) {
-        displayImageInReusableTarget(imageView, new CompositionImage(data.getId()), errorPlaceholder);
+        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), errorPlaceholder);
     }
 
     public void displayImage(@NonNull ImageView imageView,
@@ -94,7 +103,7 @@ public class CoverImageLoader {
                                           Callback<Bitmap> onCompleted,
                                           Function<Bitmap> currentBitmap) {
         return loadNotificationImage(
-                new CompositionImage(data.getId()),
+                new CompositionImage(data.getId(), data.getDateModified()),
                 onCompleted,
                 currentBitmap
         );
@@ -130,13 +139,14 @@ public class CoverImageLoader {
     }
 
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
-        loadImage(new CompositionImage(data.getId()), onCompleted);
+        loadImage(new CompositionImage(data.getId(), data.getDateModified()), onCompleted);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
                              int appWidgetId,
                              long compositionId,
+                             long compositionUpdateTime,
                              @DrawableRes int placeholder) {
         CustomAppWidgetTarget widgetTarget = new CustomAppWidgetTarget(context,
                 viewId,
@@ -146,7 +156,7 @@ public class CoverImageLoader {
 
         Glide.with(context)
                 .asBitmap()
-                .load(new CompositionImage(compositionId))
+                .load(new CompositionImage(compositionId, new Date(compositionUpdateTime)))
                 .override(150, 150)
                 .downsample(DownsampleStrategy.AT_MOST)
                 .transform(new CircleCrop())

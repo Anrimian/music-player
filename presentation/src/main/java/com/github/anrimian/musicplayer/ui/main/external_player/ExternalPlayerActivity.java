@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
@@ -16,6 +17,7 @@ import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
@@ -56,6 +58,9 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         super.onCreate(savedInstanceState);
         viewBinding = ActivityExternalPlayerBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
+
+        CompatUtils.setMainButtonStyle(viewBinding.ivPlayPause);
+        CompatUtils.setMainButtonStyle(viewBinding.ivRepeatMode);
 
         seekBarViewWrapper = new SeekBarViewWrapper(viewBinding.sbTrackState);
         seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);
@@ -138,6 +143,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     }
 
     //async creation?
+    @NonNull
     private UriCompositionSource createCompositionSource(Uri uri) {
         String displayName = null;
         String title = null;
@@ -156,16 +162,12 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
                 null,
                 null,
                 null)) {
-            if (cursor == null || cursor.getCount() == 0) {
-                return null;
-            }
-
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()) {
                 displayName = cursorWrapper.getString(MediaStore.Audio.Media.DISPLAY_NAME);
                 size = cursorWrapper.getLong(MediaStore.Audio.Media.SIZE);
             }
-        }
+        } catch (Exception ignored) {}
 
         MediaMetadataRetriever mmr = null;
         try {

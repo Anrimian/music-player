@@ -173,7 +173,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void release() {
-        pausePlayer();
+        equalizerController.detachEqualizer(context);
         stopTracingTrackPosition();
         mediaPlayer.release();
     }
@@ -275,7 +275,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     private void pausePlayer() {
         equalizerController.detachEqualizer(context);
-        mediaPlayer.pause();
+        pause(mediaPlayer);
     }
 
     private void start() {
@@ -284,4 +284,13 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         startTracingTrackPosition();
         isPlaying = true;
     }
+
+    private void pause(MediaPlayer mediaPlayer) {
+        try {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+            }
+        } catch (Exception ignored) {}
+    }
+
 }

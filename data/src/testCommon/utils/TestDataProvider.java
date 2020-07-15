@@ -34,6 +34,7 @@ public class TestDataProvider {
                 albumId,
                 folderId,
                 title,
+                null,
                 "test file name",
                 "test file path",
                 100L,
@@ -76,7 +77,7 @@ public class TestDataProvider {
     }
 
     public static CompositionSource fakeCompositionSource(long id) {
-        return new LibraryCompositionSource(fakeComposition(id), trackPosition);
+        return new LibraryCompositionSource(fakeComposition(id), 0);
     }
 
     public static Composition fakeComposition(long id) {

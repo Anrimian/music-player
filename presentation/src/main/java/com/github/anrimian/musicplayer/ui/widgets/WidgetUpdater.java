@@ -18,6 +18,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_UPDATE_TIME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
@@ -87,25 +88,29 @@ public class WidgetUpdater {
         String compositionName = null;
         String compositionAuthor = null;
         long compositionId = 0;
+        long compositionUpdateTime = 0;
         PlayQueueItem item = playQueueEvent.getPlayQueueItem();
         if (item != null) {
             compositionName = formatCompositionName(item.getComposition());
             compositionAuthor = formatCompositionAuthor(item.getComposition(), context).toString();
             compositionId = item.getComposition().getId();
+            compositionUpdateTime = item.getComposition().getDateModified().getTime();
         }
-        updateComposition(compositionName, compositionAuthor, compositionId);
+        updateComposition(compositionName, compositionAuthor, compositionId, compositionUpdateTime);
     }
 
     private void updateComposition(String compositionName,
                                    String compositionAuthor,
-                                   long compositionId) {
-        WidgetDataHolder.setCompositionInfo(context, compositionName, compositionAuthor, compositionId);
+                                   long compositionId,
+                                   long updateTime) {
+        WidgetDataHolder.setCompositionInfo(context, compositionName, compositionAuthor, compositionId, updateTime);
 
         updateWidgets(intent -> {
             intent.putExtra(WIDGET_ACTION, ACTION_UPDATE_COMPOSITION);
             intent.putExtra(COMPOSITION_NAME_ARG, compositionName);
             intent.putExtra(COMPOSITION_AUTHOR_ARG, compositionAuthor);
             intent.putExtra(COMPOSITION_ID_ARG, compositionId);
+            intent.putExtra(COMPOSITION_UPDATE_TIME_ARG, updateTime);
         });
     }
 

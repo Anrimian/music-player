@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.Constants.Arguments.CAN_BE_EMPTY_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPLETE_ON_ENTER_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_HINT;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_VALUE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
@@ -107,16 +108,20 @@ public class InputTextDialogFragment extends DialogFragment {
         dialog.show();
 
         boolean canBeEmpty = args.getBoolean(CAN_BE_EMPTY_ARG);
+        boolean completeOnEnterButton = args.getBoolean(COMPLETE_ON_ENTER_ARG);
 
         editText.setHint(args.getInt(EDIT_TEXT_HINT));
-        editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editText.setImeOptions(completeOnEnterButton? EditorInfo.IME_ACTION_DONE: EditorInfo.IME_ACTION_UNSPECIFIED);
         editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
         editText.setOnEditorActionListener((v, actionId, event) -> {
             if (!canBeEmpty && !isEnterButtonEnabled(editText.getText().toString().trim())) {
                 return true;
             }
-            onCompleteButtonClicked();
-            return true;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                onCompleteButtonClicked();
+                return true;
+            }
+            return false;
         });
         String startText = args.getString(EDIT_TEXT_VALUE);
         setEditableText(editText, startText);
@@ -167,6 +172,7 @@ public class InputTextDialogFragment extends DialogFragment {
     private boolean isEnterButtonEnabled(String text) {
         return !isEmpty(text);
     }
+
     public static class Builder {
         @StringRes private final int title;
         @StringRes private final int positiveButtonText;
@@ -174,6 +180,7 @@ public class InputTextDialogFragment extends DialogFragment {
         @StringRes private final int editTextHint;
         private final String editTextValue;
         private boolean canBeEmpty = true;
+        private boolean completeOnEnterButton = true;
         private Bundle extra = null;
         private String[] hints;
 
@@ -187,6 +194,11 @@ public class InputTextDialogFragment extends DialogFragment {
             this.negativeButtonText = negativeButtonText;
             this.editTextHint = editTextHint;
             this.editTextValue = editTextValue;
+        }
+
+        public Builder completeOnEnterButton(boolean completeOnEnterButton) {
+            this.completeOnEnterButton = completeOnEnterButton;
+            return this;
         }
 
         public Builder canBeEmpty(boolean canBeEmpty) {
@@ -212,6 +224,7 @@ public class InputTextDialogFragment extends DialogFragment {
             args.putInt(EDIT_TEXT_HINT, editTextHint);
             args.putString(EDIT_TEXT_VALUE, editTextValue);
             args.putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty);
+            args.putBoolean(COMPLETE_ON_ENTER_ARG, completeOnEnterButton);
             args.putBundle(EXTRA_DATA_ARG, extra);
             args.putStringArray(HINTS_ARG, hints);
             InputTextDialogFragment fragment = new InputTextDialogFragment();
