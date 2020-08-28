@@ -52,9 +52,7 @@ public class StorageAlbumsProvider {
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             LongSparseArray<StorageAlbum> artists = new LongSparseArray<>(cursor.getCount());
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-
+            while (cursor.moveToNext()) {
                 StorageAlbum item = getAlbumFromCursor(cursorWrapper);
                 if (item != null) {
                     artists.put(item.getId(), item);

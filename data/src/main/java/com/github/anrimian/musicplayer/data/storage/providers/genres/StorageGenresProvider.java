@@ -44,9 +44,7 @@ public class StorageGenresProvider {
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             Map<String, StorageGenre> genres = new HashMap<>(cursor.getCount());
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-
+            while (cursor.moveToNext()) {
                 StorageGenre item = getGenreFromCursor(cursorWrapper);
                 if (item != null) {
                     genres.put(item.getName(), item);
@@ -76,9 +74,7 @@ public class StorageGenresProvider {
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             LongSparseArray<StorageGenreItem> artists = new LongSparseArray<>(cursor.getCount());
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-
+            while (cursor.moveToNext()) {
                 StorageGenreItem item = getGenreItemFromCursor(cursorWrapper);
                 artists.put(item.getId(), item);
             }
