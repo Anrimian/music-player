@@ -151,7 +151,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void setVolume(float volume) {
-        mediaPlayer.setVolume(volume, volume);
+        try {
+            mediaPlayer.setVolume(volume, volume);
+        } catch (IllegalStateException ignored) {}
     }
 
     @Override
