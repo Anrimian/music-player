@@ -285,7 +285,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             equalizerController.attachEqualizer(context, mediaPlayer.getAudioSessionId());
         } catch (IllegalStateException ignored) {}
 
-        mediaPlayer.start();
+        start(mediaPlayer);
         startTracingTrackPosition();
         isPlaying = true;
     }
@@ -296,6 +296,12 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
                 mediaPlayer.pause();
             }
         } catch (Exception ignored) {}
+    }
+
+    private void start(MediaPlayer mediaPlayer) {
+        try {
+            mediaPlayer.start();
+        } catch (IllegalStateException ignored) {}
     }
 
 }
