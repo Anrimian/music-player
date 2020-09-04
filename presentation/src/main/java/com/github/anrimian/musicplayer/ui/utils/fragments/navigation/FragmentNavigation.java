@@ -156,8 +156,11 @@ public class FragmentNavigation {
 
             Fragment fragment = fragments.get(fragments.size() - 1);
             fragment.setMenuVisibility(isVisible);
-            fragmentManagerProvider.getFragmentManager()
-                    .beginTransaction()
+            FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+            if (fm == null) {
+                return;
+            }
+            fm.beginTransaction()
                     .setCustomAnimations(enterAnimation, 0)
                     .replace(id, fragment)
                     .runOnCommit(() -> {
