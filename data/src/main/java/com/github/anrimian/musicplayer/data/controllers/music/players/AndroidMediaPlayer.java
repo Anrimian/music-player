@@ -151,7 +151,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void setVolume(float volume) {
-        mediaPlayer.setVolume(volume, volume);
+        try {
+            mediaPlayer.setVolume(volume, volume);
+        } catch (IllegalStateException ignored) {}
     }
 
     @Override
@@ -279,8 +281,11 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     private void start() {
-        equalizerController.attachEqualizer(context, mediaPlayer.getAudioSessionId());
-        mediaPlayer.start();
+        try {
+            equalizerController.attachEqualizer(context, mediaPlayer.getAudioSessionId());
+        } catch (IllegalStateException ignored) {}
+
+        start(mediaPlayer);
         startTracingTrackPosition();
         isPlaying = true;
     }
@@ -291,6 +296,12 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
                 mediaPlayer.pause();
             }
         } catch (Exception ignored) {}
+    }
+
+    private void start(MediaPlayer mediaPlayer) {
+        try {
+            mediaPlayer.start();
+        } catch (IllegalStateException ignored) {}
     }
 
 }
