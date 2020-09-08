@@ -133,9 +133,7 @@ public class StorageMusicProvider {
 
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>(cursor.getCount());
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-
+            while (cursor.moveToNext()) {
                 StorageFullComposition composition = buildStorageComposition(cursorWrapper, albums);
                 if (composition != null) {
                     compositions.put(composition.getId(), composition);

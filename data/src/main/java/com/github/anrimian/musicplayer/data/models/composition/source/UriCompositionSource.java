@@ -95,4 +95,70 @@ public class UriCompositionSource implements CompositionSource {
                 ", size=" + size +
                 '}';
     }
+
+    public static class Builder {
+        private final Uri uri;
+        private String displayName;
+        private String title;
+        private String artist;
+        private String album;
+        private long duration;
+        private long size;
+        private byte[] imageBytes;
+
+        public Builder(Uri uri) {
+            this.uri = uri;
+        }
+
+        public Uri getUri() {
+            return uri;
+        }
+
+        public Builder setDisplayName(String displayName) {
+            this.displayName = displayName;
+            return this;
+        }
+
+        public Builder setSize(long size) {
+            this.size = size;
+            return this;
+        }
+
+        public Builder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder setArtist(String artist) {
+            this.artist = artist;
+            return this;
+        }
+
+        public Builder setAlbum(String album) {
+            this.album = album;
+            return this;
+        }
+
+        public Builder setDuration(long duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public Builder setImageBytes(byte[] imageBytes) {
+            this.imageBytes = imageBytes;
+            return this;
+        }
+
+        public UriCompositionSource build() {
+            return new UriCompositionSource(uri,
+                    displayName,
+                    title,
+                    artist,
+                    album,
+                    duration,
+                    size,
+                    imageBytes
+            );
+        }
+    }
 }
