@@ -228,7 +228,9 @@ public class AndroidUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(vibrationTime, VibrationEffect.DEFAULT_AMPLITUDE));
+            try {
+                v.vibrate(VibrationEffect.createOneShot(vibrationTime, VibrationEffect.DEFAULT_AMPLITUDE));
+            } catch (Exception ignored) {} //random bug on system version 8.1
         } else {
             v.vibrate(vibrationTime);
         }
