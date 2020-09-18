@@ -203,7 +203,6 @@ public class NotificationsDisplayer {
                     currentNotificationBitmap = bitmap;
                     notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
                 },
-                () -> currentNotificationBitmap,
                 coverImageLoader);
     }
 
