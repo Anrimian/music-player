@@ -197,6 +197,7 @@ public class MusicService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mediaSession.setActive(false);
         mediaSession.release();
         serviceDisposable.dispose();
     }
