@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,7 +104,7 @@ public class FragmentNavigation {
                                      @AnimRes int enterAnimation) {
         checkForInitialization();
 
-        runForwardAction(() -> {
+        runForwardAction(fm -> {
             if (fragments.isEmpty()) {
                 return;
             }
@@ -117,8 +119,7 @@ public class FragmentNavigation {
 
             Fragment fragment = fragments.get(fragments.size() - 1);
             fragment.setMenuVisibility(isVisible);
-            fragmentManagerProvider.getFragmentManager()
-                    .beginTransaction()
+            fm.beginTransaction()
                     .setCustomAnimations(enterAnimation, exitAnimation)
                     .replace(id, fragment)
                     .runOnCommit(() -> {
@@ -142,7 +143,7 @@ public class FragmentNavigation {
     public void addNewFragmentStack(List<Fragment> fragments, @AnimRes int enterAnimation) {
         checkForInitialization();
 
-        runForwardAction(() -> {
+        runForwardAction(fm -> {
             if (fragments.isEmpty()) {
                 return;
             }
@@ -156,10 +157,6 @@ public class FragmentNavigation {
 
             Fragment fragment = fragments.get(fragments.size() - 1);
             fragment.setMenuVisibility(isVisible);
-            FragmentManager fm = fragmentManagerProvider.getFragmentManager();
-            if (fm == null) {
-                return;
-            }
             fm.beginTransaction()
                     .setCustomAnimations(enterAnimation, 0)
                     .replace(id, fragment)
@@ -185,12 +182,11 @@ public class FragmentNavigation {
                                @AnimRes int enterAnimation) {
         checkForInitialization();
 
-        runForwardAction(() -> {
+        runForwardAction(fm -> {
             screens.add(new FragmentMetaData(fragment));
             int id = jugglerView.prepareTopView();
             fragment.setMenuVisibility(isVisible);
-            fragmentManagerProvider.getFragmentManager()
-                    .beginTransaction()
+            fm.beginTransaction()
                     .setCustomAnimations(enterAnimation, 0)
                     .replace(id, fragment)
                     .runOnCommit(() -> {
@@ -232,7 +228,7 @@ public class FragmentNavigation {
                                 @AnimRes int enterAnimation) {
         checkForInitialization();
 
-        runForwardAction(() -> {
+        runForwardAction(fm -> {
             Fragment oldRootFragment = getFragmentOnTop();
             if (checkForEquality && equalClass(oldRootFragment, newRootFragment)) {
                 return;
@@ -242,10 +238,6 @@ public class FragmentNavigation {
             screens.add(new FragmentMetaData(newRootFragment));
             int topViewId = jugglerView.getTopViewId();
             newRootFragment.setMenuVisibility(isVisible);
-            FragmentManager fm = fragmentManagerProvider.getFragmentManager();
-            if (fm == null) {
-                return;
-            }
             fm.beginTransaction()
                     .setCustomAnimations(enterAnimation, exitAnimation)
                     .replace(topViewId, newRootFragment)
@@ -279,7 +271,7 @@ public class FragmentNavigation {
 
     public void clearFragmentStack(@AnimRes int exitAnimation) {
         checkForInitialization();
-        runForwardAction(() -> {
+        runForwardAction(fm -> {
             if (screens.size() < 1) {
                 return;
             }
@@ -290,8 +282,7 @@ public class FragmentNavigation {
             Fragment fragmentOnBottom = getFragmentOnBottom();
 
             screens.removeLast();
-            FragmentTransaction ft = fragmentManagerProvider.getFragmentManager()
-                    .beginTransaction();
+            FragmentTransaction ft = fm.beginTransaction();
             ft.setCustomAnimations(0, exitAnimation)
                     .remove(fragmentOnTop);
             if (fragmentOnBottom != null) {
@@ -448,8 +439,15 @@ public class FragmentNavigation {
         }
     }
 
-    private void runForwardAction(Runnable runnable) {
-        actionExecutor.execute(() -> actionHandler.post(runnable));
+    private void runForwardAction(Callback<FragmentManager> runnable) {
+        actionExecutor.execute(() -> {
+            actionHandler.post(() -> {
+                FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+                if (fm != null) {
+                    runnable.call(fm);
+                }
+            });
+        });
     }
 
     private void runBackAction(int exitAnimation) {
