@@ -74,15 +74,23 @@ public class NotificationsDisplayer {
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        createChannels(context);
+    }
+
+    public static void createChannels(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager == null) {
+                return;
+            }
+
             NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
-                    getString(R.string.foreground_channel_description),
+                    context.getString(R.string.foreground_channel_description),
                     NotificationManager.IMPORTANCE_LOW);
-            assert notificationManager != null;
             notificationManager.createNotificationChannel(channel);
 
             NotificationChannel errorChannel = new NotificationChannel(ERROR_CHANNEL_ID,
-                    getString(R.string.error_channel_description),
+                    context.getString(R.string.error_channel_description),
                     NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(errorChannel);
         }
