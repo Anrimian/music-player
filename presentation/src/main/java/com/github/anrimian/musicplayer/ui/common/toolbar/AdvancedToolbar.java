@@ -39,8 +39,8 @@ import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatche
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 import static android.animation.ObjectAnimator.ofFloat;
 import static android.text.TextUtils.isEmpty;

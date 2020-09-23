@@ -14,8 +14,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import hu.akarnokd.rxjava2.math.MathObservable;
-import io.reactivex.Observable;
+import hu.akarnokd.rxjava3.math.MathObservable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 

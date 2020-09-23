@@ -21,7 +21,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;

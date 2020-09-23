@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.folders;
 
 import org.junit.Test;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static org.junit.Assert.assertNotNull;
 

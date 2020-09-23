@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public interface AppMediaPlayer {
 

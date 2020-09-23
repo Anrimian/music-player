@@ -4,10 +4,10 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
-import io.reactivex.schedulers.TestScheduler;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.observers.TestObserver;
+import io.reactivex.rxjava3.schedulers.TestScheduler;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 

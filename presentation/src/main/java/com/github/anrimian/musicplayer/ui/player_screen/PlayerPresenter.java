@@ -17,8 +17,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;

@@ -14,7 +14,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
-import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
@@ -74,7 +74,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
     @Override
     public void goToMainScreen() {
-        requireFragmentManager()
+        getParentFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
                 .replace(R.id.main_activity_container, PlayerFragment.newInstance())

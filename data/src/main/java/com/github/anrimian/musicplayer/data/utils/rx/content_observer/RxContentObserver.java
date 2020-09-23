@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.reactivex.Emitter;
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Emitter;
+import io.reactivex.rxjava3.core.Observable;
 
 import static com.github.anrimian.musicplayer.domain.Constants.STORAGE_EVENTS_MIN_EMIT_WINDOW_MILLIS;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;

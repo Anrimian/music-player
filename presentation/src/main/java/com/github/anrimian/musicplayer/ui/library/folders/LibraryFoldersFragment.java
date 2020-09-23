@@ -57,7 +57,7 @@ import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
 
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;

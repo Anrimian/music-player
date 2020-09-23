@@ -22,12 +22,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class FoldersDaoWrapper {
 

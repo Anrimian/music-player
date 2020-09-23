@@ -10,8 +10,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpPresenter;
 
 

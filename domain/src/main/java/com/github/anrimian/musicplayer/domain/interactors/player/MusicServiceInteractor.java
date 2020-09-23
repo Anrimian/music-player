@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.domain.interactors.player;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
 

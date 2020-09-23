@@ -11,7 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static android.media.AudioManager.AUDIOFOCUS_GAIN;
 import static android.media.AudioManager.STREAM_MUSIC;

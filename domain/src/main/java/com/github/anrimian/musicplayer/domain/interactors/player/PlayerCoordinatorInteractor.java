@@ -7,7 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import java.util.HashMap;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class PlayerCoordinatorInteractor {
 

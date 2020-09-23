@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 

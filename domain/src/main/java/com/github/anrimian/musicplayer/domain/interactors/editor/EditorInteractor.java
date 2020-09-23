@@ -12,9 +12,9 @@ import com.github.anrimian.musicplayer.domain.utils.Objects;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.nullIfEmpty;

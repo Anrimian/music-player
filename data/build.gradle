@@ -64,7 +64,7 @@ dependencies {
     androidTestImplementation deps.supportTest
     androidTestImplementation deps.espresso
     androidTestImplementation deps.rules
-    androidTestImplementation deps.rxJava2Ext
+    androidTestImplementation deps.rxJavaExt
     androidTestImplementation deps.roomTest
     androidTestImplementation deps.mockito
 

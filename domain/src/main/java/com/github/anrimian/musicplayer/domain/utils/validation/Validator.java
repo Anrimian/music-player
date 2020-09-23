@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 
 public abstract class Validator<Model> {
 

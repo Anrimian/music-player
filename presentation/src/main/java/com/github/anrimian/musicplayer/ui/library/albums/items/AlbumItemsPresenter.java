@@ -13,8 +13,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
 
 
 public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumItemsView> {

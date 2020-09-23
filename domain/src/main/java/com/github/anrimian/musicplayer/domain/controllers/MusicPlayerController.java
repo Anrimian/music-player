@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.domain.controllers;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 /**
  * Created on 10.11.2017.

@@ -11,7 +11,7 @@ import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.utils.DevTools;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
-import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
 /**
  * Created on 20.10.2017.
