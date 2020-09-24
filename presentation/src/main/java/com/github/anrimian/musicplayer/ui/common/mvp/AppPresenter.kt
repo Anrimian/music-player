@@ -2,10 +2,10 @@ package com.github.anrimian.musicplayer.ui.common.mvp
 
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.utils.moxy.RxMvpPresenter
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.core.Single
 import moxy.MvpView
 
 abstract class AppPresenter<T : MvpView>(

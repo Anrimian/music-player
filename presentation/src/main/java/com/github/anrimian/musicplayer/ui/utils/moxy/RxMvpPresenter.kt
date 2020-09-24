@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.moxy
 
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
 import moxy.MvpPresenter
 import moxy.MvpView
 

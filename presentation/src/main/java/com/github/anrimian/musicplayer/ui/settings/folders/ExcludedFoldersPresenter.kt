@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFolders
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
-import io.reactivex.Scheduler
+import io.reactivex.rxjava3.core.Scheduler
 
 
 class ExcludedFoldersPresenter(private val interactor: LibraryFoldersInteractor,

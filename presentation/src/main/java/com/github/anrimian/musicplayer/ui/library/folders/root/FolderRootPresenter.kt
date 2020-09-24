@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.folders.root
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
-import io.reactivex.Scheduler
+import io.reactivex.rxjava3.core.Scheduler
 
 class FolderRootPresenter(private val interactor: LibraryFoldersScreenInteractor,
                           errorParser: ErrorParser,

@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
-import io.reactivex.Scheduler
+import io.reactivex.rxjava3.core.Scheduler
 
 class RenamePlayListPresenter(private val playListId: Long,
                               private val playListsInteractor: PlayListsInteractor,
