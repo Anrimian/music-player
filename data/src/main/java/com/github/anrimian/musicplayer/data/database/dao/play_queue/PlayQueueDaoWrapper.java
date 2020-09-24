@@ -14,7 +14,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;

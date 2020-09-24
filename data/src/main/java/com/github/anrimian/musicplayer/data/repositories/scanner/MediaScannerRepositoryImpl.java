@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.reactivex.Completable;
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 
@@ -112,7 +112,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
             long dbId = genreId.getDbId();
             if (!genreEntriesDisposable.containsKey(dbId)) {
                 Disposable disposable = genresProvider.getGenreItemsObservable(storageId)
-                        .startWith(genresProvider.getGenreItems(storageId))
+                        .startWithItem(genresProvider.getGenreItems(storageId))
                         .subscribeOn(scheduler)
                         .subscribe(entries -> applyGenreItemsData(dbId, entries));
                 genreEntriesDisposable.put(dbId, disposable);

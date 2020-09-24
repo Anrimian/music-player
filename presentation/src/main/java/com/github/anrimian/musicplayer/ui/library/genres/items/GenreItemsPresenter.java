@@ -13,9 +13,9 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 

@@ -12,8 +12,8 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;

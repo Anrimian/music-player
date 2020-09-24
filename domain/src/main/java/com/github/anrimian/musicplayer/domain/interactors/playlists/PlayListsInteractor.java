@@ -10,9 +10,9 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.List;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class PlayListsInteractor {
 

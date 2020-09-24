@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import io.reactivex.observers.TestObserver;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.observers.TestObserver;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import utils.TestDataProvider;
 
 import static org.mockito.Matchers.eq;

@@ -9,9 +9,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;

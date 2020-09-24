@@ -7,8 +7,8 @@ import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.GAIN;
 import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS;

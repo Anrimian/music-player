@@ -9,8 +9,8 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_ID;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_LAST_POSITION;

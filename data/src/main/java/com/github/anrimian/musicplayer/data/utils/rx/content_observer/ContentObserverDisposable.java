@@ -1,11 +1,10 @@
 package com.github.anrimian.musicplayer.data.utils.rx.content_observer;
 
 import android.content.ContentResolver;
-import android.content.Context;
 import android.database.ContentObserver;
 
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
  * Created on 05.11.2017.

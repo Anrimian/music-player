@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
 import androidx.collection.LongSparseArray;
-import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
@@ -22,14 +21,13 @@ import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class StorageCompositionAnalyzer {
 

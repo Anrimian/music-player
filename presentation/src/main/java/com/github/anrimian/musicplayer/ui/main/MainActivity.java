@@ -13,8 +13,6 @@ import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
-import com.tbruyelle.rxpermissions2.RxPermissions;
-
 import com.github.anrimian.musicplayer.utils.Permissions;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;

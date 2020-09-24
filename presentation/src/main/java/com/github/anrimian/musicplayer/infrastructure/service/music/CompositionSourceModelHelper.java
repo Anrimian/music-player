@@ -14,7 +14,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryC
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 import javax.annotation.Nonnull;
@@ -104,14 +103,13 @@ public class CompositionSourceModelHelper {
 
     public static Runnable getCompositionSourceCover(@Nonnull CompositionSource source,
                                                      Callback<Bitmap> onCompleted,
-                                                     Function<Bitmap> currentBitmap,
                                                      CoverImageLoader coverImageLoader) {
         if (source instanceof LibraryCompositionSource) {
             Composition composition = ((LibraryCompositionSource) source).getComposition();
-            return coverImageLoader.loadNotificationImage(composition, onCompleted, currentBitmap);
+            return coverImageLoader.loadNotificationImage(composition, onCompleted);
         }
         if (source instanceof UriCompositionSource) {
-            return coverImageLoader.loadNotificationImage((UriCompositionSource) source, onCompleted, currentBitmap);
+            return coverImageLoader.loadNotificationImage((UriCompositionSource) source, onCompleted);
         }
         throw new IllegalStateException();
     }

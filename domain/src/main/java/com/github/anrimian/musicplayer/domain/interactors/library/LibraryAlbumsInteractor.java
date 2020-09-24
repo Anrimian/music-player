@@ -11,8 +11,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class LibraryAlbumsInteractor {
 

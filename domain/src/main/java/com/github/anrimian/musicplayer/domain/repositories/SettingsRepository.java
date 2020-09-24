@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 /**
  * Created on 14.11.2017.

@@ -17,7 +17,7 @@ import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentO
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class StorageAlbumsProvider {
 

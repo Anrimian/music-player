@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.domain.repositories;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 /**
  * Created on 16.11.2017.

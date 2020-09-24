@@ -13,8 +13,8 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
 
 
 public class LibraryCompositionsPresenter

@@ -7,8 +7,8 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.List;
 
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpPresenter;
 
 

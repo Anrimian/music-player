@@ -36,7 +36,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;

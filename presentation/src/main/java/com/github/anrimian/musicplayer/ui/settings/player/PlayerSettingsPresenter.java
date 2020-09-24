@@ -2,8 +2,8 @@ package com.github.anrimian.musicplayer.ui.settings.player;
 
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
 
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpPresenter;
 
 

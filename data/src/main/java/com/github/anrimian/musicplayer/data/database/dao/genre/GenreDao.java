@@ -18,7 +18,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 @Dao
 public interface GenreDao {

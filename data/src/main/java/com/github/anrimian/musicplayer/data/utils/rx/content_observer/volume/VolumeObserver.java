@@ -5,7 +5,7 @@ import android.media.AudioManager;
 
 import com.github.anrimian.musicplayer.data.utils.rx.receivers.RxReceivers;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class VolumeObserver {
 

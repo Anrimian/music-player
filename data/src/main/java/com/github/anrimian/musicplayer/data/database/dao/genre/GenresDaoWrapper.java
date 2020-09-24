@@ -12,20 +12,19 @@ import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenr
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
 import java.util.Set;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class GenresDaoWrapper {
 

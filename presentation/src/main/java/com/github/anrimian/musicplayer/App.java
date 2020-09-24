@@ -7,10 +7,11 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer;
+import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.utils.DevTools;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
-import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
 /**
  * Created on 20.10.2017.
@@ -30,6 +31,9 @@ public class App extends Application {
 
         AppComponent appComponent = Components.getAppComponent();
         appComponent.fileLog().initFatalErrorRecorder();
+
+        //try to fix remote service exceptions
+        NotificationsDisplayer.createChannels(this);
 
         if (Permissions.hasFilePermission(this)) {
             appComponent.widgetUpdater().start();

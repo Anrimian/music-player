@@ -3,8 +3,8 @@ package com.github.anrimian.musicplayer.data.utils.rx.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
  * Created on 05.11.2017.

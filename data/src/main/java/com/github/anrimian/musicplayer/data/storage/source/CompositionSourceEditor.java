@@ -26,9 +26,9 @@ import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 
 public class CompositionSourceEditor {
 

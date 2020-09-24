@@ -7,7 +7,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Mapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class FolderTreeBuilder<M, V> {
 

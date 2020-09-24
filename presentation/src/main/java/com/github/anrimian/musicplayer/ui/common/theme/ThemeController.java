@@ -12,8 +12,8 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
-import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;

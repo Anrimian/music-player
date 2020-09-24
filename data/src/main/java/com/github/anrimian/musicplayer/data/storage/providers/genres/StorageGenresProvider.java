@@ -15,7 +15,7 @@ import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentO
 import java.util.HashMap;
 import java.util.Map;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class StorageGenresProvider {
 

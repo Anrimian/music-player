@@ -10,8 +10,8 @@ import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
-import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.models.order.OrderType.ADD_TIME;
