@@ -54,6 +54,33 @@
             tools:ignore="RtlSymmetry"/>
 
         <RadioButton
+            android:id="@+id/rbUseAppEqualizer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_text_primary"
+            android:paddingStart="@dimen/radio_button_text_margin_start"
+            android:paddingEnd="@dimen/radio_button_text_margin_start"
+            android:paddingTop="@dimen/radio_button_text_vertical_padding"
+            android:paddingBottom="@dimen/radio_button_text_vertical_padding"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            android:layout_marginEnd="@dimen/content_internal_margin"
+            android:text="@string/app_equalizer"
+            app:layout_constraintTop_toBottomOf="@id/tvSystemEqualizerDescription"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnOpenAppEqualizer"/>
+
+        <Button
+            style="@style/ButtonOutlineStyle"
+            android:id="@+id/btnOpenAppEqualizer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/rbUseAppEqualizer"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            app:layout_constraintBottom_toBottomOf="@id/rbUseAppEqualizer"/>
+
+        <RadioButton
             android:id="@+id/rbDisableEqualizer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -65,7 +92,7 @@
             android:layout_marginLeft="@dimen/content_horizontal_margin"
             android:layout_marginRight="@dimen/content_horizontal_margin"
             android:text="@string/no_equalizer"
-            app:layout_constraintTop_toBottomOf="@id/tvSystemEqualizerDescription"
+            app:layout_constraintTop_toBottomOf="@id/rbUseAppEqualizer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 

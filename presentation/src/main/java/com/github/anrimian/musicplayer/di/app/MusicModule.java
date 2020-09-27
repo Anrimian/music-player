@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.external.ExternalEqualizer;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.InternalEqualizer;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
@@ -193,8 +195,21 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    EqualizerController equalizerController(SettingsRepository settingsRepository) {
-        return new EqualizerController(settingsRepository);
+    EqualizerController equalizerController(SettingsRepository settingsRepository,
+                                            ExternalEqualizer externalEqualizer,
+                                            InternalEqualizer internalEqualizer) {
+        return new EqualizerController(settingsRepository, externalEqualizer, internalEqualizer);
     }
 
+    @Provides
+    @NonNull
+    ExternalEqualizer externalEqualizer(Context context) {
+        return new ExternalEqualizer(context);
+    }
+
+    @Provides
+    @NonNull
+    InternalEqualizer internalEqualizer(Context context) {
+        return new InternalEqualizer();
+    }
 }

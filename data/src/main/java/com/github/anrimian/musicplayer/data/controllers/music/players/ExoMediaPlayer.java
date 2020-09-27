@@ -153,7 +153,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private void startPlayWhenReady() {
         Completable.fromRunnable(() -> {
-            equalizerController.attachEqualizer(context, player.getAudioSessionId());
+            equalizerController.attachEqualizer(player.getAudioSessionId());
             player.setPlayWhenReady(true);
             startTracingTrackPosition();
         }).subscribeOn(scheduler).subscribe();
@@ -176,7 +176,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     private void pausePlayer() {
-        equalizerController.detachEqualizer(context);
+        equalizerController.detachEqualizer();
         player.setPlayWhenReady(false);
     }
 

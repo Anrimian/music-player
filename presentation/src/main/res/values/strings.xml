@@ -205,6 +205,7 @@
     <string name="change_lyrics">Change lyrics</string>
     <string name="lyrics">Lyrics</string>
     <string name="check_tags_error">Failed to check composition tags: %s</string>
+    <string name="app_equalizer">App equalizer</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

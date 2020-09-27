@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerTypes;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType;
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -72,10 +72,10 @@ public class PlayerSettingsFragment extends MvpAppCompatFragment implements Play
 
     private int getEqualizerTypeDescription(int type) {
         switch (type) {
-            case EqualizerTypes.NONE: {
+            case EqualizerType.NONE: {
                 return R.string.no_equalizer;
             }
-            case EqualizerTypes.EXTERNAL: {
+            case EqualizerType.EXTERNAL: {
                 return R.string.system_equalizer;
             }
             default: return R.string.no_equalizer;

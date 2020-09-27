@@ -220,6 +220,7 @@
     <string name="change_lyrics">Изменить текст композиции</string>
     <string name="lyrics">Текст композиции</string>
     <string name="check_tags_error">Не удалось проверить теги композиции: %s</string>
+    <string name="app_equalizer">Экалайзер приложения</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

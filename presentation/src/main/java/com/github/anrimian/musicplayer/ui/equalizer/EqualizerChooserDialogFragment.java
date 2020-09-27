@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
-import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerTypes;
-import com.github.anrimian.musicplayer.data.controllers.music.equalizer.ExternalEqualizer;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.external.ExternalEqualizer;
 import com.github.anrimian.musicplayer.databinding.DialogEqualizerChooserBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
@@ -39,6 +39,8 @@ public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
 
         viewBinding.rbUseSystemEqualizer.setOnClickListener(v -> enableSystemEqualizer());
         viewBinding.btnOpenSystemEqualizer.setOnClickListener(v -> openSystemEqualizer());
+        viewBinding.rbUseAppEqualizer.setOnClickListener(v -> enableAppEqualizer());
+        viewBinding.btnOpenAppEqualizer.setOnClickListener(v -> openAppEqualizer());
         viewBinding.rbDisableEqualizer.setOnClickListener(v -> disableEqualizer());
 
         showActiveEqualizer(equalizerController.getSelectedEqualizerType());
@@ -68,23 +70,34 @@ public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
     }
 
     private void enableSystemEqualizer() {
-        equalizerController.enableExternalEqualizer(getActivity());
-        showActiveEqualizer(EqualizerTypes.EXTERNAL);
+        equalizerController.enableEqualizer(EqualizerType.EXTERNAL);
+        showActiveEqualizer(EqualizerType.EXTERNAL);
+    }
+
+    private void openAppEqualizer() {
+        enableAppEqualizer();
+        //open screen
+    }
+
+    private void enableAppEqualizer() {
+        equalizerController.enableEqualizer(EqualizerType.APP);
+        showActiveEqualizer(EqualizerType.APP);
     }
 
     private void openSystemEqualizer() {
         equalizerController.launchExternalEqualizerSetup(getActivity());
-        showActiveEqualizer(EqualizerTypes.EXTERNAL);
+        showActiveEqualizer(EqualizerType.EXTERNAL);
     }
 
     private void disableEqualizer() {
-        equalizerController.disableExternalEqualizer(requireContext());
-        showActiveEqualizer(EqualizerTypes.NONE);
+        equalizerController.disableEqualizer();
+        showActiveEqualizer(EqualizerType.NONE);
     }
 
     private void showActiveEqualizer(int type) {
-        viewBinding.rbUseSystemEqualizer.setChecked(type == EqualizerTypes.EXTERNAL);
-        viewBinding.rbDisableEqualizer.setChecked(type == EqualizerTypes.NONE);
+        viewBinding.rbUseSystemEqualizer.setChecked(type == EqualizerType.EXTERNAL);
+        viewBinding.rbUseAppEqualizer.setChecked(type == EqualizerType.APP);
+        viewBinding.rbDisableEqualizer.setChecked(type == EqualizerType.NONE);
     }
 
 }

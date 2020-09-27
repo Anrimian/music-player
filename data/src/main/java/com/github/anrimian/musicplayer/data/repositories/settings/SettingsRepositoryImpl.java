@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerTypes;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
@@ -297,7 +297,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public int getSelectedEqualizerType() {
-        return preferences.getInt(SELECTED_EQUALIZER_TYPE, EqualizerTypes.NONE);
+        return preferences.getInt(SELECTED_EQUALIZER_TYPE, EqualizerType.NONE);
     }
 
     @Override

@@ -175,7 +175,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void release() {
-        equalizerController.detachEqualizer(context);
+        equalizerController.detachEqualizer();
         stopTracingTrackPosition();
         mediaPlayer.release();
     }
@@ -276,13 +276,13 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     private void pausePlayer() {
-        equalizerController.detachEqualizer(context);
+        equalizerController.detachEqualizer();
         pause(mediaPlayer);
     }
 
     private void start() {
         try {
-            equalizerController.attachEqualizer(context, mediaPlayer.getAudioSessionId());
+            equalizerController.attachEqualizer(mediaPlayer.getAudioSessionId());
         } catch (IllegalStateException ignored) {}
 
         start(mediaPlayer);
