@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.equalizer;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 
@@ -14,6 +15,7 @@ import com.github.anrimian.musicplayer.data.controllers.music.equalizer.external
 import com.github.anrimian.musicplayer.databinding.DialogEqualizerChooserBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
+import com.github.anrimian.musicplayer.ui.equalizer.app.EqualizerActivity;
 
 import moxy.MvpAppCompatDialogFragment;
 
@@ -76,7 +78,7 @@ public class EqualizerChooserDialogFragment extends MvpAppCompatDialogFragment {
 
     private void openAppEqualizer() {
         enableAppEqualizer();
-        //open screen
+        startActivity(new Intent(requireContext(), EqualizerActivity.class));
     }
 
     private void enableAppEqualizer() {

@@ -64,6 +64,9 @@
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/SlidrActivityTheme"/>
 
+        <activity android:name=".ui.equalizer.app.EqualizerActivity"
+            android:theme="@style/SlidrActivityTheme"/>
+
         <service android:name=".infrastructure.service.music.MusicService"
             android:exported="false">
             <intent-filter>

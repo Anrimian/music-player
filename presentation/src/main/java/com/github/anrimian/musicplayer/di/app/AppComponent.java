@@ -23,6 +23,7 @@ import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
+import com.github.anrimian.musicplayer.ui.equalizer.app.EqualizerPresenter;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
@@ -64,6 +65,7 @@ public interface AppComponent {
     PlayListsPresenter playListsPresenter();
     CreatePlayListPresenter createPlayListsPresenter();
     ChoosePlayListPresenter choosePlayListPresenter();
+    EqualizerPresenter equalizerPresenter();
 
     UiStateRepository uiStateRepository();
     MediaScannerRepository mediaScannerRepository();
@@ -80,5 +82,4 @@ public interface AppComponent {
     EqualizerController equalizerController();
 
     void inject(MusicService musicService);
-
 }

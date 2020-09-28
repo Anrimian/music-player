@@ -77,7 +77,7 @@ public class SlidrPanel {
     }
 
     @NonNull
-    private static SliderPanel attachSliderPanel(@NonNull Activity activity, SlidrConfig config) {
+    public static SliderPanel attachSliderPanel(@NonNull Activity activity, SlidrConfig config) {
         // Hijack the decorview
         ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
         View oldScreen = decorView.getChildAt(0);
