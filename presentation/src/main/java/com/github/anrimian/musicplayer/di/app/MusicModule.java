@@ -208,12 +208,14 @@ class MusicModule {
 
     @Provides
     @NonNull
+    @Singleton
     ExternalEqualizer externalEqualizer(Context context) {
         return new ExternalEqualizer(context);
     }
 
     @Provides
     @NonNull
+    @Singleton
     InternalEqualizer internalEqualizer() {
         return new InternalEqualizer();
     }
