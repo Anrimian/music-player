@@ -34,6 +34,29 @@
             tools:title="Title"/>
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/content_vertical_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            android:layout_marginEnd="@dimen/content_horizontal_margin">
+
+            <TextView
+                style="@style/TextStyle.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/presets"/>
+
+            <Spinner
+                android:id="@+id/spinnerPresets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/llBands"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

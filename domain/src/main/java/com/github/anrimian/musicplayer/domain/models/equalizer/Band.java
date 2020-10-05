@@ -4,14 +4,21 @@ public class Band {
 
     private final short bandNumber;
     private final int[] frequencyRange;
-    private final short[] levelRange;
+    private final int centerFreq;
     private final short currentRange;
 
-    public Band(short bandNumber, int[] frequencyRange, short[] levelRange, short currentRange) {
+    public Band(short bandNumber,
+                int[] frequencyRange,
+                int centerFreq,
+                short currentRange) {
         this.bandNumber = bandNumber;
         this.frequencyRange = frequencyRange;
-        this.levelRange = levelRange;
+        this.centerFreq = centerFreq;
         this.currentRange = currentRange;
+    }
+
+    public int getCenterFreq() {
+        return centerFreq;
     }
 
     public short getBandNumber() {
@@ -20,10 +27,6 @@ public class Band {
 
     public int[] getFrequencyRange() {
         return frequencyRange;
-    }
-
-    public short[] getLevelRange() {
-        return levelRange;
     }
 
     public short getCurrentRange() {

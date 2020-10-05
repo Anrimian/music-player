@@ -1,6 +1,9 @@
 package com.github.anrimian.musicplayer.ui.equalizer.app;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
@@ -12,6 +15,8 @@ import com.github.anrimian.musicplayer.databinding.ActivityEqualizerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialEqualizerBandBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerInfo;
+import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
@@ -64,8 +69,8 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
     }
 
     @Override
-    public void displayBands(List<Band> bands) {
-        for (Band band: bands) {
+    public void displayEqualizerInfo(EqualizerInfo equalizerInfo) {
+        for (Band band: equalizerInfo.getBands()) {
             PartialEqualizerBandBinding binding = PartialEqualizerBandBinding.inflate(getLayoutInflater());
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             lp.weight = 1;
@@ -74,8 +79,8 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
             short currentRange = band.getCurrentRange();
             binding.tvLevel.setText(String.valueOf(currentRange));
 
-            short lowestRange = band.getLevelRange()[0];//check
-            short highestRange = band.getLevelRange()[1];
+            short lowestRange = equalizerInfo.getBandLevelRange()[0];//check
+            short highestRange = equalizerInfo.getBandLevelRange()[1];
             int max = highestRange - lowestRange;
             binding.sbLevel.setMax(max);
             binding.sbLevel.setProgress(currentRange + Math.abs(lowestRange));
@@ -100,9 +105,28 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
                 }
             });
 
-            binding.tvFrequency.setText(String.valueOf(band.getFrequencyRange()[0]));
+            binding.tvFrequency.setText(String.valueOf(band.getFrequencyRange()[1]));
         }
 
+        //display presents
+
+        List<Preset> presets = equalizerInfo.getPresets();
+        ArrayAdapter<Preset> adapter = new ArrayAdapter<>(this,
+                R.layout.item_autocomplete,
+                R.id.text_view,
+                presets);
+        viewBinding.spinnerPresets.setAdapter(adapter);
+        viewBinding.spinnerPresets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                presenter.onPresetSelected(presets.get(i));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     @Override

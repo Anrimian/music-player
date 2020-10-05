@@ -1,9 +1,8 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
-import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerInfo;
+import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
 import com.github.anrimian.musicplayer.domain.repositories.EqualizerRepository;
-
-import java.util.List;
 
 import io.reactivex.rxjava3.core.Single;
 
@@ -15,12 +14,16 @@ public class EqualizerInteractor {
         this.equalizerRepository = equalizerRepository;
     }
 
-    public Single<List<Band>> getBands() {
-        return equalizerRepository.getBands();
+    public Single<EqualizerInfo> getEqualizerInfo() {
+        return equalizerRepository.getEqualizerInfo();
     }
 
     public void setBandLevel(short bandNumber, short level) {
         equalizerRepository.setBandLevel(bandNumber, level);
+    }
+
+    public void setPreset(Preset preset) {
+        equalizerRepository.setPreset(preset);
     }
 
 }
