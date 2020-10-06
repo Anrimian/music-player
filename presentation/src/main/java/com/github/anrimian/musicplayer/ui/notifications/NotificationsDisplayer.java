@@ -337,12 +337,14 @@ public class NotificationsDisplayer {
     private boolean isNotificationVisible(NotificationManager notificationManager,
                                           int notificationId) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
-            for (StatusBarNotification notification : notifications) {
-                if (notification.getId() == notificationId) {
-                    return true;
+            try {
+                StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
+                for (StatusBarNotification notification : notifications) {
+                    if (notification.getId() == notificationId) {
+                        return true;
+                    }
                 }
-            }
+            } catch (Exception ignored) {} //getActiveNotifications() can throw exception on android 6
         }
         return false;
     }
