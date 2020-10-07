@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.controllers.music.equalizer.interna
 import android.media.audiofx.Equalizer;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.AppEqualizer;
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerInfo;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
@@ -11,9 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class InternalEqualizer implements AppEqualizer {
+
+    private final BehaviorSubject<EqualizerInfo> currentInfoSubject = BehaviorSubject.create();
 
     private Equalizer equalizer;
 
@@ -39,40 +43,11 @@ public class InternalEqualizer implements AppEqualizer {
         }
     }
 
-    public Single<EqualizerInfo> getEqualizerInfo() {
-        return Single.fromCallable(() -> {
-            Equalizer tempEqualizer = new Equalizer(0, 1);
-
-            short[] bandLevelRange = tempEqualizer.getBandLevelRange();
-
-            List<Band> bands = new ArrayList<>();
-            for(short i = 0; i < tempEqualizer.getNumberOfBands(); i++) {
-                bands.add(new Band(
-                        i,
-                        tempEqualizer.getBandFreqRange(i),
-                        tempEqualizer.getCenterFreq(i),
-                        tempEqualizer.getBandLevel(i))
-                );
-            }
-
-            List<Preset> presets = new ArrayList<>();
-            short currentPresetNumber = tempEqualizer.getCurrentPreset();
-            Preset currentPreset = null;
-            for(short i = 0; i < tempEqualizer.getNumberOfPresets(); i++) {
-                Preset preset = new Preset(
-                        i,
-                        tempEqualizer.getPresetName(i)
-                );
-                if (i == currentPresetNumber) {
-                    currentPreset = preset;
-                }
-                presets.add(preset);
-            }
-
-            tempEqualizer.release();
-
-            return new EqualizerInfo(bandLevelRange, bands, presets, currentPreset);
-        });
+    public Observable<EqualizerInfo> getEqualizerInfoObservable() {
+        return RxUtils.withDefaultValue(
+                currentInfoSubject,
+                () -> extractEqualizerInfo(new Equalizer(0, 1))
+        );
     }
 
     public void setBandLevel(short bandNumber, short level) {
@@ -84,7 +59,40 @@ public class InternalEqualizer implements AppEqualizer {
     public void setPreset(Preset preset) {
         if (equalizer != null) {
             equalizer.usePreset(preset.getNumber());
+            currentInfoSubject.onNext(extractEqualizerInfo(equalizer));
         }
+    }
+
+    private EqualizerInfo extractEqualizerInfo(Equalizer equalizer) {
+        short[] bandLevelRange = equalizer.getBandLevelRange();
+
+        List<Band> bands = new ArrayList<>();
+        for(short i = 0; i < equalizer.getNumberOfBands(); i++) {
+            bands.add(new Band(
+                    i,
+                    equalizer.getBandFreqRange(i),
+                    equalizer.getCenterFreq(i),
+                    equalizer.getBandLevel(i))
+            );
+        }
+
+        List<Preset> presets = new ArrayList<>();
+        short currentPresetNumber = equalizer.getCurrentPreset();
+        Preset currentPreset = null;
+        for(short i = 0; i < equalizer.getNumberOfPresets(); i++) {
+            Preset preset = new Preset(
+                    i,
+                    equalizer.getPresetName(i)
+            );
+            if (i == currentPresetNumber) {
+                currentPreset = preset;
+            }
+            presets.add(preset);
+        }
+
+        equalizer.release();
+
+        return new EqualizerInfo(bandLevelRange, bands, presets, currentPreset);
     }
 
 }

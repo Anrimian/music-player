@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpPresenter;
 
 public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
@@ -13,6 +14,8 @@ public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
     private final EqualizerInteractor interactor;
     private final Scheduler scheduler;
     private final ErrorParser errorParser;
+
+    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
 
     public EqualizerPresenter(EqualizerInteractor interactor,
                               Scheduler scheduler,
@@ -25,7 +28,13 @@ public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        loadEqualizerInfo();
+        subscribeOnEqualizerInfo();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenterDisposable.dispose();
     }
 
     public void onBandLevelChanged(Band band, short value) {
@@ -36,10 +45,10 @@ public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
         interactor.setPreset(preset);
     }
 
-    private void loadEqualizerInfo() {
-        interactor.getEqualizerInfo()
+    private void subscribeOnEqualizerInfo() {
+        presenterDisposable.add(interactor.getEqualizerInfoObservable()
                 .observeOn(scheduler)
-                .subscribe(getViewState()::displayEqualizerInfo, this::onDefaultError);
+                .subscribe(getViewState()::displayEqualizerInfo, this::onDefaultError));
     }
 
     private void onDefaultError(Throwable throwable) {
