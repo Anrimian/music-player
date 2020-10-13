@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.equalizer.app;
 
 import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -28,7 +29,13 @@ public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        subscribeOnEqualizerInfo();
+        loadEqualizerConfig();
+    }
+
+    private void loadEqualizerConfig() {
+        interactor.getEqualizerConfig()
+                .observeOn(scheduler)
+                .subscribe(this::onEqualizerConfigReceived);
     }
 
     @Override
@@ -45,13 +52,22 @@ public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
         interactor.setPreset(preset);
     }
 
-    private void subscribeOnEqualizerInfo() {
-        presenterDisposable.add(interactor.getEqualizerInfoObservable()
+    private void onEqualizerConfigReceived(EqualizerConfig config) {
+        getViewState().displayEqualizerConfig(config);
+        subscribeOnEqualizerState(config);
+    }
+
+    private void subscribeOnEqualizerState(EqualizerConfig config) {
+        presenterDisposable.add(interactor.getEqualizerStateObservable()
                 .observeOn(scheduler)
-                .subscribe(getViewState()::displayEqualizerInfo, this::onDefaultError));
+                .subscribe(
+                        equalizerState -> getViewState().displayEqualizerState(equalizerState, config),
+                        this::onDefaultError)
+        );
     }
 
     private void onDefaultError(Throwable throwable) {
         getViewState().showErrorMessage(errorParser.parseError(throwable));
     }
+
 }

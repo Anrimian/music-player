@@ -1,11 +1,13 @@
 package com.github.anrimian.musicplayer.data.repositories.equalizer;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.InternalEqualizer;
-import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerInfo;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
 import com.github.anrimian.musicplayer.domain.repositories.EqualizerRepository;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class EqualizerRepositoryImpl implements EqualizerRepository {
 
@@ -16,8 +18,13 @@ public class EqualizerRepositoryImpl implements EqualizerRepository {
     }
 
     @Override
-    public Observable<EqualizerInfo> getEqualizerInfoObservable() {
-        return internalEqualizer.getEqualizerInfoObservable();
+    public Single<EqualizerConfig> getEqualizerConfig() {
+        return internalEqualizer.getEqualizerConfig();
+    }
+
+    @Override
+    public Observable<EqualizerState> getEqualizerStateObservable() {
+        return internalEqualizer.getEqualizerStateObservable();
     }
 
     @Override

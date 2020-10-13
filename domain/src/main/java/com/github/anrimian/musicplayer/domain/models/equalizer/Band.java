@@ -1,20 +1,17 @@
 package com.github.anrimian.musicplayer.domain.models.equalizer;
 
-public class Band {
+public class  Band {
 
     private final short bandNumber;
     private final int[] frequencyRange;
     private final int centerFreq;
-    private final short currentRange;
 
     public Band(short bandNumber,
                 int[] frequencyRange,
-                int centerFreq,
-                short currentRange) {
+                int centerFreq) {
         this.bandNumber = bandNumber;
         this.frequencyRange = frequencyRange;
         this.centerFreq = centerFreq;
-        this.currentRange = currentRange;
     }
 
     public int getCenterFreq() {
@@ -27,9 +24,5 @@ public class Band {
 
     public int[] getFrequencyRange() {
         return frequencyRange;
-    }
-
-    public short getCurrentRange() {
-        return currentRange;
     }
 }

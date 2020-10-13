@@ -3,21 +3,23 @@ package com.github.anrimian.musicplayer.data.controllers.music.equalizer.interna
 import android.media.audiofx.Equalizer;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.AppEqualizer;
-import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
-import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerInfo;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class InternalEqualizer implements AppEqualizer {
 
-    private final BehaviorSubject<EqualizerInfo> currentInfoSubject = BehaviorSubject.create();
+    private final BehaviorSubject<EqualizerState> currentStateSubject = BehaviorSubject.create();
 
     private Equalizer equalizer;
 
@@ -27,12 +29,7 @@ public class InternalEqualizer implements AppEqualizer {
             equalizer = new Equalizer(1000, audioSessionId);
             equalizer.setEnabled(true);
 
-            System.out.println("KEK bands level range: " + Arrays.toString(equalizer.getBandLevelRange()));
-            for(short i = 0; i < equalizer.getNumberOfBands(); i++) {
-                System.out.println("KEK band i: " + i);
-                System.out.println("KEK band freq range: " + Arrays.toString(equalizer.getBandFreqRange(i)));
-                System.out.println("KEK band level: " + equalizer.getBandLevel(i));
-            }
+            currentStateSubject.onNext(extractEqualizerState(equalizer));
         }
     }
 
@@ -43,11 +40,17 @@ public class InternalEqualizer implements AppEqualizer {
         }
     }
 
-    public Observable<EqualizerInfo> getEqualizerInfoObservable() {
-        return RxUtils.withDefaultValue(
-                currentInfoSubject,
-                () -> extractEqualizerInfo(new Equalizer(0, 1))
-        );
+    public Single<EqualizerConfig> getEqualizerConfig() {
+        return Single.fromCallable(() -> {
+            Equalizer tempEqualizer = new Equalizer(0, 1);
+            EqualizerConfig config = extractEqualizerInfo(tempEqualizer);
+            tempEqualizer.release();
+            return config;
+        });
+    }
+
+    public Observable<EqualizerState> getEqualizerStateObservable() {
+        return currentStateSubject;
     }
 
     public void setBandLevel(short bandNumber, short level) {
@@ -57,42 +60,50 @@ public class InternalEqualizer implements AppEqualizer {
     }
 
     public void setPreset(Preset preset) {
-        if (equalizer != null) {
+        if (equalizer != null
+                && preset.getNumber() != equalizer.getCurrentPreset()
+                && preset.getNumber() <= equalizer.getNumberOfPresets()) {
             equalizer.usePreset(preset.getNumber());
-            currentInfoSubject.onNext(extractEqualizerInfo(equalizer));
+            currentStateSubject.onNext(extractEqualizerState(equalizer));
         }
     }
 
-    private EqualizerInfo extractEqualizerInfo(Equalizer equalizer) {
+    private EqualizerState extractEqualizerState(Equalizer equalizer) {
+        Map<Short, Short> maps = new HashMap<>();
+        for(short i = 0; i < equalizer.getNumberOfBands(); i++) {
+            maps.put(i, equalizer.getBandLevel(i));
+        }
+        return new EqualizerState(
+                equalizer.getCurrentPreset(),
+                maps
+        );
+    }
+
+    private EqualizerConfig extractEqualizerInfo(Equalizer equalizer) {
         short[] bandLevelRange = equalizer.getBandLevelRange();
+
+        short lowestRange = bandLevelRange[0];
+        short highestRange = bandLevelRange[1];
 
         List<Band> bands = new ArrayList<>();
         for(short i = 0; i < equalizer.getNumberOfBands(); i++) {
             bands.add(new Band(
                     i,
                     equalizer.getBandFreqRange(i),
-                    equalizer.getCenterFreq(i),
-                    equalizer.getBandLevel(i))
+                    equalizer.getCenterFreq(i))
             );
         }
 
         List<Preset> presets = new ArrayList<>();
-        short currentPresetNumber = equalizer.getCurrentPreset();
-        Preset currentPreset = null;
         for(short i = 0; i < equalizer.getNumberOfPresets(); i++) {
             Preset preset = new Preset(
                     i,
                     equalizer.getPresetName(i)
             );
-            if (i == currentPresetNumber) {
-                currentPreset = preset;
-            }
             presets.add(preset);
         }
 
-        equalizer.release();
-
-        return new EqualizerInfo(bandLevelRange, bands, presets, currentPreset);
+        return new EqualizerConfig(lowestRange, highestRange, bands, presets);
     }
 
 }

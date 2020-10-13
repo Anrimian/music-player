@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.equalizer.app;
 
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,13 +16,16 @@ import com.github.anrimian.musicplayer.databinding.ActivityEqualizerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialEqualizerBandBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
-import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerInfo;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.r0adkll.slidr.Slidr;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import moxy.MvpAppCompatActivity;
@@ -37,6 +41,8 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
     EqualizerPresenter presenter;
 
     private ActivityEqualizerBinding viewBinding;
+
+    private final List<Pair<PartialEqualizerBandBinding, Band>> bandsViewList = new LinkedList<>();
 
     @ProvidePresenter
     EqualizerPresenter providePresenter() {
@@ -69,21 +75,24 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
     }
 
     @Override
-    public void displayEqualizerInfo(EqualizerInfo equalizerInfo) {
-        for (Band band: equalizerInfo.getBands()) {
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        AppSnackbar.make(viewBinding.container, errorCommand.getMessage()).show();
+    }
+
+    @Override
+    public void displayEqualizerConfig(EqualizerConfig equalizerConfig) {
+        for (Band band: equalizerConfig.getBands()) {
             PartialEqualizerBandBinding binding = PartialEqualizerBandBinding.inflate(getLayoutInflater());
+            bandsViewList.add(new Pair<>(binding, band));
+
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             lp.weight = 1;
             viewBinding.llBands.addView(binding.getRoot(), lp);
 
-            short currentRange = band.getCurrentRange();
-            binding.tvLevel.setText(String.valueOf(currentRange));
-
-            short lowestRange = equalizerInfo.getBandLevelRange()[0];//check
-            short highestRange = equalizerInfo.getBandLevelRange()[1];
+            short lowestRange = equalizerConfig.getLowestBandRange();
+            short highestRange = equalizerConfig.getHighestBandRange();
             int max = highestRange - lowestRange;
             binding.sbLevel.setMax(max);
-            binding.sbLevel.setProgress(currentRange + Math.abs(lowestRange));
             binding.sbLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -108,9 +117,7 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
             binding.tvFrequency.setText(String.valueOf(band.getFrequencyRange()[1]));
         }
 
-        //display presents
-
-        List<Preset> presets = equalizerInfo.getPresets();
+        List<Preset> presets = equalizerConfig.getPresets();
         ArrayAdapter<Preset> adapter = new ArrayAdapter<>(this,
                 R.layout.item_autocomplete,
                 R.id.text_view,
@@ -130,7 +137,27 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
     }
 
     @Override
-    public void showErrorMessage(ErrorCommand errorCommand) {
-        AppSnackbar.make(viewBinding.container, errorCommand.getMessage()).show();
+    public void displayEqualizerState(EqualizerState equalizerState, EqualizerConfig config) {
+        int position = ListUtils.findPosition(
+                config.getPresets(),
+                preset -> preset.getNumber() == equalizerState.getCurrentPreset()
+        );
+        viewBinding.spinnerPresets.setSelection(position);
+
+        for (Pair<PartialEqualizerBandBinding, Band> pair: bandsViewList) {
+            PartialEqualizerBandBinding binding = pair.first;
+            Band band = pair.second;
+
+            Short currentRange = equalizerState.getBendLevels().get(band.getBandNumber());
+            if (currentRange == null) {
+                return;
+            }
+
+            binding.tvLevel.setText(String.valueOf(currentRange));
+            short lowestRange = config.getLowestBandRange();
+            binding.sbLevel.setProgress(currentRange + Math.abs(lowestRange));
+        }
+
     }
+
 }

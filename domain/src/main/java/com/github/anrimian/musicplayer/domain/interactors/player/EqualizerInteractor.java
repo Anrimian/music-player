@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
-import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerInfo;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
 import com.github.anrimian.musicplayer.domain.repositories.EqualizerRepository;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class EqualizerInteractor {
 
@@ -14,8 +16,12 @@ public class EqualizerInteractor {
         this.equalizerRepository = equalizerRepository;
     }
 
-    public Observable<EqualizerInfo> getEqualizerInfoObservable() {
-        return equalizerRepository.getEqualizerInfoObservable();
+    public Single<EqualizerConfig> getEqualizerConfig() {
+        return equalizerRepository.getEqualizerConfig();
+    }
+
+    public Observable<EqualizerState> getEqualizerStateObservable() {
+        return equalizerRepository.getEqualizerStateObservable();
     }
 
     public void setBandLevel(short bandNumber, short level) {
