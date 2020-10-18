@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--widgets-->
+    <dimen name="widget_content_margin_vertical">16dp</dimen>
+    <dimen name="widget_content_margin_horizontal">16dp</dimen>
+
+</resources>

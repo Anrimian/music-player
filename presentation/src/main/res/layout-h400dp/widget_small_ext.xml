@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_appwidget"
     tools:layout_width="300dp"
-    tools:layout_height="140dp">
+    tools:layout_height="80dp">
 
     <TextView
         android:id="@+id/tv_composition"
@@ -33,9 +33,19 @@
         tools:text="composition_author composition_author composition_author composition_author composition_author" />
 
     <ImageView
+        android:id="@+id/iv_shuffle_mode"
+        style="@style/AppWidget_ImageButton"
+        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
+        android:layout_alignTop="@id/iv_play_pause"
+        android:layout_alignBottom="@+id/iv_skip_to_next"
+        android:layout_alignStart="@id/tv_composition"
+        android:src="@drawable/ic_shuffle"
+        android:contentDescription="@string/previous_track"/>
+
+    <ImageView
         android:id="@+id/iv_skip_to_previous"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginEnd="@dimen/widget_content_spacing_margin"
+        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
         android:layout_alignTop="@id/iv_play_pause"
         android:layout_alignBottom="@+id/iv_skip_to_next"
         android:layout_toStartOf="@+id/iv_play_pause"
@@ -45,7 +55,7 @@
     <ImageView
         android:id="@+id/iv_play_pause"
         style="@style/AppWidget_ImageButton"
-        android:layout_toStartOf="@id/iv_skip_to_next"
+        android:layout_centerHorizontal="true"
         android:layout_alignTop="@+id/iv_skip_to_next"
         android:layout_alignBottom="@+id/iv_skip_to_next"
         android:src="@drawable/ic_play"
@@ -54,13 +64,22 @@
     <ImageView
         android:id="@+id/iv_skip_to_next"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginTop="@dimen/widget_content_spacing_margin"
-        android:layout_marginStart="@dimen/widget_content_spacing_margin"
+        android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
+        android:layout_marginStart="@dimen/widget_medium_content_spacing_margin_horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="@dimen/widget_content_margin_horizontal"
-        android:layout_marginBottom="@dimen/widget_content_spacing_margin"
+        android:layout_toEndOf="@id/iv_play_pause"
+        android:layout_marginEnd="@dimen/widget_medium_content_margin_horizontal"
+        android:layout_marginBottom="@dimen/widget_content_margin_vertical"
         android:src="@drawable/ic_skip_next"
         android:contentDescription="@string/next_track"/>
+
+    <ImageView
+        android:id="@+id/iv_repeat_mode"
+        style="@style/AppWidget_ImageButton"
+        android:layout_alignTop="@id/iv_play_pause"
+        android:layout_alignBottom="@+id/iv_skip_to_next"
+        android:layout_alignEnd="@id/tv_composition_author"
+        android:src="@drawable/ic_repeat"
+        android:contentDescription="@string/previous_track"/>
 
 </RelativeLayout>
