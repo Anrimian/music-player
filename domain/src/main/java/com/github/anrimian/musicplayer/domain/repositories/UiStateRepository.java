@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
+
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -44,4 +46,9 @@ public interface UiStateRepository {
     Observable<Long> getCurrentItemIdObservable();
 
     long getCurrentQueueItemId();
+
+    ListPosition getSavedCompositionsListPosition();
+
+    void saveCompositionsListPosition(ListPosition listPosition);
+
 }

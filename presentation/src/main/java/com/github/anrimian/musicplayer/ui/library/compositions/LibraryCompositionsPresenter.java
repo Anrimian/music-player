@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 
@@ -42,5 +43,15 @@ public class LibraryCompositionsPresenter
     void onOrderSelected(Order order) {
         interactor.setOrder(order);
         subscribeOnCompositions();
+    }
+
+    @Override
+    protected ListPosition getSavedListPosition() {
+        return interactor.getSavedListPosition();
+    }
+
+    @Override
+    protected void saveListPosition(ListPosition listPosition) {
+        interactor.saveListPosition(listPosition);
     }
 }

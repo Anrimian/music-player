@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.Screens;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import javax.annotation.Nullable;
@@ -15,6 +16,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_ID;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_LAST_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.IS_PLAYER_PANEL_OPEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_COMPOSITIONS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PREFERENCES_NAME;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_DRAWER_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_FOLDER_SCREEN;
@@ -42,6 +44,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
         String SELECTED_FOLDER_SCREEN = "selected_folder_screen_id";
         String SELECTED_PLAYLIST_SCREEN = "selected_playlist_screen";
+        String LIBRARY_COMPOSITIONS_POSITION = "library_compositions_position";
     }
 
     private final BehaviorSubject<Long> currentItemSubject = BehaviorSubject.create();
@@ -144,5 +147,15 @@ public class UiStateRepositoryImpl implements UiStateRepository {
             return cachedValue;
         }
         return preferences.getLong(CURRENT_QUEUE_ITEM_ID, NO_ITEM);
+    }
+
+    @Override
+    public ListPosition getSavedCompositionsListPosition() {
+        return preferences.getListPosition(LIBRARY_COMPOSITIONS_POSITION);
+    }
+
+    @Override
+    public void saveCompositionsListPosition(ListPosition listPosition) {
+        preferences.putListPosition(LIBRARY_COMPOSITIONS_POSITION, listPosition);
     }
 }

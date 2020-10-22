@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.utils.functions.BooleanConditionRunner;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
@@ -243,6 +244,9 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         showNoCompositionsRunner.setCondition(compositions.isEmpty());
         artistAlbumsPresenter.setCompositionsTitleVisible(!compositions.isEmpty());
     }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {}
 
     @Override
     public void showArtistAlbums(List<Album> albums) {

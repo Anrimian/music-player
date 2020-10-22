@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 
@@ -84,5 +85,15 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
     private void onGenreInfoReceived(Genre genre) {
         this.genre = genre;
         getViewState().showGenreInfo(genre);
+    }
+
+    @Override
+    protected ListPosition getSavedListPosition() {
+        return null;
+    }
+
+    @Override
+    protected void saveListPosition(ListPosition listPosition) {
+
     }
 }

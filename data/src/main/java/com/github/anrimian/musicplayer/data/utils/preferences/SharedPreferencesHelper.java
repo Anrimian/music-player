@@ -4,6 +4,9 @@ import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.Build;
 
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,6 +89,16 @@ public class SharedPreferencesHelper {
 
     public long getLong(String key) {
         return preferences.getLong(key, 0L);
+    }
+
+    public ListPosition getListPosition(String key) {
+        long positions = getLong(key);
+        return new ListPosition((int) (positions >> 32), (int) positions);
+    }
+
+    public void putListPosition(String key, ListPosition listPosition) {
+        long positions = (((long) listPosition.getPosition()) << 32) | (listPosition.getOffset() & 0xffffffffL);
+        putLong(key, positions);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

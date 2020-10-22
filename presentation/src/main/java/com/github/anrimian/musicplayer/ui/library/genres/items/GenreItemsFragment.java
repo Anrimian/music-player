@@ -21,6 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
@@ -219,6 +220,10 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     public void updateList(List<Composition> genres) {
         adapter.submitList(genres);
     }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {}
+
     @Override
     public void onCompositionSelected(Composition composition, int position) {
         adapter.setItemSelected(position);

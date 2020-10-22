@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.common.compositions;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.mvp.ListMvpView;
 
@@ -13,6 +14,7 @@ import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.OneExecution;
 
 public interface BaseLibraryCompositionsView extends ListMvpView<Composition> {
 
@@ -66,4 +68,7 @@ public interface BaseLibraryCompositionsView extends ListMvpView<Composition> {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showCurrentComposition(CurrentComposition currentComposition);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void restoreListPosition(ListPosition listPosition);
 }

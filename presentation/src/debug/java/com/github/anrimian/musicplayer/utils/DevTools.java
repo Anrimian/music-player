@@ -7,6 +7,6 @@ import com.github.anrimian.acrareportdialog.AcraReportDialog;
 public class DevTools {
 
     public static void run(Application application) {
-        AcraReportDialog.setupCrashDialog(application);
+//        AcraReportDialog.setupCrashDialog(application);
     }
 }
