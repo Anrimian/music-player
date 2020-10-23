@@ -3,10 +3,19 @@ package com.github.anrimian.musicplayer.data.repositories.state;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.collection.ArrayMap;
+import androidx.collection.LruCache;
+
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+
+import org.json.JSONObject;
+
+import java.util.LinkedHashMap;
+import java.util.Stack;
+import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
@@ -181,5 +190,19 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     @Override
     public void saveAlbumsListPosition(ListPosition listPosition) {
         preferences.putListPosition(LIBRARY_ALBUMS_POSITION, listPosition);
+    }
+
+    @Override
+    public void saveFolderListPosition(@Nullable Long folderId, ListPosition listPosition) {
+//        LinkedHashMap<Long, ListPosition> map;
+//        TreeMap<Long, ListPosition> treeMap = new TreeMap<>();
+//        treeMap.
+//        ArrayMap
+//        new JSONObject();
+    }
+
+    @Override
+    public ListPosition getSavedFolderListPosition(@Nullable Long folderId) {
+        return new ListPosition(0, 0);
     }
 }
