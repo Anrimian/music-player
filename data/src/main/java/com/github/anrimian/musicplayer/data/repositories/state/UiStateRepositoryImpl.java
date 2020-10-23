@@ -16,6 +16,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_ID;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_LAST_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.IS_PLAYER_PANEL_OPEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_ALBUMS_POSITION;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_ARTISTS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_COMPOSITIONS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PREFERENCES_NAME;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_DRAWER_SCREEN;
@@ -45,6 +47,8 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String SELECTED_FOLDER_SCREEN = "selected_folder_screen_id";
         String SELECTED_PLAYLIST_SCREEN = "selected_playlist_screen";
         String LIBRARY_COMPOSITIONS_POSITION = "library_compositions_position";
+        String LIBRARY_ARTISTS_POSITION = "library_artists_position";
+        String LIBRARY_ALBUMS_POSITION = "library_albums_position";
     }
 
     private final BehaviorSubject<Long> currentItemSubject = BehaviorSubject.create();
@@ -157,5 +161,25 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     @Override
     public void saveCompositionsListPosition(ListPosition listPosition) {
         preferences.putListPosition(LIBRARY_COMPOSITIONS_POSITION, listPosition);
+    }
+
+    @Override
+    public ListPosition getSavedArtistsListPosition() {
+        return preferences.getListPosition(LIBRARY_ARTISTS_POSITION);
+    }
+
+    @Override
+    public void saveArtistsListPosition(ListPosition listPosition) {
+        preferences.putListPosition(LIBRARY_ARTISTS_POSITION, listPosition);
+    }
+
+    @Override
+    public ListPosition getSavedAlbumsListPosition() {
+        return preferences.getListPosition(LIBRARY_ALBUMS_POSITION);
+    }
+
+    @Override
+    public void saveAlbumsListPosition(ListPosition listPosition) {
+        preferences.putListPosition(LIBRARY_ALBUMS_POSITION, listPosition);
     }
 }

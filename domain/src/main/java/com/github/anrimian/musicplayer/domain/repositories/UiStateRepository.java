@@ -51,4 +51,11 @@ public interface UiStateRepository {
 
     void saveCompositionsListPosition(ListPosition listPosition);
 
+    ListPosition getSavedArtistsListPosition();
+
+    void saveArtistsListPosition(ListPosition listPosition);
+
+    ListPosition getSavedAlbumsListPosition();
+
+    void saveAlbumsListPosition(ListPosition listPosition);
 }

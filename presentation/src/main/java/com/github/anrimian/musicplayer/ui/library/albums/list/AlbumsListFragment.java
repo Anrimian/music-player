@@ -18,10 +18,12 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.AlbumSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
@@ -57,6 +59,7 @@ public class AlbumsListFragment extends LibraryFragment implements
     private AdvancedToolbar toolbar;
     private AlbumsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
+    private LinearLayoutManager layoutManager;
 
     private DialogFragmentRunner<MenuDialogFragment> albumMenuDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
@@ -89,7 +92,7 @@ public class AlbumsListFragment extends LibraryFragment implements
         adapter = new AlbumsAdapter(recyclerView, this::goToAlbumScreen, this::onAlbumLongClick);
         recyclerView.setAdapter(adapter);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         RecyclerViewUtils.attachFastScroller(recyclerView);
@@ -111,6 +114,12 @@ public class AlbumsListFragment extends LibraryFragment implements
         toolbar.setSubtitle(R.string.albums);
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
         toolbar.setupOptionsMenu(R.menu.library_albums_menu, this::onOptionsItemClicked);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
     }
 
     @Override
@@ -163,6 +172,11 @@ public class AlbumsListFragment extends LibraryFragment implements
                 OrderType.ALPHABETICAL,
                 OrderType.COMPOSITION_COUNT);
         selectOrderDialogRunner.show(fragment);
+    }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
     }
 
     private void onAlbumMenuClicked(MenuItem menuItem, Bundle extra) {

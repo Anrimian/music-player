@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsI
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListPresenter;
 
@@ -23,8 +24,12 @@ public class AlbumsModule {
     @Nonnull
     LibraryAlbumsInteractor libraryArtistsInteractor(LibraryRepository repository,
                                                      EditorRepository editorRepository,
-                                                     SettingsRepository settingsRepository) {
-        return new LibraryAlbumsInteractor(repository, editorRepository, settingsRepository);
+                                                     SettingsRepository settingsRepository,
+                                                     UiStateRepository uiStateRepository) {
+        return new LibraryAlbumsInteractor(repository,
+                editorRepository,
+                settingsRepository,
+                uiStateRepository);
     }
 
     @Provides
