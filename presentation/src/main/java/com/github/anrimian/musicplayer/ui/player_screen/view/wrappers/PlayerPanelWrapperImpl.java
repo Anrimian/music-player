@@ -191,7 +191,8 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(panelBinding.btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvPlayedTime)))
                 .addDelegate(new ToolbarDelegate(toolbar, activity.getWindow()))
-                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvTotalTime)));
+                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvTotalTime)))
+                .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.8f, 1f, new VisibilityDelegate(panelBinding.ivBottomPanelIndicator))));
 
         DelegateManager delegateManager = new DelegateManager();
         if (isInLandscapeOrientation()) {//landscape
