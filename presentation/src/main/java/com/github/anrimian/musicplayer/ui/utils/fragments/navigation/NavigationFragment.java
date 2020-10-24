@@ -17,7 +17,7 @@ public class NavigationFragment extends Fragment {
 
     FragmentNavigation getFragmentNavigation() {
         if (fragmentNavigation == null) {
-            fragmentNavigation = new FragmentNavigation(this::getFragmentManager);
+            fragmentNavigation = new FragmentNavigation(this::getParentFragmentManager);
         }
         return fragmentNavigation;
     }

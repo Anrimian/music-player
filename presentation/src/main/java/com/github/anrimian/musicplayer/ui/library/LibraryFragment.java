@@ -46,7 +46,7 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
                 R.menu.library_categories_menu,
                 Gravity.BOTTOM,
                 item -> {
-                    FragmentManager fm = getFragmentManager();
+                    FragmentManager fm = getParentFragmentManager();
                     if (fm == null) {//can be null in some state, don't know which
                         return;
                     }

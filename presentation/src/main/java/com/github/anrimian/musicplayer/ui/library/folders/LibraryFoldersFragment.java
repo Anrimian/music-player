@@ -217,7 +217,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             SlidrPanel.replace(viewBinding.contentContainer,
                     () -> {
                         toolbar.showSelectionMode(0);
-                        FragmentNavigation.from(requireFragmentManager()).goBack();
+                        FragmentNavigation.from(getParentFragmentManager()).goBack();
                     },
                     slidrConfig);
         }
@@ -299,7 +299,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void goBackToParentFolderScreen() {
-        FragmentNavigation.from(requireFragmentManager()).goBack();
+        FragmentNavigation.from(getParentFragmentManager()).goBack();
     }
 
     @Override
@@ -407,7 +407,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void goToMusicStorageScreen(Long folderId) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(LibraryFoldersFragment.newInstance(folderId));
     }
 
@@ -662,7 +662,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             }
             case R.id.menu_excluded_folders: {
                 //noinspection ConstantConditions
-                FragmentNavigation.from(getParentFragment().requireFragmentManager())
+                FragmentNavigation.from(getParentFragment().getParentFragmentManager())
                         .addNewFragment(new ExcludedFoldersFragment());
                 break;
             }

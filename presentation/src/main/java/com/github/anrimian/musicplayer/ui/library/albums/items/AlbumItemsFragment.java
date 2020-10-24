@@ -43,7 +43,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -322,11 +321,11 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     @Override
     public void closeScreen() {
-        FragmentNavigation.from(requireFragmentManager()).goBack();
+        FragmentNavigation.from(getParentFragmentManager()).goBack();
     }
 
     private long getAlbumId() {
-        return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
+        return requireArguments().getLong(ID_ARG);
     }
 
     private void onOptionsItemClicked(@NonNull MenuItem item) {

@@ -186,7 +186,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
     }
 
     private void goToPlayListScreen(PlayList playList) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(PlayListFragment.newInstance(playList.getId()));
     }
 }

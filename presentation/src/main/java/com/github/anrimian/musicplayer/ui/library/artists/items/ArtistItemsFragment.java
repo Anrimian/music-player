@@ -51,7 +51,6 @@ import com.r0adkll.slidr.model.SlidrInterface;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -362,7 +361,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
     @Override
     public void closeScreen() {
-        FragmentNavigation.from(requireFragmentManager()).goBack();
+        FragmentNavigation.from(getParentFragmentManager()).goBack();
     }
 
     @Override
@@ -401,11 +400,11 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     }
 
     private long getAlbumId() {
-        return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
+        return requireArguments().getLong(ID_ARG);
     }
 
     private void onAlbumClicked(Album album) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));
     }
 

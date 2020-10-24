@@ -46,7 +46,7 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
 
-        navigation = FragmentNavigation.from(requireFragmentManager());
+        navigation = FragmentNavigation.from(getParentFragmentManager());
 
         viewBinding.tvDisplay.setOnClickListener(v -> navigation.addNewFragment(new DisplaySettingsFragment()));
         viewBinding.tvLibrary.setOnClickListener(v -> navigation.addNewFragment(new LibrarySettingsFragment()));

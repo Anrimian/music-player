@@ -176,7 +176,7 @@ public class AlbumsListFragment extends LibraryFragment implements
     }
 
     private void goToAlbumScreen(Album album) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));
     }
 
