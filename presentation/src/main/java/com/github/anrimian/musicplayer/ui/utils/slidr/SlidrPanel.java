@@ -23,7 +23,7 @@ public class SlidrPanel {
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
         return SlidrPanel.replace(oldScreen,
                 slidrConfig,
-                () -> FragmentNavigation.from(fragment.requireFragmentManager()).goBack(0),
+                () -> FragmentNavigation.from(fragment.getParentFragmentManager()).goBack(0),
                 slideListener);
     }
 

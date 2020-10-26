@@ -41,7 +41,6 @@ import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
-import java.util.Objects;
 
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
@@ -177,7 +176,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void closeScreen() {
-        FragmentNavigation.from(requireFragmentManager()).goBack();
+        FragmentNavigation.from(getParentFragmentManager()).goBack();
     }
 
     @Override
@@ -362,7 +361,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     }
 
     private long getPlayListId() {
-        return Objects.requireNonNull(getArguments()).getLong(PLAY_LIST_ID_ARG);
+        return requireArguments().getLong(PLAY_LIST_ID_ARG);
     }
 
     private void onOptionsItemClicked(@NonNull MenuItem item) {

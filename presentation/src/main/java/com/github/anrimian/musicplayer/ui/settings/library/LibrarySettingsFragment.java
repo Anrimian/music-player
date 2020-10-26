@@ -42,7 +42,7 @@ public class LibrarySettingsFragment extends Fragment implements FragmentLayerLi
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
 
-        navigation = FragmentNavigation.from(requireFragmentManager());
+        navigation = FragmentNavigation.from(getParentFragmentManager());
 
         viewBinding.tvExcludedFolders.setOnClickListener(v -> navigation.addNewFragment(new ExcludedFoldersFragment()));
 

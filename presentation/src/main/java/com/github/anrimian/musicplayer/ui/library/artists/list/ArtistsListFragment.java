@@ -234,7 +234,7 @@ public class ArtistsListFragment extends LibraryFragment implements
     }
 
     private void goToArtistScreen(Artist artist) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(ArtistItemsFragment.newInstance(artist.getId()));
     }
 

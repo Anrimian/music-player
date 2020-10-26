@@ -227,7 +227,7 @@ public class GenresListFragment extends LibraryFragment implements
     }
 
     private void goToGenreScreen(Genre genre) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(GenreItemsFragment.newInstance(genre.getId()));
     }
 

@@ -335,7 +335,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         RxPermissions rxPermissions = new RxPermissions(this);
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requireFragmentManager()
+            getParentFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_activity_container, new StartFragment())
                     .commit();
