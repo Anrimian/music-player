@@ -3,9 +3,17 @@ package com.github.anrimian.musicplayer.data.utils.preferences;
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Log;
+
+import androidx.collection.LruCache;
 
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -99,6 +107,48 @@ public class SharedPreferencesHelper {
     public void putListPosition(String key, ListPosition listPosition) {
         long positions = (((long) listPosition.getPosition()) << 32) | (listPosition.getOffset() & 0xffffffffL);
         putLong(key, positions);
+    }
+
+    public <K, V> void putLruCache(String key, LruCache<K, V> cache) {
+        Log.d("KEK", "putLruCache----------------");
+        try {
+            LinkedHashMap<K, V> map = (LinkedHashMap<K, V>) cache.snapshot();
+            JSONArray jsonArray = new JSONArray();
+            for (Map.Entry<K, V> entry : map.entrySet()) {
+                JSONObject obj = new JSONObject();
+                obj.put("key", entry.getKey());
+                obj.put("value", entry.getValue());
+                Log.d("KEK", "putLruCache: key: " + entry.getKey() + ", value: " + entry.getValue());
+                jsonArray.put(obj);
+            }
+            putString(key, jsonArray.toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <K, V> LruCache<K, V> getLruCache(String key, int maxCacheSize) {
+        Log.d("KEK", "getLruCache----------------");
+        try {
+            LruCache<K, V> cache = new LruCache<>(maxCacheSize);
+
+            String rawData = getString(key);
+            if (rawData == null) {
+                return cache;
+            }
+            JSONArray jsonArray = new JSONArray(rawData);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                K cacheKey = (K) obj.get("key");
+                V cacheValue = (V) obj.get("value");
+                Log.d("KEK", "getLruCache: key: " + cacheKey + ", value: " + cacheValue);
+                cache.put(cacheKey, cacheValue);
+            }
+            return cache;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

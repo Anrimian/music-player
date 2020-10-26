@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.state;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.collection.ArrayMap;
 import androidx.collection.LruCache;
@@ -11,9 +12,11 @@ import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -28,6 +31,8 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_ALBUMS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_ARTISTS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_COMPOSITIONS_POSITION;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_FOLDERS_POSITIONS;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PREFERENCES_NAME;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_DRAWER_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_FOLDER_SCREEN;
@@ -58,6 +63,9 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String LIBRARY_COMPOSITIONS_POSITION = "library_compositions_position";
         String LIBRARY_ARTISTS_POSITION = "library_artists_position";
         String LIBRARY_ALBUMS_POSITION = "library_albums_position";
+        String LIBRARY_FOLDERS_POSITIONS = "library_folders_positions";
+
+        int LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE = 5;//20;
     }
 
     private final BehaviorSubject<Long> currentItemSubject = BehaviorSubject.create();
@@ -192,17 +200,32 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         preferences.putListPosition(LIBRARY_ALBUMS_POSITION, listPosition);
     }
 
+    private volatile LruCache<Long, ListPosition> foldersPositions;
+
     @Override
     public void saveFolderListPosition(@Nullable Long folderId, ListPosition listPosition) {
-//        LinkedHashMap<Long, ListPosition> map;
-//        TreeMap<Long, ListPosition> treeMap = new TreeMap<>();
-//        treeMap.
-//        ArrayMap
-//        new JSONObject();
+        long key = mapToNonNull(folderId);
+
+        //duplicate issue on saving?
+        LruCache<Long, ListPosition> foldersPositions = getFoldersPositions();
+        foldersPositions.put(key, listPosition);
+        Log.d("KEK", "saveFolderListPosition: key: " + key + ", value: " + listPosition);
+        preferences.putLruCache(LIBRARY_FOLDERS_POSITIONS, foldersPositions);
     }
 
     @Override
     public ListPosition getSavedFolderListPosition(@Nullable Long folderId) {
-        return new ListPosition(0, 0);
+        return getFoldersPositions().get(mapToNonNull(folderId));
+    }
+
+    private LruCache<Long, ListPosition> getFoldersPositions() {
+        if (foldersPositions == null) {
+            foldersPositions = preferences.getLruCache(LIBRARY_FOLDERS_POSITIONS, LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE);
+        }
+        return foldersPositions;
+    }
+
+    private long mapToNonNull(@Nullable Long key) {
+        return key == null? -1L: key;
     }
 }
