@@ -200,16 +200,14 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         preferences.putListPosition(LIBRARY_ALBUMS_POSITION, listPosition);
     }
 
-    private volatile LruCache<Long, ListPosition> foldersPositions;
+    private LruCache<Long, ListPosition> foldersPositions;
 
     @Override
     public void saveFolderListPosition(@Nullable Long folderId, ListPosition listPosition) {
         long key = mapToNonNull(folderId);
 
-        //duplicate issue on saving?
         LruCache<Long, ListPosition> foldersPositions = getFoldersPositions();
         foldersPositions.put(key, listPosition);
-        Log.d("KEK", "saveFolderListPosition: key: " + key + ", value: " + listPosition);
         preferences.putLruCache(LIBRARY_FOLDERS_POSITIONS, foldersPositions);
     }
 

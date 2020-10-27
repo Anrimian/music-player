@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.utils.preferences;
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.JsonReader;
 import android.util.Log;
 
 import androidx.collection.LruCache;
@@ -109,16 +110,20 @@ public class SharedPreferencesHelper {
         putLong(key, positions);
     }
 
-    public <K, V> void putLruCache(String key, LruCache<K, V> cache) {
-        Log.d("KEK", "putLruCache----------------");
+    public void putLruCache(String key, LruCache<Long, ListPosition> cache) {
         try {
-            LinkedHashMap<K, V> map = (LinkedHashMap<K, V>) cache.snapshot();
+            LinkedHashMap<Long, ListPosition> map = (LinkedHashMap<Long, ListPosition>) cache.snapshot();
             JSONArray jsonArray = new JSONArray();
-            for (Map.Entry<K, V> entry : map.entrySet()) {
+            for (Map.Entry<Long, ListPosition> entry : map.entrySet()) {
                 JSONObject obj = new JSONObject();
                 obj.put("key", entry.getKey());
-                obj.put("value", entry.getValue());
-                Log.d("KEK", "putLruCache: key: " + entry.getKey() + ", value: " + entry.getValue());
+
+                ListPosition value = entry.getValue();
+                JSONObject valueObj = new JSONObject();
+                valueObj.put("position", value.getPosition());
+                valueObj.put("offset", value.getOffset());
+
+                obj.put("value", valueObj);
                 jsonArray.put(obj);
             }
             putString(key, jsonArray.toString());
@@ -127,11 +132,9 @@ public class SharedPreferencesHelper {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <K, V> LruCache<K, V> getLruCache(String key, int maxCacheSize) {
-        Log.d("KEK", "getLruCache----------------");
+    public LruCache<Long, ListPosition> getLruCache(String key, int maxCacheSize) {
         try {
-            LruCache<K, V> cache = new LruCache<>(maxCacheSize);
+            LruCache<Long, ListPosition> cache = new LruCache<>(maxCacheSize);
 
             String rawData = getString(key);
             if (rawData == null) {
@@ -140,10 +143,15 @@ public class SharedPreferencesHelper {
             JSONArray jsonArray = new JSONArray(rawData);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                K cacheKey = (K) obj.get("key");
-                V cacheValue = (V) obj.get("value");
-                Log.d("KEK", "getLruCache: key: " + cacheKey + ", value: " + cacheValue);
-                cache.put(cacheKey, cacheValue);
+                Long cacheKey = obj.getLong("key");
+
+                JSONObject cacheValue = obj.getJSONObject("value");
+                ListPosition value = new ListPosition(
+                        cacheValue.getInt("position"),
+                        cacheValue.getInt("offset")
+                );
+
+                cache.put(cacheKey, value);
             }
             return cache;
         } catch (JSONException e) {
