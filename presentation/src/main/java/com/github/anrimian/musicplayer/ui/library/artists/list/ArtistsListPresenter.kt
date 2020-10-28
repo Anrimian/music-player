@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor
 import com.github.anrimian.musicplayer.domain.models.artist.Artist
 import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
@@ -25,6 +26,10 @@ class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         subscribeOnArtistsList()
+    }
+
+    fun onStop(listPosition: ListPosition) {
+        interactor.saveListPosition(listPosition)
     }
 
     fun onTryAgainLoadCompositionsClicked() {
@@ -73,6 +78,8 @@ class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
     }
 
     private fun onArtistsReceived(artists: List<Artist>) {
+        val firstReceive = this.artists.isEmpty()
+
         this.artists = artists
         viewState.submitList(artists)
         if (artists.isEmpty()) {
@@ -83,6 +90,12 @@ class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
             }
         } else {
             viewState.showList()
+            if (firstReceive) {
+                val listPosition = interactor.savedListPosition
+                if (listPosition != null) {
+                    viewState.restoreListPosition(listPosition)
+                }
+            }
         }
     }
 

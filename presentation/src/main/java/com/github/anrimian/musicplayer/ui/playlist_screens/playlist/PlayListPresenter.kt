@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.model.Item
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
@@ -16,7 +17,6 @@ import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
-
 
 class PlayListPresenter(private val playListId: Long,
                         private val playerInteractor: LibraryPlayerInteractor,
@@ -57,7 +57,8 @@ class PlayListPresenter(private val playListId: Long,
         }
     }
 
-    fun onStop() {
+    fun onStop(listPosition: ListPosition) {
+        playListsInteractor.saveListPosition(listPosition)
         presenterBatterySafeDisposable.clear()
     }
 
@@ -262,12 +263,21 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun onPlayListsReceived(list: List<PlayListItem>) {
+        val firstReceive = this.items.isEmpty()
+
         items = list
         viewState.updateItemsList(list)
         if (items.isEmpty()) {
             viewState.showEmptyList()
         } else {
             viewState.showList()
+            if (firstReceive) {
+                val listPosition = playListsInteractor.savedListPosition
+                if (listPosition != null) {
+                    viewState.restoreListPosition(listPosition)
+                }
+            }
+
             if (RxUtils.isInactive(currentItemDisposable)) {
                 subscribeOnCurrentComposition()
             }

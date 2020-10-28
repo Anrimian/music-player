@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettin
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
@@ -24,7 +25,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         private val playListsInteractor: PlayListsInteractor,
         private val displaySettingsInteractor: DisplaySettingsInteractor,
         errorParser: ErrorParser,
-        uiScheduler: Scheduler)
+        uiScheduler: Scheduler,
+)
     : AppPresenter<T>(uiScheduler, errorParser) {
     
     private val presenterBatterySafeDisposable = CompositeDisposable()
@@ -58,7 +60,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         }
     }
 
-    fun onStop() {
+    fun onStop(listPosition: ListPosition) {
+        saveListPosition(listPosition)
         presenterBatterySafeDisposable.clear()
     }
 
@@ -275,6 +278,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     private fun onCompositionsReceived(compositions: List<Composition>) {
+        val firstReceive = this.compositions.isEmpty()
+
         this.compositions = compositions
         viewState.updateList(compositions)
         if (compositions.isEmpty()) {
@@ -285,6 +290,13 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
             }
         } else {
             viewState.showList()
+            if (firstReceive) {
+                val listPosition = getSavedListPosition()
+                if (listPosition != null) {
+                    viewState.restoreListPosition(listPosition)
+                }
+            }
+
             if (RxUtils.isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition()
             }
@@ -307,5 +319,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     protected abstract fun getCompositionsObservable(searchText: String?): Observable<List<Composition>>
+    protected abstract fun getSavedListPosition(): ListPosition?
+    protected abstract fun saveListPosition(listPosition: ListPosition)
 
 }

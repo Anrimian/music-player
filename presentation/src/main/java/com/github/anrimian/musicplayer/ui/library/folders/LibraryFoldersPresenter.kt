@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
@@ -67,7 +68,8 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
     }
 
-    fun onStop() {
+    fun onStop(listPosition: ListPosition) {
+        interactor.saveListPosition(folderId, listPosition)
         presenterBatterySafeDisposable.clear()
     }
 
@@ -451,6 +453,8 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     private fun onFilesLoaded(files: List<FileSource>) {
+        val firstReceive = this.sourceList.isEmpty()
+
         sourceList = files
         viewState.updateList(sourceList)
         if (sourceList.isEmpty()) {
@@ -461,6 +465,13 @@ class LibraryFoldersPresenter(private val folderId: Long?,
             }
         } else {
             viewState.showList()
+            if (firstReceive) {
+                val listPosition = interactor.getSavedListPosition(folderId)
+                if (listPosition != null) {
+                    viewState.restoreListPosition(listPosition)
+                }
+            }
+
             if (RxUtils.isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition()
             }
