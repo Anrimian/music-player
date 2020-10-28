@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlists;
 
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
@@ -41,4 +42,7 @@ public interface PlayListsView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showEditPlayListNameDialog(PlayList playListInMenu);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void restoreListPosition(ListPosition listPosition);
 }

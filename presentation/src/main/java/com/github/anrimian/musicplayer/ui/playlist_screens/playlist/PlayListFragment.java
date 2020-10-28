@@ -21,12 +21,14 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
@@ -67,6 +69,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     private AdvancedToolbar toolbar;
     private PlayListItemAdapter adapter;
+    private LinearLayoutManager layoutManager;
     private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
@@ -116,7 +119,7 @@ public class PlayListFragment extends MvpAppCompatFragment
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         RecyclerViewUtils.attachFastScroller(recyclerView, true);
@@ -152,6 +155,12 @@ public class PlayListFragment extends MvpAppCompatFragment
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
+    }
+
+    @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
         progressViewWrapper.hideAll();
@@ -172,6 +181,11 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void updateItemsList(List<PlayListItem> list) {
         adapter.submitList(list);
+    }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
     }
 
     @Override

@@ -55,6 +55,16 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
         return interactor.getGenreItemsObservable(genreId);
     }
 
+    @Override
+    protected ListPosition getSavedListPosition() {
+        return null;
+    }
+
+    @Override
+    protected void saveListPosition(ListPosition listPosition) {
+
+    }
+
     void onFragmentMovedToTop() {
         //save selected genre screen. Wait a little for all screens
     }
@@ -85,15 +95,5 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
     private void onGenreInfoReceived(Genre genre) {
         this.genre = genre;
         getViewState().showGenreInfo(genre);
-    }
-
-    @Override
-    protected ListPosition getSavedListPosition() {
-        return null;
-    }
-
-    @Override
-    protected void saveListPosition(ListPosition listPosition) {
-
     }
 }

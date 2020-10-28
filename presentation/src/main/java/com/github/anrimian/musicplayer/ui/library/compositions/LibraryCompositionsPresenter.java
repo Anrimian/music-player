@@ -36,15 +36,6 @@ public class LibraryCompositionsPresenter
         return interactor.getCompositionsObservable(searchText);
     }
 
-    void onOrderMenuItemClicked() {
-        getViewState().showSelectOrderScreen(interactor.getOrder());
-    }
-
-    void onOrderSelected(Order order) {
-        interactor.setOrder(order);
-        subscribeOnCompositions();
-    }
-
     @Override
     protected ListPosition getSavedListPosition() {
         return interactor.getSavedListPosition();
@@ -53,5 +44,14 @@ public class LibraryCompositionsPresenter
     @Override
     protected void saveListPosition(ListPosition listPosition) {
         interactor.saveListPosition(listPosition);
+    }
+
+    void onOrderMenuItemClicked() {
+        getViewState().showSelectOrderScreen(interactor.getOrder());
+    }
+
+    void onOrderSelected(Order order) {
+        interactor.setOrder(order);
+        subscribeOnCompositions();
     }
 }

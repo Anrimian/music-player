@@ -301,6 +301,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
             preferences.putLruCache(preferenceKey, positions);
         }
 
+        @Nullable
         public ListPosition get(@Nullable Long folderId) {
             return getCachedData().get(mapToNonNull(folderId));
         }

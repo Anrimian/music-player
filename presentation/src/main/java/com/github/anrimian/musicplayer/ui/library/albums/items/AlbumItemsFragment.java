@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
@@ -67,6 +68,7 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
+    private LinearLayoutManager layoutManager;
     private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
@@ -123,7 +125,7 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
@@ -149,6 +151,12 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
         toolbar.setupOptionsMenu(R.menu.album_menu, this::onOptionsItemClicked);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
     }
 
     @Override
@@ -207,7 +215,9 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
     }
 
     @Override
-    public void restoreListPosition(ListPosition listPosition) {}
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
+    }
 
     @Override
     public void onCompositionSelected(Composition composition, int position) {

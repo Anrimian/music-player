@@ -69,4 +69,12 @@ public class LibraryArtistsInteractor {
     public void saveListPosition(ListPosition listPosition) {
         uiStateRepository.saveArtistsListPosition(listPosition);
     }
+
+    public ListPosition getSavedItemsListPosition(long artistId) {
+        return uiStateRepository.getSavedArtistListPosition(artistId);
+    }
+
+    public void saveItemsListPosition(long artistId, ListPosition listPosition) {
+        uiStateRepository.saveArtistListPosition(artistId, listPosition);
+    }
 }

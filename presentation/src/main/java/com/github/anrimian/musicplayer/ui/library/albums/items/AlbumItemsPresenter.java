@@ -53,6 +53,16 @@ public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumI
         return interactor.getAlbumItemsObservable(albumId);
     }
 
+    @Override
+    protected ListPosition getSavedListPosition() {
+        return interactor.getSavedItemsListPosition(albumId);
+    }
+
+    @Override
+    protected void saveListPosition(ListPosition listPosition) {
+        interactor.saveItemsListPosition(albumId, listPosition);
+    }
+
     void onFragmentMovedToTop() {
         //save selected screen. Wait a little for all screens
     }
@@ -74,15 +84,5 @@ public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumI
     private void onAlbumInfoReceived(Album album) {
         this.album = album;
         getViewState().showAlbumInfo(album);
-    }
-
-    @Override
-    protected ListPosition getSavedListPosition() {
-        return null;
-    }
-
-    @Override
-    protected void saveListPosition(ListPosition listPosition) {
-
     }
 }

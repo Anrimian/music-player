@@ -57,6 +57,16 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
         return interactor.getCompositionsByArtist(artistId);
     }
 
+    @Override
+    protected ListPosition getSavedListPosition() {
+        return interactor.getSavedItemsListPosition(artistId);
+    }
+
+    @Override
+    protected void saveListPosition(ListPosition listPosition) {
+        interactor.saveItemsListPosition(artistId, listPosition);
+    }
+
     void onFragmentMovedToTop() {
         //save selected screen. Wait a little for all screens
         if (artist != null) {
@@ -102,15 +112,5 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
 
     private void onArtistInfoReceived(List<Album> albums) {
         getViewState().showArtistAlbums(albums);
-    }
-
-    @Override
-    protected ListPosition getSavedListPosition() {
-        return null;
-    }
-
-    @Override
-    protected void saveListPosition(ListPosition listPosition) {
-
     }
 }

@@ -64,4 +64,12 @@ public class LibraryAlbumsInteractor {
     public ListPosition getSavedListPosition() {
         return uiStateRepository.getSavedAlbumsListPosition();
     }
+
+    public ListPosition getSavedItemsListPosition(long albumId) {
+        return uiStateRepository.getSavedAlbumListPosition(albumId);
+    }
+
+    public void saveItemsListPosition(long albumId, ListPosition listPosition) {
+        uiStateRepository.saveAlbumListPosition(albumId, listPosition);
+    }
 }

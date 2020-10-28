@@ -9,17 +9,18 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentPlayListsBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.PlaylistSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
@@ -49,6 +50,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
     private FragmentPlayListsBinding viewBinding;
 
     private PlayListsAdapter adapter;
+    private LinearLayoutManager layoutManager;
     private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<MenuDialogFragment> menuDialogRunner;
@@ -74,7 +76,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.hideAll();
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         viewBinding.recyclerView.setLayoutManager(layoutManager);
 
         RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView);
@@ -108,6 +110,12 @@ public class PlayListsFragment extends MvpAppCompatFragment
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
+    }
+
+    @Override
     public void showEmptyList() {
         progressViewWrapper.hideAll();
         progressViewWrapper.showMessage(R.string.play_lists_on_device_not_found, false);
@@ -126,6 +134,11 @@ public class PlayListsFragment extends MvpAppCompatFragment
     @Override
     public void updateList(List<PlayList> lists) {
         adapter.submitList(lists);
+    }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
     }
 
     @Override

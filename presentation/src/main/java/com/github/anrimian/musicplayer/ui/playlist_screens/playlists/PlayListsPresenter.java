@@ -2,9 +2,11 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlists;
 
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Scheduler;
@@ -19,6 +21,8 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
     private final ErrorParser errorParser;
 
     private final CompositeDisposable presenterDisposable = new CompositeDisposable();
+
+    private List<PlayList> playLists = new ArrayList<>();
 
     public PlayListsPresenter(PlayListsInteractor playListsInteractor,
                               Scheduler uiScheduler,
@@ -38,6 +42,10 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
     public void onDestroy() {
         super.onDestroy();
         presenterDisposable.dispose();
+    }
+
+    public void onStop(ListPosition listPosition) {
+        playListsInteractor.saveListPosition(listPosition);
     }
 
     void onPlayListLongClick(PlayList playList) {
@@ -79,11 +87,20 @@ public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
     }
 
     private void onPlayListsReceived(List<PlayList> list) {
+        boolean firstReceive = this.playLists.isEmpty();
+
+        this.playLists = list;
         getViewState().updateList(list);
         if (list.isEmpty()) {
             getViewState().showEmptyList();
         } else {
             getViewState().showList();
+            if (firstReceive) {
+                ListPosition listPosition = playListsInteractor.getSavedListPosition();
+                if (listPosition != null) {
+                    getViewState().restoreListPosition(listPosition);
+                }
+            }
         }
     }
 }

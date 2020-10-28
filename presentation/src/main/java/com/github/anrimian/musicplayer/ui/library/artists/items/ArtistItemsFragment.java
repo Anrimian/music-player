@@ -31,6 +31,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistAlbumsPresenter;
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistItemsAdapter;
@@ -77,6 +78,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
     private AdvancedToolbar toolbar;
     private ArtistItemsAdapter adapter;
+    private LinearLayoutManager layoutManager;
     private ProgressViewWrapper progressViewWrapper;
 
     private final BooleanConditionRunner showNoCompositionsRunner = new BooleanConditionRunner(2,
@@ -142,7 +144,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
                 this::onAlbumsScrolled);
         recyclerView.setAdapter(adapter);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
@@ -181,6 +183,12 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
         toolbar.setupOptionsMenu(R.menu.artist_menu, this::onOptionsItemClicked);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
     }
 
     @Override
@@ -245,7 +253,9 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     }
 
     @Override
-    public void restoreListPosition(ListPosition listPosition) {}
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
+    }
 
     @Override
     public void showArtistAlbums(List<Album> albums) {
