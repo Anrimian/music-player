@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +23,13 @@ import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposit
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
@@ -59,6 +62,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @InjectPresenter
     LibraryCompositionsPresenter presenter;
 
+    private LinearLayoutManager layoutManager;
     private RecyclerView recyclerView;
     private View fab;
     private CoordinatorLayout clListContainer;
@@ -103,7 +107,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
         progressViewWrapper.hideAll();
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         RecyclerViewUtils.attachFastScroller(recyclerView, true);
@@ -152,7 +156,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void onStop() {
         super.onStop();
-        presenter.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
     }
 
     @Override
@@ -197,8 +201,13 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     }
 
     @Override
-    public void updateList(List<Composition> list) {
-        adapter.submitList(list);
+    public void updateList(List<Composition> genres) {
+        adapter.submitList(genres);
+    }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
     }
 
     @Override

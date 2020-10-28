@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFolders
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.folders.root.FolderRootPresenter;
 
@@ -36,11 +37,13 @@ public class LibraryFilesModule {
     LibraryFoldersScreenInteractor libraryFilesInteractor(LibraryFoldersInteractor foldersInteractor,
                                                           LibraryRepository libraryRepository,
                                                           EditorRepository editorRepository,
-                                                          MediaScannerRepository mediaScannerRepository) {
+                                                          MediaScannerRepository mediaScannerRepository,
+                                                          UiStateRepository uiStateRepository) {
         return new LibraryFoldersScreenInteractor(foldersInteractor,
                 libraryRepository,
                 editorRepository,
-                mediaScannerRepository);
+                mediaScannerRepository,
+                uiStateRepository);
     }
 
 }

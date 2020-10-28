@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
@@ -35,6 +36,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -91,6 +93,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private FragmentLibraryFoldersBinding viewBinding;
     private RecyclerView recyclerView;
     private CoordinatorLayout clListContainer;
+    private LinearLayoutManager layoutManager;
 
     private final CompositeDisposable fragmentDisposable = new CompositeDisposable();
 
@@ -142,7 +145,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
         progressViewWrapper.hideAll();
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         RecyclerViewUtils.attachFastScroller(recyclerView, true);
@@ -217,7 +220,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             SlidrPanel.replace(viewBinding.contentContainer,
                     () -> {
                         toolbar.showSelectionMode(0);
-                        FragmentNavigation.from(requireFragmentManager()).goBack();
+                        FragmentNavigation.from(getParentFragmentManager()).goBack();
                     },
                     slidrConfig);
         }
@@ -232,7 +235,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void onStop() {
         super.onStop();
-        presenter.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
     }
 
     @Override
@@ -299,7 +302,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void goBackToParentFolderScreen() {
-        FragmentNavigation.from(requireFragmentManager()).goBack();
+        FragmentNavigation.from(getParentFragmentManager()).goBack();
     }
 
     @Override
@@ -407,7 +410,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void goToMusicStorageScreen(Long folderId) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(LibraryFoldersFragment.newInstance(folderId));
     }
 
@@ -490,6 +493,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showCurrentComposition(CurrentComposition currentComposition) {
         adapter.showCurrentComposition(currentComposition);
+    }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
     }
 
     @Override
@@ -662,7 +670,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             }
             case R.id.menu_excluded_folders: {
                 //noinspection ConstantConditions
-                FragmentNavigation.from(getParentFragment().requireFragmentManager())
+                FragmentNavigation.from(getParentFragment().getParentFragmentManager())
                         .addNewFragment(new ExcludedFoldersFragment());
                 break;
             }

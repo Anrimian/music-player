@@ -19,11 +19,13 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.ArtistSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragment;
@@ -63,6 +65,7 @@ public class ArtistsListFragment extends LibraryFragment implements
     private AdvancedToolbar toolbar;
     private ArtistsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
+    private LinearLayoutManager layoutManager;
 
     private DialogFragmentRunner<MenuDialogFragment> artistMenuDialogRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editArtistNameDialogRunner;
@@ -100,7 +103,7 @@ public class ArtistsListFragment extends LibraryFragment implements
                 this::onArtistLongClick);
         recyclerView.setAdapter(adapter);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         RecyclerViewUtils.attachFastScroller(recyclerView);
@@ -130,6 +133,12 @@ public class ArtistsListFragment extends LibraryFragment implements
         toolbar.setSubtitle(R.string.artists);
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
         toolbar.setupOptionsMenu(R.menu.library_artists_menu, this::onOptionsItemClicked);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
     }
 
     @Override
@@ -169,6 +178,11 @@ public class ArtistsListFragment extends LibraryFragment implements
     @Override
     public void submitList(List<Artist> artists) {
         adapter.submitList(artists);
+    }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
     }
 
     @Override
@@ -220,7 +234,7 @@ public class ArtistsListFragment extends LibraryFragment implements
     }
 
     private void goToArtistScreen(Artist artist) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(ArtistItemsFragment.newInstance(artist.getId()));
     }
 

@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.library.albums.list;
 
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
@@ -40,4 +41,7 @@ public interface AlbumsListView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showSelectOrderScreen(Order order);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void restoreListPosition(ListPosition listPosition);
 }

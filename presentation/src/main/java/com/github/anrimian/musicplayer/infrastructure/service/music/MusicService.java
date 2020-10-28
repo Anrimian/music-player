@@ -203,7 +203,16 @@ public class MusicService extends Service {
     }
 
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
-        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
+        /* player interactor not null check because case:
+        * 1) start-stop play
+        * 2) enable bluetooth connection receiver
+        * 3) hide activity
+        * 4) revoke permission
+        * 5) connect bluetooth device
+        * 6) use play button from device
+        * 7) resume activity from task manager
+        */
+        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY && playerInteractor != null) {
             playerInteractor.play();
         }
     }
