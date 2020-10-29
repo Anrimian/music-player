@@ -10,7 +10,6 @@ import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
@@ -21,14 +20,19 @@ import org.jaudiotagger.tag.datatype.Artwork;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
+
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 
 public class CompositionSourceEditor {
 
@@ -322,16 +326,33 @@ public class CompositionSourceEditor {
         return file.getTag();
     }
 
-    private void editFile(String filePath, FieldKey genericKey, String value) throws IOException,
-            TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException,
-            CannotWriteException {
-        AudioFile file = AudioFileIO.read(new File(filePath));
-        Tag tag = file.getTag();
-        if (tag == null) {
-            tag = new ID3v24Tag();
-            file.setTag(tag);
+    private void editFile(String filePath, FieldKey genericKey, String value) throws Exception {
+        fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
+            File fileToEdit = new File(filePath);
+            copyFileUsingStream(fileToEdit, tempFile);
+
+            AudioFile audioFile = AudioFileIO.read(tempFile);
+            Tag tag = audioFile.getTag();
+            if (tag == null) {
+                tag = new ID3v24Tag();
+                audioFile.setTag(tag);
+            }
+            tag.setField(genericKey, value == null? "" : value);
+            AudioFileIO.write(audioFile);
+
+            copyFileUsingStream(tempFile, fileToEdit);//open failed: EACCES (Permission denied)
+        });
+    }
+
+    private static void copyFileUsingStream(File source, File dest) throws IOException {
+        try (InputStream is = new FileInputStream(source);
+             OutputStream os = new FileOutputStream(dest)
+        ) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
         }
-        tag.setField(genericKey, value == null? "" : value);
-        AudioFileIO.write(file);
     }
 }
