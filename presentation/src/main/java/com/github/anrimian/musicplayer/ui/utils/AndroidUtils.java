@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -268,8 +269,7 @@ public class AndroidUtils {
             Window window = dialog.getWindow();
             if (window != null) {
                 int color = AndroidUtils.getColorFromAttr(dialog.getContext(), attrRes);
-                DisplayMetrics metrics = new DisplayMetrics();
-                window.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                int screenHeight = getScreenHeight(window);
 
                 GradientDrawable dimDrawable = new GradientDrawable();
 
@@ -280,16 +280,30 @@ public class AndroidUtils {
                 Drawable[] layers = {dimDrawable, navigationBarDrawable};
 
                 LayerDrawable windowBackground = new LayerDrawable(layers);
-                windowBackground.setLayerInsetTop(1, metrics.heightPixels);
+                windowBackground.setLayerInsetTop(1, screenHeight);
 
                 window.setBackgroundDrawable(windowBackground);
+                window.setNavigationBarColor(color);
 
                 if (ColorUtils.calculateLuminance(color) >= 0.5f) {//white
-                    View decorView = window.getDecorView();
-                    decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {//fast fix for dialog nav bar on android 11
+                        View decorView = window.getDecorView();
+                        decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                    }
                 }
             }
         }
+    }
+
+    public static int getScreenHeight(@NonNull Window window) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowMetrics windowMetrics = window.getWindowManager().getCurrentWindowMetrics();
+            return windowMetrics.getBounds().height();
+        }
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        window.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.heightPixels;
+
     }
 
     public static void clearVectorAnimationInfo(ImageView imageView) {
