@@ -200,11 +200,17 @@
     <string name="change_cover">Change cover</string>
     <string name="pick_from_gallery">Pick from gallery</string>
     <string name="remove_cover">Remove cover</string>
+<!--    remove!-->
     <string name="changing_cover_progress">Changing cover…</string>
     <string name="editor_timeout_error">Tag editor timed out. Perhaps file format is unsupported</string>
     <string name="change_lyrics">Change lyrics</string>
     <string name="lyrics">Lyrics</string>
     <string name="check_tags_error">Failed to check composition tags: %s</string>
+    <string name="changing_file_progress">Changing file…</string>
+<!--    remove!-->
+    <string name="android_r_edit_file_permission_denied">
+        From system version 11 editing and deleting files requires explicit permission
+    </string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

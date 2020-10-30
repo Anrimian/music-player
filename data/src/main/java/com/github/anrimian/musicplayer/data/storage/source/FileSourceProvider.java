@@ -31,8 +31,11 @@ public class FileSourceProvider {
 
     public void useTempFile(String name, ThrowsCallback<File> fileFunction) throws Exception {
         File file = getTempFile(name);
-        fileFunction.call(file);
-        file.delete();
+        try {
+            fileFunction.call(file);
+        } finally {
+            file.delete();
+        }
     }
 
     private File getTempFile(String name) throws IOException {
