@@ -366,9 +366,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        editorErrorHandler.handleEditorError(this, errorCommand, () -> {
-            makeSnackbar(viewBinding.container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
-        });
+        editorErrorHandler.handleEditorError(this, errorCommand, () ->
+                makeSnackbar(viewBinding.container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
+        );
     }
 
     @Override
@@ -450,6 +450,6 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     private void showEditorRequestDeniedMessage() {
-        makeSnackbar(viewBinding.container, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_SHORT).show();
+        makeSnackbar(viewBinding.container, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
     }
 }

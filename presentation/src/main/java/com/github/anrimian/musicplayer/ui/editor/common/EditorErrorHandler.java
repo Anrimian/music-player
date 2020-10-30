@@ -18,11 +18,13 @@ public class EditorErrorHandler {
     private static final int EDIT_REQUEST_CODE = 1;
     private static final String EDITOR_REQUEST_FRAGMENT_TAG = "editor_request_fragment";
 
+    private EditRequestFragment fragment;
+
     public EditorErrorHandler(AppCompatActivity activity,
                               Runnable onPermissionGranted,
                               Runnable onPermissionDenied) {
         FragmentManager fm =  activity.getSupportFragmentManager();
-        EditRequestFragment fragment = (EditRequestFragment) fm.findFragmentByTag(EDITOR_REQUEST_FRAGMENT_TAG);
+        fragment = (EditRequestFragment) fm.findFragmentByTag(EDITOR_REQUEST_FRAGMENT_TAG);
         if (fragment == null) {
             fragment = new EditRequestFragment();
             fm.beginTransaction()
@@ -38,7 +40,7 @@ public class EditorErrorHandler {
                                   Runnable defaultAction) {
         if (errorCommand instanceof EditorErrorCommand) {
             try {
-                activity.startIntentSenderForResult(
+                fragment.startIntentSenderForResult(
                         ((EditorErrorCommand) errorCommand).getIntentSender(),
                         EDIT_REQUEST_CODE,
                         null,
@@ -71,9 +73,9 @@ public class EditorErrorHandler {
             switch (requestCode) {
                 case EditorErrorHandler.EDIT_REQUEST_CODE: {
                     if (resultCode == Activity.RESULT_OK) {
-                        onPermissionGranted.run();//seems not called after recreation
+                        onPermissionGranted.run();
                     } else {
-                        onPermissionDenied.run();//seems not called
+                        onPermissionDenied.run();
                     }
                 }
                 default: super.onActivityResult(requestCode, resultCode, data);
