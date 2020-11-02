@@ -33,7 +33,10 @@
     <color name="color_control_highlight_light">#80BDBDBD</color>
 
     <color name="popup_menu_background_color">#fff</color>
-<!-- leave for future ideas  -->
+
+    <color name="cover_dark_foreground">#33000000</color>
+
+    <!-- leave for future ideas  -->
 <!--    <color name="player_panel_background">#F6F6F6</color>-->
 
     <color name="light_background_level_1">#fafafa</color>
@@ -87,4 +90,5 @@
     <color name="colorTealPrimary">#009688</color>
     <color name="colorTealPrimaryDark">#00796B</color>
     <color name="colorPinkAccent">#FF4081</color>
+
 </resources>

@@ -9,6 +9,9 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -30,6 +33,9 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     private FullComposition composition;
 
     private ShortGenre removedGenre;
+
+    @Nullable
+    private Completable lastEditAction;
 
     public CompositionEditorPresenter(long compositionId,
                                       EditorInteractor editorInteractor,
@@ -155,9 +161,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.addCompositionGenre(composition, genre)
+        lastEditAction = editorInteractor.addCompositionGenre(composition, genre)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -167,9 +175,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.changeCompositionGenre(composition, oldGenre, newName)
+        lastEditAction = editorInteractor.changeCompositionGenre(composition, oldGenre, newName)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -179,9 +189,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.removeCompositionGenre(composition, genre)
+        lastEditAction = editorInteractor.removeCompositionGenre(composition, genre)
                 .observeOn(uiScheduler)
-                .subscribe(() -> onGenreRemoved(genre), this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> onGenreRemoved(genre), this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -198,9 +210,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.editCompositionAuthor(composition, author)
+        lastEditAction = editorInteractor.editCompositionAuthor(composition, author)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -210,9 +224,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.editCompositionAlbum(composition, album)
+        lastEditAction = editorInteractor.editCompositionAlbum(composition, album)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -222,9 +238,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.editCompositionAlbumArtist(composition, artist)
+        lastEditAction = editorInteractor.editCompositionAlbumArtist(composition, artist)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -234,9 +252,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.editCompositionTitle(composition, title)
+        lastEditAction = editorInteractor.editCompositionTitle(composition, title)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -246,9 +266,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.editCompositionFileName(composition, fileName)
+        lastEditAction = editorInteractor.editCompositionFileName(composition, fileName)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -258,9 +280,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.editCompositionLyrics(composition, text)
+        lastEditAction = editorInteractor.editCompositionLyrics(composition, text)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -283,11 +307,11 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
             return;
         }
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.removeCompositionAlbumArt(composition)
+        lastEditAction = editorInteractor.removeCompositionAlbumArt(composition)
                 .observeOn(uiScheduler)
-                .doOnSubscribe(d -> getViewState().showChangeCoverProgress())
-                .doFinally(() -> getViewState().hideChangeCoverProgress())
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -300,12 +324,22 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
             return;
         }
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.changeCompositionAlbumArt(composition, imageSource)
+        lastEditAction = editorInteractor.changeCompositionAlbumArt(composition, imageSource)
                 .observeOn(uiScheduler)
-                .doOnSubscribe(d -> getViewState().showChangeCoverProgress())
-                .doFinally(() -> getViewState().hideChangeCoverProgress())
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe(d -> getViewState().showChangeFileProgress())
+                .doFinally(() -> getViewState().hideChangeFileProgress());
+        changeDisposable =  lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
+    }
+
+    void onRetryFailedEditActionClicked() {
+        if (lastEditAction != null) {
+            dispose(changeDisposable, presenterDisposable);
+            changeDisposable = lastEditAction
+                    .doFinally(() -> lastEditAction = null)
+                    .subscribe(() -> {}, this::onDefaultError);
+            presenterDisposable.add(changeDisposable);
+        }
     }
 
     private void onDefaultError(Throwable throwable) {

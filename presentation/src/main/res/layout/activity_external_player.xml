@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_music_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -15,6 +15,7 @@
         android:scaleType="centerCrop"
         android:layout_marginTop="@dimen/content_vertical_margin"
         android:layout_marginStart="@dimen/content_horizontal_margin"
+        app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:srcCompat="@drawable/ic_music_placeholder" />
