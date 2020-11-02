@@ -15,10 +15,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.DrawableImageViewTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
@@ -51,7 +55,9 @@ public class CoverImageLoader {
         this.themeController = themeController;
     }
 
-    public void displayImage(@NonNull ImageView imageView, @NonNull Composition data) {
+    public void displayImage(@NonNull ImageView imageView,
+                             @NonNull Composition data,
+                             Callback<Boolean> listener) {
         if (!isValidContextForGlide(imageView)) {
             return;
         }
@@ -61,6 +67,26 @@ public class CoverImageLoader {
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e,
+                                                Object model,
+                                                Target<Drawable> target,
+                                                boolean isFirstResource) {
+                        listener.call(false);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource,
+                                                   Object model,
+                                                   Target<Drawable> target,
+                                                   DataSource dataSource,
+                                                   boolean isFirstResource) {
+                        listener.call(true);
+                        return false;
+                    }
+                })
                 .into(imageView);
     }
 

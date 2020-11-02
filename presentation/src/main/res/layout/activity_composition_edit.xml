@@ -45,12 +45,13 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
-                <de.hdodenhof.circleimageview.CircleImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/iv_cover"
                     style="@style/ImageStyle"
                     android:scaleType="centerCrop"
                     android:layout_marginTop="@dimen/content_internal_margin"
                     android:importantForAccessibility="no"
+                    app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
                     app:layout_constraintStart_toStartOf="@+id/tv_cover_hint"
                     app:layout_constraintTop_toBottomOf="@id/tv_cover_hint"
                     tools:src="@drawable/ic_music_placeholder"/>

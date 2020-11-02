@@ -154,13 +154,14 @@
         app:layout_constraintBottom_toTopOf="@id/sb_track_state"
         app:layout_constraintLeft_toLeftOf="@id/tv_played_time">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_music_icon"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="@string/folder"
             android:layout_gravity="center|start"
             android:scaleType="centerCrop"
+            app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
             tools:srcCompat="@drawable/ic_music_placeholder" />
 
     </FrameLayout>

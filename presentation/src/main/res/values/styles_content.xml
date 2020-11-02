@@ -141,6 +141,12 @@
     <style name="ImageStyle.ItemImage">
         <item name="android:layout_width">40dp</item>
         <item name="android:layout_height">40dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.CircleImageView</item>
+    </style>
+
+    <style name="ShapeAppearance.CircleImageView" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 
     <style name="ImageStyle.Small">
