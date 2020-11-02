@@ -29,7 +29,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.WindowMetrics;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -286,7 +285,8 @@ public class AndroidUtils {
                 window.setNavigationBarColor(color);
 
                 if (ColorUtils.calculateLuminance(color) >= 0.5f) {//white
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {//fast fix for dialog nav bar on android 11
+//                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {//fast fix for dialog nav bar on android 11
+                    if (Build.VERSION.SDK_INT < 30) {//fast fix for dialog nav bar on android 11
                         View decorView = window.getDecorView();
                         decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
                     }
@@ -296,10 +296,10 @@ public class AndroidUtils {
     }
 
     public static int getScreenHeight(@NonNull Window window) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            WindowMetrics windowMetrics = window.getWindowManager().getCurrentWindowMetrics();
-            return windowMetrics.getBounds().height();
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            WindowMetrics windowMetrics = window.getWindowManager().getCurrentWindowMetrics();
+//            return windowMetrics.getBounds().height();
+//        }
         DisplayMetrics displayMetrics = new DisplayMetrics();
         window.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         return displayMetrics.heightPixels;
