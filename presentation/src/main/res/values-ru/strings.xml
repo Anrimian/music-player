@@ -221,7 +221,7 @@
     <string name="check_tags_error">Не удалось проверить теги композиции: %s</string>
     <string name="changing_file_progress">Изменение файла…</string>
     <string name="android_r_edit_file_permission_denied">
-        Начиная с Android 11 редактирование и удаление файлов требует явного разрешения
+        Начиная с Android 11 редактирование и удаление файлов требует явного разрешения системы
     </string>
 
     <plurals name="compositions_count">
