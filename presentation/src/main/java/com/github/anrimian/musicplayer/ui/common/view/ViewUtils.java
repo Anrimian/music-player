@@ -11,7 +11,10 @@ public class ViewUtils {
     public static ListPosition getListPosition(LinearLayoutManager layoutManager) {
         int position = layoutManager.findFirstVisibleItemPosition();
         View v = layoutManager.findViewByPosition(position);
-        int offset = v.getTop();
+        int offset = 0;
+        if (v != null) {
+            offset = v.getTop();
+        }
         return new ListPosition(position, offset);
     }
 
