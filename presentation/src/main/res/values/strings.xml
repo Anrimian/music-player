@@ -206,7 +206,7 @@
     <string name="check_tags_error">Failed to check composition tags: %s</string>
     <string name="changing_file_progress">Changing file…</string>
     <string name="android_r_edit_file_permission_denied">
-        From Android 11 editing and deleting files requires explicit permission
+        From Android 11 editing and deleting files requires explicit system permission
     </string>
 
     <plurals name="compositions_count">
