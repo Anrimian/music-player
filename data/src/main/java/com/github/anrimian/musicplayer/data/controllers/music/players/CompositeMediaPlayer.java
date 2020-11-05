@@ -84,6 +84,11 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
+    public void seekBy(long millis) {
+        currentPlayer.seekBy(millis);
+    }
+
+    @Override
     public void release() {
         currentPlayer.release();
     }

@@ -63,6 +63,18 @@ public class PlayerCoordinatorInteractor {
         }
     }
 
+    public void fastSeekForward(PlayerType playerType) {
+        if (playerType == activePlayerType) {
+            playerInteractor.fastSeekForward();
+        }
+    }
+
+    public void fastSeekBackward(PlayerType playerType) {
+        if (playerType == activePlayerType) {
+            playerInteractor.fastSeekBackward();
+        }
+    }
+
     public void prepareToPlay(CompositionSource compositionSource, PlayerType playerType) {
         preparedSourcesMap.put(playerType, compositionSource);
         if (playerType == activePlayerType) {

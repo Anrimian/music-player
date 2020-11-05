@@ -96,6 +96,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
+    public void seekBy(long millis) {
+        mediaPlayer.seekBy(millis);
+    }
+
+    @Override
     public long getTrackPosition() {
         return mediaPlayer.getTrackPosition();
     }
