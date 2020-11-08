@@ -11,15 +11,10 @@ import android.widget.RemoteViews;
 import androidx.annotation.LayoutRes;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetDataHolder;
-import com.github.anrimian.musicplayer.utils.Permissions;
 
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
@@ -31,11 +26,12 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_UPDATE_TIME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.RANDOM_PLAY_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.REPEAT_ARG;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
-import static com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater.ACTION_UPDATE_COMPOSITION;
-import static com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater.ACTION_UPDATE_QUEUE;
-import static com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater.WIDGET_ACTION;
+import static com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater.UPDATE_FROM_INTENT;
 
 
 public abstract class BaseWidgetProvider extends AppWidgetProvider {
@@ -50,37 +46,31 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         String compositionAuthor;
         long compositionId;
         long compositionUpdateTime;
-        if (ACTION_UPDATE_COMPOSITION.equals(intent.getStringExtra(WIDGET_ACTION))) {
+        int queueSize;
+        boolean play = false;
+        boolean randomPlayModeEnabled;
+        int repeatMode;
+        boolean showCovers;
+        if (intent.getBooleanExtra(UPDATE_FROM_INTENT, false)) {
             compositionName = intent.getStringExtra(COMPOSITION_NAME_ARG);
             compositionAuthor = intent.getStringExtra(COMPOSITION_AUTHOR_ARG);
             compositionId = intent.getLongExtra(COMPOSITION_ID_ARG, 0);
             compositionUpdateTime = intent.getLongExtra(COMPOSITION_UPDATE_TIME_ARG, 0);
+            queueSize = intent.getIntExtra(QUEUE_SIZE_ARG, 0);
+            play = intent.getBooleanExtra(PLAY_ARG, false);
+            randomPlayModeEnabled = intent.getBooleanExtra(RANDOM_PLAY_ARG, false);
+            repeatMode = intent.getIntExtra(REPEAT_ARG, RepeatMode.NONE);
+            showCovers = intent.getBooleanExtra(RANDOM_PLAY_ARG, false);
         } else {
             compositionName = WidgetDataHolder.getCompositionName(context);
             compositionAuthor = WidgetDataHolder.getCompositionAuthor(context);
             compositionId = WidgetDataHolder.getCompositionId(context);
             compositionUpdateTime = WidgetDataHolder.getCompositionUpdateTime(context);
-        }
-
-        int queueSize;
-        if (ACTION_UPDATE_QUEUE.equals(intent.getStringExtra(WIDGET_ACTION))) {
-            queueSize = intent.getIntExtra(QUEUE_SIZE_ARG, 0);
-        } else {
             queueSize = WidgetDataHolder.getCurrentQueueSize(context);
+            randomPlayModeEnabled = WidgetDataHolder.isRandomPlayModeEnabled(context);
+            repeatMode = WidgetDataHolder.getRepeatMode(context);
+            showCovers = WidgetDataHolder.isShowCoversEnabled(context);
         }
-
-        AppComponent appComponent = Components.getAppComponent();
-        boolean play = false;
-        boolean randomPlayModeEnabled = false;
-        int repeatMode = RepeatMode.NONE;
-        if (Permissions.hasFilePermission(context)) {
-            LibraryPlayerInteractor musicPlayerInteractor = appComponent.musicPlayerInteractor();
-            play = musicPlayerInteractor.getPlayerState() == PlayerState.PLAY;
-            randomPlayModeEnabled = musicPlayerInteractor.isRandomPlayingEnabled();
-            repeatMode = musicPlayerInteractor.getRepeatMode();
-        }
-
-        boolean showCovers = appComponent.displaySettingsInteractor().isCoversEnabled();
 
         boolean enabled = true;
         if (isEmpty(compositionName)) {
