@@ -148,7 +148,12 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     public void release() {
         pausePlayer();
         stopTracingTrackPosition();
-        player.release();
+        try {
+            player.release();
+        } catch (Exception ignored) {
+            //can be IllegalArgumentException here, remove after exo player will fix release
+            //https://github.com/google/ExoPlayer/issues/8087z
+        }
     }
 
     private void startPlayWhenReady() {
