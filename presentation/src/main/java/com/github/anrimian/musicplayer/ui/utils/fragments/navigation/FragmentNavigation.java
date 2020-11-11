@@ -57,7 +57,7 @@ public class FragmentNavigation {
             container = new NavigationFragment();
             fm.beginTransaction()
                     .add(container, NAVIGATION_FRAGMENT_TAG)
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         }
         return container.getFragmentNavigation();
     }
@@ -132,7 +132,7 @@ public class FragmentNavigation {
                         }
 
                     })
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         });
     }
 
@@ -170,7 +170,7 @@ public class FragmentNavigation {
                         }
 
                     })
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         });
     }
 
@@ -194,7 +194,7 @@ public class FragmentNavigation {
                         notifyStackListeners();
                         notifyFragmentMovedToTop(getFragmentOnTop());
                     })
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         });
     }
 
@@ -246,7 +246,7 @@ public class FragmentNavigation {
                         notifyFragmentMovedToTop(getFragmentOnTop());
                         scheduleBottomFragmentClearing(getAnimationDuration(enterAnimation));
                     })
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         });
     }
 
@@ -289,7 +289,7 @@ public class FragmentNavigation {
                 ft.remove(fragmentOnBottom);
             }
             ft.runOnCommit(this::notifyStackListeners)
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         });
     }
 
@@ -416,7 +416,7 @@ public class FragmentNavigation {
             fm.beginTransaction()
                     .replace(jugglerView.getBottomViewId(), createFragment(bottomFragment, fm))
                     .runOnCommit(this::hideBottomFragmentMenu)
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         }
     }
 
@@ -438,7 +438,7 @@ public class FragmentNavigation {
             fm.beginTransaction()
                     .remove(fragment)
                     .runOnCommit(() -> fragment.setMenuVisibility(false))
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         }
     }
 
@@ -487,7 +487,7 @@ public class FragmentNavigation {
                                 notifyStackListeners();
                                 scheduleFragmentAtBottomReplacing(getAnimationDuration(exitAnimation));
                             })
-                            .commitAllowingStateLoss();
+                            .commitNowAllowingStateLoss();
                 }
             });
             try {
@@ -513,7 +513,7 @@ public class FragmentNavigation {
             bottomFragment.setMenuVisibility(false);
             fm.beginTransaction()
                     .replace(id, bottomFragment)
-                    .commitAllowingStateLoss();
+                    .commitNowAllowingStateLoss();
         }
         synchronized (backLock) {
             backLock.notify();
