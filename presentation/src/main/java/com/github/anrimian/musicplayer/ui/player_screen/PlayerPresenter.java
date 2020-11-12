@@ -62,7 +62,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        getViewState().setSkipToNextButtonEnabled(true);
         if (playerScreenInteractor.isPlayerPanelOpen()) {
             getViewState().expandBottomPanel();
         } else {
@@ -379,7 +378,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         playQueue = list;
         getViewState().showPlayQueueSubtitle(playQueue.size());
         getViewState().setMusicControlsEnabled(!playQueue.isEmpty());
-        getViewState().setSkipToNextButtonEnabled(playQueue.size() > 1);
         getViewState().updatePlayQueue(list);
     }
 

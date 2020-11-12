@@ -5,8 +5,21 @@ import android.view.View;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.RepeatListener;
 
 public class ViewUtils {
+
+    private static final int REWIND_HOLD_START_MILLIS = 500;
+    private static final int REWIND_HOLD_INTERVAL_MILLIS = 400;
+
+    public static void setOnHoldListener(View view, Runnable runnable) {
+        view.setOnTouchListener(new RepeatListener(
+                REWIND_HOLD_START_MILLIS,
+                REWIND_HOLD_INTERVAL_MILLIS,
+                () -> AndroidUtils.playShortVibration(view.getContext()),
+                runnable));
+    }
 
     public static ListPosition getListPosition(LinearLayoutManager layoutManager) {
         int position = layoutManager.findFirstVisibleItemPosition();

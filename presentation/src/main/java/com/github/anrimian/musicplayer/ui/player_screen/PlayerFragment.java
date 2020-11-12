@@ -65,7 +65,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFr
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
-import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
@@ -96,6 +95,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
@@ -273,9 +273,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 () -> playerPanelWrapper.isBottomPanelExpanded());
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
-        ViewUtils.setOnHoldListener(ivSkipToPrevious, 300, 500, presenter::onRewindBackwardCalled);
+        setOnHoldListener(ivSkipToPrevious, presenter::onRewindBackwardCalled);
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
-        ViewUtils.setOnHoldListener(ivSkipToNext, 300, 500, presenter::onRewindForwardCalled);
+        setOnHoldListener(ivSkipToNext, presenter::onRewindForwardCalled);
         btnRepeatMode.setOnClickListener(this::onRepeatModeButtonClicked);
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
@@ -608,11 +608,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showPlayQueueSubtitle(int size) {
         tvQueueSubtitle.setText(getResources().getQuantityString(R.plurals.compositions_count, size, size));
-    }
-
-    @Override
-    public void setSkipToNextButtonEnabled(boolean enabled) {
-        ivSkipToNext.setEnabled(enabled);
     }
 
     @Override

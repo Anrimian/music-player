@@ -145,15 +145,17 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void seekBy(long millis) {
-        long targetPosition = getTrackPosition() + millis;
+    public long seekBy(long millis) {
+        long currentPosition = getTrackPosition();
+        long targetPosition = currentPosition + millis;
         if (targetPosition < 0) {
             targetPosition = 0;
         }
         if (targetPosition > player.getDuration()) {
-            return;
+            return currentPosition;
         }
         seekTo(targetPosition);
+        return targetPosition;
     }
 
     @Override

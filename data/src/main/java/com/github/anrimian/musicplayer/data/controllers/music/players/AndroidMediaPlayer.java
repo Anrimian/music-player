@@ -174,17 +174,22 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void seekBy(long millis) {
+    public long seekBy(long millis) {
+        long currentPosition = getTrackPosition();
         try {
-            long targetPosition = getTrackPosition() + millis;
+            long targetPosition = currentPosition + millis;
             if (targetPosition < 0) {
                 targetPosition = 0;
             }
             if (targetPosition > mediaPlayer.getDuration()) {
-                return;
+                return currentPosition;
             }
             seekTo(targetPosition);
-        } catch (IllegalStateException ignored) {}
+            return targetPosition;
+
+        } catch (IllegalStateException ignored) {
+            return currentPosition;
+        }
     }
 
     @Override

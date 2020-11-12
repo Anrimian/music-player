@@ -25,7 +25,7 @@ public interface AppMediaPlayer {
 
     long getTrackPosition();
 
-    void seekBy(long millis);
+    long seekBy(long millis);
 
     void release();
 }

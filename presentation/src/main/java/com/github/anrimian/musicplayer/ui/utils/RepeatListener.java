@@ -8,26 +8,30 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 
 //often click doesn't work - fixed
-//move out of view bounds
+//move out of view bounds - done
+//add vibration after rewind starts - done
+//save positions after rewind - done
+//remove skip to next button disabling behavior - removed
 
 //increasing rewind speed
-//save positions after rewind
-//add vibration after rewind starts
+//add answer to so question
 //implement rewind from service
 //implement rewind in external player
-//remove skip to next button disabling behavior
 public class RepeatListener implements OnTouchListener {
+
+    private final static int TOUCH_OFFSET = 20;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private final int initialInterval;
     private final int normalInterval;
+    private final Runnable startListener;
     private final Runnable actionListener;
+
+    private final Rect touchHoldRect = new Rect();
 
     private View touchedView;
     private boolean calledAtLeastOnce = false;
-
-    private final Rect viewRect = new Rect();
 
     private final Runnable handlerRunnable = new Runnable() {
         @Override
@@ -35,9 +39,11 @@ public class RepeatListener implements OnTouchListener {
             if (touchedView.isEnabled()) {
                 handler.postDelayed(this, normalInterval);
                 actionListener.run();
+                if (!calledAtLeastOnce && startListener != null) {
+                    startListener.run();
+                }
                 calledAtLeastOnce = true;
             } else {
-                // if the view was disabled by the clickListener, remove the callback
                 handler.removeCallbacks(handlerRunnable);
                 touchedView.setPressed(false);
                 touchedView = null;
@@ -48,6 +54,7 @@ public class RepeatListener implements OnTouchListener {
 
     public RepeatListener(int initialInterval,
                           int normalInterval,
+                          Runnable startListener,
                           Runnable actionListener) {
         if (actionListener == null) {
             throw new IllegalArgumentException("null runnable");
@@ -58,6 +65,7 @@ public class RepeatListener implements OnTouchListener {
 
         this.initialInterval = initialInterval;
         this.normalInterval = normalInterval;
+        this.startListener = startListener;
         this.actionListener = actionListener;
     }
 
@@ -68,7 +76,10 @@ public class RepeatListener implements OnTouchListener {
                 calledAtLeastOnce = false;
                 handler.postDelayed(handlerRunnable, initialInterval);
                 touchedView = view;
-                viewRect.set(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+                touchHoldRect.set(view.getLeft() - TOUCH_OFFSET,
+                        view.getTop() - TOUCH_OFFSET,
+                        view.getRight() + TOUCH_OFFSET,
+                        view.getBottom() + TOUCH_OFFSET);
                 return false;
             }
             case MotionEvent.ACTION_UP:
@@ -84,9 +95,10 @@ public class RepeatListener implements OnTouchListener {
                 return processed;
             }
             case MotionEvent.ACTION_MOVE: {
-                if (!viewRect.contains(view.getLeft() + (int) motionEvent.getX(),
+                if (!touchHoldRect.contains(
+                        view.getLeft() + (int) motionEvent.getX(),
                         view.getTop() + (int) motionEvent.getY())) {
-//                    resetTouch();
+                    handler.removeCallbacks(handlerRunnable);
                 }
                 break;
             }
