@@ -21,7 +21,6 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.DrawableImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
@@ -189,12 +188,13 @@ public class CoverImageLoader {
             return;
         }
 
+        Drawable currentDrawable = imageView.getDrawable();
         Glide.with(imageView)
                 .load(data)
-                .placeholder(errorPlaceholder)
+                .placeholder(currentDrawable == null? context.getDrawable(errorPlaceholder): currentDrawable)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
-                .into(imageViewTarget(imageView));
+                .into(imageView);
     }
 
     private Runnable loadNotificationImage(Object compositionImage,
@@ -221,24 +221,6 @@ public class CoverImageLoader {
                 .load(data)
                 .timeout(TIMEOUT_MILLIS)
                 .into(simpleTarget(onCompleted));
-    }
-
-    private DrawableImageViewTarget imageViewTarget(ImageView imageView) {
-        return new DrawableImageViewTarget(imageView) {
-            @Override
-            public void onLoadStarted(@Nullable Drawable placeholder) {
-                if (view.getDrawable() == null) {
-                    super.onLoadStarted(placeholder);
-                }
-            }
-
-            @Override
-            public void onLoadCleared(@Nullable Drawable placeholder) {
-                if (view.getDrawable() == null) {
-                    super.onLoadCleared(placeholder);
-                }
-            }
-        };
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

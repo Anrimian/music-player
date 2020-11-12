@@ -14,24 +14,30 @@ public class WidgetDataHolder {
     private static final String CURRENT_QUEUE_SIZE = "current_queue_size";
     private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
     private static final String CURRENT_COMPOSITION_UPDATE_TIME = "current_composition_update_time";
+    private static final String RANDOM_PLAY = "random_play";
+    private static final String REPEAT = "repeat";
+    private static final String COVERS_ENABLED = "covers_enabled";
 
-    static void setCompositionInfo(Context context,
-                                   String compositionName,
-                                   String author,
-                                   long compositionId,
-                                   long updateTime) {
+    static void setWidgetInfo(Context context,
+                              String compositionName,
+                              String author,
+                              long compositionId,
+                              long updateTime,
+                              int queueSize,
+                              boolean randomPlay,
+                              int repeatMode,
+                              boolean isCoversEnabled) {
         SharedPreferences preferences = getWidgetPreferences(context);
         preferences.edit()
                 .putString(CURRENT_COMPOSITION, compositionName)
                 .putString(CURRENT_COMPOSITION_AUTHOR, author)
                 .putLong(CURRENT_COMPOSITION_ID, compositionId)
                 .putLong(CURRENT_COMPOSITION_UPDATE_TIME, updateTime)
+                .putInt(CURRENT_QUEUE_SIZE, queueSize)
+                .putBoolean(RANDOM_PLAY, randomPlay)
+                .putInt(REPEAT, repeatMode)
+                .putBoolean(COVERS_ENABLED, isCoversEnabled)
                 .apply();
-    }
-
-    static void setCurrentQueueSize(Context context, int size) {
-        SharedPreferencesHelper preferences = getPreferences(context);
-        preferences.putInt(CURRENT_QUEUE_SIZE, size);
     }
 
     public static String getCompositionName(Context context) {
@@ -66,5 +72,20 @@ public class WidgetDataHolder {
 
     private static SharedPreferences getWidgetPreferences(Context context) {
         return context.getSharedPreferences(WIDGET_STATE, Context.MODE_PRIVATE);
+    }
+
+    public static boolean isRandomPlayModeEnabled(Context context) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        return preferences.getBoolean(RANDOM_PLAY);
+    }
+
+    public static int getRepeatMode(Context context) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        return preferences.getInt(REPEAT);
+    }
+
+    public static boolean isShowCoversEnabled(Context context) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        return preferences.getBoolean(COVERS_ENABLED);
     }
 }
