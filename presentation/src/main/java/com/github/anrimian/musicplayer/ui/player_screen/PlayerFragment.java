@@ -65,6 +65,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFr
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
@@ -272,7 +273,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 () -> playerPanelWrapper.isBottomPanelExpanded());
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
+        ViewUtils.setOnHoldListener(ivSkipToPrevious, 300, 500, presenter::onRewindBackwardCalled);
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
+        ViewUtils.setOnHoldListener(ivSkipToNext, 300, 500, presenter::onRewindForwardCalled);
         btnRepeatMode.setOnClickListener(this::onRepeatModeButtonClicked);
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());

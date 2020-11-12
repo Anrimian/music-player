@@ -47,6 +47,13 @@ public class ViewUtils {
         });
     }
 
+    public static void setOnHoldListener(View view,
+                                         int startCallTime,
+                                         int callPeriod,
+                                         Runnable runnable) {
+        view.setOnTouchListener(new RepeatListener(startCallTime, callPeriod, runnable));
+    }
+
     public static void run(View view, Runnable runnable) {
         if (isLaidOut(view)) {
             runnable.run();

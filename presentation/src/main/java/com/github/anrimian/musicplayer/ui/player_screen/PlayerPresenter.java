@@ -249,6 +249,14 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         playerInteractor.clearPlayQueue();
     }
 
+    void onRewindForwardCalled() {
+        playerInteractor.fastSeekForward();
+    }
+
+    void onRewindBackwardCalled() {
+        playerInteractor.fastSeekBackward();
+    }
+
     private void swapItems(int from, int to) {
         if (!ListUtils.isIndexInRange(playQueue, from) || !ListUtils.isIndexInRange(playQueue, to)) {
             return;
