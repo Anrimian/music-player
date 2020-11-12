@@ -2,11 +2,14 @@ package com.github.anrimian.musicplayer.ui.utils;
 
 import android.graphics.Rect;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-//!!!!often click doesn't work
+//often click doesn't work - fixed
+//move out of view bounds
+
 //increasing rewind speed
 //save positions after rewind
 //add vibration after rewind starts
@@ -15,7 +18,7 @@ import android.view.View.OnTouchListener;
 //remove skip to next button disabling behavior
 public class RepeatListener implements OnTouchListener {
 
-    private final Handler handler = new Handler();
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     private final int initialInterval;
     private final int normalInterval;
@@ -65,16 +68,18 @@ public class RepeatListener implements OnTouchListener {
                 calledAtLeastOnce = false;
                 handler.postDelayed(handlerRunnable, initialInterval);
                 touchedView = view;
-//                touchedView.setPressed(true);
                 viewRect.set(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
                 return false;
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
                 handler.removeCallbacks(handlerRunnable);
-                touchedView.setPressed(false);
+                if (calledAtLeastOnce) {
+                    touchedView.setPressed(false);
+                }
                 touchedView = null;
                 boolean processed = calledAtLeastOnce;
+
                 calledAtLeastOnce = false;
                 return processed;
             }
