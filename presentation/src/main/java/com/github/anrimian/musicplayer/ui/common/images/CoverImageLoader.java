@@ -38,6 +38,8 @@ import java.util.Date;
 
 import javax.annotation.Nonnull;
 
+import static com.bumptech.glide.request.target.Target.SIZE_ORIGINAL;
+
 public class CoverImageLoader {
 
     private static final int DEFAULT_PLACEHOLDER = R.drawable.ic_music_placeholder_simple;
@@ -63,6 +65,7 @@ public class CoverImageLoader {
 
         Glide.with(imageView)
                 .load(new CompositionImage(data.getId(), data.getDateModified()))
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
@@ -124,6 +127,7 @@ public class CoverImageLoader {
 
         Glide.with(imageView)
                 .load(album)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
@@ -200,8 +204,10 @@ public class CoverImageLoader {
         //here replacement with error placeholder flickers, don't know how to solve it
         Glide.with(imageView)
                 .load(data)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .thumbnail(Glide.with(imageView)
                         .load(oldData)
+                        .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                         .timeout(TIMEOUT_MILLIS))
                 .listener(new RequestListener<Drawable>() {
                     @Override
@@ -239,6 +245,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(compositionImage)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
@@ -249,6 +256,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(data)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .timeout(TIMEOUT_MILLIS)
                 .into(simpleTarget(onCompleted));
     }
