@@ -60,7 +60,6 @@ public class UriCoverFetcher implements DataFetcher<Bitmap> {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.outWidth = getCoverSize();
             opt.outHeight = getCoverSize();
-            opt.inPreferredConfig = Bitmap.Config.RGB_565;
             return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
         } catch (Exception ignored) {
             return null;

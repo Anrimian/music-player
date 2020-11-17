@@ -61,7 +61,6 @@ public class AlbumCoverFetcher implements DataFetcher<Bitmap> {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.outWidth = getCoverSize();
             opt.outHeight = getCoverSize();
-            opt.inPreferredConfig = Bitmap.Config.RGB_565;
             return BitmapFactory.decodeStream(in, null, opt);
         } catch (IOException ignores) {
             return null;
