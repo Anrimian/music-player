@@ -14,8 +14,8 @@ import android.view.View.OnTouchListener;
 //remove skip to next button disabling behavior - removed
 //add answer to so question - done
 //increasing rewind speed - done
+//implement rewind from service - done
 
-//implement rewind from service
 //implement rewind in external player
 public class RepeatListener implements OnTouchListener {
 
