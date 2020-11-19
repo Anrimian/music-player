@@ -158,6 +158,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private PlayerPanelWrapper playerPanelWrapper;
 
+    @Nullable
+    private Composition previousCoverComposition;
+
     public static PlayerFragment newInstance() {
         return newInstance(false);
     }
@@ -516,6 +519,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, noCompositionMessage));
             rvPlayList.setContentDescription(noCompositionMessage);
             sbTrackState.setContentDescription(noCompositionMessage);
+            previousCoverComposition = null;
         } else {
             Composition composition = item.getComposition();
             String compositionName = formatCompositionName(composition);
@@ -529,9 +533,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             if (showCover) {
                 Components.getAppComponent()
                         .imageLoader()
-                        .displayImageInReusableTarget(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
+                        .displayImageInReusableTarget(ivMusicIcon, composition, previousCoverComposition, R.drawable.ic_music_placeholder);
+                previousCoverComposition = composition;
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
+                previousCoverComposition = null;
             }
 
             playQueueAdapter.onCurrentItemChanged(item);

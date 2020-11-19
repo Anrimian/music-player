@@ -49,7 +49,7 @@ import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class EditorRepositoryImpl implements EditorRepository {
 
-    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 5000;
+    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 15000;
 
     private final CompositionSourceEditor sourceEditor;
     private final StorageFilesDataSource filesDataSource;

@@ -38,6 +38,8 @@ import java.util.Date;
 
 import javax.annotation.Nonnull;
 
+import static com.bumptech.glide.request.target.Target.SIZE_ORIGINAL;
+
 public class CoverImageLoader {
 
     private static final int DEFAULT_PLACEHOLDER = R.drawable.ic_music_placeholder_simple;
@@ -63,6 +65,7 @@ public class CoverImageLoader {
 
         Glide.with(imageView)
                 .load(new CompositionImage(data.getId(), data.getDateModified()))
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
@@ -92,19 +95,27 @@ public class CoverImageLoader {
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull UriCompositionSource data,
                                              @DrawableRes int errorPlaceholder) {
-        displayImageInReusableTarget(imageView, new UriCompositionImage(data), errorPlaceholder);
+        displayImageInReusableTarget(imageView, new UriCompositionImage(data), null, errorPlaceholder);
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull FullComposition data,
                                              @DrawableRes int errorPlaceholder) {
-        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), errorPlaceholder);
+        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), null, errorPlaceholder);
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull Composition data,
+                                             @Nullable Composition oldData,
                                              @DrawableRes int errorPlaceholder) {
-        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), errorPlaceholder);
+        CompositionImage oldComposition = null;
+        if (oldData != null) {
+            oldComposition = new CompositionImage(oldData.getId(), oldData.getDateModified());
+        }
+        displayImageInReusableTarget(imageView,
+                new CompositionImage(data.getId(), data.getDateModified()),
+                oldComposition,
+                errorPlaceholder);
     }
 
     public void displayImage(@NonNull ImageView imageView,
@@ -116,6 +127,7 @@ public class CoverImageLoader {
 
         Glide.with(imageView)
                 .load(album)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
@@ -183,15 +195,39 @@ public class CoverImageLoader {
 
     private void displayImageInReusableTarget(@NonNull ImageView imageView,
                                               @NonNull Object data,
+                                              @Nullable Object oldData,
                                               @DrawableRes int errorPlaceholder) {
         if (!isValidContextForGlide(imageView)) {
             return;
         }
 
-        Drawable currentDrawable = imageView.getDrawable();
+        //here replacement with error placeholder flickers, don't know how to solve it
         Glide.with(imageView)
                 .load(data)
-                .placeholder(currentDrawable == null? context.getDrawable(errorPlaceholder): currentDrawable)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .thumbnail(Glide.with(imageView)
+                        .load(oldData)
+                        .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                        .timeout(TIMEOUT_MILLIS))
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e,
+                                                Object model,
+                                                Target<Drawable> target,
+                                                boolean isFirstResource) {
+                        imageView.setImageResource(errorPlaceholder);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource,
+                                                   Object model,
+                                                   Target<Drawable> target,
+                                                   DataSource dataSource,
+                                                   boolean isFirstResource) {
+                        return false;
+                    }
+                })
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
                 .into(imageView);
@@ -209,6 +245,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(compositionImage)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
@@ -219,6 +256,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(data)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .timeout(TIMEOUT_MILLIS)
                 .into(simpleTarget(onCompleted));
     }
@@ -239,10 +277,10 @@ public class CoverImageLoader {
         return true;
     }
 
-    private CustomTarget<Bitmap> simpleTarget(Callback<Bitmap> callback) {
-        return new CustomTarget<Bitmap>() {
+    private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {
+        return new CustomTarget<T>() {
             @Override
-            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+            public void onResourceReady(@NonNull T resource, @Nullable Transition<? super T> transition) {
                 callback.call(resource);
             }
 
