@@ -12,14 +12,15 @@ import android.view.View.OnTouchListener;
 //add vibration after rewind starts - done
 //save positions after rewind - done
 //remove skip to next button disabling behavior - removed
+//add answer to so question - done
+//increasing rewind speed - done
 
-//increasing rewind speed
-//add answer to so question
 //implement rewind from service
 //implement rewind in external player
 public class RepeatListener implements OnTouchListener {
 
     private final static int TOUCH_OFFSET = 20;
+    private final static int CALL_COUNT_TO_INCREASE_SPEED = 5;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -33,18 +34,21 @@ public class RepeatListener implements OnTouchListener {
     private View touchedView;
     private boolean calledAtLeastOnce = false;
 
+    private short callCount = 0;
+
     private final Runnable handlerRunnable = new Runnable() {
         @Override
         public void run() {
             if (touchedView.isEnabled()) {
-                handler.postDelayed(this, normalInterval);
+                handler.postDelayed(this, getCallInterval());
                 actionListener.run();
+                callCount++;
                 if (!calledAtLeastOnce && startListener != null) {
                     startListener.run();
                 }
                 calledAtLeastOnce = true;
             } else {
-                handler.removeCallbacks(handlerRunnable);
+                stopRepeatCall();
                 touchedView.setPressed(false);
                 touchedView = null;
                 calledAtLeastOnce = false;
@@ -72,7 +76,7 @@ public class RepeatListener implements OnTouchListener {
     public boolean onTouch(View view, MotionEvent motionEvent) {
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_DOWN: {
-                handler.removeCallbacks(handlerRunnable);
+                stopRepeatCall();
                 calledAtLeastOnce = false;
                 handler.postDelayed(handlerRunnable, initialInterval);
                 touchedView = view;
@@ -84,7 +88,7 @@ public class RepeatListener implements OnTouchListener {
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
-                handler.removeCallbacks(handlerRunnable);
+                stopRepeatCall();
                 if (calledAtLeastOnce) {
                     touchedView.setPressed(false);
                 }
@@ -98,13 +102,26 @@ public class RepeatListener implements OnTouchListener {
                 if (!touchHoldRect.contains(
                         view.getLeft() + (int) motionEvent.getX(),
                         view.getTop() + (int) motionEvent.getY())) {
-                    handler.removeCallbacks(handlerRunnable);
+                    stopRepeatCall();
                 }
                 break;
             }
         }
 
         return false;
+    }
+
+    private void stopRepeatCall() {
+        handler.removeCallbacks(handlerRunnable);
+        callCount = 0;
+    }
+
+    private long getCallInterval() {
+        if (callCount <= CALL_COUNT_TO_INCREASE_SPEED) {
+            return normalInterval;
+        } else {
+            return normalInterval / 2;
+        }
     }
 
 }
