@@ -276,9 +276,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 () -> playerPanelWrapper.isBottomPanelExpanded());
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
-        setOnHoldListener(ivSkipToPrevious, presenter::onRewindBackwardCalled);
+        setOnHoldListener(ivSkipToPrevious, presenter::onFastSeekBackwardCalled);
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
-        setOnHoldListener(ivSkipToNext, presenter::onRewindForwardCalled);
+        setOnHoldListener(ivSkipToNext, presenter::onFastSeekForwardCalled);
         btnRepeatMode.setOnClickListener(this::onRepeatModeButtonClicked);
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());

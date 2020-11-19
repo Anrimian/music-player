@@ -7,16 +7,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-//often click doesn't work - fixed
-//move out of view bounds - done
-//add vibration after rewind starts - done
-//save positions after rewind - done
-//remove skip to next button disabling behavior - removed
-//add answer to so question - done
-//increasing rewind speed - done
-//implement rewind from service - done
-
-//implement rewind in external player
 public class RepeatListener implements OnTouchListener {
 
     private final static int TOUCH_OFFSET = 20;

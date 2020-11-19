@@ -14,6 +14,9 @@ public class ViewUtils {
     private static final int REWIND_HOLD_INTERVAL_MILLIS = 400;
 
     public static void setOnHoldListener(View view, Runnable runnable) {
+        if (!view.hasOnClickListeners()) {
+            view.setClickable(true);
+        }
         view.setOnTouchListener(new RepeatListener(
                 REWIND_HOLD_START_MILLIS,
                 REWIND_HOLD_INTERVAL_MILLIS,

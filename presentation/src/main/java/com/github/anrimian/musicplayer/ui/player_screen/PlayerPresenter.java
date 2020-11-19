@@ -248,11 +248,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         playerInteractor.clearPlayQueue();
     }
 
-    void onRewindForwardCalled() {
+    void onFastSeekForwardCalled() {
         playerInteractor.fastSeekForward();
     }
 
-    void onRewindBackwardCalled() {
+    void onFastSeekBackwardCalled() {
         playerInteractor.fastSeekBackward();
     }
 
