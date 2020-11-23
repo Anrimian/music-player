@@ -42,6 +42,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private List<PlayQueueItem> playQueue = new ArrayList<>();
 
     private PlayQueueItem currentItem;
+    private int currentPosition = -1;
+    private boolean isDragging;
+
     private boolean isCoversEnabled = false;
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
@@ -147,6 +150,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onCompositionItemClicked(int position, PlayQueueItem item) {
+        this.currentPosition = position;
         this.currentItem = item;
         playerInteractor.skipToItem(item);
 
@@ -256,6 +260,14 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         playerInteractor.fastSeekBackward();
     }
 
+    void onDragStarted(int position) {
+        isDragging = true;
+    }
+
+    void onDragEnded(int position) {
+        isDragging = false;
+    }
+
     private void swapItems(int from, int to) {
         if (!ListUtils.isIndexInRange(playQueue, from) || !ListUtils.isIndexInRange(playQueue, to)) {
             return;
@@ -328,7 +340,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void onItemPositionReceived(int position) {
-        getViewState().scrollQueueToPosition(position);
+        if (!isDragging && currentPosition != position) {
+            currentPosition = position;
+            getViewState().scrollQueueToPosition(position);
+        }
     }
 
     private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {

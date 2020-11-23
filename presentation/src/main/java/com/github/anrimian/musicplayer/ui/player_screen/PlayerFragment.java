@@ -297,8 +297,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 R.drawable.ic_remove_from_queue,
                 R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
+        callback.setOnStartDragListener(presenter::onDragStarted);
+        callback.setOnEndDragListener(presenter::onDragEnded);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvPlayList);
+
 
         if (savedInstanceState != null) {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
