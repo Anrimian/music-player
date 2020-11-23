@@ -152,7 +152,7 @@
     <string name="scan_storage">Пересканировать системную библиотеку</string>
     <string name="auto_night_mode">Автоматическая тёмная тема</string>
     <string name="unsupported_format_hint">Неподдерживаемый формат</string>
-    <string name="artists">Иполнители</string>
+    <string name="artists">Исполнители</string>
     <string name="no_artists_in_library">Нет исполнителей в библиотеке</string>
     <string name="albums">Альбомы</string>
     <string name="no_albums_in_library">Нет альбомов в библиотеке</string>
