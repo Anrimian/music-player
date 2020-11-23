@@ -64,25 +64,26 @@ public class CoverImageLoader {
         }
 
         Glide.with(imageView)
+                .asBitmap()
                 .load(new CompositionImage(data.getId(), data.getDateModified()))
                 .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
-                .listener(new RequestListener<Drawable>() {
+                .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e,
                                                 Object model,
-                                                Target<Drawable> target,
+                                                Target<Bitmap> target,
                                                 boolean isFirstResource) {
                         listener.call(false);
                         return false;
                     }
 
                     @Override
-                    public boolean onResourceReady(Drawable resource,
+                    public boolean onResourceReady(Bitmap resource,
                                                    Object model,
-                                                   Target<Drawable> target,
+                                                   Target<Bitmap> target,
                                                    DataSource dataSource,
                                                    boolean isFirstResource) {
                         listener.call(true);
@@ -126,6 +127,7 @@ public class CoverImageLoader {
         }
 
         Glide.with(imageView)
+                .asBitmap()
                 .load(album)
                 .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .placeholder(errorPlaceholder)
@@ -203,26 +205,28 @@ public class CoverImageLoader {
 
         //here replacement with error placeholder flickers, don't know how to solve it
         Glide.with(imageView)
+                .asBitmap()
                 .load(data)
                 .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .thumbnail(Glide.with(imageView)
+                        .asBitmap()
                         .load(oldData)
                         .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                         .timeout(TIMEOUT_MILLIS))
-                .listener(new RequestListener<Drawable>() {
+                .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e,
                                                 Object model,
-                                                Target<Drawable> target,
+                                                Target<Bitmap> target,
                                                 boolean isFirstResource) {
                         imageView.setImageResource(errorPlaceholder);
                         return true;
                     }
 
                     @Override
-                    public boolean onResourceReady(Drawable resource,
+                    public boolean onResourceReady(Bitmap resource,
                                                    Object model,
-                                                   Target<Drawable> target,
+                                                   Target<Bitmap> target,
                                                    DataSource dataSource,
                                                    boolean isFirstResource) {
                         return false;
