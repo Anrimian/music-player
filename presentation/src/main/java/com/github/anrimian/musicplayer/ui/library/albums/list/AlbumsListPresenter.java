@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.albums.list;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -54,6 +55,10 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
         presenterDisposable.dispose();
     }
 
+    public void onStop(ListPosition listPosition) {
+        interactor.saveListPosition(listPosition);
+    }
+
     void onTryAgainLoadCompositionsClicked() {
         subscribeOnAlbumsList();
     }
@@ -95,6 +100,8 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
     }
 
     private void onAlbumsReceived(List<Album> albums) {
+        boolean firstReceive = this.albums.isEmpty();
+
         this.albums = albums;
         getViewState().submitList(albums);
         if (albums.isEmpty()) {
@@ -105,6 +112,12 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
             }
         } else {
             getViewState().showList();
+            if (firstReceive) {
+                ListPosition listPosition = interactor.getSavedListPosition();
+                if (listPosition != null) {
+                    getViewState().restoreListPosition(listPosition);
+                }
+            }
         }
     }
 }

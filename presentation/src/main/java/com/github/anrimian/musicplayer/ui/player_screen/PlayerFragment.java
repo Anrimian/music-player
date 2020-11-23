@@ -95,6 +95,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
@@ -156,6 +157,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private FragmentNavigation navigation;
 
     private PlayerPanelWrapper playerPanelWrapper;
+
+    @Nullable
+    private Composition previousCoverComposition;
 
     public static PlayerFragment newInstance() {
         return newInstance(false);
@@ -272,7 +276,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 () -> playerPanelWrapper.isBottomPanelExpanded());
 
         ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
+        setOnHoldListener(ivSkipToPrevious, presenter::onFastSeekBackwardCalled);
         ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
+        setOnHoldListener(ivSkipToNext, presenter::onFastSeekForwardCalled);
         btnRepeatMode.setOnClickListener(this::onRepeatModeButtonClicked);
 
         playQueueLayoutManager = new LinearLayoutManager(requireContext());
@@ -291,8 +297,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 R.drawable.ic_remove_from_queue,
                 R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
+        callback.setOnStartDragListener(presenter::onDragStarted);
+        callback.setOnEndDragListener(presenter::onDragEnded);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvPlayList);
+
 
         if (savedInstanceState != null) {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
@@ -335,7 +344,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         RxPermissions rxPermissions = new RxPermissions(this);
         if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requireFragmentManager()
+            getParentFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_activity_container, new StartFragment())
                     .commit();
@@ -513,6 +522,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, noCompositionMessage));
             rvPlayList.setContentDescription(noCompositionMessage);
             sbTrackState.setContentDescription(noCompositionMessage);
+            previousCoverComposition = null;
         } else {
             Composition composition = item.getComposition();
             String compositionName = formatCompositionName(composition);
@@ -526,9 +536,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             if (showCover) {
                 Components.getAppComponent()
                         .imageLoader()
-                        .displayImageInReusableTarget(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
+                        .displayImageInReusableTarget(ivMusicIcon, composition, previousCoverComposition, R.drawable.ic_music_placeholder);
+                previousCoverComposition = composition;
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
+                previousCoverComposition = null;
             }
 
             playQueueAdapter.onCurrentItemChanged(item);
@@ -605,11 +617,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showPlayQueueSubtitle(int size) {
         tvQueueSubtitle.setText(getResources().getQuantityString(R.plurals.compositions_count, size, size));
-    }
-
-    @Override
-    public void setSkipToNextButtonEnabled(boolean enabled) {
-        ivSkipToNext.setEnabled(enabled);
     }
 
     @Override

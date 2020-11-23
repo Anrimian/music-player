@@ -68,6 +68,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:foreground="?selectableItemBackground"
+                android:contentDescription="@string/equalizer"
                 app:layout_constraintTop_toTopOf="@id/tvEqualizer"
                 app:layout_constraintBottom_toBottomOf="@id/tvEqualizerState"
                 app:layout_constraintStart_toStartOf="parent"

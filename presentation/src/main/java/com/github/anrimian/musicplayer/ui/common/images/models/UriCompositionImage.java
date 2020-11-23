@@ -13,4 +13,19 @@ public class UriCompositionImage {
     public UriCompositionSource getSource() {
         return source;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UriCompositionImage that = (UriCompositionImage) o;
+
+        return source.equals(that.source);
+    }
+
+    @Override
+    public int hashCode() {
+        return source.hashCode();
+    }
 }

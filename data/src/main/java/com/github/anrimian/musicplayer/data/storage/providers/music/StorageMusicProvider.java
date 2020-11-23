@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -319,6 +320,35 @@ public class StorageMusicProvider {
         }
         return fd.getFileDescriptor();
     }
+
+    public OutputStream openCompositionOutputStream(Long id) throws FileNotFoundException {
+        if (id == null) {
+            throw new FileNotFoundException("can not open stream for file without media store id");
+        }
+        return contentResolver.openOutputStream(getCompositionUri(id));
+    }
+
+/*    public void modifyComposition(long id, ThrowsCallback<OutputStream> modifyFunction)
+            throws Exception {
+        Uri uri = getCompositionUri(id);
+
+        ContentValues cv = new ContentValues();
+        cv.put(MediaStore.Audio.Media.IS_PENDING, 1);
+        contentResolver.update(uri,
+                cv,
+                Media._ID + " = ?",
+                new String[] { String.valueOf(id) });
+
+        try (OutputStream os = contentResolver.openOutputStream(uri)) {
+            modifyFunction.call(os);
+        }
+
+        cv.put(MediaStore.Audio.Media.IS_PENDING, 0);
+        contentResolver.update(uri,
+                cv,
+                Media._ID + " = ?",
+                new String[] { String.valueOf(id) });
+    }*/
 
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();

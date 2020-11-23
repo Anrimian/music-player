@@ -174,6 +174,25 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
+    public long seekBy(long millis) {
+        long currentPosition = getTrackPosition();
+        try {
+            long targetPosition = currentPosition + millis;
+            if (targetPosition < 0) {
+                targetPosition = 0;
+            }
+            if (targetPosition > mediaPlayer.getDuration()) {
+                return currentPosition;
+            }
+            seekTo(targetPosition);
+            return targetPosition;
+
+        } catch (IllegalStateException ignored) {
+            return currentPosition;
+        }
+    }
+
+    @Override
     public void release() {
         equalizerController.detachEqualizer();
         stopTracingTrackPosition();

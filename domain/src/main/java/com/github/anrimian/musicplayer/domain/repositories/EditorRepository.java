@@ -63,4 +63,6 @@ public interface EditorRepository {
     Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource);
 
     Completable removeCompositionAlbumArt(FullComposition composition);
+
+    Completable updateTagsFromSource(FullComposition fullComposition);
 }

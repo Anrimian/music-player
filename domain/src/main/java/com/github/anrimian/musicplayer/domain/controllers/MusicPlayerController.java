@@ -27,5 +27,7 @@ public interface MusicPlayerController {
 
     Observable<Long> getTrackPositionObservable();
 
+    void seekBy(long millis);
+
     long getTrackPosition();
 }

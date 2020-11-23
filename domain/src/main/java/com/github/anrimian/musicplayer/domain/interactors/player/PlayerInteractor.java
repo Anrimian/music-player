@@ -133,6 +133,14 @@ public class PlayerInteractor {
         musicPlayerController.seekTo(position);
     }
 
+    public void fastSeekForward() {
+        musicPlayerController.seekBy(settingsRepository.getRewindValueMillis());
+    }
+
+    public void fastSeekBackward() {
+        musicPlayerController.seekBy(-settingsRepository.getRewindValueMillis());
+    }
+
     public Observable<Long> getTrackPositionObservable() {
         return musicPlayerController.getTrackPositionObservable();
     }

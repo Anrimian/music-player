@@ -95,4 +95,6 @@ public interface SettingsRepository {
     int getSelectedEqualizerType();
 
     Observable<Integer> getSelectedEqualizerTypeObservable();
+
+    long getRewindValueMillis();
 }

@@ -1,10 +1,13 @@
 package com.github.anrimian.musicplayer.ui.common.mvp;
 
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import moxy.MvpView;
 import moxy.viewstate.strategy.StateStrategyType;

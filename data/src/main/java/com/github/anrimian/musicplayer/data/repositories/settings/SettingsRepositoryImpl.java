@@ -305,6 +305,11 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         return withDefaultValue(selectedEqualizerSubject, this::getSelectedEqualizerType);
     }
 
+    @Override
+    public long getRewindValueMillis() {
+        return 10000;
+    }
+
     private Order orderFromInt(int order) {
         boolean reversed = false;
         if (order % 2 == 0) {

@@ -74,6 +74,14 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
         interactor.setExternalPlayerKeepInBackground(checked);
     }
 
+    void onFastSeekForwardCalled() {
+        interactor.fastSeekForward();
+    }
+
+    void onFastSeekBackwardCalled() {
+        interactor.fastSeekBackward();
+    }
+
     private void subscribeOnErrorEvents() {
         presenterDisposable.add(interactor.getErrorEventsObservable()
                 .observeOn(uiScheduler)

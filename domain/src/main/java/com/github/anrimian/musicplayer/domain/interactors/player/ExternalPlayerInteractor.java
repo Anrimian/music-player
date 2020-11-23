@@ -91,6 +91,14 @@ public class ExternalPlayerInteractor {
         settingsRepository.setExternalPlayerRepeatMode(mode);
     }
 
+    public void fastSeekForward() {
+        playerCoordinatorInteractor.fastSeekForward(EXTERNAL);
+    }
+
+    public void fastSeekBackward() {
+        playerCoordinatorInteractor.fastSeekBackward(EXTERNAL);
+    }
+
     public Observable<Integer> getExternalPlayerRepeatModeObservable() {
         return settingsRepository.getExternalPlayerRepeatModeObservable();
     }

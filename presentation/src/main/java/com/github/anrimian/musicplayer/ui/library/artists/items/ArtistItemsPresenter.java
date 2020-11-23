@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettin
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 
@@ -54,6 +55,16 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
     @Override
     protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
         return interactor.getCompositionsByArtist(artistId);
+    }
+
+    @Override
+    protected ListPosition getSavedListPosition() {
+        return interactor.getSavedItemsListPosition(artistId);
+    }
+
+    @Override
+    protected void saveListPosition(ListPosition listPosition) {
+        interactor.saveItemsListPosition(artistId, listPosition);
     }
 
     void onFragmentMovedToTop() {

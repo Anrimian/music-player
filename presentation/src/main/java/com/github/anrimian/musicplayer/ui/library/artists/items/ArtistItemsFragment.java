@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.utils.functions.BooleanConditionRunner;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
@@ -30,6 +31,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistAlbumsPresenter;
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistItemsAdapter;
@@ -51,7 +53,6 @@ import com.r0adkll.slidr.model.SlidrInterface;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -77,6 +78,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
     private AdvancedToolbar toolbar;
     private ArtistItemsAdapter adapter;
+    private LinearLayoutManager layoutManager;
     private ProgressViewWrapper progressViewWrapper;
 
     private final BooleanConditionRunner showNoCompositionsRunner = new BooleanConditionRunner(2,
@@ -142,7 +144,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
                 this::onAlbumsScrolled);
         recyclerView.setAdapter(adapter);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
@@ -181,6 +183,12 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu,
                 this::onActionModeItemClicked);
         toolbar.setupOptionsMenu(R.menu.artist_menu, this::onOptionsItemClicked);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop(ViewUtils.getListPosition(layoutManager));
     }
 
     @Override
@@ -242,6 +250,11 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
         showNoCompositionsRunner.setCondition(compositions.isEmpty());
         artistAlbumsPresenter.setCompositionsTitleVisible(!compositions.isEmpty());
+    }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition);
     }
 
     @Override
@@ -362,7 +375,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
     @Override
     public void closeScreen() {
-        FragmentNavigation.from(requireFragmentManager()).goBack();
+        FragmentNavigation.from(getParentFragmentManager()).goBack();
     }
 
     @Override
@@ -401,11 +414,11 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     }
 
     private long getAlbumId() {
-        return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
+        return requireArguments().getLong(ID_ARG);
     }
 
     private void onAlbumClicked(Album album) {
-        FragmentNavigation.from(requireFragmentManager())
+        FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));
     }
 

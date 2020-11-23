@@ -40,10 +40,14 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_FAST_FORWARD;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_REWIND;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SEEK_TO;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SET_REPEAT_MODE;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP;
@@ -94,7 +98,12 @@ public class MusicService extends Service {
                     | ACTION_PLAY_PAUSE
                     | ACTION_SKIP_TO_NEXT
                     | ACTION_SKIP_TO_PREVIOUS
-                    | ACTION_SEEK_TO);
+                    | ACTION_SEEK_TO
+                    | ACTION_SET_REPEAT_MODE
+                    | ACTION_SET_SHUFFLE_MODE
+                    | ACTION_FAST_FORWARD
+                    | ACTION_REWIND
+            );
     //optimization
     private final ServiceState serviceState = new ServiceState();
 
@@ -466,6 +475,16 @@ public class MusicService extends Service {
             musicServiceInteractor.setRandomPlayingEnabled(shuffleMode != SHUFFLE_MODE_NONE);
         }
 
+        @Override
+        public void onFastForward() {
+            playerInteractor.fastSeekForward();
+        }
+
+        @Override
+        public void onRewind() {
+            playerInteractor.fastSeekBackward();
+        }
+
         //next - not implemented
 
         @Override
@@ -516,16 +535,6 @@ public class MusicService extends Service {
         @Override
         public void onSkipToQueueItem(long id) {
             super.onSkipToQueueItem(id);
-        }
-
-        @Override
-        public void onFastForward() {
-            super.onFastForward();
-        }
-
-        @Override
-        public void onRewind() {
-            super.onRewind();
         }
 
         @Override

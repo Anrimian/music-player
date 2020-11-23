@@ -21,6 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutEx
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateException;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.editor.common.EditorErrorCommand;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -81,6 +82,9 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof GenreAlreadyExistsException) {
             return error(R.string.genre_already_exists);
+        }
+        if (throwable instanceof SecurityException) {
+            return new EditorErrorCommand((SecurityException) throwable);
         }
         if (throwable instanceof EditorTimeoutException) {
             return error(R.string.editor_timeout_error);

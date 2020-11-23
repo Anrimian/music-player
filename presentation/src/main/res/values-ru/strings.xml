@@ -215,11 +215,14 @@
     <string name="change_cover">Изменить обложку</string>
     <string name="pick_from_gallery">Выбрать из галереи</string>
     <string name="remove_cover">Убрать обложку</string>
-    <string name="changing_cover_progress">Смена обложки…</string>
     <string name="editor_timeout_error">Время ожидания редактора тэгов истекло. Возможно, формат файла неподдерживается</string>
     <string name="change_lyrics">Изменить текст композиции</string>
     <string name="lyrics">Текст композиции</string>
     <string name="check_tags_error">Не удалось проверить теги композиции: %s</string>
+    <string name="changing_file_progress">Изменение файла…</string>
+    <string name="android_r_edit_file_permission_denied">
+        Начиная с Android 11 редактирование и удаление файлов требует явного разрешения системы
+    </string>
     <string name="app_equalizer">Экалайзер приложения</string>
 
     <plurals name="compositions_count">

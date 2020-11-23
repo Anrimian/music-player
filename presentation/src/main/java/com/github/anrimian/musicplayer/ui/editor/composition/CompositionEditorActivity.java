@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFr
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
+import com.github.anrimian.musicplayer.ui.editor.common.EditorErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
@@ -78,6 +79,8 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     private DialogFragmentDelayRunner progressDialogRunner;
 
     private ShortGenresAdapter genresAdapter;
+
+    private EditorErrorHandler editorErrorHandler;
 
     public static Intent newIntent(Context context, long compositionId) {
         Intent intent = new Intent(context, CompositionEditorActivity.class);
@@ -142,6 +145,10 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         CompatUtils.setMainButtonStyle(viewBinding.ivAlbumArtist);
         CompatUtils.setMainButtonStyle(viewBinding.ivLyrics);
         CompatUtils.setMainButtonStyle(viewBinding.ivGenreEdit);
+
+        editorErrorHandler = new EditorErrorHandler(this,
+                presenter::onRetryFailedEditActionClicked,
+                this::showEditorRequestDeniedMessage);
 
         FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
@@ -211,6 +218,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
                     return;
                 }
                 presenter.onNewImageForCoverSelected(new UriImageSource(uri));
+                return;
             }
             default: super.onActivityResult(requestCode, resultCode, data);
         }
@@ -358,7 +366,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        makeSnackbar(viewBinding.container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
+        editorErrorHandler.handleEditorError(this, errorCommand, () ->
+                makeSnackbar(viewBinding.container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
+        );
     }
 
     @Override
@@ -400,13 +410,13 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
     }
 
     @Override
-    public void showChangeCoverProgress() {
-        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.changing_cover_progress);
+    public void showChangeFileProgress() {
+        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.changing_file_progress);
         progressDialogRunner.show(fragment);
     }
 
     @Override
-    public void hideChangeCoverProgress() {
+    public void hideChangeFileProgress() {
         progressDialogRunner.cancel();
     }
 
@@ -437,5 +447,9 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     private void onTextCopied() {
         makeSnackbar(viewBinding.container, R.string.copied_message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(viewBinding.container, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
     }
 }

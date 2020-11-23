@@ -38,6 +38,9 @@ public interface Constants {
         String POSITION_ARG = "position_arg";
         String HINTS_ARG = "hints_arg";
         String PLAYLIST_ARG = "playlist_arg";
+        String RANDOM_PLAY_ARG = "random_play_arg";
+        String REPEAT_ARG = "repeat_arg";
+        String COVERS_ENABLED_ARG = "covers_enabled_arg";
     }
 
     interface Tags {

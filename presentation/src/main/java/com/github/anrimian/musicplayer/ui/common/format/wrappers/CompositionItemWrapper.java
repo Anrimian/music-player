@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common.format.wrappers;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
@@ -118,9 +120,12 @@ public class CompositionItemWrapper {
     public void showCompositionImage(boolean showCovers) {
         if (ivMusicIcon != null) {
             if (showCovers) {
-                Components.getAppComponent().imageLoader().displayImage(ivMusicIcon, composition);
+                Components.getAppComponent().imageLoader().displayImage(ivMusicIcon,
+                        composition,
+                        this::onCoverImageLoadFinished);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder_simple);
+                ivMusicIcon.setColorFilter(Color.TRANSPARENT);
             }
         }
     }
@@ -150,6 +155,16 @@ public class CompositionItemWrapper {
             AndroidUtils.setAnimatedVectorDrawable(ivPlay,
                     isPlaying? R.drawable.anim_play_to_pause: R.drawable.anim_pause_to_play,
                     animate);
+        }
+    }
+
+    private void onCoverImageLoadFinished(boolean loaded) {
+        if (ivMusicIcon != null) {
+            int tint = Color.TRANSPARENT;
+            if (loaded) {
+                tint = ContextCompat.getColor(getContext(), R.color.cover_dark_foreground);
+            }
+            ivMusicIcon.setColorFilter(tint);
         }
     }
 

@@ -45,10 +45,11 @@ import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class EditorRepositoryImpl implements EditorRepository {
 
-    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 5000;
+    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 15000;
 
     private final CompositionSourceEditor sourceEditor;
     private final StorageFilesDataSource filesDataSource;
@@ -360,6 +361,49 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .doOnComplete(() -> onCompositionFileChanged(composition))
                 .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
+    }
+
+    /**
+     * Album-artist in android system and in common file has conflicts. This function
+     * updates media library by real file source tags.
+     */
+    @Override
+    public Completable updateTagsFromSource(FullComposition composition) {
+        return sourceEditor.getFullTags(composition)
+                .flatMapCompletable(tags -> updateCompositionTags(composition, tags))
+                .subscribeOn(scheduler);
+    }
+
+    private Completable updateCompositionTags(FullComposition composition,
+                                              CompositionSourceTags tags) {
+        return Completable.fromAction(() -> {
+            long id = composition.getId();
+
+            String tagTitle = tags.getTitle();
+            if (!isEmpty(tagTitle) && !Objects.equals(composition.getTitle(), tagTitle)) {
+                compositionsDao.updateTitle(id, tagTitle);
+            }
+
+            String tagArtist = tags.getArtist();
+            if (!isEmpty(tagArtist) && !Objects.equals(composition.getArtist(), tagArtist)) {
+                compositionsDao.updateArtist(id, tagArtist);
+            }
+
+            String tagAlbum = tags.getAlbum();
+            if (!isEmpty(tagAlbum) && !Objects.equals(composition.getAlbum(), tagAlbum)) {
+                compositionsDao.updateAlbum(id, tagAlbum);
+            }
+
+            String tagAlbumArtist = tags.getAlbumArtist();
+            if (!isEmpty(tagAlbumArtist) && !Objects.equals(composition.getAlbumArtist(), tagAlbumArtist)) {
+                compositionsDao.updateAlbumArtist(id, tagAlbumArtist);
+            }
+
+            String tagLyrics = tags.getLyrics();
+            if (!isEmpty(tagLyrics) && !Objects.equals(composition.getLyrics(), tagLyrics)) {
+                compositionsDao.updateLyrics(id, tagLyrics);
+            }
+        });
     }
 
     private void onCompositionFileChanged(FullComposition composition) {

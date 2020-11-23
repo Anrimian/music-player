@@ -35,6 +35,7 @@ import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHel
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
+import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
 
@@ -74,6 +75,9 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         viewBinding.ivPlayPause.setOnClickListener(v -> presenter.onPlayPauseClicked());
         viewBinding.ivRepeatMode.setOnClickListener(v -> presenter.onRepeatModeButtonClicked());
         onCheckChanged(viewBinding.cbKeepPlayingAfterClose, presenter::onKeepPlayerInBackgroundChecked);
+
+        setOnHoldListener(viewBinding.ivSkipToNext, presenter::onFastSeekForwardCalled);
+        setOnHoldListener(viewBinding.ivSkipToPrevious, presenter::onFastSeekBackwardCalled);
 
         if (savedInstanceState == null) {
             Uri uriToPlay = getIntent().getData();

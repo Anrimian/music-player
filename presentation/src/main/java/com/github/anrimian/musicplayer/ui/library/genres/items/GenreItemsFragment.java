@@ -21,6 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
@@ -44,7 +45,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -219,6 +219,10 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     public void updateList(List<Composition> genres) {
         adapter.submitList(genres);
     }
+
+    @Override
+    public void restoreListPosition(ListPosition listPosition) {}
+
     @Override
     public void onCompositionSelected(Composition composition, int position) {
         adapter.setItemSelected(position);
@@ -357,11 +361,11 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     @Override
     public void closeScreen() {
-        FragmentNavigation.from(requireFragmentManager()).goBack();
+        FragmentNavigation.from(getParentFragmentManager()).goBack();
     }
 
     private long getGenreId() {
-        return Objects.requireNonNull(getArguments()).getLong(ID_ARG);
+        return requireArguments().getLong(ID_ARG);
     }
 
     private void onOptionsItemClicked(@NonNull MenuItem item) {
