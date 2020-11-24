@@ -212,7 +212,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .flatMap(this::createMediaSource)
                 .timeout(2, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
                 .observeOn(scheduler)
-                .doOnSuccess(player::prepare)
+                .doOnSuccess(getPlayer()::prepare)
                 .ignoreElement();
     }
 
