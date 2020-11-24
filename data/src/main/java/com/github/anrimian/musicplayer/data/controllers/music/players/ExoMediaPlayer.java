@@ -143,7 +143,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         if (targetPosition < 0) {
             targetPosition = 0;
         }
-        if (targetPosition > player.getDuration()) {
+        if (targetPosition > getPlayer().getDuration()) {
             return currentPosition;
         }
         seekTo(targetPosition);
@@ -226,7 +226,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .flatMap(this::createMediaSource)
                 .timeout(2, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
                 .observeOn(scheduler)
-                .doOnSuccess(player::prepare)
+                .doOnSuccess(getPlayer()::prepare)
                 .ignoreElement();
     }
 
