@@ -36,6 +36,8 @@ public class EqualizerStateRepository {
         String BANDS = "bands";
     }
 
+    public static final short NO_PRESET = -1;
+
     private final SharedPreferencesHelper preferences;
 
     public EqualizerStateRepository(Context context) {
@@ -72,7 +74,7 @@ public class EqualizerStateRepository {
             JSONObject jsonObject = new JSONObject(rawData);
             short currentPreset = (short) jsonObject.getInt(SELECTED_PRESET);
 
-            JSONArray jsonArray = new JSONArray(jsonObject.getJSONObject(BANDS));
+            JSONArray jsonArray = jsonObject.getJSONArray(BANDS);
             Map<Short, Short> bands = new HashMap<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);

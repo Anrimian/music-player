@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.equalizer.app;
 
 import android.os.Bundle;
 import android.util.Pair;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -123,17 +121,17 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
                 R.id.text_view,
                 presets);
         viewBinding.spinnerPresets.setAdapter(adapter);
-        viewBinding.spinnerPresets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                presenter.onPresetSelected(presets.get(i));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+//        viewBinding.spinnerPresets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                presenter.onPresetSelected(presets.get(i));
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
     }
 
     @Override

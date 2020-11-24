@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class EqualizerState {
 
-    private final short currentPreset;
-    private final Map<Short, Short> bendLevels;
+    private short currentPreset;
+    private Map<Short, Short> bendLevels;
 
     public EqualizerState(short currentPreset, Map<Short, Short> bendLevels) {
         this.currentPreset = currentPreset;
@@ -18,5 +18,21 @@ public class EqualizerState {
 
     public Map<Short, Short> getBendLevels() {
         return bendLevels;
+    }
+
+    public void setCurrentPreset(short currentPreset) {
+        this.currentPreset = currentPreset;
+    }
+
+    public void setBendLevels(Map<Short, Short> bendLevels) {
+        this.bendLevels = bendLevels;
+    }
+
+    @Override
+    public String toString() {
+        return "EqualizerState{" +
+                "currentPreset=" + currentPreset +
+                ", bendLevels=" + bendLevels +
+                '}';
     }
 }

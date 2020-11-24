@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapp
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository;
 import com.github.anrimian.musicplayer.data.repositories.library.LibraryRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
@@ -216,8 +217,15 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    InternalEqualizer internalEqualizer() {
-        return new InternalEqualizer();
+    InternalEqualizer internalEqualizer(EqualizerStateRepository equalizerStateRepository) {
+        return new InternalEqualizer(equalizerStateRepository);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    EqualizerStateRepository equalizerStateRepository(Context context) {
+        return new EqualizerStateRepository(context);
     }
 
     @Provides
