@@ -28,6 +28,8 @@ public class AudioFocusRxWrapper {
     @Nullable
     public Observable<AudioFocusEvent> requestAudioFocus(int streamType, int durationHint) {
         AudioFocusObservable audioFocusObservable = new AudioFocusObservable();
+        //W/AudioManager: Use of stream types is deprecated for operations other than volume control
+        //W/AudioManager: See the documentation of requestAudioFocus() for what to use instead with android.media.AudioAttributes to qualify your playback use case
         int audioFocusResult = audioManager.requestAudioFocus(audioFocusObservable, streamType,
                 durationHint);
         if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {

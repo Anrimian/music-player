@@ -121,6 +121,12 @@ public class EqualizerActivity extends MvpAppCompatActivity implements Equalizer
                 R.id.text_view,
                 presets);
         viewBinding.spinnerPresets.setAdapter(adapter);
+//        viewBinding.spinnerPresets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                presenter.onPresetSelected(presets.get(position));
+//            }
+//        });
 //        viewBinding.spinnerPresets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 //            @Override
 //            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {

@@ -22,8 +22,14 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
-//add state caching
 //save only when band seekbar was released(?)
+//play -> enable eq = eq not attached - works?
+//bands number depends on device: use horizontal seek bar
+//unite internal equalizer screen with equalizer setup dialog. Use bottom sheet dialog?
+//check sound gap on eq start
+//remove selected preset displaying? And saving at all
+//display correct band values
+//
 public class InternalEqualizer implements AppEqualizer {
 
     private final EqualizerStateRepository equalizerStateRepository;

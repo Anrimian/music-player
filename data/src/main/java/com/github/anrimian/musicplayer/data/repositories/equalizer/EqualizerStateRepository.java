@@ -40,6 +40,8 @@ public class EqualizerStateRepository {
 
     private final SharedPreferencesHelper preferences;
 
+    private EqualizerState cachedEqualizerState;
+
     public EqualizerStateRepository(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
@@ -62,10 +64,15 @@ public class EqualizerStateRepository {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+        cachedEqualizerState = state;
     }
 
     @Nullable
     public EqualizerState loadEqualizerState() {
+        if (cachedEqualizerState != null) {
+            return cachedEqualizerState;
+        }
+
         try {
             String rawData = preferences.getString(EQUALIZER_STATE);
             if (rawData == null) {
@@ -82,7 +89,8 @@ public class EqualizerStateRepository {
                 short level = (short) obj.getInt(BAND_LEVEL);
                 bands.put(number, level);
             }
-            return new EqualizerState(currentPreset, bands);
+            cachedEqualizerState = new EqualizerState(currentPreset, bands);
+            return cachedEqualizerState;
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
