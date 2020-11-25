@@ -36,14 +36,18 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_FAST_FORWARD;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_REWIND;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SEEK_TO;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SET_REPEAT_MODE;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP;
@@ -94,7 +98,12 @@ public class MusicService extends Service {
                     | ACTION_PLAY_PAUSE
                     | ACTION_SKIP_TO_NEXT
                     | ACTION_SKIP_TO_PREVIOUS
-                    | ACTION_SEEK_TO);
+                    | ACTION_SEEK_TO
+                    | ACTION_SET_REPEAT_MODE
+                    | ACTION_SET_SHUFFLE_MODE
+                    | ACTION_FAST_FORWARD
+                    | ACTION_REWIND
+            );
     //optimization
     private final ServiceState serviceState = new ServiceState();
 
@@ -161,6 +170,11 @@ public class MusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            stopForeground(true);
+            stopSelf();
+            return START_NOT_STICKY;
+        }
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
@@ -192,12 +206,22 @@ public class MusicService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mediaSession.setActive(false);
         mediaSession.release();
         serviceDisposable.dispose();
     }
 
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
-        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
+        /* player interactor not null check because case:
+        * 1) start-stop play
+        * 2) enable bluetooth connection receiver
+        * 3) hide activity
+        * 4) revoke permission
+        * 5) connect bluetooth device
+        * 6) use play button from device
+        * 7) resume activity from task manager
+        */
+        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY && playerInteractor != null) {
             playerInteractor.play();
         }
     }
@@ -451,6 +475,16 @@ public class MusicService extends Service {
             musicServiceInteractor.setRandomPlayingEnabled(shuffleMode != SHUFFLE_MODE_NONE);
         }
 
+        @Override
+        public void onFastForward() {
+            playerInteractor.fastSeekForward();
+        }
+
+        @Override
+        public void onRewind() {
+            playerInteractor.fastSeekBackward();
+        }
+
         //next - not implemented
 
         @Override
@@ -501,16 +535,6 @@ public class MusicService extends Service {
         @Override
         public void onSkipToQueueItem(long id) {
             super.onSkipToQueueItem(id);
-        }
-
-        @Override
-        public void onFastForward() {
-            super.onFastForward();
-        }
-
-        @Override
-        public void onRewind() {
-            super.onRewind();
         }
 
         @Override

@@ -89,9 +89,6 @@ public interface PlayerView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showLibraryScreen(int selectedLibraryScreen);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void setSkipToNextButtonEnabled(boolean enabled);
-
     @StateStrategyType(SkipStrategy.class)
     void notifyItemMoved(int from, int to);
 

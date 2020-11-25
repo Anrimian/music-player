@@ -6,14 +6,15 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
@@ -52,6 +53,16 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
     @Override
     protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
         return interactor.getGenreItemsObservable(genreId);
+    }
+
+    @Override
+    protected ListPosition getSavedListPosition() {
+        return null;
+    }
+
+    @Override
+    protected void saveListPosition(ListPosition listPosition) {
+
     }
 
     void onFragmentMovedToTop() {

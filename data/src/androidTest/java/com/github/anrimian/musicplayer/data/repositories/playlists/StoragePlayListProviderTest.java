@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import io.reactivex.observers.TestObserver;
+import io.reactivex.rxjava3.observers.TestObserver;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static junit.framework.Assert.assertEquals;

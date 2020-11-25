@@ -53,7 +53,11 @@ public class BluetoothConnectionReceiver extends BroadcastReceiver {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             if (device != null) {
                 BluetoothClass bluetoothClass = device.getBluetoothClass();
+                if (bluetoothClass == null) {
+                    return;
+                }
                 int deviceClass = bluetoothClass.getDeviceClass();
+                //add setting to start without check?
                 if (!ALLOWED_DEVICES_TO_START.contains(deviceClass)) {
                     return;
                 }

@@ -92,9 +92,9 @@
     <dimen name="toolbar_control_offset_2">0dp</dimen>
 
     <!--widgets-->
-    <dimen name="widget_content_margin_vertical">4dp</dimen>
+    <dimen name="widget_content_margin_vertical">0dp</dimen>
+    <dimen name="widget_content_spacing_margin">0dp</dimen>
     <dimen name="widget_content_margin_horizontal">8dp</dimen>
-    <dimen name="widget_content_spacing_margin">2dp</dimen>
 
     <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
     <dimen name="widget_medium_content_margin_horizontal">8dp</dimen>

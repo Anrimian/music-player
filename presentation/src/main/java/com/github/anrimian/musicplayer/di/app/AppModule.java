@@ -18,10 +18,14 @@ import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
 import com.github.anrimian.musicplayer.utils.filelog.FileLog;
 
 import javax.annotation.Nonnull;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.rxjava3.core.Scheduler;
+
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 11.02.2017.
@@ -84,8 +88,9 @@ public class AppModule {
     @Singleton
     WidgetUpdater widgetUpdater(Context context,
                                 LibraryPlayerInteractor playerInteractor,
-                                DisplaySettingsInteractor displaySettingsInteractor) {
-        return new WidgetUpdater(context, playerInteractor, displaySettingsInteractor);
+                                DisplaySettingsInteractor displaySettingsInteractor,
+                                @Named(UI_SCHEDULER) Scheduler scheduler) {
+        return new WidgetUpdater(context, playerInteractor, displaySettingsInteractor, scheduler);
     }
 
     @Provides

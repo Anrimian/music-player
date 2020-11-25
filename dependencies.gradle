@@ -5,6 +5,7 @@ allprojects {
             url "https://maven.google.com"
         }
         maven { url 'https://jitpack.io' }
+        google()
     }
 }
 
@@ -17,24 +18,23 @@ ext {
 
     //support libraries
     androidXVersion = "1.1.0"
-    googleMaterialVersion = "1.1.0"
+    googleMaterialVersion = "1.2.0"
     cardViewVersion = "1.0.0"
     recyclerViewVersion = "1.1.0"
     recyclerViewFastScrollVersion = "1.1.1"
     mediaCompatVersion = "1.1.0"
 
     constraintLayoutVersion = "2.0.0-beta4"
-    rxJavaVersion = "2.2.19"
-    rxAndroidVersion = "2.1.1"
-    rxPermissionsVersion = "0.10.2"
-    rxJavaExtVersion = "0.20.10"
-    moxyVersion = "2.1.2"
-    daggerVersion = "2.28.1"
+    rxJavaVersion = "3.0.6"
+    rxAndroidVersion = "3.0.0"
+    rxPermissionsVersion = "0.12"
+    rxJavaExtVersion = "3.0.1"
+    moxyVersion = "2.2.0"
+    daggerVersion = "2.29.1"
     slidrVersion = "2.1.0"
-    exoPlayerVersion = "2.11.6"
-    roomVersion = "2.2.5"
+    exoPlayerVersion = "2.12.0"
+    roomVersion = "2.3.0-alpha02"
     jTaggerVersion = '2.0.3'
-    circleImageViewVersion = "3.1.0"
     chipsLayoutManagerVersion = "0.3.7"
     glideVersion = "4.11.0"
 
@@ -59,9 +59,9 @@ ext {
     supportMedia = "androidx.media:media:$mediaCompatVersion"
     constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
 
-    rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:$rxJavaExtVersion"
-    rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    rxJava = "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
+    rxJavaExt = "com.github.akarnokd:rxjava3-extensions:$rxJavaExtVersion"
+    rxAndroid = "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
     rxPermissions = "com.github.tbruyelle:rxpermissions:$rxPermissionsVersion"
 
     moxy = "com.github.moxy-community:moxy:$moxyVersion"
@@ -77,13 +77,12 @@ ext {
 
     slidr = "com.r0adkll:slidableactivity:$slidrVersion"
 
-    circleImageView = "de.hdodenhof:circleimageview:$circleImageViewVersion"
     chipsLayoutManager = "com.beloo.widget:ChipsLayoutManager:$chipsLayoutManagerVersion"
 
     exoPlayerCore = "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
 
     room = "androidx.room:room-runtime:$roomVersion"
-    roomRx = "androidx.room:room-rxjava2:$roomVersion"
+    roomRx = "androidx.room:room-rxjava3:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
     roomTest = "android.arch.persistence.room:testing:$roomVersion"
 

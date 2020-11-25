@@ -2,8 +2,8 @@ package com.github.anrimian.musicplayer.ui.settings.display;
 
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpPresenter;
 
 

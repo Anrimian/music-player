@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.albums.list;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -12,9 +13,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
@@ -52,6 +53,10 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
     public void onDestroy() {
         super.onDestroy();
         presenterDisposable.dispose();
+    }
+
+    public void onStop(ListPosition listPosition) {
+        interactor.saveListPosition(listPosition);
     }
 
     void onTryAgainLoadCompositionsClicked() {
@@ -95,6 +100,8 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
     }
 
     private void onAlbumsReceived(List<Album> albums) {
+        boolean firstReceive = this.albums.isEmpty();
+
         this.albums = albums;
         getViewState().submitList(albums);
         if (albums.isEmpty()) {
@@ -105,6 +112,12 @@ public class AlbumsListPresenter extends MvpPresenter<AlbumsListView> {
             }
         } else {
             getViewState().showList();
+            if (firstReceive) {
+                ListPosition listPosition = interactor.getSavedListPosition();
+                if (listPosition != null) {
+                    getViewState().restoreListPosition(listPosition);
+                }
+            }
         }
     }
 }

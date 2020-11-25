@@ -4,8 +4,8 @@ import com.github.anrimian.musicplayer.data.models.composition.source.UriComposi
 import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpPresenter;
 
 public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
@@ -72,6 +72,14 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
 
     void onKeepPlayerInBackgroundChecked(boolean checked) {
         interactor.setExternalPlayerKeepInBackground(checked);
+    }
+
+    void onFastSeekForwardCalled() {
+        interactor.fastSeekForward();
+    }
+
+    void onFastSeekBackwardCalled() {
+        interactor.fastSeekBackward();
     }
 
     private void subscribeOnErrorEvents() {

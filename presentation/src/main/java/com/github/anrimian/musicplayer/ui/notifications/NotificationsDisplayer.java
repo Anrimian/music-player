@@ -74,18 +74,7 @@ public class NotificationsDisplayer {
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
-                    getString(R.string.foreground_channel_description),
-                    NotificationManager.IMPORTANCE_LOW);
-            assert notificationManager != null;
-            notificationManager.createNotificationChannel(channel);
-
-            NotificationChannel errorChannel = new NotificationChannel(ERROR_CHANNEL_ID,
-                    getString(R.string.error_channel_description),
-                    NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(errorChannel);
-        }
+        createChannels(context);
     }
 
     public void showErrorNotification(@StringRes int errorMessageId) {
@@ -203,7 +192,6 @@ public class NotificationsDisplayer {
                     currentNotificationBitmap = bitmap;
                     notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
                 },
-                () -> currentNotificationBitmap,
                 coverImageLoader);
     }
 
@@ -330,14 +318,35 @@ public class NotificationsDisplayer {
     private boolean isNotificationVisible(NotificationManager notificationManager,
                                           int notificationId) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
-            for (StatusBarNotification notification : notifications) {
-                if (notification.getId() == notificationId) {
-                    return true;
+            try {
+                StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
+                for (StatusBarNotification notification : notifications) {
+                    if (notification.getId() == notificationId) {
+                        return true;
+                    }
                 }
-            }
+            } catch (Exception ignored) {} //getActiveNotifications() can throw exception on android 6
         }
         return false;
+    }
+
+    private void createChannels(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager == null) {
+                return;
+            }
+
+            NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
+                    context.getString(R.string.foreground_channel_description),
+                    NotificationManager.IMPORTANCE_LOW);
+            notificationManager.createNotificationChannel(channel);
+
+            NotificationChannel errorChannel = new NotificationChannel(ERROR_CHANNEL_ID,
+                    context.getString(R.string.error_channel_description),
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(errorChannel);
+        }
     }
 
     private String getString(@StringRes int resId) {

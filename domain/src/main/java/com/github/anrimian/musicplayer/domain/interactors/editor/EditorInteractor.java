@@ -2,21 +2,17 @@ package com.github.anrimian.musicplayer.domain.interactors.editor;
 
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
 
-import java.util.LinkedList;
 import java.util.List;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.nullIfEmpty;
 
 public class EditorInteractor {
@@ -81,13 +77,8 @@ public class EditorInteractor {
         return musicProviderRepository.getAlbumObservable(albumId);
     }
 
-    /**
-     * Album-artist in android system and in common file has conflicts. This function
-     * updates media library by real file source tags.
-     */
     public Completable updateTagsFromSource(FullComposition fullComposition) {
-        return editorRepository.getCompositionFileTags(fullComposition)
-                .flatMapCompletable(tags -> updateCompositionTags(fullComposition, tags));
+        return editorRepository.updateTagsFromSource(fullComposition);
     }
 
     public Completable updateAlbumName(String name, long albumId) {
@@ -116,37 +107,5 @@ public class EditorInteractor {
 
     public Completable removeCompositionAlbumArt(FullComposition composition) {
         return editorRepository.removeCompositionAlbumArt(composition);
-    }
-
-    private Completable updateCompositionTags(FullComposition fullComposition,
-                                              CompositionSourceTags tags) {
-        LinkedList<Completable> tasksList = new LinkedList<>();
-
-        String tagTitle = tags.getTitle();
-        if (!isEmpty(tagTitle) && !Objects.equals(fullComposition.getTitle(), tagTitle)) {
-            tasksList.add(editCompositionTitle(fullComposition, tagTitle));
-        }
-
-        String tagArtist = tags.getArtist();
-        if (!isEmpty(tagArtist) && !Objects.equals(fullComposition.getArtist(), tagArtist)) {
-            tasksList.add(editCompositionAuthor(fullComposition, tagArtist));
-        }
-
-        String tagAlbum = tags.getAlbum();
-        if (!isEmpty(tagAlbum) && !Objects.equals(fullComposition.getAlbum(), tagAlbum)) {
-            tasksList.add(editCompositionAlbum(fullComposition, tagAlbum));
-        }
-
-        String tagAlbumArtist = tags.getAlbumArtist();
-        if (!isEmpty(tagAlbumArtist) && !Objects.equals(fullComposition.getAlbumArtist(), tagAlbumArtist)) {
-            tasksList.add(editCompositionAlbumArtist(fullComposition, tagAlbumArtist));
-        }
-
-        String tagLyrics = tags.getLyrics();
-        if (!isEmpty(tagLyrics) && !Objects.equals(fullComposition.getLyrics(), tagLyrics)) {
-            tasksList.add(editCompositionLyrics(fullComposition, tagLyrics));
-        }
-
-        return Completable.concat(tasksList);
     }
 }

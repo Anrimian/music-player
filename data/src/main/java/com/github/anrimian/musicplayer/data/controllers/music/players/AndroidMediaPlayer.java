@@ -22,13 +22,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static android.media.MediaPlayer.MEDIA_ERROR_UNSUPPORTED;
 
@@ -151,7 +151,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void setVolume(float volume) {
-        mediaPlayer.setVolume(volume, volume);
+        try {
+            mediaPlayer.setVolume(volume, volume);
+        } catch (IllegalStateException ignored) {}
     }
 
     @Override
@@ -168,6 +170,25 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             return mediaPlayer.getCurrentPosition();
         } catch (IllegalStateException e) {
             return 0;
+        }
+    }
+
+    @Override
+    public long seekBy(long millis) {
+        long currentPosition = getTrackPosition();
+        try {
+            long targetPosition = currentPosition + millis;
+            if (targetPosition < 0) {
+                targetPosition = 0;
+            }
+            if (targetPosition > mediaPlayer.getDuration()) {
+                return currentPosition;
+            }
+            seekTo(targetPosition);
+            return targetPosition;
+
+        } catch (IllegalStateException ignored) {
+            return currentPosition;
         }
     }
 
@@ -279,8 +300,11 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     private void start() {
-        equalizerController.attachEqualizer(context, mediaPlayer.getAudioSessionId());
-        mediaPlayer.start();
+        try {
+            equalizerController.attachEqualizer(context, mediaPlayer.getAudioSessionId());
+        } catch (IllegalStateException ignored) {}
+
+        start(mediaPlayer);
         startTracingTrackPosition();
         isPlaying = true;
     }
@@ -291,6 +315,12 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
                 mediaPlayer.pause();
             }
         } catch (Exception ignored) {}
+    }
+
+    private void start(MediaPlayer mediaPlayer) {
+        try {
+            mediaPlayer.start();
+        } catch (IllegalStateException ignored) {}
     }
 
 }

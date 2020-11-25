@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.domain.interactors.player;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class PlayerScreenInteractor {
 

@@ -21,7 +21,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
@@ -54,8 +54,7 @@ public class StoragePlayListsProvider {
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
 
             LongSparseArray<StoragePlayList> map = new LongSparseArray<>();
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
+            while (cursor.moveToNext()) {
                 StoragePlayList playList = getPlayListFromCursor(cursorWrapper);
                 if (playList != null) {
                     map.put(playList.getStorageId(), playList);
@@ -122,9 +121,7 @@ public class StoragePlayListsProvider {
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             List<StoragePlayListItem> items = new ArrayList<>(cursor.getCount());
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-
+            while (cursor.moveToNext()) {
                 StoragePlayListItem item = getPlayListItemFromCursor(cursorWrapper);
                 items.add(item);
             }

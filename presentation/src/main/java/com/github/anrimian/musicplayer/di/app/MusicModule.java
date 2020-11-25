@@ -42,7 +42,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.reactivex.Scheduler;
+import io.reactivex.rxjava3.core.Scheduler;
 
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;

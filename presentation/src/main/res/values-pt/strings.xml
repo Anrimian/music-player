@@ -200,11 +200,14 @@
     <string name="change_cover">Change cover</string>
     <string name="pick_from_gallery">Escolha da galeria</string>
     <string name="remove_cover">Retirar capa</string>
-    <string name="changing_cover_progress">Trocando a capa…</string>
     <string name="editor_timeout_error">O tempo limite do editor de TAGs expirou. Talvez o formato do arquivo não seja suportado</string>
     <string name="change_lyrics">Alterar letras</string>
     <string name="lyrics">Letras</string>
     <string name="check_tags_error">Falha ao verificar as TAGS de composição: %s</string>
+    <string name="changing_file_progress">Alterando arquivo…</string>
+    <string name="android_r_edit_file_permission_denied">
+        No Android 11, editar e excluir arquivos requer permissão explícita do sistema
+    </string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s música</item>

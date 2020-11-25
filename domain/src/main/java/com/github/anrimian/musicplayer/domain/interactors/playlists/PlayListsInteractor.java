@@ -5,14 +5,15 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.P
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.List;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class PlayListsInteractor {
 
@@ -79,5 +80,21 @@ public class PlayListsInteractor {
 
     public void setSelectedPlayListScreen(long playListId) {
         uiStateRepository.setSelectedPlayListScreenId(playListId);
+    }
+
+    public void saveListPosition(ListPosition listPosition) {
+        uiStateRepository.savePlaylistsPosition(listPosition);
+    }
+
+    public ListPosition getSavedListPosition() {
+        return uiStateRepository.getSavedPlaylistsPosition();
+    }
+
+    public void saveItemsListPosition(long playListId, ListPosition listPosition) {
+        uiStateRepository.savePlaylistsListPosition(playListId, listPosition);
+    }
+
+    public ListPosition getSavedItemsListPosition(long playListId) {
+        return uiStateRepository.getSavedPlaylistListPosition(playListId);
     }
 }

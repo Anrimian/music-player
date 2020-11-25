@@ -30,13 +30,14 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
@@ -133,9 +134,7 @@ public class StorageMusicProvider {
 
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>(cursor.getCount());
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-
+            while (cursor.moveToNext()) {
                 StorageFullComposition composition = buildStorageComposition(cursorWrapper, albums);
                 if (composition != null) {
                     compositions.put(composition.getId(), composition);
@@ -321,6 +320,35 @@ public class StorageMusicProvider {
         }
         return fd.getFileDescriptor();
     }
+
+    public OutputStream openCompositionOutputStream(Long id) throws FileNotFoundException {
+        if (id == null) {
+            throw new FileNotFoundException("can not open stream for file without media store id");
+        }
+        return contentResolver.openOutputStream(getCompositionUri(id));
+    }
+
+/*    public void modifyComposition(long id, ThrowsCallback<OutputStream> modifyFunction)
+            throws Exception {
+        Uri uri = getCompositionUri(id);
+
+        ContentValues cv = new ContentValues();
+        cv.put(MediaStore.Audio.Media.IS_PENDING, 1);
+        contentResolver.update(uri,
+                cv,
+                Media._ID + " = ?",
+                new String[] { String.valueOf(id) });
+
+        try (OutputStream os = contentResolver.openOutputStream(uri)) {
+            modifyFunction.call(os);
+        }
+
+        cv.put(MediaStore.Audio.Media.IS_PENDING, 0);
+        contentResolver.update(uri,
+                cv,
+                Media._ID + " = ?",
+                new String[] { String.valueOf(id) });
+    }*/
 
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();

@@ -11,10 +11,10 @@ import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import java.util.Date;
 import java.util.List;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.core.Single;
 
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 

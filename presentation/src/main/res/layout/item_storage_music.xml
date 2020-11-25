@@ -49,7 +49,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_music_icon"
         style="@style/ImageStyle.ItemImage"
         android:scaleType="centerCrop"

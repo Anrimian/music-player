@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.DimenRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
@@ -53,6 +54,7 @@ import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
 import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+import static androidx.core.content.ContextCompat.getColor;
 
 /**
  * Created on 16.02.2017.
@@ -67,7 +69,7 @@ public class AndroidUtils {
 
     public static int getColorFromAttr(Context ctx, int attributeId) {
         int colorId = getResourceIdFromAttr(ctx, attributeId);
-        return ContextCompat.getColor(ctx, colorId);
+        return getColor(ctx, colorId);
     }
 
     public static Drawable getDrawableFromAttr(Context ctx, int attributeId) {
@@ -228,7 +230,9 @@ public class AndroidUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(vibrationTime, VibrationEffect.DEFAULT_AMPLITUDE));
+            try {
+                v.vibrate(VibrationEffect.createOneShot(vibrationTime, VibrationEffect.DEFAULT_AMPLITUDE));
+            } catch (Exception ignored) {} //random bug on system version 8.1
         } else {
             v.vibrate(vibrationTime);
         }
@@ -266,8 +270,7 @@ public class AndroidUtils {
             Window window = dialog.getWindow();
             if (window != null) {
                 int color = AndroidUtils.getColorFromAttr(dialog.getContext(), attrRes);
-                DisplayMetrics metrics = new DisplayMetrics();
-                window.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                int screenHeight = getScreenHeight(window);
 
                 GradientDrawable dimDrawable = new GradientDrawable();
 
@@ -278,16 +281,31 @@ public class AndroidUtils {
                 Drawable[] layers = {dimDrawable, navigationBarDrawable};
 
                 LayerDrawable windowBackground = new LayerDrawable(layers);
-                windowBackground.setLayerInsetTop(1, metrics.heightPixels);
+                windowBackground.setLayerInsetTop(1, screenHeight);
 
                 window.setBackgroundDrawable(windowBackground);
+                window.setNavigationBarColor(color);
 
                 if (ColorUtils.calculateLuminance(color) >= 0.5f) {//white
-                    View decorView = window.getDecorView();
-                    decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+//                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {//fast fix for dialog nav bar on android 11
+                    if (Build.VERSION.SDK_INT < 30) {//fast fix for dialog nav bar on android 11
+                        View decorView = window.getDecorView();
+                        decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                    }
                 }
             }
         }
+    }
+
+    public static int getScreenHeight(@NonNull Window window) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            WindowMetrics windowMetrics = window.getWindowManager().getCurrentWindowMetrics();
+//            return windowMetrics.getBounds().height();
+//        }
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        window.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.heightPixels;
+
     }
 
     public static void clearVectorAnimationInfo(ImageView imageView) {
@@ -311,5 +329,18 @@ public class AndroidUtils {
         if (animate && tag != null && drawable instanceof Animatable) {
             ((Animatable) drawable).start();
         }
+    }
+
+    public static int getContrastColor(Context context,
+                                       @ColorInt int color,
+                                       @ColorRes int resultColorDark,
+                                       @ColorRes int resultColorLight) {
+        return isContrastColorDark(color)?
+                getColor(context, resultColorDark)
+                : getColor(context, resultColorLight);
+    }
+
+    public static boolean isContrastColorDark(@ColorInt int color) {
+        return ColorUtils.calculateLuminance(color) >= 0.5f;
     }
 }

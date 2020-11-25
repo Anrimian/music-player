@@ -11,9 +11,9 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.EXTERNAL;
 
@@ -89,6 +89,14 @@ public class ExternalPlayerInteractor {
             return;
         }
         settingsRepository.setExternalPlayerRepeatMode(mode);
+    }
+
+    public void fastSeekForward() {
+        playerCoordinatorInteractor.fastSeekForward(EXTERNAL);
+    }
+
+    public void fastSeekBackward() {
+        playerCoordinatorInteractor.fastSeekBackward(EXTERNAL);
     }
 
     public Observable<Integer> getExternalPlayerRepeatModeObservable() {

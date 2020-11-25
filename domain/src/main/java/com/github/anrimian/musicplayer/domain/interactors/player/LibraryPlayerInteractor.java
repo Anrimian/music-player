@@ -23,12 +23,12 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Completable;
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
@@ -111,6 +111,14 @@ public class LibraryPlayerInteractor {
 
     public void pause() {
         playerCoordinatorInteractor.pause(LIBRARY);
+    }
+
+    public void fastSeekForward() {
+        playerCoordinatorInteractor.fastSeekForward(LIBRARY);
+    }
+
+    public void fastSeekBackward() {
+        playerCoordinatorInteractor.fastSeekBackward(LIBRARY);
     }
 
     public void skipToPrevious() {

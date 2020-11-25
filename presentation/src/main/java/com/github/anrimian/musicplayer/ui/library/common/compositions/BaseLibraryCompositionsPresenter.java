@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettin
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -18,10 +19,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
@@ -85,7 +86,8 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
         }
     }
 
-    public void onStop() {
+    public void onStop(ListPosition listPosition) {
+        saveListPosition(listPosition);
         presenterBatterySafeDisposable.clear();
     }
 
@@ -309,6 +311,8 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
     }
 
     private void onCompositionsReceived(List<Composition> compositions) {
+        boolean firstReceive = this.compositions.isEmpty();
+
         this.compositions = compositions;
         getViewState().updateList(compositions);
         if (compositions.isEmpty()) {
@@ -319,6 +323,12 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
             }
         } else {
             getViewState().showList();
+            if (firstReceive) {
+                ListPosition listPosition = getSavedListPosition();
+                if (listPosition != null) {
+                    getViewState().restoreListPosition(listPosition);
+                }
+            }
 
             if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();
@@ -342,5 +352,9 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
     }
 
     protected abstract Observable<List<Composition>> getCompositionsObservable(String searchText);
+
+    protected abstract ListPosition getSavedListPosition();
+
+    protected abstract void saveListPosition(ListPosition listPosition);
 
 }

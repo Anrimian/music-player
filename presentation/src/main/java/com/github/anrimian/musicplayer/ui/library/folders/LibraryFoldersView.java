@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
@@ -151,4 +152,7 @@ public interface LibraryFoldersView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showCurrentComposition(CurrentComposition currentComposition);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void restoreListPosition(ListPosition listPosition);
 }

@@ -14,7 +14,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class StorageArtistsProvider {
 
@@ -46,9 +46,7 @@ public class StorageArtistsProvider {
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             Map<String, StorageArtist> artists = new HashMap<>(cursor.getCount());
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-
+            while (cursor.moveToNext()) {
                 StorageArtist artist = getArtistFromCursor(cursorWrapper);
                 if (artist != null) {
                     artists.put(artist.getName(), artist);

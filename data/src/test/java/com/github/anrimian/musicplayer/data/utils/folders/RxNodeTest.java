@@ -4,9 +4,9 @@ import org.junit.Test;
 
 import java.util.List;
 
-import io.reactivex.observers.TestObserver;
+import io.reactivex.rxjava3.observers.TestObserver;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class RxNodeTest {
 

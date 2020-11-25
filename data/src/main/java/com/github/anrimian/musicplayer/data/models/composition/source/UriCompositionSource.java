@@ -72,14 +72,14 @@ public class UriCompositionSource implements CompositionSource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UriCompositionSource source = (UriCompositionSource) o;
+        UriCompositionSource that = (UriCompositionSource) o;
 
-        return uri.equals(source.uri);
+        return uri != null ? uri.equals(that.uri) : that.uri == null;
     }
 
     @Override
     public int hashCode() {
-        return uri.hashCode();
+        return uri != null ? uri.hashCode() : 0;
     }
 
     @NonNull
@@ -94,5 +94,71 @@ public class UriCompositionSource implements CompositionSource {
                 ", duration=" + duration +
                 ", size=" + size +
                 '}';
+    }
+
+    public static class Builder {
+        private final Uri uri;
+        private String displayName;
+        private String title;
+        private String artist;
+        private String album;
+        private long duration;
+        private long size;
+        private byte[] imageBytes;
+
+        public Builder(Uri uri) {
+            this.uri = uri;
+        }
+
+        public Uri getUri() {
+            return uri;
+        }
+
+        public Builder setDisplayName(String displayName) {
+            this.displayName = displayName;
+            return this;
+        }
+
+        public Builder setSize(long size) {
+            this.size = size;
+            return this;
+        }
+
+        public Builder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder setArtist(String artist) {
+            this.artist = artist;
+            return this;
+        }
+
+        public Builder setAlbum(String album) {
+            this.album = album;
+            return this;
+        }
+
+        public Builder setDuration(long duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public Builder setImageBytes(byte[] imageBytes) {
+            this.imageBytes = imageBytes;
+            return this;
+        }
+
+        public UriCompositionSource build() {
+            return new UriCompositionSource(uri,
+                    displayName,
+                    title,
+                    artist,
+                    album,
+                    duration,
+                    size,
+                    imageBytes
+            );
+        }
     }
 }

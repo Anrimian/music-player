@@ -3,7 +3,19 @@ package com.github.anrimian.musicplayer.data.utils.preferences;
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.JsonReader;
+import android.util.Log;
 
+import androidx.collection.LruCache;
+
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,6 +98,65 @@ public class SharedPreferencesHelper {
 
     public long getLong(String key) {
         return preferences.getLong(key, 0L);
+    }
+
+    public ListPosition getListPosition(String key) {
+        long positions = getLong(key);
+        return new ListPosition((int) (positions >> 32), (int) positions);
+    }
+
+    public void putListPosition(String key, ListPosition listPosition) {
+        long positions = (((long) listPosition.getPosition()) << 32) | (listPosition.getOffset() & 0xffffffffL);
+        putLong(key, positions);
+    }
+
+    public void putLruCache(String key, LruCache<Long, ListPosition> cache) {
+        try {
+            LinkedHashMap<Long, ListPosition> map = (LinkedHashMap<Long, ListPosition>) cache.snapshot();
+            JSONArray jsonArray = new JSONArray();
+            for (Map.Entry<Long, ListPosition> entry : map.entrySet()) {
+                JSONObject obj = new JSONObject();
+                obj.put("key", entry.getKey());
+
+                ListPosition value = entry.getValue();
+                JSONObject valueObj = new JSONObject();
+                valueObj.put("position", value.getPosition());
+                valueObj.put("offset", value.getOffset());
+
+                obj.put("value", valueObj);
+                jsonArray.put(obj);
+            }
+            putString(key, jsonArray.toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public LruCache<Long, ListPosition> getLruCache(String key, int maxCacheSize) {
+        try {
+            LruCache<Long, ListPosition> cache = new LruCache<>(maxCacheSize);
+
+            String rawData = getString(key);
+            if (rawData == null) {
+                return cache;
+            }
+            JSONArray jsonArray = new JSONArray(rawData);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                Long cacheKey = obj.getLong("key");
+
+                JSONObject cacheValue = obj.getJSONObject("value");
+                ListPosition value = new ListPosition(
+                        cacheValue.getInt("position"),
+                        cacheValue.getInt("offset")
+                );
+
+                cache.put(cacheKey, value);
+            }
+            return cache;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

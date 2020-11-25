@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -24,9 +25,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
@@ -115,7 +116,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         }
     }
 
-    void onStop() {
+    void onStop(ListPosition listPosition) {
+        interactor.saveListPosition(folderId, listPosition);
         presenterBatterySafeDisposable.clear();
     }
 
@@ -564,6 +566,8 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     }
 
     private void onFilesLoaded(List<FileSource> files) {
+        boolean firstReceive = this.sourceList.isEmpty();
+
         this.sourceList = files;
         getViewState().updateList(sourceList);
         if (sourceList.isEmpty()) {
@@ -574,6 +578,12 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             }
         } else {
             getViewState().showList();
+            if (firstReceive) {
+                ListPosition listPosition = interactor.getSavedListPosition(folderId);
+                if (listPosition != null) {
+                    getViewState().restoreListPosition(listPosition);
+                }
+            }
 
             if (isInactive(currentCompositionDisposable)) {
                 subscribeOnCurrentComposition();

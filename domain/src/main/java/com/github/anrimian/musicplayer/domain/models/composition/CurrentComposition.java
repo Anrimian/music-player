@@ -3,11 +3,10 @@ package com.github.anrimian.musicplayer.domain.models.composition;
 
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.annotations.NonNull;
+import io.reactivex.rxjava3.annotations.NonNull;
 
 public class CurrentComposition {
 

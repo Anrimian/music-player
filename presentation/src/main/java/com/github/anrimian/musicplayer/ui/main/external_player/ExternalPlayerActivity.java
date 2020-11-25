@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 
 import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
@@ -22,6 +21,12 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -30,6 +35,7 @@ import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHel
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
+import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
 
@@ -42,13 +48,12 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
 
     private SeekBarViewWrapper seekBarViewWrapper;
 
+    @Nullable
+    private Disposable sourceCreationDisposable;
+
     @ProvidePresenter
     ExternalPlayerPresenter providePresenter() {
-        Uri uriToPlay = getIntent().getData();
-        UriCompositionSource source = createCompositionSource(uriToPlay);
-        ExternalPlayerPresenter presenter = Components.getExternalPlayerComponent().externalPlayerPresenter();
-        presenter.onSourceForPlayingReceived(source);
-        return presenter;
+        return Components.getExternalPlayerComponent().externalPlayerPresenter();
     }
 
     @Override
@@ -70,6 +75,14 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         viewBinding.ivPlayPause.setOnClickListener(v -> presenter.onPlayPauseClicked());
         viewBinding.ivRepeatMode.setOnClickListener(v -> presenter.onRepeatModeButtonClicked());
         onCheckChanged(viewBinding.cbKeepPlayingAfterClose, presenter::onKeepPlayerInBackgroundChecked);
+
+        setOnHoldListener(viewBinding.ivSkipToNext, presenter::onFastSeekForwardCalled);
+        setOnHoldListener(viewBinding.ivSkipToPrevious, presenter::onFastSeekBackwardCalled);
+
+        if (savedInstanceState == null) {
+            Uri uriToPlay = getIntent().getData();
+            createCompositionSource(uriToPlay);
+        }
     }
 
     @Override
@@ -77,8 +90,15 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         super.onNewIntent(intent);
 
         Uri uriToPlay = intent.getData();
-        UriCompositionSource source = createCompositionSource(uriToPlay);
-        presenter.onSourceForPlayingReceived(source);
+        createCompositionSource(uriToPlay);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (sourceCreationDisposable != null) {
+            sourceCreationDisposable.dispose();
+        }
     }
 
     @Override
@@ -142,19 +162,27 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         }
     }
 
-    //async creation?
-    @NonNull
-    private UriCompositionSource createCompositionSource(Uri uri) {
+    private void createCompositionSource(Uri uri) {
+        UriCompositionSource.Builder builder = new UriCompositionSource.Builder(uri);
+        sourceCreationDisposable = Single.fromCallable(() -> builder)
+                .map(this::readDataFromContentResolver)
+                .timeout(2, TimeUnit.SECONDS)
+                .map(this::readDataFromFile)
+                .timeout(2, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturnItem(builder)
+                .subscribe(
+                        createdBuilder -> presenter.onSourceForPlayingReceived(createdBuilder.build())
+                );
+    }
+
+    private UriCompositionSource.Builder readDataFromContentResolver(UriCompositionSource.Builder builder) {
         String displayName = null;
-        String title = null;
-        String artist = null;
-        String album = null;
-        long duration = 0;
         long size = 0;
-        byte[] imageBytes = null;
 
         try (Cursor cursor = getContentResolver().query(
-                uri,
+                builder.getUri(),
                 new String[] {
                         MediaStore.Audio.Media.DISPLAY_NAME,
                         MediaStore.Audio.Media.SIZE
@@ -169,10 +197,20 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
             }
         } catch (Exception ignored) {}
 
+        return builder.setDisplayName(displayName == null? "unknown name" : displayName)
+                .setSize(size);
+    }
+
+    private UriCompositionSource.Builder readDataFromFile(UriCompositionSource.Builder builder) {
+        String title = null;
+        String artist = null;
+        String album = null;
+        long duration = 0;
+        byte[] imageBytes = null;
         MediaMetadataRetriever mmr = null;
         try {
             mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(this, uri);
+            mmr.setDataSource(this, builder.getUri());
 
             artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
             title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
@@ -193,13 +231,10 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
             }
         }
 
-        return new UriCompositionSource(uri,
-                displayName == null? "unknown name" : displayName,
-                title,
-                artist,
-                album,
-                duration,
-                size,
-                imageBytes);
+        return builder.setTitle(title)
+                .setArtist(artist)
+                .setAlbum(album)
+                .setDuration(duration)
+                .setImageBytes(imageBytes);
     }
 }

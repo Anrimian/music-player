@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 
@@ -13,8 +14,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
 
 
 public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumItemsView> {
@@ -52,6 +53,16 @@ public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumI
         return interactor.getAlbumItemsObservable(albumId);
     }
 
+    @Override
+    protected ListPosition getSavedListPosition() {
+        return interactor.getSavedItemsListPosition(albumId);
+    }
+
+    @Override
+    protected void saveListPosition(ListPosition listPosition) {
+        interactor.saveItemsListPosition(albumId, listPosition);
+    }
+
     void onFragmentMovedToTop() {
         //save selected screen. Wait a little for all screens
     }
@@ -74,5 +85,4 @@ public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumI
         this.album = album;
         getViewState().showAlbumInfo(album);
     }
-
 }

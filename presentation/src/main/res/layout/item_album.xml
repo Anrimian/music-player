@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:background="?attr/listItemBackground">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_music_icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -15,6 +15,7 @@
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         android:contentDescription="@string/folder"
+        app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_album_name"
         tools:srcCompat="@drawable/ic_music_placeholder_simple" />

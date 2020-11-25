@@ -6,9 +6,11 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -16,10 +18,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 /**
  * Created on 24.10.2017.
@@ -31,7 +33,7 @@ public class LibraryFoldersScreenInteractor {
     private final LibraryRepository libraryRepository;
     private final EditorRepository editorRepository;
     private final MediaScannerRepository mediaScannerRepository;
-
+    private final UiStateRepository uiStateRepository;
 
     private final BehaviorSubject<Boolean> moveModeSubject = BehaviorSubject.createDefault(false);
     private final LinkedHashSet<FileSource> filesToCopy = new LinkedHashSet<>();
@@ -43,11 +45,13 @@ public class LibraryFoldersScreenInteractor {
     public LibraryFoldersScreenInteractor(LibraryFoldersInteractor foldersInteractor,
                                           LibraryRepository libraryRepository,
                                           EditorRepository editorRepository,
-                                          MediaScannerRepository mediaScannerRepository) {
+                                          MediaScannerRepository mediaScannerRepository,
+                                          UiStateRepository uiStateRepository) {
         this.foldersInteractor = foldersInteractor;
         this.libraryRepository = libraryRepository;
         this.editorRepository = editorRepository;
         this.mediaScannerRepository = mediaScannerRepository;
+        this.uiStateRepository = uiStateRepository;
     }
 
     public Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
@@ -186,5 +190,13 @@ public class LibraryFoldersScreenInteractor {
     public Completable deleteIgnoredFolder(IgnoredFolder folder) {
         return libraryRepository.deleteIgnoredFolder(folder)
                 .andThen(mediaScannerRepository.runStorageScanner());
+    }
+
+    public void saveListPosition(@Nullable Long folderId, ListPosition listPosition) {
+        uiStateRepository.saveFolderListPosition(folderId, listPosition);
+    }
+
+    public ListPosition getSavedListPosition(@Nullable Long folderId) {
+        return uiStateRepository.getSavedFolderListPosition(folderId);
     }
 }

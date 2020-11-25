@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.domain.interactors.settings;
 
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class DisplaySettingsInteractor {
 

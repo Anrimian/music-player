@@ -15,10 +15,10 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.LOADING;
@@ -27,7 +27,7 @@ import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.P
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_PREPARE_ERROR;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
-import static io.reactivex.subjects.BehaviorSubject.createDefault;
+import static io.reactivex.rxjava3.subjects.BehaviorSubject.createDefault;
 
 public class PlayerInteractor {
 
@@ -131,6 +131,14 @@ public class PlayerInteractor {
             musicPlayerController.resume();
         }
         musicPlayerController.seekTo(position);
+    }
+
+    public void fastSeekForward() {
+        musicPlayerController.seekBy(settingsRepository.getRewindValueMillis());
+    }
+
+    public void fastSeekBackward() {
+        musicPlayerController.seekBy(-settingsRepository.getRewindValueMillis());
     }
 
     public Observable<Long> getTrackPositionObservable() {

@@ -7,7 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import java.util.HashMap;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class PlayerCoordinatorInteractor {
 
@@ -61,6 +61,18 @@ public class PlayerCoordinatorInteractor {
         if (playerType == activePlayerType) {
             playerInteractor.pause();
         }
+    }
+
+    public void fastSeekForward(PlayerType playerType) {
+        if (playerType == activePlayerType) {
+            playerInteractor.fastSeekForward();
+        } //else update and save position
+    }
+
+    public void fastSeekBackward(PlayerType playerType) {
+        if (playerType == activePlayerType) {
+            playerInteractor.fastSeekBackward();
+        } //else update and save position
     }
 
     public void prepareToPlay(CompositionSource compositionSource, PlayerType playerType) {

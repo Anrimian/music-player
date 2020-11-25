@@ -29,6 +29,17 @@
         android:layout_height="0dp" />
 
     <ImageView
+        android:id="@+id/ivBottomPanelIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_bottom_panel_open"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
         android:id="@+id/iv_skip_to_previous"
         style="@style/ButtonStyle.Main"
         android:layout_marginEnd="@dimen/content_spacing_margin"
@@ -143,13 +154,14 @@
         app:layout_constraintBottom_toTopOf="@id/sb_track_state"
         app:layout_constraintLeft_toLeftOf="@id/tv_played_time">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_music_icon"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:contentDescription="@string/folder"
+            android:contentDescription="@string/cover"
             android:layout_gravity="center|start"
             android:scaleType="centerCrop"
+            app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
             tools:srcCompat="@drawable/ic_music_placeholder" />
 
     </FrameLayout>

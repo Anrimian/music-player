@@ -19,8 +19,8 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
 
 /**
  * Created on 10.11.2017.
@@ -93,6 +93,12 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public Observable<Long> getTrackPositionObservable() {
         return mediaPlayer.getTrackPositionObservable();
+    }
+
+    @Override
+    public void seekBy(long millis) {
+        long position = mediaPlayer.seekBy(millis);
+        saveTrackPosition(position);
     }
 
     @Override

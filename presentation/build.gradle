@@ -70,7 +70,6 @@ dependencies {
     implementation deps.recyclerViewFastScroll
     implementation deps.constraintLayout
     implementation deps.supportMedia
-    implementation deps.circleImageView
 
     implementation deps.rxAndroid
     implementation deps.rxPermissions

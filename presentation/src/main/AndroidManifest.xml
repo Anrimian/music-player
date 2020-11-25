@@ -103,6 +103,19 @@
         </receiver>
 
         <receiver
+            android:name=".ui.widgets.providers.WidgetProviderSmallExt"
+            android:icon="@mipmap/ic_launcher_round"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_small_ext_metadata">
+            </meta-data>
+        </receiver>
+
+        <receiver
             android:name=".ui.widgets.providers.WidgetProviderMedium"
             android:icon="@mipmap/ic_launcher_round"
             android:label="@string/app_name">

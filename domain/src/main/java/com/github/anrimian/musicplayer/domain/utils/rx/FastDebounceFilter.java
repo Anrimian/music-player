@@ -2,9 +2,9 @@ package com.github.anrimian.musicplayer.domain.utils.rx;
 
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Function;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.functions.Function;
 
 public class FastDebounceFilter<T> implements Function<T, ObservableSource<T>> {
     private static final int DEBOUNCE_MIN_DELAY_MILLIS = 300;
