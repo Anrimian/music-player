@@ -35,6 +35,8 @@ public class AppPopupWindow {
                 true);
 
         popupWindow.setAnimationStyle(R.style.PopupAnimationStyle);
+        //fix for closing by back button or touch on android 5.1
+        popupWindow.setBackgroundDrawable(context.getDrawable(R.drawable.bg_transparent));
 
         popupView.measure(
                 makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),

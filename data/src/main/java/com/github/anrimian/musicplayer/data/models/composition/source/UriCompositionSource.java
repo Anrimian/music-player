@@ -72,14 +72,14 @@ public class UriCompositionSource implements CompositionSource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UriCompositionSource source = (UriCompositionSource) o;
+        UriCompositionSource that = (UriCompositionSource) o;
 
-        return uri.equals(source.uri);
+        return uri != null ? uri.equals(that.uri) : that.uri == null;
     }
 
     @Override
     public int hashCode() {
-        return uri.hashCode();
+        return uri != null ? uri.hashCode() : 0;
     }
 
     @NonNull

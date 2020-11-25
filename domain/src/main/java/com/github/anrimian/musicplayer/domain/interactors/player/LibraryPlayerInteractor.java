@@ -113,6 +113,14 @@ public class LibraryPlayerInteractor {
         playerCoordinatorInteractor.pause(LIBRARY);
     }
 
+    public void fastSeekForward() {
+        playerCoordinatorInteractor.fastSeekForward(LIBRARY);
+    }
+
+    public void fastSeekBackward() {
+        playerCoordinatorInteractor.fastSeekBackward(LIBRARY);
+    }
+
     public void skipToPrevious() {
         if (getActualTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
             onSeekFinished(0);

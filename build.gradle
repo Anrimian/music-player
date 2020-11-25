@@ -7,7 +7,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
@@ -15,7 +15,7 @@ buildscript {
 allprojects {
     ext {
         androidApplicationId = 'com.github.anrimian.musicplayer'
-        androidVersionCode = 84
+        androidVersionCode = 87
         androidVersionName = "0.8.5.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId = 'com.github.anrimian.musicplayer.test'

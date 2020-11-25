@@ -21,7 +21,6 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.DrawableImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
@@ -38,6 +37,8 @@ import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
+
+import static com.bumptech.glide.request.target.Target.SIZE_ORIGINAL;
 
 public class CoverImageLoader {
 
@@ -63,24 +64,26 @@ public class CoverImageLoader {
         }
 
         Glide.with(imageView)
+                .asBitmap()
                 .load(new CompositionImage(data.getId(), data.getDateModified()))
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
-                .listener(new RequestListener<Drawable>() {
+                .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e,
                                                 Object model,
-                                                Target<Drawable> target,
+                                                Target<Bitmap> target,
                                                 boolean isFirstResource) {
                         listener.call(false);
                         return false;
                     }
 
                     @Override
-                    public boolean onResourceReady(Drawable resource,
+                    public boolean onResourceReady(Bitmap resource,
                                                    Object model,
-                                                   Target<Drawable> target,
+                                                   Target<Bitmap> target,
                                                    DataSource dataSource,
                                                    boolean isFirstResource) {
                         listener.call(true);
@@ -93,19 +96,27 @@ public class CoverImageLoader {
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull UriCompositionSource data,
                                              @DrawableRes int errorPlaceholder) {
-        displayImageInReusableTarget(imageView, new UriCompositionImage(data), errorPlaceholder);
+        displayImageInReusableTarget(imageView, new UriCompositionImage(data), null, errorPlaceholder);
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull FullComposition data,
                                              @DrawableRes int errorPlaceholder) {
-        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), errorPlaceholder);
+        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), null, errorPlaceholder);
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull Composition data,
+                                             @Nullable Composition oldData,
                                              @DrawableRes int errorPlaceholder) {
-        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), errorPlaceholder);
+        CompositionImage oldComposition = null;
+        if (oldData != null) {
+            oldComposition = new CompositionImage(oldData.getId(), oldData.getDateModified());
+        }
+        displayImageInReusableTarget(imageView,
+                new CompositionImage(data.getId(), data.getDateModified()),
+                oldComposition,
+                errorPlaceholder);
     }
 
     public void displayImage(@NonNull ImageView imageView,
@@ -116,7 +127,9 @@ public class CoverImageLoader {
         }
 
         Glide.with(imageView)
+                .asBitmap()
                 .load(album)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
@@ -184,17 +197,44 @@ public class CoverImageLoader {
 
     private void displayImageInReusableTarget(@NonNull ImageView imageView,
                                               @NonNull Object data,
+                                              @Nullable Object oldData,
                                               @DrawableRes int errorPlaceholder) {
         if (!isValidContextForGlide(imageView)) {
             return;
         }
 
+        //here replacement with error placeholder flickers, don't know how to solve it
         Glide.with(imageView)
+                .asBitmap()
                 .load(data)
-                .placeholder(errorPlaceholder)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .thumbnail(Glide.with(imageView)
+                        .asBitmap()
+                        .load(oldData)
+                        .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                        .timeout(TIMEOUT_MILLIS))
+                .listener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e,
+                                                Object model,
+                                                Target<Bitmap> target,
+                                                boolean isFirstResource) {
+                        imageView.setImageResource(errorPlaceholder);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource,
+                                                   Object model,
+                                                   Target<Bitmap> target,
+                                                   DataSource dataSource,
+                                                   boolean isFirstResource) {
+                        return false;
+                    }
+                })
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
-                .into(imageViewTarget(imageView));
+                .into(imageView);
     }
 
     private Runnable loadNotificationImage(Object compositionImage,
@@ -209,6 +249,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(compositionImage)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
@@ -219,26 +260,9 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(data)
+                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                 .timeout(TIMEOUT_MILLIS)
                 .into(simpleTarget(onCompleted));
-    }
-
-    private DrawableImageViewTarget imageViewTarget(ImageView imageView) {
-        return new DrawableImageViewTarget(imageView) {
-            @Override
-            public void onLoadStarted(@Nullable Drawable placeholder) {
-                if (view.getDrawable() == null) {
-                    super.onLoadStarted(placeholder);
-                }
-            }
-
-            @Override
-            public void onLoadCleared(@Nullable Drawable placeholder) {
-                if (view.getDrawable() == null) {
-                    super.onLoadCleared(placeholder);
-                }
-            }
-        };
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -257,10 +281,10 @@ public class CoverImageLoader {
         return true;
     }
 
-    private CustomTarget<Bitmap> simpleTarget(Callback<Bitmap> callback) {
-        return new CustomTarget<Bitmap>() {
+    private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {
+        return new CustomTarget<T>() {
             @Override
-            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+            public void onResourceReady(@NonNull T resource, @Nullable Transition<? super T> transition) {
                 callback.call(resource);
             }
 
