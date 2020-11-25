@@ -97,4 +97,12 @@ public interface SettingsRepository {
     Observable<Integer> getSelectedEqualizerTypeObservable();
 
     long getRewindValueMillis();
+
+    void setSleepTimerTime(long millis);
+
+    long getSleepTimerTime();
+
+    void setSleepTimerPlayLastSong(boolean playLastSong);
+
+    boolean isSleepTimerPlayLastSong();
 }

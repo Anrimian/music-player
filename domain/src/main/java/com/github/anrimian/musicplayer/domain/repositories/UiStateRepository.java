@@ -78,4 +78,8 @@ public interface UiStateRepository {
     void savePlaylistsListPosition(@Nullable Long id, ListPosition listPosition);
 
     ListPosition getSavedPlaylistListPosition(@Nullable Long id);
+
+    long getSleepTimerStartTime();
+
+    void setSleepTimerStartTimer(long startTime);
 }

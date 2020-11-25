@@ -43,6 +43,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String EXTERNAL_PLAYER_REPEAT_MODE = "external_player_repeat_mode";
     private static final String EXTERNAL_PLAYER_KEEP_IN_BACKGROUND = "external_player_keep_in_background";
 
+    private static final String SLEEP_TIMER_TIME = "sleep_timer_time";
+    private static final String SLEEP_TIMER_PLAY_LAST = "sleep_timer_play_last";
+
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Order> folderOrderSubject = BehaviorSubject.create();
@@ -308,6 +311,26 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public long getRewindValueMillis() {
         return 10000;
+    }
+
+    @Override
+    public void setSleepTimerTime(long millis) {
+        preferences.getLong(SLEEP_TIMER_TIME, millis);
+    }
+
+    @Override
+    public long getSleepTimerTime() {
+        return preferences.getLong(SLEEP_TIMER_TIME);
+    }
+
+    @Override
+    public void setSleepTimerPlayLastSong(boolean playLastSong) {
+        preferences.putBoolean(SLEEP_TIMER_PLAY_LAST, playLastSong);
+    }
+
+    @Override
+    public boolean isSleepTimerPlayLastSong() {
+        return preferences.getBoolean(SLEEP_TIMER_PLAY_LAST);
     }
 
     private Order orderFromInt(int order) {
