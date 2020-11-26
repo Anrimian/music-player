@@ -35,7 +35,7 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_FOLDER_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_LIBRARY_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_PLAYLIST_SCREEN;
-import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SLEEP_TIMER_START_TIME;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SLEEP_TIMER_REMAINING_MILLIS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.TRACK_POSITION;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
@@ -66,7 +66,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String LIBRARY_ARTISTS_COMPOSITIONS_POSITIONS = "library_artists_compositions_positions";
         String PLAYLISTS_POSITION = "playlists_positions";
         String PLAYLISTS_COMPOSITIONS_POSITIONS = "playlists_compositions_positions";
-        String SLEEP_TIMER_START_TIME = "sleep_timer_start_time";
+        String SLEEP_TIMER_REMAINING_MILLIS = "sleep_timer_remaining_millis";
 
         int LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE = 15;
         int LIBRARY_ALBUMS_POSITIONS_MAX_CACHE_SIZE = 5;
@@ -282,13 +282,13 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     }
 
     @Override
-    public long getSleepTimerStartTime() {
-        return preferences.getLong(SLEEP_TIMER_START_TIME);
+    public long getSleepTimerRemainingMillis() {
+        return preferences.getLong(SLEEP_TIMER_REMAINING_MILLIS);
     }
 
     @Override
-    public void setSleepTimerStartTimer(long startTime) {
-        preferences.putLong(SLEEP_TIMER_START_TIME, startTime);
+    public void setSleepTimerRemainingMillis(long startTime) {
+        preferences.putLong(SLEEP_TIMER_REMAINING_MILLIS, startTime);
     }
 
     private static class LruCachePreference {

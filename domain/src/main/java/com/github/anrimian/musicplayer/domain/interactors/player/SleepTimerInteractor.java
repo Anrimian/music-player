@@ -29,27 +29,22 @@ public class SleepTimerInteractor {
     }
 
     public void start() {
-        //set enabled state
-        //start timer if present
+        startSleepTimer(settingsRepository.getSleepTimerTime());
     }
 
     public void stop() {
-        //set disabled state
-        //cancel timer
+        pause();
+        uiStateRepository.setSleepTimerRemainingMillis(0L);
     }
 
-    public void onCompositionPlayFinished() {
-        //if enabled
-        //decrease counter
-        //stop if counter is 0 OR flag to stop is enabled
+    public void pause() {
+        if (timerDisposable != null) {
+            timerDisposable.dispose();
+        }
     }
 
-    public void setFinishTime() {
-        //save finish time
-    }
-
-    public void setCompositionToFinishCount() {
-        //save count
+    public void resume() {
+        startSleepTimer(uiStateRepository.getSleepTimerRemainingMillis());
     }
 
     public void setPlayLastSong(boolean playLastSong) {
@@ -60,34 +55,19 @@ public class SleepTimerInteractor {
         settingsRepository.setSleepTimerTime(millis);
     }
 
-    private void onTimerFinished() {
-        //if finish play last song is enabled -> set flag to stop
-        //else stop
-    }
-
-    private void startPromoteScreenCountDownTimer() {
-        if (timerDisposable != null && !timerDisposable.isDisposed()) {
-            return;
-        }
-        long startTime = uiStateRepository.getSleepTimerStartTime();
-        if (startTime == 0) {
-            startTime = System.currentTimeMillis();
-            uiStateRepository.setSleepTimerStartTimer(startTime);
-        }
-
-        long remainingSeconds = ((startTime - System.currentTimeMillis()) + settingsRepository.getSleepTimerTime()) / 1000L;
-        if (remainingSeconds <= 0) {
-            return;
-        }
-
+    private void startSleepTimer(long timeMillis) {
+        long remainingSeconds = timeMillis / 1000L;
         timerDisposable = Observable.interval( 1, TimeUnit.SECONDS)
                 .map(seconds -> remainingSeconds - seconds)
                 .doOnNext(timerCountDownSubject::onNext)
                 .takeUntil(seconds -> seconds <= 0)
-                .doOnComplete(() -> {
-                    //stop music
-                    //disable timer
-                })
+                .doOnDispose(() -> uiStateRepository.setSleepTimerRemainingMillis(remainingSeconds))
+                .doOnComplete(this::onTimerFinished)
                 .subscribe();
+    }
+
+    private void onTimerFinished() {
+        //stop music
+        //disable timer
     }
 }
