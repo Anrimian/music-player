@@ -305,6 +305,7 @@ public class MusicService extends Service {
         if (this.repeatMode != serviceState.repeatMode) {
             this.repeatMode = serviceState.repeatMode;
             updateMediaSessionState = true;
+            updateNotification = true;
         }
 
         MusicNotificationSetting newSettings = serviceState.settings;

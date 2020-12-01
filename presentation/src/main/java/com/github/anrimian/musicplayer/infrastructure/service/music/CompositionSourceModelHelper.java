@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
-import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
@@ -31,7 +30,7 @@ public class CompositionSourceModelHelper {
                         ((LibraryCompositionSource) first).getComposition(),
                         ((LibraryCompositionSource) second).getComposition());
             }
-            if (first instanceof CompositionFileSource) {
+            if (first instanceof UriCompositionSource) {
                 return true;
             }
         }
