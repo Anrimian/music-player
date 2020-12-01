@@ -115,8 +115,8 @@
     <dimen name="chip_button_width">34dp</dimen>
     <dimen name="chip_spacing_margin">8dp</dimen>
 
-    <!--notification-->
-    <dimen name="notification_large_icon_size">300dp</dimen>
+    <!--covers-->
+    <integer name="icon_image_size">100</integer>
 
     <!--snackbar-->
     <integer name="snackbar_max_lines">3</integer>
