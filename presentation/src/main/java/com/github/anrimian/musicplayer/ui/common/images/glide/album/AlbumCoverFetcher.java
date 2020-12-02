@@ -68,7 +68,7 @@ public class AlbumCoverFetcher implements DataFetcher<Bitmap> {
     }
 
     private int getCoverSize() {
-        return context.getResources().getDimensionPixelSize(R.dimen.notification_large_icon_size);
+        return context.getResources().getInteger(R.integer.icon_image_size);
     }
 
 }
