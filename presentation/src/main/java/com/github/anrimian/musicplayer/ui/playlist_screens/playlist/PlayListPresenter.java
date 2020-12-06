@@ -303,19 +303,18 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         getViewState().showLoading();
         presenterDisposable.add(playListsInteractor.getCompositionsObservable(playListId)
                 .observeOn(uiScheduler)
-                .filter(o -> isPlaylistEmitIgnored())
+                .filter(o -> isPlaylistEmitAllowed())
                 .subscribe(this::onPlayListsReceived,
                         t -> getViewState().closeScreen(),
                         getViewState()::closeScreen));
     }
 
-    //add this filter to play queue too
-    private boolean isPlaylistEmitIgnored() {
-        boolean isIgnored = numberOfUpdatesToIgnore <= 0;
+    private boolean isPlaylistEmitAllowed() {
+        boolean isAllowed = numberOfUpdatesToIgnore <= 0;
         if (numberOfUpdatesToIgnore > 0) {
             numberOfUpdatesToIgnore--;
         }
-        return isIgnored;
+        return isAllowed;
     }
 
     private void subscribePlayList() {
