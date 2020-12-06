@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.model.Item;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -58,6 +59,8 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private PlayQueueItem currentItem;
 
     private Item<PlayListItem> deletedItem;
+
+    private short numberOfUpdatesToIgnore = 0;
 
     public PlayListPresenter(long playListId,
                              LibraryPlayerInteractor playerInteractor,
@@ -180,7 +183,12 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     void onDragEnded(int position) {
-        playListsInteractor.moveItemInPlayList(playList, startDragPosition, position);
+        if (!ListUtils.isIndexInRange(items, startDragPosition) || !ListUtils.isIndexInRange(items, position)) {
+            return;
+        }
+        numberOfUpdatesToIgnore++;
+        playListsInteractor.moveItemInPlayList(playList, startDragPosition, position)
+                .subscribe();
     }
 
     void onPlayActionSelected(int position) {
@@ -295,9 +303,19 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
         getViewState().showLoading();
         presenterDisposable.add(playListsInteractor.getCompositionsObservable(playListId)
                 .observeOn(uiScheduler)
+                .filter(o -> isPlaylistEmitIgnored())
                 .subscribe(this::onPlayListsReceived,
                         t -> getViewState().closeScreen(),
                         getViewState()::closeScreen));
+    }
+
+    //add this filter to play queue too
+    private boolean isPlaylistEmitIgnored() {
+        boolean isIgnored = numberOfUpdatesToIgnore <= 0;
+        if (numberOfUpdatesToIgnore > 0) {
+            numberOfUpdatesToIgnore--;
+        }
+        return isIgnored;
     }
 
     private void subscribePlayList() {
