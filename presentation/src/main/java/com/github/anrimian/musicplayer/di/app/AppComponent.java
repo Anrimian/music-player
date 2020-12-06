@@ -16,10 +16,11 @@ import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
-import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
@@ -60,6 +61,8 @@ public interface AppComponent {
 
     LibraryPlayerInteractor musicPlayerInteractor();
     DisplaySettingsInteractor displaySettingsInteractor();
+    PlayerInteractor playerInteractor();
+    MusicServiceInteractor musicServiceInteractor();
 
     PlayListsPresenter playListsPresenter();
     CreatePlayListPresenter createPlayListsPresenter();
@@ -78,7 +81,5 @@ public interface AppComponent {
 
     ThemeController themeController();
     EqualizerController equalizerController();
-
-    void inject(MusicService musicService);
 
 }
