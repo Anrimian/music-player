@@ -1,19 +1,8 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
-import com.github.anrimian.musicplayer.data.utils.files.ResourceFile;
-
-import org.junit.Rule;
-import org.junit.Test;
-
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
 public class CompositionSourceEditorTest {
 
-    @Rule
+    /*@Rule
     public ResourceFile res = new ResourceFile("/Кот Леопольд - Неприятность эту мы переживем.mp3");
 
     private StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
@@ -127,5 +116,5 @@ public class CompositionSourceEditorTest {
         String newArtist = sourceEditor.getCompositionAlbumArtist(filePath).blockingGet();
         System.out.println("new album artist: " + newArtist);
         assertEquals(testName, newArtist);
-    }
+    }*/
 }

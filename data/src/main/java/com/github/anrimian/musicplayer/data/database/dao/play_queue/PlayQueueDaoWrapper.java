@@ -43,6 +43,9 @@ public class PlayQueueDaoWrapper {
     public void reshuffleQueue(long currentItemId) {
         appDatabase.runInTransaction(() -> {
             List<PlayQueueEntity> list = playQueueDao.getPlayQueue();
+            if (list.isEmpty()) {
+                return;
+            }
 
             Collections.shuffle(list);
 
