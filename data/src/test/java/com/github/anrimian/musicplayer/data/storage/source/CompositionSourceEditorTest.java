@@ -1,8 +1,22 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.utils.files.ResourceFile;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class CompositionSourceEditorTest {
 
-    /*@Rule
+    @Rule
     public ResourceFile res = new ResourceFile("/Кот Леопольд - Неприятность эту мы переживем.mp3");
 
     private StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
@@ -23,10 +37,11 @@ public class CompositionSourceEditorTest {
     @Test
     public void changeTitleTest() throws IOException {
         String filePath = res.getFile().getPath();
+        when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
 
         String testTitle = "Test title";
-        sourceEditor.setCompositionTitle(filePath, testTitle).subscribe();
+        sourceEditor.setCompositionTitle(anyFullComposition(), testTitle).subscribe();
         String newTitle = sourceEditor.getCompositionTitle(filePath).blockingGet();
         System.out.println("new title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
         assertEquals(testTitle, newTitle);
@@ -35,10 +50,11 @@ public class CompositionSourceEditorTest {
     @Test
     public void changeAlbumTest() throws IOException {
         String filePath = res.getFile().getPath();
+        when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         System.out.println("album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());
 
         String testAlbum = "Test album";
-        sourceEditor.setCompositionAlbum(filePath, testAlbum).subscribe();
+        sourceEditor.setCompositionAlbum(anyFullComposition(), testAlbum).subscribe();
         String newTitle = sourceEditor.getCompositionAlbum(filePath).blockingGet();
         System.out.println("new album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());
         assertEquals(testAlbum, newTitle);
@@ -47,13 +63,14 @@ public class CompositionSourceEditorTest {
     @Test
     public void addGenreTest() throws IOException {
         String filePath = res.getFile().getPath();
+        when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("genres: " + genres);
 
         String testGenre1 = "Test genre1";
         String testGenre2 = "Test genre2";
-        sourceEditor.addCompositionGenre(filePath, testGenre1).subscribe();
-        sourceEditor.addCompositionGenre(filePath, testGenre2).subscribe();
+        sourceEditor.addCompositionGenre(anyFullComposition(), testGenre1).subscribe();
+        sourceEditor.addCompositionGenre(anyFullComposition(), testGenre2).subscribe();
         String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("new genres: " + newGenres);
         assertEquals(testGenre1 + "\u0000" + testGenre2, newGenres);
@@ -62,14 +79,15 @@ public class CompositionSourceEditorTest {
     @Test
     public void removeGenreTest() throws IOException {
         String filePath = res.getFile().getPath();
+        when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("genres: " + genres);
 
         String testGenre1 = "Test genre1";
         String testGenre2 = "Test genre2";
-        sourceEditor.addCompositionGenre(filePath, testGenre1).subscribe();
-        sourceEditor.addCompositionGenre(filePath, testGenre2).subscribe();
-        sourceEditor.removeCompositionGenre(filePath, testGenre1).subscribe();
+        sourceEditor.addCompositionGenre(anyFullComposition(), testGenre1).subscribe();
+        sourceEditor.addCompositionGenre(anyFullComposition(), testGenre2).subscribe();
+        sourceEditor.removeCompositionGenre(anyFullComposition(), testGenre1).subscribe();
         String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("new genres: " + newGenres);
         assertEquals(testGenre2, newGenres);
@@ -78,12 +96,13 @@ public class CompositionSourceEditorTest {
     @Test
     public void removeLastTest() throws IOException {
         String filePath = res.getFile().getPath();
+        when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("genres: " + genres);
 
         String testGenre1 = "Test genre1";
-        sourceEditor.addCompositionGenre(filePath, testGenre1).subscribe();
-        sourceEditor.removeCompositionGenre(filePath, testGenre1).subscribe();
+        sourceEditor.addCompositionGenre(anyFullComposition(), testGenre1).subscribe();
+        sourceEditor.removeCompositionGenre(anyFullComposition(), testGenre1).subscribe();
         String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("new genres: " + newGenres);
         assertEquals("", newGenres);
@@ -92,15 +111,16 @@ public class CompositionSourceEditorTest {
     @Test
     public void changeGenreTest() throws IOException {
         String filePath = res.getFile().getPath();
+        when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("genres: " + genres);
 
         String testGenre1 = "Test genre1";
         String testGenre2 = "Test genre2";
         String testGenre3 = "Test genre3";
-        sourceEditor.addCompositionGenre(filePath, testGenre1).subscribe();
-        sourceEditor.addCompositionGenre(filePath, testGenre2).subscribe();
-        sourceEditor.changeCompositionGenre(filePath, testGenre1, testGenre3).subscribe();
+        sourceEditor.addCompositionGenre(anyFullComposition(), testGenre1).subscribe();
+        sourceEditor.addCompositionGenre(anyFullComposition(), testGenre2).subscribe();
+        sourceEditor.changeCompositionGenre(anyFullComposition(), testGenre1, testGenre3).subscribe();
         String newGenres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("new genres: " + newGenres);
         assertEquals(testGenre3 + "\u0000" + testGenre2, newGenres);
@@ -109,12 +129,31 @@ public class CompositionSourceEditorTest {
     @Test
     public void changeAlbumArtistTest() throws IOException {
         String filePath = res.getFile().getPath();
+        when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         System.out.println("album artist: " + sourceEditor.getCompositionAlbumArtist(filePath).blockingGet());
 
         String testName = "Test album artist";
-        sourceEditor.setCompositionAlbumArtist(filePath, testName).subscribe();
+        sourceEditor.setCompositionAlbumArtist(anyFullComposition(), testName).subscribe();
         String newArtist = sourceEditor.getCompositionAlbumArtist(filePath).blockingGet();
         System.out.println("new album artist: " + newArtist);
         assertEquals(testName, newArtist);
-    }*/
+    }
+
+    private FullComposition anyFullComposition() {
+        return new FullComposition(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0L,
+                0L,
+                0L,
+                0L,
+                null,
+                null,
+                null
+        );
+    }
 }
