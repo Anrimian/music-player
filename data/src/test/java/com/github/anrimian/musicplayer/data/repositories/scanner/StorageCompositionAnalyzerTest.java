@@ -416,6 +416,9 @@ public class StorageCompositionAnalyzerTest {
                 eq(asList(2L)));
     }
 
+    /**
+     * was try to reproduce output when folder deletion leads to SQLiteConstraintException
+     */
     @Test
     public void deleteUnnecessaryFolderTest() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
@@ -423,18 +426,19 @@ public class StorageCompositionAnalyzerTest {
         StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
         currentCompositions.put(2, composition2);
         currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
-        StorageComposition composition4 = fakeStorageComposition(4, "music-4", 2L);
-        currentCompositions.put(4, composition4);
+//        StorageComposition composition4 = fakeStorageComposition(4, "music-4", 3L);
+//        currentCompositions.put(4, composition4);
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
         List<StorageFolder> folders = new LinkedList<>();
         folders.add(new StorageFolder(1L, null, "music"));
         folders.add(new StorageFolder(2L, 1L, "new"));
+//        folders.add(new StorageFolder(3L, 2L, "newest"));
         when(foldersDao.getAllFolders()).thenReturn(folders);
 
         StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
         StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
-        StorageFullComposition c4 = new StorageCompositionBuilder(4, "music-4").relativePath("music/new").build();
+        StorageFullComposition c4 = new StorageCompositionBuilder(4, "music-4").relativePath("music/new/newest").build();
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         newCompositions.put(1, c1);
         newCompositions.put(3, c3);
@@ -444,8 +448,8 @@ public class StorageCompositionAnalyzerTest {
 
         verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter).applyChanges(
-                eq(emptyList()),
-                eq(emptyList()),
+                eq(asList(new AddedNode(2L, new FolderNode<>("newest")))),
+                eq(asList(c4)),
                 eq(asList(composition2)),
                 eq(emptyList()),
                 any(),
