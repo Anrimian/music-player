@@ -470,12 +470,12 @@ public class MusicService extends Service {
 
         @Override
         public void onFastForward() {
-            playerInteractor.fastSeekForward();
+            playerInteractor().fastSeekForward();
         }
 
         @Override
         public void onRewind() {
-            playerInteractor.fastSeekBackward();
+            playerInteractor().fastSeekBackward();
         }
 
         //next - not implemented
