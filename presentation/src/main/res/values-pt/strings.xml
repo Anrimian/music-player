@@ -110,9 +110,6 @@
     <string name="about_app">Sobre</string>
     <string name="version_template">Versão %1$s(Construção %2$d)</string>
     <string name="theme">Tema</string>
-    <string name="white_purple_theme">Branco (Roxo)</string>
-    <string name="white_indigo_theme">Branco (Índigo)</string>
-    <string name="white_teal_theme">Branco (Cerceta)</string>
     <string name="dark_theme">Escuro</string>
     <string name="edit">Editar</string>
     <string name="edit_tags">Editar etiquetas</string>

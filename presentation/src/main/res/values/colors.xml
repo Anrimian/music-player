@@ -36,10 +36,13 @@
 
     <color name="cover_dark_foreground">#33000000</color>
 
+    <color name="color_control_highlight">#1f000000</color>
+
     <!-- leave for future ideas  -->
 <!--    <color name="player_panel_background">#F6F6F6</color>-->
 
     <color name="light_background_level_1">#fafafa</color>
+    <color name="light_background_level_0">#fafafa</color>
     <color name="color_control_third">#CCCCCC</color>
 
     <!--second theme-->

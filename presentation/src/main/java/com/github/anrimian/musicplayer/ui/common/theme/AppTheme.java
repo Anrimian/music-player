@@ -4,30 +4,40 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
 
+//TODO more dark themes and save previous selected dark theme for night mode
+//TODO completely light and dark themes, dynamic/disable shadows
 public enum AppTheme {
     WHITE_PURPLE_DEFAULT(0,
             R.style.PrimaryLightTheme,
-            R.string.white_purple_theme,
+            0,
             R.color.colorPrimary,
-            android.R.color.white,
+            R.color.light_background_level_0,
+            R.color.colorAccent,
+            R.color.color_control_highlight,
             false),
     WHITE_INDIGO(2,
             R.style.PrimaryBlueTheme,
-            R.string.white_indigo_theme,
+            0,
             R.color.colorBluePrimary,
-            android.R.color.white,
+            R.color.light_background_level_0,
+            R.color.colorGreenAccent,
+            R.color.color_control_highlight,
             false),
     WHITE_TEAL(3,
             R.style.PrimaryTealTheme,
-            R.string.white_teal_theme,
+            0,
             R.color.colorTealPrimary,
-            android.R.color.white,
+            R.color.light_background_level_0,
+            R.color.colorPinkAccent,
+            R.color.color_control_highlight,
             false),
     DARK(1,
             R.style.PrimaryDarkTheme,
-            R.string.dark_theme,
+            0,
             R.color.darkColorPrimary,
-            android.R.color.black,
+            R.color.dark_background_level_1,
+            R.color.colorAccentDark,
+            R.color.color_control_highlight_dark,
             true);
 
     private final int id;
@@ -35,6 +45,8 @@ public enum AppTheme {
     private final int descriptionId;
     private final int primaryColorId;
     private final int backgroundColorId;
+    private final int accentColorId;
+    private final int rippleColorId;
     private final boolean isDark;
 
     @NonNull
@@ -52,12 +64,14 @@ public enum AppTheme {
              int descriptionId,
              int primaryColorId,
              int backgroundColorId,
-             boolean isDark) {
+             int accentColorId, int rippleColorId, boolean isDark) {
         this.id = id;
         this.themeResId = themeResId;
         this.descriptionId = descriptionId;
         this.primaryColorId = primaryColorId;
         this.backgroundColorId = backgroundColorId;
+        this.accentColorId = accentColorId;
+        this.rippleColorId = rippleColorId;
         this.isDark = isDark;
     }
 
@@ -79,6 +93,14 @@ public enum AppTheme {
 
     public int getBackgroundColorId() {
         return backgroundColorId;
+    }
+
+    public int getAccentColorId() {
+        return accentColorId;
+    }
+
+    public int getRippleColorId() {
+        return rippleColorId;
     }
 
     public boolean isDark() {
