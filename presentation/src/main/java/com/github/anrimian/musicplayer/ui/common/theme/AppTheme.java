@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
 
-//TODO completely light and dark themes, dynamic/disable shadows
+//TODO completely light(finish shadow) and dark themes, dynamic/disable shadows
 public enum AppTheme {
     WHITE_PURPLE_DEFAULT(0,
             R.style.PrimaryLightTheme,
@@ -30,6 +30,14 @@ public enum AppTheme {
             R.color.colorPinkAccent,
             R.color.color_control_highlight,
             false),
+    COMPLETELY_WHITE(6,
+            R.style.CompletelyWhiteTheme,
+            0,
+            android.R.color.white,
+            android.R.color.white,
+            R.color.colorAccentBlue,
+            R.color.color_control_highlight,
+            false),
     DARK(1,
             R.style.PrimaryDarkTheme,
             0,
@@ -52,6 +60,14 @@ public enum AppTheme {
             R.color.darkColorPrimary,
             R.color.dark_background_level_1,
             R.color.colorGreenAccent,
+            R.color.color_control_highlight_dark,
+            true),
+    COMPLETELY_BLACK(7,
+            R.style.CompletelyBlackTheme,
+            0,
+            android.R.color.black,
+            R.color.dark_background_level_1,
+            R.color.colorAccentBlue,
             R.color.color_control_highlight_dark,
             true);
 
