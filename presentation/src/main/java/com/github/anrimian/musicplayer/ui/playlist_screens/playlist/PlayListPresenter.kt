@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.model.Item
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
@@ -38,6 +39,8 @@ class PlayListPresenter(private val playListId: Long,
     private var startDragPosition = 0
     private var currentItem: PlayQueueItem? = null
     private var deletedItem: Item<PlayListItem>? = null
+
+    private var numberOfUpdatesToIgnore: Short = 0
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -140,8 +143,12 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     fun onDragEnded(position: Int) {
+        if (!ListUtils.isIndexInRange(items, startDragPosition) || !ListUtils.isIndexInRange(items, position)) {
+            return
+        }
+        numberOfUpdatesToIgnore++
         playListsInteractor.moveItemInPlayList(playList, startDragPosition, position)
-    }
+                .subscribe()    }
 
     fun onPlayActionSelected(position: Int) {
         playerInteractor.startPlaying(items.map(PlayListItem::getComposition), position)
@@ -150,8 +157,8 @@ class PlayListPresenter(private val playListId: Long,
     fun onRestoreRemovedItemClicked() {
         val removedComposition = deletedItem!!.data!!.composition
         playListsInteractor.addCompositionsToPlayList(listOf(removedComposition),
-                        playList,
-                        deletedItem!!.position)
+                playList,
+                deletedItem!!.position)
                 .justSubscribe(this::onDefaultError)
     }
 
@@ -241,11 +248,21 @@ class PlayListPresenter(private val playListId: Long,
     private fun subscribeOnCompositions() {
         viewState.showLoading()
         playListsInteractor.getCompositionsObservable(playListId)
+                .observeOn(uiScheduler)
+                .filter { isPlaylistEmitAllowed() }
                 .subscribeOnUi(
                         this::onPlayListsReceived,
                         { viewState.closeScreen() },
                         viewState::closeScreen
                 )
+    }
+
+    private fun isPlaylistEmitAllowed(): Boolean {
+        val isAllowed = numberOfUpdatesToIgnore <= 0
+        if (numberOfUpdatesToIgnore > 0) {
+            numberOfUpdatesToIgnore--
+        }
+        return isAllowed
     }
 
     private fun subscribePlayList() {

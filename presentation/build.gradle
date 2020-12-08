@@ -99,7 +99,7 @@ dependencies {
     kapt deps.roomCompiler
 
     implementation deps.glide
-    annotationProcessor deps.glideCompiler
+    kapt deps.glideCompiler
 
     implementation deps.slidr
 
