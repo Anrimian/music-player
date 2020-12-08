@@ -26,11 +26,11 @@ public final class MyAppGlideModule extends AppGlideModule {
 
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
-        int memoryCacheSizeBytes = 2 * 1024 * 1024;//2 MB
+        int memoryCacheSizeBytes = 6 * 1024 * 1024;//6 MB
         builder.setMemoryCache(new LruResourceCache(memoryCacheSizeBytes));
         builder.setBitmapPool(new LruBitmapPool(memoryCacheSizeBytes));
 
-        int diskCacheSizeBytes = 2 * 1024 * 1024; // 2 MB
+        int diskCacheSizeBytes = 10 * 1024 * 1024; // 10 MB
         String diskCacheDirectory = "image_cache";
         builder.setDiskCache(new InternalCacheDiskCacheFactory(context, diskCacheDirectory, diskCacheSizeBytes));
 

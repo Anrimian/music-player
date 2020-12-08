@@ -18,7 +18,6 @@ import androidx.media.session.MediaButtonReceiver;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
@@ -27,17 +26,14 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
-import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_FAST_FORWARD;
@@ -63,7 +59,6 @@ import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 
 /**
@@ -74,22 +69,7 @@ public class MusicService extends Service {
 
     public static final String REQUEST_CODE = "request_code";
     public static final String START_FOREGROUND_SIGNAL = "start_foreground_signal";
-
-    private NotificationsDisplayer notificationsDisplayer;
-
-    @Inject
-    PlayerInteractor playerInteractor;
-
-    @Inject
-    MusicServiceInteractor musicServiceInteractor;
-
-    @Inject
-    ThemeController themeController;
-
-    @Named(UI_SCHEDULER)
-    @Inject
-    Scheduler uiScheduler;
-
+    
     private final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
     private final Builder stateBuilder = new Builder()
             .setActions(ACTION_PLAY
@@ -123,38 +103,22 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
-
-        AppComponent appComponent = Components.getAppComponent();
-        notificationsDisplayer = appComponent.notificationDisplayer();
-
         if (!Permissions.hasFilePermission(this)) {
-            notificationsDisplayer.startForegroundErrorNotification(this, R.string.no_file_permission);
+            notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
             stopForeground(true);
             stopSelf();
             return;
         }
-        appComponent.inject(this);
-
-        mediaSession.setCallback(mediaSessionCallback);
-
-        Intent activityIntent = new Intent(this, MainActivity.class);
-        PendingIntent pActivityIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
-        mediaSession.setSessionActivity(pActivityIntent);
-
-        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
-        PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
-        mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
 
         //reduce chance to show first notification without info
-        currentSource = playerInteractor.getCurrentSource();
-        notificationSetting = musicServiceInteractor.getNotificationSettings();
+        currentSource = playerInteractor().getCurrentSource();
+        notificationSetting = musicServiceInteractor().getNotificationSettings();
 
         //we must start foreground in onCreate, strange ANR otherwise
-        notificationsDisplayer.startForegroundNotification(this,
+        notificationsDisplayer().startForegroundNotification(this,
                 playerState == PlayerState.PLAY,
                 currentSource,
-                mediaSession,
+                mediaSession(),
                 repeatMode,
                 notificationSetting,
                 true);
@@ -178,10 +142,10 @@ public class MusicService extends Service {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
-            notificationsDisplayer.startForegroundNotification(this,
+            notificationsDisplayer().startForegroundNotification(this,
                     playerState == PlayerState.PLAY,
                     currentSource,
-                    mediaSession,
+                    mediaSession(),
                     repeatMode,
                     notificationSetting,
                     false);
@@ -189,7 +153,7 @@ public class MusicService extends Service {
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
         } else {
-            KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession, intent);
+            KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession(), intent);
             if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
                 handleMediaButtonAction(keyEvent);
             }
@@ -206,8 +170,8 @@ public class MusicService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mediaSession.setActive(false);
-        mediaSession.release();
+        mediaSession().setActive(false);
+        mediaSession().release();
         serviceDisposable.dispose();
     }
 
@@ -221,45 +185,45 @@ public class MusicService extends Service {
         * 6) use play button from device
         * 7) resume activity from task manager
         */
-        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY && playerInteractor != null) {
-            playerInteractor.play();
+        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY && playerInteractor() != null) {
+            playerInteractor().play();
         }
     }
 
     private void handleNotificationAction(int requestCode) {
         switch (requestCode) {
             case PLAY: {
-                playerInteractor.play();
+                playerInteractor().play();
                 break;
             }
             case PAUSE: {
-                playerInteractor.pause();
+                playerInteractor().pause();
                 break;
             }
             case SKIP_TO_NEXT: {
-                musicServiceInteractor.skipToNext();
+                musicServiceInteractor().skipToNext();
                 break;
             }
             case SKIP_TO_PREVIOUS: {
-                musicServiceInteractor.skipToPrevious();
+                musicServiceInteractor().skipToPrevious();
                 break;
             }
             case CHANGE_REPEAT_MODE: {
-                musicServiceInteractor.changeRepeatMode();
+                musicServiceInteractor().changeRepeatMode();
                 break;
             }
         }
     }
 
     private void subscribeOnServiceState() {
-        serviceDisposable.add(Observable.combineLatest(playerInteractor.getPlayerStateObservable(),
-                playerInteractor.getCurrentSourceObservable(),
-                playerInteractor.getTrackPositionObservable(),
-                musicServiceInteractor.getRepeatModeObservable(),
-                musicServiceInteractor.getNotificationSettingObservable(),
-                themeController.getAppThemeObservable(),
+        serviceDisposable.add(Observable.combineLatest(playerInteractor().getPlayerStateObservable(),
+                playerInteractor().getCurrentSourceObservable(),
+                playerInteractor().getTrackPositionObservable(),
+                musicServiceInteractor().getRepeatModeObservable(),
+                musicServiceInteractor().getNotificationSettingObservable(),
+                Components.getAppComponent().themeController().getAppThemeObservable(),
                 serviceState::set)
-                .observeOn(uiScheduler)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onServiceStateReceived));
     }
 
@@ -271,14 +235,14 @@ public class MusicService extends Service {
         if (newCompositionSource == null || newPlayerState == PlayerState.STOP) {
             currentSource = null;
             trackPosition = 0;
-            notificationsDisplayer.cancelCoverLoadingForForegroundNotification();
-            mediaSession.setActive(false);
+            notificationsDisplayer().cancelCoverLoadingForForegroundNotification();
+            mediaSession().setActive(false);
             stopForeground(true);
             stopSelf();
             return;
         }
-        if (!mediaSession.isActive()) {
-            mediaSession.setActive(true);
+        if (!mediaSession().isActive()) {
+            mediaSession().setActive(true);
         }
 
         boolean updateNotification = false;
@@ -314,6 +278,7 @@ public class MusicService extends Service {
         if (this.repeatMode != serviceState.repeatMode) {
             this.repeatMode = serviceState.repeatMode;
             updateMediaSessionState = true;
+            updateNotification = true;
         }
 
         MusicNotificationSetting newSettings = serviceState.settings;
@@ -351,7 +316,7 @@ public class MusicService extends Service {
         assert currentSource != null;
         CompositionSourceModelHelper.updateMediaSessionAlbumArt(currentSource,
                 metadataBuilder,
-                mediaSession,
+                mediaSession(),
                 notificationSetting.isCoversOnLockScreen());
     }
 
@@ -359,13 +324,13 @@ public class MusicService extends Service {
         assert currentSource != null;
         CompositionSourceModelHelper.updateMediaSessionMetadata(currentSource,
                 metadataBuilder,
-                mediaSession,
+                mediaSession(),
                 this);
     }
 
     private void updateMediaSessionState() {
         stateBuilder.setState(toMediaState(playerState), trackPosition, 1);
-        mediaSession.setPlaybackState(stateBuilder.build());
+        mediaSession().setPlaybackState(stateBuilder.build());
     }
 
     private void onPlayerStateChanged(PlayerState playerState) {
@@ -378,10 +343,10 @@ public class MusicService extends Service {
     }
 
     private void updateForegroundNotification(boolean reloadCover) {
-        notificationsDisplayer.updateForegroundNotification(
+        notificationsDisplayer().updateForegroundNotification(
                 playerState == PlayerState.PLAY,
                 currentSource,
-                mediaSession,
+                mediaSession(),
                 repeatMode,
                 notificationSetting,
                 reloadCover);
@@ -411,36 +376,64 @@ public class MusicService extends Service {
         }
     }
 
+    private MediaSessionCompat mediaSession() {
+        if (mediaSession == null) {
+            mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
+            mediaSession.setCallback(mediaSessionCallback);
+
+            Intent activityIntent = new Intent(this, MainActivity.class);
+            PendingIntent pActivityIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
+            mediaSession.setSessionActivity(pActivityIntent);
+
+            Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
+            PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
+            mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
+        }
+        return mediaSession;
+    }
+
+    private PlayerInteractor playerInteractor() {
+        return Components.getAppComponent().playerInteractor();
+    }
+    
+    private MusicServiceInteractor musicServiceInteractor() {
+        return Components.getAppComponent().musicServiceInteractor();
+    }
+    
+    private NotificationsDisplayer notificationsDisplayer() {
+        return Components.getAppComponent().notificationDisplayer();
+    }
+    
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
 
         @Override
         public void onPlay() {
-            playerInteractor.playOrPause();
+            playerInteractor().playOrPause();
         }
 
         @Override
         public void onPause() {
-            playerInteractor.playOrPause();
+            playerInteractor().playOrPause();
         }
 
         @Override
         public void onStop() {
-            playerInteractor.stop();
+            playerInteractor().stop();
         }
 
         @Override
         public void onSkipToNext() {
-            musicServiceInteractor.skipToNext();
+            musicServiceInteractor().skipToNext();
         }
 
         @Override
         public void onSkipToPrevious() {
-            musicServiceInteractor.skipToPrevious();
+            musicServiceInteractor().skipToPrevious();
         }
 
         @Override
         public void onSeekTo(long pos) {
-            playerInteractor.onSeekFinished(pos);
+            playerInteractor().onSeekFinished(pos);
         }
 
         //next - test it
@@ -467,22 +460,22 @@ public class MusicService extends Service {
                     appRepeatMode = RepeatMode.NONE;
                 }
             }
-            musicServiceInteractor.setRepeatMode(appRepeatMode);
+            musicServiceInteractor().setRepeatMode(appRepeatMode);
         }
 
         @Override
         public void onSetShuffleMode(int shuffleMode) {
-            musicServiceInteractor.setRandomPlayingEnabled(shuffleMode != SHUFFLE_MODE_NONE);
+            musicServiceInteractor().setRandomPlayingEnabled(shuffleMode != SHUFFLE_MODE_NONE);
         }
 
         @Override
         public void onFastForward() {
-            playerInteractor.fastSeekForward();
+            playerInteractor().fastSeekForward();
         }
 
         @Override
         public void onRewind() {
-            playerInteractor.fastSeekBackward();
+            playerInteractor().fastSeekBackward();
         }
 
         //next - not implemented
