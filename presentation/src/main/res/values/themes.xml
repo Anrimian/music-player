@@ -80,12 +80,12 @@
 
     <style name="DarkOrangeTheme" parent="@style/PrimaryDarkTheme">
         <item name="colorAccent">@color/colorOrangeAccent</item>
+        <item name="colorPrimaryVariant">@color/colorGreenDarkAccent</item>
     </style>
 
     <style name="DarkGreenTheme" parent="@style/PrimaryDarkTheme">
         <item name="colorAccent">@color/colorGreenDarkAccent</item>
+        <item name="colorPrimaryVariant">@color/colorAccentDark</item>
     </style>
-
-
 
 </resources>
