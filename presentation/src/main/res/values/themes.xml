@@ -40,7 +40,6 @@
         <item name="secondaryButtonColor">@color/secondary_button_color_dark</item>
         <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
         <item name="buttonColorInverse">@color/primary_button_color_dark</item>
-        <item name="android:colorControlHighlight">@color/color_control_highlight</item>
         <item name="colorControlHighlightInverse">@color/color_control_highlight_light</item>
         <item name="colorControlThird">@color/dialog_background_color_dark</item>
 
@@ -78,5 +77,15 @@
         <!--navigation view-->
         <item name="navigationViewPrimaryColor">@color/colorTealPrimary</item>
     </style>
+
+    <style name="DarkOrangeTheme" parent="@style/PrimaryDarkTheme">
+        <item name="colorAccent">@color/colorOrangeAccent</item>
+    </style>
+
+    <style name="DarkGreenTheme" parent="@style/PrimaryDarkTheme">
+        <item name="colorAccent">@color/colorGreenDarkAccent</item>
+    </style>
+
+
 
 </resources>

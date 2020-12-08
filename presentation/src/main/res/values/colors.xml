@@ -94,4 +94,10 @@
     <color name="colorTealPrimaryDark">#00796B</color>
     <color name="colorPinkAccent">#FF4081</color>
 
+    <!--dark theme(orange)-->
+    <color name="colorOrangeAccent">#e65100</color>
+
+    <!--dark theme(green)-->
+    <color name="colorGreenDarkAccent">#00c853</color>
+
 </resources>

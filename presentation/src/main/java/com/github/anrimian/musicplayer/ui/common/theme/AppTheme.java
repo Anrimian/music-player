@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
 
-//TODO more dark themes and save previous selected dark theme for night mode
 //TODO completely light and dark themes, dynamic/disable shadows
 public enum AppTheme {
     WHITE_PURPLE_DEFAULT(0,
@@ -37,6 +36,22 @@ public enum AppTheme {
             R.color.darkColorPrimary,
             R.color.dark_background_level_1,
             R.color.colorAccentDark,
+            R.color.color_control_highlight_dark,
+            true),
+    DARK_ORANGE(4,
+            R.style.DarkOrangeTheme,
+            0,
+            R.color.darkColorPrimary,
+            R.color.dark_background_level_1,
+            R.color.colorOrangeAccent,
+            R.color.color_control_highlight_dark,
+            true),
+    DARK_GREEN(5,
+            R.style.DarkGreenTheme,
+            0,
+            R.color.darkColorPrimary,
+            R.color.dark_background_level_1,
+            R.color.colorGreenAccent,
             R.color.color_control_highlight_dark,
             true);
 
