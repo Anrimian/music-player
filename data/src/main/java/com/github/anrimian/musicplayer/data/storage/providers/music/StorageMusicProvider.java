@@ -445,7 +445,7 @@ public class StorageMusicProvider {
 
     private Uri getStorageUri() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         } else {
             return Media.EXTERNAL_CONTENT_URI;
         }
