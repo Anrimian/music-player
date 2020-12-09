@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
+import android.os.Build;
+
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -33,6 +35,12 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
+
+//TODO albums editor
+//TODO files moving
+//TODO files deleting
+//TODO replace DATA with relative path
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';
@@ -339,15 +347,15 @@ public class CompositionSourceEditor {
     private void editAudioFileTag(String filePath, Long id, ThrowsCallback<Tag> callback)
             throws Exception {
         File fileToEdit = new File(filePath);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
-//                copyFileUsingStream(fileToEdit, tempFile);
-//                runFileAction(tempFile, callback);
-//                copyFileToMediaStore(tempFile, id);
-//            });
-//        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
+                copyFileUsingStream(fileToEdit, tempFile);
+                runFileAction(tempFile, callback);
+                copyFileToMediaStore(tempFile, id);
+            });
+        } else {
             runFileAction(fileToEdit, callback);
-//        }
+        }
     }
 
     private void runFileAction(File file, ThrowsCallback<Tag> callback) throws Exception {
