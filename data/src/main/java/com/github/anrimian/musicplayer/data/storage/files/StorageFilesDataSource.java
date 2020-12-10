@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
+import android.os.Build;
+
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
@@ -111,7 +113,10 @@ public class StorageFilesDataSource {
                                               String directoryName,
                                               List<FilePathComposition> updatedCompositions) {
         String newFolderPath = toParentPath + '/' + directoryName;
-        createDirectory(newFolderPath);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            createDirectory(newFolderPath);
+        }
 
         for (Composition composition: compositions) {
             Long storageId = composition.getStorageId();
@@ -127,7 +132,11 @@ public class StorageFilesDataSource {
                 );
             }
         }
-        storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            storageMusicProvider.updateCompositionsRelativePath(updatedCompositions);
+        } else {
+            storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
+        }
         return FileUtils.getFileName(newFolderPath);
     }
 
@@ -179,7 +188,13 @@ public class StorageFilesDataSource {
 
     @Nonnull
     private String getCompositionFilePath(long storageId) {
-        String filePath = storageMusicProvider.getCompositionFilePath(storageId);
+        String filePath;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            filePath = storageMusicProvider.getCompositionRelativePath(storageId);
+        } else {
+            filePath = storageMusicProvider.getCompositionFilePath(storageId);
+        }
+
         if (filePath == null) {
             throw new RuntimeException("composition path not found in system media store");
         }
@@ -198,6 +213,9 @@ public class StorageFilesDataSource {
 
     private static void moveFile(String oldPath,
                                  String newPath) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return;
+        }
         String destDirectoryPath = FileUtils.getParentDirPath(newPath);
         File destDirectory = new File(destDirectoryPath);
         if (!destDirectory.exists()) {

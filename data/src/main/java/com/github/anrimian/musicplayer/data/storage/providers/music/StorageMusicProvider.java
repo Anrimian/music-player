@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 import androidx.collection.LongSparseArray;
@@ -22,7 +23,6 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
@@ -87,38 +87,38 @@ public class StorageMusicProvider {
 
     public LongSparseArray<StorageFullComposition> getCompositions() {
         String[] query;
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//                query = new String[] {
-//                        Media.ARTIST,
-//                        Media.TITLE,
-//                        Media.DISPLAY_NAME,
-////                            Media.ALBUM,
-//                        Media.DATA,
-//                        Media.RELATIVE_PATH,
-//                        Media.DURATION,
-//                        Media.SIZE,
-//                        Media._ID,
-////                            Media.ARTIST_ID,
-//                        Media.ALBUM_ID,
-//                        Media.DATE_ADDED,
-//                        Media.DATE_MODIFIED
-//                };
-//            } else {
-        query = new String[] {
-                Media.ARTIST,
-                Media.TITLE,
-                Media.DISPLAY_NAME,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            query = new String[] {
+                    Media.ARTIST,
+                    Media.TITLE,
+                    Media.DISPLAY_NAME,
 //                            Media.ALBUM,
-                Media.DATA,
-                Media.DURATION,
-                Media.SIZE,
-                Media._ID,
+                    Media.DATA,
+                    Media.RELATIVE_PATH,
+                    Media.DURATION,
+                    Media.SIZE,
+                    Media._ID,
 //                            Media.ARTIST_ID,
-                Media.ALBUM_ID,
-                Media.DATE_ADDED,
-                Media.DATE_MODIFIED
-        };
-//            }
+                    Media.ALBUM_ID,
+                    Media.DATE_ADDED,
+                    Media.DATE_MODIFIED
+            };
+        } else {
+            query = new String[] {
+                    Media.ARTIST,
+                    Media.TITLE,
+                    Media.DISPLAY_NAME,
+//                            Media.ALBUM,
+                    Media.DATA,
+                    Media.DURATION,
+                    Media.SIZE,
+                    Media._ID,
+//                            Media.ARTIST_ID,
+                    Media.ALBUM_ID,
+                    Media.DATE_ADDED,
+                    Media.DATE_MODIFIED
+            };
+        }
 
         try(Cursor cursor = contentResolver.query(
                 getStorageUri(),
@@ -164,6 +164,34 @@ public class StorageMusicProvider {
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             if (cursor.moveToFirst()) {
                 return cursorWrapper.getString(Media.DATA);
+            }
+            return null;
+        }
+    }
+
+    @Nullable
+    public String getCompositionRelativePath(long storageId) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            throw new IllegalStateException();
+        }
+        String[] query;
+        query = new String[] {
+                Media.RELATIVE_PATH,
+        };
+
+        try(Cursor cursor = contentResolver.query(
+                getStorageUri(),
+                query,
+                Media._ID + " = ?",
+                new String[] { String.valueOf(storageId) },
+                null)) {
+            if (cursor == null || cursor.getCount() == 0) {
+                return null;
+            }
+
+            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+            if (cursor.moveToFirst()) {
+                return cursorWrapper.getString(Media.RELATIVE_PATH);
             }
             return null;
         }
@@ -237,60 +265,18 @@ public class StorageMusicProvider {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public void updateCompositionsRelativePath(List<Composition> compositions,
-                                               String oldPath,
-                                               String newPath) {
+    public void updateCompositionsRelativePath(List<FilePathComposition> compositions) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
-//        Cursor cursor = null;
-//        try {
-//            String[] query;
-//            query = new String[] {
-//                    Media.RELATIVE_PATH,
-//                    Media._ID,
-//            };
-//
-//            cursor = contentResolver.query(
-//                    getCompositionsUri(),
-//                    query,
-//                    Media.RELATIVE_PATH + " LIKE ?",
-//                    new String[] { oldPath },//need selection
-//                    null);
-//            if (cursor == null) {
-//                return;
-//            }
-//
-//            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-//            for (int i = 0; i < cursor.getCount(); i++) {
-//                cursor.moveToPosition(i);
-//                long id = cursorWrapper.getLong(Media._ID);
-//                String relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
-//                if (relativePath == null) {
-//                    continue;
-//                }
-//
-//                String path = relativePath.replace(oldPath, newPath);
-//
-//                ContentProviderOperation operation = ContentProviderOperation.newUpdate(getCompositionsUri())
-//                        .withValue(Media.RELATIVE_PATH, path)
-//                        .withSelection(Media._ID + " = ?", new String[] { String.valueOf(id) })
-//                        .build();
-//
-//                operations.add(operation);
-//
-//            }
-//        } finally {
-//            IOUtils.closeSilently(cursor);
-//        }
-
-        for (Composition composition: compositions) {
+        for (FilePathComposition composition: compositions) {
             Long storageId = composition.getStorageId();
             if (storageId == null) {
                 continue;
             }
-//            String path = composition.getFilePath().replace(oldPath, newPath);
+            Log.d("KEK", "updateCompositionsRelativePath: " + composition.getFilePath());
+            //seems path is right
             ContentProviderOperation operation = ContentProviderOperation.newUpdate(getStorageUri())
-                    .withValue(Media.RELATIVE_PATH, newPath)//we can't move? Path seems right
+                    .withValue(Media.RELATIVE_PATH, composition.getFilePath())
                     .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
@@ -371,11 +357,11 @@ public class StorageMusicProvider {
         }
 
         String relativePath;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//            relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
-//        } else {
-        relativePath = FileUtils.getParentDirPath(filePath);
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
+        } else {
+            relativePath = FileUtils.getParentDirPath(filePath);
+        }
         if (isEmpty(relativePath)) {
             return null;
         }
