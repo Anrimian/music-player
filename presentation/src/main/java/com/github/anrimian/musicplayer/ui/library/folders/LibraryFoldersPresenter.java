@@ -392,9 +392,6 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         getViewState().showInputNewFolderNameDialog();
     }
 
-    //TODO seems moving works, but:
-    // move multiple files issues
-    // update after
     void onNewFileNameForPasteEntered(String name) {
         if (isActive(fileActionDisposable)) {
             return;
