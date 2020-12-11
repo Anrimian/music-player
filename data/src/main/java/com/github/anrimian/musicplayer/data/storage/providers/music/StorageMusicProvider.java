@@ -266,7 +266,7 @@ public class StorageMusicProvider {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.R)
     public void updateCompositionsRelativePath(List<FilePathComposition> compositions) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
