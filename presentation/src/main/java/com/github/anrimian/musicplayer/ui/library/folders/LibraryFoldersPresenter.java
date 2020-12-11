@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -77,6 +78,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     @Nullable
     private IgnoredFolder recentlyAddedIgnoredFolder;
+
+    @Nullable
+    private Completable lastEditAction;
 
     public LibraryFoldersPresenter(@Nullable Long folderId,
                                    LibraryFoldersScreenInteractor interactor,
@@ -388,16 +392,19 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         getViewState().showInputNewFolderNameDialog();
     }
 
+    //TODO seems moving works, but:
+    // move multiple files issues
+    // update after
     void onNewFileNameForPasteEntered(String name) {
         if (isActive(fileActionDisposable)) {
             return;
         }
         dispose(fileActionDisposable);
-        fileActionDisposable = interactor.moveFilesToNewFolder(folderId, name)
+        lastEditAction = interactor.moveFilesToNewFolder(folderId, name)
                 .observeOn(uiScheduler)
                 .doOnSubscribe(o -> getViewState().showMoveProgress())
-                .doFinally(() -> getViewState().hideProgressDialog())
-                .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
+                .doFinally(() -> getViewState().hideProgressDialog());
+        fileActionDisposable = lastEditAction.subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
     }
 
     @SuppressLint("CheckResult")
@@ -414,6 +421,16 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         interactor.deleteIgnoredFolder(recentlyAddedIgnoredFolder)
                 .observeOn(uiScheduler)
                 .subscribe(() -> {}, this::onDefaultError);
+    }
+
+    void onRetryFailedEditActionClicked() {
+        if (lastEditAction != null) {
+            dispose(fileActionDisposable, presenterDisposable);
+            fileActionDisposable = lastEditAction
+                    .doFinally(() -> lastEditAction = null)
+                    .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
+            presenterDisposable.add(fileActionDisposable);
+        }
     }
 
     LinkedHashSet<FileSource> getSelectedFiles() {

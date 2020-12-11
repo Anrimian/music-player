@@ -1,13 +1,13 @@
 package com.github.anrimian.musicplayer.ui.editor.common;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -20,10 +20,9 @@ public class EditorErrorHandler {
 
     private EditRequestFragment fragment;
 
-    public EditorErrorHandler(AppCompatActivity activity,
+    public EditorErrorHandler(FragmentManager fm,
                               Runnable onPermissionGranted,
                               Runnable onPermissionDenied) {
-        FragmentManager fm =  activity.getSupportFragmentManager();
         fragment = (EditRequestFragment) fm.findFragmentByTag(EDITOR_REQUEST_FRAGMENT_TAG);
         if (fragment == null) {
             fragment = new EditRequestFragment();
@@ -35,9 +34,7 @@ public class EditorErrorHandler {
         fragment.setOnPermissionDenied(onPermissionDenied);
     }
 
-    public void handleEditorError(Activity activity,
-                                  ErrorCommand errorCommand,
-                                  Runnable defaultAction) {
+    public void handleEditorError(ErrorCommand errorCommand, Runnable defaultAction) {
         if (errorCommand instanceof EditorErrorCommand) {
             try {
                 fragment.startIntentSenderForResult(
@@ -50,7 +47,10 @@ public class EditorErrorHandler {
                         null
                 );
             } catch (IntentSender.SendIntentException e) {
-                Toast.makeText(activity, "can not start request activity", Toast.LENGTH_LONG).show();
+                Context context = fragment.getContext();
+                if (context != null) {
+                    Toast.makeText(fragment.getContext(), "can not start request activity", Toast.LENGTH_LONG).show();
+                }
             }
         } else {
             defaultAction.run();

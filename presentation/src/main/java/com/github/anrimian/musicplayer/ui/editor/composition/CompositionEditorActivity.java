@@ -146,11 +146,12 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         CompatUtils.setMainButtonStyle(viewBinding.ivLyrics);
         CompatUtils.setMainButtonStyle(viewBinding.ivGenreEdit);
 
-        editorErrorHandler = new EditorErrorHandler(this,
+        FragmentManager fm = getSupportFragmentManager();
+
+        editorErrorHandler = new EditorErrorHandler(fm,
                 presenter::onRetryFailedEditActionClicked,
                 this::showEditorRequestDeniedMessage);
 
-        FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 AUTHOR_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewAuthorEntered));
@@ -366,7 +367,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        editorErrorHandler.handleEditorError(this, errorCommand, () ->
+        editorErrorHandler.handleEditorError(errorCommand, () ->
                 makeSnackbar(viewBinding.container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
         );
     }

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
+import android.app.PendingIntent;
+import android.app.RecoverableSecurityException;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -24,6 +26,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.io.File;
@@ -249,9 +252,8 @@ public class StorageMusicProvider {
             if (storageId == null) {
                 continue;
             }
-            ContentProviderOperation operation = ContentProviderOperation.newUpdate(getStorageUri())
+            ContentProviderOperation operation = ContentProviderOperation.newUpdate(getCompositionUri(storageId))
                     .withValue(Media.DATA, composition.getFilePath())
-                    .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
             operations.add(operation);
@@ -274,10 +276,8 @@ public class StorageMusicProvider {
                 continue;
             }
             Log.d("KEK", "updateCompositionsRelativePath: " + composition.getFilePath());
-            //seems path is right
-            ContentProviderOperation operation = ContentProviderOperation.newUpdate(getStorageUri())
+            ContentProviderOperation operation = ContentProviderOperation.newUpdate(getCompositionUri(storageId))
                     .withValue(Media.RELATIVE_PATH, composition.getFilePath())
-                    .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
             operations.add(operation);
@@ -287,6 +287,16 @@ public class StorageMusicProvider {
             contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
         } catch (OperationApplicationException | RemoteException e) {
             throw new UpdateMediaStoreException(e);
+        } catch (RecoverableSecurityException e) {
+            List<Uri> uris = ListUtils.mapListNotNull(compositions, composition -> {
+                Long storageId = composition.getStorageId();
+                if (storageId == null) {
+                    return null;
+                }
+                return getCompositionUri(storageId);
+            });
+            PendingIntent pIntent = MediaStore.createWriteRequest(contentResolver, uris);
+            throw new RecoverableSecurityExceptionExt(pIntent);
         }
     }
 
