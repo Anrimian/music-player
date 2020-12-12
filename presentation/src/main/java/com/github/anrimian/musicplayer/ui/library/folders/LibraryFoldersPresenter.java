@@ -381,11 +381,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             return;
         }
         dispose(fileActionDisposable);
-        fileActionDisposable = interactor.moveFilesTo(folderId)
+        lastEditAction = interactor.moveFilesTo(folderId)
                 .observeOn(uiScheduler)
                 .doOnSubscribe(o -> getViewState().showMoveProgress())
-                .doFinally(() -> getViewState().hideProgressDialog())
-                .subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
+                .doFinally(() -> getViewState().hideProgressDialog());
+        fileActionDisposable = lastEditAction.subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
     }
 
     void onPasteInNewFolderButtonClicked() {

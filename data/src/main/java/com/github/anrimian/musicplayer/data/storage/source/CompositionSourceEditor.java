@@ -38,8 +38,11 @@ import io.reactivex.rxjava3.core.Single;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 
 //TODO albums editor
-//TODO files moving
-//TODO files deleting
+//files moving - done
+//TODO remove empty folder after files had moved
+//TODO files moving - process error on not "well defined collection" - show advice to move files to right folder
+//TODO file/folder rename
+//TODO files/folder deleting
 //TODO replace DATA with relative path
 public class CompositionSourceEditor {
 

@@ -83,18 +83,12 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
     public List<FilePathComposition> moveCompositionsToFolder(List<Composition> compositions,
                                                               String fromPath,
                                                               String toPath) {
-//        Log.d("KEK2", "moveCompositionsToFolder, fromPath: " + fromPath);
-//        Log.d("KEK2", "moveCompositionsToFolder, toPath: " + toPath);
-
         List<FilePathComposition> updatedCompositions = new LinkedList<>();
         for (Composition composition: compositions) {
             Long storageId = composition.getStorageId();
             if (storageId != null) {
                 String oldPath = getCompositionFilePath(storageId);
                 String newPath = FileUtils.safeReplacePath(oldPath, fromPath, toPath);
-
-//            Log.d("KEK2", "rename file, oldPath: " + oldPath);
-//            Log.d("KEK2", "rename file, newPath: " + newPath);
 
                 moveFile(oldPath, newPath);
 

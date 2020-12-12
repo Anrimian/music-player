@@ -4,7 +4,6 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -86,14 +85,10 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         return newPath;
     }
 
-    //TODO adapt
     @Override
     public List<FilePathComposition> moveCompositionsToFolder(List<Composition> compositions,
                                                               String fromPath,
                                                               String toPath) {
-//        Log.d("KEK2", "moveCompositionsToFolder, fromPath: " + fromPath);
-//        Log.d("KEK2", "moveCompositionsToFolder, toPath: " + toPath);
-
         List<FilePathComposition> updatedCompositions = new LinkedList<>();
         for (Composition composition: compositions) {
             Long storageId = composition.getStorageId();
@@ -101,18 +96,13 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
                 String oldPath = getCompositionFilePath(storageId);
                 String newPath = FileUtils.safeReplacePath(oldPath, fromPath, toPath);
 
-//            Log.d("KEK2", "rename file, oldPath: " + oldPath);
-//            Log.d("KEK2", "rename file, newPath: " + newPath);
-
-                moveFile(oldPath, newPath);
-
                 updatedCompositions.add(new FilePathComposition(composition.getId(),
                         composition.getStorageId(),
                         newPath)
                 );
             }
         }
-        storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
+        storageMusicProvider.updateCompositionsRelativePath(updatedCompositions);
         return updatedCompositions;
     }
 
@@ -199,41 +189,6 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
             throw new RuntimeException("composition path not found in system media store");
         }
         return filePath;
-    }
-
-    private void createDirectory(String path) {
-        File file = new File(path);
-        if (file.exists()) {
-            throw new FileExistsException();
-        }
-        if (!file.mkdir()) {
-            throw new RuntimeException("file not created, path: " + path);
-        }
-    }
-
-    private static void moveFile(String oldPath,
-                                 String newPath) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return;
-        }
-        String destDirectoryPath = FileUtils.getParentDirPath(newPath);
-        File destDirectory = new File(destDirectoryPath);
-        if (!destDirectory.exists()) {
-            boolean created = destDirectory.mkdirs();
-            if (!created) {
-                throw new RuntimeException("parent directory wasn't created");
-            }
-        }
-        renameFile(oldPath, newPath);
-
-        String oldDirectoryPath = FileUtils.getParentDirPath(oldPath);
-        File oldDirectory = new File(oldDirectoryPath);
-        String[] files = oldDirectory.list();
-        if (oldDirectory.isDirectory() && files != null && files.length == 0) {
-            //not necessary to check
-            //noinspection ResultOfMethodCallIgnored
-            oldDirectory.delete();
-        }
     }
 
     private static void renameFile(String oldPath, String newPath) {
