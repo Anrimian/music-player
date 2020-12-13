@@ -111,7 +111,20 @@
     </style>
 
     <style name="CompletelyBlackTheme" parent="PrimaryDarkTheme">
+        <!--primary colors-->
         <item name="colorPrimary">@android:color/black</item>
+        <item name="colorPrimaryDark">@color/dark_background_level_0</item>
+        <item name="colorPrimaryVariant">@color/colorAccentDark</item>
+        <item name="colorPrimaryDarkSecondary">@android:color/black</item>
+
+        <!--background-->
+        <item name="android:colorBackground">@android:color/black</item>
+        <item name="listBackground">@android:color/black</item>
+        <item name="listItemBottomBackground">@android:color/black</item>
+        <item name="listItemBackground">@android:color/black</item>
+        <item name="popupMenuBackgroundColor">@color/dark_background_level_0</item>
+        <item name="dialogBackground">@color/dark_background_level_0</item>
+        <item name="subToolbarBackground">@android:color/black</item>
     </style>
 
 </resources>

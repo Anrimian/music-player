@@ -96,7 +96,7 @@
 
     <!--completely white theme-->
     <color name="colorPrimaryWhiteGray">#848282</color>
-    <color name="colorAccentBlue">#304ffe</color>
+    <color name="colorAccentBlue">#247bee</color>
 
     <!--dark theme(orange)-->
     <color name="colorOrangeAccent">#e65100</color>
