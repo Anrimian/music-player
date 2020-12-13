@@ -294,11 +294,11 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
             return;
         }
         dispose(fileActionDisposable);
-        fileActionDisposable = interactor.renameFolder(folderId, name)
+        lastEditAction = interactor.renameFolder(folderId, name)
                 .observeOn(uiScheduler)
                 .doOnSubscribe(o -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideProgressDialog())
-                .subscribe(() -> {}, this::onDefaultError);
+                .doFinally(() -> getViewState().hideProgressDialog());
+        fileActionDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
     }
 
     void onSelectionModeBackPressed() {
@@ -384,8 +384,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         lastEditAction = interactor.moveFilesTo(folderId)
                 .observeOn(uiScheduler)
                 .doOnSubscribe(o -> getViewState().showMoveProgress())
+                .doOnComplete(getViewState()::updateMoveFilesList)
                 .doFinally(() -> getViewState().hideProgressDialog());
-        fileActionDisposable = lastEditAction.subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
+        fileActionDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
     }
 
     void onPasteInNewFolderButtonClicked() {
@@ -400,8 +401,9 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
         lastEditAction = interactor.moveFilesToNewFolder(folderId, name)
                 .observeOn(uiScheduler)
                 .doOnSubscribe(o -> getViewState().showMoveProgress())
+                .doOnComplete(getViewState()::updateMoveFilesList)
                 .doFinally(() -> getViewState().hideProgressDialog());
-        fileActionDisposable = lastEditAction.subscribe(getViewState()::updateMoveFilesList, this::onDefaultError);
+        fileActionDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
     }
 
     @SuppressLint("CheckResult")

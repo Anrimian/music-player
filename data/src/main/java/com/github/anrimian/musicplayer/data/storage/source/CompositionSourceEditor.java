@@ -39,9 +39,12 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 
 //TODO albums editor
 //files moving - done
-//TODO remove empty folder after files had moved
-//TODO files moving - process error on not "well defined collection" - show advice to move files to right folder
-//TODO file/folder rename
+//TODO remove empty folder after files had moved or folder renamed
+//TODO files moving/folder renaming - process error on not "well defined collection" - show advice to move files to right folder
+//TODO file rename
+//folder rename - done
+//TODO folder rename - delete old folder
+//TODO folder rename - check for duplicate
 //TODO files/folder deleting
 //TODO replace DATA with relative path
 public class CompositionSourceEditor {

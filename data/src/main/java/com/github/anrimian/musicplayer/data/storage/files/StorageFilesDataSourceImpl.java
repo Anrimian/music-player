@@ -28,19 +28,6 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
                                            String oldPath,
                                            String newName,
                                            List<FilePathComposition> updatedCompositions) {
-//        Log.d("KEK2", "changeFolderName, oldPath: " + oldPath);
-//        Log.d("KEK2", "changeFolderName, newPath: " + newPath);
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//            String newName = FileUtils.formatFileName(newPath);
-//            File oldFile = new File(oldPath);
-//            DocumentFile documentFile = DocumentFile.fromFile(oldFile);
-//            documentFile.renameTo(newName);
-//            storageMusicProvider.scanMedia(oldPath);
-//            storageMusicProvider.scanMedia(newPath);
-//        } else {
-
-        //seems working for android <10, implement for scoped storage
         String newPath = FileUtils.getChangedFilePath(oldPath, newName);
         for (Composition composition: compositions) {
             Long storageId = composition.getStorageId();
@@ -59,7 +46,6 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
 
         storageMusicProvider.updateCompositionsFilePath(updatedCompositions);
         return FileUtils.getFileName(newPath);
-//        }
     }
 
     @Override
