@@ -28,9 +28,8 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgrou
 
 public class MusicViewHolder extends SelectableViewHolder {
 
-    private FrameLayout clickableItem;
-
-    private CompositionItemWrapper compositionItemWrapper;
+    private final CompositionItemWrapper compositionItemWrapper;
+    private final FrameLayout clickableItem;
 
     private Composition composition;
 
@@ -47,7 +46,10 @@ public class MusicViewHolder extends SelectableViewHolder {
 
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 o -> iconClickListener.onItemClick(getAdapterPosition(), composition),
-                composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), composition)
+                composition -> iconClickListener.onItemClick(getAdapterPosition(), composition)
+        );
+        binding.btnActionsMenu.setOnClickListener(v ->
+                onCompositionClickListener.onItemClick(getAdapterPosition(), composition)
         );
 
         if (onLongClickListener != null) {
