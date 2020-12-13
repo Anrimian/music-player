@@ -73,6 +73,10 @@ public class SleepTimerInteractor {
         settingsRepository.setSleepTimerTime(millis);
     }
 
+    public long getSleepTimerTime() {
+        return settingsRepository.getSleepTimerTime();
+    }
+
     private void startSleepTimer(long timeMillis) {
         long remainingSeconds = timeMillis / 1000L;
         timerDisposable = Observable.interval( 1, TimeUnit.SECONDS)
