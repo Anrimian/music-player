@@ -39,17 +39,18 @@ public class MusicViewHolder extends SelectableViewHolder {
     public MusicViewHolder(ViewGroup parent,
                            OnPositionItemClickListener<Composition> onCompositionClickListener,
                            OnPositionItemClickListener<Composition> onLongClickListener,
-                           OnPositionItemClickListener<Composition> iconClickListener) {
+                           OnPositionItemClickListener<Composition> iconClickListener,
+                           OnPositionItemClickListener<Composition> menuClickListener) {
         super(parent, R.layout.item_storage_music);
         ItemStorageMusicBinding binding = ItemStorageMusicBinding.bind(itemView);
         clickableItem = binding.clickableItem;
 
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 o -> iconClickListener.onItemClick(getAdapterPosition(), composition),
-                composition -> iconClickListener.onItemClick(getAdapterPosition(), composition)
+                composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), composition)
         );
         binding.btnActionsMenu.setOnClickListener(v ->
-                onCompositionClickListener.onItemClick(getAdapterPosition(), composition)
+                menuClickListener.onItemClick(getAdapterPosition(), composition)
         );
 
         if (onLongClickListener != null) {
