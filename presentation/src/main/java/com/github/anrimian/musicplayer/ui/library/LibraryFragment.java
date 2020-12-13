@@ -46,7 +46,7 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
                 R.menu.library_categories_menu,
                 Gravity.BOTTOM,
                 item -> {
-                    FragmentManager fm = getParentFragmentManager();
+                    FragmentManager fm = safeGetFragmentManager();//don't know how, but gor crashes here
                     if (fm == null) {//can be null in some state, don't know which
                         return;
                     }
@@ -80,6 +80,15 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
 //                        }
                     }
                 });
+    }
+
+    @Nullable
+    private FragmentManager safeGetFragmentManager() {
+        try {
+            return getParentFragmentManager();
+        } catch (IllegalStateException e) {
+            return null;
+        }
     }
 
 }
