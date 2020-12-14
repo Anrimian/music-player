@@ -80,8 +80,17 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     fun onCompositionClicked(position: Int, musicFileSource: CompositionFileSource) {
         processMultiSelectClick(position, musicFileSource) {
             val composition = musicFileSource.composition
-            viewState.showCompositionActionDialog(composition)
+            if (composition == currentComposition) {
+                playerInteractor.playOrPause()
+            } else {
+                interactor.play(folderId, composition)
+                viewState.showCurrentComposition(CurrentComposition(composition, true))
+            }
         }
+    }
+
+    fun onCompositionMenuClick(position: Int, musicFileSource: CompositionFileSource) {
+        viewState.showCompositionActionDialog(musicFileSource.composition)
     }
 
     fun onCompositionIconClicked(composition: Composition) {

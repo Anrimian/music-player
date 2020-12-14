@@ -28,21 +28,21 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         uiScheduler: Scheduler,
 )
     : AppPresenter<T>(uiScheduler, errorParser) {
-    
+
     private val presenterBatterySafeDisposable = CompositeDisposable()
-    
+
     private var currentCompositionDisposable: Disposable? = null
     private var compositionsDisposable: Disposable? = null
-    
+
     private var compositions: List<Composition> = ArrayList()
     private val selectedCompositions = LinkedHashSet<Composition>()
     private val compositionsForPlayList: MutableList<Composition> = LinkedList()
     private val compositionsToDelete: MutableList<Composition> = LinkedList()
-    
+
     private var currentComposition: Composition? = null
-    
+
     private var searchText: String? = null
-    
+
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         subscribeOnUiSettings()
@@ -71,17 +71,26 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
 
     fun onCompositionClicked(position: Int, composition: Composition) {
         if (selectedCompositions.isEmpty()) {
-            viewState.showCompositionActionDialog(composition, position)
-        } else {
-            if (selectedCompositions.contains(composition)) {
-                selectedCompositions.remove(composition)
-                viewState.onCompositionUnselected(composition, position)
+            if (composition == currentComposition) {
+                playerInteractor.playOrPause()
             } else {
-                selectedCompositions.add(composition)
-                viewState.onCompositionSelected(composition, position)
+                playerInteractor.startPlaying(compositions, position)
+                viewState.showCurrentComposition(CurrentComposition(composition, true))
             }
-            viewState.showSelectionMode(selectedCompositions.size)
+            return
         }
+        if (selectedCompositions.contains(composition)) {
+            selectedCompositions.remove(composition)
+            viewState.onCompositionUnselected(composition, position)
+        } else {
+            selectedCompositions.add(composition)
+            viewState.onCompositionSelected(composition, position)
+        }
+        viewState.showSelectionMode(selectedCompositions.size)
+    }
+
+    fun onCompositionMenuClicked(position: Int, composition: Composition) {
+        viewState.showCompositionActionDialog(composition, position)
     }
 
     fun onCompositionIconClicked(position: Int, composition: Composition) {
