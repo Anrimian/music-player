@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -116,7 +115,8 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
                 presenter.getSelectedCompositions(),
                 presenter::onCompositionClicked,
                 presenter::onCompositionLongClick,
-                presenter::onCompositionIconClicked);
+                presenter::onCompositionIconClicked,
+                presenter::onCompositionMenuClicked);
         recyclerView.setAdapter(adapter);
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());

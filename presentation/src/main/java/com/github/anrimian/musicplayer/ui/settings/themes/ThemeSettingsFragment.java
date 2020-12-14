@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsThemesBinding;
@@ -18,13 +19,15 @@ import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.themes.view.ThemesAdapter;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.decorators.DividerItemDecoration;
+import com.r0adkll.slidr.model.SlidrInterface;
 
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
 
 public class ThemeSettingsFragment extends Fragment {
 
     private FragmentSettingsThemesBinding viewBinding;
+
+    private SlidrInterface slidrInterface;
 
     private ThemeController themeController;
 
@@ -50,14 +53,16 @@ public class ThemeSettingsFragment extends Fragment {
         toolbar.setSubtitle(R.string.theme);
         toolbar.setTitleClickListener(null);
 
-        SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided);
+        slidrInterface = SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided);
 
-        viewBinding.rvThemes.setLayoutManager(new LinearLayoutManager(requireContext()));
-        DividerItemDecoration itemDecorator = new DividerItemDecoration(requireContext(),
-                DividerItemDecoration.VERTICAL,
-                getResources().getDimensionPixelSize(R.dimen.toolbar_content_start),
-                false);
-        viewBinding.rvThemes.addItemDecoration(itemDecorator);
+        viewBinding.rvThemes.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false));
+        viewBinding.rvThemes.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                onAlbumsScrolled(viewBinding.rvThemes.computeHorizontalScrollOffset() == 0);
+            }
+        });
 
         adapter = new ThemesAdapter(AppTheme.values(),
                 themeController.getCurrentTheme(),
@@ -68,6 +73,14 @@ public class ThemeSettingsFragment extends Fragment {
         viewBinding.cbAutoNightMode.setOnCheckedChangeListener((v, isChecked) ->
                 themeController.setAutoDarkModeEnabled(requireActivity(), isChecked)
         );
+    }
+
+    private void onAlbumsScrolled(boolean onStart) {
+        if (onStart) {
+            slidrInterface.unlock();
+        } else {
+            slidrInterface.lock();
+        }
     }
 
     private void onThemeClicked(AppTheme appTheme) {

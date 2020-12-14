@@ -32,9 +32,8 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgrou
 
 public class MusicFileViewHolder extends FileViewHolder {
 
-    private FrameLayout clickableItem;
-
-    private CompositionItemWrapper compositionItemWrapper;
+    private final CompositionItemWrapper compositionItemWrapper;
+    private final FrameLayout clickableItem;
 
     private CompositionFileSource fileSource;
 
@@ -45,7 +44,8 @@ public class MusicFileViewHolder extends FileViewHolder {
     public MusicFileViewHolder(ViewGroup parent,
                                OnPositionItemClickListener<CompositionFileSource> onCompositionClickListener,
                                OnPositionItemClickListener<FileSource> onLongClickListener,
-                               Callback<Composition> iconClickListener) {
+                               Callback<Composition> iconClickListener,
+                               OnPositionItemClickListener<CompositionFileSource> menuClickListener) {
         super(parent, R.layout.item_storage_music);
         ItemStorageMusicBinding binding = ItemStorageMusicBinding.bind(itemView);
         clickableItem = binding.clickableItem;
@@ -53,6 +53,9 @@ public class MusicFileViewHolder extends FileViewHolder {
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 iconClickListener,
                 composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), fileSource)
+        );
+        binding.btnActionsMenu.setOnClickListener(v ->
+                menuClickListener.onItemClick(getAdapterPosition(), fileSource)
         );
 
         if (onLongClickListener != null) {

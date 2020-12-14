@@ -38,6 +38,7 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
     private final OnPositionItemClickListener<Composition> onCompositionClickListener;
     private final OnPositionItemClickListener<Composition> onLongClickListener;
     private final OnPositionItemClickListener<Composition> iconClickListener;
+    private final OnPositionItemClickListener<Composition> menuClickListener;
     private final Callback<Album> albumClickListener;
     private final Callback<Boolean> albumsScrollStateCallback;
 
@@ -50,6 +51,7 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
                               OnPositionItemClickListener<Composition> onCompositionClickListener,
                               OnPositionItemClickListener<Composition> onLongClickListener,
                               OnPositionItemClickListener<Composition> iconClickListener,
+                              OnPositionItemClickListener<Composition> menuClickListener,
                               Callback<Album> albumClickListener,
                               Callback<Boolean> albumsScrollStateCallback) {
         super(recyclerView, new SimpleDiffItemCallback<>(
@@ -60,6 +62,7 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
         this.onCompositionClickListener = onCompositionClickListener;
         this.onLongClickListener = onLongClickListener;
         this.iconClickListener = iconClickListener;
+        this.menuClickListener = menuClickListener;
         this.albumClickListener = albumClickListener;
         this.albumsScrollStateCallback = albumsScrollStateCallback;
     }
@@ -72,7 +75,8 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
                 return new MusicViewHolder(parent,
                         wrapPositionListener(onCompositionClickListener),
                         wrapPositionListener(onLongClickListener),
-                        wrapPositionListener(iconClickListener)
+                        wrapPositionListener(iconClickListener),
+                        wrapPositionListener(menuClickListener)
                 );
             }
             case TYPE_ALBUMS: {

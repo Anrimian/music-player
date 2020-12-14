@@ -23,9 +23,10 @@ public class ThemeController {
     private static final String PREFERENCES_NAME = "theme_preferences";
 
     private static final String THEME_ID = "theme_id";
+    private static final String LATEST_DARK_THEME_ID = "latest_dark_theme_id";
     private static final String AUTO_DARK_THEME = "auto_dark_theme";
 
-    private BehaviorSubject<AppTheme> themeSubject = BehaviorSubject.create();
+    private final BehaviorSubject<AppTheme> themeSubject = BehaviorSubject.create();
 
     private final Context context;
     private final SharedPreferencesHelper preferences;
@@ -55,6 +56,9 @@ public class ThemeController {
         if (appTheme == currentTheme) {
             return;
         }
+        if (currentTheme.isDark()) {
+            setLatestDarkTheme(currentTheme);
+        }
         preferences.putInt(THEME_ID, appTheme.getId());
 
         if (applyThemeRules(appTheme) != applyThemeRules(currentTheme)) {
@@ -63,7 +67,7 @@ public class ThemeController {
     }
 
     public AppTheme getCurrentTheme() {
-        return AppTheme.getTheme(preferences.getInt(THEME_ID, 0));
+        return AppTheme.getTheme(preferences.getInt(THEME_ID, AppTheme.WHITE_PURPLE_DEFAULT.getId()));
     }
 
     @ColorInt
@@ -87,6 +91,14 @@ public class ThemeController {
         return preferences.getBoolean(AUTO_DARK_THEME, true);
     }
 
+    private AppTheme getLatestDarkTheme() {
+        return AppTheme.getTheme(preferences.getInt(LATEST_DARK_THEME_ID, AppTheme.DARK.getId()));
+    }
+
+    private void setLatestDarkTheme(AppTheme appTheme) {
+        preferences.putInt(LATEST_DARK_THEME_ID, appTheme.getId());
+    }
+
     private void processThemeChange(Activity activity, AppTheme appTheme) {
         activity.getTheme().applyStyle(appTheme.getThemeResId(), true);
         updateTaskManager(activity);
@@ -97,7 +109,7 @@ public class ThemeController {
     }
 
     private AppTheme getCurrentUsedTheme() {
-        AppTheme theme = AppTheme.getTheme(preferences.getInt(THEME_ID, 0));
+        AppTheme theme = AppTheme.getTheme(preferences.getInt(THEME_ID, AppTheme.WHITE_PURPLE_DEFAULT.getId()));
         return applyThemeRules(theme);
     }
 
@@ -105,7 +117,7 @@ public class ThemeController {
         if (isAutoDarkThemeEnabled()
                 && !theme.isDark()
                 && isSystemNightModeEnabled()) {
-            theme = AppTheme.DARK;
+            theme = getLatestDarkTheme();
         }
         return theme;
     }
