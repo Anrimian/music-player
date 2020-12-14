@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
@@ -190,6 +191,23 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         } catch (IllegalStateException ignored) {
             return currentPosition;
         }
+    }
+
+    @Override
+    public void setPlaySpeed(float speed) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
+        }
+    }
+
+    @Override
+    public float getPlaySpeed() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                return mediaPlayer.getPlaybackParams().getSpeed();
+            } catch (IllegalStateException ignored) {}
+        }
+        return 1f;
     }
 
     @Override

@@ -25,6 +25,8 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     private CompositionSource currentComposition;
     private long currentTrackPosition;
 
+    private float currentPlaySpeed = 1f;
+
     @SafeVarargs
     public CompositeMediaPlayer(Function<AppMediaPlayer>... mediaPlayers) {
         this.mediaPlayers = mediaPlayers;
@@ -89,6 +91,17 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
+    public void setPlaySpeed(float speed) {
+        this.currentPlaySpeed = speed;
+        currentPlayer.setPlaySpeed(speed);
+    }
+
+    @Override
+    public float getPlaySpeed() {
+        return currentPlaySpeed;
+    }
+
+    @Override
     public void release() {
         currentPlayer.release();
     }
@@ -99,6 +112,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
             currentPlayer.release();
         }
         currentPlayer = mediaPlayers[index].call();
+        currentPlayer.setPlaySpeed(currentPlaySpeed);
 
         playerDisposable.clear();
         playerDisposable.add(currentPlayer.getEventsObservable()

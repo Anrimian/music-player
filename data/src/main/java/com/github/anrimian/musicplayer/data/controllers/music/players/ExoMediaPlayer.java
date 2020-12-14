@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
@@ -149,6 +150,17 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         }
         seekTo(targetPosition);
         return targetPosition;
+    }
+
+    @Override
+    public void setPlaySpeed(float speed) {
+        PlaybackParameters param = new PlaybackParameters(speed);
+        getPlayer().setPlaybackParameters(param);
+    }
+
+    @Override
+    public float getPlaySpeed() {
+        return getPlayer().getPlaybackParameters().speed;
     }
 
     @Override

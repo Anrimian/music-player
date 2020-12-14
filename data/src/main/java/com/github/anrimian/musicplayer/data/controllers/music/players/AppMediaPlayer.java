@@ -27,5 +27,9 @@ public interface AppMediaPlayer {
 
     long seekBy(long millis);
 
+    void setPlaySpeed(float speed);
+
+    float getPlaySpeed();
+
     void release();
 }
