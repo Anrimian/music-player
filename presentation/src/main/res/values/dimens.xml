@@ -42,6 +42,7 @@
     <dimen name="content_vertical_spacing_margin">4dp</dimen>
    <!--content_vertical_margin*2(32) + fab size(56) -->
     <dimen name="list_bottom_padding_with_fab">88dp</dimen>
+    <dimen name="list_horizontal_margin">8dp</dimen>
 
     <!--dialogs-->
     <dimen name="dialog_content_margin_start">20dp</dimen>
@@ -140,4 +141,8 @@
     <!--seekbar-->
     <dimen name="seekbar_height">2dp</dimen>
     <dimen name="seekbar_corner_radius">6dp</dimen>
+
+    <!--cards-->
+    <dimen name="card_corner_radius">8dp</dimen>
+
 </resources>

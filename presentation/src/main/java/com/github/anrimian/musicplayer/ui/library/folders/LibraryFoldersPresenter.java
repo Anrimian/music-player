@@ -132,8 +132,18 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
     void onCompositionClicked(int position, CompositionFileSource musicFileSource) {
         processMultiSelectClick(position, musicFileSource, () -> {
             Composition composition = musicFileSource.getComposition();
-            getViewState().showCompositionActionDialog(composition);
+            if (composition.equals(currentComposition)) {
+                playerInteractor.playOrPause();
+            } else {
+                interactor.play(folderId, composition);
+                getViewState().showCurrentComposition(new CurrentComposition(composition, true));
+            }
         });
+    }
+
+    void onCompositionMenuClick(int position, CompositionFileSource musicFileSource) {
+        Composition composition = musicFileSource.getComposition();
+        getViewState().showCompositionActionDialog(composition);
     }
 
     void onCompositionIconClicked(int position, Composition composition) {

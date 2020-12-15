@@ -120,7 +120,8 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
                 presenter.getSelectedCompositions(),
                 presenter::onCompositionClicked,
                 presenter::onCompositionLongClick,
-                presenter::onCompositionIconClicked);
+                presenter::onCompositionIconClicked,
+                presenter::onCompositionMenuClicked);
         recyclerView.setAdapter(adapter);
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());

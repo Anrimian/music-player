@@ -140,6 +140,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
                 presenter::onCompositionClicked,
                 presenter::onCompositionLongClick,
                 presenter::onCompositionIconClicked,
+                presenter::onCompositionMenuClicked,
                 this::onAlbumClicked,
                 this::onAlbumsScrolled);
         recyclerView.setAdapter(adapter);
