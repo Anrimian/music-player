@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
+import androidx.core.util.Pair;
+
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
@@ -49,10 +51,10 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
     }
 
     @Override
-    public String renameCompositionFile(FullComposition composition, String fileName) {
+    public Pair<String, String> renameCompositionFile(FullComposition composition, String fileName) {
         Long storageId = composition.getStorageId();
         if (storageId == null) {
-            return null;
+            return new Pair<>(null, fileName);
         }
 
         String oldPath = getCompositionFilePath(storageId);
@@ -62,7 +64,9 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
         storageMusicProvider.updateCompositionFilePath(storageId, newPath);
         storageMusicProvider.updateCompositionFileName(storageId, fileName);
 
-        return newPath;
+        String newFileName = storageMusicProvider.getCompositionFileName(storageId);
+
+        return new Pair<>(newPath, newFileName);
     }
 
     @Override

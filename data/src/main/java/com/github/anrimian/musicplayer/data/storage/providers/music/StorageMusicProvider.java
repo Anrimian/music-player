@@ -173,6 +173,31 @@ public class StorageMusicProvider {
     }
 
     @Nullable
+    public String getCompositionFileName(long storageId) {
+        String[] query;
+        query = new String[] {
+                Media.DISPLAY_NAME,
+        };
+
+        try(Cursor cursor = contentResolver.query(
+                getStorageUri(),
+                query,
+                Media._ID + " = ?",
+                new String[] { String.valueOf(storageId) },
+                null)) {
+            if (cursor == null || cursor.getCount() == 0) {
+                return null;
+            }
+
+            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+            if (cursor.moveToFirst()) {
+                return cursorWrapper.getString(Media.DISPLAY_NAME);
+            }
+            return null;
+        }
+    }
+
+    @Nullable
     public String getCompositionRelativePath(long storageId) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             throw new IllegalStateException();

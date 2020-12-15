@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
+import androidx.core.util.Pair;
+
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -12,7 +14,7 @@ public interface StorageFilesDataSource {
                                     String newName,
                                     List<FilePathComposition> updatedCompositions);
 
-    String renameCompositionFile(FullComposition composition, String fileName);
+    Pair<String, String> renameCompositionFile(FullComposition composition, String fileName);
 
     List<FilePathComposition> moveCompositionsToFolder(List<Composition> compositions,
                                                        String fromPath,

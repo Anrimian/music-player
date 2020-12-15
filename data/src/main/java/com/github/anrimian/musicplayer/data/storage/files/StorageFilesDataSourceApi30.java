@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.storage.files;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
@@ -50,22 +51,18 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         return FileUtils.getFileName(newPath);
     }
 
-    //TODO adapt
     @Override
-    public String renameCompositionFile(FullComposition composition, String fileName) {
+    public Pair<String, String> renameCompositionFile(FullComposition composition, String fileName) {
         Long storageId = composition.getStorageId();
         if (storageId == null) {
-            return null;
+            return new Pair<>(null, fileName);
         }
 
-        String oldPath = getCompositionFilePath(storageId);
-        String newPath = FileUtils.getChangedFilePath(oldPath, fileName);
-        renameFile(oldPath, newPath);
-
-        storageMusicProvider.updateCompositionFilePath(storageId, newPath);
         storageMusicProvider.updateCompositionFileName(storageId, fileName);
 
-        return newPath;
+        String newFileName = storageMusicProvider.getCompositionFileName(storageId);
+
+        return new Pair<>(null, newFileName);
     }
 
     @Override

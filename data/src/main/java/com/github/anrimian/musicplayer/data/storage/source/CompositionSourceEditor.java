@@ -41,10 +41,10 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //files moving - done
 //TODO remove empty folder after files had moved or folder renamed
 //TODO files moving/folder renaming - process error on not "well defined collection" - show advice to move files to right folder
-//TODO file rename
+//file rename - done
 //folder rename - done
 //TODO folder rename - delete old folder
-//TODO folder rename - check for duplicate
+//TODO folder rename - check for duplicate?
 //TODO files/folder deleting
 //TODO replace DATA with relative path
 public class CompositionSourceEditor {
@@ -317,23 +317,21 @@ public class CompositionSourceEditor {
     }
 
     private Completable changeCompositionAlbumArt(String filePath, Long id, ImageSource imageSource) {
-        return Completable.fromAction(() -> {
-            editAudioFileTag(filePath,
-                    id,
-                    tag -> {
-                        try (InputStream stream = fileSourceProvider.getImageStream(imageSource)) {
-                            if (stream == null) {
-                                return;
-                            }
-                            byte[] data = FileUtils.getScaledBitmapByteArray(stream, MAX_COVER_SIZE);
-                            Artwork artwork = new Artwork();
-                            artwork.setBinaryData(data);
-                            tag.deleteArtworkField();
-                            tag.setField(artwork);
+        return Completable.fromAction(() -> editAudioFileTag(filePath,
+                id,
+                tag -> {
+                    try (InputStream stream = fileSourceProvider.getImageStream(imageSource)) {
+                        if (stream == null) {
+                            return;
                         }
+                        byte[] data = FileUtils.getScaledBitmapByteArray(stream, MAX_COVER_SIZE);
+                        Artwork artwork = new Artwork();
+                        artwork.setBinaryData(data);
+                        tag.deleteArtworkField();
+                        tag.setField(artwork);
                     }
-            );
-        });
+                }
+        ));
     }
 
     private Completable removeCompositionAlbumArt(String filePath, Long id) {

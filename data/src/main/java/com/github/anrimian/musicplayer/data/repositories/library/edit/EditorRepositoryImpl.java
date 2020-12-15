@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.library.edit;
 
+import androidx.core.util.Pair;
+
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
@@ -189,11 +191,11 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Completable.fromAction(() -> {
-            String newPath = filesDataSource.renameCompositionFile(composition, fileName);
-            if (newPath != null) {
-                compositionsDao.updateFilePath(composition.getId(), newPath);
+            Pair<String, String> newPathAndName = filesDataSource.renameCompositionFile(composition, fileName);
+            if (newPathAndName.first != null) {
+                compositionsDao.updateFilePath(composition.getId(), newPathAndName.first);
             }
-            compositionsDao.updateCompositionFileName(composition.getId(), fileName);
+            compositionsDao.updateCompositionFileName(composition.getId(), newPathAndName.second);
         }).subscribeOn(scheduler);
     }
 
