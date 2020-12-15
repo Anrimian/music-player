@@ -50,6 +50,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
 
+    private short numberOfQueueUpdatesToIgnore = 0;
+
     public PlayerPresenter(LibraryPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
                            PlayerScreenInteractor playerScreenInteractor,
@@ -278,6 +280,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         Collections.swap(playQueue, from, to);
         getViewState().notifyItemMoved(from, to);
 
+        numberOfQueueUpdatesToIgnore++;
         playerInteractor.swapItems(fromItem, toItem);
     }
 
@@ -386,7 +389,16 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void subscribeOnPlayQueue() {
         batterySafeDisposable.add(playerInteractor.getPlayQueueObservable()
                 .observeOn(uiScheduler)
+                .filter(o -> isPlayQueueEmitAllowed())
                 .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError));
+    }
+
+    private boolean isPlayQueueEmitAllowed() {
+        boolean isAllowed = numberOfQueueUpdatesToIgnore <= 0;
+        if (numberOfQueueUpdatesToIgnore > 0) {
+            numberOfQueueUpdatesToIgnore--;
+        }
+        return isAllowed;
     }
 
     private void onPlayQueueChanged(List<PlayQueueItem> list) {

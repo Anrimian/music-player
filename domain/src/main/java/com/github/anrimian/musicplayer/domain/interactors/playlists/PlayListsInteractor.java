@@ -66,11 +66,10 @@ public class PlayListsInteractor {
         return playListsRepository.deletePlayList(playListId);
     }
 
-    public void moveItemInPlayList(PlayList playList, int from, int to) {
-        playListsRepository.moveItemInPlayList(playList, from, to)
+    public Completable moveItemInPlayList(PlayList playList, int from, int to) {
+        return playListsRepository.moveItemInPlayList(playList, from, to)
                 .doOnError(analytics::processNonFatalError)
-                .onErrorComplete()
-                .subscribe();
+                .onErrorComplete();
     }
 
     public Completable updatePlayListName(long playListId, String name) {

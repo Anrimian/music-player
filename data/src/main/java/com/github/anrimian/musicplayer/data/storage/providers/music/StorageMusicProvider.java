@@ -69,7 +69,7 @@ public class StorageMusicProvider {
     }
 
     public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable() {
-        Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, Media.EXTERNAL_CONTENT_URI);
+        Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, getStorageUri());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             //on new composition content observer not called on android 10
             //but for some reason content observer is called for playlist items when new file added
@@ -121,7 +121,7 @@ public class StorageMusicProvider {
 //            }
 
         try(Cursor cursor = contentResolver.query(
-                Media.EXTERNAL_CONTENT_URI,
+                getStorageUri(),
                 query,
                 Media.IS_MUSIC + " = ?",
                 new String[] { String.valueOf(1) },
@@ -152,7 +152,7 @@ public class StorageMusicProvider {
         };
 
         try(Cursor cursor = contentResolver.query(
-                Media.EXTERNAL_CONTENT_URI,
+                getStorageUri(),
                 query,
                 Media._ID + " = ?",
                 new String[] { String.valueOf(storageId) },
@@ -173,7 +173,7 @@ public class StorageMusicProvider {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         for (Long storageId: ids) {
-            ContentProviderOperation operation = ContentProviderOperation.newDelete(Media.EXTERNAL_CONTENT_URI)
+            ContentProviderOperation operation = ContentProviderOperation.newDelete(getStorageUri())
                     .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
 
@@ -188,7 +188,7 @@ public class StorageMusicProvider {
     }
 
     public void deleteComposition(long id) {
-        contentResolver.delete(Media.EXTERNAL_CONTENT_URI,
+        contentResolver.delete(getStorageUri(),
                 Media._ID + " = ?",
                 new String[] { String.valueOf(id) });
     }
@@ -221,7 +221,7 @@ public class StorageMusicProvider {
             if (storageId == null) {
                 continue;
             }
-            ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
+            ContentProviderOperation operation = ContentProviderOperation.newUpdate(getStorageUri())
                     .withValue(Media.DATA, composition.getFilePath())
                     .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
@@ -251,7 +251,7 @@ public class StorageMusicProvider {
 //            };
 //
 //            cursor = contentResolver.query(
-//                    Media.EXTERNAL_CONTENT_URI,
+//                    getCompositionsUri(),
 //                    query,
 //                    Media.RELATIVE_PATH + " LIKE ?",
 //                    new String[] { oldPath },//need selection
@@ -271,7 +271,7 @@ public class StorageMusicProvider {
 //
 //                String path = relativePath.replace(oldPath, newPath);
 //
-//                ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
+//                ContentProviderOperation operation = ContentProviderOperation.newUpdate(getCompositionsUri())
 //                        .withValue(Media.RELATIVE_PATH, path)
 //                        .withSelection(Media._ID + " = ?", new String[] { String.valueOf(id) })
 //                        .build();
@@ -289,7 +289,7 @@ public class StorageMusicProvider {
                 continue;
             }
 //            String path = composition.getFilePath().replace(oldPath, newPath);
-            ContentProviderOperation operation = ContentProviderOperation.newUpdate(Media.EXTERNAL_CONTENT_URI)
+            ContentProviderOperation operation = ContentProviderOperation.newUpdate(getStorageUri())
                     .withValue(Media.RELATIVE_PATH, newPath)//we can't move? Path seems right
                     .withSelection(Media._ID + " = ?", new String[] { String.valueOf(storageId) })
                     .build();
@@ -305,7 +305,7 @@ public class StorageMusicProvider {
     }
 
     public Uri getCompositionUri(long id) {
-        return ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, id);
+        return ContentUris.withAppendedId(getStorageUri(), id);
     }
 
     public InputStream getCompositionStream(long id) throws FileNotFoundException {
@@ -441,5 +441,13 @@ public class StorageMusicProvider {
                 dateAdded,
                 dateModified,
                 storageAlbum);
+    }
+
+    private Uri getStorageUri() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+        } else {
+            return Media.EXTERNAL_CONTENT_URI;
+        }
     }
 }

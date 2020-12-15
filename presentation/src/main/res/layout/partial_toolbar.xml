@@ -65,6 +65,7 @@
                 android:src="@drawable/ic_arrow_drop_down"
                 android:scaleType="center"
                 android:contentDescription="@null"
+                android:tint="?attr/toolbarTextColorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/acv_main"
                 app:layout_constraintHorizontal_bias="0.0"

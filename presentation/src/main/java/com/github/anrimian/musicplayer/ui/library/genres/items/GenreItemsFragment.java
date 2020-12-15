@@ -123,7 +123,8 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
                 presenter.getSelectedCompositions(),
                 presenter::onCompositionClicked,
                 presenter::onCompositionLongClick,
-                presenter::onCompositionIconClicked);
+                presenter::onCompositionIconClicked,
+                presenter::onCompositionMenuClicked);
         recyclerView.setAdapter(adapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
