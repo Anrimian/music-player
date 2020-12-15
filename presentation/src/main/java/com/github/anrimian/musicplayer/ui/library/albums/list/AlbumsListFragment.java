@@ -25,7 +25,7 @@ import com.github.anrimian.musicplayer.ui.common.serialization.AlbumSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
-import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter;
@@ -216,7 +216,7 @@ public class AlbumsListFragment extends LibraryFragment implements
                 break;
             }
             case R.id.menu_equalizer: {
-                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
+                new EqualizerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_rescan_storage: {

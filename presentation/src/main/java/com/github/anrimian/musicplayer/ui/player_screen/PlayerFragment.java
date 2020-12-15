@@ -47,7 +47,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
-import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
@@ -702,7 +702,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 break;
             }
             case R.id.menu_equalizer: {
-                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
+                new EqualizerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_clear_play_queue: {

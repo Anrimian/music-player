@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.equalizer.app;
+package com.github.anrimian.musicplayer.ui.equalizer;
 
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;

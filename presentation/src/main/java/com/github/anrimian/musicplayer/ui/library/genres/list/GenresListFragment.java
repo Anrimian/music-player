@@ -23,7 +23,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.genres.items.GenreItemsFragment;
@@ -243,7 +243,7 @@ public class GenresListFragment extends LibraryFragment implements
                 break;
             }
             case R.id.menu_equalizer: {
-                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
+                new EqualizerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_rescan_storage: {
