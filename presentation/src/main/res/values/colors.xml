@@ -36,10 +36,13 @@
 
     <color name="cover_dark_foreground">#33000000</color>
 
+    <color name="color_control_highlight">#1f000000</color>
+
     <!-- leave for future ideas  -->
 <!--    <color name="player_panel_background">#F6F6F6</color>-->
 
     <color name="light_background_level_1">#fafafa</color>
+    <color name="light_background_level_0">#fafafa</color>
     <color name="color_control_third">#CCCCCC</color>
 
     <!--second theme-->
@@ -90,5 +93,15 @@
     <color name="colorTealPrimary">#009688</color>
     <color name="colorTealPrimaryDark">#00796B</color>
     <color name="colorPinkAccent">#FF4081</color>
+
+    <!--completely white theme-->
+    <color name="colorPrimaryWhiteGray">#848282</color>
+    <color name="colorAccentBlue">#247bee</color>
+
+    <!--dark theme(orange)-->
+    <color name="colorOrangeAccent">#e65100</color>
+
+    <!--dark theme(green)-->
+    <color name="colorGreenDarkAccent">#00c853</color>
 
 </resources>

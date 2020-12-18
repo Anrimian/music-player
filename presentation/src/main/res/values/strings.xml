@@ -110,9 +110,6 @@
     <string name="about_app">About</string>
     <string name="version_template">Version %1$s(Build %2$d)</string>
     <string name="theme">Theme</string>
-    <string name="white_purple_theme">White(Purple)</string>
-    <string name="white_indigo_theme">White(Indigo)</string>
-    <string name="white_teal_theme">White(Teal)</string>
     <string name="dark_theme">Dark</string>
     <string name="edit">Edit</string>
     <string name="edit_tags">Edit tags</string>
