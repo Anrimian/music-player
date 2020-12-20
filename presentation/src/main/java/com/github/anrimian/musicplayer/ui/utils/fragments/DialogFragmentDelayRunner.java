@@ -28,7 +28,11 @@ public class DialogFragmentDelayRunner {
     }
 
     public void show(DialogFragment fragment) {
-        handler.postDelayed(() -> fragment.show(fragmentManager, tag), delayMillis);
+        handler.postDelayed(() -> {
+            if (!fragmentManager.isDestroyed()) {
+                fragment.show(fragmentManager, tag);
+            }
+        }, delayMillis);
     }
 
     public void cancel() {
