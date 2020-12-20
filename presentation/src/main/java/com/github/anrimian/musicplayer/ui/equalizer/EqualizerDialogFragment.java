@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
@@ -54,6 +55,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
     private EqualizerController equalizerController;
 
     private final List<Pair<PartialEqualizerBandBinding, Band>> bandsViewList = new LinkedList<>();
+    private boolean inAppEqualizerSettingsEnabled;
 
     @ProvidePresenter
     EqualizerPresenter providePresenter() {
@@ -157,9 +159,9 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     if (fromUser) {
-                        int value = progress - Math.abs(lowestRange);
-                        binding.tvLevel.setText(String.valueOf(value));
-                        presenter.onBandLevelChanged(band, (short) value);
+                        short value = (short) (progress - Math.abs(lowestRange));
+                        binding.tvLevel.setText(FormatUtils.formatDecibels(value));
+                        presenter.onBandLevelChanged(band, value);
                     }
                 }
 
@@ -174,7 +176,8 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
                 }
             });
 
-            binding.tvFrequency.setText(String.valueOf(band.getFrequencyRange()[1]));
+
+            binding.tvFrequency.setText(FormatUtils.formatHz(band.getFrequencyRange()[1]));
         }
 
         List<Preset> presets = equalizerConfig.getPresets();
@@ -183,6 +186,8 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
                 R.id.text_view,
                 presets);
         viewBinding.spinnerPresets.setAdapter(adapter);
+
+        setInAppEqualizerSettingsEnabled(inAppEqualizerSettingsEnabled);
 //        viewBinding.spinnerPresets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -218,8 +223,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
             if (currentRange == null) {
                 return;
             }
-
-            binding.tvLevel.setText(String.valueOf(currentRange));
+            binding.tvLevel.setText(FormatUtils.formatDecibels(currentRange));
             short lowestRange = config.getLowestBandRange();
             binding.sbLevel.setProgress(currentRange + Math.abs(lowestRange));
         }
@@ -250,6 +254,18 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         viewBinding.rbUseSystemEqualizer.setChecked(type == EqualizerType.EXTERNAL);
         viewBinding.rbUseAppEqualizer.setChecked(type == EqualizerType.APP);
         viewBinding.rbDisableEqualizer.setChecked(type == EqualizerType.NONE);
+
+        setInAppEqualizerSettingsEnabled(type == EqualizerType.APP);
+    }
+
+    private void setInAppEqualizerSettingsEnabled(boolean enabled) {
+        this.inAppEqualizerSettingsEnabled = enabled;
+
+        for (Pair<PartialEqualizerBandBinding, Band> pair: bandsViewList) {
+            PartialEqualizerBandBinding binding = pair.first;
+            binding.sbLevel.setEnabled(enabled);
+        }
+        viewBinding.spinnerPresets.setEnabled(enabled);
     }
 
 }

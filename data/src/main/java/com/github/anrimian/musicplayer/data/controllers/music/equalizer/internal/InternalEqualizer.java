@@ -28,11 +28,12 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //unite internal equalizer screen with equalizer setup dialog - done
 //TODO check sound gap on eq start
 //TODO remove selected preset displaying? And saving at all
-//TODO display correct band values
-//TODO disable eq controls when eq is disabled
+//TODO display correct band and freq values
+//disable eq controls when eq is disabled - done
 //TODO presets ui
-//TODO add divider under eq radio buttons
+//add divider under eq radio buttons - done
 //TODO add title and close button
+//TODO disabled seek bar thumb ui
 
 public class InternalEqualizer implements AppEqualizer {
 

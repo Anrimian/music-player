@@ -36,6 +36,14 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class FormatUtils {
 
+    public static String formatDecibels(short milliDecibels) {
+        return String.format("%04d", milliDecibels) + " dB";//00.00 dB
+    }
+
+    public static String formatHz(int hz) {
+        return hz + " hz";
+    }
+
     public static String formatCompositionsCount(Context context, int compositionsCount) {
         return context.getResources().getQuantityString(
                 R.plurals.compositions_count,
