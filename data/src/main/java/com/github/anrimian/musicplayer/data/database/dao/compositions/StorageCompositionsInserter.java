@@ -207,12 +207,12 @@ public class StorageCompositionsInserter {
             return;
         }
 
-        long id = foldersDao.insertFolder(new FolderEntity(dbParentId, name));
+        long folderId = foldersDao.insertFolder(new FolderEntity(dbParentId, name));
         for (Long compositionId : nodeToInsert.getFiles()) {
-            insertedCompositionFolderMap.put(compositionId, id);
+            insertedCompositionFolderMap.put(compositionId, folderId);
         }
         for (FolderNode<Long> node: nodeToInsert.getFolders()) {
-            insertNode(id, node, insertedCompositionFolderMap);
+            insertNode(folderId, node, insertedCompositionFolderMap);
         }
     }
 }

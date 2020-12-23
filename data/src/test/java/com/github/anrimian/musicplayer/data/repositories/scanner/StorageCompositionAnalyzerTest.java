@@ -416,11 +416,15 @@ public class StorageCompositionAnalyzerTest {
                 eq(asList(2L)));
     }
 
+    //check: can we put into compositionsFolderIdMap irrelevant folder id?
+    //check: can we have the same folder in list for insert/modify and delete?
+    //check: can we fail to insert folder but mapping compId=null causes replace?
+    //check: exists composition, move to new folder AND change other field - causes update to irrelevant folder id?
     @Test
     public void testDeleteFolderWithoutCompositionIssue() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 2L));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 3L);
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
+        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
         currentCompositions.put(2, composition2);
 //        currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
@@ -428,25 +432,25 @@ public class StorageCompositionAnalyzerTest {
         List<StorageFolder> folders = new LinkedList<>();
         folders.add(new StorageFolder(1L, null, "music"));
         folders.add(new StorageFolder(2L, 1L, "new"));
-        folders.add(new StorageFolder(3L, 2L, "newest"));
+//        folders.add(new StorageFolder(3L, 2L, "newest"));
         when(foldersDao.getAllFolders()).thenReturn(folders);
 
-        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("a/b/c").build();
-        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("b/c").build();
+//        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
+        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("music/new").build();
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
-        newCompositions.put(1, c1);
+//        newCompositions.put(1, c1);
         newCompositions.put(2, c2);
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(stateRepository).setRootFolderPath(any());
-        verify(compositionsInserter).applyChanges(
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                any(),
-                eq(asList(1L, 2L, 3L)));
+//        verify(stateRepository).setRootFolderPath(any());
+//        verify(compositionsInserter).applyChanges(
+//                eq(emptyList()),
+//                eq(emptyList()),
+//                eq(emptyList()),
+//                eq(emptyList()),
+//                any(),
+//                eq(asList(1L, 2L, 3L)));
     }
 
 }

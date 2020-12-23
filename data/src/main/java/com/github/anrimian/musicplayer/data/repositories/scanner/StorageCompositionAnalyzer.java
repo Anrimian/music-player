@@ -55,34 +55,35 @@ public class StorageCompositionAnalyzer {
         );
     }
 
-    public synchronized void applyCompositionsData(LongSparseArray<StorageFullComposition> newCompositions) {//at the end check file path to relative path migration
-        FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(newCompositions));
+    public synchronized void applyCompositionsData(
+            LongSparseArray<StorageFullComposition> actualCompositionsMap) {//at the end check file path to relative path migration
+        FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(actualCompositionsMap));
 
         StringBuilder sbRootPath = new StringBuilder();
         actualFolderTree = cutEmptyRootNodes(actualFolderTree, sbRootPath);
         String parentPath = TextUtils.toNullableString(sbRootPath);
         stateRepository.setRootFolderPath(parentPath);
 
-        excludeCompositions(actualFolderTree, newCompositions);
+        excludeCompositions(actualFolderTree, actualCompositionsMap);
 
         List<StorageFolder> storageFolders = foldersDao.getAllFolders();
-        LongSparseArray<StorageComposition> currentCompositions = compositionsDao.selectAllAsStorageCompositions();
+        LongSparseArray<StorageComposition> currentCompositionsMap = compositionsDao.selectAllAsStorageCompositions();
 
-        LocalFolderNode<Long> existsFolders = nodeTreeBuilder.createTreeFromIdMap(
+        LocalFolderNode<Long> currentFolderTree = nodeTreeBuilder.createTreeFromIdMap(
                 storageFolders,
-                currentCompositions);
+                currentCompositionsMap);
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-        LongSparseArray<Long> movedCompositions = new LongSparseArray<>();
-        folderMerger.mergeFolderTrees(actualFolderTree, existsFolders, foldersToDelete, foldersToInsert, movedCompositions);
+        LongSparseArray<Long> movedCompositionsFolderMap = new LongSparseArray<>();//value can be null when folder to insert is root OR when folder doesn't exists yet
+        folderMerger.mergeFolderTrees(actualFolderTree, currentFolderTree, foldersToDelete, foldersToInsert, movedCompositionsFolderMap);
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();
         List<StorageComposition> deletedCompositions = new ArrayList<>();
         List<Change<StorageComposition, StorageFullComposition>> changedCompositions = new ArrayList<>();
-        boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositions,
-                newCompositions,
-                (first, second) -> hasActualChanges(first, second) || movedCompositions.containsKey(first.getStorageId()),
+        boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositionsMap,
+                actualCompositionsMap,
+                (first, second) -> hasActualChanges(first, second) || movedCompositionsFolderMap.containsKey(first.getStorageId()),
                 deletedCompositions::add,
                 addedCompositions::add,
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
@@ -92,7 +93,7 @@ public class StorageCompositionAnalyzer {
                     addedCompositions,
                     deletedCompositions,
                     changedCompositions,
-                    movedCompositions,
+                    movedCompositionsFolderMap,
                     foldersToDelete);
         }
     }
@@ -159,11 +160,10 @@ public class StorageCompositionAnalyzer {
         return result;
     }
 
-    private Observable<StorageFullComposition> fromSparseArray(
-            LongSparseArray<StorageFullComposition> sparseArray) {
+    private <T> Observable<T> fromSparseArray(LongSparseArray<T> sparseArray) {
         return Observable.create(emitter -> {
             for(int i = 0, size = sparseArray.size(); i < size; i++) {
-                StorageFullComposition existValue = sparseArray.valueAt(i);
+                T existValue = sparseArray.valueAt(i);
                 emitter.onNext(existValue);
             }
             emitter.onComplete();
