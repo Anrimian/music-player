@@ -8,10 +8,8 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.LocalFold
 
 import org.junit.Test;
 
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -117,7 +115,7 @@ public class FolderMergerTest {
         assert foldersToDelete.contains(2L);
         assert foldersToInsert.contains(new AddedNode(null, folder2));
         assert movedFiles.containsKey(2L);
-        assert movedFiles.containsValue(null);
+        assert movedFiles.containsValue(FolderMerger.UNKNOWN_CURRENT_FOLDER_ID);
     }
 
     @Test

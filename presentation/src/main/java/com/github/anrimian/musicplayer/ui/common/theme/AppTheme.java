@@ -67,7 +67,7 @@ public enum AppTheme {
             android.R.color.black,
             android.R.color.black,
             R.color.colorAccentDark,
-            R.color.dark_background_level_1,
+            R.color.color_control_highlight_dark,
             true);
 
     private final int id;

@@ -9,20 +9,20 @@ import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 
-public class FolderTreeBuilder<M, V> {
+public class FolderTreeBuilder<F, N> {
 
-    private final Mapper<M, String> pathFunc;
-    private final Mapper<M, V> valueFunc;
+    private final Mapper<F, String> pathFunc;
+    private final Mapper<F, N> valueFunc;
 
-    public FolderTreeBuilder(Mapper<M, String> pathFunc, Mapper<M, V> valueFunc) {
+    public FolderTreeBuilder(Mapper<F, String> pathFunc, Mapper<F, N> valueFunc) {
         this.pathFunc = pathFunc;
         this.valueFunc = valueFunc;
     }
 
-    public FolderNode<V> createFileTree(Observable<M> objectsObservable) {
-        FolderNode<V> rootFolder = new FolderNode<>(null);
+    public FolderNode<N> createFileTree(Observable<F> objectsObservable) {
+        FolderNode<N> rootFolder = new FolderNode<>(null);
         objectsObservable.groupBy(pathFunc::map)
-                .doOnNext(group -> group.collect(ArrayList<M>::new, List::add)
+                .doOnNext(group -> group.collect(ArrayList<F>::new, List::add)
                         .map(this::toValueList)
                         .doOnSuccess(list -> addValuesToFolder(rootFolder, group.getKey(), list))
                         .subscribe())
@@ -30,27 +30,27 @@ public class FolderTreeBuilder<M, V> {
         return rootFolder;
     }
 
-    private List<V> toValueList(List<M> list) {
+    private List<N> toValueList(List<F> list) {
         return ListUtils.mapList(list, valueFunc::map);
     }
 
-    private void addValuesToFolder(FolderNode<V> root,
+    private void addValuesToFolder(FolderNode<N> root,
                                    String path,
-                                   List<V> values) {
-        FolderNode<V> parent = getNode(root, path);
+                                   List<N> values) {
+        FolderNode<N> parent = getNode(root, path);
         parent.addFiles(values);
     }
 
-    private FolderNode<V> getNode(FolderNode<V> root, String path) {
+    private FolderNode<N> getNode(FolderNode<N> root, String path) {
         if (TextUtils.isEmpty(path)) {
             return root;
         }
 
-        FolderNode<V> target = root;
+        FolderNode<N> target = root;
 
         String[] partialPaths = path.split("/");
         for (String partialPath : partialPaths) {
-            FolderNode<V> child = target.getFolder(partialPath);
+            FolderNode<N> child = target.getFolder(partialPath);
             if (child == null) {
                 child = new FolderNode<>(partialPath);
                 target.addFolder(child);
