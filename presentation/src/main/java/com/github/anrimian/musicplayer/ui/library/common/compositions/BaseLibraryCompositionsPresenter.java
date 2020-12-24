@@ -97,17 +97,27 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
 
     public void onCompositionClicked(int position, Composition composition) {
         if (selectedCompositions.isEmpty()) {
-            getViewState().showCompositionActionDialog(composition, position);
-        } else {
-            if (selectedCompositions.contains(composition)) {
-                selectedCompositions.remove(composition);
-                getViewState().onCompositionUnselected(composition, position);
+            if (composition.equals(currentComposition)) {
+                playerInteractor.playOrPause();
             } else {
-                selectedCompositions.add(composition);
-                getViewState().onCompositionSelected(composition, position);
+                playerInteractor.startPlaying(compositions, position);
+                getViewState().showCurrentComposition(new CurrentComposition(composition, true));
             }
-            getViewState().showSelectionMode(selectedCompositions.size());
+            return;
         }
+        if (selectedCompositions.contains(composition)) {
+            selectedCompositions.remove(composition);
+            getViewState().onCompositionUnselected(composition, position);
+        } else {
+            selectedCompositions.add(composition);
+            getViewState().onCompositionSelected(composition, position);
+        }
+        getViewState().showSelectionMode(selectedCompositions.size());
+
+    }
+
+    public void onCompositionMenuClicked(int position, Composition composition) {
+        getViewState().showCompositionActionDialog(composition, position);
     }
 
     public void onCompositionIconClicked(int position, Composition composition) {

@@ -416,44 +416,41 @@ public class StorageCompositionAnalyzerTest {
                 eq(asList(2L)));
     }
 
-    /**
-     * was try to reproduce output when folder deletion leads to SQLiteConstraintException
-     */
+    //check: can we put into compositionsFolderIdMap irrelevant folder id?
+    //check: can we have the same folder in list for insert/modify and delete?
+    //check: can we fail to insert folder but mapping compId=null causes replace?
+    //check: exists composition, move to new folder AND change other field - causes update to irrelevant folder id?
     @Test
-    public void deleteUnnecessaryFolderTest() {
+    public void testDeleteFolderWithoutCompositionIssue() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
         currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
+        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 1L);
         currentCompositions.put(2, composition2);
-        currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
-//        StorageComposition composition4 = fakeStorageComposition(4, "music-4", 3L);
-//        currentCompositions.put(4, composition4);
+//        currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
         List<StorageFolder> folders = new LinkedList<>();
         folders.add(new StorageFolder(1L, null, "music"));
-        folders.add(new StorageFolder(2L, 1L, "new"));
+//        folders.add(new StorageFolder(2L, 1L, "new"));
 //        folders.add(new StorageFolder(3L, 2L, "newest"));
         when(foldersDao.getAllFolders()).thenReturn(folders);
 
         StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
-        StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
-        StorageFullComposition c4 = new StorageCompositionBuilder(4, "music-4").relativePath("music/new/newest").build();
+        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2 EDITED").relativePath("music/new").build();
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
         newCompositions.put(1, c1);
-        newCompositions.put(3, c3);
-        newCompositions.put(4, c4);
+        newCompositions.put(2, c2);
 
         analyzer.applyCompositionsData(newCompositions);
 
-        verify(stateRepository).setRootFolderPath(eq(null));
-        verify(compositionsInserter).applyChanges(
-                eq(asList(new AddedNode(2L, new FolderNode<>("newest")))),
-                eq(asList(c4)),
-                eq(asList(composition2)),
-                eq(emptyList()),
-                any(),
-                eq(emptyList()));
+//        verify(stateRepository).setRootFolderPath(any());
+//        verify(compositionsInserter).applyChanges(
+//                eq(emptyList()),
+//                eq(emptyList()),
+//                eq(emptyList()),
+//                eq(asList(new Change<>(composition2, c2))),
+//                any(),
+//                eq(emptyList()));
     }
 
 }

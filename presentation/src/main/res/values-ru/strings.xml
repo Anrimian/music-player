@@ -125,9 +125,6 @@
     <string name="about_app_text_write">напишите</string>
     <string name="about_app_text_here">напишите</string>
     <string name="theme">Тема оформления</string>
-    <string name="white_purple_theme">Светлая(Фиолетовая)</string>
-    <string name="white_indigo_theme">Светлая(Синяя)</string>
-    <string name="white_teal_theme">Светлая(Зелёная)</string>
     <string name="dark_theme">Тёмная</string>
     <string name="edit">Редактировать</string>
     <string name="edit_tags">Редактировать теги</string>

@@ -32,6 +32,7 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
     private final OnPositionItemClickListener<Composition> onCompositionClickListener;
     private final OnPositionItemClickListener<Composition> onLongClickListener;
     private final OnPositionItemClickListener<Composition> iconClickListener;
+    private final OnPositionItemClickListener<Composition> menuClickListener;
 
     @Nullable
     private CurrentComposition currentComposition;
@@ -41,7 +42,8 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
                                HashSet<Composition> selectedCompositions,
                                OnPositionItemClickListener<Composition> onCompositionClickListener,
                                OnPositionItemClickListener<Composition> onLongClickListener,
-                               OnPositionItemClickListener<Composition> iconClickListener) {
+                               OnPositionItemClickListener<Composition> iconClickListener,
+                               OnPositionItemClickListener<Composition> menuClickListener) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 CompositionHelper::areSourcesTheSame,
                 CompositionHelper::getChangePayload)
@@ -50,6 +52,7 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
         this.onCompositionClickListener = onCompositionClickListener;
         this.onLongClickListener = onLongClickListener;
         this.iconClickListener = iconClickListener;
+        this.menuClickListener = menuClickListener;
     }
 
     @NonNull
@@ -58,7 +61,8 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
         return new MusicViewHolder(parent,
                 onCompositionClickListener,
                 onLongClickListener,
-                iconClickListener);
+                iconClickListener,
+                menuClickListener);
     }
 
     @Override

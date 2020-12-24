@@ -72,6 +72,7 @@ public class FragmentNavigation {
 
         hideBottomFragmentMenu();
 
+        //use notify() in handler?(faced too fast call)
         if (!screens.isEmpty()) {//just config change
             notifyFragmentMovedToTop(getFragmentOnTop());
             return;

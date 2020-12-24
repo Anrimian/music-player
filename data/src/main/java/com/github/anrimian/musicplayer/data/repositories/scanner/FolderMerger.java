@@ -6,23 +6,23 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderN
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.LocalFolderNode;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class FolderMerger {
 
+    public static final long UNKNOWN_CURRENT_FOLDER_ID = -1L;
+
     public void mergeFolderTrees(FolderNode<Long> actualFolderNode,
-                                 LocalFolderNode<Long> existsFoldersNode,
+                                 LocalFolderNode<Long> currentFoldersNode,
                                  List<Long> outFoldersToDelete,
                                  List<AddedNode> outFoldersToInsert,
-                                 LongSparseArray<Long> outAddedFiles) {
+                                 LongSparseArray<Long> outAddedFilesFolderMap) {
         for (Long file: actualFolderNode.getFiles()) {
-            if (!existsFoldersNode.containsFile(file)) {
-                outAddedFiles.put(file, existsFoldersNode.getId());
+            if (!currentFoldersNode.containsFile(file)) {
+                outAddedFilesFolderMap.put(file, currentFoldersNode.getId());
             }
         }
-        for (LocalFolderNode<Long> existFolder : existsFoldersNode.getFolders()) {
+        for (LocalFolderNode<Long> existFolder : currentFoldersNode.getFolders()) {
             String key = existFolder.getKeyPath();
 
             FolderNode<Long> actualFolder = actualFolderNode.getFolder(key);
@@ -33,31 +33,28 @@ public class FolderMerger {
         for (FolderNode<Long> actualFolder : actualFolderNode.getFolders()) {
             String key = actualFolder.getKeyPath();
 
-            LocalFolderNode<Long> existFolder = existsFoldersNode.getFolder(key);
+            LocalFolderNode<Long> existFolder = currentFoldersNode.getFolder(key);
             if (existFolder == null) {
-                Long parentId = existsFoldersNode.getId();
+                Long parentId = currentFoldersNode.getId();
 
                 AddedNode addedNode = new AddedNode(parentId, actualFolder);
                 outFoldersToInsert.add(addedNode);
-
-                LongSparseArray<Long> affectedFiles = getAllFilesInNode(actualFolder);
-                outAddedFiles.putAll(affectedFiles);
+                collectAllNewFilesInNode(actualFolder, outAddedFilesFolderMap);
             } else {
-                mergeFolderTrees(actualFolder, existFolder, outFoldersToDelete, outFoldersToInsert, outAddedFiles);
+                mergeFolderTrees(actualFolder, existFolder, outFoldersToDelete, outFoldersToInsert, outAddedFilesFolderMap);
             }
         }
     }
 
-    private LongSparseArray<Long> getAllFilesInNode(FolderNode<Long> parentNode) {
-        LongSparseArray<Long> result = new LongSparseArray<>();
+    private void collectAllNewFilesInNode(FolderNode<Long> parentNode,
+                                          LongSparseArray<Long> outAddedFilesFolderMap) {
         for (Long file: parentNode.getFiles()) {
-            result.put(file, null);
+            outAddedFilesFolderMap.put(file, UNKNOWN_CURRENT_FOLDER_ID);
         }
 
         for (FolderNode<Long> node: parentNode.getFolders()) {
-            result.putAll(getAllFilesInNode(node));
+            collectAllNewFilesInNode(node, outAddedFilesFolderMap);
         }
-        return result;
     }
 
 }

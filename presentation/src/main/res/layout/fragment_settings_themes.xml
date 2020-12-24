@@ -20,7 +20,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:overScrollMode="never"
-                android:background="?android:attr/colorBackground"/>
+                android:background="?android:attr/colorBackground"
+                android:paddingStart="@dimen/list_horizontal_margin"
+                android:paddingEnd="@dimen/list_horizontal_margin"
+                android:clipToPadding="false"/>
 
             <View
                 style="@style/Divider.Horizontal"
