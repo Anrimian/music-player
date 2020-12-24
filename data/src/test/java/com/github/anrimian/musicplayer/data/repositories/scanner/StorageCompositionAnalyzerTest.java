@@ -424,21 +424,21 @@ public class StorageCompositionAnalyzerTest {
     public void testDeleteFolderWithoutCompositionIssue() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
         currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
+        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 1L);
         currentCompositions.put(2, composition2);
 //        currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
         List<StorageFolder> folders = new LinkedList<>();
         folders.add(new StorageFolder(1L, null, "music"));
-        folders.add(new StorageFolder(2L, 1L, "new"));
+//        folders.add(new StorageFolder(2L, 1L, "new"));
 //        folders.add(new StorageFolder(3L, 2L, "newest"));
         when(foldersDao.getAllFolders()).thenReturn(folders);
 
-//        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
-        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("music/new").build();
+        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
+        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2 EDITED").relativePath("music/new").build();
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
-//        newCompositions.put(1, c1);
+        newCompositions.put(1, c1);
         newCompositions.put(2, c2);
 
         analyzer.applyCompositionsData(newCompositions);
@@ -448,9 +448,9 @@ public class StorageCompositionAnalyzerTest {
 //                eq(emptyList()),
 //                eq(emptyList()),
 //                eq(emptyList()),
-//                eq(emptyList()),
+//                eq(asList(new Change<>(composition2, c2))),
 //                any(),
-//                eq(asList(1L, 2L, 3L)));
+//                eq(emptyList()));
     }
 
 }

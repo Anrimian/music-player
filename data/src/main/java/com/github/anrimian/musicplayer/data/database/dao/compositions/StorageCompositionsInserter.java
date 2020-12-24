@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.data.database.entities.composition.Compos
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
+import com.github.anrimian.musicplayer.data.repositories.scanner.FolderMerger;
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
@@ -52,14 +53,14 @@ public class StorageCompositionsInserter {
                              List<StorageFullComposition> addedCompositions,
                              List<StorageComposition> deletedCompositions,
                              List<Change<StorageComposition, StorageFullComposition>> changedCompositions,
-                             LongSparseArray<Long> movedCompositions,
+                             LongSparseArray<Long> addedFilesFolderMap,
                              List<Long> foldersToDelete) {
         appDatabase.runInTransaction(() -> {
-            movedCompositions.putAll(insertFolders(foldersToInsert));
+            addedFilesFolderMap.putAll(insertFolders(foldersToInsert));
             applyCompositionChanges(addedCompositions,
                     deletedCompositions,
                     changedCompositions,
-                    movedCompositions);
+                    addedFilesFolderMap);
             foldersDao.deleteFolders(foldersToDelete);
         });
     }
@@ -67,15 +68,15 @@ public class StorageCompositionsInserter {
     private void applyCompositionChanges(List<StorageFullComposition> addedCompositions,
                                          List<StorageComposition> deletedCompositions,
                                          List<Change<StorageComposition, StorageFullComposition>> changedCompositions,
-                                         LongSparseArray<Long> insertedCompositionFolderMap) {
-        insertCompositions(addedCompositions, insertedCompositionFolderMap);
+                                         LongSparseArray<Long> addedFilesFolderMap) {
+        insertCompositions(addedCompositions, addedFilesFolderMap);
 
         for (StorageComposition composition: deletedCompositions) {
             compositionsDao.delete(composition.getId());
         }
 
         for (Change<StorageComposition, StorageFullComposition> change: changedCompositions) {
-            handleCompositionUpdate(change, insertedCompositionFolderMap);
+            handleCompositionUpdate(change, addedFilesFolderMap);
         }
         albumsDao.deleteEmptyAlbums();
         artistsDao.deleteEmptyArtists();
@@ -83,7 +84,7 @@ public class StorageCompositionsInserter {
     }
 
     private void handleCompositionUpdate(Change<StorageComposition, StorageFullComposition> change,
-                                         LongSparseArray<Long> insertedCompositionFolderMap) {
+                                         LongSparseArray<Long> addedFilesFolderMap) {
         StorageFullComposition composition = change.getObj();
         StorageComposition oldComposition = change.getOld();
         long compositionId = oldComposition.getId();
@@ -108,8 +109,9 @@ public class StorageCompositionsInserter {
             compositionsDaoWrapper.updateArtist(compositionId, newArtist);
         }
 
-        Long newFolderId = insertedCompositionFolderMap.get(compositionStorageId);
-        if (!Objects.equals(oldComposition.getFolderId(), newFolderId)) {
+        Long newFolderId = addedFilesFolderMap.get(compositionStorageId);
+        if (!Objects.equals(newFolderId, FolderMerger.UNKNOWN_CURRENT_FOLDER_ID)
+                && !Objects.equals(oldComposition.getFolderId(), newFolderId)) {
             compositionsDao.updateFolderId(compositionId, newFolderId);
         }
 
@@ -126,20 +128,20 @@ public class StorageCompositionsInserter {
     }
 
     private void insertCompositions(List<StorageFullComposition> addedCompositions,
-                                    LongSparseArray<Long> insertedCompositionFolderMap) {
+                                    LongSparseArray<Long> addedFilesFolderMap) {
         //optimization with cache, ~33% faster
         Map<String, Long> artistsCache = new HashMap<>();
         Map<String, Long> albumsCache = new HashMap<>();
         compositionsDao.insert(mapList(
                 addedCompositions,
-                composition -> toCompositionEntity(composition, artistsCache, albumsCache, insertedCompositionFolderMap))
+                composition -> toCompositionEntity(composition, artistsCache, albumsCache, addedFilesFolderMap))
         );
     }
 
     private CompositionEntity toCompositionEntity(StorageFullComposition composition,
                                                   Map<String, Long> artistsCache,
                                                   Map<String, Long> albumsCache,
-                                                  LongSparseArray<Long> insertedCompositionFolderMap) {
+                                                  LongSparseArray<Long> addedFilesFolderMap) {
         String artist = composition.getArtist();
         Long artistId = getOrInsertArtist(artist, artistsCache);
 
@@ -149,7 +151,10 @@ public class StorageCompositionsInserter {
             Long albumArtistId = getOrInsertArtist(storageAlbum.getArtist(), artistsCache);
             albumId = getOrInsertAlbum(storageAlbum, albumArtistId, albumsCache);
         }
-        Long folderId = insertedCompositionFolderMap.get(composition.getId());
+        Long folderId = addedFilesFolderMap.get(composition.getId());
+        if (Objects.equals(folderId, FolderMerger.UNKNOWN_CURRENT_FOLDER_ID)) {
+            folderId = null;
+        }
         return CompositionMapper.toEntity(composition, artistId, albumId, folderId);
     }
 
@@ -191,28 +196,28 @@ public class StorageCompositionsInserter {
 
     private LongSparseArray<Long> insertFolders(List<AddedNode> foldersToInsert) {
         return appDatabase.runInTransaction(() -> {
-            LongSparseArray<Long> insertedCompositionFolderMap = new LongSparseArray<>();
+            LongSparseArray<Long> addedFilesFolderMap = new LongSparseArray<>();
             for (AddedNode node: foldersToInsert) {
-                insertNode(node.getFolderDbId(), node.getNode(), insertedCompositionFolderMap);
+                insertNode(node.getFolderDbId(), node.getNode(), addedFilesFolderMap);
             }
-            return insertedCompositionFolderMap;
+            return addedFilesFolderMap;
         });
     }
 
     private void insertNode(Long dbParentId,
                             FolderNode<Long> nodeToInsert,
-                            LongSparseArray<Long> insertedCompositionFolderMap) {
+                            LongSparseArray<Long> addedFilesFolderMap) {
         String name = nodeToInsert.getKeyPath();
         if (name == null) {
             return;
         }
 
         long folderId = foldersDao.insertFolder(new FolderEntity(dbParentId, name));
-        for (Long compositionId : nodeToInsert.getFiles()) {
-            insertedCompositionFolderMap.put(compositionId, folderId);
+        for (Long storageFileId : nodeToInsert.getFiles()) {
+            addedFilesFolderMap.put(storageFileId, folderId);
         }
         for (FolderNode<Long> node: nodeToInsert.getFolders()) {
-            insertNode(folderId, node, insertedCompositionFolderMap);
+            insertNode(folderId, node, addedFilesFolderMap);
         }
     }
 }

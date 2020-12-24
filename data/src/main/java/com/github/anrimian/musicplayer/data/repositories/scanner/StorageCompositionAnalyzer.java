@@ -75,15 +75,15 @@ public class StorageCompositionAnalyzer {
 
         List<Long> foldersToDelete = new LinkedList<>();
         List<AddedNode> foldersToInsert = new LinkedList<>();
-        LongSparseArray<Long> movedCompositionsFolderMap = new LongSparseArray<>();//value can be null when folder to insert is root OR when folder doesn't exists yet
-        folderMerger.mergeFolderTrees(actualFolderTree, currentFolderTree, foldersToDelete, foldersToInsert, movedCompositionsFolderMap);
+        LongSparseArray<Long> addedFilesFolderMap = new LongSparseArray<>();
+        folderMerger.mergeFolderTrees(actualFolderTree, currentFolderTree, foldersToDelete, foldersToInsert, addedFilesFolderMap);
 
         List<StorageFullComposition> addedCompositions = new ArrayList<>();
         List<StorageComposition> deletedCompositions = new ArrayList<>();
         List<Change<StorageComposition, StorageFullComposition>> changedCompositions = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentCompositionsMap,
                 actualCompositionsMap,
-                (first, second) -> hasActualChanges(first, second) || movedCompositionsFolderMap.containsKey(first.getStorageId()),
+                (first, second) -> hasActualChanges(first, second) || addedFilesFolderMap.containsKey(first.getStorageId()),
                 deletedCompositions::add,
                 addedCompositions::add,
                 (oldItem, newItem) -> changedCompositions.add(new Change<>(oldItem, newItem)));
@@ -93,7 +93,7 @@ public class StorageCompositionAnalyzer {
                     addedCompositions,
                     deletedCompositions,
                     changedCompositions,
-                    movedCompositionsFolderMap,
+                    addedFilesFolderMap,
                     foldersToDelete);
         }
     }

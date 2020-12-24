@@ -10,6 +10,8 @@ import java.util.List;
 
 public class FolderMerger {
 
+    public static final long UNKNOWN_CURRENT_FOLDER_ID = -1L;
+
     public void mergeFolderTrees(FolderNode<Long> actualFolderNode,
                                  LocalFolderNode<Long> currentFoldersNode,
                                  List<Long> outFoldersToDelete,
@@ -37,25 +39,22 @@ public class FolderMerger {
 
                 AddedNode addedNode = new AddedNode(parentId, actualFolder);
                 outFoldersToInsert.add(addedNode);
-
-                LongSparseArray<Long> affectedFiles = getAllFilesInNode(actualFolder);
-                outAddedFilesFolderMap.putAll(affectedFiles);
+                collectAllNewFilesInNode(actualFolder, outAddedFilesFolderMap);
             } else {
                 mergeFolderTrees(actualFolder, existFolder, outFoldersToDelete, outFoldersToInsert, outAddedFilesFolderMap);
             }
         }
     }
 
-    private LongSparseArray<Long> getAllFilesInNode(FolderNode<Long> parentNode) {
-        LongSparseArray<Long> result = new LongSparseArray<>();
+    private void collectAllNewFilesInNode(FolderNode<Long> parentNode,
+                                          LongSparseArray<Long> outAddedFilesFolderMap) {
         for (Long file: parentNode.getFiles()) {
-            result.put(file, null);
+            outAddedFilesFolderMap.put(file, UNKNOWN_CURRENT_FOLDER_ID);
         }
 
         for (FolderNode<Long> node: parentNode.getFolders()) {
-            result.putAll(getAllFilesInNode(node));
+            collectAllNewFilesInNode(node, outAddedFilesFolderMap);
         }
-        return result;
     }
 
 }
