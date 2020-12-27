@@ -47,6 +47,7 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //TODO folder rename - check for duplicate?
 //TODO files/folder deleting
 //TODO replace DATA with relative path
+//TODO content observer not called
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';

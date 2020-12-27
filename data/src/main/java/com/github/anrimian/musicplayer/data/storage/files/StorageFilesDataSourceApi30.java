@@ -110,22 +110,16 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         return FileUtils.getFileName(newFolderPath);
     }
 
-    //TODO adapt
     @Override
     public void deleteCompositionFiles(List<Composition> compositions) {
-        for (Composition composition: compositions) {
-            deleteFile(composition);
-        }
         storageMusicProvider.deleteCompositions(mapListNotNull(
                 compositions,
                 Composition::getStorageId)
         );
     }
 
-    //TODO adapt
     @Override
     public void deleteCompositionFile(Composition composition) {
-        deleteFile(composition);
         Long storageId = composition.getStorageId();
         if (storageId != null) {
             storageMusicProvider.deleteComposition(storageId);
@@ -146,22 +140,6 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         return new File(filePath).length();
     }
 
-    private void deleteFile(Composition composition) {
-        Long storageId = composition.getStorageId();
-        if (storageId == null) {
-            return;
-        }
-        String filePath = storageMusicProvider.getCompositionFilePath(storageId);
-        if (filePath == null) {
-            return;
-        }
-        File parentDirectory = new File(filePath).getParentFile();
-        FileManager.deleteFile(filePath);
-        if (parentDirectory != null) {
-            FileManager.deleteEmptyDirectory(parentDirectory);
-        }
-    }
-
     @Nonnull
     private String getCompositionFilePath(long storageId) {
         String filePath = storageMusicProvider.getCompositionRelativePath(storageId);
@@ -170,17 +148,4 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         }
         return filePath;
     }
-
-    private static void renameFile(String oldPath, String newPath) {
-        File oldFile = new File(oldPath);
-        if (!oldFile.exists()) {
-            throw new RuntimeException("target file not exists");
-        }
-        File newFile = new File(newPath);
-        boolean renamed = oldFile.renameTo(newFile);
-        if (!renamed) {
-            throw new RuntimeException("file wasn't renamed");
-        }
-    }
-
 }

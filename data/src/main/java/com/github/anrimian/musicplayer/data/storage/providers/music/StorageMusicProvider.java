@@ -44,6 +44,7 @@ import io.reactivex.rxjava3.core.Observable;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 public class StorageMusicProvider {
 
@@ -155,10 +156,10 @@ public class StorageMusicProvider {
         };
 
         try(Cursor cursor = contentResolver.query(
-                getStorageUri(),
+                getCompositionUri(storageId),
                 query,
-                Media._ID + " = ?",
-                new String[] { String.valueOf(storageId) },
+                null,
+                null,
                 null)) {
             if (cursor == null || cursor.getCount() == 0) {
                 return null;
@@ -180,10 +181,10 @@ public class StorageMusicProvider {
         };
 
         try(Cursor cursor = contentResolver.query(
-                getStorageUri(),
+                getCompositionUri(storageId),
                 query,
-                Media._ID + " = ?",
-                new String[] { String.valueOf(storageId) },
+                null,
+                null,
                 null)) {
             if (cursor == null || cursor.getCount() == 0) {
                 return null;
@@ -208,10 +209,10 @@ public class StorageMusicProvider {
         };
 
         try(Cursor cursor = contentResolver.query(
-                getStorageUri(),
+                getCompositionUri(storageId),
                 query,
-                Media._ID + " = ?",
-                new String[] { String.valueOf(storageId) },
+                null,
+                null,
                 null)) {
             if (cursor == null || cursor.getCount() == 0) {
                 return null;
@@ -225,28 +226,32 @@ public class StorageMusicProvider {
         }
     }
 
+    public void deleteComposition(long id) {
+        deleteCompositions(asList(id));
+    }
+
     public void deleteCompositions(List<Long> ids) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         for (Long storageId: ids) {
-            ContentProviderOperation operation = ContentProviderOperation.newDelete(getStorageUri())
-                    .withSelection(MediaStore.Audio.Playlists._ID + " = ?", new String[] { String.valueOf(storageId) })
+            ContentProviderOperation operation = ContentProviderOperation
+                    .newDelete(getCompositionUri(storageId))
                     .build();
 
             operations.add(operation);
         }
 
-        try {
-            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
-        } catch (OperationApplicationException | RemoteException e) {
-            throw new UpdateMediaStoreException(e);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                applyBatch(operations);
+            } catch (RecoverableSecurityException e) {
+                List<Uri> uris = ListUtils.mapList(ids, this::getCompositionUri);
+                PendingIntent pIntent = MediaStore.createDeleteRequest(contentResolver, uris);
+                throw new RecoverableSecurityExceptionExt(pIntent);
+            }
+        } else {
+            applyBatch(operations);
         }
-    }
-
-    public void deleteComposition(long id) {
-        contentResolver.delete(getStorageUri(),
-                Media._ID + " = ?",
-                new String[] { String.valueOf(id) });
     }
 
     public void updateCompositionArtist(long id, String author) {
@@ -284,11 +289,7 @@ public class StorageMusicProvider {
             operations.add(operation);
         }
 
-        try {
-            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
-        } catch (OperationApplicationException | RemoteException e) {
-            throw new UpdateMediaStoreException(e);
-        }
+        applyBatch(operations);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
@@ -309,9 +310,7 @@ public class StorageMusicProvider {
         }
 
         try {
-            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
-        } catch (OperationApplicationException | RemoteException e) {
-            throw new UpdateMediaStoreException(e);
+            applyBatch(operations);
         } catch (RecoverableSecurityException e) {
             List<Uri> uris = ListUtils.mapListNotNull(compositions, composition -> {
                 Long storageId = composition.getStorageId();
@@ -374,10 +373,7 @@ public class StorageMusicProvider {
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
         cv.put(key, value);
-        contentResolver.update(getCompositionUri(id),
-                cv,
-                Media._ID + " = ?",
-                new String[] { String.valueOf(id) });
+        contentResolver.update(getCompositionUri(id), cv, null, null);
     }
 
     private StorageFullComposition buildStorageComposition(CursorWrapper cursorWrapper,
@@ -469,6 +465,14 @@ public class StorageMusicProvider {
             return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         } else {
             return Media.EXTERNAL_CONTENT_URI;
+        }
+    }
+
+    private void applyBatch(ArrayList<ContentProviderOperation> operations) {
+        try {
+            contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
+        } catch (OperationApplicationException | RemoteException e) {
+            throw new UpdateMediaStoreException(e);
         }
     }
 }
