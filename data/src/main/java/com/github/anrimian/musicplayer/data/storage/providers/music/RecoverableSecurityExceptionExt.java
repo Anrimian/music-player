@@ -6,7 +6,8 @@ public class RecoverableSecurityExceptionExt extends SecurityException {
 
     private final PendingIntent pIntent;
 
-    public RecoverableSecurityExceptionExt(PendingIntent pIntent) {
+    public RecoverableSecurityExceptionExt(PendingIntent pIntent, String message) {
+        super(message);
         this.pIntent = pIntent;
     }
 

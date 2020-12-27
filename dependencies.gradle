@@ -51,6 +51,9 @@ ext {
 }
 
 ext {
+    kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    androidxKtx = "androidx.core:core-ktx:1.1.0"//wait a little for update
+
     appCompat = "androidx.appcompat:appcompat:$androidXVersion"
     material = "com.google.android.material:material:$googleMaterialVersion"
     cardView = "androidx.cardview:cardview:$cardViewVersion"

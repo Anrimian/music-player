@@ -247,7 +247,7 @@ public class StorageMusicProvider {
             } catch (RecoverableSecurityException e) {
                 List<Uri> uris = ListUtils.mapList(ids, this::getCompositionUri);
                 PendingIntent pIntent = MediaStore.createDeleteRequest(contentResolver, uris);
-                throw new RecoverableSecurityExceptionExt(pIntent);
+                throw new RecoverableSecurityExceptionExt(pIntent, e.getMessage());
             }
         } else {
             applyBatch(operations);
@@ -320,7 +320,7 @@ public class StorageMusicProvider {
                 return getCompositionUri(storageId);
             });
             PendingIntent pIntent = MediaStore.createWriteRequest(contentResolver, uris);
-            throw new RecoverableSecurityExceptionExt(pIntent);
+            throw new RecoverableSecurityExceptionExt(pIntent, e.getMessage());
         }
     }
 

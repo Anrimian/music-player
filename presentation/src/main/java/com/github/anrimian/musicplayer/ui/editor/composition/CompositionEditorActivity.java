@@ -24,7 +24,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFr
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
-import com.github.anrimian.musicplayer.ui.editor.common.EditorErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
@@ -80,7 +80,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     private ShortGenresAdapter genresAdapter;
 
-    private EditorErrorHandler editorErrorHandler;
+    private ErrorHandler errorHandler;
 
     public static Intent newIntent(Context context, long compositionId) {
         Intent intent = new Intent(context, CompositionEditorActivity.class);
@@ -148,7 +148,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
         FragmentManager fm = getSupportFragmentManager();
 
-        editorErrorHandler = new EditorErrorHandler(fm,
+        errorHandler = new ErrorHandler(fm,
                 presenter::onRetryFailedEditActionClicked,
                 this::showEditorRequestDeniedMessage);
 
@@ -367,7 +367,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        editorErrorHandler.handleEditorError(errorCommand, () ->
+        errorHandler.handleError(errorCommand, () ->
                 makeSnackbar(viewBinding.container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
         );
     }

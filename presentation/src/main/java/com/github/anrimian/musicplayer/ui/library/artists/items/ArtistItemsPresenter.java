@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.artists.items;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
@@ -52,6 +54,7 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
         subscribeOnArtistAlbums();
     }
 
+    @NonNull
     @Override
     protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
         return interactor.getCompositionsByArtist(artistId);
@@ -83,15 +86,15 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
     void onNewArtistNameEntered(String name, long artistId) {
         dispose(changeDisposable);
         changeDisposable = interactor.updateArtistName(name, artistId)
-                .observeOn(uiScheduler)
+                .observeOn(getUiScheduler())
                 .doOnSubscribe(d -> getViewState().showRenameProgress())
                 .doFinally(() -> getViewState().hideRenameProgress())
                 .subscribe(() -> {}, this::onDefaultError);
     }
 
     private void subscribeOnArtistInfo() {
-        presenterDisposable.add(interactor.getArtistObservable(artistId)
-                .observeOn(uiScheduler)
+        getPresenterDisposable().add(interactor.getArtistObservable(artistId)
+                .observeOn(getUiScheduler())
                 .subscribe(this::onArtistInfoReceived,
                         t -> getViewState().closeScreen(),
                         getViewState()::closeScreen));
@@ -103,8 +106,8 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
     }
 
     private void subscribeOnArtistAlbums() {
-        presenterDisposable.add(interactor.getAllAlbumsForArtist(artistId)
-                .observeOn(uiScheduler)
+        getPresenterDisposable().add(interactor.getAllAlbumsForArtist(artistId)
+                .observeOn(getUiScheduler())
                 .subscribe(this::onArtistInfoReceived,
                         t -> getViewState().closeScreen(),
                         getViewState()::closeScreen));

@@ -37,7 +37,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
-import com.github.anrimian.musicplayer.ui.editor.common.EditorErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -111,7 +111,8 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlaylistForFolderDialogRunner;
     private DialogFragmentDelayRunner progressDialogRunner;
 
-    private EditorErrorHandler editorErrorHandler;
+    private ErrorHandler editorErrorHandler;
+    private ErrorHandler deletingErrorHandler;
 
     public static LibraryFoldersFragment newInstance(@Nullable Long folderId) {
         Bundle args = new Bundle();
@@ -197,8 +198,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
 
-        editorErrorHandler = new EditorErrorHandler(fm,
+        editorErrorHandler = new ErrorHandler(fm,
                 presenter::onRetryFailedEditActionClicked,
+                this::showEditorRequestDeniedMessage);
+
+        deletingErrorHandler = new ErrorHandler(fm,
+                presenter::onRetryFailedDeleteActionClicked,
                 this::showEditorRequestDeniedMessage);
 
         choosePlaylistForFolderDialogRunner = new DialogFragmentRunner<>(fm,
@@ -392,10 +397,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer,
-                getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+        deletingErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clListContainer,
+                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
+                        Snackbar.LENGTH_SHORT)
+                        .show()
+        );
     }
 
     @Override
@@ -436,7 +443,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        editorErrorHandler.handleEditorError(errorCommand, () ->
+        editorErrorHandler.handleError(errorCommand, () ->
                 makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
         );
     }

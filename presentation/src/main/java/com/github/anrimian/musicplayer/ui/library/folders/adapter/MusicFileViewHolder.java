@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 
@@ -43,14 +44,14 @@ public class MusicFileViewHolder extends FileViewHolder {
     public MusicFileViewHolder(ViewGroup parent,
                                OnPositionItemClickListener<CompositionFileSource> onCompositionClickListener,
                                OnPositionItemClickListener<FileSource> onLongClickListener,
-                               OnPositionItemClickListener<Composition> iconClickListener,
+                               Callback<Composition> iconClickListener,
                                OnPositionItemClickListener<CompositionFileSource> menuClickListener) {
         super(parent, R.layout.item_storage_music);
         ItemStorageMusicBinding binding = ItemStorageMusicBinding.bind(itemView);
         clickableItem = binding.clickableItem;
 
         compositionItemWrapper = new CompositionItemWrapper(itemView,
-                composition -> iconClickListener.onItemClick(getAdapterPosition(), composition),
+                iconClickListener,
                 composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), fileSource)
         );
         binding.btnActionsMenu.setOnClickListener(v ->
