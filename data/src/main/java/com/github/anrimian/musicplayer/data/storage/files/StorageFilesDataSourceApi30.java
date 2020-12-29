@@ -16,13 +16,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 
 @RequiresApi(api = Build.VERSION_CODES.R)
 public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
 
     private final StorageMusicProvider storageMusicProvider;
+
+    @Nullable
+    private List<Composition> latestCompositionsToDelete;
 
     public StorageFilesDataSourceApi30(StorageMusicProvider storageMusicProvider) {
         this.storageMusicProvider = storageMusicProvider;
@@ -111,19 +116,23 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
     }
 
     @Override
-    public void deleteCompositionFiles(List<Composition> compositions) {
+    public List<Composition> deleteCompositionFiles(List<Composition> compositions) {
+        if (compositions.equals(latestCompositionsToDelete)) {//TODO not working, in second call is 0 size list
+            List<Composition> listToReturn = latestCompositionsToDelete;
+            latestCompositionsToDelete = null;
+            return listToReturn;
+        }
+        latestCompositionsToDelete = compositions;
         storageMusicProvider.deleteCompositions(mapListNotNull(
                 compositions,
                 Composition::getStorageId)
         );
+        return latestCompositionsToDelete;
     }
 
     @Override
     public void deleteCompositionFile(Composition composition) {
-        Long storageId = composition.getStorageId();
-        if (storageId != null) {
-            storageMusicProvider.deleteComposition(storageId);
-        }
+        deleteCompositionFiles(asList(composition));
     }
 
     //TODO adapt

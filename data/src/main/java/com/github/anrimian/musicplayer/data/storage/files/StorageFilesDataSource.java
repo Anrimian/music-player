@@ -26,7 +26,7 @@ public interface StorageFilesDataSource {
                                        String directoryName,
                                        List<FilePathComposition> updatedCompositions);
 
-    void deleteCompositionFiles(List<Composition> compositions);
+    List<Composition> deleteCompositionFiles(List<Composition> compositions);
 
     void deleteCompositionFile(Composition composition);
 

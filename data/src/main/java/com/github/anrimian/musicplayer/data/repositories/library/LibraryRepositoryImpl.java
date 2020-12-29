@@ -223,20 +223,16 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
         return Single.fromCallable(() -> compositionsDao.getAllCompositionsInFolder(folder.getId()))
-                .doOnSuccess(compositions -> {
-                    storageFilesDataSource.deleteCompositionFiles(compositions);
-                    foldersDao.deleteFolder(folder.getId(), compositions);
-                })
+                .map(storageFilesDataSource::deleteCompositionFiles)
+                .doOnSuccess(compositions -> foldersDao.deleteFolder(folder.getId(), compositions))
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Single<List<Composition>> deleteFolders(List<FileSource> folders) {
         return foldersDao.extractAllCompositionsFromFiles(folders)
-                .doOnSuccess(compositions -> {
-                    storageFilesDataSource.deleteCompositionFiles(compositions);
-                    foldersDao.deleteFolders(extractFolderIds(folders), compositions);
-                })
+                .map(storageFilesDataSource::deleteCompositionFiles)
+                .doOnSuccess(compositions -> foldersDao.deleteFolders(extractFolderIds(folders), compositions))
                 .subscribeOn(scheduler);
     }
 

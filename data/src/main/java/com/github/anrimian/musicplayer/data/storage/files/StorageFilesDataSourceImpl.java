@@ -121,7 +121,7 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
     }
 
     @Override
-    public void deleteCompositionFiles(List<Composition> compositions) {
+    public List<Composition> deleteCompositionFiles(List<Composition> compositions) {
         for (Composition composition: compositions) {
             deleteFile(composition);
         }
@@ -129,6 +129,7 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
                 compositions,
                 Composition::getStorageId)
         );
+        return compositions;
     }
 
     @Override
