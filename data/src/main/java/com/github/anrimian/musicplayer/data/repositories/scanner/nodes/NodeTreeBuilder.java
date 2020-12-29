@@ -12,12 +12,12 @@ public class NodeTreeBuilder {
 
     public LocalFolderNode<Long> createTreeFromIdMap(List<StorageFolder> folders,
                                                      LongSparseArray<StorageComposition> filesMap) {
-        LongSparseArray<List<Long>> folderIdMap = buildFolderIdMap(filesMap);
+        LongSparseArray<List<Long>> folderFilesMap = buildFolderIdMap(filesMap);
 
-        LongSparseArray<List<StorageFolder>> idMap = new LongSparseArray<>();
+        LongSparseArray<List<StorageFolder>> folderParentIdMap = new LongSparseArray<>();
 
         LocalFolderNode<Long> rootNode = new LocalFolderNode<>(null, null);
-        List<Long> files = folderIdMap.get(0);
+        List<Long> files = folderFilesMap.get(0);
         if (files != null) {
             rootNode.addFiles(files);
         }
@@ -25,22 +25,22 @@ public class NodeTreeBuilder {
         for (StorageFolder folder: folders) {
             Long parentId = folder.getParentId();
             if (parentId == null) {
-                rootNode.addFolder(newLocalFolder(folder, folderIdMap));
+                rootNode.addFolder(createLocalFolderWithFiles(folder, folderFilesMap));
             } else {
-                List<StorageFolder> childList = idMap.get(parentId);
+                List<StorageFolder> childList = folderParentIdMap.get(parentId);
                 if (childList == null) {
                     childList = new LinkedList<>();
-                    idMap.put(parentId, childList);
+                    folderParentIdMap.put(parentId, childList);
                 }
                 childList.add(folder);
             }
         }
 
         for (LocalFolderNode<Long> childNode: rootNode.getFolders()) {
-            fillNode(childNode, idMap, folderIdMap);
+            fillNode(childNode, folderParentIdMap, folderFilesMap);
         }
 
-        if (!idMap.isEmpty()) {
+        if (!folderParentIdMap.isEmpty()) {
             throw new IllegalStateException("found missed folders");
         }
 
@@ -67,28 +67,28 @@ public class NodeTreeBuilder {
     }
 
     private void fillNode(LocalFolderNode<Long> targetNode,
-                          LongSparseArray<List<StorageFolder>> parentIdMap,
-                          LongSparseArray<List<Long>> folderIdMap) {
+                          LongSparseArray<List<StorageFolder>> folderParentIdMap,
+                          LongSparseArray<List<Long>> folderFilesMap) {
         Long id = targetNode.getId();
         if (id == null) {
-            throw new IllegalStateException("try to access folder with null value");
+            throw new IllegalStateException("try to access folder with id == null");
         }
-        List<StorageFolder> childList = parentIdMap.get(id);
+        List<StorageFolder> childList = folderParentIdMap.get(id);
         if (childList != null) {
             for (StorageFolder folder: childList) {
-                LocalFolderNode<Long> node = newLocalFolder(folder, folderIdMap);
+                LocalFolderNode<Long> node = createLocalFolderWithFiles(folder, folderFilesMap);
                 targetNode.addFolder(node);
-                fillNode(node, parentIdMap, folderIdMap);
+                fillNode(node, folderParentIdMap, folderFilesMap);
             }
         }
-        parentIdMap.remove(id);
+        folderParentIdMap.remove(id);
     }
 
-    private LocalFolderNode<Long> newLocalFolder(StorageFolder folder,
-                                                 LongSparseArray<List<Long>> folderIdMap) {
+    private LocalFolderNode<Long> createLocalFolderWithFiles(StorageFolder folder,
+                                                             LongSparseArray<List<Long>> folderFilesMap) {
         long id = folder.getId();
-        LocalFolderNode<Long> node = new LocalFolderNode<>(folder.getName(), id);//and fill with files
-        List<Long> files = folderIdMap.get(id);
+        LocalFolderNode<Long> node = new LocalFolderNode<>(folder.getName(), id);
+        List<Long> files = folderFilesMap.get(id);
         if (files != null) {
             node.addFiles(files);
         }
