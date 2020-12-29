@@ -207,6 +207,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
 //        });
     }
 
+    //TODO display after process restore
     @Override
     public void displayEqualizerState(EqualizerState equalizerState, EqualizerConfig config) {
         int position = ListUtils.findPosition(

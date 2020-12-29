@@ -8,10 +8,11 @@
     <TextView
         android:id="@+id/tvLevel"
         style="@style/TextStyle.Subtitle.Small"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_vertical_margin"
         android:layout_marginBottom="@dimen/list_vertical_margin"
+        android:minEms="4"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

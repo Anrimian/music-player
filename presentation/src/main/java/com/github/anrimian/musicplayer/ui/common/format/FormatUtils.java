@@ -37,7 +37,21 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class FormatUtils {
 
     public static String formatDecibels(short milliDecibels) {
-        return String.format("%04d", milliDecibels) + " dB";//00.00 dB
+        short firstNumber = (short) (milliDecibels / 100);
+        int secondNumber = Math.abs(milliDecibels % 100);
+
+        StringBuilder sb = new StringBuilder();
+        if (milliDecibels > 0) {
+            sb.append('+');
+        }
+        if (firstNumber == 0 && milliDecibels < 0) {
+            sb.append('-');
+        }
+        sb.append(milliDecibels / 100);
+        sb.append('.');
+        sb.append(String.format(Locale.getDefault(),"%02d", secondNumber));
+        sb.append(" dB");
+        return sb.toString();//00.00 dB
     }
 
     public static String formatHz(int hz) {
