@@ -3,9 +3,9 @@ package com.github.anrimian.musicplayer.ui.equalizer;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
@@ -22,14 +22,15 @@ import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.menu.SimpleMenuBuilder;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.LinkedList;
@@ -181,41 +182,27 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         }
 
         List<Preset> presets = equalizerConfig.getPresets();
-        ArrayAdapter<Preset> adapter = new ArrayAdapter<>(requireContext(),
-                R.layout.item_autocomplete,
-                R.id.text_view,
-                presets);
-        viewBinding.spinnerPresets.setAdapter(adapter);
+        SimpleMenuBuilder menuBuilder = new SimpleMenuBuilder(requireContext());
+        for (int i = 0; i < presets.size(); i++) {
+            Preset preset = presets.get(i);
+            menuBuilder.add(i, preset.getPresetName());
+        }
+
+        viewBinding.tvPresets.setOnClickListener(v -> {
+            PopupMenuWindow.showActionBarPopup(viewBinding.tvPresets,
+                    menuBuilder.getItems(),
+                    menu -> presenter.onPresetSelected(presets.get(menu.getItemId())),
+                    Gravity.END
+            );
+        });
+
 
         setInAppEqualizerSettingsEnabled(inAppEqualizerSettingsEnabled);
-//        viewBinding.spinnerPresets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                presenter.onPresetSelected(presets.get(position));
-//            }
-//        });
-//        viewBinding.spinnerPresets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                presenter.onPresetSelected(presets.get(i));
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
     }
 
     //TODO display after process restore
     @Override
     public void displayEqualizerState(EqualizerState equalizerState, EqualizerConfig config) {
-        int position = ListUtils.findPosition(
-                config.getPresets(),
-                preset -> preset.getNumber() == equalizerState.getCurrentPreset()
-        );
-        viewBinding.spinnerPresets.setSelection(position);
-
         for (Pair<PartialEqualizerBandBinding, Band> pair: bandsViewList) {
             PartialEqualizerBandBinding binding = pair.first;
             Band band = pair.second;
@@ -266,7 +253,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
             PartialEqualizerBandBinding binding = pair.first;
             binding.sbLevel.setEnabled(enabled);
         }
-        viewBinding.spinnerPresets.setEnabled(enabled);
+        viewBinding.tvPresets.setEnabled(enabled);
     }
 
 }

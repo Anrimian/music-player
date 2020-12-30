@@ -27,10 +27,10 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //bands number depends on device: use horizontal seek bar - done
 //unite internal equalizer screen with equalizer setup dialog - done
 //TODO check sound gap on eq start
-//TODO remove selected preset displaying? And saving at all
+//remove selected preset displaying? - removed. And saving at all - leave saving
 //TODO display correct band and freq values
 //disable eq controls when eq is disabled - done
-//TODO presets ui
+//presets ui - done
 //add divider under eq radio buttons - done
 //TODO add title and close button
 //TODO disabled seek bar thumb ui
