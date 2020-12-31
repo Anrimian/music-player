@@ -30,4 +30,10 @@ public interface MusicPlayerController {
     void seekBy(long millis);
 
     long getTrackPosition();
+
+    void setPlaybackSpeed(float speed);
+
+    float getCurrentPlaybackSpeed();
+
+    Observable<Float> getPlaybackSpeedObservable();
 }

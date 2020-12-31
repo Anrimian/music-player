@@ -65,6 +65,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String LIBRARY_ARTISTS_COMPOSITIONS_POSITIONS = "library_artists_compositions_positions";
         String PLAYLISTS_POSITION = "playlists_positions";
         String PLAYLISTS_COMPOSITIONS_POSITIONS = "playlists_compositions_positions";
+        String PLAYBACK_SPEED = "playback_speed";
 
         int LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE = 15;
         int LIBRARY_ALBUMS_POSITIONS_MAX_CACHE_SIZE = 5;
@@ -73,6 +74,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     }
 
     private final BehaviorSubject<Long> currentItemSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Float> playbackSpeedSubject = BehaviorSubject.create();
 
     private final SharedPreferencesHelper preferences;
 
@@ -277,6 +279,24 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     @Override
     public ListPosition getSavedPlaylistListPosition(@Nullable Long id) {
         return playlistsPositionsPreference.get(id);
+    }
+
+    @Override
+    public float getCurrentPlaybackSpeed() {
+        return preferences.getFloat(Constants.PLAYBACK_SPEED, 1f);
+    }
+
+    @Override
+    public void setCurrentPlaybackSpeed(float speed) {
+        if (getCurrentPlaybackSpeed() != speed) {
+            preferences.putFloat(Constants.PLAYBACK_SPEED, speed);
+            playbackSpeedSubject.onNext(speed);
+        }
+    }
+
+    @Override
+    public Observable<Float> getPlaybackSpeedObservable() {
+        return withDefaultValue(playbackSpeedSubject, this::getCurrentPlaybackSpeed);
     }
 
     private static class LruCachePreference {

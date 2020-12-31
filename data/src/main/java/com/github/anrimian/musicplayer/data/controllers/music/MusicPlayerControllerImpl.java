@@ -60,6 +60,12 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         long trackPosition = getStartTrackPosition(source);
         currentSource = source;
         mediaPlayer.prepareToPlay(source, trackPosition);
+
+        if (source instanceof LibraryCompositionSource) {
+            mediaPlayer.setPlaySpeed(uiStateRepository.getCurrentPlaybackSpeed());
+        } else {
+            mediaPlayer.setPlaySpeed(1f);
+        }
     }
 
     @Override
@@ -104,6 +110,24 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public long getTrackPosition() {
         return mediaPlayer.getTrackPosition();
+    }
+
+    @Override
+    public void setPlaybackSpeed(float speed) {
+        mediaPlayer.setPlaySpeed(speed);
+        if (currentSource instanceof LibraryCompositionSource) {
+            uiStateRepository.setCurrentPlaybackSpeed(speed);
+        }
+    }
+
+    @Override
+    public float getCurrentPlaybackSpeed() {
+        return uiStateRepository.getCurrentPlaybackSpeed();
+    }
+
+    @Override
+    public Observable<Float> getPlaybackSpeedObservable() {
+        return uiStateRepository.getPlaybackSpeedObservable();
     }
 
     private void saveTrackPosition(long position) {
