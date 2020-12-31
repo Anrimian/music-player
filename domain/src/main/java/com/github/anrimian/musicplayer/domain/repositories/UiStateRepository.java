@@ -82,6 +82,4 @@ public interface UiStateRepository {
     float getCurrentPlaybackSpeed();
 
     void setCurrentPlaybackSpeed(float speed);
-
-    Observable<Float> getPlaybackSpeedObservable();
 }

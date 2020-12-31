@@ -70,6 +70,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         } else {
             getViewState().collapseBottomPanel();
         }
+        getViewState().displayPlaybackSpeed(playerInteractor.getPlaybackSpeed());
         subscribeOnUiSettings();
         subscribeOnRandomMode();
     }
@@ -266,6 +267,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     void onDragEnded(int position) {
         isDragging = false;
+    }
+
+    void onPlaybackSpeedSelected(float speed) {
+        getViewState().displayPlaybackSpeed(speed);
+        playerInteractor.setPlaybackSpeed(speed);
     }
 
     private void swapItems(int from, int to) {

@@ -121,13 +121,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
-    public float getCurrentPlaybackSpeed() {
+    public float getPlaybackSpeed() {
         return uiStateRepository.getCurrentPlaybackSpeed();
-    }
-
-    @Override
-    public Observable<Float> getPlaybackSpeedObservable() {
-        return uiStateRepository.getPlaybackSpeedObservable();
     }
 
     private void saveTrackPosition(long position) {

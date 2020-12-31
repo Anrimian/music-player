@@ -74,7 +74,6 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     }
 
     private final BehaviorSubject<Long> currentItemSubject = BehaviorSubject.create();
-    private final BehaviorSubject<Float> playbackSpeedSubject = BehaviorSubject.create();
 
     private final SharedPreferencesHelper preferences;
 
@@ -288,15 +287,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
 
     @Override
     public void setCurrentPlaybackSpeed(float speed) {
-        if (getCurrentPlaybackSpeed() != speed) {
-            preferences.putFloat(Constants.PLAYBACK_SPEED, speed);
-            playbackSpeedSubject.onNext(speed);
-        }
-    }
-
-    @Override
-    public Observable<Float> getPlaybackSpeedObservable() {
-        return withDefaultValue(playbackSpeedSubject, this::getCurrentPlaybackSpeed);
+        preferences.putFloat(Constants.PLAYBACK_SPEED, speed);
     }
 
     private static class LruCachePreference {

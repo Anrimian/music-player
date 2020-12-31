@@ -105,6 +105,14 @@ public class PlayerCoordinatorInteractor {
         return isPlayerTypeActive(playerType)? playerInteractor.getTrackPosition(): -1;
     }
 
+    public void setPlaybackSpeed(float speed) {
+        playerInteractor.setPlaybackSpeed(speed);
+    }
+
+    public float getPlaybackSpeed() {
+        return playerInteractor.getPlaybackSpeed();
+    }
+
     public Observable<PlayerEvent> getPlayerEventsObservable(PlayerType playerType) {
         return playerInteractor.getPlayerEventsObservable()
                 .filter(o -> isPlayerTypeActive(playerType));

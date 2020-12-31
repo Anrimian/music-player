@@ -688,6 +688,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         MessagesUtils.makeSnackbar(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void displayPlaybackSpeed(float speed) {
+        //TODO think about external player playback speed handling
+        //presenter.onPlaybackSpeedSelected()
+    }
+
     public void openPlayQueue() {
         presenter.onOpenPlayQueueClicked();
         playerPanelWrapper.openPlayQueue();

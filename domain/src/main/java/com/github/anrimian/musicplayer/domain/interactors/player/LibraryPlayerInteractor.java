@@ -258,6 +258,14 @@ public class LibraryPlayerInteractor {
         playQueueRepository.clearPlayQueue();
     }
 
+    public void setPlaybackSpeed(float speed) {
+        playerCoordinatorInteractor.setPlaybackSpeed(speed);
+    }
+
+    public float getPlaybackSpeed() {
+        return playerCoordinatorInteractor.getPlaybackSpeed();
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();

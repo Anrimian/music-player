@@ -159,6 +159,14 @@ public class PlayerInteractor {
         return musicPlayerController.getTrackPosition();
     }
 
+    public void setPlaybackSpeed(float speed) {
+        musicPlayerController.setPlaybackSpeed(speed);
+    }
+
+    public float getPlaybackSpeed() {
+        return musicPlayerController.getPlaybackSpeed();
+    }
+
     public Observable<PlayerEvent> getPlayerEventsObservable() {
         return playerEventsSubject;
     }
