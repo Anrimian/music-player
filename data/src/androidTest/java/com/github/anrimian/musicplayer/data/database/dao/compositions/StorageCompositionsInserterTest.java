@@ -127,4 +127,25 @@ public class StorageCompositionsInserterTest {
         StorageFolder folder = folders.get(0);
         assertEquals("test folder 2", folder.getName());
     }
+
+/*    @Test
+    public void testDeleteFolderWithExistsCompositions() {
+        long folder1Id = foldersDao.insertFolder(new FolderEntity(null, "test folder 1"));
+        long compositionId = compositionsDao.insert(composition(null, null, "test title", folder1Id));
+
+        List<AddedNode> foldersToInsert = new LinkedList<>();
+        List<Long> foldersToDelete = new LinkedList<>();
+        foldersToDelete.add(folder1Id);
+
+        List<StorageFullComposition> addedCompositions = new ArrayList<>();
+        List<StorageComposition> deletedCompositions = new ArrayList<>();
+        List<Change<StorageComposition, StorageFullComposition>> changedCompositions = new ArrayList<>();
+
+        inserter.applyChanges(foldersToInsert,
+                addedCompositions,
+                deletedCompositions,
+                changedCompositions,
+                new LongSparseArray<>(),
+                foldersToDelete);
+    }*/
 }

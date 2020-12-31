@@ -134,7 +134,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
             // if error event, switch to another player and consume event
             if (event instanceof ErrorEvent) {
                 ErrorType errorType = ((ErrorEvent) event).getErrorType();
-                if (errorType == ErrorType.UNSUPPORTED || errorType == ErrorType.NOT_FOUND) {
+                if (errorType == ErrorType.UNSUPPORTED) {
                     int newPlayerIndex = currentPlayerIndex + 1;
                     //don't switch player when we reached end of available players
                     if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.length) {

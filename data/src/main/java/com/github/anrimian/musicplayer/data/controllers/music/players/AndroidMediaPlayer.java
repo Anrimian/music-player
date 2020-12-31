@@ -31,6 +31,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
+import static android.media.MediaPlayer.MEDIA_ERROR_MALFORMED;
 import static android.media.MediaPlayer.MEDIA_ERROR_UNSUPPORTED;
 
 public class AndroidMediaPlayer implements AppMediaPlayer {
@@ -254,7 +255,8 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     private ErrorType getErrorTypeFromPlayerError(int what, int playerError) {
         switch (playerError) {
-            case MEDIA_ERROR_UNSUPPORTED: {
+            case MEDIA_ERROR_UNSUPPORTED:
+            case MEDIA_ERROR_MALFORMED: {
                 return ErrorType.UNSUPPORTED;
             }
             default: {
