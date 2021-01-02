@@ -45,7 +45,7 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //folder rename - done
 //TODO folder rename - delete old folder
 //TODO folder rename - check for duplicate?
-//TODO files/folder deleting
+//TODO files/folder deleting - implement retry on all screens
 //TODO replace DATA with relative path
 //TODO content observer not called
 public class CompositionSourceEditor {

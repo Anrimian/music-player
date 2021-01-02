@@ -121,7 +121,7 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
     }
 
     @Override
-    public List<Composition> deleteCompositionFiles(List<Composition> compositions) {
+    public List<Composition> deleteCompositionFiles(List<Composition> compositions, Object tokenForDelete) {
         for (Composition composition: compositions) {
             deleteFile(composition);
         }

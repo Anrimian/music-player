@@ -28,6 +28,8 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
 
     @Nullable
     private List<Composition> latestCompositionsToDelete;
+    @Nullable
+    private Object tokenForDelete;
 
     public StorageFilesDataSourceApi30(StorageMusicProvider storageMusicProvider) {
         this.storageMusicProvider = storageMusicProvider;
@@ -116,13 +118,20 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
     }
 
     @Override
-    public List<Composition> deleteCompositionFiles(List<Composition> compositions) {
-        if (compositions.equals(latestCompositionsToDelete)) {//TODO not working, in second call is 0 size list
+    public List<Composition> deleteCompositionFiles(List<Composition> compositions,
+                                                    Object tokenForDelete) {
+        // From android 11 delete actions are started twice.
+        // Moreover, files are deleting by system after dialog confirm.
+        // So, on second attempt composition list can be null when it is received from folder by db query
+        // So token for delete represent folder object that is not changed on second attempt
+        if (tokenForDelete.equals(this.tokenForDelete)) {
             List<Composition> listToReturn = latestCompositionsToDelete;
             latestCompositionsToDelete = null;
+            this.tokenForDelete = null;
             return listToReturn;
         }
         latestCompositionsToDelete = compositions;
+        this.tokenForDelete = tokenForDelete;
         storageMusicProvider.deleteCompositions(mapListNotNull(
                 compositions,
                 Composition::getStorageId)
@@ -132,7 +141,7 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
 
     @Override
     public void deleteCompositionFile(Composition composition) {
-        deleteCompositionFiles(asList(composition));
+        deleteCompositionFiles(asList(composition), composition);
     }
 
     //TODO adapt
