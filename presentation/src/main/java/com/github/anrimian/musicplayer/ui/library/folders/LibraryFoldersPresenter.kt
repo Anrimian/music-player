@@ -374,7 +374,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         if (lastDeleteAction != null) {
              lastDeleteAction!!
                     .doFinally { lastDeleteAction = null }
-                    .justSubscribe(this::onDefaultError)
+                    .justSubscribe(this::onDeleteCompositionsError)
         }
     }
 

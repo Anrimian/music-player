@@ -29,6 +29,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
@@ -55,6 +56,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class PlayListFragment extends MvpAppCompatFragment
@@ -73,6 +75,8 @@ public class PlayListFragment extends MvpAppCompatFragment
     private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
+
+    private ErrorHandler deletingErrorHandler;
 
     public static PlayListFragment newInstance(long playListId) {
         Bundle args = new Bundle();
@@ -135,6 +139,11 @@ public class PlayListFragment extends MvpAppCompatFragment
         SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
+
+        deletingErrorHandler = new ErrorHandler(getChildFragmentManager(),
+                presenter::onRetryFailedDeleteActionClicked,
+                this::showEditorRequestDeniedMessage);
+
         ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) fm
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (playListDialog != null) {
@@ -218,10 +227,12 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer,
-                getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+        deletingErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clListContainer,
+                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
+                        Snackbar.LENGTH_SHORT)
+                        .show()
+        );
     }
 
     @Override
@@ -390,5 +401,9 @@ public class PlayListFragment extends MvpAppCompatFragment
                 break;
             }
         }
+    }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(clListContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
     }
 }

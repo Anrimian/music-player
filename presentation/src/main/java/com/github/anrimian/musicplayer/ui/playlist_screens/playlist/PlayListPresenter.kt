@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.model.Item
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -41,6 +42,8 @@ class PlayListPresenter(private val playListId: Long,
     private var deletedItem: Item<PlayListItem>? = null
 
     private var numberOfUpdatesToIgnore: Short = 0
+
+    private var lastDeleteAction: Completable? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -168,6 +171,14 @@ class PlayListPresenter(private val playListId: Long,
         }
     }
 
+    fun onRetryFailedDeleteActionClicked() {
+        if (lastDeleteAction != null) {
+            lastDeleteAction!!
+                    .doFinally { lastDeleteAction = null }
+                    .justSubscribe(this::onDeleteCompositionsError)
+        }
+    }
+
     fun isCoversEnabled() = displaySettingsInteractor.isCoversEnabled
 
     private fun addCompositionsToPlayNext(compositions: List<Composition>) {
@@ -232,8 +243,11 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun deletePreparedCompositions() {
-        playerInteractor.deleteCompositions(compositionsToDelete)
-                .subscribeOnUi(this::onDeleteCompositionsSuccess, this::onDeleteCompositionsError)
+        lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
+                .observeOn(uiScheduler)
+                .doOnComplete(this::onDeleteCompositionsSuccess)
+
+        lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
     }
 
     private fun onDeleteCompositionsSuccess() {

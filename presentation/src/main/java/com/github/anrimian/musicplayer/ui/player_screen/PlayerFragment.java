@@ -46,6 +46,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
@@ -95,6 +96,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -160,6 +162,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Nullable
     private Composition previousCoverComposition;
+
+    private ErrorHandler deletingErrorHandler;
 
     public static PlayerFragment newInstance() {
         return newInstance(false);
@@ -323,6 +327,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         CompatUtils.setMainButtonStyle(btnRandomPlay);
         CompatUtils.setMainButtonStyle(btnRepeatMode);
         CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+
+        deletingErrorHandler = new ErrorHandler(getChildFragmentManager(),
+                presenter::onRetryFailedDeleteActionClicked,
+                this::showEditorRequestDeniedMessage);
 
         ChoosePlayListDialogFragment fragment = (ChoosePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
@@ -671,15 +679,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showConfirmDeleteDialog(List<Composition> compositionsToDelete) {
         DialogUtils.showConfirmDeleteDialog(requireContext(),
                 compositionsToDelete,
-                presenter::onDeleteCompositionsDialogConfirmed);
+                () -> presenter.onDeleteCompositionsDialogConfirmed(compositionsToDelete));
     }
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clPlayQueueContainer,
-                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+        deletingErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clPlayQueueContainer,
+                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
+                        Snackbar.LENGTH_SHORT)
+                        .show()
+        );
     }
 
     @Override
@@ -841,4 +851,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onShareCompositionClicked(Composition composition) {
         DialogUtils.shareComposition(requireContext(), composition);
     }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(clPlayQueueContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
+    }
+
 }

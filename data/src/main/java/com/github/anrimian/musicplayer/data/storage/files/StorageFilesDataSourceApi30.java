@@ -124,6 +124,8 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         // Moreover, files are deleting by system after dialog confirm.
         // So, on second attempt composition list can be null when it is received from folder by db query
         // So token for delete represent folder object that is not changed on second attempt
+
+        //TODO deny request and rerun it again - composition will be not deleted
         if (tokenForDelete.equals(this.tokenForDelete)) {
             List<Composition> listToReturn = latestCompositionsToDelete;
             latestCompositionsToDelete = null;

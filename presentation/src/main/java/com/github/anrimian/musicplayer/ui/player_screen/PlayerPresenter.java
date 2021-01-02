@@ -17,11 +17,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
@@ -48,7 +52,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private boolean isCoversEnabled = false;
 
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
-    private final List<Composition> compositionsToDelete = new LinkedList<>();
+//    private final List<Composition> compositionsToDelete = new LinkedList<>();
+
+    @Nullable
+    private Completable lastDeleteAction;
 
     public PlayerPresenter(LibraryPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
@@ -171,15 +178,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     void onDeleteCompositionButtonClicked(Composition composition) {
-        compositionsToDelete.clear();
-        compositionsToDelete.add(composition);
-        getViewState().showConfirmDeleteDialog(compositionsToDelete);
+        getViewState().showConfirmDeleteDialog(asList(composition));
     }
 
     void onDeleteCurrentCompositionButtonClicked() {
-        compositionsToDelete.clear();
-        compositionsToDelete.add(currentItem.getComposition());
-        getViewState().showConfirmDeleteDialog(compositionsToDelete);
+        getViewState().showConfirmDeleteDialog(asList(currentItem.getComposition()));
     }
 
     void onAddQueueItemToPlayListButtonClicked(Composition composition) {
@@ -206,8 +209,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                         this::onAddingToPlayListError);
     }
 
-    void onDeleteCompositionsDialogConfirmed() {
-        deletePreparedCompositions();
+    void onDeleteCompositionsDialogConfirmed(List<Composition> compositionsToDelete) {
+        deletePreparedCompositions(compositionsToDelete);
     }
 
     void onSeekStart() {
@@ -268,6 +271,14 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         isDragging = false;
     }
 
+    void onRetryFailedDeleteActionClicked() {
+        if (lastDeleteAction != null) {
+            lastDeleteAction
+                    .doFinally(() -> lastDeleteAction = null)
+                    .subscribe(() -> {}, this::onDeleteCompositionError);
+        }
+    }
+
     private void swapItems(int from, int to) {
         if (!ListUtils.isIndexInRange(playQueue, from) || !ListUtils.isIndexInRange(playQueue, to)) {
             return;
@@ -300,21 +311,21 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                         this::onAddingToPlayListError);
     }
 
-    private void deletePreparedCompositions() {
-        playerInteractor.deleteCompositions(compositionsToDelete)
+    private void deletePreparedCompositions(List<Composition> compositionsToDelete) {
+        lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
                 .observeOn(uiScheduler)
-                .subscribe(this::onDeleteCompositionsSuccess, this::onDeleteCompositionError);
+                .doOnComplete(() -> onDeleteCompositionsSuccess(compositionsToDelete));
+
+        lastDeleteAction.subscribe(() -> {}, this::onDeleteCompositionError);
     }
 
-    private void onDeleteCompositionsSuccess() {
+    private void onDeleteCompositionsSuccess(List<Composition> compositionsToDelete) {
         getViewState().showDeleteCompositionMessage(compositionsToDelete);
-        compositionsToDelete.clear();
     }
 
     private void onDeleteCompositionError(Throwable throwable) {
         ErrorCommand errorCommand = errorParser.parseError(throwable);
         getViewState().showDeleteCompositionError(errorCommand);
-        compositionsToDelete.clear();
     }
 
     private void onAddingToPlayListError(Throwable throwable) {
