@@ -71,7 +71,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private void subscribeOnMediaStoreChanges() {
         mediaStoreDisposable.add(musicProvider.getCompositionsObservable()
                 .subscribeOn(scheduler)
-                .subscribe(compositionAnalyzer::applyCompositionsData));
+                .subscribe(compositionAnalyzer::applyCompositionsData));//then run file scanner
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)
                 .subscribe(playlistAnalyzer::applyPlayListData));
