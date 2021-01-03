@@ -266,9 +266,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable updateAlbumName(String name, long albumId) {
         return checkAlbumExists(name)
                 .andThen(Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId)))
-                .flatMap(compositions -> Observable.fromIterable(compositions)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition, name))
-                        .toSingleDefault(compositions))
+                .flatMap(compositions -> sourceEditor.setCompositionsAlbum(compositions, name))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumName(name, albumId);
                     for (Composition composition: compositions) {
@@ -282,9 +280,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable updateAlbumArtist(String newArtistName, long albumId) {
         return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
-                .flatMap(compositions -> Observable.fromIterable(compositions)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition, newArtistName))// not working, we can't edit album artist?
-                        .toSingleDefault(compositions))
+                .flatMap(compositions -> sourceEditor.setCompositionsAlbumArtist(compositions, newArtistName))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumArtist(albumId, newArtistName);
                     for (Composition composition: compositions) {

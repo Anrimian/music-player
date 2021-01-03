@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -40,6 +41,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 
 import static android.provider.MediaStore.Audio.Media;
@@ -346,6 +348,23 @@ public class StorageMusicProvider {
             throw new FileNotFoundException("can not open stream for file without media store id");
         }
         return contentResolver.openOutputStream(getCompositionUri(id));
+    }
+
+    public Completable processStorageError(Throwable throwable, List<Composition> compositions) {
+        return Completable.fromAction(() -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && throwable instanceof RecoverableSecurityException) {
+                List<Uri> uris = ListUtils.mapListNotNull(compositions, composition -> {
+                    Long storageId = composition.getStorageId();
+                    if (storageId == null) {
+                        return null;
+                    }
+                    return getCompositionUri(storageId);
+                });
+                PendingIntent pIntent = MediaStore.createWriteRequest(contentResolver, uris);
+                throw new RecoverableSecurityExceptionExt(pIntent, throwable.getMessage());
+            }
+            throw throwable;
+        });
     }
 
 /*    public void modifyComposition(long id, ThrowsCallback<OutputStream> modifyFunction)

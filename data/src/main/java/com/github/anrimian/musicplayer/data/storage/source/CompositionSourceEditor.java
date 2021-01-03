@@ -28,16 +28,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 
-//TODO albums editor
+//albums editor - done
 //files moving - done
 //TODO remove empty folder after files had moved or folder renamed
 //TODO files moving/folder renaming - process error on not "well defined collection" - show advice to move files to right folder
@@ -89,9 +91,23 @@ public class CompositionSourceEditor {
                 .flatMapCompletable(path -> setCompositionAlbum(path, composition.getStorageId(), author));
     }
 
+    public Single<List<Composition>> setCompositionsAlbum(List<Composition> compositions, String album) {
+        return Observable.fromIterable(compositions)
+                .flatMapCompletable(composition -> setCompositionAlbum(composition, album))
+                .onErrorResumeNext(throwable -> storageMusicProvider.processStorageError(throwable, compositions))
+                .toSingleDefault(compositions);
+    }
+
     public Completable setCompositionAlbumArtist(FullComposition composition, String artist) {
         return getPath(composition)
                 .flatMapCompletable(path -> setCompositionAlbumArtist(path, composition.getStorageId(), artist));
+    }
+
+    public Single<List<Composition>> setCompositionsAlbumArtist(List<Composition> compositions, String artist) {
+        return Observable.fromIterable(compositions)
+                .flatMapCompletable(composition -> setCompositionAlbumArtist(composition, artist))
+                .onErrorResumeNext(throwable -> storageMusicProvider.processStorageError(throwable, compositions))
+                .toSingleDefault(compositions);
     }
 
     public Completable setCompositionAlbumArtist(Composition composition, String artist) {

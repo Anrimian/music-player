@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
@@ -30,7 +31,6 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.ALBUM_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
-import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
@@ -45,6 +45,8 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     private DialogFragmentRunner<InputTextDialogFragment> authorDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> nameDialogFragmentRunner;
     private DialogFragmentDelayRunner progressDialogRunner;
+
+    private ErrorHandler errorHandler;
 
     public static Intent newIntent(Context context, long albumId) {
         Intent intent = new Intent(context, AlbumEditorActivity.class);
@@ -88,6 +90,11 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
         );
 
         FragmentManager fm = getSupportFragmentManager();
+
+        errorHandler = new ErrorHandler(fm,
+                presenter::onRetryFailedEditActionClicked,
+                this::showEditorRequestDeniedMessage);
+
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 AUTHOR_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewAuthorEntered));
@@ -123,7 +130,9 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        makeSnackbar(viewBinding.getRoot(), errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
+        errorHandler.handleError(errorCommand, () ->
+                makeSnackbar(viewBinding.getRoot(), errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
+        );
     }
 
     @Override
@@ -155,7 +164,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
                 R.string.change,
                 R.string.cancel,
                 R.string.name,
-                formatFileName(album.getName()),
+                album.getName(),
                 false);
         nameDialogFragmentRunner.show(fragment);
     }
@@ -169,5 +178,9 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
 
     private void onTextCopied() {
         makeSnackbar(viewBinding.getRoot(), R.string.copied_message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(viewBinding.getRoot(), R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
     }
 }
