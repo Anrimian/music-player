@@ -120,7 +120,7 @@
     <integer name="icon_image_size">100</integer>
 
     <!--snackbar-->
-    <integer name="snackbar_max_lines">3</integer>
+    <integer name="snackbar_max_lines">5</integer>
     <dimen name="snackbar_padding_start">16dp</dimen>
     <dimen name="snackbar_padding_end">8dp</dimen>
     <dimen name="snackbar_padding_vertical">16dp</dimen>

@@ -45,11 +45,12 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //TODO files moving/folder renaming - process error on not "well defined collection" - show advice to move files to right folder
 //file rename - done
 //folder rename - done
-//TODO folder rename - delete old folder
 //TODO folder rename - check for duplicate?
-//TODO files/folder deleting
-//TODO replace DATA with relative path
+//TODO files/folder deleting - (deny delete issue; hide app confirm dialog?)
 //TODO content observer not called
+
+//TODO replace DATA with relative path
+//TODO getFileSize() adapt
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';
