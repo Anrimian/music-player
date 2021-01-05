@@ -177,8 +177,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
                 }
             });
 
-
-            binding.tvFrequency.setText(FormatUtils.formatHz(band.getFrequencyRange()[1]));
+            binding.tvFrequency.setText(FormatUtils.formatMilliHz(band.getCenterFreq()));
         }
 
         List<Preset> presets = equalizerConfig.getPresets();

@@ -28,7 +28,7 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //unite internal equalizer screen with equalizer setup dialog - done
 //TODO check sound gap on eq start
 //remove selected preset displaying? - removed. And saving at all - leave saving
-//TODO display correct band and freq values
+//display correct band and freq values - done
 //disable eq controls when eq is disabled - done
 //presets ui - done
 //add divider under eq radio buttons - done
@@ -160,11 +160,7 @@ public class InternalEqualizer implements AppEqualizer {
 
         List<Band> bands = new ArrayList<>();
         for(short i = 0; i < equalizer.getNumberOfBands(); i++) {
-            bands.add(new Band(
-                    i,
-                    equalizer.getBandFreqRange(i),
-                    equalizer.getCenterFreq(i))
-            );
+            bands.add(new Band(i, equalizer.getCenterFreq(i)));
         }
 
         List<Preset> presets = new ArrayList<>();

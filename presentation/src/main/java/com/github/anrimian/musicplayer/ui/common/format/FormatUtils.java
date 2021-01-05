@@ -54,8 +54,26 @@ public class FormatUtils {
         return sb.toString();//00.00 dB
     }
 
-    public static String formatHz(int hz) {
-        return hz + " hz";
+    public static String formatMilliHz(int mhz) {
+        int hz = mhz / 1000;
+        int mhzLeft = (mhz % 1000) / 10;
+        int kHz = hz / 1000;
+        int hzLeft = (hz % 1000) / 10;
+
+        StringBuilder sb = new StringBuilder();
+        if (kHz == 0) {
+            sb.append(hz);
+            sb.append('.');
+            sb.append(String.format(Locale.getDefault(),"%02d", mhzLeft));
+            sb.append("Hz");
+        } else {
+            sb.append(kHz);
+            sb.append('.');
+            sb.append(String.format(Locale.getDefault(),"%02d", hzLeft));
+            sb.append("kHz");
+        }
+
+        return sb.toString();//000.00Hz or 000.00kHz
     }
 
     public static String formatCompositionsCount(Context context, int compositionsCount) {
