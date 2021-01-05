@@ -95,6 +95,13 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <style name="TextStyleSpeedButton" parent="TextStyle">
+        <item name="android:textSize">11sp</item>
+        <item name="android:background">@drawable/bg_outline_text_button</item>
+        <item name="android:textColor">@color/color_text_secondary</item>
+        <item name="android:padding">4dp</item>
+    </style>
+
     <style name="TextStyleContentSubtitle.Small">
         <item name="android:textSize">11sp</item>
     </style>

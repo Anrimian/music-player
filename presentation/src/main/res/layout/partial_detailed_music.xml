@@ -145,6 +145,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/tv_played_time"/>
 
+    <TextView
+        android:id="@+id/tvPlaybackSpeed"
+        style="@style/TextStyleSpeedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/sb_track_state"
+        app:layout_constraintEnd_toEndOf="@id/btn_infinite_play"/>
+
     <FrameLayout
         android:id="@+id/music_icon_wrapper"
         android:layout_width="50dp"

@@ -502,6 +502,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         btnRandomPlay.setEnabled(show);
         sbTrackState.setEnabled(show);
         acvPlayQueueMenu.getMenu().findItem(R.id.menu_save_as_playlist).setEnabled(show);
+        panelBinding.tvPlaybackSpeed.setEnabled(show);
     }
 
     @Override
@@ -692,6 +693,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void displayPlaybackSpeed(float speed) {
         //TODO think about external player playback speed handling
         //presenter.onPlaybackSpeedSelected()
+        panelBinding.tvPlaybackSpeed.setText(getString(R.string.playback_speed_template, speed));
+        panelBinding.tvPlaybackSpeed.setOnClickListener(v -> {});
     }
 
     public void openPlayQueue() {
