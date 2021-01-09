@@ -20,7 +20,6 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.StorageComposit
 import com.github.anrimian.musicplayer.data.repositories.scanner.StoragePlaylistAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
@@ -51,13 +50,6 @@ public class StorageModule {
     @Singleton
     StorageMusicProvider storageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
         return new StorageMusicProvider(context, albumsProvider);
-    }
-
-    @Provides
-    @Nonnull
-    @Singleton
-    StorageArtistsProvider storageArtistProvider(Context context) {
-        return new StorageArtistsProvider(context);
     }
 
     @Provides

@@ -115,7 +115,11 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     @Override
     public void seekTo(long position) {
         Completable.fromRunnable(() -> {
-            getPlayer().seekTo(position);
+            try {
+                getPlayer().seekTo(position);
+            } catch (IndexOutOfBoundsException ignored) {//crash inside exoplayer
+                return;
+            }
             trackPositionSubject.onNext(position);
         }).subscribeOn(scheduler).subscribe();
     }
