@@ -35,6 +35,7 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
@@ -340,6 +341,10 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
             }
             case R.id.menu_search: {
                 toolbar.setSearchModeEnabled(true);
+                break;
+            }
+            case R.id.menu_sleep_timer: {
+                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_equalizer: {

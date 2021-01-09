@@ -63,6 +63,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
@@ -699,6 +700,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
                 fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
                 fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
+                break;
+            }
+            case R.id.menu_sleep_timer: {
+                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_equalizer: {

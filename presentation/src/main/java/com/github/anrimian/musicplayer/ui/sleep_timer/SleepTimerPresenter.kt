@@ -1,52 +1,32 @@
-package com.github.anrimian.musicplayer.ui.sleep_timer;
+package com.github.anrimian.musicplayer.ui.sleep_timer
 
-import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Scheduler
 
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import moxy.MvpPresenter;
-
-public class SleepTimerPresenter extends MvpPresenter<SleepTimerView> {
-
-    private final SleepTimerInteractor interactor;
-    private final Scheduler scheduler;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-
-    public SleepTimerPresenter(SleepTimerInteractor interactor,
-                               Scheduler scheduler) {
-        this.interactor = interactor;
-        this.scheduler = scheduler;
+class SleepTimerPresenter(private val interactor: SleepTimerInteractor,
+                          scheduler: Scheduler,
+                          errorParser: ErrorParser
+) : AppPresenter<SleepTimerView>(scheduler, errorParser) {
+    
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        viewState.showSleepTimerTime(interactor.sleepTimerTime)
+        subscribeOnSleepTimerState()
+        subscribeOnSleepTimerRemainingTime()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        getViewState().showSleepTimerTime(interactor.getSleepTimerTime());
-        subscribeOnSleepTimerState();
-        subscribeOnSleepTimerRemainingTime();
+    fun onSleepTimerTimeChanged(millis: Long) {
+        viewState.showSleepTimerTime(millis)
+        interactor.sleepTimerTime = millis
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
+    private fun subscribeOnSleepTimerState() {
+        interactor.sleepTimerStateObservable.unsafeSubscribeOnUi(viewState::showSleepTimerState)
     }
 
-    void onSleepTimerTimeChanged(long millis) {
-        getViewState().showSleepTimerTime(millis);
-        interactor.setSleepTimerTime(millis);
-    }
-
-    private void subscribeOnSleepTimerState() {
-        presenterDisposable.add(interactor.getSleepTimerStateObservable()
-                .observeOn(scheduler)
-                .subscribe(getViewState()::showSleepTimerState));
-    }
-
-    private void subscribeOnSleepTimerRemainingTime() {
-        presenterDisposable.add(interactor.getSleepTimerCountDownObservable()
-                .observeOn(scheduler)
-                .subscribe(getViewState()::showSleepRemainingSeconds));
+    private fun subscribeOnSleepTimerRemainingTime() {
+        interactor.sleepTimerCountDownObservable.unsafeSubscribeOnUi(viewState::showSleepRemainingSeconds)
     }
 }

@@ -13,6 +13,11 @@
         android:icon="@drawable/ic_sort"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/menu_sleep_timer"
+        android:icon="@drawable/ic_timer"
+        android:title="@string/sleep_timer"
+        app:showAsAction="never"/>
+
     <item android:id="@+id/menu_equalizer"
         android:title="@string/equalizer"
         android:icon="@drawable/ic_equalizer"

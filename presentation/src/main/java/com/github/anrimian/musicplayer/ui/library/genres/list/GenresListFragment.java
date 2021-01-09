@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.genres.items.GenreItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.genres.list.adapter.GenresAdapter;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
@@ -240,6 +241,10 @@ public class GenresListFragment extends LibraryFragment implements
             }
             case R.id.menu_search: {
                 toolbar.setSearchModeEnabled(true);
+                break;
+            }
+            case R.id.menu_sleep_timer: {
+                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_equalizer: {

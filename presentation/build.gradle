@@ -93,6 +93,7 @@ dependencies {
     implementation deps.moxy
     implementation deps.moxyAppcompat
     implementation deps.moxyMaterial
+    implementation deps.moxyKtx
     kapt deps.moxyCompiler
 
     implementation deps.dagger

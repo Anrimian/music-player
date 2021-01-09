@@ -205,6 +205,7 @@
     <string name="android_r_edit_file_permission_denied">
         From Android 11 editing and deleting files requires explicit system permission
     </string>
+    <string name="sleep_timer">Sleep timer</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
