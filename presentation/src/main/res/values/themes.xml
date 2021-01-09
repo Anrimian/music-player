@@ -78,4 +78,59 @@
         <item name="navigationViewPrimaryColor">@color/colorTealPrimary</item>
     </style>
 
+    <style name="DarkOrangeTheme" parent="@style/PrimaryDarkTheme">
+        <item name="colorAccent">@color/colorOrangeAccent</item>
+        <item name="colorPrimaryVariant">@color/colorGreenDarkAccent</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@color/colorOrangeAccent</item>
+    </style>
+
+    <style name="DarkGreenTheme" parent="@style/PrimaryDarkTheme">
+        <item name="colorAccent">@color/colorGreenDarkAccent</item>
+        <item name="colorPrimaryVariant">@color/colorAccentDark</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@color/colorGreenDarkAccent</item>
+    </style>
+
+    <style name="CompletelyWhiteTheme" parent="PrimaryLightTheme">
+        <!--primary colors-->
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryWhiteGray</item>
+        <item name="colorAccent">@color/colorAccentBlue</item>
+        <item name="colorPrimaryVariant">@color/colorAccentBlue</item>
+
+        <!--text colors-->
+        <item name="toolbarTextColorPrimary">@color/text_color_primary</item>
+        <item name="toolbarTextColorSecondary">@color/text_color_secondary</item>
+        <item name="android:textColorSecondaryInverse">@color/text_color_secondary</item>
+        <item name="dialogButtonColor">@color/colorAccentBlue</item>
+
+        <!--background-->
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="listBackground">@android:color/white</item>
+        <item name="listItemBackground">@android:color/white</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@color/colorAccentBlue</item>
+    </style>
+
+    <style name="CompletelyBlackTheme" parent="PrimaryDarkTheme">
+        <!--primary colors-->
+        <item name="colorPrimary">@android:color/black</item>
+        <item name="colorPrimaryDark">@color/dark_background_level_0</item>
+        <item name="colorPrimaryVariant">@color/colorAccentDark</item>
+        <item name="colorPrimaryDarkSecondary">@android:color/black</item>
+
+        <!--background-->
+        <item name="android:colorBackground">@android:color/black</item>
+        <item name="listBackground">@android:color/black</item>
+        <item name="listItemBottomBackground">@android:color/black</item>
+        <item name="listItemBackground">@android:color/black</item>
+        <item name="popupMenuBackgroundColor">@color/dark_background_level_0</item>
+        <item name="dialogBackground">@color/dark_background_level_0</item>
+        <item name="subToolbarBackground">@android:color/black</item>
+    </style>
+
 </resources>

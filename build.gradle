@@ -8,14 +8,15 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
 
 allprojects {
     ext {
         androidApplicationId = 'com.github.anrimian.musicplayer'
-        androidVersionCode = 88
-        androidVersionName = "0.8.5.3"
+        androidVersionCode = 91
+        androidVersionName = "0.8.5.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId = 'com.github.anrimian.musicplayer.test'
     }
@@ -24,3 +25,14 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)
+        .all {
+            kotlinOptions {
+                freeCompilerArgs += [
+                        '-Xno-call-assertions',
+                        '-Xno-receiver-assertions',
+                        '-Xno-param-assertions'
+                ]
+            }
+        }

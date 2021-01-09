@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
@@ -226,7 +227,10 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .flatMap(this::createMediaSource)
                 .timeout(2, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
                 .observeOn(scheduler)
-                .doOnSuccess(getPlayer()::prepare)
+                .doOnSuccess(mediaSource -> {
+                    getPlayer().setMediaSource(mediaSource);
+                    getPlayer().prepare();
+                })
                 .ignoreElement();
     }
 
@@ -256,7 +260,8 @@ public class ExoMediaPlayer implements AppMediaPlayer {
             dataSource.open(dataSpec);
 
             DataSource.Factory factory = () -> dataSource;
-            return new ProgressiveMediaSource.Factory(factory).createMediaSource(uri);
+            MediaItem mediaItem = new MediaItem.Builder().setUri(uri).build();
+            return new ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem);
         });
     }
 

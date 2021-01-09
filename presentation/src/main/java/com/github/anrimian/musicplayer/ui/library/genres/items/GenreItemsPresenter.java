@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.genres.items;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
@@ -50,6 +52,7 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
         subscribeOnGenreInfo();
     }
 
+    @NonNull
     @Override
     protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
         return interactor.getGenreItemsObservable(genreId);
@@ -78,15 +81,15 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
     void onNewGenreNameEntered(String name, long genreId) {
         dispose(changeDisposable);
         changeDisposable = interactor.updateGenreName(name, genreId)
-                .observeOn(uiScheduler)
+                .observeOn(getUiScheduler())
                 .doOnSubscribe(d -> getViewState().showRenameProgress())
                 .doFinally(() -> getViewState().hideRenameProgress())
                 .subscribe(() -> {}, this::onDefaultError);
     }
 
     private void subscribeOnGenreInfo() {
-        presenterDisposable.add(interactor.getGenreObservable(genreId)
-                .observeOn(uiScheduler)
+        getPresenterDisposable().add(interactor.getGenreObservable(genreId)
+                .observeOn(getUiScheduler())
                 .subscribe(this::onGenreInfoReceived,
                         t -> getViewState().closeScreen(),
                         getViewState()::closeScreen));

@@ -42,6 +42,7 @@
         <item name="actionModeBackgroundColor">@android:color/white</item>
 
         <!--background-->
+        <item name="android:colorBackground">@color/light_background_level_0</item>
         <item name="listBackground">@color/light_light_gray</item>
         <item name="listItemBottomBackground">@color/list_item_bottom_background_light</item>
         <item name="listItemBackground">@color/light_background_level_1</item>

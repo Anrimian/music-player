@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     def config = rootProject.ext
@@ -45,6 +47,8 @@ dependencies {
     implementation project(':domain')
 
     def deps = rootProject.ext
+
+    implementation kotlinStdLib
 
     implementation deps.appCompat
     implementation deps.rxJava

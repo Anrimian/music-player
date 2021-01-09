@@ -159,6 +159,7 @@ public class CompositionSourceEditor {
         return Completable.fromAction(() -> editFile(filePath, storageId, FieldKey.ALBUM, author));
     }
 
+
     Completable setCompositionTitle(String filePath,
                                     Long storageId,
                                     String title) {

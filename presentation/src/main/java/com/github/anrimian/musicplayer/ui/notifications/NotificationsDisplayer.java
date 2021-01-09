@@ -325,9 +325,10 @@ public class NotificationsDisplayer {
                         return true;
                     }
                 }
+                return false;
             } catch (Exception ignored) {} //getActiveNotifications() can throw exception on android 6
         }
-        return false;
+        return true;
     }
 
     private void createChannels(Context context) {
