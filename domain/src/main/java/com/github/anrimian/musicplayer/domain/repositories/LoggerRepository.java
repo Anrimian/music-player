@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 //TODO implement report dialog
-//TODO implement logger repository impl
 //TODO try to fix report intent action
 public interface LoggerRepository {
 
@@ -18,7 +17,7 @@ public interface LoggerRepository {
      */
     void setWasCriticalFatalError(boolean wasCriticalFatalError);
 
-    boolean showReportDialogOnStart(boolean show);
+    void showReportDialogOnStart(boolean show);
 
     boolean isReportDialogOnStartEnabled();
 
