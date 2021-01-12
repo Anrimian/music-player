@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
-//TODO implement report dialog
+//TODO check report dialog leaked window
 //TODO try to fix report intent action
 public interface LoggerRepository {
 

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.main;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -8,13 +9,17 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.DialogErrorReportBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.utils.Permissions;
+import com.github.anrimian.musicplayer.utils.logger.AppLogger;
+import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 
@@ -96,11 +101,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showReportDialog(boolean isCritical) {
-        //show error report dialog(is critical - change message)
-        //buttons:
-        //1) checkbox - enable/disable this dialog
-        //2) send file -> disable flag on click
-        //3) view file
-        //4) delete file - disable flag on click
+        LoggerRepository loggerRepository = Components.getAppComponent().loggerRepository();
+
+        DialogErrorReportBinding binding = DialogErrorReportBinding.inflate(getLayoutInflater());
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.error_report)
+                .setMessage(isCritical? R.string.critical_error_report_message: R.string.error_report_message)
+                .setView(binding.getRoot())
+                .setOnCancelListener(o -> loggerRepository.clearErrorFlags())
+                .show();
+
+        binding.cbShowReportDialogOnStart.setChecked(loggerRepository.isReportDialogOnStartEnabled());
+        ViewUtils.onCheckChanged(binding.cbShowReportDialogOnStart, loggerRepository::showReportDialogOnStart);
+
+        FileLog fileLog = Components.getAppComponent().fileLog();
+
+        binding.btnDelete.setOnClickListener(v -> {
+            fileLog.deleteLogFile();
+            dialog.dismiss();
+            loggerRepository.clearErrorFlags();
+        });
+
+        AppLogger appLogger = Components.getAppComponent().appLogger();
+
+        binding.btnView.setOnClickListener(v -> appLogger.startViewLogScreen(this));
+        binding.btnSend.setOnClickListener(v -> {
+            appLogger.startSendLogScreen(this);
+            dialog.dismiss();
+            loggerRepository.clearErrorFlags();
+        });
+
+        binding.btnClose.setOnClickListener(v -> {
+            dialog.dismiss();
+            loggerRepository.clearErrorFlags();
+        });
     }
 }
