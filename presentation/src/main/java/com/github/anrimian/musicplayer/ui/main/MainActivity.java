@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
@@ -25,10 +26,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (Permissions.hasFilePermission(this)) {
-            goToMainScreen();
-        } else {
-            goToStartScreen();
+        if (savedInstanceState == null) {
+            LoggerRepository loggerRepository = Components.getAppComponent().loggerRepository();
+            if ((loggerRepository.wasFatalError() && loggerRepository.isReportDialogOnStartEnabled())
+                    || loggerRepository.wasCriticalFatalError()) {
+                showReportDialog(loggerRepository.wasCriticalFatalError());
+                if (loggerRepository.wasCriticalFatalError()) {
+                    return;
+                }
+            }
+
+            if (Permissions.hasFilePermission(this)) {
+                goToMainScreen();
+            } else {
+                goToStartScreen();
+            }
         }
     }
 
@@ -81,5 +93,14 @@ public class MainActivity extends AppCompatActivity {
         boolean openPlayQueue = intent.getBooleanExtra(OPEN_PLAY_QUEUE_ARG, false);
         getIntent().removeExtra(OPEN_PLAY_QUEUE_ARG);
         return openPlayQueue;
+    }
+
+    private void showReportDialog(boolean isCritical) {
+        //show error report dialog(is critical - change message)
+        //buttons:
+        //1) checkbox - enable/disable this dialog
+        //2) send file -> disable flag on click
+        //3) view file
+        //4) delete file - disable flag on click
     }
 }

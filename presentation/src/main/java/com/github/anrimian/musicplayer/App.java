@@ -29,7 +29,7 @@ public class App extends Application {
         DevTools.run(this);
 
         AppComponent appComponent = Components.getAppComponent();
-        appComponent.fileLog().initFatalErrorRecorder();
+        appComponent.appLogger().initFatalErrorRecorder();
 
         if (Permissions.hasFilePermission(this)) {
             appComponent.widgetUpdater().start();
