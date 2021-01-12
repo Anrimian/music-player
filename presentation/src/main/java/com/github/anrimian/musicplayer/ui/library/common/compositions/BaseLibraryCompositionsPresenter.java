@@ -141,7 +141,6 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
         } else {
             playSelectedCompositions();
         }
-        throw new RuntimeException("TEST");
     }
 
     public void onDeleteCompositionButtonClicked(Composition composition) {
