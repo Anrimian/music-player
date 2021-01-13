@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.main;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,7 @@ import androidx.fragment.app.FragmentManager;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.DialogErrorReportBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
@@ -41,11 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if (Permissions.hasFilePermission(this)) {
-                goToMainScreen();
-            } else {
-                goToStartScreen();
-            }
+            startScreens();
         }
     }
 
@@ -73,6 +71,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         AndroidUtils.hideKeyboard(getWindow().getDecorView());
+    }
+
+    private void startScreens() {
+        if (Permissions.hasFilePermission(this)) {
+            goToMainScreen();
+        } else {
+            goToStartScreen();
+        }
     }
 
     private void goToStartScreen() {
@@ -108,9 +114,10 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle(R.string.error_report)
                 .setMessage(isCritical? R.string.critical_error_report_message: R.string.error_report_message)
                 .setView(binding.getRoot())
-                .setOnCancelListener(o -> loggerRepository.clearErrorFlags())
+                .setOnCancelListener(o -> onReportDialogClosed(isCritical))
                 .show();
 
+        binding.cbShowReportDialogOnStart.setVisibility(isCritical? View.GONE: View.VISIBLE);
         binding.cbShowReportDialogOnStart.setChecked(loggerRepository.isReportDialogOnStartEnabled());
         ViewUtils.onCheckChanged(binding.cbShowReportDialogOnStart, loggerRepository::showReportDialogOnStart);
 
@@ -119,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         binding.btnDelete.setOnClickListener(v -> {
             fileLog.deleteLogFile();
             dialog.dismiss();
-            loggerRepository.clearErrorFlags();
+            onReportDialogClosed(isCritical);
         });
 
         AppLogger appLogger = Components.getAppComponent().appLogger();
@@ -128,12 +135,27 @@ public class MainActivity extends AppCompatActivity {
         binding.btnSend.setOnClickListener(v -> {
             appLogger.startSendLogScreen(this);
             dialog.dismiss();
-            loggerRepository.clearErrorFlags();
+            onReportDialogClosed(isCritical);
         });
 
         binding.btnClose.setOnClickListener(v -> {
             dialog.dismiss();
-            loggerRepository.clearErrorFlags();
+            onReportDialogClosed(isCritical);
         });
     }
+
+    private void onReportDialogClosed(boolean isCritical) {
+        AppComponent appComponent = Components.getAppComponent();
+        LoggerRepository loggerRepository = appComponent.loggerRepository();
+        loggerRepository.clearErrorFlags();
+
+        if (isCritical) {
+            startScreens();
+            if (Permissions.hasFilePermission(this)) {
+                appComponent.widgetUpdater().start();
+                appComponent.mediaScannerRepository().runStorageObserver();
+            }
+        }
+    }
+
 }
