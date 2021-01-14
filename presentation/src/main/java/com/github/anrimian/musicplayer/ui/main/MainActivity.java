@@ -1,11 +1,15 @@
 package com.github.anrimian.musicplayer.ui.main;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -37,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             LoggerRepository loggerRepository = Components.getAppComponent().loggerRepository();
             if ((loggerRepository.wasFatalError() && loggerRepository.isReportDialogOnStartEnabled())
                     || loggerRepository.wasCriticalFatalError()) {
-                showReportDialog(loggerRepository.wasCriticalFatalError());
+                new ErrorReportDialogFragment().show(getSupportFragmentManager(), null);
                 if (loggerRepository.wasCriticalFatalError()) {
                     return;
                 }
@@ -106,56 +110,71 @@ public class MainActivity extends AppCompatActivity {
         return openPlayQueue;
     }
 
-    private void showReportDialog(boolean isCritical) {
-        LoggerRepository loggerRepository = Components.getAppComponent().loggerRepository();
+    public static class ErrorReportDialogFragment extends DialogFragment {
 
-        DialogErrorReportBinding binding = DialogErrorReportBinding.inflate(getLayoutInflater());
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.error_report)
-                .setMessage(isCritical? R.string.critical_error_report_message: R.string.error_report_message)
-                .setView(binding.getRoot())
-                .setOnCancelListener(o -> onReportDialogClosed(isCritical))
-                .show();
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LoggerRepository loggerRepository = Components.getAppComponent().loggerRepository();
+            boolean isCritical = loggerRepository.wasCriticalFatalError();
 
-        binding.cbShowReportDialogOnStart.setVisibility(isCritical? View.GONE: View.VISIBLE);
-        binding.cbShowReportDialogOnStart.setChecked(loggerRepository.isReportDialogOnStartEnabled());
-        ViewUtils.onCheckChanged(binding.cbShowReportDialogOnStart, loggerRepository::showReportDialogOnStart);
+            DialogErrorReportBinding binding = DialogErrorReportBinding.inflate(getLayoutInflater());
+            AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.error_report)
+                    .setMessage(isCritical? R.string.critical_error_report_message: R.string.error_report_message)
+                    .setView(binding.getRoot())
+                    .show();
 
-        FileLog fileLog = Components.getAppComponent().fileLog();
+            binding.cbShowReportDialogOnStart.setVisibility(isCritical? View.GONE: View.VISIBLE);
+            binding.cbShowReportDialogOnStart.setChecked(loggerRepository.isReportDialogOnStartEnabled());
+            ViewUtils.onCheckChanged(binding.cbShowReportDialogOnStart, loggerRepository::showReportDialogOnStart);
 
-        binding.btnDelete.setOnClickListener(v -> {
-            fileLog.deleteLogFile();
-            dialog.dismiss();
-            onReportDialogClosed(isCritical);
-        });
+            FileLog fileLog = Components.getAppComponent().fileLog();
 
-        AppLogger appLogger = Components.getAppComponent().appLogger();
+            binding.btnDelete.setOnClickListener(v -> {
+                fileLog.deleteLogFile();
+                dismissAllowingStateLoss();
+                onReportDialogClosed();
+            });
 
-        binding.btnView.setOnClickListener(v -> appLogger.startViewLogScreen(this));
-        binding.btnSend.setOnClickListener(v -> {
-            appLogger.startSendLogScreen(this);
-            dialog.dismiss();
-            onReportDialogClosed(isCritical);
-        });
+            AppLogger appLogger = Components.getAppComponent().appLogger();
 
-        binding.btnClose.setOnClickListener(v -> {
-            dialog.dismiss();
-            onReportDialogClosed(isCritical);
-        });
-    }
+            binding.btnView.setOnClickListener(v -> appLogger.startViewLogScreen(requireActivity()));
+            binding.btnSend.setOnClickListener(v -> {
+                appLogger.startSendLogScreen(requireActivity());
+                dismissAllowingStateLoss();
+                onReportDialogClosed();
+            });
 
-    private void onReportDialogClosed(boolean isCritical) {
-        AppComponent appComponent = Components.getAppComponent();
-        LoggerRepository loggerRepository = appComponent.loggerRepository();
-        loggerRepository.clearErrorFlags();
+            binding.btnClose.setOnClickListener(v -> {
+                dismissAllowingStateLoss();
+                onReportDialogClosed();
+            });
 
-        if (isCritical) {
-            startScreens();
-            if (Permissions.hasFilePermission(this)) {
-                appComponent.widgetUpdater().start();
-                appComponent.mediaScannerRepository().runStorageObserver();
+            return dialog;
+        }
+
+        @Override
+        public void onCancel(@NonNull DialogInterface dialog) {
+            super.onCancel(dialog);
+            onReportDialogClosed();
+        }
+
+        private void onReportDialogClosed() {
+            AppComponent appComponent = Components.getAppComponent();
+            LoggerRepository loggerRepository = appComponent.loggerRepository();
+            boolean isCritical = loggerRepository.wasCriticalFatalError();
+            loggerRepository.clearErrorFlags();
+
+            if (isCritical) {
+                ((MainActivity) getActivity()).startScreens();
+                if (Permissions.hasFilePermission(requireContext())) {
+                    appComponent.widgetUpdater().start();
+                    appComponent.mediaScannerRepository().runStorageObserver();
+                }
             }
         }
+
     }
 
 }

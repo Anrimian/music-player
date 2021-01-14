@@ -1,9 +1,7 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
-//TODO check report dialog leaked window
 //TODO try to fix report intent action
 //TODO report dialog on landscape orientation
-//TODO check critical error case - rotate screen, multiple restarts
 public interface LoggerRepository {
 
     boolean wasFatalError();
