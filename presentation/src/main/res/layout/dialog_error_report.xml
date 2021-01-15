@@ -46,8 +46,10 @@
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         android:layout_marginTop="@dimen/content_vertical_margin"
+        android:layout_marginBottom="@dimen/content_vertical_margin"
         app:layout_constraintTop_toBottomOf="@id/btnSend"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <Button
         android:id="@+id/btnClose"
@@ -57,10 +59,8 @@
         android:text="@string/close"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
-        android:layout_marginTop="@dimen/content_vertical_margin"
         android:layout_marginBottom="@dimen/content_vertical_margin"
-        app:layout_constraintTop_toBottomOf="@id/btnDelete"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/cbShowReportDialogOnStart"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

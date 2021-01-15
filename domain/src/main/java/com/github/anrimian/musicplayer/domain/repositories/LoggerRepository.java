@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 //TODO try to fix report intent action
-//TODO report dialog on landscape orientation
 public interface LoggerRepository {
 
     boolean wasFatalError();
