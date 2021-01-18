@@ -206,9 +206,9 @@
         From Android 11 editing and deleting files requires explicit system permission
     </string>
     <string name="error_report">Error report</string>
-    <string name="critical_error_report_message">Fatal error occurred and due to this app can\'t start. Appearing of this errors is highly unwanted. Application doesn\'t collect logs automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
-    <string name="error_report_message">Fatal error occurred. Application doesn\'t collect error logs automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
-    <string name="show_error_report_dialog_on_start">Show error report dialog on application start</string>
+    <string name="critical_error_report_message">Fatal error occurred and due to this app can\'t start. Appearing of this errors is highly unwanted. Application doesn\'t send any info  automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
+    <string name="error_report_message">Fatal error occurred. Application doesn\'t send any info automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
+    <string name="show_error_report_dialog_on_start">Show error report dialog on application start after app crashes</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
