@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
-//TODO try to fix report intent action
 public interface LoggerRepository {
 
     boolean wasFatalError();
