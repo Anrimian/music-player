@@ -112,24 +112,22 @@
         android:id="@+id/tv_played_time"
         style="@style/TextStyle.Time"
         android:gravity="center_vertical|start"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_random_play"
         app:layout_constraintStart_toStartOf="@+id/btn_random_play"
-        app:layout_constraintEnd_toStartOf="@id/tv_total_time"
         tools:text="00:11"/>
 
     <TextView
         android:id="@+id/tv_total_time"
         style="@style/TextStyle.Time"
         android:gravity="center_vertical|end"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_infinite_play"
         app:layout_constraintEnd_toEndOf="@+id/btn_infinite_play"
-        app:layout_constraintStart_toEndOf="@id/tv_played_time"
         tools:text="00:11" />
 
     <SeekBar
@@ -150,8 +148,10 @@
         style="@style/TextStyleSpeedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/sb_track_state"
-        app:layout_constraintEnd_toEndOf="@id/btn_infinite_play"/>
+        android:layout_marginEnd="@dimen/content_margin"
+        app:layout_constraintTop_toTopOf="@id/tv_total_time"
+        app:layout_constraintBottom_toBottomOf="@id/tv_total_time"
+        app:layout_constraintEnd_toStartOf="@id/tv_total_time"/>
 
     <FrameLayout
         android:id="@+id/music_icon_wrapper"

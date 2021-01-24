@@ -692,6 +692,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void displayPlaybackSpeed(float speed) {
         //TODO think about external player playback speed handling
+        //TODO ability to hide speed indicator if there are no available feature
         //presenter.onPlaybackSpeedSelected()
         panelBinding.tvPlaybackSpeed.setText(getString(R.string.playback_speed_template, speed));
         panelBinding.tvPlaybackSpeed.setOnClickListener(v -> {});

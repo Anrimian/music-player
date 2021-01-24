@@ -96,7 +96,8 @@
     </style>
 
     <style name="TextStyleSpeedButton" parent="TextStyle">
-        <item name="android:textSize">11sp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:background">@drawable/bg_outline_text_button</item>
         <item name="android:textColor">@color/color_text_secondary</item>
         <item name="android:padding">4dp</item>
