@@ -1,7 +1,5 @@
 <resources>
 
-    <!--TODO delete swipe dialog text bottom padding, width-->
-
     <string name="open_drawer">Abrir cajón</string>
     <string name="close_drawer">Cerrar cajón</string>
     <string name="try_again">Reintentar</string>
@@ -207,6 +205,10 @@
     <string name="android_r_edit_file_permission_denied">
         Desde Android 11 la edición y eliminación de archivos requiere un permiso explicito del sistema
     </string>
+    <string name="error_report">Informe de errores</string>
+    <string name="critical_error_report_message">Se produjo un error grave y debido a esto la aplicación no puede iniciarse. La aparición de estos errores es altamente indeseable. La aplicación no envía ningún dato automaticamente, pero se puede enviar el archivo de registro de errores manualmente por correo electrónico.</string>
+    <string name="error_report_message">Se produjo un error grave. La app no envía ningún dato automaticamente, pero se puede enviar el archivo de registro de errores manualmente por correo electrónico. Eso ayudará a corregir este error.</string>
+    <string name="show_error_report_dialog_on_start">Mostrar el diálogo de informe de errores al iniciar la aplicación una vez que la app se bloquee</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s canción</item>
