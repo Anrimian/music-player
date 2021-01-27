@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.infrastructure.analytics;
 import android.util.Log;
 
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
-import com.github.anrimian.musicplayer.utils.filelog.FileLog;
+import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
 public class AnalyticsImpl implements Analytics {
 

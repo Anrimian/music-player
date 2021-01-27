@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.data.storage.source.FileSourceProvider;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 
@@ -131,6 +132,7 @@ public class StorageModule {
                                                   GenresDaoWrapper genresDao,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
                                                   StoragePlaylistAnalyzer storagePlaylistAnalyzer,
+                                                  LoggerRepository loggerRepository,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
@@ -138,6 +140,7 @@ public class StorageModule {
                 genresDao,
                 compositionAnalyzer,
                 storagePlaylistAnalyzer,
+                loggerRepository,
                 scheduler);
     }
 
