@@ -154,6 +154,9 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
         return new File(filePath).length();
     }
 
+    @Override
+    public void clearDeleteData() {}
+
     private void deleteFile(Composition composition) {
         Long storageId = composition.getStorageId();
         if (storageId == null) {

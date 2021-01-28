@@ -46,6 +46,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
@@ -328,7 +329,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         CompatUtils.setMainButtonStyle(btnRepeatMode);
         CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
 
-        deletingErrorHandler = new ErrorHandler(getChildFragmentManager(),
+        deletingErrorHandler = new DeleteErrorHandler(getChildFragmentManager(),
                 presenter::onRetryFailedDeleteActionClicked,
                 this::showEditorRequestDeniedMessage);
 
@@ -344,7 +345,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
         }
 
-        //noinspection ConstantConditions
         if (getArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
             getArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();

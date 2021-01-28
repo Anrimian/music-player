@@ -32,6 +32,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistAlbumsPresenter;
@@ -160,7 +161,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
         FragmentManager fm = getChildFragmentManager();
 
-        deletingErrorHandler = new ErrorHandler(fm,
+        deletingErrorHandler = new DeleteErrorHandler(fm,
                 presenter::onRetryFailedDeleteActionClicked,
                 this::showEditorRequestDeniedMessage);
 

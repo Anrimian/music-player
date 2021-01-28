@@ -125,7 +125,6 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         // So, on second attempt composition list can be null when it is received from folder by db query
         // So token for delete represent folder object that is not changed on second attempt
 
-        //TODO deny request and rerun it again - composition will be not deleted
         if (tokenForDelete.equals(this.tokenForDelete)) {
             List<Composition> listToReturn = latestCompositionsToDelete;
             latestCompositionsToDelete = null;
@@ -158,6 +157,12 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
             return -1;
         }
         return new File(filePath).length();
+    }
+
+    @Override
+    public void clearDeleteData() {
+        latestCompositionsToDelete = null;
+        tokenForDelete = null;
     }
 
     @Nonnull

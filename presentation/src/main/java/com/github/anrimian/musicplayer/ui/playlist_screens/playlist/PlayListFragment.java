@@ -29,6 +29,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
@@ -140,7 +141,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
         FragmentManager fm = getChildFragmentManager();
 
-        deletingErrorHandler = new ErrorHandler(getChildFragmentManager(),
+        deletingErrorHandler = new DeleteErrorHandler(getChildFragmentManager(),
                 presenter::onRetryFailedDeleteActionClicked,
                 this::showEditorRequestDeniedMessage);
 

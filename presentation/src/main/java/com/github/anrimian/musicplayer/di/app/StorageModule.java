@@ -115,6 +115,7 @@ public class StorageModule {
 
     @Provides
     @Nonnull
+    @Singleton
     StorageFilesDataSource storageFilesDataSource(StorageMusicProvider musicProvider) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             return new StorageFilesDataSourceApi30(musicProvider);

@@ -42,12 +42,13 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //albums editor - done
 //files moving - done
 //TODO remove empty folder after files had moved or folder renamed
-//TODO files moving/folder renaming - process error on not "well defined collection" - show advice to move files to right folder
+//files moving/folder renaming - process error on not "well defined collection" - skip
 //file rename - done
 //folder rename - done
 //TODO folder rename - check for duplicate?
-//TODO files/folder deleting - (deny delete issue; hide app confirm dialog?)
-//TODO content observer not called
+//deny delete issue - done
+//TODO files/folder deleting - hide app confirm dialog
+//TODO content observer not called - seems working?
 
 //TODO replace DATA with relative path
 //TODO getFileSize() adapt

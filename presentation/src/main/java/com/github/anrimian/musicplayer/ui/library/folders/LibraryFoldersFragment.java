@@ -37,6 +37,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
@@ -202,7 +203,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter::onRetryFailedEditActionClicked,
                 this::showEditorRequestDeniedMessage);
 
-        deletingErrorHandler = new ErrorHandler(fm,
+        deletingErrorHandler = new DeleteErrorHandler(fm,
                 presenter::onRetryFailedDeleteActionClicked,
                 this::showEditorRequestDeniedMessage);
 

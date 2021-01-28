@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
@@ -82,8 +83,8 @@ public interface AppComponent {
     ErrorParser errorParser();
     FileLog fileLog();
     AppLogger appLogger();
+    StorageFilesDataSource storageFilesDataSource();
 
     ThemeController themeController();
     EqualizerController equalizerController();
-
 }
