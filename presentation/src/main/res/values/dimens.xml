@@ -103,7 +103,7 @@
     <dimen name="widget_medium_content_spacing_margin_horizontal">2dp</dimen>
 
     <!--swipe panel-->
-    <dimen name="swipe_panel_width">80dp</dimen>
+    <dimen name="swipe_panel_width">90dp</dimen>
     <dimen name="swipe_panel_padding_end">8dp</dimen>
     <dimen name="swipe_panel_text_top_padding">4dp</dimen>
     <dimen name="swipe_panel_icon_size">28dp</dimen>

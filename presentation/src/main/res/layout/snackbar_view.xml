@@ -47,9 +47,6 @@
         android:layout_marginEnd="@dimen/snackbar_padding_end"
         android:layout_marginTop="@dimen/snackbar_padding_button_vertical"
         android:layout_marginBottom="@dimen/snackbar_padding_button_vertical"
-        android:textColor="?attr/colorAccent"
-        android:maxLines="1"
-        android:ellipsize="end"
         tools:visibility="visible"
         tools:text="retry"/>
 
