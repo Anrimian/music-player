@@ -47,11 +47,18 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //folder rename - done
 //TODO folder rename - check for duplicate?
 //deny delete issue - done
-//TODO files/folder deleting - hide app confirm dialog
+//files/folder deleting - hide app confirm dialog possibility - done
 //TODO content observer not called - seems working?
 
 //TODO replace DATA with relative path
 //TODO getFileSize() adapt
+//TODO pathchnotes with explanation
+/*
+    Android 11 storage adaptation. From system version 11 editing and deleting files requires explicit
+    user permission. So editing tags, moving compositions and folders, renaming folders action will require additional confirm.
+    Deleting files and folders also will require additional dialog confirm, but with possibility not to show application delete dialog anymore.
+
+ */
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';
