@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer;
-import com.github.anrimian.musicplayer.utils.DevTools;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -26,12 +25,14 @@ public class App extends Application {
 
         Components.init(getApplicationContext());
 
-        DevTools.run(this);
+//        DevTools.run(this);
 
         AppComponent appComponent = Components.getAppComponent();
-        appComponent.fileLog().initFatalErrorRecorder();
+        appComponent.appLogger().initFatalErrorRecorder();
 
-        if (Permissions.hasFilePermission(this)) {
+        if (Permissions.hasFilePermission(this)
+                && !appComponent.loggerRepository().wasCriticalFatalError()
+        ) {
             appComponent.widgetUpdater().start();
             appComponent.mediaScannerRepository().runStorageObserver();
         }

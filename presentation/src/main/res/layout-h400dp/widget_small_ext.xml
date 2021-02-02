@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_appwidget"
     tools:layout_width="300dp"
-    tools:layout_height="80dp">
+    tools:layout_height="100dp">
 
     <TextView
         android:id="@+id/tv_composition"
@@ -19,7 +19,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        tools:text="composition_name composition_name composition_name composition_name" />
+        tools:text="Composition name" />
 
     <TextView
         android:id="@+id/tv_composition_author"
@@ -30,7 +30,7 @@
         android:layout_alignStart="@id/tv_composition"
         android:layout_below="@id/tv_composition"
         android:layout_alignEnd="@+id/tv_composition"
-        tools:text="composition_author composition_author composition_author composition_author composition_author" />
+        tools:text="Composition artist" />
 
     <ImageView
         android:id="@+id/iv_shuffle_mode"
