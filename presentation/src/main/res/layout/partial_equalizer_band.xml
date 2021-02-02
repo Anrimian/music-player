@@ -24,6 +24,8 @@
         android:id="@+id/sbLevel"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:paddingTop="@dimen/content_spacing_margin"
+        android:paddingBottom="@dimen/content_spacing_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/tvLevel"
         app:layout_constraintEnd_toStartOf="@id/tvFrequency"

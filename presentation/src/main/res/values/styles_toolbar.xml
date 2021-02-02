@@ -40,6 +40,10 @@
         <item name="android:textColor">?attr/actionModeTextColor</item>
     </style>
 
+    <style name="ToolbarTitleStyle.Reversed">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
     <style name="ToolbarSubtitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
         <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
         <item name="android:maxLines">1</item>

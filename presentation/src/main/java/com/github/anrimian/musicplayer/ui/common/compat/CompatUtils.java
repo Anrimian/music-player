@@ -3,8 +3,8 @@ package com.github.anrimian.musicplayer.ui.common.compat;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Build;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
@@ -54,7 +54,7 @@ public class CompatUtils {
         }
     }
 
-    public static void setOutlineButtonStyle(Button button) {
+    public static void setOutlineButtonStyle(TextView button) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             Context context = button.getContext();
             int[][] states = new int[][]{

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
@@ -9,6 +10,7 @@ import android.view.View;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
@@ -122,6 +124,16 @@ public class RecyclerViewUtils {
         });
     }
 
+    @SuppressLint("RestrictedApi")
+    public static void attachDynamicShadow(NestedScrollView nestedScrollView, View shadow) {
+        shadow.setVisibility(
+                nestedScrollView.computeVerticalScrollOffset() > 0? VISIBLE: View.GONE
+        );
+        nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> animateVisibility(
+                shadow,
+                nestedScrollView.computeVerticalScrollOffset() > 0? VISIBLE: GONE
+        ));
+    }
 
     public static void attachFastScroller(RecyclerView recyclerView) {
         attachFastScroller(recyclerView, false);

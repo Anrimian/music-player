@@ -44,6 +44,7 @@ import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.setupBottomSheetDialogMaxWidth;
+import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils.attachDynamicShadow;
 
 public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         implements EqualizerView {
@@ -96,6 +97,8 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
 
         AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground);
 
+        attachDynamicShadow(viewBinding.nestedScrollView, viewBinding.titleShadow);
+
         equalizerController = Components.getAppComponent().equalizerController();
 
 //        AlertDialog dialog = new AlertDialog.Builder(getActivity())
@@ -110,10 +113,13 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         viewBinding.rbUseAppEqualizer.setOnClickListener(v -> enableAppEqualizer());
 //        viewBinding.btnOpenAppEqualizer.setOnClickListener(v -> openAppEqualizer());
         viewBinding.rbDisableEqualizer.setOnClickListener(v -> disableEqualizer());
+        viewBinding.ivClose.setOnClickListener(v -> dismissAllowingStateLoss());
 
         showActiveEqualizer(equalizerController.getSelectedEqualizerType());
 
         CompatUtils.setOutlineButtonStyle(viewBinding.btnOpenSystemEqualizer);
+        CompatUtils.setOutlineButtonStyle(viewBinding.tvPresets);
+
     }
 
     @Override
@@ -187,14 +193,13 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
             menuBuilder.add(i, preset.getPresetName());
         }
 
-        viewBinding.tvPresets.setOnClickListener(v -> {
-            PopupMenuWindow.showActionBarPopup(viewBinding.tvPresets,
-                    menuBuilder.getItems(),
-                    menu -> presenter.onPresetSelected(presets.get(menu.getItemId())),
-                    Gravity.END
-            );
-        });
-
+        viewBinding.tvPresets.setOnClickListener(v ->
+                PopupMenuWindow.showActionBarPopup(viewBinding.tvPresets,
+                        menuBuilder.getItems(),
+                        menu -> presenter.onPresetSelected(presets.get(menu.getItemId())),
+                        Gravity.END
+                )
+        );
 
         setInAppEqualizerSettingsEnabled(inAppEqualizerSettingsEnabled);
     }

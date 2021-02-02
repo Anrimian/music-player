@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/pressed"
+        android:state_pressed="true"
+        android:drawable="@drawable/bg_seekbar_thumb_pressed" />
+    <item
+        android:id="@+id/unpressed"
+        android:drawable="@drawable/bg_seekbar_thumb_unpressed" />
+    <transition
+        android:fromId="@+id/unpressed"
+        android:toId="@+id/pressed"
+        android:drawable="@drawable/bg_seekbar_thumb_unpressed_to_pressed" />
+    <transition
+        android:fromId="@+id/pressed"
+        android:toId="@+id/unpressed"
+        android:drawable="@drawable/bg_seekbar_thumb_pressed_to_unpressed" />
+</animated-selector>

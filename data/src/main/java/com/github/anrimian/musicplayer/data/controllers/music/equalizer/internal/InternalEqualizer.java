@@ -32,8 +32,9 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //disable eq controls when eq is disabled - done
 //presets ui - done
 //add divider under eq radio buttons - done
-//TODO add title and close button
-//TODO disabled seek bar thumb ui
+//add title and close button - done
+//disabled seek bar thumb ui - done
+//TODO empty band values on start
 
 public class InternalEqualizer implements AppEqualizer {
 
