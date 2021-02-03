@@ -48,6 +48,10 @@ public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
         interactor.setBandLevel(band.getBandNumber(), value);
     }
 
+    public void onBandLevelDragStopped() {
+        interactor.saveBandLevel();
+    }
+
     public void onPresetSelected(Preset preset) {
         interactor.setPreset(preset);
     }
@@ -69,5 +73,4 @@ public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
     private void onDefaultError(Throwable throwable) {
         getViewState().showErrorMessage(errorParser.parseError(throwable));
     }
-
 }

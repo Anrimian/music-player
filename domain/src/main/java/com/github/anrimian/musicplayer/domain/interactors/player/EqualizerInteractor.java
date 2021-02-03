@@ -28,8 +28,11 @@ public class EqualizerInteractor {
         equalizerRepository.setBandLevel(bandNumber, level);
     }
 
+    public void saveBandLevel() {
+        equalizerRepository.saveBandLevel();
+    }
+
     public void setPreset(Preset preset) {
         equalizerRepository.setPreset(preset);
     }
-
 }

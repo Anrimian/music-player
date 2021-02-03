@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal;
 
 import android.media.audiofx.Equalizer;
-import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.AppEqualizer;
 import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository;
@@ -22,8 +21,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
-//TODO save only when band seekbar was released(?)
-//TODO play -> enable eq = eq not attached - works?
+//save only when band seekbar was released - done
+//play -> enable eq = eq not attached - works
 //bands number depends on device: use horizontal seek bar - done
 //unite internal equalizer screen with equalizer setup dialog - done
 //TODO check sound gap on eq start
@@ -51,12 +50,10 @@ public class InternalEqualizer implements AppEqualizer {
     @Override
     public void attachEqualizer(int audioSessionId) {
         if (audioSessionId != 0) {
-            Log.d("KEK", "attachEqualizer, audioSessionId: " + audioSessionId);
             if (equalizer == null) {
                 equalizer = new Equalizer(1000, audioSessionId);
 
                 EqualizerState equalizerState = equalizerStateRepository.loadEqualizerState();
-                Log.d("KEK", "attachEqualizer, loadEqualizerState: " + equalizerState);
                 if (equalizerState != null) {
                     applyEqualizerState(equalizer, equalizerState);
                     currentStateSubject.onNext(equalizerState);
@@ -102,15 +99,20 @@ public class InternalEqualizer implements AppEqualizer {
             equalizer.setBandLevel(bandNumber, level);
         }
 
-        EqualizerState equalizerState = equalizerStateRepository.loadEqualizerState();
+        EqualizerState equalizerState = currentStateSubject.getValue();
         if (equalizerState == null) {
             equalizerState = new EqualizerState(NO_PRESET, new HashMap<>());
         }
         equalizerState.getBendLevels().put(bandNumber, level);
         equalizerState.setCurrentPreset(NO_PRESET);
-        Log.d("KEK", "setBandLevel, saveEqualizerState: " + equalizerState);
-        equalizerStateRepository.saveEqualizerState(equalizerState);
         currentStateSubject.onNext(equalizerState);
+    }
+
+    public void saveBandLevel() {
+        EqualizerState equalizerState = currentStateSubject.getValue();
+        if (equalizerState != null) {
+            equalizerStateRepository.saveEqualizerState(equalizerState);
+        }
     }
 
     public void setPreset(Preset preset) {
@@ -120,7 +122,6 @@ public class InternalEqualizer implements AppEqualizer {
             EqualizerState equalizerState = extractEqualizerState(tempEqualizer);
             tempEqualizer.release();
 
-            Log.d("KEK", "setPreset, saveEqualizerState(from tmp eq): " + equalizerState);
             equalizerStateRepository.saveEqualizerState(equalizerState);
             currentStateSubject.onNext(equalizerState);
         } else {
@@ -129,7 +130,6 @@ public class InternalEqualizer implements AppEqualizer {
                 equalizer.usePreset(preset.getNumber());
                 EqualizerState equalizerState = extractEqualizerState(equalizer);
 
-                Log.d("KEK", "setPreset, saveEqualizerState: " + equalizerState);
                 equalizerStateRepository.saveEqualizerState(equalizerState);
                 currentStateSubject.onNext(equalizerState);
             }
@@ -175,5 +175,4 @@ public class InternalEqualizer implements AppEqualizer {
 
         return new EqualizerConfig(lowestRange, highestRange, bands, presets);
     }
-
 }

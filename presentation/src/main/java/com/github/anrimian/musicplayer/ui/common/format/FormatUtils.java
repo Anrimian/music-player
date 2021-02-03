@@ -65,12 +65,12 @@ public class FormatUtils {
             sb.append(hz);
             sb.append('.');
             sb.append(String.format(Locale.getDefault(),"%02d", mhzLeft));
-            sb.append("Hz");
+            sb.append(" Hz");
         } else {
             sb.append(kHz);
             sb.append('.');
             sb.append(String.format(Locale.getDefault(),"%02d", hzLeft));
-            sb.append("kHz");
+            sb.append(" kHz");
         }
 
         return sb.toString();//000.00Hz or 000.00kHz

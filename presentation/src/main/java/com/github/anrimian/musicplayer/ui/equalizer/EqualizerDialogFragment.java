@@ -7,7 +7,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 
@@ -31,6 +30,7 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.menu.SimpleMenuBuilder;
+import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.LinkedList;
@@ -162,26 +162,15 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
             short highestRange = equalizerConfig.getHighestBandRange();
             int max = highestRange - lowestRange;
             binding.sbLevel.setMax(max);
-            binding.sbLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if (fromUser) {
-                        short value = (short) (progress - Math.abs(lowestRange));
-                        binding.tvLevel.setText(FormatUtils.formatDecibels(value));
-                        presenter.onBandLevelChanged(band, value);
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
+            SeekBarViewWrapper seekBarViewWrapper = new SeekBarViewWrapper(binding.sbLevel);
+            seekBarViewWrapper.setProgressChangeListener(progress -> {
+                short value = (short) (progress - Math.abs(lowestRange));
+                binding.tvLevel.setText(FormatUtils.formatDecibels(value));
+                presenter.onBandLevelChanged(band, value);
             });
+            seekBarViewWrapper.setOnSeekStopListener(progress ->
+                    presenter.onBandLevelDragStopped()
+            );
 
             binding.tvFrequency.setText(FormatUtils.formatMilliHz(band.getCenterFreq()));
         }

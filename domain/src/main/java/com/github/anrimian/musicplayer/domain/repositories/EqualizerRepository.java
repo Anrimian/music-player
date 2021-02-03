@@ -15,5 +15,8 @@ public interface EqualizerRepository {
 
     void setBandLevel(short bandNumber, short level);
 
+    void saveBandLevel();
+
     void setPreset(Preset preset);
+
 }

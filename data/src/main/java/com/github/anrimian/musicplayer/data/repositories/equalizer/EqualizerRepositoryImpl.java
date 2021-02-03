@@ -33,6 +33,11 @@ public class EqualizerRepositoryImpl implements EqualizerRepository {
     }
 
     @Override
+    public void saveBandLevel() {
+        internalEqualizer.saveBandLevel();
+    }
+
+    @Override
     public void setPreset(Preset preset) {
         internalEqualizer.setPreset(preset);
     }
