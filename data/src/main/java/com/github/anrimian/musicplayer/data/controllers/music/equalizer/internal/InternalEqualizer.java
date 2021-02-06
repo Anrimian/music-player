@@ -33,7 +33,8 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //add divider under eq radio buttons - done
 //add title and close button - done
 //disabled seek bar thumb ui - done
-//TODO empty band values on start
+//empty band values on start - unable to reproduce
+//TODO calculate dialog height
 
 public class InternalEqualizer implements AppEqualizer {
 

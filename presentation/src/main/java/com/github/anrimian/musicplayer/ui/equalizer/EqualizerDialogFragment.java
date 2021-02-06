@@ -6,6 +6,7 @@ import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -72,20 +73,12 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         View view = viewBinding.getRoot();
         dialog.setContentView(view);
 
-//        DisplayMetrics displayMetrics = requireActivity().getResources().getDisplayMetrics();
-//
-//        int height = displayMetrics.heightPixels;
-//
-//        float heightPercent = getFloat(getResources(), R.dimen.choose_playlist_dialog_height);
-//        int minHeight = (int) (height * heightPercent);
-//        view.setMinimumHeight(minHeight);
-
         view.measure(
                 makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                 makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         );
 
-        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
+        BottomSheetBehavior<FrameLayout> bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
         bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 dismissAllowingStateLoss();
@@ -94,24 +87,15 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         bottomSheetBehavior.setPeekHeight(view.getMeasuredHeight());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-
         AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground);
 
         attachDynamicShadow(viewBinding.nestedScrollView, viewBinding.titleShadow);
 
         equalizerController = Components.getAppComponent().equalizerController();
 
-//        AlertDialog dialog = new AlertDialog.Builder(getActivity())
-//                .setTitle(R.string.equalizer)
-//                .setView(viewBinding.getRoot())
-//                .setNegativeButton(R.string.close, (dialog1, which) -> {})
-//                .create();
-//        dialog.show();
-
         viewBinding.rbUseSystemEqualizer.setOnClickListener(v -> enableSystemEqualizer());
         viewBinding.btnOpenSystemEqualizer.setOnClickListener(v -> openSystemEqualizer());
         viewBinding.rbUseAppEqualizer.setOnClickListener(v -> enableAppEqualizer());
-//        viewBinding.btnOpenAppEqualizer.setOnClickListener(v -> openAppEqualizer());
         viewBinding.rbDisableEqualizer.setOnClickListener(v -> disableEqualizer());
         viewBinding.ivClose.setOnClickListener(v -> dismissAllowingStateLoss());
 
@@ -156,7 +140,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             lp.weight = 1;
-            viewBinding.llBands.addView(binding.getRoot(), lp);
+            viewBinding.llBands.addView(binding.getRoot(), lp);//recalculate dialog height?
 
             short lowestRange = equalizerConfig.getLowestBandRange();
             short highestRange = equalizerConfig.getHighestBandRange();
@@ -168,9 +152,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
                 binding.tvLevel.setText(FormatUtils.formatDecibels(value));
                 presenter.onBandLevelChanged(band, value);
             });
-            seekBarViewWrapper.setOnSeekStopListener(progress ->
-                    presenter.onBandLevelDragStopped()
-            );
+            seekBarViewWrapper.setOnSeekStopListener(progress -> presenter.onBandLevelDragStopped());
 
             binding.tvFrequency.setText(FormatUtils.formatMilliHz(band.getCenterFreq()));
         }
@@ -193,7 +175,6 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         setInAppEqualizerSettingsEnabled(inAppEqualizerSettingsEnabled);
     }
 
-    //TODO display after process restore
     @Override
     public void displayEqualizerState(EqualizerState equalizerState, EqualizerConfig config) {
         for (Pair<PartialEqualizerBandBinding, Band> pair: bandsViewList) {
@@ -208,7 +189,6 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
             short lowestRange = config.getLowestBandRange();
             binding.sbLevel.setProgress(currentRange + Math.abs(lowestRange));
         }
-
     }
 
     private void enableSystemEqualizer() {
