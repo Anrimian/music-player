@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.controllers.music;
 
 import android.content.Context;
+import android.os.Handler;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
@@ -88,6 +89,15 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public void resume() {
         mediaPlayer.resume();
+    }
+
+    @Override
+    public void resume(int delay) {
+        if (delay == 0) {
+            resume();
+        } else {
+            new Handler().postDelayed(this::resume, delay);
+        }
     }
 
     @Override

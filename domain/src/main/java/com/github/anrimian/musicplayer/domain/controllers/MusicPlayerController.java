@@ -19,6 +19,8 @@ public interface MusicPlayerController {
 
     void resume();
 
+    void resume(int delay);
+
     void pause();
 
     void seekTo(long position);
@@ -30,4 +32,5 @@ public interface MusicPlayerController {
     void seekBy(long millis);
 
     long getTrackPosition();
+
 }

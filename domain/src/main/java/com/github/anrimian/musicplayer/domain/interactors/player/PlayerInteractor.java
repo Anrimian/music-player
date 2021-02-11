@@ -78,6 +78,10 @@ public class PlayerInteractor {
     }
 
     public void play() {
+        play(0);
+    }
+
+    public void play(int delay) {
         if (playerStateSubject.getValue() == PLAY) {
             return;
         }
@@ -89,7 +93,7 @@ public class PlayerInteractor {
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
             if (playerStateSubject.getValue() != LOADING) {
-                musicPlayerController.resume();
+                musicPlayerController.resume(delay);
                 playerStateSubject.onNext(PLAY);
             }
             systemServiceController.startMusicService();

@@ -24,13 +24,15 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 public class BluetoothConnectionReceiver extends BroadcastReceiver {
 
-    private static List<Integer> ALLOWED_DEVICES_TO_START = asList(
+    private static final List<Integer> ALLOWED_DEVICES_TO_START = asList(
             AUDIO_VIDEO_UNCATEGORIZED,
             AUDIO_VIDEO_WEARABLE_HEADSET,
             AUDIO_VIDEO_HANDSFREE,
             AUDIO_VIDEO_HEADPHONES,
             AUDIO_VIDEO_PORTABLE_AUDIO
     );
+
+    private static final int PLAY_DELAY_MILLIS = 1500;
 
     public static void setEnabled(Context context, boolean enabled) {
         context.getPackageManager().setComponentEnabledSetting(
@@ -62,7 +64,7 @@ public class BluetoothConnectionReceiver extends BroadcastReceiver {
                     return;
                 }
             }
-            Components.getAppComponent().musicPlayerInteractor().play();
+            Components.getAppComponent().musicPlayerInteractor().play(PLAY_DELAY_MILLIS);
         }
     }
 }
