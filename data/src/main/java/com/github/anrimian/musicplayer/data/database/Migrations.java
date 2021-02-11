@@ -134,6 +134,9 @@ class Migrations {
                 LongSparseArray<StorageFullComposition> storageCompositions;
                 if (hasFilePermission(context)) {
                     storageCompositions = provider.getCompositions();
+                    if (storageCompositions == null) {
+                        storageCompositions = new LongSparseArray<>();
+                    }
                 } else {
                     storageCompositions = new LongSparseArray<>();
                 }
@@ -278,6 +281,9 @@ class Migrations {
 
                 EnumConverter enumConverter = new EnumConverter();
                 LongSparseArray<StorageFullComposition> map = provider.getCompositions();
+                if (map == null) {
+                    map = new LongSparseArray<>();
+                }
                 for(int i = 0, size = map.size(); i < size; i++) {
                     StorageFullComposition composition = map.valueAt(i);
                     ContentValues cv = new ContentValues();

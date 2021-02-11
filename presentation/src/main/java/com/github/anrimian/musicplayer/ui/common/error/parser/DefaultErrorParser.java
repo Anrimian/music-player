@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
+import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
@@ -95,6 +96,9 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof StorageTimeoutException) {
             return error(R.string.storage_timeout_error_message);
+        }
+        if (throwable instanceof UnavailableMediaStoreException) {
+            return error(R.string.system_media_store_system_error);
         }
         logException(throwable);
         return new ErrorCommand(getString(R.string.unexpected_error, throwable.getMessage()));
