@@ -211,6 +211,7 @@
     <string name="show_error_report_dialog_on_start">Show error report dialog on application start after app crashes</string>
 
     <string name="system_media_store_system_error" translatable="false">Android system can\'t find system media storage. This is very strange and rare issue on android 10. Try to restart app or reboot the device, perhaps it will solve this problem.</string>
+    <string name="empty_string" translatable="false"/>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
