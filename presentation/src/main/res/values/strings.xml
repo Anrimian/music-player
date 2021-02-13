@@ -212,6 +212,9 @@
     <string name="app_equalizer">App equalizer</string>
     <string name="presets">Presets</string>
 
+    <string name="system_media_store_system_error" translatable="false">Android system can\'t find system media storage. This is very strange and rare issue on android 10. Try to restart app or reboot the device, perhaps it will solve this problem.</string>
+    <string name="empty_string" translatable="false"/>
+
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
         <item quantity="other">%1$s songs</item>

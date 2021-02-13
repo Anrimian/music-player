@@ -207,7 +207,7 @@ public class LibraryPlayerInteractorTest {
         inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(1)), any());
 
         playerEventSubject.onNext(new ErrorEvent(UNKNOWN, composition));
-        inOrder.verify(playerCoordinatorInteractor, never()).play(any());
+        inOrder.verify(playerCoordinatorInteractor, never()).play(any(), 0);
     }
 
     @Test

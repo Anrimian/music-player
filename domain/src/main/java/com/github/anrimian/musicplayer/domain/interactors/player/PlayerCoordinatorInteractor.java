@@ -25,9 +25,9 @@ public class PlayerCoordinatorInteractor {
         playerInteractor.startPlaying(compositionSource);
     }
 
-    public void play(PlayerType playerType) {
+    public void play(PlayerType playerType, int delay) {
         applyPlayerType(playerType);
-        playerInteractor.play();
+        playerInteractor.play(delay);
     }
 
     public void setInLoadingState(PlayerType playerType) {

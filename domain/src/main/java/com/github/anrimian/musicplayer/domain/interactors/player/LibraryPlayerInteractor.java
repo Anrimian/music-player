@@ -89,7 +89,7 @@ public class LibraryPlayerInteractor {
 
     public void startPlaying(List<Composition> compositions, int firstPosition) {
         playQueueRepository.setPlayQueue(compositions, firstPosition)
-                .doOnComplete(() -> playerCoordinatorInteractor.play(LIBRARY))
+                .doOnComplete(this::play)
                 //fixes music gap and state blinking(prepare new queue from stop state)
                 .doOnSubscribe(o -> playerCoordinatorInteractor.setInLoadingState(LIBRARY))
                 .doOnError(analytics::processNonFatalError)
@@ -98,7 +98,11 @@ public class LibraryPlayerInteractor {
     }
 
     public void play() {
-        playerCoordinatorInteractor.play(LIBRARY);
+        play(0);
+    }
+
+    public void play(int delay) {
+        playerCoordinatorInteractor.play(LIBRARY, delay);
     }
 
     public void playOrPause() {
