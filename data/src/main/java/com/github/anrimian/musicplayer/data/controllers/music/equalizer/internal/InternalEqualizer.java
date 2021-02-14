@@ -25,7 +25,7 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //play -> enable eq = eq not attached - works
 //bands number depends on device: use horizontal seek bar - done
 //unite internal equalizer screen with equalizer setup dialog - done
-//TODO check sound gap on eq start
+//TODO check sound gap on eq start - exists, need solution
 //remove selected preset displaying? - removed. And saving at all - leave saving
 //display correct band and freq values - done
 //disable eq controls when eq is disabled - done
@@ -34,7 +34,7 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //add title and close button - done
 //disabled seek bar thumb ui - done
 //empty band values on start - unable to reproduce
-//TODO calculate dialog height
+//calculate dialog height - done
 
 public class InternalEqualizer implements AppEqualizer {
 

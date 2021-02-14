@@ -85,6 +85,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
             }
         }, o -> {}));
         bottomSheetBehavior.setPeekHeight(view.getMeasuredHeight());
+        bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
         AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground);
