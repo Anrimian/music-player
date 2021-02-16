@@ -3,6 +3,8 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.content.Context;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
@@ -17,6 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
@@ -157,6 +160,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void release() {
+        equalizerController.detachEqualizer();
         pausePlayer();
         stopTracingTrackPosition();
         try {
@@ -169,7 +173,6 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private void startPlayWhenReady() {
         Completable.fromRunnable(() -> {
-            equalizerController.attachEqualizer(getPlayer().getAudioSessionId());
             getPlayer().setPlayWhenReady(true);
             startTracingTrackPosition();
         }).subscribeOn(scheduler).subscribe();
@@ -192,7 +195,6 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     private void pausePlayer() {
-        equalizerController.detachEqualizer();
         getPlayer().setPlayWhenReady(false);
     }
 
@@ -273,13 +275,22 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         if (player == null) {
             synchronized (this) {
                 if (player == null) {
-                    player = new SimpleExoPlayer.Builder(context).build();
+
+                    player = new SimpleExoPlayer.Builder(context)
+                            .build();
 
                     PlayerEventListener playerEventListener = new PlayerEventListener(
                             () -> playerEventSubject.onNext(new FinishedEvent(currentComposition)),
                             this::sendErrorEvent
                     );
                     player.addListener(playerEventListener);
+                    player.addAnalyticsListener(new AnalyticsListener() {
+                        @Override
+                        public void onAudioSessionId(@NonNull EventTime eventTime, int audioSessionId) {
+                            equalizerController.attachEqualizer(audioSessionId);
+                        }
+                    });
+
                 }
             }
         }

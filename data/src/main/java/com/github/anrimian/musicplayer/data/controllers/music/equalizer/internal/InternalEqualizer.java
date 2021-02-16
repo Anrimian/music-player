@@ -25,7 +25,7 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //play -> enable eq = eq not attached - works
 //bands number depends on device: use horizontal seek bar - done
 //unite internal equalizer screen with equalizer setup dialog - done
-//TODO check sound gap on eq start - exists, need solution
+//TODO check sound gap on eq start - done(exo player), and need to deal with default media player
 //remove selected preset displaying? - removed. And saving at all - leave saving
 //display correct band and freq values - done
 //disable eq controls when eq is disabled - done
