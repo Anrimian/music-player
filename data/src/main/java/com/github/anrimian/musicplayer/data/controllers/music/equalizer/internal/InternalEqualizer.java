@@ -21,21 +21,6 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
-//save only when band seekbar was released - done
-//play -> enable eq = eq not attached - works
-//bands number depends on device: use horizontal seek bar - done
-//unite internal equalizer screen with equalizer setup dialog - done
-//TODO check sound gap on eq start - done(exo player), and need to deal with default media player
-//remove selected preset displaying? - removed. And saving at all - leave saving
-//display correct band and freq values - done
-//disable eq controls when eq is disabled - done
-//presets ui - done
-//add divider under eq radio buttons - done
-//add title and close button - done
-//disabled seek bar thumb ui - done
-//empty band values on start - unable to reproduce
-//calculate dialog height - done
-
 public class InternalEqualizer implements AppEqualizer {
 
     private final EqualizerStateRepository equalizerStateRepository;

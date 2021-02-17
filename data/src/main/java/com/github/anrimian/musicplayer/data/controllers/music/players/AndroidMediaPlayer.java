@@ -83,6 +83,10 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             sendErrorEvent(what, extra);
             return false;
         });
+
+        try {
+            equalizerController.attachEqualizer(mediaPlayer.getAudioSessionId());
+        } catch (IllegalStateException ignored) {}
     }
 
     @Override
@@ -297,15 +301,10 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     private void pausePlayer() {
-        equalizerController.detachEqualizer();
         pause(mediaPlayer);
     }
 
     private void start() {
-        try {
-            equalizerController.attachEqualizer(mediaPlayer.getAudioSessionId());
-        } catch (IllegalStateException ignored) {}
-
         start(mediaPlayer);
         startTracingTrackPosition();
         isPlaying = true;
