@@ -135,7 +135,6 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
-            notificationsDisplayer().startForegroundErrorNotification(this, R.string.empty_string);
             stopForeground(true);
             stopSelf();
             return START_NOT_STICKY;
