@@ -51,6 +51,17 @@ public class StorageMusicProvider {
     private final Context context;
     private final StorageAlbumsProvider albumsProvider;
 
+    public static void checkIfMediaStoreAvailable(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Set<String> volumes = MediaStore.getExternalVolumeNames(context);
+            if (!volumes.contains(MediaStore.VOLUME_EXTERNAL_PRIMARY)) {
+                //can crash in rare weird cases on android 10 so we check for existence
+                //https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android
+                throw new UnavailableMediaStoreException();
+            }
+        }
+    }
+
     public StorageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
         contentResolver = context.getContentResolver();
         this.context = context;
@@ -470,12 +481,7 @@ public class StorageMusicProvider {
     @Nullable
     private Uri getStorageUri() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            Set<String> volumes = MediaStore.getExternalVolumeNames(context);
-            if (!volumes.contains(MediaStore.VOLUME_EXTERNAL_PRIMARY)) {
-                //can crash in rare weird cases on android 10 so we check for existence
-                //https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android
-                throw new UnavailableMediaStoreException();
-            }
+            checkIfMediaStoreAvailable(context);
             return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         } else {
             return Media.EXTERNAL_CONTENT_URI;

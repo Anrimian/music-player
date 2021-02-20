@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenr
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
@@ -96,7 +97,11 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 return;
             }
             compositionAnalyzer.applyCompositionsData(compositions);
-            playlistAnalyzer.applyPlayListData(playListsProvider.getPlayLists());
+            LongSparseArray<StoragePlayList> playlists = playListsProvider.getPlayLists();
+            if (playlists == null) {
+                return;
+            }
+            playlistAnalyzer.applyPlayListData(playlists);
 
             //<return genres after deep scan implementation>
 //            applyGenresData(genresProvider.getGenres());
