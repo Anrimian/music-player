@@ -92,7 +92,7 @@ public class MusicService extends Service {
 
     private MediaSessionCompat mediaSession;
 
-    private PlayerState playerState = PlayerState.PAUSE;
+    private PlayerState playerState = PlayerState.PLAY;
     @Nullable
     private CompositionSource currentSource;
     private long trackPosition;
