@@ -163,34 +163,38 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public long getTrackPosition() {
-        if (currentComposition == null) {
-            return 0;
-        }
-        try {
-            return mediaPlayer.getCurrentPosition();
-        } catch (IllegalStateException e) {
-            return 0;
-        }
+    public Single<Long> getTrackPosition() {
+        return Single.fromCallable(() -> {
+            if (currentComposition == null) {
+                return 0L;
+            }
+            try {
+                return (long) mediaPlayer.getCurrentPosition();
+            } catch (IllegalStateException e) {
+                return 0L;
+            }
+        });
     }
 
     @Override
-    public long seekBy(long millis) {
-        long currentPosition = getTrackPosition();
-        try {
-            long targetPosition = currentPosition + millis;
-            if (targetPosition < 0) {
-                targetPosition = 0;
-            }
-            if (targetPosition > mediaPlayer.getDuration()) {
-                return currentPosition;
-            }
-            seekTo(targetPosition);
-            return targetPosition;
+    public Single<Long> seekBy(long millis) {
+        return getTrackPosition()
+                .map(currentPosition -> {
+                    try {
+                        long targetPosition = currentPosition + millis;
+                        if (targetPosition < 0) {
+                            targetPosition = 0;
+                        }
+                        if (targetPosition > mediaPlayer.getDuration()) {
+                            return currentPosition;
+                        }
+                        seekTo(targetPosition);
+                        return targetPosition;
 
-        } catch (IllegalStateException ignored) {
-            return currentPosition;
-        }
+                    } catch (IllegalStateException ignored) {
+                        return currentPosition;
+                    }
+                });
     }
 
     @Override
@@ -204,7 +208,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(scheduler)
-                .map(o -> getTrackPosition())
+                .flatMapSingle(o -> getTrackPosition())
                 .subscribe(trackPositionSubject::onNext);
     }
 

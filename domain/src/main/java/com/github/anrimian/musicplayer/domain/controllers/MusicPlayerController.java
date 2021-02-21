@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.source.Composit
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 /**
  * Created on 10.11.2017.
@@ -31,6 +32,6 @@ public interface MusicPlayerController {
 
     void seekBy(long millis);
 
-    long getTrackPosition();
+    Single<Long> getTrackPosition();
 
 }

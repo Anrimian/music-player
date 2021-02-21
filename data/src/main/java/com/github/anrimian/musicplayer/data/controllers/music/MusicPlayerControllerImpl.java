@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.core.Single;
 
 /**
  * Created on 10.11.2017.
@@ -71,8 +72,12 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void pause() {
-        saveTrackPosition(mediaPlayer.getTrackPosition());
-        mediaPlayer.pause();
+        //noinspection ResultOfMethodCallIgnored
+        mediaPlayer.getTrackPosition()
+                .subscribe(position -> {
+                    saveTrackPosition(position);
+                    mediaPlayer.pause();
+                });
     }
 
     @Override
@@ -107,12 +112,12 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void seekBy(long millis) {
-        long position = mediaPlayer.seekBy(millis);
-        saveTrackPosition(position);
+        //noinspection ResultOfMethodCallIgnored
+        mediaPlayer.seekBy(millis).subscribe(this::saveTrackPosition);
     }
 
     @Override
-    public long getTrackPosition() {
+    public Single<Long> getTrackPosition() {
         return mediaPlayer.getTrackPosition();
     }
 

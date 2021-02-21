@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -79,12 +80,12 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public long getTrackPosition() {
+    public Single<Long> getTrackPosition() {
         return currentPlayer.getTrackPosition();
     }
 
     @Override
-    public long seekBy(long millis) {
+    public Single<Long> seekBy(long millis) {
         return currentPlayer.seekBy(millis);
     }
 

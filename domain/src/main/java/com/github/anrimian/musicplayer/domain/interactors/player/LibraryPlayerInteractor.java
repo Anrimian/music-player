@@ -126,11 +126,14 @@ public class LibraryPlayerInteractor {
     }
 
     public void skipToPrevious() {
-        if (getActualTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
-            onSeekFinished(0);
-            return;
-        }
-        playQueueRepository.skipToPrevious();
+        //noinspection ResultOfMethodCallIgnored
+        getActualTrackPosition().subscribe(position -> {
+            if (position > settingsRepository.getSkipConstraintMillis()) {
+                onSeekFinished(0);
+                return;
+            }
+            playQueueRepository.skipToPrevious();
+        });
     }
 
     public void skipToNext() {
@@ -270,37 +273,42 @@ public class LibraryPlayerInteractor {
                 stop();
             }
         } else {
-            long trackPosition = compositionEvent.getTrackPosition();
+            //noinspection ResultOfMethodCallIgnored
+            getActualTrackPosition().subscribe(actualTrackPosition -> {
+                long trackPosition = compositionEvent.getTrackPosition();
 
-            //if items are equal and content changed -> restart play
-            if (previousItem != null && previousItem.equals(currentItem)) {
-                trackPosition = getActualTrackPosition();
+                //if items are equal and content changed -> restart play
+                if (previousItem != null && previousItem.equals(currentItem)) {
+                    trackPosition = actualTrackPosition;
 
-                if (!hasSourceChanges(previousItem, currentItem)) {
+                    if (!hasSourceChanges(previousItem, currentItem)) {
 
-                    //if other fields was changed - update source
-                    if (!areSourcesTheSame(previousItem, currentItem)) {
-                        playerCoordinatorInteractor.updateSource(
-                                new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
-                                LIBRARY);
+                        //if other fields was changed - update source
+                        if (!areSourcesTheSame(previousItem, currentItem)) {
+                            playerCoordinatorInteractor.updateSource(
+                                    new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
+                                    LIBRARY);
+                        }
+                        return;
                     }
-                    return;
                 }
-            }
 
-            playerCoordinatorInteractor.prepareToPlay(
-                    new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
-                    LIBRARY
-            );
+                playerCoordinatorInteractor.prepareToPlay(
+                        new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
+                        LIBRARY
+                );
+            });
         }
     }
 
-    private long getActualTrackPosition() {
-        long position = playerCoordinatorInteractor.getActualTrackPosition(LIBRARY);
-        if (position == -1) {
-            return uiStateRepository.getTrackPosition();
-        }
-        return position;
+    private Single<Long> getActualTrackPosition() {
+        return playerCoordinatorInteractor.getActualTrackPosition(LIBRARY)
+                .map(position -> {
+                    if (position == -1) {
+                        return uiStateRepository.getTrackPosition();
+                    }
+                    return position;
+                });
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {

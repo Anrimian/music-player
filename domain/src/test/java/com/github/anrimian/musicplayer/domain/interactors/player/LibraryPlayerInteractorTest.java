@@ -64,6 +64,7 @@ public class LibraryPlayerInteractorTest {
         when(playQueueRepository.skipToNext()).thenReturn(Single.just(1));
 
         when(playerCoordinatorInteractor.getPlayerEventsObservable(any())).thenReturn(playerEventSubject);
+        when(playerCoordinatorInteractor.getActualTrackPosition(any())).thenReturn(Single.just(0L));
 
         when(musicProviderRepository.writeErrorAboutComposition(any(), any()))
                 .thenReturn(Completable.complete());
@@ -242,12 +243,12 @@ public class LibraryPlayerInteractorTest {
         inOrder.verify(playerCoordinatorInteractor).prepareToPlay(eq(fakeCompositionSource(0)), any());
 
         when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
-        when(playerCoordinatorInteractor.getActualTrackPosition(any())).thenReturn(10L);
+        when(playerCoordinatorInteractor.getActualTrackPosition(any())).thenReturn(Single.just(10L));
         libraryPlayerInteractor.skipToPrevious();
         inOrder.verify(playQueueRepository).skipToPrevious();
 
         when(settingsRepository.getSkipConstraintMillis()).thenReturn(15);
-        when(playerCoordinatorInteractor.getActualTrackPosition(any())).thenReturn(30L);
+        when(playerCoordinatorInteractor.getActualTrackPosition(any())).thenReturn(Single.just(30L));
         libraryPlayerInteractor.skipToPrevious();
         inOrder.verify(playerCoordinatorInteractor).onSeekFinished(eq(0L), any());
     }
