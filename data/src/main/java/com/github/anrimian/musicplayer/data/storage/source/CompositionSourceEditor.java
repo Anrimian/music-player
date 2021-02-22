@@ -5,17 +5,15 @@ import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.utils.functions.ThrowsCallback;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.TagOptionSingleton;
 import org.jaudiotagger.tag.datatype.Artwork;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
@@ -296,9 +294,8 @@ public class CompositionSourceEditor {
         });
     }
 
-    private Tag getFileTag(String filePath) throws TagException, ReadOnlyFileException,
-            CannotReadException, InvalidAudioFrameException, IOException {
-        AudioFile file = AudioFileIO.read(new File(filePath));
+    private Tag getFileTag(String filePath) throws Exception {
+        AudioFile file = readFile(new File(filePath));
         return file.getTag();
     }
 
@@ -351,7 +348,7 @@ public class CompositionSourceEditor {
     }
 
     private void runFileAction(File file, ThrowsCallback<Tag> callback) throws Exception {
-        AudioFile audioFile = AudioFileIO.read(file);
+        AudioFile audioFile = readFile(file);
         Tag tag = audioFile.getTag();
         if (tag == null) {
             tag = new ID3v24Tag();
@@ -359,6 +356,14 @@ public class CompositionSourceEditor {
         }
         callback.call(tag);
         AudioFileIO.write(audioFile);
+    }
+
+    private AudioFile readFile(File file) throws Exception {
+        try {
+            return AudioFileIO.read(file);
+        } catch (CannotReadException e) {
+            throw new EditorReadException(e.getMessage());
+        }
     }
 
     private void copyFileToMediaStore(File source, Long id) throws IOException {
