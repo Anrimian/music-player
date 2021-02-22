@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -60,6 +61,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private boolean playWhenReady = false;
     private boolean isPlaying = false;
 
+    @Nullable
+    private ErrorType previousErrorType;
+
     //problem with error case(file not found), multiple error events
     public AndroidMediaPlayer(Context context,
                               Scheduler scheduler,
@@ -91,8 +95,11 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition,
+                              long startPosition,
+                              @Nullable ErrorType previousErrorType) {
         this.currentComposition = composition;
+        this.previousErrorType = previousErrorType;
         RxUtils.dispose(preparationDisposable);
         preparationDisposable = Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)
@@ -254,10 +261,14 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     private void sendErrorEvent(Throwable throwable) {
         if (currentComposition != null) {
-            playerEventSubject.onNext(new ErrorEvent(
-                    playerErrorParser.getErrorType(throwable),
-                    currentComposition)
-            );
+            ErrorType errorType;
+            if (throwable instanceof IOException && previousErrorType == ErrorType.UNSUPPORTED) {
+                errorType = ErrorType.UNSUPPORTED;
+                previousErrorType = null;
+            } else {
+                errorType = playerErrorParser.getErrorType(throwable);
+            }
+            playerEventSubject.onNext(new ErrorEvent(errorType, currentComposition));
         }
     }
 

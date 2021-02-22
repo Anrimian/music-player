@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProv
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
@@ -76,7 +77,9 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition,
+                              long startPosition,
+                              @Nullable ErrorType previousErrorType) {
         isPreparing = true;
         this.currentComposition = composition;
         Single.fromCallable(() -> composition)
@@ -201,7 +204,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         if (currentComposition != null) {
             //workaround for prepareError in newest exo player versions
             if (isStrangeLoaderException(throwable)) {
-                prepareToPlay(currentComposition, getPlayer().getCurrentPosition());
+                prepareToPlay(currentComposition, getPlayer().getCurrentPosition(), null);
                 return;
             }
 

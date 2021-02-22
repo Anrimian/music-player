@@ -6,6 +6,8 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -39,14 +41,16 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition,
+                              long startPosition,
+                              @Nullable ErrorType previousErrorType) {
         currentComposition = composition;
         currentTrackPosition = startPosition;
 
         if (currentPlayerIndex != startPlayerIndex) {
             setPlayer(startPlayerIndex);
         }
-        currentPlayer.prepareToPlay(composition, startPosition);
+        currentPlayer.prepareToPlay(composition, startPosition, previousErrorType);
     }
 
     @Override
@@ -126,7 +130,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
                     //don't switch player when we reached end of available players
                     if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.length) {
                         setPlayer(newPlayerIndex);
-                        currentPlayer.prepareToPlay(currentComposition, currentTrackPosition);
+                        currentPlayer.prepareToPlay(currentComposition, currentTrackPosition, errorType);
                         return;
                     }
                 }
