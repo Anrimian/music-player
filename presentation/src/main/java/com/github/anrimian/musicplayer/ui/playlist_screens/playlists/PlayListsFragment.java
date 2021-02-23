@@ -30,7 +30,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -51,7 +50,6 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     private PlayListsAdapter adapter;
     private LinearLayoutManager layoutManager;
-    private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<MenuDialogFragment> menuDialogRunner;
 
@@ -72,9 +70,6 @@ public class PlayListsFragment extends MvpAppCompatFragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.hideAll();
 
         layoutManager = new LinearLayoutManager(getContext());
         viewBinding.recyclerView.setLayoutManager(layoutManager);
@@ -117,18 +112,17 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     @Override
     public void showEmptyList() {
-        progressViewWrapper.hideAll();
-        progressViewWrapper.showMessage(R.string.play_lists_on_device_not_found, false);
+        viewBinding.progressStateView.showMessage(R.string.play_lists_on_device_not_found, true);
     }
 
     @Override
     public void showList() {
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        viewBinding.progressStateView.showProgress();
     }
 
     @Override
