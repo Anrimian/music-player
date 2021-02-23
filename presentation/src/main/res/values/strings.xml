@@ -10,7 +10,7 @@
     <string name="internal_app_error">Internal app error</string>
     <string name="unexpected_error">Error: %s</string>
     <string name="file_not_found">File not found</string>
-    <string name="compositions_on_device_not_found">No songs found on device</string>
+    <string name="compositions_on_device_not_found">No songs found on the device</string>
     <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
     <string name="compositions_for_search_not_found">No matching search results found</string>
     <string name="foreground_channel_description">Foreground player notification</string>
@@ -31,7 +31,7 @@
     <string name="folders">Folders</string>
     <string name="compositions">Songs</string>
     <string name="play_lists">Playlists</string>
-    <string name="play_lists_on_device_not_found">No playlists found on device</string>
+    <string name="play_lists_on_device_not_found">No playlists found on the device</string>
     <string name="name">Name</string>
     <string name="create">Create</string>
     <string name="create_playlist">Create playlist</string>

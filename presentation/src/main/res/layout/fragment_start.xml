@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.github.anrimian.musicplayer.ui.utils.views.progress_state.ProgressStateView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/progressStateView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <include layout="@layout/partial_progress_state"/>
-
-</FrameLayout>
+    android:layout_height="match_parent"/>
