@@ -112,7 +112,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     @Override
     public void showEmptyList() {
-        viewBinding.progressStateView.showMessage(R.string.play_lists_on_device_not_found, true);
+        viewBinding.progressStateView.showMessage(R.string.play_lists_on_device_not_found, false);
     }
 
     @Override
