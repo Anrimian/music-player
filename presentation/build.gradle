@@ -64,8 +64,8 @@ dependencies {
     def deps = rootProject.ext
 
     implementation deps.appCompat
+    implementation deps.appCompatResources
     implementation deps.material
-    implementation deps.cardView
     implementation deps.recyclerView
     implementation deps.recyclerViewFastScroll
     implementation deps.constraintLayout

@@ -10,6 +10,8 @@ import android.provider.MediaStore.Audio.Playlists;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
+import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -22,6 +24,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
@@ -31,18 +34,32 @@ import static java.util.Collections.emptyList;
 
 public class StoragePlayListsProvider {
 
+    private final Context context;
     private final ContentResolver contentResolver;
 
     public StoragePlayListsProvider(Context context) {
+        this.context = context;
         contentResolver = context.getContentResolver();
     }
 
     public Observable<LongSparseArray<StoragePlayList>> getPlayListsObservable() {
         return RxContentObserver.getObservable(contentResolver, Playlists.EXTERNAL_CONTENT_URI)
-                .map(o -> getPlayLists());
+                .flatMapSingle(o -> Single.create(emitter -> {
+                    LongSparseArray<StoragePlayList> playLists = getPlayLists();
+                    if (playLists != null) {
+                        emitter.onSuccess(playLists);
+                    }
+                }));
     }
 
+    @Nullable
     public LongSparseArray<StoragePlayList> getPlayLists() {
+        try {
+            StorageMusicProvider.checkIfMediaStoreAvailable(context);
+        } catch (UnavailableMediaStoreException e) {
+            return null;
+        }
+
         try(Cursor cursor = contentResolver.query(Playlists.EXTERNAL_CONTENT_URI,
                 null,
                 null,
@@ -65,6 +82,8 @@ public class StoragePlayListsProvider {
     }
 
     public Long createPlayList(String name, Date dateAdded, Date dateModified) {
+        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
         contentValues.put(Playlists.DATE_ADDED, dateAdded.getTime() / 1000L);
@@ -82,6 +101,8 @@ public class StoragePlayListsProvider {
     }
 
     public StoragePlayList createPlayList(String name) {
+        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
         contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
@@ -98,6 +119,8 @@ public class StoragePlayListsProvider {
     }
 
     public void deletePlayList(long id) {
+        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+
         contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
                 Playlists._ID + " = ?",
                 new String[] { String.valueOf(id) });
@@ -177,6 +200,8 @@ public class StoragePlayListsProvider {
     }
 
     public void updatePlayListName(long playListId, String name) {
+        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
         contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
@@ -187,6 +212,8 @@ public class StoragePlayListsProvider {
     }
 
     private void updateModifyTime(long playListId) {
+        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+
         ContentValues playListValues = new ContentValues();
         playListValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
         contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,

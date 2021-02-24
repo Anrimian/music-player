@@ -12,10 +12,12 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProv
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -78,7 +80,9 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition,
+                              long startPosition,
+                              @Nullable ErrorType previousErrorType) {
         isPreparing = true;
         this.currentComposition = composition;
         Single.fromCallable(() -> composition)
@@ -140,35 +144,35 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public long getTrackPosition() {
-        return getPlayer().getCurrentPosition();
+    public Single<Long> getTrackPosition() {
+        return Single.fromCallable(() -> getPlayer().getCurrentPosition())
+                .subscribeOn(scheduler);
     }
 
     @Override
-    public long seekBy(long millis) {
-        long currentPosition = getTrackPosition();
-        long targetPosition = currentPosition + millis;
-        if (targetPosition < 0) {
-            targetPosition = 0;
-        }
-        if (targetPosition > getPlayer().getDuration()) {
-            return currentPosition;
-        }
-        seekTo(targetPosition);
-        return targetPosition;
+    public Single<Long> seekBy(long millis) {
+        return getTrackPosition()
+                .map(currentPosition -> {
+                    long targetPosition = currentPosition + millis;
+                    if (targetPosition < 0) {
+                        targetPosition = 0;
+                    }
+                    if (targetPosition > getPlayer().getDuration()) {
+                        return currentPosition;
+                    }
+                    seekTo(targetPosition);
+                    return targetPosition;
+                });
     }
 
     @Override
     public void release() {
         equalizerController.detachEqualizer();
-        pausePlayer();
-        stopTracingTrackPosition();
-        try {
-            getPlayer().release();
-        } catch (Exception ignored) {
-            //can be IllegalArgumentException here, remove after exo player will fix release
-            //https://github.com/google/ExoPlayer/issues/8087z
-        }
+        usePlayer(player -> {
+            pausePlayer();
+            stopTracingTrackPosition();
+            player.release();
+        });
     }
 
     private void startPlayWhenReady() {
@@ -202,7 +206,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         if (currentComposition != null) {
             //workaround for prepareError in newest exo player versions
             if (isStrangeLoaderException(throwable)) {
-                prepareToPlay(currentComposition, getPlayer().getCurrentPosition());
+                prepareToPlay(currentComposition, getPlayer().getCurrentPosition(), null);
                 return;
             }
 
@@ -271,6 +275,12 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         });
     }
 
+    private void usePlayer(Callback<SimpleExoPlayer> function) {
+        Completable.fromAction(() -> function.call(getPlayer()))
+                .subscribeOn(scheduler)
+                .subscribe();
+    }
+
     private SimpleExoPlayer getPlayer() {
         if (player == null) {
             synchronized (this) {
@@ -296,4 +306,5 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         }
         return player;
     }
+
 }

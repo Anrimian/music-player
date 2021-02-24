@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
@@ -89,6 +90,9 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof EditorTimeoutException) {
             return error(R.string.editor_timeout_error);
+        }
+        if (throwable instanceof EditorReadException) {
+            return new ErrorCommand(throwable.getMessage());
         }
         if (throwable instanceof NullPointerException) {
             logException(throwable);

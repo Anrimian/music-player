@@ -46,7 +46,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLay
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrInterface;
 
@@ -72,6 +71,8 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     @InjectPresenter
     ArtistItemsPresenter presenter;
 
+    private FragmentBaseFabListBinding viewBinding;
+
     private RecyclerView recyclerView;
     private CoordinatorLayout clListContainer;
     private View fab;
@@ -79,10 +80,9 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     private AdvancedToolbar toolbar;
     private ArtistItemsAdapter adapter;
     private LinearLayoutManager layoutManager;
-    private ProgressViewWrapper progressViewWrapper;
 
     private final BooleanConditionRunner showNoCompositionsRunner = new BooleanConditionRunner(2,
-            () -> progressViewWrapper.showMessage(R.string.no_compositions));
+            () -> viewBinding.progressStateView.showMessage(R.string.no_compositions));
 
     private final ArtistAlbumsPresenter artistAlbumsPresenter = new ArtistAlbumsPresenter();
 
@@ -116,7 +116,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        FragmentBaseFabListBinding viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false);
+        viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false);
         recyclerView = viewBinding.recyclerView;
         clListContainer = viewBinding.listContainer;
         fab = viewBinding.fab;
@@ -129,9 +129,7 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
 
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
 
         RecyclerViewUtils.attachFastScroller(recyclerView, true);
 
@@ -217,29 +215,29 @@ public class ArtistItemsFragment extends BaseLibraryCompositionsFragment impleme
     @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showEmptySearchResult() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.compositions_for_search_not_found);
+        viewBinding.progressStateView.showMessage(R.string.compositions_for_search_not_found);
     }
 
     @Override
     public void showList() {
         fab.setVisibility(View.VISIBLE);
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        viewBinding.progressStateView.showProgress();
     }
 
     @Override
     public void showLoadingError(ErrorCommand errorCommand) {
-        progressViewWrapper.showMessage(errorCommand.getMessage(), true);
+        viewBinding.progressStateView.showMessage(errorCommand.getMessage(), true);
     }
 
     @Override

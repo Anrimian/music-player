@@ -92,7 +92,7 @@ public class MusicService extends Service {
 
     private MediaSessionCompat mediaSession;
 
-    private PlayerState playerState = PlayerState.PAUSE;
+    private PlayerState playerState = PlayerState.PLAY;
     @Nullable
     private CompositionSource currentSource;
     private long trackPosition;
@@ -135,7 +135,6 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
-            notificationsDisplayer().startForegroundErrorNotification(this, R.string.empty_string);
             stopForeground(true);
             stopSelf();
             return START_NOT_STICKY;

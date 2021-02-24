@@ -20,7 +20,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
 
@@ -35,12 +34,12 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     @InjectPresenter
     FolderRootPresenter presenter;
 
+    private FragmentRootLibraryFoldersBinding binding;
+
     private JugglerView jvFoldersContainer;
 
     private FragmentNavigation navigation;
     private final DefferedObject<FragmentNavigation> navigationWrapper = new DefferedObject<>();
-
-    private ProgressViewWrapper progressViewWrapper;
 
     @ProvidePresenter
     FolderRootPresenter providePresenter() {
@@ -52,7 +51,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        FragmentRootLibraryFoldersBinding binding = FragmentRootLibraryFoldersBinding.inflate(inflater, container, false);
+        binding = FragmentRootLibraryFoldersBinding.inflate(inflater, container, false);
         jvFoldersContainer = binding.libraryFoldersContainer;
         return binding.getRoot();
     }
@@ -61,8 +60,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.onTryAgainClick(presenter::onEmptyFolderStackArrived);
+        binding.progressStateView.onTryAgainClick(presenter::onEmptyFolderStackArrived);
 
         navigation = FragmentNavigation.from(getChildFragmentManager());
         navigation.initialize(jvFoldersContainer, savedInstanceState);
@@ -114,16 +112,16 @@ public class LibraryFoldersRootFragment extends LibraryFragment
 
     @Override
     public void showProgress() {
-        progressViewWrapper.showProgress();
+        binding.progressStateView.showProgress();
     }
 
     @Override
     public void showError(ErrorCommand errorCommand) {
-        progressViewWrapper.showMessage(errorCommand.getMessage(), true);
+        binding.progressStateView.showMessage(errorCommand.getMessage(), true);
     }
 
     @Override
     public void showIdle() {
-        progressViewWrapper.hideAll();
+        binding.progressStateView.hideAll();
     }
 }
