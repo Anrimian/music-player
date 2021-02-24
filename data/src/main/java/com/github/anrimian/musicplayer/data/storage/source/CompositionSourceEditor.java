@@ -39,17 +39,18 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 
 //albums editor - done
 //files moving - done
-//TODO remove empty folder after files had moved or folder renamed
+//remove empty folder after files had moved or folder renamed - leave, but change delete description
 //files moving/folder renaming - process error on not "well defined collection" - skip
 //file rename - done
 //folder rename - done
 //folder rename - check for duplicate - done
 //deny delete issue - done
 //files/folder deleting - hide app confirm dialog possibility - done
-//TODO content observer not called - seems working?
+//content observer not called? - working, skip
 
 //TODO replace DATA with relative path
 //TODO getFileSize() adapt
+
 //TODO pathchnotes with explanation
 /*
     Android 11 storage adaptation. From system version 11 editing and deleting files requires explicit

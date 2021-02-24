@@ -17,7 +17,7 @@
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
-    <string name="content_description_menu">Open current composition menu</string>
+    <string name="content_description_menu">Open current composition menu</string>F
     <string name="content_description_menu_template">Open composition menu: %s</string>
     <string name="share">Send</string>
     <string name="content_description_repeat_mode">Repeat mode menu</string>
@@ -51,10 +51,7 @@
     <string name="deleting">Deleting</string>
     <string name="delete_composition_template">Delete song \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_empty_folder">Delete folder \"%s\"? This action cannot be undone.</string>
-    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"?
-        If there are no more files in the folder, it will also be deleted.
-        This action cannot be undone.
-    </string>
+    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"?This action cannot be undone.</string>
     <string name="delete_template">Delete \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_composition_success">Song \"%1$s\" deleted</string>
     <string name="search">Search</string>
@@ -215,7 +212,7 @@
     <string name="empty_string" translatable="false"/>
 
     <string name="widget_small_name" translatable="false">4x1: Small</string>
-    <string name="widget_small_ext_name" translatable="false">4x1: Small ext</string>
+    <string name="widget_small_ext_name" translatable="false">4x1: Small extended</string>
     <string name="widget_medium_name" translatable="false">4x2: Medium</string>
 
     <plurals name="compositions_count">

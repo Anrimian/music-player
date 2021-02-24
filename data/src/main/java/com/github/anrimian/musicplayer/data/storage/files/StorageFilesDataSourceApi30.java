@@ -35,6 +35,7 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         this.storageMusicProvider = storageMusicProvider;
     }
 
+    //previous folder will be not deleted, but I didn't find solution for that
     @Override
     public String renameCompositionsFolder(List<Composition> compositions,
                                            String oldPath,
@@ -72,6 +73,7 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         return new Pair<>(null, newFileName);
     }
 
+    //internal folders will stay, but I didn't find solution for that
     @Override
     public List<FilePathComposition> moveCompositionsToFolder(List<Composition> compositions,
                                                               String fromPath,
@@ -93,6 +95,7 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         return updatedCompositions;
     }
 
+    //previous folder will be not deleted, but I didn't find solution for that
     @Override
     public String moveCompositionsToNewFolder(List<Composition> compositions,
                                               String fromPath,
@@ -117,6 +120,7 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         return FileUtils.getFileName(newFolderPath);
     }
 
+    //empty root folder will be not deleted, but I didn't find solution for that
     @Override
     public List<Composition> deleteCompositionFiles(List<Composition> compositions,
                                                     Object tokenForDelete) {

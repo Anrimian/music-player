@@ -52,7 +52,6 @@
     <string name="delete_composition_template">Excluir música \"%1$s\"? Essa ação não pode ser desfeita.</string>
     <string name="delete_empty_folder">Excluir pasta \"%s\"? Essa ação não pode ser desfeita.</string>
     <string name="delete_folder_template">Excluir %2$s da pasta \"%1$s\"?
-        Se não houver mais arquivos na pasta, ele também será excluído.
         Essa ação não pode ser desfeita.
     </string>
     <string name="delete_template">Excluir \"%1$s\"? Essa ação não pode ser desfeita.</string>
