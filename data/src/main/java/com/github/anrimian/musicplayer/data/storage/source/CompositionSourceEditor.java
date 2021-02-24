@@ -54,9 +54,10 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //TODO pathchnotes with explanation
 /*
     Android 11 storage adaptation. From system version 11 editing and deleting files requires explicit
-    user permission. So editing tags, moving compositions and folders, renaming folders action will require additional confirm.
+    user permission. So, on android 11:
+    Editing tags, moving compositions and folders, renaming folders action will require additional confirm.
     Deleting files and folders also will require additional dialog confirm, but with possibility not to show application delete dialog anymore.
-
+    Changing tags will take significant more time
  */
 public class CompositionSourceEditor {
 
