@@ -43,7 +43,7 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //files moving/folder renaming - process error on not "well defined collection" - skip
 //file rename - done
 //folder rename - done
-//TODO folder rename - check for duplicate?
+//folder rename - check for duplicate - done
 //deny delete issue - done
 //files/folder deleting - hide app confirm dialog possibility - done
 //TODO content observer not called - seems working?

@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.EditorTimeoutException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
@@ -116,7 +117,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 })
                 .subscribeOn(scheduler);
     }
-    
+
     @Override
     public Completable addCompositionGenre(FullComposition composition,
                                            String newGenre) {
@@ -242,7 +243,11 @@ public class EditorRepositoryImpl implements EditorRepository {
                                                @Nullable Long fromFolderId,
                                                @Nullable Long targetParentFolderId,
                                                String directoryName) {
-        return Single.zip(getFullFolderPath(fromFolderId),
+        return Completable.fromRunnable(() -> {
+            if (foldersDao.isFolderWithNameExists(targetParentFolderId, directoryName)) {
+                throw new FileExistsException();
+            }
+        }).andThen(Single.zip(getFullFolderPath(fromFolderId),
                 getFullFolderPath(targetParentFolderId),
                 foldersDao.extractAllCompositionsFromFiles(files),
                 (fromPath, toParentPath, compositions) -> {
@@ -256,7 +261,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                     compositionsDao.updateFilesPath(updatedCompositions);
 
                     return foldersDao.createFolder(targetParentFolderId, name);
-                })
+                }))
                 .doOnSuccess(folderId -> foldersDao.updateFolderId(files, folderId))
                 .ignoreElement()
                 .subscribeOn(scheduler);
