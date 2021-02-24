@@ -167,8 +167,8 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void release() {
-        equalizerController.detachEqualizer();
         usePlayer(player -> {
+            equalizerController.detachEqualizer();
             pausePlayer();
             stopTracingTrackPosition();
             player.release();
@@ -294,11 +294,14 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                             this::sendErrorEvent
                     );
                     player.addListener(playerEventListener);
+                    equalizerController.attachEqualizer(player.getAudioSessionId());
                     player.addAnalyticsListener(new AnalyticsListener() {
+
                         @Override
-                        public void onAudioSessionId(@NonNull EventTime eventTime, int audioSessionId) {
+                        public void onAudioSessionIdChanged(@NonNull EventTime eventTime, int audioSessionId) {
                             equalizerController.attachEqualizer(audioSessionId);
                         }
+
                     });
 
                 }
