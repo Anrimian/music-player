@@ -41,7 +41,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNav
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -66,6 +65,8 @@ public class PlayListFragment extends MvpAppCompatFragment
     @InjectPresenter
     PlayListPresenter presenter;
 
+    private FragmentBaseFabListBinding viewBinding;
+
     private RecyclerView recyclerView;
     private View fab;
     private CoordinatorLayout clListContainer;
@@ -73,7 +74,6 @@ public class PlayListFragment extends MvpAppCompatFragment
     private AdvancedToolbar toolbar;
     private PlayListItemAdapter adapter;
     private LinearLayoutManager layoutManager;
-    private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
 
@@ -95,7 +95,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        FragmentBaseFabListBinding viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false);
+        viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false);
         recyclerView = viewBinding.recyclerView;
         fab = viewBinding.fab;
         clListContainer = viewBinding.listContainer;
@@ -108,9 +108,6 @@ public class PlayListFragment extends MvpAppCompatFragment
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitleClickListener(null);
-
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.hideAll();
 
         DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(recyclerView,
                 getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
@@ -173,19 +170,18 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.hideAll();
-        progressViewWrapper.showMessage(R.string.play_list_is_empty, false);
+        viewBinding.progressStateView.showMessage(R.string.play_list_is_empty, false);
     }
 
     @Override
     public void showList() {
         fab.setVisibility(View.VISIBLE);
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        viewBinding.progressStateView.showProgress();
     }
 
     @Override

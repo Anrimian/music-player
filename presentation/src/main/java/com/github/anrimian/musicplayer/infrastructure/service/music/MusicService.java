@@ -139,7 +139,6 @@ public class MusicService extends Service {
             stopSelf();
             return START_NOT_STICKY;
         }
-        int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
             notificationsDisplayer().startForegroundNotification(this,
@@ -150,6 +149,7 @@ public class MusicService extends Service {
                     notificationSetting,
                     false);
         }
+        int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
         } else {
@@ -184,8 +184,10 @@ public class MusicService extends Service {
         * 5) connect bluetooth device
         * 6) use play button from device
         * 7) resume activity from task manager
+        *
+        * not actual, but leave, it's interesting memory
         */
-        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY && playerInteractor() != null) {
+        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
             playerInteractor().play();
         }
     }

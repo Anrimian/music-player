@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -78,6 +79,10 @@ public class PlayerInteractor {
     }
 
     public void play() {
+        play(0);
+    }
+
+    public void play(int delay) {
         if (playerStateSubject.getValue() == PLAY) {
             return;
         }
@@ -89,7 +94,7 @@ public class PlayerInteractor {
         Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
         if (audioFocusObservable != null) {
             if (playerStateSubject.getValue() != LOADING) {
-                musicPlayerController.resume();
+                musicPlayerController.resume(delay);
                 playerStateSubject.onNext(PLAY);
             }
             systemServiceController.startMusicService();
@@ -155,7 +160,7 @@ public class PlayerInteractor {
         return playerStateSubject.getValue();
     }
 
-    public long getTrackPosition() {
+    public Single<Long> getTrackPosition() {
         return musicPlayerController.getTrackPosition();
     }
 
@@ -238,7 +243,6 @@ public class PlayerInteractor {
         }
     }
 
-    @SuppressWarnings("unused")
     private void onAudioBecomingNoisy(Object o) {
         musicPlayerController.pause();
         playerStateSubject.onNext(PAUSE);

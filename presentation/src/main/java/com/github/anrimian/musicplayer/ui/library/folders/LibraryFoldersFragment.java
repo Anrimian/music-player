@@ -54,7 +54,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLay
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -101,7 +100,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private final CompositeDisposable fragmentDisposable = new CompositeDisposable();
 
     private AdvancedToolbar toolbar;
-    private ProgressViewWrapper progressViewWrapper;
     private MusicFileSourceAdapter adapter;
 
     private HeaderViewWrapper headerViewWrapper;
@@ -147,9 +145,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         fragmentDisposable.add(toolbar.getSelectionModeObservable()
                 .subscribe(this::onSelectionModeChanged));
 
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.onTryAgainClick(presenter::onTryAgainButtonClicked);
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -289,30 +285,29 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showEmptyList() {
         viewBinding.fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
+        viewBinding.progressStateView.showMessage(R.string.compositions_on_device_not_found, false);
     }
 
     @Override
     public void showEmptySearchResult() {
         viewBinding.fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.compositions_and_folders_for_search_not_found, false);
+        viewBinding.progressStateView.showMessage(R.string.compositions_and_folders_for_search_not_found, false);
     }
 
     @Override
     public void showList() {
         viewBinding.fab.setVisibility(VISIBLE);
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        viewBinding.progressStateView.showProgress();
     }
 
     @Override
     public void showError(ErrorCommand errorCommand) {
-        progressViewWrapper.hideAll();
-        progressViewWrapper.showMessage(errorCommand.getMessage(), true);
+        viewBinding.progressStateView.showMessage(errorCommand.getMessage(), true);
     }
 
     @Override

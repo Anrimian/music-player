@@ -21,7 +21,6 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.folders.view.ExcludedFolderAdapter;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -40,7 +39,6 @@ public class ExcludedFoldersFragment extends MvpAppCompatFragment implements Exc
     private RecyclerView recyclerView;
 
     private ExcludedFolderAdapter adapter;
-    private ProgressViewWrapper progressViewWrapper;
 
     @ProvidePresenter
     ExcludedFoldersPresenter providePresenter() {
@@ -67,9 +65,6 @@ public class ExcludedFoldersFragment extends MvpAppCompatFragment implements Exc
         toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
 
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.hideAll();
-
         adapter = new ExcludedFolderAdapter(recyclerView, presenter::onDeleteFolderClicked);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -85,17 +80,17 @@ public class ExcludedFoldersFragment extends MvpAppCompatFragment implements Exc
 
     @Override
     public void showListState() {
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showEmptyListState() {
-        progressViewWrapper.showMessage(R.string.no_excluded_folders);
+        viewBinding.progressStateView.showMessage(R.string.no_excluded_folders);
     }
 
     @Override
     public void showErrorState(ErrorCommand errorCommand) {
-        progressViewWrapper.showMessage(errorCommand.getMessage(), false);
+        viewBinding.progressStateView.showMessage(errorCommand.getMessage(), false);
     }
 
     @Override

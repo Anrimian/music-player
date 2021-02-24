@@ -7,7 +7,9 @@ import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
@@ -90,8 +92,16 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 
     private Completable runRescanStorage() {
         return Completable.fromAction(() -> {
-            compositionAnalyzer.applyCompositionsData(musicProvider.getCompositions());
-            playlistAnalyzer.applyPlayListData(playListsProvider.getPlayLists());
+            LongSparseArray<StorageFullComposition> compositions = musicProvider.getCompositions();
+            if (compositions == null) {
+                return;
+            }
+            compositionAnalyzer.applyCompositionsData(compositions);
+            LongSparseArray<StoragePlayList> playlists = playListsProvider.getPlayLists();
+            if (playlists == null) {
+                return;
+            }
+            playlistAnalyzer.applyPlayListData(playlists);
 
             //<return genres after deep scan implementation>
 //            applyGenresData(genresProvider.getGenres());

@@ -20,6 +20,7 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
@@ -38,11 +39,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
@@ -53,6 +56,17 @@ public class StorageMusicProvider {
     private final ContentResolver contentResolver;
     private final Context context;
     private final StorageAlbumsProvider albumsProvider;
+
+    public static void checkIfMediaStoreAvailable(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Set<String> volumes = MediaStore.getExternalVolumeNames(context);
+            if (!volumes.contains(MediaStore.VOLUME_EXTERNAL_PRIMARY)) {
+                //can crash in rare weird cases on android 10 so we check for existence
+                //https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android
+                throw new UnavailableMediaStoreException();
+            }
+        }
+    }
 
     public StorageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
         contentResolver = context.getContentResolver();
@@ -75,7 +89,7 @@ public class StorageMusicProvider {
     }
 
     public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable() {
-        Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, getStorageUri());
+        Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, unsafeGetStorageUri());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             //on new composition content observer not called on android 10
             //but for some reason content observer is called for playlist items when new file added
@@ -88,9 +102,15 @@ public class StorageMusicProvider {
             //maybe filter often events?
             storageChangeObservable = Observable.merge(storageChangeObservable, playListChangeObservable);
         }
-        return storageChangeObservable.map(o -> getCompositions());
+        return storageChangeObservable.flatMapSingle(o -> Single.create(emitter -> {
+            LongSparseArray<StorageFullComposition> compositions = getCompositions();
+            if (compositions != null) {
+                emitter.onSuccess(compositions);
+            }
+        }));
     }
 
+    @Nullable
     public LongSparseArray<StorageFullComposition> getCompositions() {
         String[] query;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -126,8 +146,15 @@ public class StorageMusicProvider {
             };
         }
 
+        Uri uri;
+        try {
+            uri = getStorageUri();
+        } catch (UnavailableMediaStoreException e) {
+            return null;
+        }
+
         try(Cursor cursor = contentResolver.query(
-                getStorageUri(),
+                uri,
                 query,
                 Media.IS_MUSIC + " = ?",
                 new String[] { String.valueOf(1) },
@@ -479,8 +506,18 @@ public class StorageMusicProvider {
                 storageAlbum);
     }
 
+    private Uri unsafeGetStorageUri() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+        } else {
+            return Media.EXTERNAL_CONTENT_URI;
+        }
+    }
+
+    @Nullable
     private Uri getStorageUri() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            checkIfMediaStoreAvailable(context);
             return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         } else {
             return Media.EXTERNAL_CONTENT_URI;

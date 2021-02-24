@@ -10,10 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentStartBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import moxy.MvpAppCompatFragment;
@@ -28,14 +28,15 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     @InjectPresenter
     StartPresenter presenter;
 
-    private ProgressViewWrapper progressViewWrapper;
+    private FragmentStartBinding viewBinding;
 
     private RxPermissions rxPermissions;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_start, container, false);
+        viewBinding = FragmentStartBinding.inflate(inflater, container, false);
+        return viewBinding.getRoot();
     }
 
     @Override
@@ -44,8 +45,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
         rxPermissions = new RxPermissions(this);
 
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
+        viewBinding.progressStateView.onTryAgainClick(presenter::onTryAgainButtonClicked);
     }
 
     @Override
@@ -56,12 +56,12 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
     @Override
     public void showDeniedPermissionMessage() {
-        progressViewWrapper.showMessage(R.string.can_not_work_without_file_permission, true);
+        viewBinding.progressStateView.showMessage(R.string.can_not_work_without_file_permission, true);
     }
 
     @Override
     public void showStub() {
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
