@@ -30,7 +30,5 @@ public interface StorageFilesDataSource {
 
     void deleteCompositionFile(Composition composition);
 
-    long getCompositionFileSize(FullComposition composition);
-
     void clearDeleteData();
 }

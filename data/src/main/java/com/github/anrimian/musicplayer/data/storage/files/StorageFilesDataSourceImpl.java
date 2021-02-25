@@ -142,19 +142,6 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
     }
 
     @Override
-    public long getCompositionFileSize(FullComposition composition) {
-        Long storageId = composition.getStorageId();
-        if (storageId == null) {
-            return -1;
-        }
-        String filePath = storageMusicProvider.getCompositionFilePath(storageId);
-        if (filePath == null) {
-            return -1;
-        }
-        return new File(filePath).length();
-    }
-
-    @Override
     public void clearDeleteData() {}
 
     private void deleteFile(Composition composition) {

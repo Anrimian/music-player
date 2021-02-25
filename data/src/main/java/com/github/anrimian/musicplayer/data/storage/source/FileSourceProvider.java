@@ -29,10 +29,11 @@ public class FileSourceProvider {
         throw new IllegalArgumentException("unknown image source: " + imageSource);
     }
 
-    public void useTempFile(String name, ThrowsCallback<File> fileFunction) throws Exception {
+    public long useTempFile(String name, ThrowsCallback<File> fileFunction) throws Exception {
         File file = getTempFile(name);
         try {
             fileFunction.call(file);
+            return file.length();
         } finally {
             file.delete();
         }

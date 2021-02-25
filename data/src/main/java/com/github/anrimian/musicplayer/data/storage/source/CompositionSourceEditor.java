@@ -47,17 +47,17 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 //deny delete issue - done
 //files/folder deleting - hide app confirm dialog possibility - done
 //content observer not called? - working, skip
+//getFileSize() adapt - done, removed
 
 //TODO replace DATA with relative path
-//TODO getFileSize() adapt
 
 //TODO pathchnotes with explanation
 /*
     Android 11 storage adaptation. From system version 11 editing and deleting files requires explicit
     user permission. So, on android 11:
-    Editing tags, moving compositions and folders, renaming folders action will require additional confirm.
-    Deleting files and folders also will require additional dialog confirm, but with possibility not to show application delete dialog anymore.
-    Changing tags will take significant more time
+    + Editing tags, moving compositions and folders, renaming folders action will require additional confirm.
+    + Deleting files and folders also will require additional dialog confirm, but with possibility not to show application delete dialog anymore.
+    + Changing tags will take significant more time
  */
 public class CompositionSourceEditor {
 
@@ -159,15 +159,15 @@ public class CompositionSourceEditor {
                 .flatMap(this::getCompositionGenres);
     }
 
-    public Completable changeCompositionAlbumArt(FullComposition composition,
+    public Single<Long> changeCompositionAlbumArt(FullComposition composition,
                                                  ImageSource imageSource) {
         return getPath(composition)
-                .flatMapCompletable(path -> changeCompositionAlbumArt(path, composition.getStorageId(), imageSource));
+                .flatMap(path -> changeCompositionAlbumArt(path, composition.getStorageId(), imageSource));
     }
 
-    public Completable removeCompositionAlbumArt(FullComposition composition) {
+    public Single<Long> removeCompositionAlbumArt(FullComposition composition) {
         return getPath(composition)
-                .flatMapCompletable(path -> removeCompositionAlbumArt(path, composition.getStorageId()));
+                .flatMap(path -> removeCompositionAlbumArt(path, composition.getStorageId()));
     }
 
     public Maybe<CompositionSourceTags> getFullTags(FullComposition composition) {
@@ -341,8 +341,8 @@ public class CompositionSourceEditor {
         return file.getTag();
     }
 
-    private Completable changeCompositionAlbumArt(String filePath, Long id, ImageSource imageSource) {
-        return Completable.fromAction(() -> editAudioFileTag(filePath,
+    private Single<Long> changeCompositionAlbumArt(String filePath, Long id, ImageSource imageSource) {
+        return Single.fromCallable(() -> editAudioFileTag(filePath,
                 id,
                 tag -> {
                     try (InputStream stream = fileSourceProvider.getImageStream(imageSource)) {
@@ -359,8 +359,8 @@ public class CompositionSourceEditor {
         ));
     }
 
-    private Completable removeCompositionAlbumArt(String filePath, Long id) {
-        return Completable.fromAction(() -> editAudioFileTag(filePath, id, Tag::deleteArtworkField));
+    private Single<Long> removeCompositionAlbumArt(String filePath, Long id) {
+        return Single.fromCallable(() -> editAudioFileTag(filePath, id, Tag::deleteArtworkField));
     }
 
     private void editFile(String filePath,
@@ -373,17 +373,18 @@ public class CompositionSourceEditor {
         );
     }
 
-    private void editAudioFileTag(String filePath, Long id, ThrowsCallback<Tag> callback)
+    private long editAudioFileTag(String filePath, Long id, ThrowsCallback<Tag> callback)
             throws Exception {
         File fileToEdit = new File(filePath);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
+            return fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
                 copyFileUsingStream(fileToEdit, tempFile);
                 runFileAction(tempFile, callback);
                 copyFileToMediaStore(tempFile, id);
             });
         } else {
             runFileAction(fileToEdit, callback);
+            return fileToEdit.length();
         }
     }
 

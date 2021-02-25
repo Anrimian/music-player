@@ -52,7 +52,7 @@ import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class EditorRepositoryImpl implements EditorRepository {
 
-    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 15000;
+    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 25000;
 
     private final CompositionSourceEditor sourceEditor;
     private final StorageFilesDataSource filesDataSource;
@@ -353,7 +353,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
         return sourceEditor.changeCompositionAlbumArt(composition, imageSource)
-                .doOnComplete(() -> onCompositionFileChanged(composition))
+                .doOnSuccess(newSize -> onCompositionFileChanged(composition, newSize))
+                .ignoreElement()
                 .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
     }
@@ -361,7 +362,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable removeCompositionAlbumArt(FullComposition composition) {
         return sourceEditor.removeCompositionAlbumArt(composition)
-                .doOnComplete(() -> onCompositionFileChanged(composition))
+                .doOnSuccess(newSize -> onCompositionFileChanged(composition, newSize))
+                .ignoreElement()
                 .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
     }
@@ -409,11 +411,8 @@ public class EditorRepositoryImpl implements EditorRepository {
         });
     }
 
-    private void onCompositionFileChanged(FullComposition composition) {
-        long size = filesDataSource.getCompositionFileSize(composition);
-        if (size > 0) {
-            compositionsDao.updateModifyTimeAndSize(composition.getId(), size, new Date());
-        }
+    private void onCompositionFileChanged(FullComposition composition, long newSize) {
+        compositionsDao.updateModifyTimeAndSize(composition.getId(), newSize, new Date());
         runSystemRescan(composition);
     }
 

@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -147,20 +146,6 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
     @Override
     public void deleteCompositionFile(Composition composition) {
         deleteCompositionFiles(asList(composition), composition);
-    }
-
-    //TODO adapt
-    @Override
-    public long getCompositionFileSize(FullComposition composition) {
-        Long storageId = composition.getStorageId();
-        if (storageId == null) {
-            return -1;
-        }
-        String filePath = storageMusicProvider.getCompositionFilePath(storageId);
-        if (filePath == null) {
-            return -1;
-        }
-        return new File(filePath).length();
     }
 
     @Override
