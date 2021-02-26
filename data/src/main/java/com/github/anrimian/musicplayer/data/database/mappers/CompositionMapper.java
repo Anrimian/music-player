@@ -17,7 +17,7 @@ public class CompositionMapper {
                 composition.getTitle(),
                 null,
                 composition.getFileName(),
-                composition.getFilePath(),
+                composition.getRelativePath(),
                 composition.getDuration(),
                 composition.getSize(),
                 composition.getId(),

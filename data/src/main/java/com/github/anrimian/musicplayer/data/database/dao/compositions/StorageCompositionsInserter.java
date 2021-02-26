@@ -118,7 +118,7 @@ public class StorageCompositionsInserter {
         compositionsDao.update(
                 composition.getTitle(),
                 composition.getFileName(),
-                composition.getFilePath(),
+                composition.getRelativePath(),
                 composition.getDuration(),
                 composition.getSize(),
                 composition.getDateAdded(),

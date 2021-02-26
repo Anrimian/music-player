@@ -294,7 +294,7 @@ class Migrations {
                     if (storageAlbum != null) {
                         cv.put("album", storageAlbum.getAlbum());
                     }
-                    cv.put("filePath", composition.getFilePath());
+                    cv.put("filePath", composition.getRelativePath());
                     cv.put("duration", composition.getDuration());
                     cv.put("size", composition.getSize());
                     cv.put("dateAdded", composition.getDateAdded().getTime());

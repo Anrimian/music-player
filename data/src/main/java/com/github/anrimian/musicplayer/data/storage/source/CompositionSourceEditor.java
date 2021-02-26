@@ -37,28 +37,6 @@ import io.reactivex.rxjava3.core.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 
-//albums editor - done
-//files moving - done
-//remove empty folder after files had moved or folder renamed - leave, but change delete description
-//files moving/folder renaming - process error on not "well defined collection" - skip
-//file rename - done
-//folder rename - done
-//folder rename - check for duplicate - done
-//deny delete issue - done
-//files/folder deleting - hide app confirm dialog possibility - done
-//content observer not called? - working, skip
-//getFileSize() adapt - done, removed
-
-//TODO replace DATA with relative path
-
-//TODO pathchnotes with explanation
-/*
-    Android 11 storage adaptation. From system version 11 editing and deleting files requires explicit
-    user permission. So, on android 11:
-    + Editing tags, moving compositions and folders, renaming folders action will require additional confirm.
-    + Deleting files and folders also will require additional dialog confirm, but with possibility not to show application delete dialog anymore.
-    + Changing tags will take significant more time
- */
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';

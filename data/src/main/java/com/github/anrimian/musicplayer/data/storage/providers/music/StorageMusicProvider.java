@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 import androidx.collection.LongSparseArray;
@@ -27,7 +26,6 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
@@ -118,13 +116,10 @@ public class StorageMusicProvider {
                     Media.ARTIST,
                     Media.TITLE,
                     Media.DISPLAY_NAME,
-//                            Media.ALBUM,
-                    Media.DATA,
                     Media.RELATIVE_PATH,
                     Media.DURATION,
                     Media.SIZE,
                     Media._ID,
-//                            Media.ARTIST_ID,
                     Media.ALBUM_ID,
                     Media.DATE_ADDED,
                     Media.DATE_MODIFIED
@@ -134,12 +129,10 @@ public class StorageMusicProvider {
                     Media.ARTIST,
                     Media.TITLE,
                     Media.DISPLAY_NAME,
-//                            Media.ALBUM,
                     Media.DATA,
                     Media.DURATION,
                     Media.SIZE,
                     Media._ID,
-//                            Media.ARTIST_ID,
                     Media.ALBUM_ID,
                     Media.DATE_ADDED,
                     Media.DATE_MODIFIED
@@ -330,7 +323,6 @@ public class StorageMusicProvider {
             if (storageId == null) {
                 continue;
             }
-            Log.d("KEK", "updateCompositionsRelativePath: " + composition.getFilePath());
             ContentProviderOperation operation = ContentProviderOperation.newUpdate(getCompositionUri(storageId))
                     .withValue(Media.RELATIVE_PATH, composition.getFilePath())
                     .build();
@@ -394,28 +386,6 @@ public class StorageMusicProvider {
         });
     }
 
-/*    public void modifyComposition(long id, ThrowsCallback<OutputStream> modifyFunction)
-            throws Exception {
-        Uri uri = getCompositionUri(id);
-
-        ContentValues cv = new ContentValues();
-        cv.put(MediaStore.Audio.Media.IS_PENDING, 1);
-        contentResolver.update(uri,
-                cv,
-                Media._ID + " = ?",
-                new String[] { String.valueOf(id) });
-
-        try (OutputStream os = contentResolver.openOutputStream(uri)) {
-            modifyFunction.call(os);
-        }
-
-        cv.put(MediaStore.Audio.Media.IS_PENDING, 0);
-        contentResolver.update(uri,
-                cv,
-                Media._ID + " = ?",
-                new String[] { String.valueOf(id) });
-    }*/
-
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
         cv.put(key, value);
@@ -428,20 +398,20 @@ public class StorageMusicProvider {
         String artist = cursorWrapper.getString(Media.ARTIST);
         String title = cursorWrapper.getString(Media.TITLE);
 //        String album = cursorWrapper.getString(Media.ALBUM);
-        String filePath = cursorWrapper.getString(Media.DATA);
-        if (isEmpty(filePath)) {
-            return null;
+
+        String filePath;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            filePath = cursorWrapper.getString(Media.RELATIVE_PATH);
+        } else {
+            filePath = cursorWrapper.getString(Media.DATA);
+            if (isEmpty(filePath)) {
+                return null;
+            }
+        }
+        if (filePath == null) {
+            filePath = "";
         }
 
-        String relativePath;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            relativePath = cursorWrapper.getString(Media.RELATIVE_PATH);
-        } else {
-            relativePath = FileUtils.getParentDirPath(filePath);
-        }
-        if (isEmpty(relativePath)) {
-            return null;
-        }
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
         String displayName = cursorWrapper.getString(Media.DISPLAY_NAME);
@@ -485,11 +455,6 @@ public class StorageMusicProvider {
             artist = null;
         }
 
-//        CorruptionType corruptionType = null;
-//        if (duration == 0) {
-//            corruptionType = CorruptionType.UNKNOWN;
-//        }
-
         StorageAlbum storageAlbum = albums.get(albumId);
 
         return new StorageFullComposition(
@@ -497,7 +462,6 @@ public class StorageMusicProvider {
                 title,
                 displayName,
                 filePath,
-                relativePath,
                 duration,
                 size,
                 id,

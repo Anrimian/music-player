@@ -42,7 +42,7 @@ public class StorageMusicProviderTest {
         for(int i = 0, size = map.size(); i < size; i++) {
             StorageFullComposition composition = map.valueAt(i);
             System.out.println(composition);
-            Assert.assertNotNull(composition.getFilePath());
+            Assert.assertNotNull(composition.getRelativePath());
         }
     }
 
