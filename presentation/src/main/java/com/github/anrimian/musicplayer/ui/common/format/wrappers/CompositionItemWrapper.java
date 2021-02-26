@@ -175,7 +175,6 @@ public class CompositionItemWrapper {
         }
         int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
         animateBackgroundColor(clickableItem, endColor);
-        clickableItem.setClickable(!isPlaying);
     }
 
     private void showCompositionName() {

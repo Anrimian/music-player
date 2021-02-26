@@ -156,7 +156,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().showShareMusicDialog(currentItem.getComposition());
     }
 
-    void onCompositionItemClicked(int position, PlayQueueItem item) {
+    void onQueueItemClicked(int position, PlayQueueItem item) {
+        if (item.equals(currentItem)) {
+            playerInteractor.playOrPause();
+            return;
+        }
         this.currentPosition = position;
         this.currentItem = item;
         playerInteractor.skipToItem(item);
@@ -168,7 +172,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (playQueueItem.equals(currentItem)) {
             playerInteractor.playOrPause();
         } else {
-            onCompositionItemClicked(position, playQueueItem);
+            onQueueItemClicked(position, playQueueItem);
             playerInteractor.play();
         }
     }

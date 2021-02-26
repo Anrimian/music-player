@@ -290,7 +290,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
         playQueueAdapter = new PlayQueueAdapter(rvPlayList);
-        playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
+        playQueueAdapter.setOnCompositionClickListener(presenter::onQueueItemClicked);
         playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
         playQueueAdapter.setIconClickListener(presenter::onQueueItemIconClicked);
         rvPlayList.setAdapter(playQueueAdapter);
