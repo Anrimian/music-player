@@ -27,6 +27,7 @@ import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.I
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.IGNORED;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -86,7 +87,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.play();
         musicPlayerInteractor.pause();
 
-        verify(musicPlayerController).resume();
+        verify(musicPlayerController).resume(anyInt());
         verify(musicPlayerController).pause();
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
     }
@@ -127,7 +128,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).resume(anyInt());
 
         audioFocusSubject.onNext(LOSS);
 
@@ -147,7 +148,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).resume(anyInt());
 
         audioFocusSubject.onNext(LOSS_SHORTLY);
 
@@ -168,7 +169,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).resume(anyInt());
 
         audioFocusSubject.onNext(LOSS_SHORTLY);
 
@@ -187,7 +188,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).resume(anyInt());
 
         noisyAudioSubject.onNext(new Object());
 
@@ -202,7 +203,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).resume(anyInt());
 
         audioFocusSubject.onNext(LOSS);
 
@@ -222,7 +223,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).resume(anyInt());
 
         noisyAudioSubject.onNext(new Object());
 
@@ -242,7 +243,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
 
-        inOrder.verify(musicPlayerController).resume();
+        inOrder.verify(musicPlayerController).resume(anyInt());
 
         volumeSubject.onNext(0);
 

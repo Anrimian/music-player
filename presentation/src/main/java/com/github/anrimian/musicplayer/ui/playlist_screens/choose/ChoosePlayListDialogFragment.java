@@ -39,7 +39,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDel
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextColorDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -76,7 +75,6 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     private BiCallback<PlayList, Bundle> complexCompleteListener;
 
     private PlayListsAdapter adapter;
-    private ProgressViewWrapper progressViewWrapper;
     private SlideDelegate slideDelegate;
 
     public static ChoosePlayListDialogFragment newInstance(@AttrRes int statusBarColorAttr) {
@@ -118,9 +116,6 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         float heightPercent = getFloat(getResources(), R.dimen.choose_playlist_dialog_height);
         int minHeight = (int) (height * heightPercent);
         view.setMinimumHeight(minHeight);
-
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.hideAll();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -188,18 +183,17 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showEmptyList() {
-        progressViewWrapper.hideAll();
-        progressViewWrapper.showMessage(R.string.play_lists_on_device_not_found, false);
+        viewBinding.progressStateView.showMessage(R.string.play_lists_on_device_not_found, false);
     }
 
     @Override
     public void showList() {
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        viewBinding.progressStateView.showProgress();
     }
 
     @Override

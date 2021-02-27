@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
@@ -19,8 +20,9 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRep
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StoragePlaylistAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceApi30;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
@@ -29,6 +31,7 @@ import com.github.anrimian.musicplayer.data.storage.source.FileSourceProvider;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 
@@ -51,13 +54,6 @@ public class StorageModule {
     @Singleton
     StorageMusicProvider storageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
         return new StorageMusicProvider(context, albumsProvider);
-    }
-
-    @Provides
-    @Nonnull
-    @Singleton
-    StorageArtistsProvider storageArtistProvider(Context context) {
-        return new StorageArtistsProvider(context);
     }
 
     @Provides
@@ -119,8 +115,12 @@ public class StorageModule {
 
     @Provides
     @Nonnull
+    @Singleton
     StorageFilesDataSource storageFilesDataSource(StorageMusicProvider musicProvider) {
-        return new StorageFilesDataSource(musicProvider);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return new StorageFilesDataSourceApi30(musicProvider);
+        }
+        return new StorageFilesDataSourceImpl(musicProvider);
     }
 
     @Provides
@@ -139,6 +139,7 @@ public class StorageModule {
                                                   GenresDaoWrapper genresDao,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
                                                   StoragePlaylistAnalyzer storagePlaylistAnalyzer,
+                                                  LoggerRepository loggerRepository,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
@@ -146,6 +147,7 @@ public class StorageModule {
                 genresDao,
                 compositionAnalyzer,
                 storagePlaylistAnalyzer,
+                loggerRepository,
                 scheduler);
     }
 

@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import java.util.HashMap;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class PlayerCoordinatorInteractor {
 
@@ -25,9 +26,9 @@ public class PlayerCoordinatorInteractor {
         playerInteractor.startPlaying(compositionSource);
     }
 
-    public void play(PlayerType playerType) {
+    public void play(PlayerType playerType, int delay) {
         applyPlayerType(playerType);
-        playerInteractor.play();
+        playerInteractor.play(delay);
     }
 
     public void setInLoadingState(PlayerType playerType) {
@@ -101,8 +102,8 @@ public class PlayerCoordinatorInteractor {
         }
     }
 
-    public long getActualTrackPosition(PlayerType playerType) {
-        return isPlayerTypeActive(playerType)? playerInteractor.getTrackPosition(): -1;
+    public Single<Long> getActualTrackPosition(PlayerType playerType) {
+        return isPlayerTypeActive(playerType)? playerInteractor.getTrackPosition(): Single.just(-1L);
     }
 
     public void setPlaybackSpeed(float speed) {
@@ -145,7 +146,9 @@ public class PlayerCoordinatorInteractor {
             }
             CompositionSource oldSource = preparedSourcesMap.get(activePlayerType);
             if (oldSource != null) {
-                applyPositionChange(oldSource, playerInteractor.getTrackPosition());
+                //noinspection ResultOfMethodCallIgnored
+                playerInteractor.getTrackPosition()
+                        .subscribe(position -> applyPositionChange(oldSource, position));
             }
             activePlayerType = playerType;
         }

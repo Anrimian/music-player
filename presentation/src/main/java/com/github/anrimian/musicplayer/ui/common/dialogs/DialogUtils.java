@@ -5,17 +5,22 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.view.LayoutInflater;
 import android.view.Window;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.PartialDeleteDialogBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.io.File;
@@ -36,7 +41,7 @@ public class DialogUtils {
         String message = compositions.size() == 1?
                 context.getString(R.string.delete_composition_template, formatCompositionName(compositions.get(0))):
                 context.getString(R.string.delete_template, getDativCompositionsMessage(context, compositions.size()));
-        showConfirmDeleteDialog(context, message, deleteCallback);
+        showConfirmDeleteFileDialog(context, message, deleteCallback);
     }
 
     public static void showConfirmDeleteDialog(Context context,
@@ -53,7 +58,7 @@ public class DialogUtils {
                     getDativCompositionsMessage(context, filesCount));
         }
 
-        showConfirmDeleteDialog(context, message, deleteCallback);
+        showConfirmDeleteFileDialog(context, message, deleteCallback);
     }
 
 
@@ -62,6 +67,34 @@ public class DialogUtils {
                                                Runnable deleteCallback) {
         String message = context.getString(R.string.delete_playlist_template, playList.getName());
         showConfirmDeleteDialog(context, message, deleteCallback);
+    }
+
+    public static void showConfirmDeleteFileDialog(Context context,
+                                                   String message,
+                                                   Runnable deleteCallback) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            LibrarySettingsInteractor interactor = Components.getAppComponent().librarySettingsInteractor();
+            if (!interactor.isAppConfirmDeleteDialogEnabled()) {
+                deleteCallback.run();
+                return;
+            }
+
+            PartialDeleteDialogBinding binding = PartialDeleteDialogBinding.inflate(LayoutInflater.from(context));
+            ViewUtils.setChecked(binding.cbDoNotShowDeleteDialog, !interactor.isAppConfirmDeleteDialogEnabled());
+            ViewUtils.onCheckChanged(
+                    binding.cbDoNotShowDeleteDialog,
+                    enabled -> interactor.setAppConfirmDeleteDialogEnabled(!enabled)
+            );
+            new AlertDialog.Builder(context)
+                    .setTitle(R.string.deleting)
+                    .setMessage(message)
+                    .setView(binding.getRoot())
+                    .setPositiveButton(R.string.delete, (dialog, which) -> deleteCallback.run())
+                    .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                    .show();
+        } else {
+            showConfirmDeleteDialog(context, message, deleteCallback);
+        }
     }
 
     public static void showConfirmDeleteDialog(Context context,

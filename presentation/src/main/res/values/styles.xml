@@ -77,6 +77,7 @@
     <style name="SlidrActivityTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
     </style>
 
     <style name="DialogActivityTheme">

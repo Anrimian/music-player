@@ -29,6 +29,8 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
@@ -39,7 +41,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Collection;
@@ -54,12 +55,15 @@ import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 
 public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment implements
         LibraryCompositionsView, BackButtonListener, FragmentLayerListener {
 
     @InjectPresenter
     LibraryCompositionsPresenter presenter;
+
+    private FragmentLibraryCompositionsBinding binding;
 
     private LinearLayoutManager layoutManager;
     private RecyclerView recyclerView;
@@ -68,11 +72,12 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 
     private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
-    private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
+
+    private ErrorHandler deletingErrorHandler;
 
     @ProvidePresenter
     LibraryCompositionsPresenter providePresenter() {
@@ -89,7 +94,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        FragmentLibraryCompositionsBinding binding = FragmentLibraryCompositionsBinding.inflate(inflater, container, false);
+        binding = FragmentLibraryCompositionsBinding.inflate(inflater, container, false);
         recyclerView = binding.recyclerView;
         fab = binding.fab;
         clListContainer = binding.listContainer;
@@ -102,9 +107,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
 
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
-        progressViewWrapper.hideAll();
+        binding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -122,6 +125,10 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
         FragmentManager fm = getChildFragmentManager();
+
+        deletingErrorHandler = new DeleteErrorHandler(fm,
+                presenter::onRetryFailedDeleteActionClicked,
+                this::showEditorRequestDeniedMessage);
 
         selectOrderDialogRunner = new DialogFragmentRunner<>(fm,
                 ORDER_TAG,
@@ -175,29 +182,29 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.compositions_on_device_not_found);
+        binding.progressStateView.showMessage(R.string.compositions_on_device_not_found);
     }
 
     @Override
     public void showEmptySearchResult() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.showMessage(R.string.compositions_for_search_not_found);
+        binding.progressStateView.showMessage(R.string.compositions_for_search_not_found);
     }
 
     @Override
     public void showList() {
         fab.setVisibility(View.VISIBLE);
-        progressViewWrapper.hideAll();
+        binding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        binding.progressStateView.showProgress();
     }
 
     @Override
     public void showLoadingError(ErrorCommand errorCommand) {
-        progressViewWrapper.showMessage(errorCommand.getMessage(), true);
+        binding.progressStateView.showMessage(errorCommand.getMessage(), true);
     }
 
     @Override
@@ -272,10 +279,12 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer,
-                getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+        deletingErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clListContainer,
+                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
+                        Snackbar.LENGTH_SHORT)
+                        .show()
+        );
     }
 
     @Override
@@ -351,5 +360,9 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
                 break;
             }
         }
+    }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(clListContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
     }
 }

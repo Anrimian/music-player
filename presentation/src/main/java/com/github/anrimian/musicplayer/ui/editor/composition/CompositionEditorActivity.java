@@ -24,7 +24,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFr
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer;
-import com.github.anrimian.musicplayer.ui.editor.common.EditorErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
@@ -80,7 +80,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     private ShortGenresAdapter genresAdapter;
 
-    private EditorErrorHandler editorErrorHandler;
+    private ErrorHandler errorHandler;
 
     public static Intent newIntent(Context context, long compositionId) {
         Intent intent = new Intent(context, CompositionEditorActivity.class);
@@ -146,11 +146,12 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
         CompatUtils.setMainButtonStyle(viewBinding.ivLyrics);
         CompatUtils.setMainButtonStyle(viewBinding.ivGenreEdit);
 
-        editorErrorHandler = new EditorErrorHandler(this,
+        FragmentManager fm = getSupportFragmentManager();
+
+        errorHandler = new ErrorHandler(fm,
                 presenter::onRetryFailedEditActionClicked,
                 this::showEditorRequestDeniedMessage);
 
-        FragmentManager fm = getSupportFragmentManager();
         authorDialogFragmentRunner = new DialogFragmentRunner<>(fm,
                 AUTHOR_TAG,
                 fragment -> fragment.setOnCompleteListener(presenter::onNewAuthorEntered));
@@ -366,7 +367,7 @@ public class CompositionEditorActivity extends MvpAppCompatActivity
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        editorErrorHandler.handleEditorError(this, errorCommand, () ->
+        errorHandler.handleError(errorCommand, () ->
                 makeSnackbar(viewBinding.container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
         );
     }

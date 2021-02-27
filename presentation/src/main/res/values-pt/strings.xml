@@ -52,7 +52,6 @@
     <string name="delete_composition_template">Excluir música \"%1$s\"? Essa ação não pode ser desfeita.</string>
     <string name="delete_empty_folder">Excluir pasta \"%s\"? Essa ação não pode ser desfeita.</string>
     <string name="delete_folder_template">Excluir %2$s da pasta \"%1$s\"?
-        Se não houver mais arquivos na pasta, ele também será excluído.
         Essa ação não pode ser desfeita.
     </string>
     <string name="delete_template">Excluir \"%1$s\"? Essa ação não pode ser desfeita.</string>
@@ -205,6 +204,13 @@
     <string name="android_r_edit_file_permission_denied">
         No Android 11, editar e excluir arquivos requer permissão explícita do sistema
     </string>
+    <string name="error_report">Relatório de erro</string>
+    <string name="critical_error_report_message">Ocorreu um erro fatal e, devido a este aplicativo, não é possível iniciar. O aparecimento desses erros é altamente indesejado. O aplicativo não envia nenhuma informação automaticamente, mas você pode enviar o arquivo com o log de erros manualmente por e-mail. Isso ajudará a corrigir esse erro.</string>
+    <string name="error_report_message">Ocorreu um erro fatal. O aplicativo não envia nenhuma informação automaticamente, mas você pode enviar o arquivo com o log de erros manualmente por e-mail. Isso ajudará a corrigir esse erro.</string>
+    <string name="show_error_report_dialog_on_start">Mostrar caixa de diálogo de relatório de erro ao iniciar o aplicativo após o travamento do aplicativo</string>
+    <!-- now verified-->
+    <string name="do_not_show_confirm_delete_dialog">Não mostrar a caixa de diálogo de confirmação de exclusão do aplicativo</string>
+    <!--    -->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s música</item>

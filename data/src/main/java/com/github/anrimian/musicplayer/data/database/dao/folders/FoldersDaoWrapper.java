@@ -194,6 +194,10 @@ public class FoldersDaoWrapper {
         foldersDao.deleteIgnoredFolder(folder.getRelativePath());
     }
 
+    public boolean isFolderWithNameExists(Long parentId, String name) {
+        return foldersDao.isFolderWithNameExists(parentId, name);
+    }
+
     private Observable<List<FolderFileSource>> getFoldersObservable(Long parentFolderId,
                                                                     Order order,
                                                                     @Nullable String searchText) {
@@ -263,5 +267,4 @@ public class FoldersDaoWrapper {
         }
         throw new IllegalStateException("unexpected file source: " + fileSource);
     }
-
 }

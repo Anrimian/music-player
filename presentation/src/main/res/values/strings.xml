@@ -10,14 +10,14 @@
     <string name="internal_app_error">Internal app error</string>
     <string name="unexpected_error">Error: %s</string>
     <string name="file_not_found">File not found</string>
-    <string name="compositions_on_device_not_found">No songs found on device</string>
+    <string name="compositions_on_device_not_found">No songs found on the device</string>
     <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
     <string name="compositions_for_search_not_found">No matching search results found</string>
     <string name="foreground_channel_description">Foreground player notification</string>
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
-    <string name="content_description_menu">Open current composition menu</string>
+    <string name="content_description_menu">Open current composition menu</string>F
     <string name="content_description_menu_template">Open composition menu: %s</string>
     <string name="share">Send</string>
     <string name="content_description_repeat_mode">Repeat mode menu</string>
@@ -31,7 +31,7 @@
     <string name="folders">Folders</string>
     <string name="compositions">Songs</string>
     <string name="play_lists">Playlists</string>
-    <string name="play_lists_on_device_not_found">No playlists found on device</string>
+    <string name="play_lists_on_device_not_found">No playlists found on the device</string>
     <string name="name">Name</string>
     <string name="create">Create</string>
     <string name="create_playlist">Create playlist</string>
@@ -51,10 +51,7 @@
     <string name="deleting">Deleting</string>
     <string name="delete_composition_template">Delete song \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_empty_folder">Delete folder \"%s\"? This action cannot be undone.</string>
-    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"?
-        If there are no more files in the folder, it will also be deleted.
-        This action cannot be undone.
-    </string>
+    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"?This action cannot be undone.</string>
     <string name="delete_template">Delete \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_composition_success">Song \"%1$s\" deleted</string>
     <string name="search">Search</string>
@@ -205,6 +202,18 @@
     <string name="android_r_edit_file_permission_denied">
         From Android 11 editing and deleting files requires explicit system permission
     </string>
+    <string name="error_report">Error report</string>
+    <string name="critical_error_report_message">Fatal error occurred and due to this app can\'t start. Appearing of this errors is highly unwanted. Application doesn\'t send any info  automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
+    <string name="error_report_message">Fatal error occurred. Application doesn\'t send any info automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
+    <string name="show_error_report_dialog_on_start">Show error report dialog on application start after app crashes</string>
+    <string name="do_not_show_confirm_delete_dialog">Don\'t show application confirm delete dialog</string>
+
+    <string name="system_media_store_system_error" translatable="false">Android system can\'t find the system media storage. This is very strange and rare issue on android 10. Try to restart app or reboot the device, perhaps it will solve this problem.</string>
+    <string name="empty_string" translatable="false"/>
+
+    <string name="widget_small_name" translatable="false">4x1: Small</string>
+    <string name="widget_small_ext_name" translatable="false">4x1: Small extended</string>
+    <string name="widget_medium_name" translatable="false">4x2: Medium</string>
     <string name="playback_speed_template" translatable="false">%.2fX</string>
 
     <plurals name="compositions_count">

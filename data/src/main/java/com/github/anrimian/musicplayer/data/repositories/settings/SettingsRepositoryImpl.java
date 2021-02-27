@@ -37,6 +37,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String COLORED_NOTIFICATION = "colored_notification";
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
 
+    private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
+
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
 
@@ -53,11 +55,12 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
     private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
 
     private final BehaviorSubject<Integer> externalPlayerRepeatModeSubject = BehaviorSubject.create();
 
-    private SharedPreferencesHelper preferences;
+    private final SharedPreferencesHelper preferences;
 
     public SettingsRepositoryImpl(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -303,6 +306,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public Observable<Integer> getSelectedEqualizerTypeObservable() {
         return withDefaultValue(selectedEqualizerSubject, this::getSelectedEqualizerType);
+    }
+
+    @Override
+    public Observable<Boolean> getAppConfirmDeleteDialogEnabledObservable() {
+        return withDefaultValue(showAppConfirmDeleteDialog, this::isAppConfirmDeleteDialogEnabled);
+    }
+
+    @Override
+    public void setAppConfirmDeleteDialogEnabled(boolean enabled) {
+        if (enabled != isAppConfirmDeleteDialogEnabled()) {
+            preferences.putBoolean(SHOW_APP_CONFIRM_DELETE_DIALOG, enabled);
+            showAppConfirmDeleteDialog.onNext(enabled);
+        }
+    }
+
+    @Override
+    public boolean isAppConfirmDeleteDialogEnabled() {
+        return preferences.getBoolean(SHOW_APP_CONFIRM_DELETE_DIALOG, true);
     }
 
     @Override

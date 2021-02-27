@@ -36,10 +36,13 @@ public class StorageMusicProviderTest {
     @Test
     public void testRepositoryReturnValues() {
         LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions();
+        if (map == null) {
+            map = new LongSparseArray<>();
+        }
         for(int i = 0, size = map.size(); i < size; i++) {
             StorageFullComposition composition = map.valueAt(i);
             System.out.println(composition);
-            Assert.assertNotNull(composition.getFilePath());
+            Assert.assertNotNull(composition.getRelativePath());
         }
     }
 
@@ -55,7 +58,10 @@ public class StorageMusicProviderTest {
 
     private long load() {
         long startTime = System.currentTimeMillis();
-        storageMusicProvider.getCompositions();
+        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions();
+        if (map == null) {
+            Log.d("KEK", "load failed");
+        }
         long endTime = System.currentTimeMillis();
         return endTime - startTime;
     }

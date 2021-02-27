@@ -5,6 +5,9 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
+import javax.annotation.Nullable;
+
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -24,6 +27,9 @@ public class AlbumEditorPresenter extends MvpPresenter<AlbumEditorView> {
     private Disposable changeDisposable;
 
     private Album album;
+
+    @Nullable
+    private Completable lastEditAction;
 
     public AlbumEditorPresenter(long albumId,
                                 EditorInteractor editorInteractor,
@@ -76,11 +82,11 @@ public class AlbumEditorPresenter extends MvpPresenter<AlbumEditorView> {
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.updateAlbumArtist(author, album.getId())
+        lastEditAction = editorInteractor.updateAlbumArtist(author, album.getId())
                 .observeOn(uiScheduler)
                 .doOnSubscribe(d -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideRenameProgress())
-                .subscribe(() -> {}, this::onDefaultError);
+                .doFinally(() -> getViewState().hideRenameProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
     }
 
@@ -90,12 +96,22 @@ public class AlbumEditorPresenter extends MvpPresenter<AlbumEditorView> {
         }
 
         dispose(changeDisposable, presenterDisposable);
-        changeDisposable = editorInteractor.updateAlbumName(name, album.getId())
+        lastEditAction = editorInteractor.updateAlbumName(name, album.getId())
                 .observeOn(uiScheduler)
                 .doOnSubscribe(d -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideRenameProgress())
-                .subscribe(() -> {}, this::onDefaultError);
+                .doFinally(() -> getViewState().hideRenameProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
         presenterDisposable.add(changeDisposable);
+    }
+
+    void onRetryFailedEditActionClicked() {
+        if (lastEditAction != null) {
+            dispose(changeDisposable, presenterDisposable);
+            changeDisposable = lastEditAction
+                    .doFinally(() -> lastEditAction = null)
+                    .subscribe(() -> {}, this::onDefaultError);
+            presenterDisposable.add(changeDisposable);
+        }
     }
 
     private void onDefaultError(Throwable throwable) {

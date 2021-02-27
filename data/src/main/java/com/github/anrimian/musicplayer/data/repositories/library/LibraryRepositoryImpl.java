@@ -186,7 +186,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Completable deleteCompositions(List<Composition> compositions) {
         return Completable.fromAction(() -> {
-            storageFilesDataSource.deleteCompositionFiles(compositions);
+            storageFilesDataSource.deleteCompositionFiles(compositions, compositions);
             compositionsDao.deleteAll(mapList(compositions, Composition::getId));
         }).subscribeOn(scheduler);
     }
@@ -223,20 +223,16 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
         return Single.fromCallable(() -> compositionsDao.getAllCompositionsInFolder(folder.getId()))
-                .doOnSuccess(compositions -> {
-                    storageFilesDataSource.deleteCompositionFiles(compositions);
-                    foldersDao.deleteFolder(folder.getId(), compositions);
-                })
+                .map(compositions -> storageFilesDataSource.deleteCompositionFiles(compositions, folder))
+                .doOnSuccess(compositions -> foldersDao.deleteFolder(folder.getId(), compositions))
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Single<List<Composition>> deleteFolders(List<FileSource> folders) {
         return foldersDao.extractAllCompositionsFromFiles(folders)
-                .doOnSuccess(compositions -> {
-                    storageFilesDataSource.deleteCompositionFiles(compositions);
-                    foldersDao.deleteFolders(extractFolderIds(folders), compositions);
-                })
+                .map(compositions -> storageFilesDataSource.deleteCompositionFiles(compositions, folders))
+                .doOnSuccess(compositions -> foldersDao.deleteFolders(extractFolderIds(folders), compositions))
                 .subscribeOn(scheduler);
     }
 

@@ -7,9 +7,12 @@ import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
+import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 
 import java.util.ArrayList;
@@ -30,6 +33,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final GenresDaoWrapper genresDao;
     private final StorageCompositionAnalyzer compositionAnalyzer;
     private final StoragePlaylistAnalyzer playlistAnalyzer;
+    private final LoggerRepository loggerRepository;
     private final Scheduler scheduler;
 
     private CompositeDisposable mediaStoreDisposable = new CompositeDisposable();
@@ -41,6 +45,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                                       GenresDaoWrapper genresDao,
                                       StorageCompositionAnalyzer compositionAnalyzer,
                                       StoragePlaylistAnalyzer playlistAnalyzer,
+                                      LoggerRepository loggerRepository,
                                       Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.playListsProvider = playListsProvider;
@@ -48,6 +53,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         this.genresDao = genresDao;
         this.compositionAnalyzer = compositionAnalyzer;
         this.playlistAnalyzer = playlistAnalyzer;
+        this.loggerRepository = loggerRepository;
         this.scheduler = scheduler;
     }
 
@@ -86,8 +92,16 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 
     private Completable runRescanStorage() {
         return Completable.fromAction(() -> {
-            compositionAnalyzer.applyCompositionsData(musicProvider.getCompositions());
-            playlistAnalyzer.applyPlayListData(playListsProvider.getPlayLists());
+            LongSparseArray<StorageFullComposition> compositions = musicProvider.getCompositions();
+            if (compositions == null) {
+                return;
+            }
+            compositionAnalyzer.applyCompositionsData(compositions);
+            LongSparseArray<StoragePlayList> playlists = playListsProvider.getPlayLists();
+            if (playlists == null) {
+                return;
+            }
+            playlistAnalyzer.applyPlayListData(playlists);
 
             //<return genres after deep scan implementation>
 //            applyGenresData(genresProvider.getGenres());
@@ -97,7 +111,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 //                long dbId = genreId.getDbId();
 //                applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
 //            }
-        }).subscribeOn(scheduler);
+        }).doOnError(e -> loggerRepository.setWasCriticalFatalError(true))
+                .subscribeOn(scheduler);
     }
 
     private void onStorageGenresReceived(Map<String, StorageGenre> newGenres) {

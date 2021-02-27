@@ -52,6 +52,9 @@ public class StoragePlayListProviderTest {
         assertEquals("test playlist10", createdPlayList.getName());
 
         LongSparseArray<StoragePlayList> map = storagePlayListsProvider.getPlayLists();
+        if (map == null) {
+            map = new LongSparseArray<>();
+        }
         for(int i = 0, size = map.size(); i < size; i++) {
             StoragePlayList playList = map.valueAt(i);
             if (playList.getName().equals("test playlist10")) {
@@ -142,6 +145,9 @@ public class StoragePlayListProviderTest {
 
     private StoragePlayList getPlayList(String name) {
         LongSparseArray<StoragePlayList> map = storagePlayListsProvider.getPlayLists();
+        if (map == null) {
+            map = new LongSparseArray<>();
+        }
         for(int i = 0, size = map.size(); i < size; i++) {
             StoragePlayList playList = map.valueAt(i);
             if (playList.getName().equals(name)) {
@@ -153,6 +159,9 @@ public class StoragePlayListProviderTest {
 
     private StoragePlayListItem findComposition(int index) {
         LongSparseArray<StoragePlayList> map = storagePlayListsProvider.getPlayLists();
+        if (map == null) {
+            map = new LongSparseArray<>();
+        }
         for(int i = 0, size = map.size(); i < size; i++) {
             StoragePlayList playList = map.valueAt(i);
             List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getStorageId());
