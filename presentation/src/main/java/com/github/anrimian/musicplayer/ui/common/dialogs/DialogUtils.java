@@ -6,19 +6,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Window;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.DialogSpeedSelectorBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDeleteDialogBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -27,10 +32,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 
 public class DialogUtils {
@@ -168,6 +175,41 @@ public class DialogUtils {
                 window.setLayout(width > 0 ? width : MATCH_PARENT, MATCH_PARENT);
             }
         }
+    }
+
+    public static void showSpeedSelectorDialog(Context context,
+                                               float currentSpeed,
+                                               Callback<Float> onSpeedSelected) {
+        float[] availableSpeedValues = { 0.25f, 0.5f, 0.75f, 1.00f, 1.25f, 1.5f, 1.75f, 2f, 3f };
+
+        DialogSpeedSelectorBinding viewBinding = DialogSpeedSelectorBinding.inflate(
+                LayoutInflater.from(context)
+        );
+        viewBinding.rangeSlider.setStepSize(1f);
+        viewBinding.rangeSlider.setValueFrom(0f);
+        viewBinding.rangeSlider.setValueTo(availableSpeedValues.length - 1f);
+//        viewBinding.rangeSlider.setValue();
+
+        for (float value: availableSpeedValues) {
+            TextView textView = new TextView(context);
+            textView.setText(String.format(Locale.getDefault(), "%.2f", value));
+            textView.setTextSize(12f);
+            textView.setGravity(Gravity.CENTER_HORIZONTAL);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+            params.weight = 1f;
+            viewBinding.thickValuesContainer.addView(textView, params);
+        }
+
+        new AlertDialog.Builder(context)
+//                .setTitle(R.string.)
+                .setView(viewBinding.getRoot())
+                .setPositiveButton(android.R.string.ok, ((dialog, which) -> {
+                    int index = (int) viewBinding.rangeSlider.getValue();
+                    onSpeedSelected.call(availableSpeedValues[index]);
+                }))
+                .setNegativeButton(android.R.string.cancel, (dialog1, which) -> {})
+                .create()
+                .show();
     }
 
     private static Uri createUri(Context context, String filePath) {

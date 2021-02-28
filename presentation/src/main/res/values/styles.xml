@@ -5,6 +5,8 @@
         <!-- Customize your theme here. -->
 
         <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+        <item name="colorOnBackground">#000</item>
+        <item name="colorSurface">#0f0</item>
     </style>
 
     <style name="AppTheme" parent="AppBaseTheme">
