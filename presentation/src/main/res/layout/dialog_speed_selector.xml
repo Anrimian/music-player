@@ -6,17 +6,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <com.google.android.material.slider.Slider
+        android:theme="@style/DiscreteSliderStyle"
+        style="@style/DiscreteSliderStyle"
         android:id="@+id/rangeSlider"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:labelBehavior="gone"
-        app:labelStyle="@style/TextStyle"
+        app:layout_constraintEnd_toEndOf="@id/thickValuesContainer"
+        app:layout_constraintStart_toStartOf="@id/thickValuesContainer"
         android:layout_marginTop="@dimen/content_vertical_margin"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginStart="@dimen/content_internal_margin"
+        android:layout_marginEnd="@dimen/content_internal_margin"
         tools:valueFrom="0.25"
         tools:valueTo="2.00"
         tools:stepSize="0.25"/>
