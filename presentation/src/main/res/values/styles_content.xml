@@ -29,13 +29,14 @@
     </style>
 
     <style name="ButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/bg_button_outline</item>
         <item name="android:textColor">@color/color_accent_state</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
 
     <style name="ButtonBorderlessStyleInverse" parent="ButtonBorderlessStyle">
-        <item name="android:background">@drawable/bg_click_inverse</item>
+        <item name="android:background">@drawable/bg_button_outline_inverse</item>
     </style>
 
     <style name="ButtonBrightStyle" parent="@style/Widget.AppCompat.Button.Colored">
