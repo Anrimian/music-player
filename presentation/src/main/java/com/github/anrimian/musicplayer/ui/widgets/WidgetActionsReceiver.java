@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
+import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
@@ -45,9 +46,12 @@ public class WidgetActionsReceiver extends BroadcastReceiver {
                 interactor.skipToNext();
                 break;
             }
-            case PAUSE:
+            case PAUSE: {
+                interactor.pause();
+                break;
+            }
             case PLAY: {
-                interactor.playOrPause();
+                SystemServiceControllerImpl.startPlayForegroundService(context);
                 break;
             }
             case CHANGE_REPEAT_MODE: {

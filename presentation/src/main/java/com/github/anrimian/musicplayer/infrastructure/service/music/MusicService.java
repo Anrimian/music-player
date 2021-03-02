@@ -69,7 +69,8 @@ public class MusicService extends Service {
 
     public static final String REQUEST_CODE = "request_code";
     public static final String START_FOREGROUND_SIGNAL = "start_foreground_signal";
-    
+    public static final String PLAY_DELAY_MILLIS = "play_delay";
+
     private final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
     private final Builder stateBuilder = new Builder()
             .setActions(ACTION_PLAY
@@ -151,7 +152,7 @@ public class MusicService extends Service {
         }
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         if (requestCode != -1) {
-            handleNotificationAction(requestCode);
+            handleNotificationAction(requestCode, intent);
         } else {
             KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession(), intent);
             if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
@@ -192,10 +193,11 @@ public class MusicService extends Service {
         }
     }
 
-    private void handleNotificationAction(int requestCode) {
+    private void handleNotificationAction(int requestCode, Intent intent) {
         switch (requestCode) {
             case PLAY: {
-                playerInteractor().play();
+                int playDelay = intent.getIntExtra(PLAY_DELAY_MILLIS, 0);
+                playerInteractor().play(playDelay);
                 break;
             }
             case PAUSE: {
