@@ -7,7 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
-import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 
 import java.util.List;
 import java.util.Objects;
@@ -64,7 +64,7 @@ public class BluetoothConnectionReceiver extends BroadcastReceiver {
                     return;
                 }
             }
-            Components.getAppComponent().musicPlayerInteractor().play(PLAY_DELAY_MILLIS);
+            SystemServiceControllerImpl.startPlayForegroundService(context, PLAY_DELAY_MILLIS);
         }
     }
 }
