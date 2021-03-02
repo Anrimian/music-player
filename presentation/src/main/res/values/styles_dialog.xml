@@ -5,6 +5,7 @@
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowTitleStyle">@style/DialogTitleStyle</item>
         <item name="android:textColorPrimary">?attr/dialogTitleColor</item>
+        <item name="colorControlHighlight">?attr/dialogColorControlHighlight</item>
         <item name="android:buttonBarButtonStyle">@style/DialogButtonStyle</item>
     </style>
 

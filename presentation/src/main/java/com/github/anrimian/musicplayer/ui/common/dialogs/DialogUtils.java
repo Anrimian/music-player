@@ -24,7 +24,9 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -39,6 +41,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class DialogUtils {
 
@@ -181,6 +184,7 @@ public class DialogUtils {
                                                float currentSpeed,
                                                Callback<Float> onSpeedSelected) {
         float[] availableSpeedValues = { 0.25f, 0.5f, 0.75f, 1.00f, 1.25f, 1.5f, 1.75f, 2f, 3f };
+        float defaultSpeed = 1f;
 
         DialogSpeedSelectorBinding viewBinding = DialogSpeedSelectorBinding.inflate(
                 LayoutInflater.from(context)
@@ -188,28 +192,51 @@ public class DialogUtils {
         viewBinding.rangeSlider.setStepSize(1f);
         viewBinding.rangeSlider.setValueFrom(0f);
         viewBinding.rangeSlider.setValueTo(availableSpeedValues.length - 1f);
-//        viewBinding.rangeSlider.setValue();
+        int currentIndex = 3;
+        for (int i = 0; i < availableSpeedValues.length; i++) {
+            float value = availableSpeedValues[i];
+            if (value == currentSpeed) {
+                currentIndex = i;
+                break;
+            }
+        }
+        viewBinding.rangeSlider.addOnChangeListener((slider, value, fromUser) -> {
+            viewBinding.btnReset.setEnabled(availableSpeedValues[(int) value] != defaultSpeed);
+            if (fromUser) {
+                AndroidUtils.playTickVibration(context);
+            }
+        });
+        viewBinding.rangeSlider.setValue(currentIndex);
+        CompatUtils.setSliderStyle(viewBinding.rangeSlider);
 
         for (float value: availableSpeedValues) {
             TextView textView = new TextView(context);
             textView.setText(String.format(Locale.getDefault(), "%.2f", value));
             textView.setTextSize(12f);
             textView.setGravity(Gravity.CENTER_HORIZONTAL);
+            textView.setTextColor(getColorFromAttr(context, android.R.attr.textColorSecondary));
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             params.weight = 1f;
             viewBinding.thickValuesContainer.addView(textView, params);
         }
 
-        new AlertDialog.Builder(context)
-//                .setTitle(R.string.)
+        Dialog dialog = new AlertDialog.Builder(context)
+                .setTitle(R.string.playback_speed)
                 .setView(viewBinding.getRoot())
-                .setPositiveButton(android.R.string.ok, ((dialog, which) -> {
-                    int index = (int) viewBinding.rangeSlider.getValue();
-                    onSpeedSelected.call(availableSpeedValues[index]);
-                }))
-                .setNegativeButton(android.R.string.cancel, (dialog1, which) -> {})
-                .create()
-                .show();
+                .create();
+
+        viewBinding.btnCancel.setOnClickListener(v -> dialog.dismiss());
+        viewBinding.btnApply.setOnClickListener(v -> {
+            int index = (int) viewBinding.rangeSlider.getValue();
+            onSpeedSelected.call(availableSpeedValues[index]);
+            dialog.dismiss();
+        });
+        viewBinding.btnReset.setOnClickListener(v -> {
+            onSpeedSelected.call(defaultSpeed);
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     private static Uri createUri(Context context, String filePath) {

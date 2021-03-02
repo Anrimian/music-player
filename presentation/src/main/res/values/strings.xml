@@ -216,6 +216,10 @@
     <string name="widget_medium_name" translatable="false">4x2: Medium</string>
     <string name="playback_speed_template" translatable="false">%.2fX</string>
 
+    <string name="playback_speed">Playback speed</string>
+    <string name="reset">Reset</string>
+    <string name="apply">Apply</string>
+
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
         <item quantity="other">%1$s songs</item>

@@ -328,6 +328,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         CompatUtils.setMainButtonStyle(btnRandomPlay);
         CompatUtils.setMainButtonStyle(btnRepeatMode);
         CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvPlaybackSpeed);
 
         deletingErrorHandler = new DeleteErrorHandler(getChildFragmentManager(),
                 presenter::onRetryFailedDeleteActionClicked,
@@ -701,15 +702,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void displayPlaybackSpeed(float speed) {
-        //TODO think about external player playback speed handling
+        //TODO external player playback speed handling
         //TODO ability to hide speed indicator if there are no available feature
-        //TODO dialog design
         panelBinding.tvPlaybackSpeed.setText(getString(R.string.playback_speed_template, speed));
-        panelBinding.tvPlaybackSpeed.setOnClickListener(v -> {
-            DialogUtils.showSpeedSelectorDialog(requireContext(),
-                    speed,
-                    presenter::onPlaybackSpeedSelected);
-        });
+        panelBinding.tvPlaybackSpeed.setOnClickListener(v ->
+                DialogUtils.showSpeedSelectorDialog(requireContext(),
+                        speed,
+                        presenter::onPlaybackSpeedSelected)
+        );
     }
 
     public void openPlayQueue() {

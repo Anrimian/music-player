@@ -222,6 +222,16 @@ public class AndroidUtils {
         return items;
     }
 
+    public static void playTickVibration(Context context) {
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v == null) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK));
+        }
+    }
+
     public static void playShortVibration(Context context) {
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (v == null) {

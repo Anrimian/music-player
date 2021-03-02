@@ -39,7 +39,7 @@
         tools:text="messaggemessagemessage"/>
 
     <Button
-        style="@style/ButtonBorderlessStyle"
+        style="@style/ButtonBorderlessStyleInverse"
         android:id="@+id/tv_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

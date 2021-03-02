@@ -49,6 +49,8 @@
     <item name="dialog_min_width_major" type="dimen">65%</item>
     <item name="dialog_min_width_minor" type="dimen">95%</item>
     <dimen name="floating_window_z">16dp</dimen>
+    <dimen name="dialog_button_margin_vertical">8dp</dimen>
+    <dimen name="dialog_button_margin_horizontal">12dp</dimen>
 
     <dimen name="subtitle_height">48dp</dimen>
 
