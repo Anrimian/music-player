@@ -51,7 +51,7 @@
     <string name="deleting">Deleting</string>
     <string name="delete_composition_template">Delete song \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_empty_folder">Delete folder \"%s\"? This action cannot be undone.</string>
-    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"?This action cannot be undone.</string>
+    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_template">Delete \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_composition_success">Song \"%1$s\" deleted</string>
     <string name="search">Search</string>

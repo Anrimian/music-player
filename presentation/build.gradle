@@ -112,8 +112,8 @@ dependencies {
     testImplementation deps.junit
     testImplementation deps.mockito
 
-    androidTestImplementation deps.dexmaker
-    androidTestImplementation deps.dexmakerMockito
+//    androidTestImplementation deps.dexmaker
+//    androidTestImplementation deps.dexmakerMockito
     androidTestImplementation deps.mockito
     androidTestImplementation deps.espresso
 }
