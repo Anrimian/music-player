@@ -229,6 +229,11 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         mediaPlayer.release();
     }
 
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return Observable.just(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
+    }
+
     private void startTracingTrackPosition() {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)

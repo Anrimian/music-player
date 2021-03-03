@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public class CompositeMediaPlayer implements AppMediaPlayer {
@@ -20,6 +21,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
 
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
+    private final BehaviorSubject<Boolean> speedChangeAvailableSubject = BehaviorSubject.create();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
     private AppMediaPlayer currentPlayer;
@@ -111,6 +113,11 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         currentPlayer.release();
     }
 
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return speedChangeAvailableSubject;
+    }
+
     private void setPlayer(int index) {
         currentPlayerIndex = index;
         if (currentPlayer != null) {
@@ -127,6 +134,8 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         playerDisposable.add(currentPlayer.getTrackPositionObservable()
                 .subscribe(this::onTrackPositionReceived)
         );
+        playerDisposable.add(currentPlayer.getSpeedChangeAvailableObservable()
+                .subscribe(speedChangeAvailableSubject::onNext));
     }
 
     private void onTrackPositionReceived(long position) {

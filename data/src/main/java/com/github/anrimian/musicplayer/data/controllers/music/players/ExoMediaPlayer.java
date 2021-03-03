@@ -183,6 +183,11 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         });
     }
 
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return Observable.just(true);
+    }
+
     private void startPlayWhenReady() {
         Completable.fromRunnable(() -> {
             equalizerController.attachEqualizer(context, getPlayer().getAudioSessionId());

@@ -140,6 +140,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         return uiStateRepository.getCurrentPlaybackSpeed();
     }
 
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return mediaPlayer.getSpeedChangeAvailableObservable();
+    }
+
     private void saveTrackPosition(long position) {
         if (currentSource instanceof LibraryCompositionSource) {
             uiStateRepository.setTrackPosition(position);

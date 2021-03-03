@@ -273,6 +273,10 @@ public class LibraryPlayerInteractor {
         return playerCoordinatorInteractor.getPlaybackSpeed();
     }
 
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return playerCoordinatorInteractor.getSpeedChangeAvailableObservable();
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();

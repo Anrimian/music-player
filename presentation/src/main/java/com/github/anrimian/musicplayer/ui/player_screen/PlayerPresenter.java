@@ -80,6 +80,13 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         getViewState().displayPlaybackSpeed(playerInteractor.getPlaybackSpeed());
         subscribeOnUiSettings();
         subscribeOnRandomMode();
+        subscribeOnSpeedAvailableState();
+    }
+
+    private void subscribeOnSpeedAvailableState() {
+        presenterDisposable.add(playerInteractor.getSpeedChangeAvailableObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showSpeedChangeFeatureVisible));
     }
 
     @Override

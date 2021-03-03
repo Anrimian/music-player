@@ -137,6 +137,10 @@ public class PlayerCoordinatorInteractor {
         return isPlayerTypeActive(playerType)? playerInteractor.getPlayerState() : PlayerState.PAUSE;
     }
 
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return playerInteractor.getSpeedChangeAvailableObservable();
+    }
+
     private void applyPlayerType(PlayerType playerType) {
         if (activePlayerType != playerType) {
             playerInteractor.pause();
