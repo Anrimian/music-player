@@ -51,9 +51,7 @@
     <string name="deleting">Eliminando</string>
     <string name="delete_composition_template">Eliminar canción \"%1$s\"? Esta acción no se puede deshacer.</string>
     <string name="delete_empty_folder">Eliminar carpeta \"%s\"? Esta acción no se puede deshacer.</string>
-    <string name="delete_folder_template">Eliminar %2$s de carpeta \"%1$s\"?
-        Esta acción no se puede deshacer.
-    </string>
+    <string name="delete_folder_template">Eliminar %2$s de carpeta \"%1$s\"? Esta acción no se puede deshacer.</string>
     <string name="delete_template">Eliminar \"%1$s\"? Esta acción no se puede deshacer.</string>
     <string name="delete_composition_success">Canción \"%1$s\" eliminada</string>
     <string name="search">Buscar</string>
