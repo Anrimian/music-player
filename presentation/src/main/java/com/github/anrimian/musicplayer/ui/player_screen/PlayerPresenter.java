@@ -77,16 +77,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         } else {
             getViewState().collapseBottomPanel();
         }
-        getViewState().displayPlaybackSpeed(playerInteractor.getPlaybackSpeed());
         subscribeOnUiSettings();
         subscribeOnRandomMode();
         subscribeOnSpeedAvailableState();
-    }
-
-    private void subscribeOnSpeedAvailableState() {
-        presenterDisposable.add(playerInteractor.getSpeedChangeAvailableObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showSpeedChangeFeatureVisible));
+        subscribeOnSpeedState();
     }
 
     @Override
@@ -465,5 +459,17 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         presenterDisposable.add(playerInteractor.getRandomPlayingObservable()
                 .observeOn(uiScheduler)
                 .subscribe(getViewState()::showRandomPlayingButton));
+    }
+
+    private void subscribeOnSpeedAvailableState() {
+        presenterDisposable.add(playerInteractor.getSpeedChangeAvailableObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showSpeedChangeFeatureVisible));
+    }
+
+    private void subscribeOnSpeedState() {
+        presenterDisposable.add(playerInteractor.getPlaybackSpeedObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::displayPlaybackSpeed));
     }
 }

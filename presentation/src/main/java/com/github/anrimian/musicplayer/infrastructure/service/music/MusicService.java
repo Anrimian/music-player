@@ -224,7 +224,7 @@ public class MusicService extends Service {
         serviceDisposable.add(Observable.combineLatest(playerInteractor().getPlayerStateObservable(),
                 playerInteractor().getCurrentSourceObservable(),
                 playerInteractor().getTrackPositionObservable(),
-                playerInteractor().getPlaybackSpeedObservable(),
+                playerInteractor().getCurrentPlaybackSpeedObservable(),
                 musicServiceInteractor().getRepeatModeObservable(),
                 musicServiceInteractor().getNotificationSettingObservable(),
                 Components.getAppComponent().themeController().getAppThemeObservable(),
@@ -492,6 +492,11 @@ public class MusicService extends Service {
         @Override
         public void onRewind() {
             playerInteractor().fastSeekBackward();
+        }
+
+        @Override
+        public void onSetPlaybackSpeed(float speed) {
+            musicServiceInteractor().setPlaybackSpeed(speed);
         }
 
         //next - not implemented

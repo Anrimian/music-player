@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import io.reactivex.rxjava3.core.Observable;
 
+import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.EXTERNAL;
 import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
 
 public class MusicServiceInteractor {
@@ -54,6 +55,16 @@ public class MusicServiceInteractor {
 
     public void setRandomPlayingEnabled(boolean isEnabled) {
         libraryPlayerInteractor.setRandomPlayingEnabled(isEnabled);
+    }
+
+    public void setPlaybackSpeed(float speed) {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
+            libraryPlayerInteractor.setPlaybackSpeed(speed);
+            return;
+        }
+        if (playerCoordinatorInteractor.isPlayerTypeActive(EXTERNAL)) {
+            externalPlayerInteractor.setPlaybackSpeed(speed);
+        }
     }
 
     public Observable<Integer> getRepeatModeObservable() {

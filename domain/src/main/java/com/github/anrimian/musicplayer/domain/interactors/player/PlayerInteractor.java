@@ -169,7 +169,7 @@ public class PlayerInteractor {
     }
 
     public float getPlaybackSpeed() {
-        return musicPlayerController.getPlaybackSpeed();
+        return musicPlayerController.getCurrentPlaybackSpeed();
     }
 
     public Observable<PlayerEvent> getPlayerEventsObservable() {
@@ -193,8 +193,8 @@ public class PlayerInteractor {
         return musicPlayerController.getSpeedChangeAvailableObservable();
     }
 
-    public Observable<Float> getPlaybackSpeedObservable() {
-        return musicPlayerController.getPlaybackSpeedObservable();
+    public Observable<Float> getCurrentPlaybackSpeedObservable() {
+        return musicPlayerController.getCurrentPlaybackSpeedObservable();
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {

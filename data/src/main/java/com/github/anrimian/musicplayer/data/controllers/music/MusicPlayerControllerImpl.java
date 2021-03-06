@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 /**
  * Created on 10.11.2017.
@@ -34,7 +35,8 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private final UiStateRepository uiStateRepository;
 
     @Nullable
-    CompositionSource currentSource;
+    private CompositionSource currentSource;
+    private final BehaviorSubject<Float> currentSpeedSubject = BehaviorSubject.createDefault(1f);
 
     public MusicPlayerControllerImpl(UiStateRepository uiStateRepository,
                                      Context context,
@@ -130,19 +132,17 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     @Override
     public void setPlaybackSpeed(float speed) {
         mediaPlayer.setPlaySpeed(speed);
-        if (currentSource instanceof LibraryCompositionSource) {
-            uiStateRepository.setCurrentPlaybackSpeed(speed);
-        }
+        currentSpeedSubject.onNext(speed);
     }
 
     @Override
-    public float getPlaybackSpeed() {
-        return uiStateRepository.getCurrentPlaybackSpeed();
+    public float getCurrentPlaybackSpeed() {
+        return currentSpeedSubject.getValue();
     }
 
     @Override
-    public Observable<Float> getPlaybackSpeedObservable() {
-        return uiStateRepository.getPlaybackSpeedObservable();
+    public Observable<Float> getCurrentPlaybackSpeedObservable() {
+        return currentSpeedSubject;
     }
 
     @Override

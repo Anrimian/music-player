@@ -107,11 +107,9 @@ public class PlayerCoordinatorInteractor {
     }
 
     public void setPlaybackSpeed(float speed, PlayerType playerType) {
-        playerInteractor.setPlaybackSpeed(speed);
-    }
-
-    public float getPlaybackSpeed() {
-        return playerInteractor.getPlaybackSpeed();
+        if (activePlayerType == playerType) {
+            playerInteractor.setPlaybackSpeed(speed);
+        }
     }
 
     public Observable<PlayerEvent> getPlayerEventsObservable(PlayerType playerType) {

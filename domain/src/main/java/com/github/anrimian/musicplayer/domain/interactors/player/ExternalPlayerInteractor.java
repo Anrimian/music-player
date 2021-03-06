@@ -111,6 +111,10 @@ public class ExternalPlayerInteractor {
         return settingsRepository.isExternalPlayerKeepInBackground();
     }
 
+    public void setPlaybackSpeed(float speed) {
+
+    }
+
     public Observable<Long> getTrackPositionObservable() {
         return playerCoordinatorInteractor.getTrackPositionObservable(EXTERNAL)
                 .mergeWith(trackPositionSubject);
@@ -139,4 +143,5 @@ public class ExternalPlayerInteractor {
             playErrorSubject.onNext(errorType);
         }
     }
+
 }

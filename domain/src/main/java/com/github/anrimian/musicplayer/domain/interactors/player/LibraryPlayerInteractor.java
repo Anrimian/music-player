@@ -267,10 +267,15 @@ public class LibraryPlayerInteractor {
 
     public void setPlaybackSpeed(float speed) {
         playerCoordinatorInteractor.setPlaybackSpeed(speed, LIBRARY);
+        uiStateRepository.setCurrentPlaybackSpeed(speed);
     }
 
     public float getPlaybackSpeed() {
-        return playerCoordinatorInteractor.getPlaybackSpeed();
+        return uiStateRepository.getCurrentPlaybackSpeed();
+    }
+
+    public Observable<Float> getPlaybackSpeedObservable() {
+        return uiStateRepository.getPlaybackSpeedObservable();
     }
 
     public Observable<Boolean> getSpeedChangeAvailableObservable() {
