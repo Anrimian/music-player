@@ -32,6 +32,8 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
         subscribeOnTrackPositionChanging();
         subscribeOnRepeatMode();
         subscribeOnErrorEvents();
+        subscribeOnSpeedAvailableState();
+        subscribeOnSpeedState();
     }
 
     @Override
@@ -82,6 +84,11 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
         interactor.fastSeekBackward();
     }
 
+    void onPlaybackSpeedSelected(float speed) {
+        getViewState().displayPlaybackSpeed(speed);
+        interactor.setPlaybackSpeed(speed);
+    }
+
     private void subscribeOnErrorEvents() {
         presenterDisposable.add(interactor.getErrorEventsObservable()
                 .observeOn(uiScheduler)
@@ -123,5 +130,17 @@ public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
                 getViewState().showStopState();
             }
         }
+    }
+
+    private void subscribeOnSpeedAvailableState() {
+        presenterDisposable.add(interactor.getSpeedChangeAvailableObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showSpeedChangeFeatureVisible));
+    }
+
+    private void subscribeOnSpeedState() {
+        presenterDisposable.add(interactor.getPlaybackSpeedObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::displayPlaybackSpeed));
     }
 }

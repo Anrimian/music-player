@@ -702,7 +702,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void displayPlaybackSpeed(float speed) {
-        //TODO external player playback speed handling
+        //TODO cleanup onPrepare in media player controller
         //TODO display random mode and repeat mode in media session
         panelBinding.tvPlaybackSpeed.setText(getString(R.string.playback_speed_template, speed));
         panelBinding.tvPlaybackSpeed.setOnClickListener(v ->

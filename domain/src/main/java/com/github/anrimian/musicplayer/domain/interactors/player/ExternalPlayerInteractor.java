@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.EXTERNAL;
@@ -26,6 +27,7 @@ public class ExternalPlayerInteractor {
 
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
     private final PublishSubject<ErrorType> playErrorSubject = PublishSubject.create();
+    private final BehaviorSubject<Float> playbackSpeedSubject = BehaviorSubject.createDefault(1f);
 
     @Nullable
     private CompositionSource currentSource;
@@ -44,12 +46,12 @@ public class ExternalPlayerInteractor {
     public void startPlaying(CompositionSource source) {
         this.currentSource = source;
         onPlayPrepareAgain = false;
+        setPlaybackSpeed(1f);
         playerCoordinatorInteractor.startPlaying(source, EXTERNAL);
     }
 
     public void playOrPause() {
         if (onPlayPrepareAgain && currentSource != null) {
-            onPlayPrepareAgain = false;
             startPlaying(currentSource);
         } else {
             playerCoordinatorInteractor.playOrPause(EXTERNAL);
@@ -112,12 +114,21 @@ public class ExternalPlayerInteractor {
     }
 
     public void setPlaybackSpeed(float speed) {
+        playerCoordinatorInteractor.setPlaybackSpeed(speed, EXTERNAL);
+        playbackSpeedSubject.onNext(speed);
+    }
 
+    public Observable<Float> getPlaybackSpeedObservable() {
+        return playbackSpeedSubject;
     }
 
     public Observable<Long> getTrackPositionObservable() {
         return playerCoordinatorInteractor.getTrackPositionObservable(EXTERNAL)
                 .mergeWith(trackPositionSubject);
+    }
+
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return playerCoordinatorInteractor.getSpeedChangeAvailableObservable();
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
@@ -143,5 +154,6 @@ public class ExternalPlayerInteractor {
             playErrorSubject.onNext(errorType);
         }
     }
+
 
 }

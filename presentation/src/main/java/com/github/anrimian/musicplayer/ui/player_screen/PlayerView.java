@@ -105,7 +105,7 @@ public interface PlayerView extends MvpView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showDeletedItemMessage();
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void displayPlaybackSpeed(float speed);
 
     @AddToEndSingle

@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
@@ -17,6 +18,7 @@ import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
+import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
@@ -31,6 +33,7 @@ import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
+import static android.view.View.VISIBLE;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
@@ -66,6 +69,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
 
         CompatUtils.setMainButtonStyle(viewBinding.ivPlayPause);
         CompatUtils.setMainButtonStyle(viewBinding.ivRepeatMode);
+        CompatUtils.setOutlineTextButtonStyle(viewBinding.tvPlaybackSpeed);
 
         seekBarViewWrapper = new SeekBarViewWrapper(viewBinding.sbTrackState);
         seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);
@@ -76,7 +80,9 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         viewBinding.ivRepeatMode.setOnClickListener(v -> presenter.onRepeatModeButtonClicked());
         onCheckChanged(viewBinding.cbKeepPlayingAfterClose, presenter::onKeepPlayerInBackgroundChecked);
 
+        viewBinding.ivSkipToNext.setOnClickListener(v -> presenter.onFastSeekForwardCalled());
         setOnHoldListener(viewBinding.ivSkipToNext, presenter::onFastSeekForwardCalled);
+        viewBinding.ivSkipToPrevious.setOnClickListener(v -> presenter.onFastSeekBackwardCalled());
         setOnHoldListener(viewBinding.ivSkipToPrevious, presenter::onFastSeekBackwardCalled);
 
         if (savedInstanceState == null) {
@@ -148,6 +154,21 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     @Override
     public void showKeepPlayerInBackground(boolean externalPlayerKeepInBackground) {
         setChecked(viewBinding.cbKeepPlayingAfterClose, externalPlayerKeepInBackground);
+    }
+
+    @Override
+    public void displayPlaybackSpeed(float speed) {
+        viewBinding.tvPlaybackSpeed.setText(getString(R.string.playback_speed_template, speed));
+        viewBinding.tvPlaybackSpeed.setOnClickListener(v ->
+                DialogUtils.showSpeedSelectorDialog(this,
+                        speed,
+                        presenter::onPlaybackSpeedSelected)
+        );
+    }
+
+    @Override
+    public void showSpeedChangeFeatureVisible(boolean visible) {
+        viewBinding.tvPlaybackSpeed.setVisibility(visible? VISIBLE: View.GONE);
     }
 
     @Nullable
