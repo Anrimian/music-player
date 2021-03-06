@@ -106,7 +106,7 @@ public class PlayerCoordinatorInteractor {
         return isPlayerTypeActive(playerType)? playerInteractor.getTrackPosition(): Single.just(-1L);
     }
 
-    public void setPlaybackSpeed(float speed) {
+    public void setPlaybackSpeed(float speed, PlayerType playerType) {
         playerInteractor.setPlaybackSpeed(speed);
     }
 

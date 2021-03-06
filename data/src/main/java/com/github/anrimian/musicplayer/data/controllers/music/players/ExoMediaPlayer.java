@@ -165,13 +165,10 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void setPlaySpeed(float speed) {
-        PlaybackParameters param = new PlaybackParameters(speed);
-        getPlayer().setPlaybackParameters(param);
-    }
-
-    @Override
-    public float getPlaySpeed() {
-        return getPlayer().getPlaybackParameters().speed;
+        usePlayer(player -> {
+            PlaybackParameters param = new PlaybackParameters(speed);
+            player.setPlaybackParameters(param);
+        });
     }
 
     @Override

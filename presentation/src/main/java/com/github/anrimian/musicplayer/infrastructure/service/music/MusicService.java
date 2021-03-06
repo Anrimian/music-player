@@ -97,6 +97,7 @@ public class MusicService extends Service {
     @Nullable
     private CompositionSource currentSource;
     private long trackPosition;
+    private float playbackSpeed = 1f;
     private int repeatMode = RepeatMode.NONE;
     private MusicNotificationSetting notificationSetting;
     private AppTheme currentAppTheme;
@@ -223,6 +224,7 @@ public class MusicService extends Service {
         serviceDisposable.add(Observable.combineLatest(playerInteractor().getPlayerStateObservable(),
                 playerInteractor().getCurrentSourceObservable(),
                 playerInteractor().getTrackPositionObservable(),
+                playerInteractor().getPlaybackSpeedObservable(),
                 musicServiceInteractor().getRepeatModeObservable(),
                 musicServiceInteractor().getNotificationSettingObservable(),
                 Components.getAppComponent().themeController().getAppThemeObservable(),
@@ -284,6 +286,10 @@ public class MusicService extends Service {
             updateMediaSessionState = true;
             updateNotification = true;
         }
+        if (this.playbackSpeed != serviceState.playbackSpeed) {
+            this.playbackSpeed = serviceState.playbackSpeed;
+            updateMediaSessionState = true;
+        }
 
         MusicNotificationSetting newSettings = serviceState.settings;
         if (!newSettings.equals(this.notificationSetting)) {
@@ -333,8 +339,11 @@ public class MusicService extends Service {
     }
 
     private void updateMediaSessionState() {
-        stateBuilder.setState(toMediaState(playerState), trackPosition, 1);
+        stateBuilder.setState(toMediaState(playerState), trackPosition, playbackSpeed);
         mediaSession().setPlaybackState(stateBuilder.build());
+        //set values
+//        mediaSession().setRepeatMode();
+//        mediaSession().setShuffleMode();
     }
 
     private void onPlayerStateChanged(PlayerState playerState) {
@@ -360,6 +369,7 @@ public class MusicService extends Service {
         PlayerState playerState;
         Optional<CompositionSource> compositionSource;
         long trackPosition;
+        float playbackSpeed;
         int repeatMode;
         MusicNotificationSetting settings;
         AppTheme appTheme;
@@ -367,12 +377,14 @@ public class MusicService extends Service {
         private ServiceState set(PlayerState playerState,
                                  Optional<CompositionSource> compositionSource,
                                  long trackPosition,
+                                 float playbackSpeed,
                                  int repeatMode,
                                  MusicNotificationSetting settings,
                                  AppTheme appTheme) {
             this.playerState = playerState;
             this.compositionSource = compositionSource;
             this.trackPosition = trackPosition;
+            this.playbackSpeed = playbackSpeed;
             this.repeatMode = repeatMode;
             this.settings = settings;
             this.appTheme = appTheme;

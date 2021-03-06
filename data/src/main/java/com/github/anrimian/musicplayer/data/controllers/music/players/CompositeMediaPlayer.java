@@ -104,11 +104,6 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public float getPlaySpeed() {
-        return currentPlaySpeed;
-    }
-
-    @Override
     public void release() {
         currentPlayer.release();
     }

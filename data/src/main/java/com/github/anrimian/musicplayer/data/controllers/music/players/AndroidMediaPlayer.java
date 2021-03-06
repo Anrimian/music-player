@@ -213,16 +213,6 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public float getPlaySpeed() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
-                return mediaPlayer.getPlaybackParams().getSpeed();
-            } catch (IllegalStateException ignored) {}
-        }
-        return 1f;
-    }
-
-    @Override
     public void release() {
         equalizerController.detachEqualizer(context);
         stopTracingTrackPosition();

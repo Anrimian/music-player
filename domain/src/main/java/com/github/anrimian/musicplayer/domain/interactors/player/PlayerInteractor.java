@@ -193,6 +193,10 @@ public class PlayerInteractor {
         return musicPlayerController.getSpeedChangeAvailableObservable();
     }
 
+    public Observable<Float> getPlaybackSpeedObservable() {
+        return musicPlayerController.getPlaybackSpeedObservable();
+    }
+
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
         if (playerEvent instanceof PreparedEvent) {
             onCompositionPrepared();

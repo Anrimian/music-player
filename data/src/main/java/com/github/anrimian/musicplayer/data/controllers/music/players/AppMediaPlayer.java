@@ -35,8 +35,6 @@ public interface AppMediaPlayer {
 
     void setPlaySpeed(float speed);
 
-    float getPlaySpeed();
-
     void release();
 
     Observable<Boolean> getSpeedChangeAvailableObservable();

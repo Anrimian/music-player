@@ -266,7 +266,7 @@ public class LibraryPlayerInteractor {
     }
 
     public void setPlaybackSpeed(float speed) {
-        playerCoordinatorInteractor.setPlaybackSpeed(speed);
+        playerCoordinatorInteractor.setPlaybackSpeed(speed, LIBRARY);
     }
 
     public float getPlaybackSpeed() {

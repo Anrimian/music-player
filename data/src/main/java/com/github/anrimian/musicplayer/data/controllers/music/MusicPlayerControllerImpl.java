@@ -141,6 +141,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
+    public Observable<Float> getPlaybackSpeedObservable() {
+        return uiStateRepository.getPlaybackSpeedObservable();
+    }
+
+    @Override
     public Observable<Boolean> getSpeedChangeAvailableObservable() {
         return mediaPlayer.getSpeedChangeAvailableObservable();
     }
