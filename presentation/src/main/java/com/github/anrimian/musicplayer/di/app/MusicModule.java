@@ -71,8 +71,9 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    PlayerCoordinatorInteractor playerCoordinatorInteractor(PlayerInteractor playerInteractor) {
-        return new PlayerCoordinatorInteractor(playerInteractor);
+    PlayerCoordinatorInteractor playerCoordinatorInteractor(PlayerInteractor playerInteractor,
+                                                            UiStateRepository uiStateRepository) {
+        return new PlayerCoordinatorInteractor(playerInteractor, uiStateRepository);
     }
 
     @Provides

@@ -64,13 +64,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
         long trackPosition = getStartTrackPosition(source);
         currentSource = source;
         mediaPlayer.prepareToPlay(source, trackPosition, null);
-
-        //strange
-        if (source instanceof LibraryCompositionSource) {
-            mediaPlayer.setPlaySpeed(uiStateRepository.getCurrentPlaybackSpeed());
-        } else {
-            mediaPlayer.setPlaySpeed(1f);
-        }
     }
 
     @Override
