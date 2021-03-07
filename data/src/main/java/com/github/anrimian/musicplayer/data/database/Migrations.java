@@ -134,6 +134,9 @@ class Migrations {
                 LongSparseArray<StorageFullComposition> storageCompositions;
                 if (hasFilePermission(context)) {
                     storageCompositions = provider.getCompositions();
+                    if (storageCompositions == null) {
+                        storageCompositions = new LongSparseArray<>();
+                    }
                 } else {
                     storageCompositions = new LongSparseArray<>();
                 }
@@ -278,6 +281,9 @@ class Migrations {
 
                 EnumConverter enumConverter = new EnumConverter();
                 LongSparseArray<StorageFullComposition> map = provider.getCompositions();
+                if (map == null) {
+                    map = new LongSparseArray<>();
+                }
                 for(int i = 0, size = map.size(); i < size; i++) {
                     StorageFullComposition composition = map.valueAt(i);
                     ContentValues cv = new ContentValues();
@@ -288,7 +294,7 @@ class Migrations {
                     if (storageAlbum != null) {
                         cv.put("album", storageAlbum.getAlbum());
                     }
-                    cv.put("filePath", composition.getFilePath());
+                    cv.put("filePath", composition.getRelativePath());
                     cv.put("duration", composition.getDuration());
                     cv.put("size", composition.getSize());
                     cv.put("dateAdded", composition.getDateAdded().getTime());

@@ -96,6 +96,12 @@ public interface SettingsRepository {
 
     Observable<Integer> getSelectedEqualizerTypeObservable();
 
+    Observable<Boolean> getAppConfirmDeleteDialogEnabledObservable();
+
+    void setAppConfirmDeleteDialogEnabled(boolean enabled);
+
+    boolean isAppConfirmDeleteDialogEnabled();
+
     long getRewindValueMillis();
 
     void setSleepTimerTime(long millis);

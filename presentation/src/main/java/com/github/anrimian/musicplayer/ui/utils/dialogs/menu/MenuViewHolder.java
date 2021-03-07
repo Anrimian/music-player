@@ -1,7 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils.dialogs.menu;
 
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,8 +36,10 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
         this.menuItem = menuItem;
         tvTitle.setText(menuItem.getTitle());
 
+        Drawable icon = menuItem.getIcon();
+        ivIcon.setVisibility(icon == null? View.GONE: View.VISIBLE);
         ivIcon.setColorFilter(tvTitle.getCurrentTextColor());
-        ivIcon.setImageDrawable(menuItem.getIcon());
+        ivIcon.setImageDrawable(icon);
         ivIcon.setContentDescription(menuItem.getTitle());
     }
 

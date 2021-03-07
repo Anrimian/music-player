@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.MenuRes;
@@ -104,7 +105,6 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         attachDynamicShadow(viewBinding.recyclerView, viewBinding.titleShadow);
 
         Bundle args = requireArguments();
-        //noinspection ConstantConditions
         composition = CompositionSerializer.deserialize(args.getBundle(COMPOSITION_ARG));
 
         Menu menu = createMenu(requireContext(), args.getInt(MENU_ARG));
@@ -126,7 +126,7 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         );
 
         slideDelegate = buildSlideDelegate();
-        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
+        BottomSheetBehavior<FrameLayout> bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
         bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 dismissAllowingStateLoss();
@@ -179,7 +179,6 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
             onCompleteListener.call(composition, menuItem.getItemId());
         }
         if (onTripleCompleteListener != null) {
-            //noinspection ConstantConditions
             onTripleCompleteListener.call(composition,
                     menuItem.getItemId(),
                     getArguments().getBundle(EXTRA_DATA_ARG));

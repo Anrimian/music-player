@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -78,8 +77,8 @@ dependencies {
     implementation kotlinStdLib
 
     implementation deps.appCompat
+    implementation deps.appCompatResources
     implementation deps.material
-    implementation deps.cardView
     implementation deps.recyclerView
     implementation deps.recyclerViewFastScroll
     implementation deps.constraintLayout
@@ -114,8 +113,8 @@ dependencies {
     testImplementation deps.junit
     testImplementation deps.mockito
 
-    androidTestImplementation deps.dexmaker
-    androidTestImplementation deps.dexmakerMockito
+//    androidTestImplementation deps.dexmaker
+//    androidTestImplementation deps.dexmakerMockito
     androidTestImplementation deps.mockito
     androidTestImplementation deps.espresso
 }

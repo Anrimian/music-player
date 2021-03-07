@@ -29,7 +29,14 @@
     </style>
 
     <style name="ButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
-        <item name="android:background">@drawable/bg_click_inverse</item>
+        <item name="android:background">@drawable/bg_button_outline</item>
+        <item name="android:textColor">@color/color_accent_state</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="ButtonBorderlessStyleInverse" parent="ButtonBorderlessStyle">
+        <item name="android:background">@drawable/bg_button_outline_inverse</item>
     </style>
 
     <style name="ButtonBrightStyle" parent="@style/Widget.AppCompat.Button.Colored">
@@ -93,6 +100,14 @@
 
     <style name="TextStyle.Small">
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextStyleSpeedButton" parent="TextStyle">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/bg_outline_text_button</item>
+        <item name="android:textColor">@color/color_text_secondary</item>
+        <item name="android:padding">4dp</item>
     </style>
 
     <style name="TextStyleContentSubtitle.Small">

@@ -4,11 +4,13 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.github.anrimian.musicplayer.data.repositories.logger.LoggerRepositoryImpl;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
@@ -20,7 +22,8 @@ import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerPresenter;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
-import com.github.anrimian.musicplayer.utils.filelog.FileLog;
+import com.github.anrimian.musicplayer.utils.logger.AppLogger;
+import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -86,6 +89,20 @@ public class AppModule {
     @Singleton
     FileLog fileLog(Context context) {
         return new FileLog(context);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    LoggerRepository loggerRepository(Context context) {
+        return new LoggerRepositoryImpl(context);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    AppLogger appLogger(FileLog fileLog, LoggerRepository loggerRepository) {
+        return new AppLogger(fileLog, loggerRepository);
     }
 
     @Provides

@@ -3,9 +3,8 @@ package com.github.anrimian.musicplayer.infrastructure.service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 
+import com.github.anrimian.musicplayer.Constants;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 
@@ -13,7 +12,21 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     private final Context context;
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    public static void startPlayForegroundService(Context context) {
+        startPlayForegroundService(context, 0);
+    }
+
+    public static void startPlayForegroundService(Context context, int playDelay) {
+        Intent intent = new Intent(context, MusicService.class);
+        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
+        intent.putExtra(MusicService.REQUEST_CODE, Constants.Actions.PLAY);
+        intent.putExtra(MusicService.PLAY_DELAY_MILLIS, playDelay);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
+    }
 
     public SystemServiceControllerImpl(Context context) {
         this.context = context;
@@ -21,14 +34,13 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     @Override
     public void startMusicService() {
-        handler.post(() -> {
-            Intent intent = new Intent(context, MusicService.class);
-            intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent);
-            } else {
-                context.startService(intent);
-            }
-        });
+        Intent intent = new Intent(context, MusicService.class);
+        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
+        context.startService(intent);
+    }
+
+    @Override
+    public void startMusicServiceBg() {
+        startPlayForegroundService(context);
     }
 }

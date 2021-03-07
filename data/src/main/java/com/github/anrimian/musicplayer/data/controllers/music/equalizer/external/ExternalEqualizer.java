@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.controllers.music.equalizer;
+package com.github.anrimian.musicplayer.data.controllers.music.equalizer.external;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -7,9 +7,18 @@ import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.widget.Toast;
 
-public class ExternalEqualizer {
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.AppEqualizer;
 
-    public static void attachExternalEqualizer(Context context, int audioSessionId) {
+public class ExternalEqualizer implements AppEqualizer {
+
+    private final Context context;
+
+    public ExternalEqualizer(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public void attachEqualizer(int audioSessionId) {
         Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
         intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.getPackageName());
         intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId);
@@ -17,7 +26,8 @@ public class ExternalEqualizer {
         context.sendBroadcast(intent);
     }
 
-    public static void detachExternalEqualizer(Context context, int audioSessionId) {
+    @Override
+    public void detachEqualizer(int audioSessionId) {
         Intent intent = new Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION);
         intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.getPackageName());
         intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId);
@@ -25,12 +35,7 @@ public class ExternalEqualizer {
         context.sendBroadcast(intent);
     }
 
-    public static boolean isExternalEqualizerExists(Context context) {
-        Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-        return intent.resolveActivity(context.getPackageManager()) != null;
-    }
-
-    public static void launchExternalEqualizerSetup(Activity activity, int audioSessionId) {
+    public void launchExternalEqualizerSetup(Activity activity, int audioSessionId) {
         if (audioSessionId == AudioEffect.ERROR_BAD_VALUE) {
             Toast.makeText(activity, "No Session Id", Toast.LENGTH_LONG).show();
         } else {
@@ -44,4 +49,8 @@ public class ExternalEqualizer {
         }
     }
 
+    public static boolean isExternalEqualizerExists(Context context) {
+        Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+        return intent.resolveActivity(context.getPackageManager()) != null;
+    }
 }

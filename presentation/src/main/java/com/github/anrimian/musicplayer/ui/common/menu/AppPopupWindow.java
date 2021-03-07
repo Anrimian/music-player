@@ -68,6 +68,10 @@ public class AppPopupWindow {
                 showY += anchorHeight;
                 break;
             }
+            case Gravity.END: {
+                showX += anchorWidth + viewWidth + screenMargin;
+                break;
+            }
         }
 
         popupWindow.showAtLocation(anchorView, Gravity.START | Gravity.TOP, showX, showY);

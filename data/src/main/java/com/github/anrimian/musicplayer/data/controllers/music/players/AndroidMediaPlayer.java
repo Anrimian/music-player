@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
@@ -18,6 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -60,6 +62,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private boolean playWhenReady = false;
     private boolean isPlaying = false;
 
+    @Nullable
+    private ErrorType previousErrorType;
+
     //problem with error case(file not found), multiple error events
     public AndroidMediaPlayer(Context context,
                               Scheduler scheduler,
@@ -83,6 +88,10 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             sendErrorEvent(what, extra);
             return false;
         });
+
+        try {
+            equalizerController.attachEqualizer(mediaPlayer.getAudioSessionId());
+        } catch (IllegalStateException ignored) {}
     }
 
     @Override
@@ -91,8 +100,11 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition,
+                              long startPosition,
+                              @Nullable ErrorType previousErrorType) {
         this.currentComposition = composition;
+        this.previousErrorType = previousErrorType;
         RxUtils.dispose(preparationDisposable);
         preparationDisposable = Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)
@@ -163,48 +175,64 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public long getTrackPosition() {
-        if (currentComposition == null) {
-            return 0;
-        }
-        try {
-            return mediaPlayer.getCurrentPosition();
-        } catch (IllegalStateException e) {
-            return 0;
-        }
+    public Single<Long> getTrackPosition() {
+        return Single.fromCallable(() -> {
+            if (currentComposition == null) {
+                return 0L;
+            }
+            try {
+                return (long) mediaPlayer.getCurrentPosition();
+            } catch (IllegalStateException e) {
+                return 0L;
+            }
+        });
     }
 
     @Override
-    public long seekBy(long millis) {
-        long currentPosition = getTrackPosition();
-        try {
-            long targetPosition = currentPosition + millis;
-            if (targetPosition < 0) {
-                targetPosition = 0;
-            }
-            if (targetPosition > mediaPlayer.getDuration()) {
-                return currentPosition;
-            }
-            seekTo(targetPosition);
-            return targetPosition;
+    public Single<Long> seekBy(long millis) {
+        return getTrackPosition()
+                .map(currentPosition -> {
+                    try {
+                        long targetPosition = currentPosition + millis;
+                        if (targetPosition < 0) {
+                            targetPosition = 0;
+                        }
+                        if (targetPosition > mediaPlayer.getDuration()) {
+                            return currentPosition;
+                        }
+                        seekTo(targetPosition);
+                        return targetPosition;
 
-        } catch (IllegalStateException ignored) {
-            return currentPosition;
+                    } catch (IllegalStateException ignored) {
+                        return currentPosition;
+                    }
+                });
+    }
+
+    @Override
+    public void setPlaySpeed(float speed) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
         }
     }
 
     @Override
     public void release() {
-        equalizerController.detachEqualizer(context);
+        equalizerController.detachEqualizer();
         stopTracingTrackPosition();
         mediaPlayer.release();
+    }
+
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return Observable.fromCallable(() -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
     }
 
     private void startTracingTrackPosition() {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(scheduler)
-                .map(o -> getTrackPosition())
+                .flatMapSingle(o -> getTrackPosition())
                 .subscribe(trackPositionSubject::onNext);
     }
 
@@ -250,10 +278,14 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     private void sendErrorEvent(Throwable throwable) {
         if (currentComposition != null) {
-            playerEventSubject.onNext(new ErrorEvent(
-                    playerErrorParser.getErrorType(throwable),
-                    currentComposition)
-            );
+            ErrorType errorType;
+            if (throwable instanceof IOException && previousErrorType == ErrorType.UNSUPPORTED) {
+                errorType = ErrorType.UNSUPPORTED;
+                previousErrorType = null;
+            } else {
+                errorType = playerErrorParser.getErrorType(throwable);
+            }
+            playerEventSubject.onNext(new ErrorEvent(errorType, currentComposition));
         }
     }
 
@@ -297,15 +329,10 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     private void pausePlayer() {
-        equalizerController.detachEqualizer(context);
         pause(mediaPlayer);
     }
 
     private void start() {
-        try {
-            equalizerController.attachEqualizer(context, mediaPlayer.getAudioSessionId());
-        } catch (IllegalStateException ignored) {}
-
         start(mediaPlayer);
         startTracingTrackPosition();
         isPlaying = true;

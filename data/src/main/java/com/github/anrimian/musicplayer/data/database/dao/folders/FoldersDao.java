@@ -114,6 +114,14 @@ public interface FoldersDao {
             "WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)")
     List<String> getChildFoldersNames(Long parentId);
 
+    @Query("SELECT exists(" +
+            "SELECT 1 " +
+            "FROM folders " +
+            "WHERE (parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)) " +
+            "AND name = :name " +
+            "LIMIT 1)")
+    boolean isFolderWithNameExists(Long parentId, String name);
+
     static String getRecursiveFolderQuery(Long parentFolderId) {
         return "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
                 "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)" +

@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.data.controllers.music.MusicPlayerControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.SystemMusicControllerImpl;
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.external.ExternalEqualizer;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.InternalEqualizer;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
@@ -15,6 +17,8 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
+import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository;
 import com.github.anrimian.musicplayer.data.repositories.library.LibraryRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
@@ -24,17 +28,21 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerCoordinatorInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.EqualizerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -71,8 +79,9 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    PlayerCoordinatorInteractor playerCoordinatorInteractor(PlayerInteractor playerInteractor) {
-        return new PlayerCoordinatorInteractor(playerInteractor);
+    PlayerCoordinatorInteractor playerCoordinatorInteractor(PlayerInteractor playerInteractor,
+                                                            UiStateRepository uiStateRepository) {
+        return new PlayerCoordinatorInteractor(playerInteractor, uiStateRepository);
     }
 
     @Provides
@@ -193,8 +202,50 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    EqualizerController equalizerController(SettingsRepository settingsRepository) {
-        return new EqualizerController(settingsRepository);
+    EqualizerController equalizerController(SettingsRepository settingsRepository,
+                                            ExternalEqualizer externalEqualizer,
+                                            InternalEqualizer internalEqualizer) {
+        return new EqualizerController(settingsRepository, externalEqualizer, internalEqualizer);
     }
 
+    @Provides
+    @NonNull
+    @Singleton
+    ExternalEqualizer externalEqualizer(Context context) {
+        return new ExternalEqualizer(context);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    InternalEqualizer internalEqualizer(EqualizerStateRepository equalizerStateRepository) {
+        return new InternalEqualizer(equalizerStateRepository);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    EqualizerStateRepository equalizerStateRepository(Context context) {
+        return new EqualizerStateRepository(context);
+    }
+
+    @Provides
+    @Nonnull
+    EqualizerPresenter equalizerPresenter(EqualizerInteractor equalizerInteractor,
+                                          @Named(UI_SCHEDULER) Scheduler scheduler,
+                                          ErrorParser errorParser) {
+        return new EqualizerPresenter(equalizerInteractor, scheduler, errorParser);
+    }
+
+    @Provides
+    @Nonnull
+    EqualizerInteractor equalizerInteractor(EqualizerRepository equalizerRepository) {
+        return new EqualizerInteractor(equalizerRepository);
+    }
+
+    @Provides
+    @Nonnull
+    EqualizerRepository equalizerRepository(InternalEqualizer internalEqualizer) {
+        return new EqualizerRepositoryImpl(internalEqualizer);
+    }
 }

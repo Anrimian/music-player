@@ -26,7 +26,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.ArtistSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
-import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.list.adapter.ArtistsAdapter;
@@ -40,7 +40,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -60,12 +59,13 @@ public class ArtistsListFragment extends LibraryFragment implements
     @InjectPresenter
     ArtistsListPresenter presenter;
 
+    private FragmentLibraryArtistsBinding binding;
+
     private RecyclerView recyclerView;
     private CoordinatorLayout clListContainer;
 
     private AdvancedToolbar toolbar;
     private ArtistsAdapter adapter;
-    private ProgressViewWrapper progressViewWrapper;
     private LinearLayoutManager layoutManager;
 
     private DialogFragmentRunner<MenuDialogFragment> artistMenuDialogRunner;
@@ -83,7 +83,7 @@ public class ArtistsListFragment extends LibraryFragment implements
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        FragmentLibraryArtistsBinding binding = FragmentLibraryArtistsBinding.inflate(inflater, container, false);
+        binding = FragmentLibraryArtistsBinding.inflate(inflater, container, false);
         recyclerView = binding.recyclerView;
         clListContainer = binding.listContainer;
         return binding.getRoot();
@@ -95,9 +95,7 @@ public class ArtistsListFragment extends LibraryFragment implements
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
 
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
-        progressViewWrapper.hideAll();
+        binding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
 
         adapter = new ArtistsAdapter(recyclerView,
                 this::goToArtistScreen,
@@ -153,27 +151,27 @@ public class ArtistsListFragment extends LibraryFragment implements
 
     @Override
     public void showEmptyList() {
-        progressViewWrapper.showMessage(R.string.no_artists_in_library);
+        binding.progressStateView.showMessage(R.string.no_artists_in_library);
     }
 
     @Override
     public void showEmptySearchResult() {
-        progressViewWrapper.showMessage(R.string.compositions_for_search_not_found);
+        binding.progressStateView.showMessage(R.string.compositions_for_search_not_found);
     }
 
     @Override
     public void showList() {
-        progressViewWrapper.hideAll();
+        binding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        binding.progressStateView.showProgress();
     }
 
     @Override
     public void showLoadingError(ErrorCommand errorCommand) {
-        progressViewWrapper.showMessage(errorCommand.getMessage(), true);
+        binding.progressStateView.showMessage(errorCommand.getMessage(), true);
     }
 
     @Override
@@ -265,7 +263,7 @@ public class ArtistsListFragment extends LibraryFragment implements
                 break;
             }
             case R.id.menu_equalizer: {
-                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
+                new EqualizerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_rescan_storage: {

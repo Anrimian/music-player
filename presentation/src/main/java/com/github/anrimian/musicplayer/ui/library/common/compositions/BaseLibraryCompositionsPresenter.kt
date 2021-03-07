@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -42,6 +43,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     private var currentComposition: Composition? = null
 
     private var searchText: String? = null
+
+    private var lastDeleteAction: Completable? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -200,9 +203,15 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         }
     }
 
-    fun getSelectedCompositions(): HashSet<Composition> {
-        return selectedCompositions
+    fun onRetryFailedDeleteActionClicked() {
+        if (lastDeleteAction != null) {
+            lastDeleteAction!!
+                    .doFinally { lastDeleteAction = null }
+                    .justSubscribe(this::onDeleteCompositionError)
+        }
     }
+
+    fun getSelectedCompositions(): HashSet<Composition> = selectedCompositions
 
     fun getSearchText() = searchText
 
@@ -262,8 +271,11 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     private fun deletePreparedCompositions() {
-        playerInteractor.deleteCompositions(compositionsToDelete)
-                .subscribeOnUi(this::onDeleteCompositionsSuccess, this::onDeleteCompositionError)
+        lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
+                .observeOn(uiScheduler)
+                .doOnComplete(this::onDeleteCompositionsSuccess)
+
+        lastDeleteAction!!.justSubscribe(this::onDeleteCompositionError)
     }
 
     private fun onDeleteCompositionsSuccess() {

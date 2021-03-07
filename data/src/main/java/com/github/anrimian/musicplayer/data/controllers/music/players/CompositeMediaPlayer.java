@@ -6,8 +6,12 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public class CompositeMediaPlayer implements AppMediaPlayer {
@@ -17,6 +21,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
 
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
     private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
+    private final BehaviorSubject<Boolean> speedChangeAvailableSubject = BehaviorSubject.create();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 
     private AppMediaPlayer currentPlayer;
@@ -24,6 +29,8 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
 
     private CompositionSource currentComposition;
     private long currentTrackPosition;
+
+    private float currentPlaySpeed = 1f;
 
     @SafeVarargs
     public CompositeMediaPlayer(Function<AppMediaPlayer>... mediaPlayers) {
@@ -38,14 +45,16 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition,
+                              long startPosition,
+                              @Nullable ErrorType previousErrorType) {
         currentComposition = composition;
         currentTrackPosition = startPosition;
 
         if (currentPlayerIndex != startPlayerIndex) {
             setPlayer(startPlayerIndex);
         }
-        currentPlayer.prepareToPlay(composition, startPosition);
+        currentPlayer.prepareToPlay(composition, startPosition, previousErrorType);
     }
 
     @Override
@@ -79,18 +88,29 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public long getTrackPosition() {
+    public Single<Long> getTrackPosition() {
         return currentPlayer.getTrackPosition();
     }
 
     @Override
-    public long seekBy(long millis) {
+    public Single<Long> seekBy(long millis) {
         return currentPlayer.seekBy(millis);
+    }
+
+    @Override
+    public void setPlaySpeed(float speed) {
+        this.currentPlaySpeed = speed;
+        currentPlayer.setPlaySpeed(speed);
     }
 
     @Override
     public void release() {
         currentPlayer.release();
+    }
+
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return speedChangeAvailableSubject;
     }
 
     private void setPlayer(int index) {
@@ -99,6 +119,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
             currentPlayer.release();
         }
         currentPlayer = mediaPlayers[index].call();
+        currentPlayer.setPlaySpeed(currentPlaySpeed);
 
         playerDisposable.clear();
         playerDisposable.add(currentPlayer.getEventsObservable()
@@ -108,6 +129,8 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         playerDisposable.add(currentPlayer.getTrackPositionObservable()
                 .subscribe(this::onTrackPositionReceived)
         );
+        playerDisposable.add(currentPlayer.getSpeedChangeAvailableObservable()
+                .subscribe(speedChangeAvailableSubject::onNext));
     }
 
     private void onTrackPositionReceived(long position) {
@@ -125,7 +148,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
                     //don't switch player when we reached end of available players
                     if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.length) {
                         setPlayer(newPlayerIndex);
-                        currentPlayer.prepareToPlay(currentComposition, currentTrackPosition);
+                        currentPlayer.prepareToPlay(currentComposition, currentTrackPosition, errorType);
                         return;
                     }
                 }

@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
@@ -19,18 +20,22 @@ import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerIn
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerPresenter;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerPresenter;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
-import com.github.anrimian.musicplayer.utils.filelog.FileLog;
+import com.github.anrimian.musicplayer.utils.logger.AppLogger;
+import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
 import javax.inject.Singleton;
 
@@ -64,15 +69,18 @@ public interface AppComponent {
     DisplaySettingsInteractor displaySettingsInteractor();
     PlayerInteractor playerInteractor();
     MusicServiceInteractor musicServiceInteractor();
+    LibrarySettingsInteractor librarySettingsInteractor();
 
     PlayListsPresenter playListsPresenter();
     CreatePlayListPresenter createPlayListsPresenter();
     ChoosePlayListPresenter choosePlayListPresenter();
+    EqualizerPresenter equalizerPresenter();
     SleepTimerPresenter sleepTimerPresenter();
 
     UiStateRepository uiStateRepository();
     MediaScannerRepository mediaScannerRepository();
     CompositionSourceProvider sourceRepository();
+    LoggerRepository loggerRepository();
     StorageAlbumsProvider storageAlbumsProvider();
 
     CoverImageLoader imageLoader();
@@ -80,8 +88,9 @@ public interface AppComponent {
     NotificationsDisplayer notificationDisplayer();
     ErrorParser errorParser();
     FileLog fileLog();
+    AppLogger appLogger();
+    StorageFilesDataSource storageFilesDataSource();
 
     ThemeController themeController();
     EqualizerController equalizerController();
-
 }

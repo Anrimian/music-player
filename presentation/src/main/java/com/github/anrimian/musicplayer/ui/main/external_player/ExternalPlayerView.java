@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import moxy.MvpView;
 import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
 
 public interface ExternalPlayerView extends MvpView {
 
@@ -34,4 +35,10 @@ public interface ExternalPlayerView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showKeepPlayerInBackground(boolean externalPlayerKeepInBackground);
+
+    @AddToEndSingle
+    void displayPlaybackSpeed(float speed);
+
+    @AddToEndSingle
+    void showSpeedChangeFeatureVisible(boolean visible);
 }

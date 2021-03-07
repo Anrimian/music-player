@@ -174,6 +174,7 @@ public class PlayListsDaoWrapper {
                 entities.add(entryEntity);
             }
             playListDao.insertPlayListEntries(entities);
+            playListDao.updatePlayListModifyTime(playListId, new Date());
         });
     }
 

@@ -17,5 +17,14 @@
             android:layout_height="wrap_content"
             android:text="@string/excluded_folders"/>
 
+        <CheckBox
+            style="@style/CheckboxStyle"
+            android:id="@+id/cb_do_not_show_delete_dialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/do_not_show_confirm_delete_dialog"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin" />
+
     </LinearLayout>
 </FrameLayout>

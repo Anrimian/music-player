@@ -93,6 +93,16 @@ public class ListUtils {
         return index >= 0 && index < list.size();
     }
 
+    public static <T> int findPosition(List<T> list, MapperFunction<T, Boolean> predicate) {
+        for (int i = 0; i < list.size(); i++) {
+            T item = list.get(i);
+            if (predicate.map(item)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public interface MapperFunction<T, E> {
 
         E map(T t);

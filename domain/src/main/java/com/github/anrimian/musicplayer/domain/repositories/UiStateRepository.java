@@ -79,6 +79,12 @@ public interface UiStateRepository {
 
     ListPosition getSavedPlaylistListPosition(@Nullable Long id);
 
+    float getCurrentPlaybackSpeed();
+
+    void setCurrentPlaybackSpeed(float speed);
+
+    Observable<Float> getPlaybackSpeedObservable();
+
     long getSleepTimerRemainingMillis();
 
     void setSleepTimerRemainingMillis(long startTime);

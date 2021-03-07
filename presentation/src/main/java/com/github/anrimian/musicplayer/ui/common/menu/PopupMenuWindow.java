@@ -45,8 +45,15 @@ public class PopupMenuWindow {
     public static void showActionBarPopup(View anchorView,
                                           ArrayList<MenuItemImpl> items,
                                           Callback<MenuItem> listener) {
+        showActionBarPopup(anchorView, items, listener, Gravity.CENTER);
+    }
+
+    public static void showActionBarPopup(View anchorView,
+                                          ArrayList<MenuItemImpl> items,
+                                          Callback<MenuItem> listener,
+                                          int gravity) {
         int screenMargin = anchorView.getResources().getDimensionPixelSize(R.dimen.action_bar_popup_screen_margin);
-        showPopup(anchorView, items, listener, Gravity.CENTER, screenMargin);
+        showPopup(anchorView, items, listener, gravity, screenMargin);
     }
 
     private static void showPopup(View anchorView,

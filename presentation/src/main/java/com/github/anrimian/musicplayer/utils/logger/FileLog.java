@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.utils.filelog;
+package com.github.anrimian.musicplayer.utils.logger;
 
 import android.content.Context;
 import android.os.Build;
@@ -50,17 +50,6 @@ public class FileLog {
         sb.append("\n");
 
         writeLog(sb.toString());
-    }
-
-    public void initFatalErrorRecorder() {
-        Thread.UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(
-                (thread, e) -> {
-                    writeFatalException(e);
-                    if (handler != null) {
-                        handler.uncaughtException(thread, e);
-                    }
-                });
     }
 
     public void writeFatalException(Throwable throwable) {

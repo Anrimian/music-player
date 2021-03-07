@@ -7,7 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
-import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,13 +24,15 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 public class BluetoothConnectionReceiver extends BroadcastReceiver {
 
-    private static List<Integer> ALLOWED_DEVICES_TO_START = asList(
+    private static final List<Integer> ALLOWED_DEVICES_TO_START = asList(
             AUDIO_VIDEO_UNCATEGORIZED,
             AUDIO_VIDEO_WEARABLE_HEADSET,
             AUDIO_VIDEO_HANDSFREE,
             AUDIO_VIDEO_HEADPHONES,
             AUDIO_VIDEO_PORTABLE_AUDIO
     );
+
+    private static final int PLAY_DELAY_MILLIS = 1500;
 
     public static void setEnabled(Context context, boolean enabled) {
         context.getPackageManager().setComponentEnabledSetting(
@@ -62,7 +64,7 @@ public class BluetoothConnectionReceiver extends BroadcastReceiver {
                     return;
                 }
             }
-            Components.getAppComponent().musicPlayerInteractor().play();
+            SystemServiceControllerImpl.startPlayForegroundService(context, PLAY_DELAY_MILLIS);
         }
     }
 }
