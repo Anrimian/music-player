@@ -182,7 +182,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     @Override
     public Observable<Boolean> getSpeedChangeAvailableObservable() {
-        return Observable.just(true);
+        return Observable.fromCallable(() -> true);
     }
 
     private void startPlayWhenReady() {

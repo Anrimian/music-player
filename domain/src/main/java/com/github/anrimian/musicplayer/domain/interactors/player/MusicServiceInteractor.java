@@ -68,8 +68,33 @@ public class MusicServiceInteractor {
     }
 
     public Observable<Integer> getRepeatModeObservable() {
-        //we don't support library player repeat mode for now
-        return externalPlayerInteractor.getExternalPlayerRepeatModeObservable();
+        return playerCoordinatorInteractor.getActivePlayerTypeObservable()
+                .switchMap(playerType -> {
+                    switch (playerType) {
+                        case LIBRARY: {
+                            return libraryPlayerInteractor.getRepeatModeObservable();
+                        }
+                        case EXTERNAL: {
+                            return externalPlayerInteractor.getExternalPlayerRepeatModeObservable();
+                        }
+                        default: throw new IllegalStateException();
+                    }
+                });
+    }
+
+    public Observable<Boolean> getRandomModeObservable() {
+        return playerCoordinatorInteractor.getActivePlayerTypeObservable()
+                .switchMap(playerType -> {
+                    switch (playerType) {
+                        case LIBRARY: {
+                            return libraryPlayerInteractor.getRandomPlayingObservable();
+                        }
+                        case EXTERNAL: {
+                            return Observable.fromCallable(() -> false);
+                        }
+                        default: throw new IllegalStateException();
+                    }
+                });
     }
 
     public Observable<MusicNotificationSetting> getNotificationSettingObservable() {

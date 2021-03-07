@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class PlayerCoordinatorInteractor {
 
@@ -18,6 +19,8 @@ public class PlayerCoordinatorInteractor {
 
     private final HashMap<PlayerType, CompositionSource> preparedSourcesMap = new HashMap<>();
     private PlayerType activePlayerType = PlayerType.LIBRARY;
+
+    private final BehaviorSubject<PlayerType> activePlayerTypeSubject = BehaviorSubject.createDefault(activePlayerType);
 
     public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor,
                                        UiStateRepository uiStateRepository) {
@@ -143,6 +146,10 @@ public class PlayerCoordinatorInteractor {
 
     public Observable<Boolean> getSpeedChangeAvailableObservable() {
         return playerInteractor.getSpeedChangeAvailableObservable();
+    }
+
+    public Observable<PlayerType> getActivePlayerTypeObservable() {
+        return activePlayerTypeSubject;
     }
 
     private void applyPlayerType(PlayerType playerType) {

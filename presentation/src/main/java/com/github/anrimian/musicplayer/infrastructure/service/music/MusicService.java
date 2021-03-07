@@ -53,6 +53,7 @@ import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_G
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_INVALID;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE;
+import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_ALL;
 import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE;
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
@@ -99,6 +100,7 @@ public class MusicService extends Service {
     private long trackPosition;
     private float playbackSpeed = 1f;
     private int repeatMode = RepeatMode.NONE;
+    private boolean randomMode;
     private MusicNotificationSetting notificationSetting;
     private AppTheme currentAppTheme;
 
@@ -226,6 +228,7 @@ public class MusicService extends Service {
                 playerInteractor().getTrackPositionObservable(),
                 playerInteractor().getCurrentPlaybackSpeedObservable(),
                 musicServiceInteractor().getRepeatModeObservable(),
+                musicServiceInteractor().getRandomModeObservable(),
                 musicServiceInteractor().getNotificationSettingObservable(),
                 Components.getAppComponent().themeController().getAppThemeObservable(),
                 serviceState::set)
@@ -286,6 +289,12 @@ public class MusicService extends Service {
             updateMediaSessionState = true;
             updateNotification = true;
         }
+
+        if (this.randomMode != serviceState.randomMode) {
+            this.randomMode = serviceState.randomMode;
+            updateMediaSessionState = true;
+        }
+
         if (this.playbackSpeed != serviceState.playbackSpeed) {
             this.playbackSpeed = serviceState.playbackSpeed;
             updateMediaSessionState = true;
@@ -341,9 +350,30 @@ public class MusicService extends Service {
     private void updateMediaSessionState() {
         stateBuilder.setState(toMediaState(playerState), trackPosition, playbackSpeed);
         mediaSession().setPlaybackState(stateBuilder.build());
-        //set values
-//        mediaSession().setRepeatMode();
-//        mediaSession().setShuffleMode();
+
+        int sessionRepeatMode;
+        switch (repeatMode) {
+            case RepeatMode.REPEAT_COMPOSITION: {
+                sessionRepeatMode = REPEAT_MODE_ONE;
+                break;
+            }
+            case RepeatMode.REPEAT_PLAY_LIST: {
+                sessionRepeatMode = REPEAT_MODE_ALL;
+                break;
+            }
+            default: {
+                sessionRepeatMode = REPEAT_MODE_NONE;
+            }
+        }
+        mediaSession().setRepeatMode(sessionRepeatMode);
+
+        int sessionShuffleMode;
+        if (randomMode) {
+            sessionShuffleMode = SHUFFLE_MODE_ALL;
+        } else {
+            sessionShuffleMode = SHUFFLE_MODE_NONE;
+        }
+        mediaSession().setShuffleMode(sessionShuffleMode);
     }
 
     private void onPlayerStateChanged(PlayerState playerState) {
@@ -371,6 +401,7 @@ public class MusicService extends Service {
         long trackPosition;
         float playbackSpeed;
         int repeatMode;
+        boolean randomMode;
         MusicNotificationSetting settings;
         AppTheme appTheme;
 
@@ -379,6 +410,7 @@ public class MusicService extends Service {
                                  long trackPosition,
                                  float playbackSpeed,
                                  int repeatMode,
+                                 boolean randomMode,
                                  MusicNotificationSetting settings,
                                  AppTheme appTheme) {
             this.playerState = playerState;
@@ -386,6 +418,7 @@ public class MusicService extends Service {
             this.trackPosition = trackPosition;
             this.playbackSpeed = playbackSpeed;
             this.repeatMode = repeatMode;
+            this.randomMode = randomMode;
             this.settings = settings;
             this.appTheme = appTheme;
             return this;
