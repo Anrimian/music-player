@@ -37,6 +37,8 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
@@ -77,6 +79,7 @@ import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shar
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatLinkedFabView;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 /**
@@ -106,6 +109,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlaylistForFolderDialogRunner;
     private DialogFragmentDelayRunner progressDialogRunner;
+
+    private ErrorHandler editorErrorHandler;
+    private ErrorHandler deletingErrorHandler;
 
     public static LibraryFoldersFragment newInstance(@Nullable Long folderId) {
         Bundle args = new Bundle();
@@ -188,6 +194,14 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
         if (playListDialog != null) {
             playListDialog.setOnCompleteListener(presenter::onPlayListToAddingSelected);
         }
+
+        editorErrorHandler = new ErrorHandler(fm,
+                presenter::onRetryFailedEditActionClicked,
+                this::showEditorRequestDeniedMessage);
+
+        deletingErrorHandler = new DeleteErrorHandler(fm,
+                presenter::onRetryFailedDeleteActionClicked,
+                this::showEditorRequestDeniedMessage);
 
         choosePlaylistForFolderDialogRunner = new DialogFragmentRunner<>(fm,
                 SELECT_PLAYLIST_FOR_FOLDER_TAG,
@@ -379,10 +393,12 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer,
-                getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+        deletingErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clListContainer,
+                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
+                        Snackbar.LENGTH_SHORT)
+                        .show()
+        );
     }
 
     @Override
@@ -423,7 +439,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+        editorErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
+        );
     }
 
     @Override
@@ -683,6 +701,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 break;
             }
         }
+    }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(clListContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
     }
 
 }

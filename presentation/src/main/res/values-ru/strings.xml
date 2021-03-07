@@ -55,11 +55,7 @@
         Удалить композицию \"%1$s\"?
         Это действие нельзя будет отменить.
     </string>
-    <string name="delete_folder_template">
-        Удалить %2$s из папки \"%1$s\"?
-        Если в папке больше нет файлов, то она тоже будет удалена.
-        Это действие нельзя будет отменить.
-    </string>
+    <string name="delete_folder_template">Удалить %2$s из папки \"%1$s\"? Это действие нельзя будет отменить.</string>
     <string name="delete_empty_folder">Удалить папку \"%s\"? Это действие нельзя будет отменить.</string>
     <string name="delete_template">Удалить %1$s? Это действие нельзя будет отменить.</string>
     <string name="delete_composition_success">Композиция \"%1$s\" удалена</string>
@@ -224,6 +220,11 @@
     <string name="critical_error_report_message">Произошла фатальная ошибка и из-за этого приложение не может запуститься. Появление таких ошибок крайне нежелательно. Приложение не отсылает никакой информации автоматически, но вы можете отправить файл с отчётом об ошибке вручную по почте. Это поможет исправить эту ошибку.</string>
     <string name="error_report_message">Произошла фатальная ошибка. Приложение не отсылает никакой информации автоматически, но вы можете отправить файл с отчётом об ошибке вручную по почте. Это поможет исправить эту ошибку.</string>
     <string name="show_error_report_dialog_on_start">Показывать отчёт об ошибке при запуске приложения после сбоев</string>
+    <string name="do_not_show_confirm_delete_dialog">Не показывать диалоговое окно подтверждения удаления</string>
+
+    <string name="playback_speed">Скорость воспроизведения</string>
+    <string name="reset">Сбросить</string>
+    <string name="apply">Применить</string>
     <string name="app_equalizer">Экалайзер приложения</string>
 
     <plurals name="compositions_count">

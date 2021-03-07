@@ -164,6 +164,14 @@ public class PlayerInteractor {
         return musicPlayerController.getTrackPosition();
     }
 
+    public void setPlaybackSpeed(float speed) {
+        musicPlayerController.setPlaybackSpeed(speed);
+    }
+
+    public float getPlaybackSpeed() {
+        return musicPlayerController.getCurrentPlaybackSpeed();
+    }
+
     public Observable<PlayerEvent> getPlayerEventsObservable() {
         return playerEventsSubject;
     }
@@ -179,6 +187,14 @@ public class PlayerInteractor {
     @Nullable
     public CompositionSource getCurrentSource() {
         return currentSource;
+    }
+
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return musicPlayerController.getSpeedChangeAvailableObservable();
+    }
+
+    public Observable<Float> getCurrentPlaybackSpeedObservable() {
+        return musicPlayerController.getCurrentPlaybackSpeedObservable();
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
@@ -222,7 +238,7 @@ public class PlayerInteractor {
                 if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
                     playerStateSubject.onNext(PLAY);
                     musicPlayerController.resume();
-                    systemServiceController.startMusicService();
+                    systemServiceController.startMusicServiceBg();
                 }
                 break;
             }

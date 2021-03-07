@@ -11,10 +11,10 @@ allprojects {
 
 ext {
     //Android
-    androidBuildToolsVersion = "29.0.2"
+    androidBuildToolsVersion = "29.0.3"
     androidMinSdkVersion = 21
-    androidTargetSdkVersion = 29
-    androidCompileSdkVersion = 29
+    androidTargetSdkVersion = 30
+    androidCompileSdkVersion = 30
 
     //support libraries
     androidXVersion = "1.2.0"
@@ -31,7 +31,7 @@ ext {
     moxyVersion = "2.2.1"
     daggerVersion = "2.32"
     slidrVersion = "2.1.0"
-    exoPlayerVersion = "2.13.1"
+    exoPlayerVersion = "2.13.2"
     roomVersion = "2.3.0-beta02"
     jTaggerVersion = '2.0.3'
     chipsLayoutManagerVersion = "0.3.7"
@@ -50,6 +50,9 @@ ext {
 }
 
 ext {
+    kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    androidxKtx = "androidx.core:core-ktx:1.1.0"//wait a little for update
+
     appCompat = "androidx.appcompat:appcompat:$androidXVersion"
     appCompatResources = "androidx.appcompat:appcompat-resources:$androidXVersion"
     material = "com.google.android.material:material:$googleMaterialVersion"

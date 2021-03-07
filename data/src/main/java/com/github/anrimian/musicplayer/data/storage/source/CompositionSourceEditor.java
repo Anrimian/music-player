@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
+import android.os.Build;
+
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -24,12 +26,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
+
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 
 public class CompositionSourceEditor {
 
@@ -72,9 +78,23 @@ public class CompositionSourceEditor {
                 .flatMapCompletable(path -> setCompositionAlbum(path, composition.getStorageId(), author));
     }
 
+    public Single<List<Composition>> setCompositionsAlbum(List<Composition> compositions, String album) {
+        return Observable.fromIterable(compositions)
+                .flatMapCompletable(composition -> setCompositionAlbum(composition, album))
+                .onErrorResumeNext(throwable -> storageMusicProvider.processStorageError(throwable, compositions))
+                .toSingleDefault(compositions);
+    }
+
     public Completable setCompositionAlbumArtist(FullComposition composition, String artist) {
         return getPath(composition)
                 .flatMapCompletable(path -> setCompositionAlbumArtist(path, composition.getStorageId(), artist));
+    }
+
+    public Single<List<Composition>> setCompositionsAlbumArtist(List<Composition> compositions, String artist) {
+        return Observable.fromIterable(compositions)
+                .flatMapCompletable(composition -> setCompositionAlbumArtist(composition, artist))
+                .onErrorResumeNext(throwable -> storageMusicProvider.processStorageError(throwable, compositions))
+                .toSingleDefault(compositions);
     }
 
     public Completable setCompositionAlbumArtist(Composition composition, String artist) {
@@ -117,15 +137,15 @@ public class CompositionSourceEditor {
                 .flatMap(this::getCompositionGenres);
     }
 
-    public Completable changeCompositionAlbumArt(FullComposition composition,
+    public Single<Long> changeCompositionAlbumArt(FullComposition composition,
                                                  ImageSource imageSource) {
         return getPath(composition)
-                .flatMapCompletable(path -> changeCompositionAlbumArt(path, composition.getStorageId(), imageSource));
+                .flatMap(path -> changeCompositionAlbumArt(path, composition.getStorageId(), imageSource));
     }
 
-    public Completable removeCompositionAlbumArt(FullComposition composition) {
+    public Single<Long> removeCompositionAlbumArt(FullComposition composition) {
         return getPath(composition)
-                .flatMapCompletable(path -> removeCompositionAlbumArt(path, composition.getStorageId()));
+                .flatMap(path -> removeCompositionAlbumArt(path, composition.getStorageId()));
     }
 
     public Maybe<CompositionSourceTags> getFullTags(FullComposition composition) {
@@ -299,28 +319,26 @@ public class CompositionSourceEditor {
         return file.getTag();
     }
 
-    private Completable changeCompositionAlbumArt(String filePath, Long id, ImageSource imageSource) {
-        return Completable.fromAction(() -> {
-            editAudioFileTag(filePath,
-                    id,
-                    tag -> {
-                        try (InputStream stream = fileSourceProvider.getImageStream(imageSource)) {
-                            if (stream == null) {
-                                return;
-                            }
-                            byte[] data = FileUtils.getScaledBitmapByteArray(stream, MAX_COVER_SIZE);
-                            Artwork artwork = new Artwork();
-                            artwork.setBinaryData(data);
-                            tag.deleteArtworkField();
-                            tag.setField(artwork);
+    private Single<Long> changeCompositionAlbumArt(String filePath, Long id, ImageSource imageSource) {
+        return Single.fromCallable(() -> editAudioFileTag(filePath,
+                id,
+                tag -> {
+                    try (InputStream stream = fileSourceProvider.getImageStream(imageSource)) {
+                        if (stream == null) {
+                            return;
                         }
+                        byte[] data = FileUtils.getScaledBitmapByteArray(stream, MAX_COVER_SIZE);
+                        Artwork artwork = new Artwork();
+                        artwork.setBinaryData(data);
+                        tag.deleteArtworkField();
+                        tag.setField(artwork);
                     }
-            );
-        });
+                }
+        ));
     }
 
-    private Completable removeCompositionAlbumArt(String filePath, Long id) {
-        return Completable.fromAction(() -> editAudioFileTag(filePath, id, Tag::deleteArtworkField));
+    private Single<Long> removeCompositionAlbumArt(String filePath, Long id) {
+        return Single.fromCallable(() -> editAudioFileTag(filePath, id, Tag::deleteArtworkField));
     }
 
     private void editFile(String filePath,
@@ -333,18 +351,19 @@ public class CompositionSourceEditor {
         );
     }
 
-    private void editAudioFileTag(String filePath, Long id, ThrowsCallback<Tag> callback)
+    private long editAudioFileTag(String filePath, Long id, ThrowsCallback<Tag> callback)
             throws Exception {
         File fileToEdit = new File(filePath);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
-//                copyFileUsingStream(fileToEdit, tempFile);
-//                runFileAction(tempFile, callback);
-//                copyFileToMediaStore(tempFile, id);
-//            });
-//        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
+                copyFileUsingStream(fileToEdit, tempFile);
+                runFileAction(tempFile, callback);
+                copyFileToMediaStore(tempFile, id);
+            });
+        } else {
             runFileAction(fileToEdit, callback);
-//        }
+            return fileToEdit.length();
+        }
     }
 
     private void runFileAction(File file, ThrowsCallback<Tag> callback) throws Exception {

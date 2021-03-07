@@ -30,6 +30,8 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
@@ -54,6 +56,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 
 public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implements
         AlbumItemsView, FragmentLayerListener, BackButtonListener {
@@ -73,6 +76,8 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
     private DialogFragmentRunner<ChoosePlayListDialogFragment> choosePlayListDialogRunner;
+
+    private ErrorHandler deletingErrorHandler;
 
     public static AlbumItemsFragment newInstance(long albumId) {
         Bundle args = new Bundle();
@@ -130,6 +135,10 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
         SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
+
+        deletingErrorHandler = new DeleteErrorHandler(fm,
+                presenter::onRetryFailedDeleteActionClicked,
+                this::showEditorRequestDeniedMessage);
 
         choosePlayListDialogRunner = new DialogFragmentRunner<>(fm,
                 SELECT_PLAYLIST_TAG,
@@ -269,10 +278,12 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer,
-                getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+        deletingErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clListContainer,
+                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
+                        Snackbar.LENGTH_SHORT)
+                        .show()
+        );
     }
 
     @Override
@@ -349,5 +360,9 @@ public class AlbumItemsFragment extends BaseLibraryCompositionsFragment implemen
                 break;
             }
         }
+    }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(clListContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
     }
 }

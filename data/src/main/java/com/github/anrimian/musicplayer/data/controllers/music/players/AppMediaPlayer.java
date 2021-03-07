@@ -33,5 +33,10 @@ public interface AppMediaPlayer {
 
     Single<Long> seekBy(long millis);
 
+    void setPlaySpeed(float speed);
+
     void release();
+
+    Observable<Boolean> getSpeedChangeAvailableObservable();
+
 }

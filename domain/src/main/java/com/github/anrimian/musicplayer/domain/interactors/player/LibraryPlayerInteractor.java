@@ -265,6 +265,23 @@ public class LibraryPlayerInteractor {
         playQueueRepository.clearPlayQueue();
     }
 
+    public void setPlaybackSpeed(float speed) {
+        playerCoordinatorInteractor.setPlaybackSpeed(speed, LIBRARY);
+        uiStateRepository.setCurrentPlaybackSpeed(speed);
+    }
+
+    public float getPlaybackSpeed() {
+        return uiStateRepository.getCurrentPlaybackSpeed();
+    }
+
+    public Observable<Float> getPlaybackSpeedObservable() {
+        return uiStateRepository.getPlaybackSpeedObservable();
+    }
+
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return playerCoordinatorInteractor.getSpeedChangeAvailableObservable();
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
@@ -272,33 +289,36 @@ public class LibraryPlayerInteractor {
             if (previousItem != null) {
                 stop();
             }
-        } else {
-            //noinspection ResultOfMethodCallIgnored
-            getActualTrackPosition().subscribe(actualTrackPosition -> {
-                long trackPosition = compositionEvent.getTrackPosition();
+            return;
+        }
 
-                //if items are equal and content changed -> restart play
-                if (previousItem != null && previousItem.equals(currentItem)) {
-                    trackPosition = actualTrackPosition;
+        Composition currentComposition = currentItem.getComposition();
 
-                    if (!hasSourceChanges(previousItem, currentItem)) {
-
-                        //if other fields was changed - update source
-                        if (!areSourcesTheSame(previousItem, currentItem)) {
-                            playerCoordinatorInteractor.updateSource(
-                                    new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
-                                    LIBRARY);
-                        }
+        if (previousItem != null && previousItem.equals(currentItem)) {
+            //if file changed - re prepare with actual position
+            //if not - check if changes exists - if true - update source with actual position
+            boolean isFileChanged = hasSourceChanges(previousItem, currentItem);
+            boolean isModelChanged = areSourcesTheSame(previousItem, currentItem);
+            if (isFileChanged || isModelChanged) {
+                //noinspection ResultOfMethodCallIgnored
+                getActualTrackPosition().subscribe(actualTrackPosition -> {
+                    LibraryCompositionSource source = new LibraryCompositionSource(currentComposition, actualTrackPosition);
+                    if (isFileChanged) {
+                        playerCoordinatorInteractor.prepareToPlay(source, LIBRARY);
                         return;
                     }
-                }
-
-                playerCoordinatorInteractor.prepareToPlay(
-                        new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
-                        LIBRARY
-                );
-            });
+                    if (isModelChanged) {
+                        playerCoordinatorInteractor.updateSource(source, LIBRARY);
+                    }
+                });
+            }
+            return;
         }
+
+        playerCoordinatorInteractor.prepareToPlay(
+                new LibraryCompositionSource(currentComposition, compositionEvent.getTrackPosition()),
+                LIBRARY
+        );
     }
 
     private Single<Long> getActualTrackPosition() {

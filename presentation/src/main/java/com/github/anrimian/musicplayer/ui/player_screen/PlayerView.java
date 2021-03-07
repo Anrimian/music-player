@@ -16,6 +16,7 @@ import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
 
 /**
  * Created on 02.11.2017.
@@ -103,4 +104,10 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showDeletedItemMessage();
+
+    @AddToEndSingle
+    void displayPlaybackSpeed(float speed);
+
+    @AddToEndSingle
+    void showSpeedChangeFeatureVisible(boolean visible);
 }

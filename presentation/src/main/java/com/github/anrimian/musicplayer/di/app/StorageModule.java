@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
@@ -19,6 +20,8 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRep
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StoragePlaylistAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceApi30;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
@@ -112,8 +115,12 @@ public class StorageModule {
 
     @Provides
     @Nonnull
+    @Singleton
     StorageFilesDataSource storageFilesDataSource(StorageMusicProvider musicProvider) {
-        return new StorageFilesDataSource(musicProvider);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return new StorageFilesDataSourceApi30(musicProvider);
+        }
+        return new StorageFilesDataSourceImpl(musicProvider);
     }
 
     @Provides

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
@@ -209,10 +210,22 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
+    public void setPlaySpeed(float speed) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
+        }
+    }
+
+    @Override
     public void release() {
         equalizerController.detachEqualizer();
         stopTracingTrackPosition();
         mediaPlayer.release();
+    }
+
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return Observable.fromCallable(() -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
     }
 
     private void startTracingTrackPosition() {

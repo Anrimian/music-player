@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
@@ -19,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerIn
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -66,6 +68,7 @@ public interface AppComponent {
     DisplaySettingsInteractor displaySettingsInteractor();
     PlayerInteractor playerInteractor();
     MusicServiceInteractor musicServiceInteractor();
+    LibrarySettingsInteractor librarySettingsInteractor();
 
     PlayListsPresenter playListsPresenter();
     CreatePlayListPresenter createPlayListsPresenter();
@@ -84,8 +87,8 @@ public interface AppComponent {
     ErrorParser errorParser();
     FileLog fileLog();
     AppLogger appLogger();
+    StorageFilesDataSource storageFilesDataSource();
 
     ThemeController themeController();
     EqualizerController equalizerController();
-
 }

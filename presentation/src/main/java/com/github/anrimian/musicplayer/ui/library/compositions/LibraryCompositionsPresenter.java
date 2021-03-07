@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
@@ -31,6 +33,7 @@ public class LibraryCompositionsPresenter
         this.interactor = interactor;
     }
 
+    @NonNull
     @Override
     protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
         return interactor.getCompositionsObservable(searchText);

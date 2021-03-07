@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -166,6 +167,14 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
+    public void setPlaySpeed(float speed) {
+        usePlayer(player -> {
+            PlaybackParameters param = new PlaybackParameters(speed);
+            player.setPlaybackParameters(param);
+        });
+    }
+
+    @Override
     public void release() {
         usePlayer(player -> {
             equalizerController.detachEqualizer();
@@ -173,6 +182,11 @@ public class ExoMediaPlayer implements AppMediaPlayer {
             stopTracingTrackPosition();
             player.release();
         });
+    }
+
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return Observable.fromCallable(() -> true);
     }
 
     private void startPlayWhenReady() {

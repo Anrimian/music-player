@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
 
@@ -49,10 +51,19 @@ android {
     buildFeatures {
         viewBinding = true
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+    packagingOptions {
+        exclude "/META-INF/*.kotlin_module"
+        exclude "**/kotlin/**"
+        exclude "**/*.txt"
+        exclude "**/*.xml"
+        exclude "**/*.properties"
     }
 }
 
@@ -62,6 +73,8 @@ dependencies {
     implementation project(':data')
 
     def deps = rootProject.ext
+
+    implementation kotlinStdLib
 
     implementation deps.appCompat
     implementation deps.appCompatResources
@@ -79,16 +92,16 @@ dependencies {
     implementation deps.moxy
     implementation deps.moxyAppcompat
     implementation deps.moxyMaterial
-    annotationProcessor deps.moxyCompiler
+    kapt deps.moxyCompiler
 
     implementation deps.dagger
-    annotationProcessor deps.daggerCompiler
+    kapt deps.daggerCompiler
 
     implementation deps.room
-    annotationProcessor deps.roomCompiler
+    kapt deps.roomCompiler
 
     implementation deps.glide
-    annotationProcessor deps.glideCompiler
+    kapt deps.glideCompiler
 
     implementation deps.slidr
 
@@ -99,8 +112,8 @@ dependencies {
     testImplementation deps.junit
     testImplementation deps.mockito
 
-    androidTestImplementation deps.dexmaker
-    androidTestImplementation deps.dexmakerMockito
+//    androidTestImplementation deps.dexmaker
+//    androidTestImplementation deps.dexmakerMockito
     androidTestImplementation deps.mockito
     androidTestImplementation deps.espresso
 }

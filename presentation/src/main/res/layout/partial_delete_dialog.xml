@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <CheckBox
+        style="@style/CheckboxStyle"
+        android:id="@+id/cb_do_not_show_delete_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/do_not_show_confirm_delete_dialog"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
+</FrameLayout>

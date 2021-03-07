@@ -4,21 +4,30 @@ import com.github.anrimian.musicplayer.domain.models.composition.source.Composit
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.HashMap;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class PlayerCoordinatorInteractor {
 
     private final PlayerInteractor playerInteractor;
+    private final UiStateRepository uiStateRepository;
 
+    private final HashMap<PlayerType, CompositionSource> preparedSourcesMap = new HashMap<>();
     private PlayerType activePlayerType = PlayerType.LIBRARY;
-    private HashMap<PlayerType, CompositionSource> preparedSourcesMap = new HashMap<>();
 
-    public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor) {
+    private final BehaviorSubject<PlayerType> activePlayerTypeSubject = BehaviorSubject.createDefault(activePlayerType);
+
+    public PlayerCoordinatorInteractor(PlayerInteractor playerInteractor,
+                                       UiStateRepository uiStateRepository) {
         this.playerInteractor = playerInteractor;
+        this.uiStateRepository = uiStateRepository;
+
+        initializePlayerType(activePlayerType);
     }
 
     public void startPlaying(CompositionSource compositionSource, PlayerType playerType) {
@@ -106,6 +115,12 @@ public class PlayerCoordinatorInteractor {
         return isPlayerTypeActive(playerType)? playerInteractor.getTrackPosition(): Single.just(-1L);
     }
 
+    public void setPlaybackSpeed(float speed, PlayerType playerType) {
+        if (activePlayerType == playerType) {
+            playerInteractor.setPlaybackSpeed(speed);
+        }
+    }
+
     public Observable<PlayerEvent> getPlayerEventsObservable(PlayerType playerType) {
         return playerInteractor.getPlayerEventsObservable()
                 .filter(o -> isPlayerTypeActive(playerType));
@@ -129,6 +144,14 @@ public class PlayerCoordinatorInteractor {
         return isPlayerTypeActive(playerType)? playerInteractor.getPlayerState() : PlayerState.PAUSE;
     }
 
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return playerInteractor.getSpeedChangeAvailableObservable();
+    }
+
+    public Observable<PlayerType> getActivePlayerTypeObservable() {
+        return activePlayerTypeSubject;
+    }
+
     private void applyPlayerType(PlayerType playerType) {
         if (activePlayerType != playerType) {
             playerInteractor.pause();
@@ -142,7 +165,23 @@ public class PlayerCoordinatorInteractor {
                 playerInteractor.getTrackPosition()
                         .subscribe(position -> applyPositionChange(oldSource, position));
             }
+
+            //not only here
+            initializePlayerType(playerType);
             activePlayerType = playerType;
+        }
+    }
+
+    private void initializePlayerType(PlayerType playerType) {
+        switch (playerType) {
+            case LIBRARY: {
+                playerInteractor.setPlaybackSpeed(uiStateRepository.getCurrentPlaybackSpeed());
+                break;
+            }
+            case EXTERNAL: {
+                playerInteractor.setPlaybackSpeed(1f);
+
+            }
         }
     }
 

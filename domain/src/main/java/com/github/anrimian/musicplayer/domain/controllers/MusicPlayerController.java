@@ -34,4 +34,11 @@ public interface MusicPlayerController {
 
     Single<Long> getTrackPosition();
 
+    void setPlaybackSpeed(float speed);
+
+    float getCurrentPlaybackSpeed();
+
+    Observable<Float> getCurrentPlaybackSpeedObservable();
+
+    Observable<Boolean> getSpeedChangeAvailableObservable();
 }
