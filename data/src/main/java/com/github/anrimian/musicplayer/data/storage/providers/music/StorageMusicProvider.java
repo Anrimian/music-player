@@ -26,6 +26,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
@@ -407,6 +408,7 @@ public class StorageMusicProvider {
             if (isEmpty(filePath)) {
                 return null;
             }
+            filePath = FileUtils.getParentDirPath(filePath);
         }
         if (filePath == null) {
             filePath = "";
