@@ -22,11 +22,27 @@ class SleepTimerPresenter(private val interactor: SleepTimerInteractor,
         interactor.sleepTimerTime = millis
     }
 
+    fun onStartClicked() {
+        interactor.start()
+    }
+
+    fun onResumeClicked() {
+        interactor.resume()
+    }
+
+    fun onStopClicked() {
+        interactor.pause()
+    }
+
+    fun onResetButtonClicked() {
+        interactor.stop()
+    }
+
     private fun subscribeOnSleepTimerState() {
         interactor.sleepTimerStateObservable.unsafeSubscribeOnUi(viewState::showSleepTimerState)
     }
 
     private fun subscribeOnSleepTimerRemainingTime() {
-        interactor.sleepTimerCountDownObservable.unsafeSubscribeOnUi(viewState::showSleepRemainingSeconds)
+        interactor.sleepTimerCountDownObservable.unsafeSubscribeOnUi(viewState::showRemainingTimeMillis)
     }
 }

@@ -2,18 +2,17 @@ package com.github.anrimian.musicplayer.ui.sleep_timer
 
 import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor
 import moxy.MvpView
-import moxy.viewstate.strategy.AddToEndSingleStrategy
-import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
 
 interface SleepTimerView : MvpView {
 
-    @StateStrategyType(AddToEndSingleStrategy::class)
+    @AddToEndSingle
     fun showSleepTimerTime(sleepTimerTimeMillis: Long)
 
-    @StateStrategyType(AddToEndSingleStrategy::class)
-    fun showSleepTimerState(sleepTimerState: SleepTimerInteractor.SleepTimerState)
+    @AddToEndSingle
+    fun showSleepTimerState(state: SleepTimerInteractor.SleepTimerState)
 
-    @StateStrategyType(AddToEndSingleStrategy::class)
-    fun showSleepRemainingSeconds(remainingSeconds: Long)
+    @AddToEndSingle
+    fun showRemainingTimeMillis(millis: Long)
 
 }

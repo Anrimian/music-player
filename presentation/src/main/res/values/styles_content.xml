@@ -139,6 +139,11 @@
         <item name="android:textSize">15sp</item>
     </style>
 
+    <style name="TextStyle.BigTimer">
+        <item name="android:textSize">44sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="TextStyle.Composition">
         <item name="android:textStyle">bold</item>
     </style>

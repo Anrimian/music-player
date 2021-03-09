@@ -47,7 +47,13 @@ class TimePickerWrapper(
         hours = TimeUnit.MILLISECONDS.toHours(millis).toInt() % 60
         hoursPicker.value = hours
     }
-    
+
+    fun setVisibility(visibility: Int) {
+        secondsPicker.visibility = visibility
+        minutesPicker.visibility = visibility
+        hoursPicker.visibility = visibility
+    }
+
     private fun onTimePickerValueChanged() {
         val millis = ((((hours * 60) + minutes) * 60) + seconds) * 1000L
         onTimePicked(millis)

@@ -12,9 +12,10 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //fade out when timer is finishing(?)
 //handle 'play last song' option
 //states: enable/disable/paused/disable_wait_for_finish
+//TODO we need to save remaining millis into preferences?
 public class SleepTimerInteractor {
 
-    public static final long NO_TIMER = 1;
+    public static final long NO_TIMER = -1;
 
     private final LibraryPlayerInteractor libraryPlayerInteractor;
     private final SettingsRepository settingsRepository;
@@ -24,6 +25,8 @@ public class SleepTimerInteractor {
     private final BehaviorSubject<SleepTimerState> sleepTimerState = BehaviorSubject.createDefault(SleepTimerState.DISABLED);
 
     private Disposable timerDisposable;
+
+    private long remainingMillis;
 
     public SleepTimerInteractor(LibraryPlayerInteractor libraryPlayerInteractor,
                                 SettingsRepository settingsRepository,
@@ -78,12 +81,13 @@ public class SleepTimerInteractor {
     }
 
     private void startSleepTimer(long timeMillis) {
-        long remainingSeconds = timeMillis / 1000L;
+        remainingMillis = timeMillis;
         timerDisposable = Observable.interval( 1, TimeUnit.SECONDS)
-                .map(seconds -> remainingSeconds - seconds)
+                .map(seconds -> remainingMillis -= 1000)
+                .doOnSubscribe(d -> timerCountDownSubject.onNext(remainingMillis))
                 .doOnNext(timerCountDownSubject::onNext)
-                .takeUntil(seconds -> seconds <= 0)
-                .doOnDispose(() -> uiStateRepository.setSleepTimerRemainingMillis(remainingSeconds))
+                .takeUntil(millis -> millis < 0)
+                .doOnDispose(() -> uiStateRepository.setSleepTimerRemainingMillis(remainingMillis))
                 .doOnComplete(this::onTimerFinished)
                 .subscribe();
     }

@@ -222,6 +222,8 @@
     <string name="reset">Reset</string>
     <string name="apply">Apply</string>
     <string name="sleep_timer">Sleep timer</string>
+    <string name="start">Start</string>
+    <string name="resume">Resume</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
