@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.common.error.parser;
 
+import android.app.RecoverableSecurityException;
 import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.StringRes;
 
@@ -16,6 +18,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
+import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFoundException;
@@ -85,8 +88,9 @@ public class DefaultErrorParser implements ErrorParser {
         if (throwable instanceof GenreAlreadyExistsException) {
             return error(R.string.genre_already_exists);
         }
-        if (throwable instanceof SecurityException) {
-            return new EditorErrorCommand((SecurityException) throwable);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                && (throwable instanceof RecoverableSecurityException || throwable instanceof RecoverableSecurityExceptionExt)) {
+            return new EditorErrorCommand(throwable);
         }
         if (throwable instanceof EditorTimeoutException) {
             return error(R.string.editor_timeout_error);

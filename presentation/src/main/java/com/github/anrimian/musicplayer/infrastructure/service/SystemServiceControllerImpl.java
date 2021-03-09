@@ -38,4 +38,9 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
         context.startService(intent);
     }
+
+    @Override
+    public void startMusicServiceBg() {
+        startPlayForegroundService(context);
+    }
 }

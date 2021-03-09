@@ -159,7 +159,9 @@ public class CoverImageLoader {
             defaultNotificationBitmap.eraseColor(color);
         } else {
             if (defaultNotificationBitmap == null) {
-                defaultNotificationBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_music_box);
+                BitmapFactory.Options opt = new BitmapFactory.Options();
+                opt.inPreferredConfig = Bitmap.Config.RGB_565;
+                defaultNotificationBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_music_box, opt);
             }
         }
         return defaultNotificationBitmap;
@@ -242,6 +244,10 @@ public class CoverImageLoader {
         CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
             if (bitmap == null) {
                 bitmap = getDefaultNotificationBitmap();
+            } else {
+                //possible fix for RemoteServiceException crash
+                //https://stackoverflow.com/questions/54948936/bad-notification-the-given-region-must-intersect-with-the-bitmaps-dimensions
+                bitmap = bitmap.copy(Bitmap.Config.RGB_565, false);
             }
             onCompleted.call(bitmap);
         });
