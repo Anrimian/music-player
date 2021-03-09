@@ -68,7 +68,15 @@ public enum AppTheme {
             android.R.color.black,
             R.color.colorAccentDark,
             R.color.color_control_highlight_dark,
-            true);
+            true),
+    WHITE_RED(8,
+            R.style.PrimaryRedTheme,
+            0,
+            R.color.colorRedPrimary,
+            R.color.light_background_level_0,
+            R.color.colorRedPrimary,
+            R.color.color_control_highlight,
+            false);
 
     private final int id;
     private final int themeResId;

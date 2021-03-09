@@ -94,6 +94,10 @@
     <color name="colorTealPrimaryDark">#00796B</color>
     <color name="colorPinkAccent">#FF4081</color>
 
+    <!--light theme(read)-->
+    <color name="colorRedPrimary">#d50000</color>
+    <color name="colorRedPrimaryDark">#9b0000</color>
+
     <!--completely white theme-->
     <color name="colorPrimaryWhiteGray">#848282</color>
     <color name="colorAccentBlue">#247bee</color>
