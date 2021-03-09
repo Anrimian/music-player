@@ -32,6 +32,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
@@ -714,6 +715,20 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showSpeedChangeFeatureVisible(boolean visible) {
         panelBinding.tvPlaybackSpeed.setVisibility(visible? VISIBLE: View.GONE);
+    }
+
+    @Override
+    public void showSleepTimerRemainingTime(long remainingMillis) {
+        //TODO to visible
+        if (remainingMillis == SleepTimerInteractor.NO_TIMER) {
+            panelBinding.tvSleepTime.setVisibility(View.GONE);
+            return;
+        }
+        panelBinding.tvSleepTime.setVisibility(VISIBLE);
+        panelBinding.tvSleepTime.setText(FormatUtils.formatMilliseconds(remainingMillis));
+        panelBinding.tvSleepTime.setOnClickListener(v ->
+                new SleepTimerDialogFragment().show(getChildFragmentManager(), null)
+        );
     }
 
     public void openPlayQueue() {

@@ -193,6 +193,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
                 .addDelegate(new ToolbarDelegate(toolbar, activity.getWindow()))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvTotalTime)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvPlaybackSpeed)))
+                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvSleepTime)))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.8f, 1f, new VisibilityDelegate(panelBinding.ivBottomPanelIndicator))));
 
         DelegateManager delegateManager = new DelegateManager();

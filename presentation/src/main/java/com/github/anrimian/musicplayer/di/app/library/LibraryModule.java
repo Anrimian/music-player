@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
@@ -48,10 +49,10 @@ public class LibraryModule {
 
     @Provides
     @NonNull
-    PlayerScreenInteractor playerScreenInteractor(LibraryPlayerInteractor musicPlayerInteractor,
+    PlayerScreenInteractor playerScreenInteractor(SleepTimerInteractor sleepTimerInteractor,
                                                   UiStateRepository uiStateRepository,
                                                   SettingsRepository settingsRepository) {
-        return new PlayerScreenInteractor(musicPlayerInteractor, uiStateRepository, settingsRepository);
+        return new PlayerScreenInteractor(sleepTimerInteractor, uiStateRepository, settingsRepository);
     }
 
     @Provides

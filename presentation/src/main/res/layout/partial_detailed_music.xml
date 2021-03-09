@@ -153,6 +153,17 @@
         app:layout_constraintBottom_toBottomOf="@id/tv_total_time"
         app:layout_constraintEnd_toStartOf="@id/tv_total_time"/>
 
+    <TextView
+        android:id="@+id/tvSleepTime"
+        style="@style/TextStyle.Time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/tv_total_time"
+        app:layout_constraintBottom_toBottomOf="@id/tv_total_time"
+        app:layout_constraintEnd_toEndOf="@id/tv_total_time"
+        app:layout_constraintStart_toStartOf="@id/tv_played_time"
+        tools:text="00:11" />
+
     <FrameLayout
         android:id="@+id/music_icon_wrapper"
         android:layout_width="50dp"
