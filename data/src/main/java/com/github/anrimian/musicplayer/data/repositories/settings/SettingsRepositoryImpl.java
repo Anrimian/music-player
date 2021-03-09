@@ -336,12 +336,12 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setSleepTimerTime(long millis) {
-        preferences.getLong(SLEEP_TIMER_TIME, millis);
+        preferences.putLong(SLEEP_TIMER_TIME, millis);
     }
 
     @Override
     public long getSleepTimerTime() {
-        return preferences.getLong(SLEEP_TIMER_TIME);
+        return preferences.getLong(SLEEP_TIMER_TIME, 30 * 60 * 1000);
     }
 
     @Override
