@@ -54,23 +54,26 @@ class SleepTimerDialogFragment : MvpAppCompatDialogFragment(), SleepTimerView {
 
         when(state) {
             SleepTimerInteractor.SleepTimerState.ENABLED -> {
+                viewBinding.tvRemainingTimeMessage.visibility = VISIBLE
                 viewBinding.tvRemainingTime.visibility = VISIBLE
-                timePickerWrapper.setVisibility(INVISIBLE)
+                setPickerVisibility(INVISIBLE)
 
                 viewBinding.btnAction.setText(R.string.pause)
                 viewBinding.btnAction.setOnClickListener { presenter.onStopClicked() }
 
             }
             SleepTimerInteractor.SleepTimerState.DISABLED -> {
+                viewBinding.tvRemainingTimeMessage.visibility = INVISIBLE
                 viewBinding.tvRemainingTime.visibility = INVISIBLE
-                timePickerWrapper.setVisibility(VISIBLE)
+                setPickerVisibility(VISIBLE)
 
                 viewBinding.btnAction.setText(R.string.start)
                 viewBinding.btnAction.setOnClickListener { presenter.onStartClicked() }
             }
             SleepTimerInteractor.SleepTimerState.PAUSED -> {
+                viewBinding.tvRemainingTimeMessage.visibility = VISIBLE
                 viewBinding.tvRemainingTime.visibility = VISIBLE
-                timePickerWrapper.setVisibility(INVISIBLE)
+                setPickerVisibility(INVISIBLE)
 
                 viewBinding.btnAction.setText(R.string.resume)
                 viewBinding.btnAction.setOnClickListener { presenter.onResumeClicked() }
@@ -80,6 +83,12 @@ class SleepTimerDialogFragment : MvpAppCompatDialogFragment(), SleepTimerView {
 
     override fun showRemainingTimeMillis(millis: Long) {
         viewBinding.tvRemainingTime.text = FormatUtils.formatMilliseconds(millis)
+    }
+
+    private fun setPickerVisibility(visibility: Int) {
+        timePickerWrapper.setVisibility(visibility)
+        viewBinding.tvHoursDivider.visibility = visibility
+        viewBinding.tvMinutesDivider.visibility = visibility
     }
 
 }

@@ -224,6 +224,7 @@
     <string name="sleep_timer">Sleep timer</string>
     <string name="start">Start</string>
     <string name="resume">Resume</string>
+    <string name="sleep_timer_message">Playing will be stopped after:</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

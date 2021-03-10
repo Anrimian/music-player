@@ -8,32 +8,65 @@
         android:id="@+id/minutesPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvHoursDivider"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        style="@style/TextStyle"
+        android:id="@+id/tvHoursDivider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=":"
+        android:padding="4dp"
+        app:layout_constraintTop_toTopOf="@id/hoursPicker"
+        app:layout_constraintBottom_toBottomOf="@id/hoursPicker"
+        app:layout_constraintStart_toEndOf="@id/hoursPicker"/>
 
     <NumberPicker
         android:id="@+id/secondsPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/minutesPicker"
+        app:layout_constraintStart_toEndOf="@id/tvMinutesDivider"
         app:layout_constraintTop_toTopOf="@id/minutesPicker"/>
+
+    <TextView
+        style="@style/TextStyle"
+        android:id="@+id/tvMinutesDivider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=":"
+        android:padding="4dp"
+        app:layout_constraintTop_toTopOf="@id/minutesPicker"
+        app:layout_constraintBottom_toBottomOf="@id/minutesPicker"
+        app:layout_constraintStart_toEndOf="@id/minutesPicker"/>
 
     <NumberPicker
         android:id="@+id/hoursPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/minutesPicker"
+        android:layout_marginStart="@dimen/dialog_content_margin_start"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/minutesPicker"/>
+
+    <TextView
+        style="@style/TextStyle.Medium"
+        android:id="@+id/tvRemainingTimeMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dialog_content_margin_start"
+        android:text="@string/sleep_timer_message"
+        app:layout_constraintBottom_toTopOf="@id/tvRemainingTime"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"/>
 
     <TextView
         style="@style/TextStyle.BigTimer"
         android:id="@+id/tvRemainingTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tvRemainingTimeMessage"
+        app:layout_constraintTop_toBottomOf="@id/tvRemainingTimeMessage"
         app:layout_constraintBottom_toBottomOf="@id/secondsPicker"/>
 
     <Button
