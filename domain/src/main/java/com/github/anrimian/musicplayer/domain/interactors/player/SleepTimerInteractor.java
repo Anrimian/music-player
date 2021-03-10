@@ -13,6 +13,9 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //handle 'play last song' option
 //states: enable/disable/paused/disable_wait_for_finish
 //TODO we need to save remaining millis into preferences?
+//TODO dialog design
+//TODO reset button name(rename to stop?)
+//TODO check android 5 and tablets
 public class SleepTimerInteractor {
 
     public static final long NO_TIMER = -1;

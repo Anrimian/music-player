@@ -149,15 +149,13 @@
 
     <TextView
         android:id="@+id/tvSleepTime"
-        style="@style/TextStyle.Time"
-        android:gravity="center_vertical|end"
+        style="@style/TextStyleSleepTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        app:layout_constraintTop_toTopOf="@id/tv_total_time"
-        app:layout_constraintBottom_toBottomOf="@id/tv_total_time"
-        app:layout_constraintEnd_toEndOf="@id/tv_total_time"
-        app:layout_constraintStart_toStartOf="@id/tv_played_time"
+        android:layout_marginStart="@dimen/content_margin"
+        app:layout_constraintTop_toTopOf="@id/tv_played_time"
+        app:layout_constraintBottom_toBottomOf="@id/tv_played_time"
+        app:layout_constraintStart_toEndOf="@id/tv_played_time"
         tools:text="00:11" />
 
     <SeekBar

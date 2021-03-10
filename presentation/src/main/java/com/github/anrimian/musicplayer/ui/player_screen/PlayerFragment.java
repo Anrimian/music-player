@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +23,7 @@ import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -331,6 +334,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         CompatUtils.setMainButtonStyle(btnRepeatMode);
         CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
         CompatUtils.setOutlineTextButtonStyle(panelBinding.tvPlaybackSpeed);
+        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvSleepTime);
 
         deletingErrorHandler = new DeleteErrorHandler(getChildFragmentManager(),
                 presenter::onRetryFailedDeleteActionClicked,
@@ -719,16 +723,32 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showSleepTimerRemainingTime(long remainingMillis) {
-        //TODO to visible
+        //setVisibility() don't work in motion layout
         if (remainingMillis == SleepTimerInteractor.NO_TIMER) {
-            panelBinding.tvSleepTime.setVisibility(View.GONE);
+            panelBinding.tvSleepTime.setText("");
+            panelBinding.tvSleepTime.setBackground(null);
+            panelBinding.tvSleepTime.setCompoundDrawables(null, null, null, null);
+            panelBinding.tvSleepTime.setOnClickListener(null);
             return;
         }
-        panelBinding.tvSleepTime.setVisibility(VISIBLE);
+        if (!panelBinding.tvSleepTime.hasOnClickListeners()) {
+            //initialize, set visible
+            Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_timer);
+            Resources resources = requireContext().getResources();
+            int iconSize = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_size);
+            //noinspection ConstantConditions
+            icon.setBounds(0, 0, iconSize, iconSize);
+            icon.setTint(getColorFromAttr(requireContext(), android.R.attr.textColorSecondary));
+            panelBinding.tvSleepTime.setCompoundDrawables(icon, null, null, null);
+            int iconPadding = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_padding);
+            panelBinding.tvSleepTime.setCompoundDrawablePadding(iconPadding);
+            panelBinding.tvSleepTime.setBackgroundResource(R.drawable.bg_outline_text_button);
+            panelBinding.tvSleepTime.setOnClickListener(v ->
+                    new SleepTimerDialogFragment().show(getChildFragmentManager(), null)
+            );
+        }
+
         panelBinding.tvSleepTime.setText(FormatUtils.formatMilliseconds(remainingMillis));
-        panelBinding.tvSleepTime.setOnClickListener(v ->
-                new SleepTimerDialogFragment().show(getChildFragmentManager(), null)
-        );
     }
 
     public void openPlayQueue() {

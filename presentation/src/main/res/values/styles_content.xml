@@ -122,6 +122,9 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <style name="TextStyleSleepTime" parent="@style/TextStyleSpeedButton">
+    </style>
+
     <style name="TextStyle.Subtitle">
         <item name="android:textColor">@color/color_text_secondary</item>
         <item name="android:textSize">14sp</item>
