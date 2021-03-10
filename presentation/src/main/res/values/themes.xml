@@ -79,6 +79,18 @@
         <item name="navigationViewPrimaryColor">@color/colorTealPrimary</item>
     </style>
 
+    <style name="PrimaryRedTheme" parent="PrimaryLightTheme">
+        <item name="colorPrimary">@color/colorRedPrimary</item>
+        <item name="colorPrimaryDark">@color/colorRedPrimaryDark</item>
+        <item name="colorAccent">@color/colorRedPrimary</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@color/colorRedPrimary</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@color/colorRedPrimary</item>
+    </style>
+
     <style name="DarkOrangeTheme" parent="@style/PrimaryDarkTheme">
         <item name="colorAccent">@color/colorOrangeAccent</item>
         <item name="colorPrimaryVariant">@color/colorGreenDarkAccent</item>
