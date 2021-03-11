@@ -106,16 +106,20 @@ public class FormatUtils {
     }
 
     public static String formatMilliseconds(long millis) {
+        return formatMilliseconds(millis, true);
+    }
+
+    public static String formatMilliseconds(long millis, boolean cutZeroNumbers) {
         StringBuilder sb = new StringBuilder();
 
         long hours = MILLISECONDS.toHours(millis);
-        if (hours != 0) {
+        if (hours != 0 || !cutZeroNumbers) {
             sb.append(format(Locale.getDefault(), "%02d", hours));
             sb.append(":");
         }
 
         long minutes = MILLISECONDS.toMinutes(millis) - HOURS.toMinutes(hours);
-        if (minutes != 0 || hours != 0) {
+        if (minutes != 0 || hours != 0 || !cutZeroNumbers) {
             sb.append(format(Locale.getDefault(), "%02d", minutes));
 
         } else {

@@ -48,7 +48,7 @@
     </style>
 
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
-
+        <item name="android:textColor">@color/color_text_primary</item>
     </style>
 
     <style name="TextStyleItemPrimary" parent="TextStyle">
@@ -143,7 +143,7 @@
     </style>
 
     <style name="TextStyle.BigTimer">
-        <item name="android:textSize">44sp</item>
+        <item name="android:textSize">36sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 

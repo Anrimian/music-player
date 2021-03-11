@@ -14,7 +14,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //states: enable/disable/paused/disable_wait_for_finish
 //TODO we need to save remaining millis into preferences?
 //TODO dialog design
-//TODO reset button name(rename to stop?)
+//TODO number picker: scroll+disable=wrong text color
 //TODO check android 5 and tablets
 //TODO split screen: dialog buttons(timer and speed)
 public class SleepTimerInteractor {

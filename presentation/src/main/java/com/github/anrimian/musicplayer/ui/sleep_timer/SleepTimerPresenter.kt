@@ -31,7 +31,7 @@ class SleepTimerPresenter(private val interactor: SleepTimerInteractor,
     }
 
     fun onStopClicked() {
-        interactor.pause()
+        interactor.stop()
     }
 
     fun onResetButtonClicked() {

@@ -31,4 +31,9 @@
         <item name="tickColorActive">@android:color/white</item>
         <item name="tickColorInactive">?attr/colorAccent</item>
     </style>
+
+    <style name="NumberPickerStyle">
+        <item name="android:editTextColor">@color/color_text_primary</item>
+    </style>
+
 </resources>
