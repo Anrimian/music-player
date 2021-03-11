@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //TODO dialog design
 //TODO reset button name(rename to stop?)
 //TODO check android 5 and tablets
+//TODO split screen: dialog buttons(timer and speed)
 public class SleepTimerInteractor {
 
     public static final long NO_TIMER = -1;
