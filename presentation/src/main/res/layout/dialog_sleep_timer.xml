@@ -5,11 +5,12 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <NumberPicker
-        android:theme="@style/NumberPickerStyle"
+    <EditText
+        style="@style/TimeEditText"
         android:id="@+id/minutesPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialog_margin_content_vertical"
         app:layout_constraintStart_toEndOf="@id/tvHoursDivider"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -25,8 +26,8 @@
         app:layout_constraintStart_toEndOf="@id/hoursPicker"
         tools:ignore="HardcodedText"/>
 
-    <NumberPicker
-        android:theme="@style/NumberPickerStyle"
+    <com.github.anrimian.musicplayer.ui.sleep_timer.view.NumberInputView
+        style="@style/TimeEditText"
         android:id="@+id/secondsPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,8 +46,8 @@
         app:layout_constraintStart_toEndOf="@id/minutesPicker"
         tools:ignore="HardcodedText" />
 
-    <NumberPicker
-        android:theme="@style/NumberPickerStyle"
+    <EditText
+        style="@style/TimeEditText"
         android:id="@+id/hoursPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,6 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dialog_content_margin_start"
+        android:layout_marginTop="@dimen/content_vertical_margin"
         android:text="@string/sleep_timer_message"
         app:layout_constraintTop_toBottomOf="@id/minutesPicker"
         app:layout_constraintStart_toStartOf="parent"
