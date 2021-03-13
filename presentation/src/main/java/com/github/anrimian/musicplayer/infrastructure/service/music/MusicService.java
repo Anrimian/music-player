@@ -25,7 +25,6 @@ import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
-import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
@@ -413,7 +412,7 @@ public class MusicService extends Service {
 
         @Override
         public void onPlay() {
-            SystemServiceControllerImpl.startPlayForegroundService(MusicService.this);
+            playerInteractor().play();
         }
 
         @Override

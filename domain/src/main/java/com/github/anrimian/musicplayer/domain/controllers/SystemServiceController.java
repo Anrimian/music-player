@@ -4,6 +4,4 @@ public interface SystemServiceController {
 
     void startMusicService();
 
-    void startMusicServiceBg();
-
 }
