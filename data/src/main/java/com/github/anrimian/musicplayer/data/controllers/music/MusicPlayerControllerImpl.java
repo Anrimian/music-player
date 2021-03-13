@@ -39,17 +39,18 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public MusicPlayerControllerImpl(UiStateRepository uiStateRepository,
                                      Context context,
                                      CompositionSourceProvider sourceRepository,
-                                     Scheduler scheduler,
+                                     Scheduler uiScheduler,
+                                     Scheduler ioScheduler,
                                      PlayerErrorParser playerErrorParser,
                                      Analytics analytics,
                                      EqualizerController equalizerController) {
         this.uiStateRepository = uiStateRepository;
-        Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser, equalizerController);
-        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
+        Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, sourceRepository, uiScheduler, ioScheduler, playerErrorParser, equalizerController);
+        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(context, uiScheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
         mediaPlayer = new CompositeMediaPlayer(exoMediaPlayer, androidMediaPlayer);
 
-//        mediaPlayer = new AndroidMediaPlayer(context, scheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
-//        mediaPlayer = new ExoMediaPlayer(context, sourceRepository, scheduler, playerErrorParser, equalizerController);
+//        mediaPlayer = new AndroidMediaPlayer(context, uiScheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
+//        mediaPlayer = new ExoMediaPlayer(context, sourceRepository, uiScheduler, playerErrorParser, equalizerController);
     }
 
     @Override

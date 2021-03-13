@@ -45,7 +45,8 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private final Context context;
     private final CompositionSourceProvider sourceRepository;
-    private final Scheduler scheduler;
+    private final Scheduler uiScheduler;
+    private final Scheduler ioScheduler;
     private final PlayerErrorParser playerErrorParser;
     private final EqualizerController equalizerController;
 
@@ -61,13 +62,15 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     public ExoMediaPlayer(Context context,
                           CompositionSourceProvider sourceRepository,
-                          Scheduler scheduler,
+                          Scheduler uiScheduler,
+                          Scheduler ioScheduler,
                           PlayerErrorParser playerErrorParser,
                           EqualizerController equalizerController) {
         this.context = context;
         this.playerErrorParser = playerErrorParser;
         this.sourceRepository = sourceRepository;
-        this.scheduler = scheduler;
+        this.uiScheduler = uiScheduler;
+        this.ioScheduler = ioScheduler;
         this.equalizerController = equalizerController;
     }
 
@@ -86,7 +89,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .flatMapCompletable(this::prepareMediaSource)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
-                .subscribeOn(scheduler)
+                .subscribeOn(uiScheduler)
                 .subscribe();
     }
 
@@ -96,7 +99,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
             seekTo(0);
             pausePlayer();
             stopTracingTrackPosition();
-        }).subscribeOn(scheduler).subscribe();
+        }).subscribeOn(uiScheduler).subscribe();
     }
 
     @Override
@@ -113,7 +116,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         Completable.fromRunnable(() -> {
             pausePlayer();
             stopTracingTrackPosition();
-        }).subscribeOn(scheduler).subscribe();
+        }).subscribeOn(uiScheduler).subscribe();
     }
 
     @Override
@@ -125,13 +128,13 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 return;
             }
             trackPositionSubject.onNext(position);
-        }).subscribeOn(scheduler).subscribe();
+        }).subscribeOn(uiScheduler).subscribe();
     }
 
     @Override
     public void setVolume(float volume) {
         Completable.fromRunnable(() -> getPlayer().setVolume(volume))
-                .subscribeOn(scheduler)
+                .subscribeOn(uiScheduler)
                 .subscribe();
     }
 
@@ -143,7 +146,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     @Override
     public Single<Long> getTrackPosition() {
         return Single.fromCallable(() -> getPlayer().getCurrentPosition())
-                .subscribeOn(scheduler);
+                .subscribeOn(uiScheduler);
     }
 
     @Override
@@ -176,7 +179,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
             equalizerController.attachEqualizer(context, getPlayer().getAudioSessionId());
             getPlayer().setPlayWhenReady(true);
             startTracingTrackPosition();
-        }).subscribeOn(scheduler).subscribe();
+        }).subscribeOn(uiScheduler).subscribe();
     }
 
     private void onCompositionPrepared(Throwable throwable, long startPosition) {
@@ -218,7 +221,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     private void startTracingTrackPosition() {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
-                .observeOn(scheduler)
+                .observeOn(uiScheduler)
                 .map(o -> getPlayer().getCurrentPosition())
                 .subscribe(trackPositionSubject::onNext);
     }
@@ -233,8 +236,9 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     private Completable prepareMediaSource(CompositionSource composition) {
         return getCompositionUri(composition)
                 .flatMap(this::createMediaSource)
-                .timeout(2, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
-                .observeOn(scheduler)
+                .subscribeOn(ioScheduler)
+                .timeout(4, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
+                .observeOn(uiScheduler)
                 .doOnSuccess(mediaSource -> {
                     getPlayer().setMediaSource(mediaSource);
                     getPlayer().prepare();
@@ -275,7 +279,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private void usePlayer(Callback<SimpleExoPlayer> function) {
         Completable.fromAction(() -> function.call(getPlayer()))
-                .subscribeOn(scheduler)
+                .subscribeOn(uiScheduler)
                 .subscribe();
     }
 

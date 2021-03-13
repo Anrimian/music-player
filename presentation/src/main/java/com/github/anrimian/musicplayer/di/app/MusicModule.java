@@ -126,14 +126,16 @@ class MusicModule {
     MusicPlayerController provideMusicPlayerController(UiStateRepository uiStateRepository,
                                                        Context context,
                                                        CompositionSourceProvider sourceRepository,
-                                                       @Named(UI_SCHEDULER) Scheduler scheduler,
+                                                       @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                                       @Named(IO_SCHEDULER) Scheduler ioScheduler,
                                                        PlayerErrorParser playerErrorParser,
                                                        Analytics analytics,
                                                        EqualizerController equalizerController) {
         return new MusicPlayerControllerImpl(uiStateRepository,
                 context,
                 sourceRepository,
-                scheduler,
+                uiScheduler,
+                ioScheduler,
                 playerErrorParser,
                 analytics,
                 equalizerController);

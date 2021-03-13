@@ -40,7 +40,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
 
     private final Context context;
-    private final Scheduler scheduler;
+    private final Scheduler uiScheduler;
     private final CompositionSourceProvider sourceRepository;
     private final PlayerErrorParser playerErrorParser;
     private final Analytics analytics;
@@ -66,13 +66,13 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     //problem with error case(file not found), multiple error events
     public AndroidMediaPlayer(Context context,
-                              Scheduler scheduler,
+                              Scheduler uiScheduler,
                               CompositionSourceProvider sourceRepository,
                               PlayerErrorParser playerErrorParser,
                               Analytics analytics,
                               EqualizerController equalizerController) {
         this.context = context;
-        this.scheduler = scheduler;
+        this.uiScheduler = uiScheduler;
         this.sourceRepository = sourceRepository;
         this.playerErrorParser = playerErrorParser;
         this.analytics = analytics;
@@ -105,7 +105,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
                 .flatMapCompletable(this::prepareMediaSource)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
-                .subscribeOn(scheduler)
+                .subscribeOn(uiScheduler)
                 .subscribe();
     }
 
@@ -214,7 +214,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private void startTracingTrackPosition() {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
-                .observeOn(scheduler)
+                .observeOn(uiScheduler)
                 .flatMapSingle(o -> getTrackPosition())
                 .subscribe(trackPositionSubject::onNext);
     }
