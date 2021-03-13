@@ -72,12 +72,9 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
     @Override
     public void pause() {
+        mediaPlayer.pause();
         //noinspection ResultOfMethodCallIgnored
-        mediaPlayer.getTrackPosition()
-                .subscribe(position -> {
-                    saveTrackPosition(position);
-                    mediaPlayer.pause();
-                });
+        mediaPlayer.getTrackPosition().subscribe(this::saveTrackPosition);
     }
 
     @Override
