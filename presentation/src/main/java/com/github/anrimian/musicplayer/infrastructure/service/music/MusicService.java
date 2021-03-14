@@ -412,12 +412,12 @@ public class MusicService extends Service {
 
         @Override
         public void onPlay() {
-            playerInteractor().playOrPause();
+            playerInteractor().play();
         }
 
         @Override
         public void onPause() {
-            playerInteractor().playOrPause();
+            playerInteractor().pause();
         }
 
         @Override
