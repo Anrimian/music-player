@@ -14,7 +14,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //states: enable/disable/paused/disable_wait_for_finish
 //TODO we need to save remaining millis into preferences?
 //TODO dialog design
-//TODO number picker: scroll+disable=wrong text color
+//TODO time pickers design
+//TODO text time pickers
 //TODO check android 5 and tablets
 //TODO split screen: dialog buttons(timer and speed)
 public class SleepTimerInteractor {
@@ -26,7 +27,7 @@ public class SleepTimerInteractor {
     private final UiStateRepository uiStateRepository;
 
     private final BehaviorSubject<Long> timerCountDownSubject = BehaviorSubject.createDefault(NO_TIMER);
-    private final BehaviorSubject<SleepTimerState> sleepTimerState = BehaviorSubject.createDefault(SleepTimerState.DISABLED);
+    private final BehaviorSubject<SleepTimerState> sleepTimerStateSubject = BehaviorSubject.createDefault(SleepTimerState.DISABLED);
 
     private Disposable timerDisposable;
 
@@ -42,26 +43,26 @@ public class SleepTimerInteractor {
 
     public void start() {
         startSleepTimer(settingsRepository.getSleepTimerTime());
-        sleepTimerState.onNext(SleepTimerState.ENABLED);
+        sleepTimerStateSubject.onNext(SleepTimerState.ENABLED);
     }
 
     public void stop() {
         pause();
         uiStateRepository.setSleepTimerRemainingMillis(0L);
         timerCountDownSubject.onNext(NO_TIMER);
-        sleepTimerState.onNext(SleepTimerState.DISABLED);
+        sleepTimerStateSubject.onNext(SleepTimerState.DISABLED);
     }
 
     public void pause() {
         if (timerDisposable != null) {
             timerDisposable.dispose();
         }
-        sleepTimerState.onNext(SleepTimerState.PAUSED);
+        sleepTimerStateSubject.onNext(SleepTimerState.PAUSED);
     }
 
     public void resume() {
         startSleepTimer(uiStateRepository.getSleepTimerRemainingMillis());
-        sleepTimerState.onNext(SleepTimerState.ENABLED);
+        sleepTimerStateSubject.onNext(SleepTimerState.ENABLED);
     }
 
     public Observable<Long> getSleepTimerCountDownObservable() {
@@ -69,7 +70,7 @@ public class SleepTimerInteractor {
     }
 
     public Observable<SleepTimerState> getSleepTimerStateObservable() {
-        return sleepTimerState;
+        return sleepTimerStateSubject;
     }
 
     public void setPlayLastSong(boolean playLastSong) {
@@ -77,6 +78,9 @@ public class SleepTimerInteractor {
     }
 
     public void setSleepTimerTime(long millis) {
+        if (sleepTimerStateSubject.getValue() == SleepTimerState.ENABLED) {
+            return;
+        }
         settingsRepository.setSleepTimerTime(millis);
     }
 
@@ -99,7 +103,7 @@ public class SleepTimerInteractor {
     private void onTimerFinished() {
         libraryPlayerInteractor.pause();
         timerCountDownSubject.onNext(NO_TIMER);
-        sleepTimerState.onNext(SleepTimerState.DISABLED);
+        sleepTimerStateSubject.onNext(SleepTimerState.DISABLED);
     }
 
     public enum SleepTimerState {

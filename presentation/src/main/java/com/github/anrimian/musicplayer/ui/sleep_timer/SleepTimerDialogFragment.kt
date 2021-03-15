@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.databinding.DialogSleepTimerBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
-import com.github.anrimian.musicplayer.ui.sleep_timer.view.TimePickerWrapper2
+import com.github.anrimian.musicplayer.ui.sleep_timer.view.TimePickerWrapper
 import moxy.MvpAppCompatDialogFragment
 import moxy.ktx.moxyPresenter
 
@@ -19,15 +19,15 @@ class SleepTimerDialogFragment : MvpAppCompatDialogFragment(), SleepTimerView {
 
     private lateinit var viewBinding: DialogSleepTimerBinding
 
-    private lateinit var timePickerWrapper: TimePickerWrapper2
+    private lateinit var timePickerWrapper: TimePickerWrapper
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         viewBinding = DialogSleepTimerBinding.inflate(LayoutInflater.from(context))
 
-        timePickerWrapper = TimePickerWrapper2(
-                viewBinding.secondsPicker,
-                viewBinding.minutesPicker,
-                viewBinding.hoursPicker,
+        timePickerWrapper = TimePickerWrapper(
+                viewBinding.etSeconds,
+                viewBinding.etMinutes,
+                viewBinding.etHours,
                 presenter::onSleepTimerTimeChanged
         )
 

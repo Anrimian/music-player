@@ -149,6 +149,6 @@
 
     <!--sleep timer-->
     <dimen name="sleep_timer_icon_size">12dp</dimen>
-    <dimen name="sleep_timer_icon_padding">4dp</dimen>
+    <dimen name="sleep_timer_icon_padding">2dp</dimen>
 
 </resources>

@@ -18,12 +18,12 @@ class SleepTimerPresenter(private val interactor: SleepTimerInteractor,
     }
 
     fun onSleepTimerTimeChanged(millis: Long) {
-        viewState.showSleepTimerTime(millis)
         interactor.sleepTimerTime = millis
     }
 
     fun onStartClicked() {
         interactor.start()
+        viewState.showSleepTimerTime(interactor.sleepTimerTime)
     }
 
     fun onResumeClicked() {

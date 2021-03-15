@@ -46,10 +46,10 @@
         <item name="android:paddingEnd">12dp</item>
         <item name="android:inputType">number</item>
         <item name="android:maxLength">2</item>
-<!--        <item name="android:cursorVisible">false</item>-->
         <item name="android:gravity">center</item>
         <item name="android:imeOptions">flagNoExtractUi</item>
-<!--        <item name="android:textIsSelectable">false</item>-->
+        <item name="android:textIsSelectable">false</item>
+        <item name="android:longClickable">false</item>
     </style>
 
 </resources>

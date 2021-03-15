@@ -5,14 +5,16 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <EditText
+    <com.github.anrimian.musicplayer.ui.sleep_timer.view.BlockedSelectionEditText
         style="@style/TimeEditText"
-        android:id="@+id/minutesPicker"
+        android:id="@+id/etHours"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dialog_margin_content_vertical"
-        app:layout_constraintStart_toEndOf="@id/tvHoursDivider"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_marginStart="@dimen/dialog_content_margin_start"
+        android:imeOptions="actionNext"
+        android:nextFocusForward="@id/etMinutes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/etMinutes"/>
 
     <TextView
         style="@style/TextStyle"
@@ -21,18 +23,21 @@
         android:layout_height="wrap_content"
         android:text=":"
         android:padding="4dp"
-        app:layout_constraintTop_toTopOf="@id/hoursPicker"
-        app:layout_constraintBottom_toBottomOf="@id/hoursPicker"
-        app:layout_constraintStart_toEndOf="@id/hoursPicker"
+        app:layout_constraintTop_toTopOf="@id/etHours"
+        app:layout_constraintBottom_toBottomOf="@id/etHours"
+        app:layout_constraintStart_toEndOf="@id/etHours"
         tools:ignore="HardcodedText"/>
 
-    <com.github.anrimian.musicplayer.ui.sleep_timer.view.NumberInputView
+    <com.github.anrimian.musicplayer.ui.sleep_timer.view.BlockedSelectionEditText
         style="@style/TimeEditText"
-        android:id="@+id/secondsPicker"
+        android:id="@+id/etMinutes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/tvMinutesDivider"
-        app:layout_constraintTop_toTopOf="@id/minutesPicker"/>
+        android:layout_marginTop="@dimen/dialog_margin_content_vertical"
+        android:imeOptions="actionNext"
+        android:nextFocusForward="@id/etSeconds"
+        app:layout_constraintStart_toEndOf="@id/tvHoursDivider"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         style="@style/TextStyle"
@@ -41,19 +46,18 @@
         android:layout_height="wrap_content"
         android:text=":"
         android:padding="4dp"
-        app:layout_constraintTop_toTopOf="@id/minutesPicker"
-        app:layout_constraintBottom_toBottomOf="@id/minutesPicker"
-        app:layout_constraintStart_toEndOf="@id/minutesPicker"
+        app:layout_constraintTop_toTopOf="@id/etMinutes"
+        app:layout_constraintBottom_toBottomOf="@id/etMinutes"
+        app:layout_constraintStart_toEndOf="@id/etMinutes"
         tools:ignore="HardcodedText" />
 
-    <EditText
+    <com.github.anrimian.musicplayer.ui.sleep_timer.view.BlockedSelectionEditText
         style="@style/TimeEditText"
-        android:id="@+id/hoursPicker"
+        android:id="@+id/etSeconds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dialog_content_margin_start"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/minutesPicker"/>
+        app:layout_constraintStart_toEndOf="@id/tvMinutesDivider"
+        app:layout_constraintTop_toTopOf="@id/etMinutes"/>
 
     <TextView
         style="@style/TextStyle.Medium"
@@ -63,7 +67,7 @@
         android:layout_marginStart="@dimen/dialog_content_margin_start"
         android:layout_marginTop="@dimen/content_vertical_margin"
         android:text="@string/sleep_timer_message"
-        app:layout_constraintTop_toBottomOf="@id/minutesPicker"
+        app:layout_constraintTop_toBottomOf="@id/etMinutes"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintVertical_chainStyle="packed"/>
 
