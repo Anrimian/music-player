@@ -15,7 +15,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //TODO we need to save remaining millis into preferences?
 //TODO dialog design
 //TODO time pickers design
-//TODO text time pickers
+//TODO test time pickers
+//TODO etSeconds - action doesn't clear focus or even called
 //TODO check android 5 and tablets
 //TODO split screen: dialog buttons(timer and speed)
 public class SleepTimerInteractor {

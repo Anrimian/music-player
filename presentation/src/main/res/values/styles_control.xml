@@ -50,6 +50,10 @@
         <item name="android:imeOptions">flagNoExtractUi</item>
         <item name="android:textIsSelectable">false</item>
         <item name="android:longClickable">false</item>
+        <item name="android:textSelectHandleLeft">@drawable/bg_empty</item>
+        <item name="android:textSelectHandleRight">@drawable/bg_empty</item>
+        <item name="android:textSelectHandle">@drawable/bg_empty</item>
+        <item name="android:singleLine">true</item>
     </style>
 
 </resources>

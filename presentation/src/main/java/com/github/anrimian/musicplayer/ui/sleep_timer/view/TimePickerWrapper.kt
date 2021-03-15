@@ -32,6 +32,12 @@ class TimePickerWrapper(
         setMinTimeTextWidth(etHours)
         etHours.filters = arrayOf(InputFilterMinMax(0, 99))
         etHours.onTimeTextChanged { hours -> this.hours = hours }
+
+        //not called
+        etHours.setOnEditorActionListener { _, _, _ ->
+            etHours.clearFocus()
+            return@setOnEditorActionListener false
+        }
     }
 
     fun showTime(millis: Long) {

@@ -56,6 +56,7 @@
         android:id="@+id/etSeconds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:imeOptions="actionDone"
         app:layout_constraintStart_toEndOf="@id/tvMinutesDivider"
         app:layout_constraintTop_toTopOf="@id/etMinutes"/>
 
