@@ -16,9 +16,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //TODO dialog design
 //TODO time pickers design
 //TODO test time pickers
-//TODO etSeconds - action doesn't clear focus or even called
 //TODO check android 5 and tablets
-//TODO split screen: dialog buttons(timer and speed)
+//TODO split screen: speed dialog buttons
 public class SleepTimerInteractor {
 
     public static final long NO_TIMER = -1;

@@ -24,6 +24,10 @@ class TimePickerWrapper(
         setMinTimeTextWidth(etSeconds)
         etSeconds.filters = arrayOf(InputFilterMinMax(0, 59))
         etSeconds.onTimeTextChanged { seconds -> this.seconds = seconds }
+        etSeconds.setOnEditorActionListener { _, _, _ ->
+            etSeconds.clearFocus()
+            return@setOnEditorActionListener true
+        }
 
         setMinTimeTextWidth(etMinutes)
         etMinutes.filters = arrayOf(InputFilterMinMax(0, 59))
@@ -32,12 +36,6 @@ class TimePickerWrapper(
         setMinTimeTextWidth(etHours)
         etHours.filters = arrayOf(InputFilterMinMax(0, 99))
         etHours.onTimeTextChanged { hours -> this.hours = hours }
-
-        //not called
-        etHours.setOnEditorActionListener { _, _, _ ->
-            etHours.clearFocus()
-            return@setOnEditorActionListener false
-        }
     }
 
     fun showTime(millis: Long) {
@@ -76,7 +74,7 @@ class TimePickerWrapper(
     private fun EditText.onTimeTextChanged(onChanged: (Int) -> Unit) {
         onTextChanged(this) { text ->
             try {
-                val number = text.toInt()
+                val number = if (text.isEmpty()) 0 else text.toInt()
                 onChanged(number)
                 onTimePickerValueChanged()
             } catch (e: NumberFormatException) {}
