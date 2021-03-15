@@ -26,7 +26,7 @@ class TimePickerWrapper(
         etSeconds.onTimeTextChanged { seconds -> this.seconds = seconds }
         etSeconds.setOnEditorActionListener { _, _, _ ->
             etSeconds.clearFocus()
-            return@setOnEditorActionListener true
+            return@setOnEditorActionListener false
         }
 
         setMinTimeTextWidth(etMinutes)

@@ -36,6 +36,7 @@
         <item name="dialogButtonColor">@color/colorAccentDark</item>
 
         <!--controls-->
+        <item name="disabledColor">@color/disabled_color_dark</item>
         <item name="buttonColor">@color/primary_button_color_dark</item>
         <item name="secondaryButtonColor">@color/secondary_button_color_dark</item>
         <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
