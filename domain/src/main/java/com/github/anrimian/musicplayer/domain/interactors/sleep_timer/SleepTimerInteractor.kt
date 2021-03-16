@@ -1,97 +1,84 @@
-package com.github.anrimian.musicplayer.domain.interactors.sleep_timer;
+package com.github.anrimian.musicplayer.domain.interactors.sleep_timer
 
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
+import java.util.concurrent.TimeUnit
 
 //TODO check android 5 and tablets
-public class SleepTimerInteractor {
 
-    public static final long NO_TIMER = -1;
+const val NO_TIMER = -1L
 
-    private final LibraryPlayerInteractor libraryPlayerInteractor;
-    private final SettingsRepository settingsRepository;
+class SleepTimerInteractor(
+        private val libraryPlayerInteractor: LibraryPlayerInteractor,
+        private val settingsRepository: SettingsRepository
+) {
 
-    private final BehaviorSubject<Long> timerCountDownSubject = BehaviorSubject.createDefault(NO_TIMER);
-    private final BehaviorSubject<SleepTimerState> sleepTimerStateSubject = BehaviorSubject.createDefault(SleepTimerState.DISABLED);
+    private val timerCountDownSubject = BehaviorSubject.createDefault(NO_TIMER)
+    private val sleepTimerStateSubject = BehaviorSubject.createDefault(SleepTimerState.DISABLED)
 
-    private Disposable timerDisposable;
+    private var timerDisposable: Disposable? = null
+    private var remainingMillis: Long = 0
 
-    private long remainingMillis;
-
-    public SleepTimerInteractor(LibraryPlayerInteractor libraryPlayerInteractor,
-                                SettingsRepository settingsRepository) {
-        this.libraryPlayerInteractor = libraryPlayerInteractor;
-        this.settingsRepository = settingsRepository;
+    fun start() {
+        startSleepTimer(settingsRepository.sleepTimerTime)
+        sleepTimerStateSubject.onNext(SleepTimerState.ENABLED)
     }
 
-    public void start() {
-        startSleepTimer(settingsRepository.getSleepTimerTime());
-        sleepTimerStateSubject.onNext(SleepTimerState.ENABLED);
+    fun stop() {
+        timerDisposable?.dispose()
+        remainingMillis = 0L
+        timerCountDownSubject.onNext(NO_TIMER)
+        sleepTimerStateSubject.onNext(SleepTimerState.DISABLED)
     }
 
-    public void stop() {
-        pause();
-        remainingMillis = 0L;
-        timerCountDownSubject.onNext(NO_TIMER);
-        sleepTimerStateSubject.onNext(SleepTimerState.DISABLED);
+    fun pause() {
+        timerDisposable?.dispose()
+        sleepTimerStateSubject.onNext(SleepTimerState.PAUSED)
     }
 
-    public void pause() {
-        if (timerDisposable != null) {
-            timerDisposable.dispose();
+    fun resume() {
+        startSleepTimer(remainingMillis)
+        sleepTimerStateSubject.onNext(SleepTimerState.ENABLED)
+    }
+
+    fun getSleepTimerCountDownObservable(): Observable<Long> = timerCountDownSubject
+
+    fun getSleepTimerStateObservable(): Observable<SleepTimerState> = sleepTimerStateSubject
+
+    fun setPlayLastSong(playLastSong: Boolean) {
+        settingsRepository.isSleepTimerPlayLastSong = playLastSong
+    }
+
+    fun setSleepTimerTime(millis: Long) {
+        if (sleepTimerStateSubject.value == SleepTimerState.ENABLED) {
+            return
         }
-        sleepTimerStateSubject.onNext(SleepTimerState.PAUSED);
+        settingsRepository.sleepTimerTime = millis
     }
 
-    public void resume() {
-        startSleepTimer(remainingMillis);
-        sleepTimerStateSubject.onNext(SleepTimerState.ENABLED);
-    }
+    fun getSleepTimerTime() = settingsRepository.sleepTimerTime
 
-    public Observable<Long> getSleepTimerCountDownObservable() {
-        return timerCountDownSubject;
-    }
-
-    public Observable<SleepTimerState> getSleepTimerStateObservable() {
-        return sleepTimerStateSubject;
-    }
-
-    public void setPlayLastSong(boolean playLastSong) {
-        settingsRepository.setSleepTimerPlayLastSong(playLastSong);
-    }
-
-    public void setSleepTimerTime(long millis) {
-        if (sleepTimerStateSubject.getValue() == SleepTimerState.ENABLED) {
-            return;
-        }
-        settingsRepository.setSleepTimerTime(millis);
-    }
-
-    public long getSleepTimerTime() {
-        return settingsRepository.getSleepTimerTime();
-    }
-
-    private void startSleepTimer(long timeMillis) {
-        remainingMillis = timeMillis;
-        timerDisposable = Observable.interval( 1, TimeUnit.SECONDS)
-                .map(seconds -> remainingMillis -= 1000)
-                .doOnSubscribe(d -> timerCountDownSubject.onNext(remainingMillis))
+    private fun startSleepTimer(timeMillis: Long) {
+        remainingMillis = timeMillis
+        timerDisposable = Observable.interval(1, TimeUnit.SECONDS)
+                .map {
+                    remainingMillis -= 1000L
+                    return@map remainingMillis
+                }
+                .doOnSubscribe { timerCountDownSubject.onNext(remainingMillis) }
                 .doOnNext(timerCountDownSubject::onNext)
-                .takeUntil(millis -> millis < 0)
+                .takeUntil { millis: Long -> millis < 0 }
                 .doOnComplete(this::onTimerFinished)
-                .subscribe();
+                .subscribe()
     }
 
-    private void onTimerFinished() {
-        libraryPlayerInteractor.pause();
-        timerCountDownSubject.onNext(NO_TIMER);
-        sleepTimerStateSubject.onNext(SleepTimerState.DISABLED);
+    private fun onTimerFinished() {
+        libraryPlayerInteractor.pause()
+        timerCountDownSubject.onNext(NO_TIMER)
+        sleepTimerStateSubject.onNext(SleepTimerState.DISABLED)
     }
 
 }

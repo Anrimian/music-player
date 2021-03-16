@@ -35,7 +35,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractorKt;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
@@ -724,7 +724,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showSleepTimerRemainingTime(long remainingMillis) {
         //setVisibility() don't work in motion layout
-        if (remainingMillis == SleepTimerInteractor.NO_TIMER) {
+        if (remainingMillis == SleepTimerInteractorKt.NO_TIMER) {
             panelBinding.tvSleepTime.setText("");
             panelBinding.tvSleepTime.setBackground(null);
             panelBinding.tvSleepTime.setCompoundDrawables(null, null, null, null);
@@ -736,7 +736,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_timer);
             Resources resources = requireContext().getResources();
             int iconSize = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_size);
-            //noinspection ConstantConditions
             icon.setBounds(0, 0, iconSize, iconSize);
             icon.setTint(getColorFromAttr(requireContext(), android.R.attr.textColorSecondary));
             panelBinding.tvSleepTime.setCompoundDrawables(icon, null, null, null);

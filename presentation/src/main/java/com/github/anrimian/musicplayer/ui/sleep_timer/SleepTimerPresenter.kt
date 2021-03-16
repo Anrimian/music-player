@@ -12,18 +12,18 @@ class SleepTimerPresenter(private val interactor: SleepTimerInteractor,
     
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.showSleepTimerTime(interactor.sleepTimerTime)
+        viewState.showSleepTimerTime(interactor.getSleepTimerTime())
         subscribeOnSleepTimerState()
         subscribeOnSleepTimerRemainingTime()
     }
 
     fun onSleepTimerTimeChanged(millis: Long) {
-        interactor.sleepTimerTime = millis
+        interactor.setSleepTimerTime(millis)
     }
 
     fun onStartClicked() {
         interactor.start()
-        viewState.showSleepTimerTime(interactor.sleepTimerTime)
+        viewState.showSleepTimerTime(interactor.getSleepTimerTime())
     }
 
     fun onResumeClicked() {
@@ -39,10 +39,10 @@ class SleepTimerPresenter(private val interactor: SleepTimerInteractor,
     }
 
     private fun subscribeOnSleepTimerState() {
-        interactor.sleepTimerStateObservable.unsafeSubscribeOnUi(viewState::showSleepTimerState)
+        interactor.getSleepTimerStateObservable().unsafeSubscribeOnUi(viewState::showSleepTimerState)
     }
 
     private fun subscribeOnSleepTimerRemainingTime() {
-        interactor.sleepTimerCountDownObservable.unsafeSubscribeOnUi(viewState::showRemainingTimeMillis)
+        interactor.getSleepTimerCountDownObservable().unsafeSubscribeOnUi(viewState::showRemainingTimeMillis)
     }
 }
