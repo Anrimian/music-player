@@ -30,7 +30,10 @@ public class DialogFragmentDelayRunner {
     public void show(DialogFragment fragment) {
         handler.postDelayed(() -> {
             if (!fragmentManager.isDestroyed()) {
-                fragment.show(fragmentManager, tag);
+                try {
+                    fragment.show(fragmentManager, tag);
+                    //https://issuetracker.google.com/issues/37133130
+                } catch (IllegalStateException ignored) {}
             }
         }, delayMillis);
     }
