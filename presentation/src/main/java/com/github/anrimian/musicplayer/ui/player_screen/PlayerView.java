@@ -110,4 +110,7 @@ public interface PlayerView extends MvpView {
 
     @AddToEndSingle
     void showSpeedChangeFeatureVisible(boolean visible);
+
+    @AddToEndSingle
+    void showSleepTimerRemainingTime(long remainingMillis);
 }

@@ -103,4 +103,12 @@ public interface SettingsRepository {
     boolean isAppConfirmDeleteDialogEnabled();
 
     long getRewindValueMillis();
+
+    void setSleepTimerTime(long millis);
+
+    long getSleepTimerTime();
+
+    void setSleepTimerPlayLastSong(boolean playLastSong);
+
+    boolean isSleepTimerPlayLastSong();
 }

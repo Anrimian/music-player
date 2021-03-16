@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFolders
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
@@ -48,10 +49,10 @@ public class LibraryModule {
 
     @Provides
     @NonNull
-    PlayerScreenInteractor playerScreenInteractor(LibraryPlayerInteractor musicPlayerInteractor,
+    PlayerScreenInteractor playerScreenInteractor(SleepTimerInteractor sleepTimerInteractor,
                                                   UiStateRepository uiStateRepository,
                                                   SettingsRepository settingsRepository) {
-        return new PlayerScreenInteractor(musicPlayerInteractor, uiStateRepository, settingsRepository);
+        return new PlayerScreenInteractor(sleepTimerInteractor, uiStateRepository, settingsRepository);
     }
 
     @Provides

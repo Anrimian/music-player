@@ -221,6 +221,11 @@
     <string name="playback_speed">Playback speed</string>
     <string name="reset">Reset</string>
     <string name="apply">Apply</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="start">Start</string>
+    <string name="resume">Resume</string>
+    <string name="sleep_timer_message">Playing will be stopped in:</string>
+    <string name="stop">Stop</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

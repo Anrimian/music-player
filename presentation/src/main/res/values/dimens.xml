@@ -147,4 +147,8 @@
     <!--cards-->
     <dimen name="card_corner_radius">8dp</dimen>
 
+    <!--sleep timer-->
+    <dimen name="sleep_timer_icon_size">12dp</dimen>
+    <dimen name="sleep_timer_icon_padding">2dp</dimen>
+
 </resources>

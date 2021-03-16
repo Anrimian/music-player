@@ -70,6 +70,7 @@ ext {
     moxyCompiler = "com.github.moxy-community:moxy-compiler:$moxyVersion"
     moxyAppcompat = "com.github.moxy-community:moxy-androidx:$moxyVersion"
     moxyMaterial = "com.github.moxy-community:moxy-material:$moxyVersion"
+    moxyKtx = "com.github.moxy-community:moxy-ktx:$moxyVersion"
 
     room = "androidx.room:room-runtime:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"

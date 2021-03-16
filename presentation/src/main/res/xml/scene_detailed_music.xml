@@ -78,8 +78,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/sb_track_state" />
         <Constraint
-            app:layout_constraintEnd_toStartOf="@id/tv_total_time"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             app:layout_constraintBottom_toTopOf="@+id/btn_random_play"

@@ -96,6 +96,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         subscribeOnCurrentCompositionChanging();
         subscribeOnCurrentPosition();
         subscribeOnTrackPositionChanging();
+        subscribeOnSleepTimerTime();
     }
 
     void onStop() {
@@ -471,5 +472,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         presenterDisposable.add(playerInteractor.getPlaybackSpeedObservable()
                 .observeOn(uiScheduler)
                 .subscribe(getViewState()::displayPlaybackSpeed));
+    }
+
+    private void subscribeOnSleepTimerTime() {
+        batterySafeDisposable.add(playerScreenInteractor.getSleepTimerCountDownObservable()
+                .observeOn(uiScheduler)
+                .subscribe(getViewState()::showSleepTimerRemainingTime));
     }
 }

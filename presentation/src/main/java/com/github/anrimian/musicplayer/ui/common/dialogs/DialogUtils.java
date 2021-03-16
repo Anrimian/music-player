@@ -212,7 +212,7 @@ public class DialogUtils {
         for (float value: availableSpeedValues) {
             TextView textView = new TextView(context);
             textView.setText(String.format(Locale.getDefault(), "%.2f", value));
-            textView.setTextSize(12f);
+            textView.setTextSize(11f);
             textView.setGravity(Gravity.CENTER_HORIZONTAL);
             textView.setTextColor(getColorFromAttr(context, android.R.attr.textColorSecondary));
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);

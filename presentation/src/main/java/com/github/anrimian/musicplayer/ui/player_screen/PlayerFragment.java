@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +23,7 @@ import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -32,6 +35,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractorKt;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
@@ -65,6 +69,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
@@ -329,6 +334,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         CompatUtils.setMainButtonStyle(btnRepeatMode);
         CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
         CompatUtils.setOutlineTextButtonStyle(panelBinding.tvPlaybackSpeed);
+        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvSleepTime);
 
         deletingErrorHandler = new DeleteErrorHandler(getChildFragmentManager(),
                 presenter::onRetryFailedDeleteActionClicked,
@@ -715,6 +721,35 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         panelBinding.tvPlaybackSpeed.setVisibility(visible? VISIBLE: View.GONE);
     }
 
+    @Override
+    public void showSleepTimerRemainingTime(long remainingMillis) {
+        //setVisibility() don't work in motion layout
+        if (remainingMillis == SleepTimerInteractorKt.NO_TIMER) {
+            panelBinding.tvSleepTime.setText("");
+            panelBinding.tvSleepTime.setBackground(null);
+            panelBinding.tvSleepTime.setCompoundDrawables(null, null, null, null);
+            panelBinding.tvSleepTime.setOnClickListener(null);
+            return;
+        }
+        if (!panelBinding.tvSleepTime.hasOnClickListeners()) {
+            //initialize, set visible
+            Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_timer);
+            Resources resources = requireContext().getResources();
+            int iconSize = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_size);
+            icon.setBounds(0, 0, iconSize, iconSize);
+            icon.setTint(getColorFromAttr(requireContext(), android.R.attr.textColorSecondary));
+            panelBinding.tvSleepTime.setCompoundDrawables(icon, null, null, null);
+            int iconPadding = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_padding);
+            panelBinding.tvSleepTime.setCompoundDrawablePadding(iconPadding);
+            panelBinding.tvSleepTime.setBackgroundResource(R.drawable.bg_outline_text_button);
+            panelBinding.tvSleepTime.setOnClickListener(v ->
+                    new SleepTimerDialogFragment().show(getChildFragmentManager(), null)
+            );
+        }
+
+        panelBinding.tvSleepTime.setText(FormatUtils.formatMilliseconds(remainingMillis));
+    }
+
     public void openPlayQueue() {
         presenter.onOpenPlayQueueClicked();
         playerPanelWrapper.openPlayQueue();
@@ -726,6 +761,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
                 fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
                 fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
+                break;
+            }
+            case R.id.menu_sleep_timer: {
+                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_equalizer: {

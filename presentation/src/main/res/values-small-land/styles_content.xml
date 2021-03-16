@@ -4,4 +4,9 @@
     <style name="TextStyle.Time">
         <item name="android:textSize">12sp</item>
     </style>
+
+    <style name="ButtonBorderlessStyle" parent="@style/BaseButtonBorderlessStyle">
+        <item name="android:minWidth">72dip</item>
+    </style>
+
 </resources>

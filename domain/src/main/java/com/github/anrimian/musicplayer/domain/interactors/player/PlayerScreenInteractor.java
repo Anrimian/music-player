@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
@@ -7,15 +8,14 @@ import io.reactivex.rxjava3.core.Observable;
 
 public class PlayerScreenInteractor {
 
-    private final LibraryPlayerInteractor musicPlayerInteractor;
-
+    private final SleepTimerInteractor sleepTimerInteractor;
     private final UiStateRepository uiStateRepository;
     private final SettingsRepository settingsRepository;
 
-    public PlayerScreenInteractor(LibraryPlayerInteractor musicPlayerInteractor,
+    public PlayerScreenInteractor(SleepTimerInteractor sleepTimerInteractor,
                                   UiStateRepository uiStateRepository,
                                   SettingsRepository settingsRepository) {
-        this.musicPlayerInteractor = musicPlayerInteractor;
+        this.sleepTimerInteractor = sleepTimerInteractor;
         this.uiStateRepository = uiStateRepository;
         this.settingsRepository = settingsRepository;
     }
@@ -46,5 +46,9 @@ public class PlayerScreenInteractor {
 
     public Observable<Boolean> getCoversEnabledObservable() {
         return settingsRepository.getCoversEnabledObservable();
+    }
+
+    public Observable<Long> getSleepTimerCountDownObservable() {
+        return sleepTimerInteractor.getSleepTimerCountDownObservable();
     }
 }

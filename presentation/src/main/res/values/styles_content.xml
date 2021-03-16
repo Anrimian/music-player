@@ -28,12 +28,14 @@
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
 
-    <style name="ButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+    <style name="BaseButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
         <item name="android:background">@drawable/bg_button_outline</item>
         <item name="android:textColor">@color/color_accent_state</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
+
+    <style name="ButtonBorderlessStyle" parent="@style/BaseButtonBorderlessStyle"/>
 
     <style name="ButtonBorderlessStyleInverse" parent="ButtonBorderlessStyle">
         <item name="android:background">@drawable/bg_button_outline_inverse</item>
@@ -48,7 +50,7 @@
     </style>
 
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
-
+        <item name="android:textColor">@color/color_text_primary</item>
     </style>
 
     <style name="TextStyleItemPrimary" parent="TextStyle">
@@ -122,6 +124,9 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <style name="TextStyleSleepTime" parent="@style/TextStyleSpeedButton">
+    </style>
+
     <style name="TextStyle.Subtitle">
         <item name="android:textColor">@color/color_text_secondary</item>
         <item name="android:textSize">14sp</item>
@@ -137,6 +142,11 @@
 
     <style name="TextStyle.Medium">
         <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="TextStyle.BigTimer">
+        <item name="android:textSize">36sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="TextStyle.Composition">

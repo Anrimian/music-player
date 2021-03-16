@@ -385,7 +385,6 @@ public class LibraryPlayerInteractor {
         if (settingsRepository.getRepeatMode() == RepeatMode.REPEAT_COMPOSITION) {
             return;
         }
-        //skipped twice from end of queue
         playQueueRepository.skipToNext()
                 .doOnSuccess(this::onAutoSkipNextFinished)
                 .subscribe();

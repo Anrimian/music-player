@@ -142,10 +142,21 @@
         style="@style/TextStyleSpeedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/content_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
         app:layout_constraintTop_toTopOf="@id/tv_total_time"
         app:layout_constraintBottom_toBottomOf="@id/tv_total_time"
         app:layout_constraintEnd_toStartOf="@id/tv_total_time"/>
+
+    <TextView
+        android:id="@+id/tvSleepTime"
+        style="@style/TextStyleSleepTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        app:layout_constraintTop_toTopOf="@id/tv_played_time"
+        app:layout_constraintBottom_toBottomOf="@id/tv_played_time"
+        app:layout_constraintStart_toEndOf="@id/tv_played_time"
+        tools:text="00:11" />
 
     <SeekBar
         android:id="@+id/sb_track_state"

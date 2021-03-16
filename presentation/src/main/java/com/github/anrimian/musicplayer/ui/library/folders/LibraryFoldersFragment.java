@@ -46,6 +46,7 @@ import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourc
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
@@ -686,6 +687,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 //noinspection ConstantConditions
                 FragmentNavigation.from(getParentFragment().getParentFragmentManager())
                         .addNewFragment(new ExcludedFoldersFragment());
+                break;
+            }
+            case R.id.menu_sleep_timer: {
+                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_equalizer: {

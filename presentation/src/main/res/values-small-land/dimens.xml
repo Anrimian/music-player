@@ -18,4 +18,8 @@
     <!--popup-->
     <dimen name="popup_screen_margin">8dp</dimen>
 
+    <!--dialogs-->
+    <dimen name="dialog_button_margin_vertical">4dp</dimen>
+    <dimen name="dialog_button_margin_horizontal">6dp</dimen>
+
 </resources>

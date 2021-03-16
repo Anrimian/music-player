@@ -32,6 +32,7 @@ import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerPresenter;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
 import com.github.anrimian.musicplayer.utils.logger.AppLogger;
 import com.github.anrimian.musicplayer.utils.logger.FileLog;
@@ -74,6 +75,7 @@ public interface AppComponent {
     CreatePlayListPresenter createPlayListsPresenter();
     ChoosePlayListPresenter choosePlayListPresenter();
     EqualizerPresenter equalizerPresenter();
+    SleepTimerPresenter sleepTimerPresenter();
 
     UiStateRepository uiStateRepository();
     MediaScannerRepository mediaScannerRepository();
