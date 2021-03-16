@@ -36,11 +36,10 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     public void startMusicService() {
         Intent intent = new Intent(context, MusicService.class);
         intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
-        context.startService(intent);
-    }
-
-    @Override
-    public void startMusicServiceBg() {
-        startPlayForegroundService(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
     }
 }

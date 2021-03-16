@@ -238,7 +238,7 @@ public class PlayerInteractor {
                 if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
                     playerStateSubject.onNext(PLAY);
                     musicPlayerController.resume();
-                    systemServiceController.startMusicServiceBg();
+                    systemServiceController.startMusicService();
                 }
                 break;
             }
