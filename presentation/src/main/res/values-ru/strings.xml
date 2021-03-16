@@ -116,7 +116,17 @@
         <br/>Никакой аналитики или чего-либо ещё. Это приложение даже не имеет разрешения на доступ к интернету. (По крайней мере до реализации функциональности которая бы требовала подключение к интернету.)
         <br/>
         <br/><big><b>Переводы</b></big>
-        <br/>Если вы нашли ошибку к текстах приложения или хотите предложить перевод приложения на ваш язык, %2$s мне об этом.]]>
+        <br/>Если вы нашли ошибку к текстах приложения или хотите предложить перевод приложения на ваш язык, %2$s мне об этом.
+        <br/>
+        <br/><big><b>Source code</b></big>
+        <br/>Code base is can be viewed %3$s.
+        <br/>
+        <br/><big><b>Frequently Asked Questions</b></big>
+        <br/>
+        <br/><big><b>Where is big cover screen?</b></big>
+        <br/>
+        <br/>One of the main reason for creation of this app were e
+    ]]>
     </string>
     <string name="about_app_text_write">напишите</string>
     <string name="about_app_text_here">напишите</string>
