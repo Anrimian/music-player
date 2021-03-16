@@ -85,7 +85,4 @@ public interface UiStateRepository {
 
     Observable<Float> getPlaybackSpeedObservable();
 
-    long getSleepTimerRemainingMillis();
-
-    void setSleepTimerRemainingMillis(long startTime);
 }

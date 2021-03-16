@@ -35,7 +35,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;

@@ -8,11 +8,10 @@ import com.github.anrimian.musicplayer.data.repositories.logger.LoggerRepository
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -126,9 +125,8 @@ public class AppModule {
     @NonNull
     @Singleton
     SleepTimerInteractor sleepTimerInteractor(LibraryPlayerInteractor libraryPlayerInteractor,
-                                              SettingsRepository settingsRepository,
-                                              UiStateRepository uiStateRepository) {
-        return new SleepTimerInteractor(libraryPlayerInteractor, settingsRepository, uiStateRepository);
+                                              SettingsRepository settingsRepository) {
+        return new SleepTimerInteractor(libraryPlayerInteractor, settingsRepository);
     }
 
     @Provides

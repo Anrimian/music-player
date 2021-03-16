@@ -7,7 +7,8 @@ import android.view.LayoutInflater
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogSleepTimerBinding
 import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.domain.interactors.player.SleepTimerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerState
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerState.*
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.sleep_timer.view.TimePickerWrapper
 import moxy.MvpAppCompatDialogFragment
@@ -46,9 +47,9 @@ class SleepTimerDialogFragment : MvpAppCompatDialogFragment(), SleepTimerView {
         timePickerWrapper.showTime(sleepTimerTimeMillis)
     }
 
-    override fun showSleepTimerState(state: SleepTimerInteractor.SleepTimerState) {
+    override fun showSleepTimerState(state: SleepTimerState) {
         when(state) {
-            SleepTimerInteractor.SleepTimerState.ENABLED -> {
+            ENABLED -> {
                 setPickerEnabled(false)
                 setTimerEnabled(true)
 
@@ -56,14 +57,14 @@ class SleepTimerDialogFragment : MvpAppCompatDialogFragment(), SleepTimerView {
                 viewBinding.btnAction.setOnClickListener { presenter.onStopClicked() }
 
             }
-            SleepTimerInteractor.SleepTimerState.DISABLED -> {
+            DISABLED -> {
                 setPickerEnabled(true)
                 setTimerEnabled(false)
 
                 viewBinding.btnAction.setText(R.string.start)
                 viewBinding.btnAction.setOnClickListener { presenter.onStartClicked() }
             }
-            SleepTimerInteractor.SleepTimerState.PAUSED -> {
+            PAUSED -> {
                 setPickerEnabled(false)
                 setTimerEnabled(true)
 

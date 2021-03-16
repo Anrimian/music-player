@@ -35,7 +35,6 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_FOLDER_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_LIBRARY_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_PLAYLIST_SCREEN;
-import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SLEEP_TIMER_REMAINING_MILLIS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.TRACK_POSITION;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
@@ -67,7 +66,6 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String PLAYLISTS_POSITION = "playlists_positions";
         String PLAYLISTS_COMPOSITIONS_POSITIONS = "playlists_compositions_positions";
         String PLAYBACK_SPEED = "playback_speed";
-        String SLEEP_TIMER_REMAINING_MILLIS = "sleep_timer_remaining_millis";
 
         int LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE = 15;
         int LIBRARY_ALBUMS_POSITIONS_MAX_CACHE_SIZE = 5;
@@ -302,16 +300,6 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     public Observable<Float> getPlaybackSpeedObservable() {
         return withDefaultValue(currentPlaySpeedSubject, this::getCurrentPlaybackSpeed)
                 .distinctUntilChanged();
-    }
-
-    @Override
-    public long getSleepTimerRemainingMillis() {
-        return preferences.getLong(SLEEP_TIMER_REMAINING_MILLIS);
-    }
-
-    @Override
-    public void setSleepTimerRemainingMillis(long startTime) {
-        preferences.putLong(SLEEP_TIMER_REMAINING_MILLIS, startTime);
     }
 
     private static class LruCachePreference {

@@ -1,7 +1,7 @@
-package com.github.anrimian.musicplayer.domain.interactors.player;
+package com.github.anrimian.musicplayer.domain.interactors.sleep_timer;
 
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.concurrent.TimeUnit;
 
@@ -9,19 +9,13 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
-//fade out when timer is finishing(?)
-//handle 'play last song' option
-//states: enable/disable/paused/disable_wait_for_finish
-//TODO we need to save remaining millis into preferences?
 //TODO check android 5 and tablets
-//TODO cleanup
 public class SleepTimerInteractor {
 
     public static final long NO_TIMER = -1;
 
     private final LibraryPlayerInteractor libraryPlayerInteractor;
     private final SettingsRepository settingsRepository;
-    private final UiStateRepository uiStateRepository;
 
     private final BehaviorSubject<Long> timerCountDownSubject = BehaviorSubject.createDefault(NO_TIMER);
     private final BehaviorSubject<SleepTimerState> sleepTimerStateSubject = BehaviorSubject.createDefault(SleepTimerState.DISABLED);
@@ -31,11 +25,9 @@ public class SleepTimerInteractor {
     private long remainingMillis;
 
     public SleepTimerInteractor(LibraryPlayerInteractor libraryPlayerInteractor,
-                                SettingsRepository settingsRepository,
-                                UiStateRepository uiStateRepository) {
+                                SettingsRepository settingsRepository) {
         this.libraryPlayerInteractor = libraryPlayerInteractor;
         this.settingsRepository = settingsRepository;
-        this.uiStateRepository = uiStateRepository;
     }
 
     public void start() {
@@ -45,7 +37,7 @@ public class SleepTimerInteractor {
 
     public void stop() {
         pause();
-        uiStateRepository.setSleepTimerRemainingMillis(0L);
+        remainingMillis = 0L;
         timerCountDownSubject.onNext(NO_TIMER);
         sleepTimerStateSubject.onNext(SleepTimerState.DISABLED);
     }
@@ -58,7 +50,7 @@ public class SleepTimerInteractor {
     }
 
     public void resume() {
-        startSleepTimer(uiStateRepository.getSleepTimerRemainingMillis());
+        startSleepTimer(remainingMillis);
         sleepTimerStateSubject.onNext(SleepTimerState.ENABLED);
     }
 
@@ -92,7 +84,6 @@ public class SleepTimerInteractor {
                 .doOnSubscribe(d -> timerCountDownSubject.onNext(remainingMillis))
                 .doOnNext(timerCountDownSubject::onNext)
                 .takeUntil(millis -> millis < 0)
-                .doOnDispose(() -> uiStateRepository.setSleepTimerRemainingMillis(remainingMillis))
                 .doOnComplete(this::onTimerFinished)
                 .subscribe();
     }
@@ -103,9 +94,4 @@ public class SleepTimerInteractor {
         sleepTimerStateSubject.onNext(SleepTimerState.DISABLED);
     }
 
-    public enum SleepTimerState {
-        ENABLED,
-        DISABLED,
-        PAUSED
-    }
 }
