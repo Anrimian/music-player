@@ -14,7 +14,6 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //states: enable/disable/paused/disable_wait_for_finish
 //TODO we need to save remaining millis into preferences?
 //TODO check android 5 and tablets
-//TODO split screen: speed dialog buttons
 //TODO cleanup
 public class SleepTimerInteractor {
 

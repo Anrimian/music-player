@@ -28,12 +28,14 @@
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
 
-    <style name="ButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+    <style name="BaseButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
         <item name="android:background">@drawable/bg_button_outline</item>
         <item name="android:textColor">@color/color_accent_state</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
+
+    <style name="ButtonBorderlessStyle" parent="@style/BaseButtonBorderlessStyle"/>
 
     <style name="ButtonBorderlessStyleInverse" parent="ButtonBorderlessStyle">
         <item name="android:background">@drawable/bg_button_outline_inverse</item>
