@@ -57,8 +57,11 @@ class TimePickerWrapper(
 
     fun setEnabled(enabled: Boolean) {
         etSeconds.isEnabled = enabled
+        etSeconds.clearFocus()
         etMinutes.isEnabled = enabled
+        etMinutes.clearFocus()
         etHours.isEnabled = enabled
+        etHours.clearFocus()
     }
 
     private fun onTimePickerValueChanged() {

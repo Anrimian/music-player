@@ -7,8 +7,6 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 
-//TODO check android 5 and tablets
-
 const val NO_TIMER = -1L
 
 class SleepTimerInteractor(
