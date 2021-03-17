@@ -62,7 +62,9 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
 
         String aboutText = getString(R.string.about_app_text,
                 linkify("mailto:", R.string.about_app_text_write, R.string.feedback_email),
-                linkify("mailto:", R.string.about_app_text_here, R.string.feedback_email));
+                linkify("mailto:", R.string.about_app_text_here, R.string.feedback_email),
+                linkify("", R.string.about_app_text_here_link, R.string.source_code_link)
+        );
         viewBinding.tvAbout.setText(Html.fromHtml(aboutText));
         viewBinding.tvAbout.setMovementMethod(LinkMovementMethod.getInstance());
 
