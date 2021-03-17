@@ -123,6 +123,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         }
         viewBinding.btnOpenSystemEqualizer.setEnabled(enabled);
         viewBinding.rbUseSystemEqualizer.setEnabled(enabled);
+        viewBinding.tvSystemEqualizerText.setEnabled(enabled);
         viewBinding.tvSystemEqualizerDescription.setEnabled(enabled);
         viewBinding.tvSystemEqualizerDescription.setText(getString(textResId));
     }
