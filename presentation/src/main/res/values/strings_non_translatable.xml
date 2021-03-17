@@ -28,12 +28,13 @@
         <br/><big><b>Source code</b></big>
         <br/>Code base is can be viewed %3$s.
         <br/>
+        <br/>
         <br/><big>----------------------------------------------</b></big>
         <br/><big><b>Frequently Asked Questions</b></big>
         <br/><big>----------------------------------------------</b></big>
         <br/>
-        <br/><big><b>Where is the big cover screen?</b></big>
-        <br/>High amount of similar looking apps with big covers screens was one of the main reason why I created this app. I don\'t like to see big covers all time, I prefer to see play queue instead.
+        <br/><big><b>Where is a familiar for players big cover screen?</b></big>
+        <br/>High amount of similar looking apps with big covers screens was one of the main reason for creation this app. I don\'t like big cover, it just takes screen space. Let there be current play queue in this place.
     ]]>
     </string>
     <string name="about_app_text_write" translatable="false">email me</string>

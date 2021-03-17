@@ -118,18 +118,21 @@
         <br/><big><b>Переводы</b></big>
         <br/>Если вы нашли ошибку к текстах приложения или хотите предложить перевод приложения на ваш язык, %2$s мне об этом.
         <br/>
-        <br/><big><b>Source code</b></big>
-        <br/>Code base is can be viewed %3$s.
+        <br/><big><b>Исходный код</b></big>
+        <br/>Исходный код приложения можно увидеть %3$s.
         <br/>
-        <br/><big><b>Frequently Asked Questions</b></big>
         <br/>
-        <br/><big><b>Where is big cover screen?</b></big>
+        <br/><big>--------------------------------------------------</b></big>
+        <br/><big><b>Часто Задаваемые Вопросы</b></big>
+        <br/><big>--------------------------------------------------</b></big>
         <br/>
-        <br/>One of the main reason for creation of this app were e
+        <br/><big><b>Где привычный для плееров экран с большой обложкой?</b></big>
+        <br/>Большое количество похожих приложений с большими обложками было одной из главных причин для создания этого приложения. Мне не нравится большая обложка, она просто занимают пространство экрана. Пусть лучше будет очередь воспроизведения на этом месте.
     ]]>
     </string>
     <string name="about_app_text_write">напишите</string>
     <string name="about_app_text_here">напишите</string>
+    <string name="about_app_text_here_link">здесь</string>
     <string name="theme">Тема оформления</string>
     <string name="dark_theme">Тёмная</string>
     <string name="edit">Редактировать</string>
