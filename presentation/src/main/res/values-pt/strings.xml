@@ -209,6 +209,16 @@
     <!-- now verified-->
     <string name="do_not_show_confirm_delete_dialog">Não mostrar a caixa de diálogo de confirmação de exclusão do aplicativo</string>
     <!--    -->
+    <string name="app_equalizer">Equalizador de aplicativo</string>
+    <string name="presets">Predefinidos</string>
+    <string name="playback_speed">Velocidade de reprodução</string>
+    <string name="reset">Redefinir</string>
+    <string name="apply">Aplicar</string>
+    <string name="sleep_timer">Cronômetro</string>
+    <string name="start">Começar</string>
+    <string name="resume">Retomar</string>
+    <string name="sleep_timer_message">O reprodutor será interrompido em:</string>
+    <string name="stop">Pare</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s música</item>
