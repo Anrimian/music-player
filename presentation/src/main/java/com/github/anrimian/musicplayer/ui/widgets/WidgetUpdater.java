@@ -9,8 +9,6 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 
-import java.util.List;
-
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -56,7 +54,7 @@ public class WidgetUpdater {
         }
         updateDisposable.add(Observable.combineLatest(
                 musicPlayerInteractor.getCurrentQueueItemObservable(),
-                musicPlayerInteractor.getPlayQueueObservable().toObservable(),
+                musicPlayerInteractor.getPlayQueueSizeObservable(),
                 musicPlayerInteractor.getPlayerStateObservable(),
                 displaySettingsInteractor.getCoversEnabledObservable(),
                 musicPlayerInteractor.getRepeatModeObservable(),
@@ -87,7 +85,7 @@ public class WidgetUpdater {
                 compositionAuthor,
                 compositionId,
                 compositionUpdateTime,
-                widgetState.playQueueItems.size(),
+                widgetState.playQueueSize,
                 widgetState.randomPlay,
                 widgetState.repeatMode,
                 widgetState.isCoversEnabled
@@ -96,7 +94,7 @@ public class WidgetUpdater {
         intent.putExtra(COMPOSITION_AUTHOR_ARG, compositionAuthor);
         intent.putExtra(COMPOSITION_ID_ARG, compositionId);
         intent.putExtra(COMPOSITION_UPDATE_TIME_ARG, compositionUpdateTime);
-        intent.putExtra(QUEUE_SIZE_ARG, widgetState.playQueueItems.size());
+        intent.putExtra(QUEUE_SIZE_ARG, widgetState.playQueueSize);
         intent.putExtra(RANDOM_PLAY_ARG, widgetState.randomPlay);
         intent.putExtra(REPEAT_ARG, widgetState.repeatMode);
         intent.putExtra(COVERS_ENABLED_ARG, widgetState.isCoversEnabled);
@@ -108,20 +106,20 @@ public class WidgetUpdater {
     private static class WidgetState {
 
         PlayQueueEvent playQueueEvent;
-        List<PlayQueueItem> playQueueItems;
+        int playQueueSize;
         PlayerState playerState;
         boolean isCoversEnabled;
         int repeatMode;
         boolean randomPlay;
 
         private WidgetState set(PlayQueueEvent playQueueEvent,
-                                List<PlayQueueItem> playQueueItems,
+                                int playQueueSize,
                                 PlayerState playerState,
                                 boolean isCoversEnabled,
                                 int repeatMode,
                                 boolean randomPlay) {
             this.playQueueEvent = playQueueEvent;
-            this.playQueueItems = playQueueItems;
+            this.playQueueSize = playQueueSize;
             this.playerState = playerState;
             this.isCoversEnabled = isCoversEnabled;
             this.repeatMode = repeatMode;

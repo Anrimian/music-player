@@ -265,6 +265,10 @@ public class LibraryPlayerInteractor {
         playQueueRepository.clearPlayQueue();
     }
 
+    public Observable<Integer> getPlayQueueSizeObservable() {
+        return playQueueRepository.getPlayQueueSizeObservable();
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();

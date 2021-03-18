@@ -199,6 +199,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .subscribe();
     }
 
+    @Override
+    public Observable<Integer> getPlayQueueSizeObservable() {
+        return playQueueDao.getPlayQueueSizeObservable();
+    }
+
     private void setCurrentItem(@Nullable Long itemId) {
         if (itemId == null) {
             itemId = NO_ITEM;
