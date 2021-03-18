@@ -234,11 +234,16 @@
     <string name="error_report_message">Произошла фатальная ошибка. Приложение не отсылает никакой информации автоматически, но вы можете отправить файл с отчётом об ошибке вручную по почте. Это поможет исправить эту ошибку.</string>
     <string name="show_error_report_dialog_on_start">Показывать отчёт об ошибке при запуске приложения после сбоев</string>
     <string name="do_not_show_confirm_delete_dialog">Не показывать диалоговое окно подтверждения удаления</string>
-
+    <string name="app_equalizer">Экалайзер приложения</string>
+    <string name="presets">Пресеты</string>
     <string name="playback_speed">Скорость воспроизведения</string>
     <string name="reset">Сбросить</string>
     <string name="apply">Применить</string>
-    <string name="app_equalizer">Экалайзер приложения</string>
+    <string name="sleep_timer">Таймер сна</string>
+    <string name="start">Старт</string>
+    <string name="resume">Возобновить</string>
+    <string name="sleep_timer_message">Проигрывание будет остановлено через:</string>
+    <string name="stop">Стоп</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
