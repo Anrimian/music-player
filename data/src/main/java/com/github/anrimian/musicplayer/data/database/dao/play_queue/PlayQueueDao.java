@@ -214,4 +214,7 @@ public interface PlayQueueDao {
             "       (SELECT shuffledPosition FROM play_queue WHERE id = :currentItemId)" +
             "       AND (SELECT corruptionType FROM compositions WHERE id = audioId) IS NULL)")
     Long getPreviousShuffledQueueItemId(long currentItemId);
+
+    @Query("SELECT count() FROM play_queue")
+    Observable<Integer> getPlayQueueSizeObservable();
 }

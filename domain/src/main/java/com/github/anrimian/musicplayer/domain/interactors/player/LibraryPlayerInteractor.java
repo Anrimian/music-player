@@ -265,6 +265,10 @@ public class LibraryPlayerInteractor {
         playQueueRepository.clearPlayQueue();
     }
 
+    public Observable<Integer> getPlayQueueSizeObservable() {
+        return playQueueRepository.getPlayQueueSizeObservable();
+    }
+
     public void setPlaybackSpeed(float speed) {
         playerCoordinatorInteractor.setPlaybackSpeed(speed, LIBRARY);
         uiStateRepository.setCurrentPlaybackSpeed(speed);
