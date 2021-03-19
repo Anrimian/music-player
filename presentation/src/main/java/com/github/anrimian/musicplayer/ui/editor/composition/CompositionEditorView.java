@@ -8,17 +8,17 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import java.util.List;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
-import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.viewstate.strategy.alias.OneExecution;
+import moxy.viewstate.strategy.alias.Skip;
 
 public interface CompositionEditorView extends MvpView {
 
     String DISPLAY_COMPOSITION_STATE = "display_composition_state";
     String CHANGE_FILE_STATE = "change_file_state";
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void closeScreen();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = DISPLAY_COMPOSITION_STATE)
@@ -33,48 +33,48 @@ public interface CompositionEditorView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_FILE_STATE)
     void hideChangeFileProgress();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showCheckTagsErrorMessage(ErrorCommand errorCommand);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEnterAuthorDialog(FullComposition composition, String[] hints);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEnterTitleDialog(FullComposition composition);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEnterFileNameDialog(FullComposition composition);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void copyFileNameText(String filePath);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEnterAlbumDialog(FullComposition composition, String[] hints);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEnterAlbumArtistDialog(FullComposition composition, String[] hints);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEnterLyricsDialog(FullComposition composition);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showAddGenreDialog(String[] genres);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEditGenreDialog(ShortGenre shortGenre, String[] genres);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showGenres(List<ShortGenre> shortGenres);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showRemovedGenreMessage(ShortGenre genre);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showCoverActionsDialog();
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showSelectImageFromGalleryScreen();
 }

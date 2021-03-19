@@ -8,9 +8,9 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import java.util.List;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.viewstate.strategy.alias.OneExecution;
 
 public interface ChoosePlayListView extends MvpView {
 
@@ -28,21 +28,21 @@ public interface ChoosePlayListView extends MvpView {
     @StateStrategyType(ListStateStrategy.class)
     void updateList(List<PlayList> list);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showBottomSheetSlided(float slideOffset);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showPlayListMenu(PlayList playList);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showConfirmDeletePlayListDialog(PlayList playListToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showPlayListDeleteSuccess(PlayList playListToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeletePlayListError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showEditPlayListNameDialog(PlayList playListInMenu);
 }

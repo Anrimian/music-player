@@ -1,482 +1,427 @@
-package com.github.anrimian.musicplayer.ui.player_screen;
+package com.github.anrimian.musicplayer.ui.player_screen
 
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import moxy.MvpPresenter;
-
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
+import com.github.anrimian.musicplayer.domain.utils.ListUtils
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.util.*
 
 /**
  * Created on 02.11.2017.
  */
+class PlayerPresenter(
+        private val playerInteractor: LibraryPlayerInteractor,
+        private val playListsInteractor: PlayListsInteractor,
+        private val playerScreenInteractor: PlayerScreenInteractor,
+        errorParser: ErrorParser,
+        uiScheduler: Scheduler
+) : AppPresenter<PlayerView>(uiScheduler, errorParser) {
+    
+    private val batterySafeDisposable = CompositeDisposable()
+    
+    private var playQueue: List<PlayQueueItem> = ArrayList()
+    private var currentItem: PlayQueueItem? = null
+    private var currentPosition = -1
+    
+    private var isDragging = false
+    private var isCoversEnabled = false
+    
+    private val compositionsForPlayList = LinkedList<Composition>()
 
-public class PlayerPresenter extends MvpPresenter<PlayerView> {
-
-    private final LibraryPlayerInteractor playerInteractor;
-    private final PlayListsInteractor playListsInteractor;
-    private final PlayerScreenInteractor playerScreenInteractor;
-    private final ErrorParser errorParser;
-    private final Scheduler uiScheduler;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-    private final CompositeDisposable batterySafeDisposable = new CompositeDisposable();
-
-    private List<PlayQueueItem> playQueue = new ArrayList<>();
-
-    private PlayQueueItem currentItem;
-    private int currentPosition = -1;
-    private boolean isDragging;
-
-    private boolean isCoversEnabled = false;
-
-    private final List<Composition> compositionsForPlayList = new LinkedList<>();
-//    private final List<Composition> compositionsToDelete = new LinkedList<>();
-
-    @Nullable
-    private Completable lastDeleteAction;
-
-    public PlayerPresenter(LibraryPlayerInteractor musicPlayerInteractor,
-                           PlayListsInteractor playListsInteractor,
-                           PlayerScreenInteractor playerScreenInteractor,
-                           ErrorParser errorParser,
-                           Scheduler uiScheduler) {
-        this.playerInteractor = musicPlayerInteractor;
-        this.playListsInteractor = playListsInteractor;
-        this.playerScreenInteractor = playerScreenInteractor;
-        this.errorParser = errorParser;
-        this.uiScheduler = uiScheduler;
-    }
-
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        if (playerScreenInteractor.isPlayerPanelOpen()) {
-            getViewState().expandBottomPanel();
+    private var lastDeleteAction: Completable? = null
+    
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        if (playerScreenInteractor.isPlayerPanelOpen) {
+            viewState.expandBottomPanel()
         } else {
-            getViewState().collapseBottomPanel();
+            viewState.collapseBottomPanel()
         }
-        subscribeOnUiSettings();
-        subscribeOnRandomMode();
-        subscribeOnSpeedAvailableState();
-        subscribeOnSpeedState();
+        subscribeOnUiSettings()
+        subscribeOnRandomMode()
+        subscribeOnSpeedAvailableState()
+        subscribeOnSpeedState()
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
+    fun onStart() {
+        subscribeOnRepeatMode()
+        subscribeOnPlayerStateChanges()
+        subscribeOnPlayQueue()
+        subscribeOnCurrentCompositionChanging()
+        subscribeOnCurrentPosition()
+        subscribeOnTrackPositionChanging()
+        subscribeOnSleepTimerTime()
     }
 
-    void onStart() {
-        subscribeOnRepeatMode();
-        subscribeOnPlayerStateChanges();
-        subscribeOnPlayQueue();
-        subscribeOnCurrentCompositionChanging();
-        subscribeOnCurrentPosition();
-        subscribeOnTrackPositionChanging();
-        subscribeOnSleepTimerTime();
+    fun onStop() {
+        batterySafeDisposable.clear()
     }
 
-    void onStop() {
-        batterySafeDisposable.clear();
+    fun onCurrentScreenRequested() {
+        viewState.showDrawerScreen(playerScreenInteractor.selectedDrawerScreen,
+                playerScreenInteractor.selectedPlayListScreenId)
     }
 
-    void onCurrentScreenRequested() {
-        getViewState().showDrawerScreen(playerScreenInteractor.getSelectedDrawerScreen(),
-                playerScreenInteractor.getSelectedPlayListScreenId());
+    fun onOpenPlayQueueClicked() {
+        playerScreenInteractor.isPlayerPanelOpen = true
     }
 
-    void onOpenPlayQueueClicked() {
-        playerScreenInteractor.setPlayerPanelOpen(true);
+    fun onBottomPanelExpanded() {
+        playerScreenInteractor.isPlayerPanelOpen = true
+        viewState.expandBottomPanel()
     }
 
-    void onBottomPanelExpanded() {
-        playerScreenInteractor.setPlayerPanelOpen(true);
-        getViewState().expandBottomPanel();
+    fun onBottomPanelCollapsed() {
+        playerScreenInteractor.isPlayerPanelOpen = false
+        viewState.collapseBottomPanel()
     }
 
-    void onBottomPanelCollapsed() {
-        playerScreenInteractor.setPlayerPanelOpen(false);
-        getViewState().collapseBottomPanel();
+    fun onDrawerScreenSelected(screenId: Int) {
+        playerScreenInteractor.selectedDrawerScreen = screenId
+        viewState.showDrawerScreen(screenId, 0)
     }
 
-    void onDrawerScreenSelected(int screenId) {
-        playerScreenInteractor.setSelectedDrawerScreen(screenId);
-        getViewState().showDrawerScreen(screenId, 0);
+    fun onLibraryScreenSelected() {
+        viewState.showLibraryScreen(playerScreenInteractor.selectedLibraryScreen)
     }
 
-    void onLibraryScreenSelected() {
-        getViewState().showLibraryScreen(playerScreenInteractor.getSelectedLibraryScreen());
+    fun onPlayButtonClicked() {
+        playerInteractor.play()
     }
 
-    void onPlayButtonClicked() {
-        playerInteractor.play();
+    fun onStopButtonClicked() {
+        playerInteractor.pause()
     }
 
-    void onStopButtonClicked() {
-        playerInteractor.pause();
+    fun onSkipToPreviousButtonClicked() {
+        playerInteractor.skipToPrevious()
     }
 
-    void onSkipToPreviousButtonClicked() {
-        playerInteractor.skipToPrevious();
+    fun onSkipToNextButtonClicked() {
+        playerInteractor.skipToNext()
     }
 
-    void onSkipToNextButtonClicked() {
-        playerInteractor.skipToNext();
+    fun onRepeatModeChanged(mode: Int) {
+        playerInteractor.repeatMode = mode
     }
 
-    void onRepeatModeChanged(int mode) {
-        playerInteractor.setRepeatMode(mode);
+    fun onRandomPlayingButtonClicked(enable: Boolean) {
+        playerInteractor.isRandomPlayingEnabled = enable
     }
 
-    void onRandomPlayingButtonClicked(boolean enable) {
-        playerInteractor.setRandomPlayingEnabled(enable);
+    fun onShareCompositionButtonClicked() {
+        viewState.showShareMusicDialog(currentItem!!.composition)
     }
 
-    void onShareCompositionButtonClicked() {
-        getViewState().showShareMusicDialog(currentItem.getComposition());
-    }
-
-    void onQueueItemClicked(int position, PlayQueueItem item) {
-        if (item.equals(currentItem)) {
-            playerInteractor.playOrPause();
-            return;
+    fun onQueueItemClicked(position: Int, item: PlayQueueItem) {
+        if (item == currentItem) {
+            playerInteractor.playOrPause()
+            return
         }
-        this.currentPosition = position;
-        this.currentItem = item;
-        playerInteractor.skipToItem(item);
-
-        onCurrentCompositionChanged(item, 0);
+        currentPosition = position
+        currentItem = item
+        playerInteractor.skipToItem(item)
+        onCurrentCompositionChanged(item, 0)
     }
 
-    void onQueueItemIconClicked(int position, PlayQueueItem playQueueItem) {
-        if (playQueueItem.equals(currentItem)) {
-            playerInteractor.playOrPause();
+    fun onQueueItemIconClicked(position: Int, playQueueItem: PlayQueueItem) {
+        if (playQueueItem == currentItem) {
+            playerInteractor.playOrPause()
         } else {
-            onQueueItemClicked(position, playQueueItem);
-            playerInteractor.play();
+            onQueueItemClicked(position, playQueueItem)
+            playerInteractor.play()
         }
     }
 
-    void onTrackRewoundTo(int progress) {
-        playerInteractor.seekTo(progress);
+    fun onTrackRewoundTo(progress: Int) {
+        playerInteractor.seekTo(progress.toLong())
     }
 
-    void onDeleteCompositionButtonClicked(Composition composition) {
-        getViewState().showConfirmDeleteDialog(asList(composition));
+    fun onDeleteCompositionButtonClicked(composition: Composition) {
+        viewState.showConfirmDeleteDialog(listOf(composition))
     }
 
-    void onDeleteCurrentCompositionButtonClicked() {
-        getViewState().showConfirmDeleteDialog(asList(currentItem.getComposition()));
+    fun onDeleteCurrentCompositionButtonClicked() {
+        viewState.showConfirmDeleteDialog(listOf(currentItem!!.composition))
     }
 
-    void onAddQueueItemToPlayListButtonClicked(Composition composition) {
-        compositionsForPlayList.clear();
-        compositionsForPlayList.add(composition);
-        getViewState().showSelectPlayListDialog();
+    fun onAddQueueItemToPlayListButtonClicked(composition: Composition) {
+        compositionsForPlayList.clear()
+        compositionsForPlayList.add(composition)
+        viewState.showSelectPlayListDialog()
     }
 
-    void onAddCurrentCompositionToPlayListButtonClicked() {
-        compositionsForPlayList.clear();
-        compositionsForPlayList.add(currentItem.getComposition());
-        getViewState().showSelectPlayListDialog();
+    fun onAddCurrentCompositionToPlayListButtonClicked() {
+        compositionsForPlayList.clear()
+        compositionsForPlayList.add(currentItem!!.composition)
+        viewState.showSelectPlayListDialog()
     }
 
-    void onPlayListForAddingSelected(PlayList playList) {
-        addPreparedCompositionsToPlayList(playList);
+    fun onPlayListForAddingSelected(playList: PlayList) {
+        addPreparedCompositionsToPlayList(playList)
     }
 
-    void onPlayListForAddingCreated(PlayList playList) {
-        List<Composition> compositionsToAdd = mapList(playQueue, PlayQueueItem::getComposition);
+    fun onPlayListForAddingCreated(playList: PlayList?) {
+        val compositionsToAdd = playQueue.map(PlayQueueItem::getComposition)
         playListsInteractor.addCompositionsToPlayList(compositionsToAdd, playList)
-                .observeOn(uiScheduler)
-                .subscribe(() -> getViewState().showAddingToPlayListComplete(playList, compositionsToAdd),
-                        this::onAddingToPlayListError);
+                .subscribeOnUi(
+                        { viewState.showAddingToPlayListComplete(playList, compositionsToAdd) },
+                        this::onAddingToPlayListError
+                )
     }
 
-    void onDeleteCompositionsDialogConfirmed(List<Composition> compositionsToDelete) {
-        deletePreparedCompositions(compositionsToDelete);
+    fun onDeleteCompositionsDialogConfirmed(compositionsToDelete: List<Composition>) {
+        deletePreparedCompositions(compositionsToDelete)
     }
 
-    void onSeekStart() {
-        playerInteractor.onSeekStarted();
+    fun onSeekStart() {
+        playerInteractor.onSeekStarted()
     }
 
-    void onSeekStop(int progress) {
-        playerInteractor.onSeekFinished(progress);
+    fun onSeekStop(progress: Int) {
+        playerInteractor.onSeekFinished(progress.toLong())
     }
 
-    void onItemSwipedToDelete(Integer position) {
-        deletePlayQueueItem(playQueue.get(position));
+    fun onItemSwipedToDelete(position: Int) {
+        deletePlayQueueItem(playQueue[position])
     }
 
-    void onDeleteQueueItemClicked(PlayQueueItem item) {
-        deletePlayQueueItem(item);
+    fun onDeleteQueueItemClicked(item: PlayQueueItem?) {
+        deletePlayQueueItem(item)
     }
 
-    void onItemMoved(int from, int to) {
+    fun onItemMoved(from: Int, to: Int) {
         if (from < to) {
-            for (int i = from; i < to; i++) {
-                swapItems(i, i + 1);
+            for (i in from until to) {
+                swapItems(i, i + 1)
             }
         } else {
-            for (int i = from; i > to; i--) {
-                swapItems(i, i - 1);
+            for (i in from downTo to + 1) {
+                swapItems(i, i - 1)
             }
         }
     }
 
-    void onEditCompositionButtonClicked() {
-        getViewState().startEditCompositionScreen(currentItem.getComposition().getId());
+    fun onEditCompositionButtonClicked() {
+        viewState.startEditCompositionScreen(currentItem!!.composition.id)
     }
 
-    void onRestoreDeletedItemClicked() {
-        playerInteractor.restoreDeletedItem()
-                .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+    fun onRestoreDeletedItemClicked() {
+        playerInteractor.restoreDeletedItem().justSubscribe(this::onDefaultError)
     }
 
-    void onClearPlayQueueClicked() {
-        playerInteractor.clearPlayQueue();
+    fun onClearPlayQueueClicked() {
+        playerInteractor.clearPlayQueue()
     }
 
-    void onFastSeekForwardCalled() {
-        playerInteractor.fastSeekForward();
+    fun onFastSeekForwardCalled() {
+        playerInteractor.fastSeekForward()
     }
 
-    void onFastSeekBackwardCalled() {
-        playerInteractor.fastSeekBackward();
+    fun onFastSeekBackwardCalled() {
+        playerInteractor.fastSeekBackward()
     }
 
-    void onDragStarted(int position) {
-        isDragging = true;
+    fun onDragStarted(position: Int) {
+        isDragging = true
     }
 
-    void onDragEnded(int position) {
-        isDragging = false;
+    fun onDragEnded(position: Int) {
+        isDragging = false
     }
 
-    void onRetryFailedDeleteActionClicked() {
+    fun onRetryFailedDeleteActionClicked() {
         if (lastDeleteAction != null) {
-            lastDeleteAction
-                    .doFinally(() -> lastDeleteAction = null)
-                    .subscribe(() -> {}, this::onDeleteCompositionError);
+            lastDeleteAction!!
+                    .doFinally { lastDeleteAction = null }
+                    .subscribe({}, this::onDeleteCompositionError)
         }
     }
 
-    void onPlaybackSpeedSelected(float speed) {
-        getViewState().displayPlaybackSpeed(speed);
-        playerInteractor.setPlaybackSpeed(speed);
+    fun onPlaybackSpeedSelected(speed: Float) {
+        viewState.displayPlaybackSpeed(speed)
+        playerInteractor.playbackSpeed = speed
     }
 
-    private void swapItems(int from, int to) {
+    private fun swapItems(from: Int, to: Int) {
         if (!ListUtils.isIndexInRange(playQueue, from) || !ListUtils.isIndexInRange(playQueue, to)) {
-            return;
+            return
         }
-        PlayQueueItem fromItem = playQueue.get(from);
-        PlayQueueItem toItem = playQueue.get(to);
-
-        Collections.swap(playQueue, from, to);
-        getViewState().notifyItemMoved(from, to);
-
-        playerInteractor.swapItems(fromItem, toItem);
+        val fromItem = playQueue[from]
+        val toItem = playQueue[to]
+        Collections.swap(playQueue, from, to)
+        viewState.notifyItemMoved(from, to)
+        playerInteractor.swapItems(fromItem, toItem)
     }
 
-    private void deletePlayQueueItem(PlayQueueItem item) {
-        playerInteractor.removeQueueItem(item)
+    private fun deletePlayQueueItem(item: PlayQueueItem?) {
+        playerInteractor.removeQueueItem(item).unsafeSubscribeOnUi(viewState::showDeletedItemMessage)
+    }
+
+    private fun subscribeOnRepeatMode() {
+        batterySafeDisposable.add(playerInteractor.repeatModeObservable
                 .observeOn(uiScheduler)
-                .subscribe(getViewState()::showDeletedItemMessage);
+                .subscribe(viewState::showRepeatMode))
     }
 
-    private void subscribeOnRepeatMode() {
-        batterySafeDisposable.add(playerInteractor.getRepeatModeObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showRepeatMode));
-    }
-
-    private void addPreparedCompositionsToPlayList(PlayList playList) {
+    private fun addPreparedCompositionsToPlayList(playList: PlayList) {
         playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
-                .observeOn(uiScheduler)
-                .subscribe(() -> onAddingToPlayListCompleted(playList),
-                        this::onAddingToPlayListError);
+                .subscribeOnUi({ onAddingToPlayListCompleted(playList) }, this::onAddingToPlayListError)
     }
 
-    private void deletePreparedCompositions(List<Composition> compositionsToDelete) {
+    private fun deletePreparedCompositions(compositionsToDelete: List<Composition>) {
         lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
                 .observeOn(uiScheduler)
-                .doOnComplete(() -> onDeleteCompositionsSuccess(compositionsToDelete));
-
-        lastDeleteAction.subscribe(() -> {}, this::onDeleteCompositionError);
+                .doOnComplete { onDeleteCompositionsSuccess(compositionsToDelete) }
+        lastDeleteAction!!.justSubscribe(this::onDeleteCompositionError)
     }
 
-    private void onDeleteCompositionsSuccess(List<Composition> compositionsToDelete) {
-        getViewState().showDeleteCompositionMessage(compositionsToDelete);
+    private fun onDeleteCompositionsSuccess(compositionsToDelete: List<Composition>) {
+        viewState.showDeleteCompositionMessage(compositionsToDelete)
     }
 
-    private void onDeleteCompositionError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showDeleteCompositionError(errorCommand);
+    private fun onDeleteCompositionError(throwable: Throwable) {
+        val errorCommand = errorParser.parseError(throwable)
+        viewState.showDeleteCompositionError(errorCommand)
     }
 
-    private void onAddingToPlayListError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showAddingToPlayListError(errorCommand);
+    private fun onAddingToPlayListError(throwable: Throwable) {
+        val errorCommand = errorParser.parseError(throwable)
+        viewState.showAddingToPlayListError(errorCommand)
     }
 
-    private void onAddingToPlayListCompleted(PlayList playList) {
-        getViewState().showAddingToPlayListComplete(playList, compositionsForPlayList);
-        compositionsForPlayList.clear();
+    private fun onAddingToPlayListCompleted(playList: PlayList) {
+        viewState.showAddingToPlayListComplete(playList, compositionsForPlayList)
+        compositionsForPlayList.clear()
     }
 
-    private void subscribeOnCurrentCompositionChanging() {
-        batterySafeDisposable.add(playerInteractor.getCurrentQueueItemObservable()
+    private fun subscribeOnCurrentCompositionChanging() {
+        batterySafeDisposable.add(playerInteractor.currentQueueItemObservable
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayQueueEventReceived));
+                .subscribe(this::onPlayQueueEventReceived))
     }
 
-    private void subscribeOnCurrentPosition() {
-        batterySafeDisposable.add(playerInteractor.getCurrentItemPositionObservable()
+    private fun subscribeOnCurrentPosition() {
+        batterySafeDisposable.add(playerInteractor.currentItemPositionObservable
                 .observeOn(uiScheduler)
-                .subscribe(this::onItemPositionReceived));
+                .subscribe(this::onItemPositionReceived))
     }
 
-    private void onItemPositionReceived(int position) {
+    private fun onItemPositionReceived(position: Int) {
         if (!isDragging && currentPosition != position) {
-            currentPosition = position;
-            getViewState().scrollQueueToPosition(position);
+            currentPosition = position
+            viewState.scrollQueueToPosition(position)
         }
     }
 
-    private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
-        PlayQueueItem newItem = playQueueEvent.getPlayQueueItem();
-        if (currentItem == null
-                || !currentItem.equals(newItem)
-                || !areSourcesTheSame(newItem.getComposition(), currentItem.getComposition())) {
-            onCurrentCompositionChanged(newItem, playQueueEvent.getTrackPosition());
+    private fun onPlayQueueEventReceived(playQueueEvent: PlayQueueEvent) {
+        val newItem = playQueueEvent.playQueueItem
+        if (currentItem == null || currentItem != newItem
+                || !CompositionHelper.areSourcesTheSame(newItem!!.composition, currentItem!!.composition)) {
+            onCurrentCompositionChanged(newItem, playQueueEvent.trackPosition)
         }
     }
 
-    private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
-        getViewState().showCurrentQueueItem(newItem, isCoversEnabled);
+    private fun onCurrentCompositionChanged(newItem: PlayQueueItem?, trackPosition: Long) {
+        viewState.showCurrentQueueItem(newItem, isCoversEnabled)
         if (newItem != null
-                && (!newItem.equals(currentItem) || newItem.getComposition().getDuration() != currentItem.getComposition().getDuration())) {
-            getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
+                && (newItem != currentItem || newItem.composition.duration != currentItem!!.composition.duration)) {
+            viewState.showTrackState(trackPosition, newItem.composition.duration)
         }
-
-        this.currentItem = newItem;
+        currentItem = newItem
     }
 
-    private void subscribeOnPlayerStateChanges() {
-        batterySafeDisposable.add(playerInteractor.getPlayerStateObservable()
+    private fun subscribeOnPlayerStateChanges() {
+        batterySafeDisposable.add(playerInteractor.playerStateObservable
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateChanged));
+                .subscribe(this::onPlayerStateChanged))
     }
 
-    private void onPlayerStateChanged(PlayerState playerState) {
-        switch (playerState) {
-            case PLAY: {
-                getViewState().showPlayState();
-                return;
-            }
-            default: {
-                getViewState().showStopState();
-            }
+    private fun onPlayerStateChanged(playerState: PlayerState) {
+        when (playerState) {
+            PlayerState.PLAY -> viewState.showPlayState()
+            else -> viewState.showStopState()
         }
     }
 
-    private void subscribeOnPlayQueue() {
-        batterySafeDisposable.add(playerInteractor.getPlayQueueObservable()
+    private fun subscribeOnPlayQueue() {
+        batterySafeDisposable.add(playerInteractor.playQueueObservable
                 .observeOn(uiScheduler)
-                .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError));
+                .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError))
     }
 
-    private void onPlayQueueChanged(List<PlayQueueItem> list) {
-        playQueue = list;
-        getViewState().showPlayQueueSubtitle(playQueue.size());
-        getViewState().setMusicControlsEnabled(!playQueue.isEmpty());
-        getViewState().updatePlayQueue(list);
+    private fun onPlayQueueChanged(list: List<PlayQueueItem>) {
+        playQueue = list
+        viewState.showPlayQueueSubtitle(playQueue.size)
+        viewState.setMusicControlsEnabled(playQueue.isNotEmpty())
+        viewState.updatePlayQueue(list)
     }
 
-    private void onPlayQueueReceivingError(Throwable throwable) {
-        errorParser.parseError(throwable);
-        getViewState().setMusicControlsEnabled(false);
+    private fun onPlayQueueReceivingError(throwable: Throwable) {
+        errorParser.parseError(throwable)
+        viewState.setMusicControlsEnabled(false)
     }
 
-    private void subscribeOnTrackPositionChanging() {
-        batterySafeDisposable.add(playerInteractor.getTrackPositionObservable()
+    private fun subscribeOnTrackPositionChanging() {
+        batterySafeDisposable.add(playerInteractor.trackPositionObservable
                 .observeOn(uiScheduler)
-                .subscribe(this::onTrackPositionChanged));
+                .subscribe(this::onTrackPositionChanged))
     }
 
-    private void onTrackPositionChanged(Long currentPosition) {
+    private fun onTrackPositionChanged(currentPosition: Long) {
         if (currentItem != null) {
-            long duration = currentItem.getComposition().getDuration();
-            getViewState().showTrackState(currentPosition, duration);
+            val duration = currentItem!!.composition.duration
+            viewState.showTrackState(currentPosition, duration)
         }
     }
 
-    private void subscribeOnUiSettings() {
-        presenterDisposable.add(playerScreenInteractor.getCoversEnabledObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onUiSettingsReceived, errorParser::logError));
+    private fun subscribeOnUiSettings() {
+        playerScreenInteractor.coversEnabledObservable
+                .subscribeOnUi(this::onUiSettingsReceived, errorParser::logError)
     }
 
-    private void onUiSettingsReceived(boolean isCoversEnabled) {
-        this.isCoversEnabled = isCoversEnabled;
-        getViewState().setPlayQueueCoversEnabled(isCoversEnabled);
+    private fun onUiSettingsReceived(isCoversEnabled: Boolean) {
+        this.isCoversEnabled = isCoversEnabled
+        viewState.setPlayQueueCoversEnabled(isCoversEnabled)
         if (currentItem != null) {
-            getViewState().showCurrentQueueItem(currentItem, isCoversEnabled);
+            viewState.showCurrentQueueItem(currentItem, isCoversEnabled)
         }
     }
 
-    private void onDefaultError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showErrorMessage(errorCommand);
+    private fun onDefaultError(throwable: Throwable) {
+        val errorCommand = errorParser.parseError(throwable)
+        viewState.showErrorMessage(errorCommand)
     }
 
-    private void subscribeOnRandomMode() {
-        presenterDisposable.add(playerInteractor.getRandomPlayingObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showRandomPlayingButton));
+    private fun subscribeOnRandomMode() {
+        playerInteractor.randomPlayingObservable
+                .unsafeSubscribeOnUi(viewState::showRandomPlayingButton)
     }
 
-    private void subscribeOnSpeedAvailableState() {
-        presenterDisposable.add(playerInteractor.getSpeedChangeAvailableObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showSpeedChangeFeatureVisible));
+    private fun subscribeOnSpeedAvailableState() {
+        playerInteractor.speedChangeAvailableObservable
+                .unsafeSubscribeOnUi(viewState::showSpeedChangeFeatureVisible)
     }
 
-    private void subscribeOnSpeedState() {
-        presenterDisposable.add(playerInteractor.getPlaybackSpeedObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::displayPlaybackSpeed));
+    private fun subscribeOnSpeedState() {
+        playerInteractor.playbackSpeedObservable
+                .unsafeSubscribeOnUi(viewState::displayPlaybackSpeed)
     }
 
-    private void subscribeOnSleepTimerTime() {
-        batterySafeDisposable.add(playerScreenInteractor.getSleepTimerCountDownObservable()
+    private fun subscribeOnSleepTimerTime() {
+        batterySafeDisposable.add(playerScreenInteractor.sleepTimerCountDownObservable
                 .observeOn(uiScheduler)
-                .subscribe(getViewState()::showSleepTimerRemainingTime));
+                .subscribe(viewState::showSleepTimerRemainingTime))
     }
 }

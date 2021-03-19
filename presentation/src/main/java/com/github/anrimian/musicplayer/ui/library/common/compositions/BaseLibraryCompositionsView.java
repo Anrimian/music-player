@@ -10,65 +10,63 @@ import com.github.anrimian.musicplayer.ui.common.mvp.ListMvpView;
 import java.util.Collection;
 import java.util.List;
 
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
-import moxy.viewstate.strategy.SkipStrategy;
-import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
 import moxy.viewstate.strategy.alias.OneExecution;
+import moxy.viewstate.strategy.alias.Skip;
 
 public interface BaseLibraryCompositionsView extends ListMvpView<Composition> {
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showSelectPlayListDialog();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddingToPlayListError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteCompositionError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void onCompositionSelected(Composition composition, int position);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void onCompositionUnselected(Composition composition, int position);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void setItemsSelected(boolean selected);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showSelectionMode(int count);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void shareCompositions(Collection<Composition> selectedCompositions);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showCompositionActionDialog(Composition composition, int position);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void setDisplayCoversEnabled(boolean isCoversEnabled);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void onCompositionsAddedToPlayNext(List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void onCompositionsAddedToQueue(List<Composition> compositions);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showCurrentComposition(CurrentComposition currentComposition);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void restoreListPosition(ListPosition listPosition);
 }

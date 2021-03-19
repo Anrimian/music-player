@@ -5,16 +5,16 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
-import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.OneExecution;
+import moxy.viewstate.strategy.alias.Skip;
 
 public interface AlbumEditorView extends MvpView {
 
     String DISPLAY_ALBUM_STATE = "display_album_state";
     String CHANGE_STATE = "change_state";
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void closeScreen();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = DISPLAY_ALBUM_STATE)
@@ -29,13 +29,13 @@ public interface AlbumEditorView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_STATE)
     void hideRenameProgress();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEnterAuthorDialog(Album album, String[] hints);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showEnterNameDialog(Album album);
 
 }

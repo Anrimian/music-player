@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
@@ -8,17 +9,16 @@ import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
-import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.viewstate.strategy.alias.OneExecution;
+import moxy.viewstate.strategy.alias.Skip;
 
 /**
  * Created on 23.10.2017.
@@ -63,96 +63,96 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
     void showRenameProgress();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void goBackToParentFolderScreen();
 
     @StateStrategyType(ListStateStrategy.class)
     void updateList(List<FileSource> update);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showSelectOrderScreen(Order folderOrder);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showSelectPlayListDialog();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddingToPlayListError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showSelectPlayListForFolderDialog(FolderFileSource folder);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteCompositionError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showConfirmDeleteDialog(FolderFileSource folder);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showSearchMode(boolean show);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void sendCompositions(List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showReceiveCompositionsForSendError(ErrorCommand errorCommand);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void goToMusicStorageScreen(Long folderId);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showCompositionActionDialog(Composition composition);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void setDisplayCoversEnabled(boolean isCoversEnabled);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showInputFolderNameDialog(FolderFileSource folder);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showSelectionMode(int count);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void onItemSelected(FileSource item, int position);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void onItemUnselected(FileSource item, int position);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void setItemsSelected(boolean selected);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void updateMoveFilesList();
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showMoveFileMenu(boolean show);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showInputNewFolderNameDialog();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddedIgnoredFolderMessage(IgnoredFolder folder);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void onCompositionsAddedToPlayNext(List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void onCompositionsAddedToQueue(List<Composition> compositions);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showCurrentComposition(CurrentComposition currentComposition);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void restoreListPosition(ListPosition listPosition);
 }

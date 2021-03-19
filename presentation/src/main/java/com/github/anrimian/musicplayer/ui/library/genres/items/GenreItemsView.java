@@ -4,22 +4,22 @@ import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsView;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
-import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.viewstate.strategy.alias.OneExecution;
+import moxy.viewstate.strategy.alias.Skip;
 
 public interface GenreItemsView extends BaseLibraryCompositionsView {
 
     String RENAME_STATE = "rename_state";
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showGenreInfo(Genre genre);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void closeScreen();
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showRenameGenreDialog(Genre genre);
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)

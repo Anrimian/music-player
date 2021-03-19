@@ -6,10 +6,10 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import java.util.List;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.viewstate.strategy.alias.OneExecution;
 
 public interface ExcludedFoldersView extends MvpView {
 
@@ -24,12 +24,12 @@ public interface ExcludedFoldersView extends MvpView {
     @StateStrategyType(value = AddToEndSingleTagStrategy.class, tag = LIST_STATE)
     void showErrorState(ErrorCommand errorCommand);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showExcludedFoldersList(List<IgnoredFolder> folders);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showRemovedFolderMessage(IgnoredFolder folder);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 }

@@ -7,10 +7,8 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import javax.annotation.Nullable;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
 import moxy.viewstate.strategy.alias.AddToEndSingle;
-
 public interface ExternalPlayerView extends MvpView {
 
     String PLAYER_STATE = "player_state";
@@ -21,19 +19,19 @@ public interface ExternalPlayerView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
     void showPlayState();
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void displayComposition(UriCompositionSource source);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showTrackState(long currentPosition, long duration);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showRepeatMode(int mode);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showPlayErrorEvent(@Nullable ErrorType errorType);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showKeepPlayerInBackground(boolean externalPlayerKeepInBackground);
 
     @AddToEndSingle

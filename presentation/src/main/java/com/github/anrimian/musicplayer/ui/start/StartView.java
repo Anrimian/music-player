@@ -3,8 +3,8 @@ package com.github.anrimian.musicplayer.ui.start;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.OneExecution;
 
 /**
  * Created on 19.10.2017.
@@ -14,10 +14,10 @@ interface StartView extends MvpView {
 
     String SCREEN_STATE = "screen_state";
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void requestFilesPermissions();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void goToMainScreen();
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = SCREEN_STATE)
@@ -26,6 +26,6 @@ interface StartView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = SCREEN_STATE)
     void showStub();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void startSystemServices();
 }

@@ -12,11 +12,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
-import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
 import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.viewstate.strategy.alias.OneExecution;
+import moxy.viewstate.strategy.alias.Skip;
 
 /**
  * Created on 02.11.2017.
@@ -39,70 +38,70 @@ public interface PlayerView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BOTTOM_PANEL_STATE)
     void collapseBottomPanel();
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void setMusicControlsEnabled(boolean show);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void scrollQueueToPosition(int position);
 
     @StateStrategyType(ListStateStrategy.class)
     void updatePlayQueue(List<PlayQueueItem> items);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showRepeatMode(int mode);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showRandomPlayingButton(boolean active);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showTrackState(long currentPosition, long duration);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showSelectPlayListDialog();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showShareMusicDialog(Composition composition);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddingToPlayListError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteCompositionError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showPlayQueueSubtitle(int size);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDrawerScreen(int selectedDrawerScreen, long selectedPlayListScreen);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showLibraryScreen(int selectedLibraryScreen);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void notifyItemMoved(int from, int to);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void setPlayQueueCoversEnabled(boolean isCoversEnabled);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void startEditCompositionScreen(long id);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeletedItemMessage();
 
     @AddToEndSingle
