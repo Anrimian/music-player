@@ -43,11 +43,7 @@ class PlayerPresenter(
     
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        if (playerScreenInteractor.isPlayerPanelOpen) {
-            viewState.expandBottomPanel()
-        } else {
-            viewState.collapseBottomPanel()
-        }
+        viewState.setButtonPanelState(playerScreenInteractor.isPlayerPanelOpen)
         subscribeOnUiSettings()
         subscribeOnRandomMode()
         subscribeOnSpeedAvailableState()
@@ -79,12 +75,12 @@ class PlayerPresenter(
 
     fun onBottomPanelExpanded() {
         playerScreenInteractor.isPlayerPanelOpen = true
-        viewState.expandBottomPanel()
+        viewState.setButtonPanelState(true)
     }
 
     fun onBottomPanelCollapsed() {
         playerScreenInteractor.isPlayerPanelOpen = false
-        viewState.collapseBottomPanel()
+        viewState.setButtonPanelState(false)
     }
 
     fun onDrawerScreenSelected(screenId: Int) {

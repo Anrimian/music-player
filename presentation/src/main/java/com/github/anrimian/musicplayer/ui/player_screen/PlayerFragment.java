@@ -429,13 +429,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void expandBottomPanel() {
-        playerPanelWrapper.expandBottomPanel();
-    }
-
-    @Override
-    public void collapseBottomPanel() {
-        playerPanelWrapper.collapseBottomPanel();
+    public void setButtonPanelState(boolean expanded) {
+        if (expanded) {
+            playerPanelWrapper.expandBottomPanel();
+        } else {
+            playerPanelWrapper.collapseBottomPanel();
+        }
     }
 
     @Override

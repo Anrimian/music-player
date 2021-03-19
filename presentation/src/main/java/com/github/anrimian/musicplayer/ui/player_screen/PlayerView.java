@@ -24,7 +24,6 @@ import moxy.viewstate.strategy.alias.Skip;
 public interface PlayerView extends MvpView {
 
     String PLAYER_STATE = "player_state";
-    String BOTTOM_PANEL_STATE = "bottom_panel_state";
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
     void showStopState();
@@ -32,11 +31,8 @@ public interface PlayerView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
     void showPlayState();
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BOTTOM_PANEL_STATE)
-    void expandBottomPanel();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BOTTOM_PANEL_STATE)
-    void collapseBottomPanel();
+    @AddToEndSingle
+    void setButtonPanelState(boolean expanded);
 
     @AddToEndSingle
     void setMusicControlsEnabled(boolean show);
