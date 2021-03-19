@@ -206,9 +206,20 @@
     <string name="critical_error_report_message">Se produjo un error grave y debido a esto la aplicación no puede iniciarse. La aparición de estos errores es altamente indeseable. La aplicación no envía ningún dato automaticamente, pero se puede enviar el archivo de registro de errores manualmente por correo electrónico.</string>
     <string name="error_report_message">Se produjo un error grave. La app no envía ningún dato automaticamente, pero se puede enviar el archivo de registro de errores manualmente por correo electrónico. Eso ayudará a corregir este error.</string>
     <string name="show_error_report_dialog_on_start">Mostrar el diálogo de informe de errores al iniciar la aplicación una vez que la app se bloquee</string>
-    <!-- now verified-->
+    <!-- not verified-->
     <string name="do_not_show_confirm_delete_dialog">No mostrar el cuadro de diálogo de confirmación de eliminación de la aplicación</string>
+    <string name="app_equalizer">Ecualizador de aplicaciones</string>
     <!---->
+    <string name="presets">Preajustes</string>
+    <string name="playback_speed">Velocidad de reproducción</string>
+    <string name="reset">Reset</string>
+    <string name="apply">Aplicar</string>
+    <string name="sleep_timer">Temporizador de Sleep</string>
+    <string name="start">Iniciar</string>
+    <string name="resume">Reiniciar</string>
+    <string name="sleep_timer_message">Reproducción se detendrá en:</string>
+    <string name="stop">Parar</string>
+
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s canción</item>
