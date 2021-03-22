@@ -345,10 +345,7 @@ class PlayerPresenter(
     }
 
     private fun onPlayerStateChanged(playerState: PlayerState) {
-        when (playerState) {
-            PlayerState.PLAY -> viewState.showPlayState()
-            else -> viewState.showStopState()
-        }
+        viewState.showPlayerState(playerState)
     }
 
     private fun subscribeOnPlayQueue() {

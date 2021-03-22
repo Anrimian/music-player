@@ -1,146 +1,116 @@
-package com.github.anrimian.musicplayer.ui.main.external_player;
+package com.github.anrimian.musicplayer.ui.main.external_player
 
-import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
-import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource
+import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Scheduler
 
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import moxy.MvpPresenter;
+class ExternalPlayerPresenter(
+        private val interactor: ExternalPlayerInteractor,
+        uiScheduler: Scheduler,
+        errorParser: ErrorParser
+) : AppPresenter<ExternalPlayerView>(uiScheduler, errorParser) {
+    
+    private var compositionSource: UriCompositionSource? = null
+    
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        viewState.showKeepPlayerInBackground(interactor.isExternalPlayerKeepInBackground)
 
-public class ExternalPlayerPresenter extends MvpPresenter<ExternalPlayerView> {
-
-    private final ExternalPlayerInteractor interactor;
-    private final Scheduler uiScheduler;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-
-    private UriCompositionSource compositionSource;
-
-    public ExternalPlayerPresenter(ExternalPlayerInteractor interactor,
-                                   Scheduler uiScheduler) {
-        this.interactor = interactor;
-        this.uiScheduler = uiScheduler;
+        subscribeOnPlayerStateChanges()
+        subscribeOnTrackPositionChanging()
+        subscribeOnRepeatMode()
+        subscribeOnErrorEvents()
+        subscribeOnSpeedAvailableState()
+        subscribeOnSpeedState()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        getViewState().showKeepPlayerInBackground(interactor.isExternalPlayerKeepInBackground());
-
-        subscribeOnPlayerStateChanges();
-        subscribeOnTrackPositionChanging();
-        subscribeOnRepeatMode();
-        subscribeOnErrorEvents();
-        subscribeOnSpeedAvailableState();
-        subscribeOnSpeedState();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (!interactor.isExternalPlayerKeepInBackground()) {
-            interactor.stop();
+    override fun onDestroy() {
+        super.onDestroy()
+        if (!interactor.isExternalPlayerKeepInBackground) {
+            interactor.stop()
         }
-        presenterDisposable.dispose();
     }
 
-    void onSourceForPlayingReceived(UriCompositionSource source) {
-        compositionSource = source;
-        interactor.startPlaying(compositionSource);
-        getViewState().displayComposition(source);
+    fun onSourceForPlayingReceived(source: UriCompositionSource) {
+        compositionSource = source
+        interactor.startPlaying(compositionSource)
+        viewState.displayComposition(source)
     }
 
-    void onPlayPauseClicked() {
-        getViewState().showPlayErrorEvent(null);
-        interactor.playOrPause();
+    fun onPlayPauseClicked() {
+        viewState.showPlayErrorEvent(null)
+        interactor.playOrPause()
     }
 
-    void onTrackRewoundTo(int progress) {
-        interactor.seekTo(progress);
+    fun onTrackRewoundTo(progress: Int) {
+        interactor.seekTo(progress.toLong())
     }
 
-    void onSeekStart() {
-        interactor.onSeekStarted();
+    fun onSeekStart() {
+        interactor.onSeekStarted()
     }
 
-    void onSeekStop(int progress) {
-        interactor.onSeekFinished(progress);
+    fun onSeekStop(progress: Int) {
+        interactor.onSeekFinished(progress.toLong())
     }
 
-    void onRepeatModeButtonClicked() {
-        interactor.changeExternalPlayerRepeatMode();
+    fun onRepeatModeButtonClicked() {
+        interactor.changeExternalPlayerRepeatMode()
     }
 
-    void onKeepPlayerInBackgroundChecked(boolean checked) {
-        interactor.setExternalPlayerKeepInBackground(checked);
+    fun onKeepPlayerInBackgroundChecked(checked: Boolean) {
+        interactor.isExternalPlayerKeepInBackground = checked
     }
 
-    void onFastSeekForwardCalled() {
-        interactor.fastSeekForward();
+    fun onFastSeekForwardCalled() {
+        interactor.fastSeekForward()
     }
 
-    void onFastSeekBackwardCalled() {
-        interactor.fastSeekBackward();
+    fun onFastSeekBackwardCalled() {
+        interactor.fastSeekBackward()
     }
 
-    void onPlaybackSpeedSelected(float speed) {
-        getViewState().displayPlaybackSpeed(speed);
-        interactor.setPlaybackSpeed(speed);
+    fun onPlaybackSpeedSelected(speed: Float) {
+        viewState.displayPlaybackSpeed(speed)
+        interactor.setPlaybackSpeed(speed)
     }
 
-    private void subscribeOnErrorEvents() {
-        presenterDisposable.add(interactor.getErrorEventsObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showPlayErrorEvent));
+    private fun subscribeOnErrorEvents() {
+        interactor.errorEventsObservable.unsafeSubscribeOnUi(viewState::showPlayErrorEvent)
     }
 
-    private void subscribeOnRepeatMode() {
-        presenterDisposable.add(interactor.getExternalPlayerRepeatModeObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showRepeatMode));
+    private fun subscribeOnRepeatMode() {
+        interactor.externalPlayerRepeatModeObservable.unsafeSubscribeOnUi(viewState::showRepeatMode)
     }
 
-    private void subscribeOnTrackPositionChanging() {
-        presenterDisposable.add(interactor.getTrackPositionObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onTrackPositionChanged));
+    private fun subscribeOnTrackPositionChanging() {
+        interactor.trackPositionObservable.unsafeSubscribeOnUi(this::onTrackPositionChanged)
     }
 
-    private void onTrackPositionChanged(Long currentPosition) {
+    private fun onTrackPositionChanged(currentPosition: Long) {
         if (compositionSource != null) {
-            long duration = compositionSource.getDuration();
-            getViewState().showTrackState(currentPosition, duration);
+            val duration = compositionSource!!.duration
+            viewState.showTrackState(currentPosition, duration)
         }
     }
 
-    private void subscribeOnPlayerStateChanges() {
-        presenterDisposable.add(interactor.getPlayerStateObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateChanged));
+    private fun subscribeOnPlayerStateChanges() {
+        interactor.playerStateObservable.unsafeSubscribeOnUi(this::onPlayerStateChanged)
     }
 
-    private void onPlayerStateChanged(PlayerState playerState) {
-        switch (playerState) {
-            case PLAY: {
-                getViewState().showPlayState();
-                return;
-            }
-            default: {
-                getViewState().showStopState();
-            }
-        }
+    private fun onPlayerStateChanged(playerState: PlayerState) {
+        viewState.showPlayerState(playerState)
     }
 
-    private void subscribeOnSpeedAvailableState() {
-        presenterDisposable.add(interactor.getSpeedChangeAvailableObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showSpeedChangeFeatureVisible));
+    private fun subscribeOnSpeedAvailableState() {
+        interactor.speedChangeAvailableObservable
+                .unsafeSubscribeOnUi(viewState::showSpeedChangeFeatureVisible)
     }
 
-    private void subscribeOnSpeedState() {
-        presenterDisposable.add(interactor.getPlaybackSpeedObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::displayPlaybackSpeed));
+    private fun subscribeOnSpeedState() {
+        interactor.playbackSpeedObservable.unsafeSubscribeOnUi(viewState::displayPlaybackSpeed)
     }
 }
