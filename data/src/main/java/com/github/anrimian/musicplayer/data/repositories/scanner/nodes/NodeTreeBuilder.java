@@ -40,6 +40,7 @@ public class NodeTreeBuilder {
             fillNode(childNode, folderParentIdMap, folderFilesMap);
         }
 
+        //TODO we still can face it, reproduce
         if (!folderParentIdMap.isEmpty()) {
             throw new IllegalStateException("found missed folders");
         }

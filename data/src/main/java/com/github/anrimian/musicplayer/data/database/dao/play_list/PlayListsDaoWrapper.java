@@ -73,6 +73,7 @@ public class PlayListsDaoWrapper {
                 }
                 String newName = newItem.getName();
                 if (!oldItem.getName().equals(newName)) {
+                    //TODO here we can get sqlite constraint exception by name, how?
                     playListDao.updatePlayListNameByStorageId(id, getUniquePlayListName(newName));
                 }
             }
