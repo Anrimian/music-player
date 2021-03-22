@@ -1,139 +1,110 @@
-package com.github.anrimian.musicplayer.ui.editor.album;
+package com.github.anrimian.musicplayer.ui.editor.album
 
-import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor
+import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.disposables.Disposable
 
-import javax.annotation.Nullable;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import moxy.MvpPresenter;
-
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
-
-
-public class AlbumEditorPresenter extends MvpPresenter<AlbumEditorView> {
-
-    private final long albumId;
-    private final EditorInteractor editorInteractor;
-    private final Scheduler uiScheduler;
-    private final ErrorParser errorParser;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-    private Disposable changeDisposable;
-
-    private Album album;
-
-    @Nullable
-    private Completable lastEditAction;
-
-    public AlbumEditorPresenter(long albumId,
-                                EditorInteractor editorInteractor,
-                                Scheduler uiScheduler,
-                                ErrorParser errorParser) {
-        this.albumId = albumId;
-        this.editorInteractor = editorInteractor;
-        this.uiScheduler = uiScheduler;
-        this.errorParser = errorParser;
+class AlbumEditorPresenter(
+        private val albumId: Long,
+        private val editorInteractor: EditorInteractor,
+        uiScheduler: Scheduler,
+        errorParser: ErrorParser
+) : AppPresenter<AlbumEditorView>(uiScheduler, errorParser) {
+    
+    private var changeDisposable: Disposable? = null
+    private var album: Album? = null
+    private var lastEditAction: Completable? = null
+    
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        loadAlbum()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        loadAlbum();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
-    }
-
-    void onChangeAuthorClicked() {
+    fun onChangeAuthorClicked() {
         if (album == null) {
-            return;
+            return
         }
-        editorInteractor.getAuthorNames()
+        editorInteractor.authorNames
                 .observeOn(uiScheduler)
-                .doOnSuccess(artists -> getViewState().showEnterAuthorDialog(album, artists))
-                .doOnError(throwable -> {
-                    getViewState().showEnterAuthorDialog(album, null);
-                    onDefaultError(throwable);
-                })
+                .doOnSuccess { artists -> viewState.showEnterAuthorDialog(album, artists) }
+                .doOnError { throwable ->
+                    viewState.showEnterAuthorDialog(album, null)
+                    onDefaultError(throwable)
+                }
                 .ignoreElement()
                 .onErrorComplete()
-                .subscribe();
+                .subscribe()
     }
 
-    void onChangeNameClicked() {
+    fun onChangeNameClicked() {
         if (album == null) {
-            return;
+            return
         }
-        getViewState().showEnterNameDialog(album);
+        viewState.showEnterNameDialog(album)
     }
 
-    void onNewAuthorEntered(String author) {
+    fun onNewAuthorEntered(author: String?) {
         if (album == null) {
-            return;
+            return
         }
-
-        dispose(changeDisposable, presenterDisposable);
-        lastEditAction = editorInteractor.updateAlbumArtist(author, album.getId())
+        RxUtils.dispose(changeDisposable, presenterDisposable)
+        lastEditAction = editorInteractor.updateAlbumArtist(author, album!!.id)
                 .observeOn(uiScheduler)
-                .doOnSubscribe(d -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideRenameProgress());
-        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
-        presenterDisposable.add(changeDisposable);
+                .doOnSubscribe { viewState.showRenameProgress() }
+                .doFinally { viewState.hideRenameProgress() }
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
+        presenterDisposable.add(changeDisposable)
     }
 
-    void onNewNameEntered(String name) {
+    fun onNewNameEntered(name: String?) {
         if (album == null) {
-            return;
+            return
         }
-
-        dispose(changeDisposable, presenterDisposable);
-        lastEditAction = editorInteractor.updateAlbumName(name, album.getId())
+        RxUtils.dispose(changeDisposable, presenterDisposable)
+        lastEditAction = editorInteractor.updateAlbumName(name, album!!.id)
                 .observeOn(uiScheduler)
-                .doOnSubscribe(d -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideRenameProgress());
-        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
-        presenterDisposable.add(changeDisposable);
+                .doOnSubscribe { viewState.showRenameProgress() }
+                .doFinally { viewState.hideRenameProgress() }
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
+        presenterDisposable.add(changeDisposable)
     }
 
-    void onRetryFailedEditActionClicked() {
+    fun onRetryFailedEditActionClicked() {
         if (lastEditAction != null) {
-            dispose(changeDisposable, presenterDisposable);
-            changeDisposable = lastEditAction
-                    .doFinally(() -> lastEditAction = null)
-                    .subscribe(() -> {}, this::onDefaultError);
-            presenterDisposable.add(changeDisposable);
+            RxUtils.dispose(changeDisposable, presenterDisposable)
+            changeDisposable = lastEditAction!!
+                    .doFinally { lastEditAction = null }
+                    .subscribe({}, this::onDefaultError)
+            presenterDisposable.add(changeDisposable)
         }
     }
 
-    private void onDefaultError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showErrorMessage(errorCommand);
+    private fun onDefaultError(throwable: Throwable) {
+        val errorCommand = errorParser.parseError(throwable)
+        viewState.showErrorMessage(errorCommand)
     }
 
-    private void loadAlbum() {
-        presenterDisposable.add(editorInteractor.getAlbumObservable(albumId)
-                .observeOn(uiScheduler)
-                .subscribe(this::onAlbumReceived,
+    private fun loadAlbum() {
+        editorInteractor.getAlbumObservable(albumId)
+                .subscribeOnUi(
+                        this::onAlbumReceived,
                         this::onCompositionLoadingError,
-                        getViewState()::closeScreen));
+                        viewState::closeScreen
+                )
     }
 
-    private void onAlbumReceived(Album album) {
-        this.album = album;
-        getViewState().showAlbum(album);
+    private fun onAlbumReceived(album: Album) {
+        this.album = album
+        viewState.showAlbum(album)
     }
 
-    private void onCompositionLoadingError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showAlbumLoadingError(errorCommand);
+    private fun onCompositionLoadingError(throwable: Throwable) {
+        val errorCommand = errorParser.parseError(throwable)
+        viewState.showAlbumLoadingError(errorCommand)
     }
 }
