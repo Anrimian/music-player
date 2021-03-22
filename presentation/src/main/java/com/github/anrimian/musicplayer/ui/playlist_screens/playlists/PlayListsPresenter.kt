@@ -1,104 +1,77 @@
-package com.github.anrimian.musicplayer.ui.playlist_screens.playlists;
+package com.github.anrimian.musicplayer.ui.playlist_screens.playlists
 
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Scheduler
+import java.util.*
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import moxy.MvpPresenter;
-
-
-public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
-
-    private final PlayListsInteractor playListsInteractor;
-    private final Scheduler uiScheduler;
-    private final ErrorParser errorParser;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-
-    private List<PlayList> playLists = new ArrayList<>();
-
-    public PlayListsPresenter(PlayListsInteractor playListsInteractor,
-                              Scheduler uiScheduler,
-                              ErrorParser errorParser) {
-        this.playListsInteractor = playListsInteractor;
-        this.uiScheduler = uiScheduler;
-        this.errorParser = errorParser;
+class PlayListsPresenter(
+        private val playListsInteractor: PlayListsInteractor,
+        uiScheduler: Scheduler,
+        errorParser: ErrorParser
+) : AppPresenter<PlayListsView>(uiScheduler, errorParser) {
+    
+    private var playLists: List<PlayList> = ArrayList()
+    
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        subscribeOnPlayLists()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        subscribeOnPlayLists();
+    fun onStop(listPosition: ListPosition?) {
+        playListsInteractor.saveListPosition(listPosition)
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
+    fun onPlayListLongClick(playList: PlayList?) {
+        viewState.showPlayListMenu(playList)
     }
 
-    public void onStop(ListPosition listPosition) {
-        playListsInteractor.saveListPosition(listPosition);
+    fun onDeletePlayListButtonClicked(playList: PlayList) {
+        viewState.showConfirmDeletePlayListDialog(playList)
     }
 
-    void onPlayListLongClick(PlayList playList) {
-        getViewState().showPlayListMenu(playList);
+    fun onDeletePlayListDialogConfirmed(playList: PlayList) {
+        playListsInteractor.deletePlayList(playList.id)
+                .subscribeOnUi({ onPlayListDeleted(playList) }, this::onPlayListDeletingError)
     }
 
-    void onDeletePlayListButtonClicked(PlayList playList) {
-        getViewState().showConfirmDeletePlayListDialog(playList);
+    fun onFragmentMovedToTop() {
+        playListsInteractor.setSelectedPlayListScreen(0)
     }
 
-    void onDeletePlayListDialogConfirmed(PlayList playList) {
-        playListsInteractor.deletePlayList(playList.getId())
-                .observeOn(uiScheduler)
-                .subscribe(() -> onPlayListDeleted(playList), this::onPlayListDeletingError);
+    fun onChangePlayListNameButtonClicked(playList: PlayList) {
+        viewState.showEditPlayListNameDialog(playList)
     }
 
-    void onFragmentMovedToTop() {
-        playListsInteractor.setSelectedPlayListScreen(0);
+    private fun onPlayListDeletingError(throwable: Throwable) {
+        val errorCommand = errorParser.parseError(throwable)
+        viewState.showDeletePlayListError(errorCommand)
     }
 
-    void onChangePlayListNameButtonClicked(PlayList playList) {
-        getViewState().showEditPlayListNameDialog(playList);
+    private fun onPlayListDeleted(playList: PlayList) {
+        viewState.showPlayListDeleteSuccess(playList)
     }
 
-    private void onPlayListDeletingError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showDeletePlayListError(errorCommand);
+    private fun subscribeOnPlayLists() {
+        viewState.showLoading()
+        playListsInteractor.playListsObservable.unsafeSubscribeOnUi(this::onPlayListsReceived)
     }
 
-    private void onPlayListDeleted(PlayList playList) {
-        getViewState().showPlayListDeleteSuccess(playList);
-    }
-
-    private void subscribeOnPlayLists() {
-        getViewState().showLoading();
-        presenterDisposable.add(playListsInteractor.getPlayListsObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayListsReceived));
-    }
-
-    private void onPlayListsReceived(List<PlayList> list) {
-        boolean firstReceive = this.playLists.isEmpty();
-
-        this.playLists = list;
-        getViewState().updateList(list);
+    private fun onPlayListsReceived(list: List<PlayList>) {
+        val firstReceive = playLists.isEmpty()
+        playLists = list
+        viewState.updateList(list)
         if (list.isEmpty()) {
-            getViewState().showEmptyList();
+            viewState.showEmptyList()
         } else {
-            getViewState().showList();
+            viewState.showList()
             if (firstReceive) {
-                ListPosition listPosition = playListsInteractor.getSavedListPosition();
+                val listPosition = playListsInteractor.savedListPosition
                 if (listPosition != null) {
-                    getViewState().restoreListPosition(listPosition);
+                    viewState.restoreListPosition(listPosition)
                 }
             }
         }

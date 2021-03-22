@@ -1,102 +1,81 @@
-package com.github.anrimian.musicplayer.ui.playlist_screens.choose;
+package com.github.anrimian.musicplayer.ui.playlist_screens.choose
 
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Scheduler
 
-import java.util.List;
-
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import moxy.MvpPresenter;
-
-
-public class ChoosePlayListPresenter extends MvpPresenter<ChoosePlayListView> {
-
-    private final PlayListsInteractor playListsInteractor;
-    private final Scheduler uiScheduler;
-    private final ErrorParser errorParser;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-
-    private float slideOffset;
-
-    private PlayList playListInMenu;
-    private PlayList playListToDelete;
-
-    public ChoosePlayListPresenter(PlayListsInteractor playListsInteractor,
-                                   Scheduler uiScheduler,
-                                   ErrorParser errorParser) {
-        this.playListsInteractor = playListsInteractor;
-        this.uiScheduler = uiScheduler;
-        this.errorParser = errorParser;
+class ChoosePlayListPresenter(
+        private val playListsInteractor: PlayListsInteractor,
+        uiScheduler: Scheduler,
+        errorParser: ErrorParser
+) : AppPresenter<ChoosePlayListView>(uiScheduler, errorParser) {
+    
+    private var slideOffset = 0f
+    private var playListInMenu: PlayList? = null
+    private var playListToDelete: PlayList? = null
+    
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        viewState.showBottomSheetSlided(0f)
+        subscribeOnPlayLists()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        getViewState().showBottomSheetSlided(0f);
-        subscribeOnPlayLists();
+    override fun onDestroy() {
+        super.onDestroy()
+        presenterDisposable.dispose()
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
+    fun onBottomSheetSlided(slideOffset: Float) {
+        this.slideOffset = slideOffset
+        viewState.showBottomSheetSlided(slideOffset)
     }
 
-    void onBottomSheetSlided(float slideOffset) {
-        this.slideOffset = slideOffset;
-        getViewState().showBottomSheetSlided(slideOffset);
+    fun onPlayListLongClick(playList: PlayList) {
+        playListInMenu = playList
+        viewState.showPlayListMenu(playList)
     }
 
-    void onPlayListLongClick(PlayList playList) {
-        playListInMenu = playList;
-        getViewState().showPlayListMenu(playList);
+    fun onDeletePlayListButtonClicked() {
+        playListToDelete = playListInMenu
+        viewState.showConfirmDeletePlayListDialog(playListToDelete)
+        playListInMenu = null
     }
 
-    void onDeletePlayListButtonClicked() {
-        playListToDelete = playListInMenu;
-        getViewState().showConfirmDeletePlayListDialog(playListToDelete);
-        playListInMenu = null;
+    fun onDeletePlayListDialogConfirmed() {
+        playListsInteractor.deletePlayList(playListToDelete!!.id)
+                .subscribeOnUi(this::onPlayListDeleted, this::onPlayListDeletingError)
     }
 
-    void onDeletePlayListDialogConfirmed() {
-        playListsInteractor.deletePlayList(playListToDelete.getId())
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayListDeleted, this::onPlayListDeletingError);
+    fun onChangePlayListNameButtonClicked() {
+        viewState.showEditPlayListNameDialog(playListInMenu)
     }
 
-    void onChangePlayListNameButtonClicked() {
-        getViewState().showEditPlayListNameDialog(playListInMenu);
+    private fun onPlayListDeletingError(throwable: Throwable) {
+        val errorCommand = errorParser.parseError(throwable)
+        viewState.showDeletePlayListError(errorCommand)
+        playListToDelete = null
     }
 
-    private void onPlayListDeletingError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showDeletePlayListError(errorCommand);
-        playListToDelete = null;
+    private fun onPlayListDeleted() {
+        viewState.showPlayListDeleteSuccess(playListToDelete)
+        playListToDelete = null
     }
 
-    private void onPlayListDeleted() {
-        getViewState().showPlayListDeleteSuccess(playListToDelete);
-        playListToDelete = null;
+    private fun subscribeOnPlayLists() {
+        viewState.showLoading()
+        playListsInteractor.playListsObservable
+                .unsafeSubscribeOnUi(this::onPlayListsReceived)
     }
 
-    private void subscribeOnPlayLists() {
-        getViewState().showLoading();
-        presenterDisposable.add(playListsInteractor.getPlayListsObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayListsReceived));
-    }
-
-    private void onPlayListsReceived(List<PlayList> list) {
-        getViewState().updateList(list);
+    private fun onPlayListsReceived(list: List<PlayList>) {
+        viewState.updateList(list)
         if (list.isEmpty()) {
-            getViewState().showEmptyList();
+            viewState.showEmptyList()
         } else {
-            getViewState().showList();
+            viewState.showList()
         }
-        getViewState().showBottomSheetSlided(slideOffset);
+        viewState.showBottomSheetSlided(slideOffset)
     }
 }

@@ -1,76 +1,54 @@
-package com.github.anrimian.musicplayer.ui.equalizer;
+package com.github.anrimian.musicplayer.ui.equalizer
 
-import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor;
-import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
-import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
-import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor
+import com.github.anrimian.musicplayer.domain.models.equalizer.Band
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig
+import com.github.anrimian.musicplayer.domain.models.equalizer.Preset
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Scheduler
 
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import moxy.MvpPresenter;
+class EqualizerPresenter(
+        private val interactor: EqualizerInteractor,
+        uiScheduler: Scheduler,
+        errorParser: ErrorParser
+) : AppPresenter<EqualizerView>(uiScheduler, errorParser) {
 
-public class EqualizerPresenter extends MvpPresenter<EqualizerView> {
-
-    private final EqualizerInteractor interactor;
-    private final Scheduler scheduler;
-    private final ErrorParser errorParser;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-
-    public EqualizerPresenter(EqualizerInteractor interactor,
-                              Scheduler scheduler,
-                              ErrorParser errorParser) {
-        this.interactor = interactor;
-        this.scheduler = scheduler;
-        this.errorParser = errorParser;
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        loadEqualizerConfig()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        loadEqualizerConfig();
+    private fun loadEqualizerConfig() {
+        interactor.equalizerConfig.unsafeSubscribeOnUi(this::onEqualizerConfigReceived)
     }
 
-    private void loadEqualizerConfig() {
-        interactor.getEqualizerConfig()
-                .observeOn(scheduler)
-                .subscribe(this::onEqualizerConfigReceived);
+    fun onBandLevelChanged(band: Band, value: Short) {
+        interactor.setBandLevel(band.bandNumber, value)
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
+    fun onBandLevelDragStopped() {
+        interactor.saveBandLevel()
     }
 
-    public void onBandLevelChanged(Band band, short value) {
-        interactor.setBandLevel(band.getBandNumber(), value);
+    fun onPresetSelected(preset: Preset) {
+        interactor.setPreset(preset)
     }
 
-    public void onBandLevelDragStopped() {
-        interactor.saveBandLevel();
+    private fun onEqualizerConfigReceived(config: EqualizerConfig) {
+        viewState.displayEqualizerConfig(config)
+        subscribeOnEqualizerState(config)
     }
 
-    public void onPresetSelected(Preset preset) {
-        interactor.setPreset(preset);
+    private fun subscribeOnEqualizerState(config: EqualizerConfig) {
+        interactor.equalizerStateObservable
+                .subscribeOnUi(
+                        { equalizerState -> viewState.displayEqualizerState(equalizerState, config) },
+                        this::onDefaultError
+                )
     }
 
-    private void onEqualizerConfigReceived(EqualizerConfig config) {
-        getViewState().displayEqualizerConfig(config);
-        subscribeOnEqualizerState(config);
-    }
-
-    private void subscribeOnEqualizerState(EqualizerConfig config) {
-        presenterDisposable.add(interactor.getEqualizerStateObservable()
-                .observeOn(scheduler)
-                .subscribe(
-                        equalizerState -> getViewState().displayEqualizerState(equalizerState, config),
-                        this::onDefaultError)
-        );
-    }
-
-    private void onDefaultError(Throwable throwable) {
-        getViewState().showErrorMessage(errorParser.parseError(throwable));
+    private fun onDefaultError(throwable: Throwable) {
+        viewState.showErrorMessage(errorParser.parseError(throwable))
     }
 }

@@ -39,6 +39,12 @@ abstract class AppPresenter<T : MvpView>(
                 .ignoreDisposable()
     }
 
+    protected fun <K> Single<K>.unsafeSubscribeOnUi(onNext: (K) -> Unit) {
+        this.observeOn(uiScheduler)
+                .subscribe(onNext)
+                .ignoreDisposable()
+    }
+
     protected fun Completable.subscribeOnUi(onNext: () -> Unit, onError: (Throwable) -> Unit) {
         this.observeOn(uiScheduler)
                 .subscribe(onNext, onError)
