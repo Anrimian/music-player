@@ -212,7 +212,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     @Override
     public void setPlaySpeed(float speed) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
+            try {
+                mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
+            } catch (IllegalStateException ignored) {}
         }
     }
 

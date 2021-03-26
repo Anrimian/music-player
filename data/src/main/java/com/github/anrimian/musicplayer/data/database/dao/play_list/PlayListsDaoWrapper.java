@@ -115,6 +115,9 @@ public class PlayListsDaoWrapper {
     }
 
     public void updatePlayListName(long id, String name) {
+        if (playListDao.isPlayListWithNameExists(name)) {
+            throw new PlayListNotCreatedException();
+        }
         playListDao.updatePlayListName(id, name);
     }
 

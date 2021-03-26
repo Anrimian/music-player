@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -29,7 +30,9 @@ class PlayerPresenter(
 ) : AppPresenter<PlayerView>(uiScheduler, errorParser) {
     
     private val batterySafeDisposable = CompositeDisposable()
-    
+
+    private val listDragFilter = ListDragFilter()
+
     private var playQueue: List<PlayQueueItem> = ArrayList()
     private var currentItem: PlayQueueItem? = null
     private var currentPosition = -1
@@ -258,6 +261,8 @@ class PlayerPresenter(
         val toItem = playQueue[to]
         Collections.swap(playQueue, from, to)
         viewState.notifyItemMoved(from, to)
+
+        listDragFilter.increaseEventsToSkip()
         playerInteractor.swapItems(fromItem, toItem)
     }
 
@@ -354,6 +359,7 @@ class PlayerPresenter(
     private fun subscribeOnPlayQueue() {
         batterySafeDisposable.add(playerInteractor.playQueueObservable
                 .observeOn(uiScheduler)
+                .filter(listDragFilter::filterListEmitting)
                 .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError))
     }
 
