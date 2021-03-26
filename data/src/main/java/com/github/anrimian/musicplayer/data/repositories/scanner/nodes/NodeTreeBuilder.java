@@ -10,6 +10,18 @@ import java.util.List;
 
 public class NodeTreeBuilder {
 
+    /**
+     * create root node, fill node with files without folderId
+     *
+     * for each folder:
+     * + if no parent folder -> add to root folder
+     * + else -> add to map for next stage
+     *
+     * for each folder in root:
+     * + get folders from map by parentId
+     * + for each folder: fill with files, add to node
+     * + remove from map
+     */
     public LocalFolderNode<Long> createTreeFromIdMap(List<StorageFolder> folders,
                                                      LongSparseArray<StorageComposition> filesMap) {
         LongSparseArray<List<Long>> folderFilesMap = buildFolderIdMap(filesMap);
@@ -42,7 +54,7 @@ public class NodeTreeBuilder {
 
         //TODO we still can face it, reproduce
         if (!folderParentIdMap.isEmpty()) {
-            throw new IllegalStateException("found missed folders");
+            throw new IllegalStateException("found missing folders: " + folderParentIdMap);
         }
 
         return rootNode;
@@ -70,11 +82,11 @@ public class NodeTreeBuilder {
     private void fillNode(LocalFolderNode<Long> targetNode,
                           LongSparseArray<List<StorageFolder>> folderParentIdMap,
                           LongSparseArray<List<Long>> folderFilesMap) {
-        Long id = targetNode.getId();
-        if (id == null) {
+        Long parentId = targetNode.getId();
+        if (parentId == null) {
             throw new IllegalStateException("try to access folder with id == null");
         }
-        List<StorageFolder> childList = folderParentIdMap.get(id);
+        List<StorageFolder> childList = folderParentIdMap.get(parentId);
         if (childList != null) {
             for (StorageFolder folder: childList) {
                 LocalFolderNode<Long> node = createLocalFolderWithFiles(folder, folderFilesMap);
@@ -82,7 +94,7 @@ public class NodeTreeBuilder {
                 fillNode(node, folderParentIdMap, folderFilesMap);
             }
         }
-        folderParentIdMap.remove(id);
+        folderParentIdMap.remove(parentId);
     }
 
     private LocalFolderNode<Long> createLocalFolderWithFiles(StorageFolder folder,
