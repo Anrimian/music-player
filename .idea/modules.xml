@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/music-player.iml" filepath="$PROJECT_DIR$/.idea/modules/music-player.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data/music-player.data.iml" filepath="$PROJECT_DIR$/.idea/modules/data/music-player.data.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/music-player.domain.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/music-player.domain.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/presentation/music-player.presentation.iml" filepath="$PROJECT_DIR$/.idea/modules/presentation/music-player.presentation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Music_Player.iml" filepath="$PROJECT_DIR$/.idea/modules/Music_Player.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data/Music_Player.data.iml" filepath="$PROJECT_DIR$/.idea/modules/data/Music_Player.data.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/Music_Player.domain.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/Music_Player.domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/presentation/Music_Player.presentation.iml" filepath="$PROJECT_DIR$/.idea/modules/presentation/Music_Player.presentation.iml" />
     </modules>
   </component>
 </project>
