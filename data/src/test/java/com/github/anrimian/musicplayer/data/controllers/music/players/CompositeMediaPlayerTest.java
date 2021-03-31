@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.observers.TestObserver;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import utils.TestDataProvider;
@@ -37,10 +38,12 @@ public class CompositeMediaPlayerTest {
     public void setUp() {
         when(player1.getTrackPositionObservable()).thenReturn(player1PositionSubject);
         when(player1.getEventsObservable()).thenReturn(player1EventSubject);
+        when(player1.getSpeedChangeAvailableObservable()).thenReturn(Observable.just(true));
 
 
         when(player2.getTrackPositionObservable()).thenReturn(player2PositionSubject);
         when(player2.getEventsObservable()).thenReturn(player2EventSubject);
+        when(player2.getSpeedChangeAvailableObservable()).thenReturn(Observable.just(true));
 
         compositeMediaPlayer = new CompositeMediaPlayer(() -> player1, () -> player2);
     }
@@ -49,12 +52,12 @@ public class CompositeMediaPlayerTest {
     public void testPlayersSwitch() {
         CompositionSource composition = TestDataProvider.fakeCompositionSource(0);
 
-        compositeMediaPlayer.prepareToPlay(composition, 0L);
-        inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));
+        compositeMediaPlayer.prepareToPlay(composition, 0L, null);
+        inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L),  eq(null));
 
         player1EventSubject.onNext(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
         inOrder.verify(player1).release();
-        inOrder.verify(player2).prepareToPlay(eq(composition), eq(0L));
+        inOrder.verify(player2).prepareToPlay(eq(composition), eq(0L),  eq(ErrorType.UNSUPPORTED));
     }
 
     @Test
@@ -63,12 +66,12 @@ public class CompositeMediaPlayerTest {
 
         TestObserver<PlayerEvent> eventsObserver = compositeMediaPlayer.getEventsObservable().test();
 
-        compositeMediaPlayer.prepareToPlay(composition, 0L);
-        inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));
+        compositeMediaPlayer.prepareToPlay(composition, 0L, null);
+        inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L),  eq(null));
 
         player1EventSubject.onNext(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
         inOrder.verify(player1).release();
-        inOrder.verify(player2).prepareToPlay(eq(composition), eq(0L));
+        inOrder.verify(player2).prepareToPlay(eq(composition), eq(0L),  eq(ErrorType.UNSUPPORTED));
 
         player2EventSubject.onNext(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
 
@@ -76,22 +79,22 @@ public class CompositeMediaPlayerTest {
 
         CompositionSource composition2 = TestDataProvider.fakeCompositionSource(2);
 
-        compositeMediaPlayer.prepareToPlay(composition2, 0L);
+        compositeMediaPlayer.prepareToPlay(composition2, 0L, null);
         inOrder.verify(player2).release();
-        inOrder.verify(player1).prepareToPlay(eq(composition2), eq(0L));
+        inOrder.verify(player1).prepareToPlay(eq(composition2), eq(0L),  eq(null));
     }
 
     @Test
     public void testPlayersSwitchWithPosition() {
         CompositionSource composition = TestDataProvider.fakeCompositionSource(0);
 
-        compositeMediaPlayer.prepareToPlay(composition, 0L);
-        inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));
+        compositeMediaPlayer.prepareToPlay(composition, 0L, null);
+        inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L), eq(null));
 
         player1PositionSubject.onNext(100L);
 
         player1EventSubject.onNext(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
         inOrder.verify(player1).release();
-        inOrder.verify(player2).prepareToPlay(eq(composition), eq(100L));
+        inOrder.verify(player2).prepareToPlay(eq(composition), eq(100L), eq(ErrorType.UNSUPPORTED));
     }
 }
