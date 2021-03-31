@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,6 +43,8 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.incomplete_swipe.IncompleteSwipeCallback;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.incomplete_swipe.IncompleteSwipeCallbackKt;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Collection;
@@ -122,6 +125,16 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
                 presenter::onCompositionIconClicked,
                 presenter::onCompositionMenuClicked);
         recyclerView.setAdapter(adapter);
+
+        IncompleteSwipeCallback callback = IncompleteSwipeCallbackKt.createSwipeCallback(recyclerView,
+//                getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
+//                presenter::onItemSwipedToDelete,
+//                ItemTouchHelper.START,
+                R.drawable.ic_share_variant,
+                R.string.share,
+                integer -> null);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
