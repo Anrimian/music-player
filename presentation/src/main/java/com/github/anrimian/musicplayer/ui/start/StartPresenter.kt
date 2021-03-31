@@ -1,35 +1,32 @@
-package com.github.anrimian.musicplayer.ui.start;
+package com.github.anrimian.musicplayer.ui.start
 
-import moxy.MvpPresenter;
+import moxy.MvpPresenter
 
 /**
  * Created on 19.10.2017.
  */
-
-
-public class StartPresenter extends MvpPresenter<StartView> {
-
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        requestFilesPermissions();
+class StartPresenter : MvpPresenter<StartView>() {
+    
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        requestFilesPermissions()
     }
 
-    void onFilesPermissionResult(boolean granted) {
+    fun onFilesPermissionResult(granted: Boolean) {
         if (granted) {
-            getViewState().startSystemServices();
-            getViewState().goToMainScreen();
+            viewState.startSystemServices()
+            viewState.goToMainScreen()
         } else {
-            getViewState().showDeniedPermissionMessage();
+            viewState.showDeniedPermissionMessage()
         }
     }
 
-    void onTryAgainButtonClicked() {
-        requestFilesPermissions();
+    fun onTryAgainButtonClicked() {
+        requestFilesPermissions()
     }
 
-    private void requestFilesPermissions() {
-        getViewState().showStub();
-        getViewState().requestFilesPermissions();
+    private fun requestFilesPermissions() {
+        viewState.showStub()
+        viewState.requestFilesPermissions()
     }
 }

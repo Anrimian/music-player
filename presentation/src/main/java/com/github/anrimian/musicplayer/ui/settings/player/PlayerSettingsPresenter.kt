@@ -1,48 +1,30 @@
-package com.github.anrimian.musicplayer.ui.settings.player;
+package com.github.anrimian.musicplayer.ui.settings.player
 
-import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Scheduler
 
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import moxy.MvpPresenter;
+class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
+                              uiScheduler: Scheduler,
+                              errorParser: ErrorParser
+) : AppPresenter<PlayerSettingsView>(uiScheduler, errorParser) {
 
-
-public class PlayerSettingsPresenter extends MvpPresenter<PlayerSettingsView> {
-
-    private final PlayerSettingsInteractor interactor;
-    private final Scheduler uiScheduler;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-
-    public PlayerSettingsPresenter(PlayerSettingsInteractor interactor, Scheduler uiScheduler) {
-        this.interactor = interactor;
-        this.uiScheduler = uiScheduler;
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        viewState.showDecreaseVolumeOnAudioFocusLossEnabled(
+                interactor.isDecreaseVolumeOnAudioFocusLossEnabled
+        )
+        subscribeOnSelectedEqualizer()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        getViewState().showDecreaseVolumeOnAudioFocusLossEnabled(
-                interactor.isDecreaseVolumeOnAudioFocusLossEnabled()
-        );
-
-        subscribeOnSelectedEqualizer();
+    fun onDecreaseVolumeOnAudioFocusLossChecked(checked: Boolean) {
+        viewState.showDecreaseVolumeOnAudioFocusLossEnabled(checked)
+        interactor.isDecreaseVolumeOnAudioFocusLossEnabled = checked
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
-    }
-
-    void onDecreaseVolumeOnAudioFocusLossChecked(boolean checked) {
-        getViewState().showDecreaseVolumeOnAudioFocusLossEnabled(checked);
-        interactor.setDecreaseVolumeOnAudioFocusLossEnabled(checked);
-    }
-
-    private void subscribeOnSelectedEqualizer() {
-        presenterDisposable.add(interactor.getSelectedEqualizerTypeObservable()
-                .observeOn(uiScheduler)
-                .subscribe(getViewState()::showSelectedEqualizerType));
+    private fun subscribeOnSelectedEqualizer() {
+        interactor.selectedEqualizerTypeObservable
+                .unsafeSubscribeOnUi(viewState::showSelectedEqualizerType)
     }
 }

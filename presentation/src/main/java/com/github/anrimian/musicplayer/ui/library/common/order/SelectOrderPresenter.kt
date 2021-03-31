@@ -1,34 +1,32 @@
-package com.github.anrimian.musicplayer.ui.library.common.order;
+package com.github.anrimian.musicplayer.ui.library.common.order
 
-import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.models.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.models.order.OrderType
+import moxy.MvpPresenter
 
-import moxy.MvpPresenter;
+class SelectOrderPresenter : MvpPresenter<SelectOrderView>() {
 
+    private lateinit var orderType: OrderType
+    private var reverse = false
 
-public class SelectOrderPresenter extends MvpPresenter<SelectOrderView> {
-
-    private OrderType orderType;
-    private boolean reverse;
-
-    void setOrder(Order order) {
-        orderType = order.getOrderType();
-        reverse = order.isReversed();
-        getViewState().showReverse(reverse);
-        getViewState().showSelectedOrder(orderType);
+    fun setOrder(order: Order) {
+        orderType = order.orderType
+        reverse = order.isReversed
+        viewState.showReverse(reverse)
+        viewState.showSelectedOrder(orderType)
     }
 
-    void onOrderTypeSelected(OrderType order) {
-        this.orderType = order;
-        getViewState().showSelectedOrder(order);
+    fun onOrderTypeSelected(order: OrderType) {
+        orderType = order
+        viewState.showSelectedOrder(order)
     }
 
-    void onReverseTypeSelected(boolean selected) {
-        this.reverse = selected;
-        getViewState().showReverse(selected);
+    fun onReverseTypeSelected(selected: Boolean) {
+        reverse = selected
+        viewState.showReverse(selected)
     }
 
-    void onCompleteButtonClicked() {
-        getViewState().close(new Order(orderType, reverse));
+    fun onCompleteButtonClicked() {
+        viewState.close(Order(orderType, reverse))
     }
 }

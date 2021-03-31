@@ -1,126 +1,93 @@
-package com.github.anrimian.musicplayer.ui.library.genres.list;
+package com.github.anrimian.musicplayer.ui.library.genres.list
 
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor;
-import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.utils.TextUtils;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor
+import com.github.anrimian.musicplayer.domain.models.genres.Genre
+import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.utils.TextUtils
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.disposables.Disposable
+import java.util.*
 
-import java.util.ArrayList;
-import java.util.List;
+class GenresListPresenter(private val interactor: LibraryGenresInteractor,
+                          errorParser: ErrorParser,
+                          uiScheduler: Scheduler
+) : AppPresenter<GenresListView>(uiScheduler, errorParser) {
+  
+    private var listDisposable: Disposable? = null
+    private var changeDisposable: Disposable? = null
+    
+    private var genres: List<Genre> = ArrayList()
+    
+    private var searchText: String? = null
 
-import javax.annotation.Nullable;
-
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import moxy.MvpPresenter;
-
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
-
-
-public class GenresListPresenter extends MvpPresenter<GenresListView> {
-
-    private final LibraryGenresInteractor interactor;
-    private final ErrorParser errorParser;
-    private final Scheduler uiScheduler;
-
-    private final CompositeDisposable presenterDisposable = new CompositeDisposable();
-    private Disposable listDisposable;
-    private Disposable changeDisposable;
-
-    private List<Genre> genres = new ArrayList<>();
-
-    @Nullable
-    private String searchText;
-
-    public GenresListPresenter(LibraryGenresInteractor interactor,
-                               ErrorParser errorParser,
-                               Scheduler uiScheduler) {
-        this.interactor = interactor;
-        this.errorParser = errorParser;
-        this.uiScheduler = uiScheduler;
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        subscribeOnGenresList()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        subscribeOnGenresList();
+    fun onTryAgainLoadCompositionsClicked() {
+        subscribeOnGenresList()
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        presenterDisposable.dispose();
+    fun onOrderMenuItemClicked() {
+        viewState.showSelectOrderScreen(interactor.order)
     }
 
-
-    void onTryAgainLoadCompositionsClicked() {
-        subscribeOnGenresList();
+    fun onOrderSelected(order: Order) {
+        interactor.order = order
     }
 
-    void onOrderMenuItemClicked() {
-        getViewState().showSelectOrderScreen(interactor.getOrder());
-    }
-
-    void onOrderSelected(Order order) {
-        interactor.setOrder(order);
-    }
-
-    void onNewGenreNameEntered(String name, long genreId) {
-        dispose(changeDisposable);
+    fun onNewGenreNameEntered(name: String, genreId: Long) {
+        RxUtils.dispose(changeDisposable)
         changeDisposable = interactor.updateGenreName(name, genreId)
                 .observeOn(uiScheduler)
-                .doOnSubscribe(d -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideRenameProgress())
-                .subscribe(() -> {}, this::onDefaultError);
+                .doOnSubscribe { viewState.showRenameProgress() }
+                .doFinally { viewState.hideRenameProgress() }
+                .subscribe({}, this::onDefaultError)
     }
 
-    void onSearchTextChanged(String text) {
+    fun onSearchTextChanged(text: String?) {
         if (!TextUtils.equals(searchText, text)) {
-            searchText = text;
-            subscribeOnGenresList();
+            searchText = text
+            subscribeOnGenresList()
         }
     }
 
-    @Nullable
-    String getSearchText() {
-        return searchText;
-    }
+    fun getSearchText() = searchText
 
-    private void subscribeOnGenresList() {
+    private fun subscribeOnGenresList() {
         if (genres.isEmpty()) {
-            getViewState().showLoading();
+            viewState.showLoading()
         }
-        dispose(listDisposable, presenterDisposable);
+        RxUtils.dispose(listDisposable, presenterDisposable)
         listDisposable = interactor.getGenresObservable(searchText)
                 .observeOn(uiScheduler)
-                .subscribe(this::onGenresReceived, this::onGenresReceivingError);
-        presenterDisposable.add(listDisposable);
+                .subscribe(this::onGenresReceived, this::onGenresReceivingError)
+        presenterDisposable.add(listDisposable)
     }
 
-    private void onGenresReceivingError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showLoadingError(errorCommand);
+    private fun onGenresReceivingError(throwable: Throwable) {
+        viewState.showLoadingError(errorParser.parseError(throwable))
     }
 
-    private void onGenresReceived(List<Genre> genres) {
-        this.genres = genres;
-        getViewState().submitList(genres);
+    private fun onGenresReceived(genres: List<Genre>) {
+        this.genres = genres
+        viewState.submitList(genres)
         if (genres.isEmpty()) {
             if (TextUtils.isEmpty(searchText)) {
-                getViewState().showEmptyList();
+                viewState.showEmptyList()
             } else {
-                getViewState().showEmptySearchResult();
+                viewState.showEmptySearchResult()
             }
         } else {
-            getViewState().showList();
+            viewState.showList()
         }
     }
 
-    private void onDefaultError(Throwable throwable) {
-        ErrorCommand errorCommand = errorParser.parseError(throwable);
-        getViewState().showErrorMessage(errorCommand);
+    private fun onDefaultError(throwable: Throwable) {
+        viewState.showErrorMessage(errorParser.parseError(throwable))
     }
 }
