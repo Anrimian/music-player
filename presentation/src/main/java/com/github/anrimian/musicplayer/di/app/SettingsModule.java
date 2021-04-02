@@ -63,8 +63,10 @@ public class SettingsModule {
 
     @Provides
     @Nonnull
-    DisplaySettingsPresenter displaySettingsPresenter(DisplaySettingsInteractor displaySettingsInteractor) {
-        return new DisplaySettingsPresenter(displaySettingsInteractor);
+    DisplaySettingsPresenter displaySettingsPresenter(DisplaySettingsInteractor displaySettingsInteractor,
+                                                      @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                                      ErrorParser errorParser) {
+        return new DisplaySettingsPresenter(displaySettingsInteractor, uiScheduler, errorParser);
     }
 
     @Provides
@@ -76,8 +78,9 @@ public class SettingsModule {
     @Provides
     @Nonnull
     PlayerSettingsPresenter playerSettingsPresenter(PlayerSettingsInteractor playerSettingsInteractor,
-                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler) {
-        return new PlayerSettingsPresenter(playerSettingsInteractor, uiScheduler);
+                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                                    ErrorParser errorParser) {
+        return new PlayerSettingsPresenter(playerSettingsInteractor, uiScheduler, errorParser);
     }
 
     @Provides

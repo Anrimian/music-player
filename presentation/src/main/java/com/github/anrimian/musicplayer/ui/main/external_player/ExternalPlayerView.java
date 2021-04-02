@@ -1,23 +1,17 @@
 package com.github.anrimian.musicplayer.ui.main.external_player;
 
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import javax.annotation.Nullable;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.StateStrategyType;
 import moxy.viewstate.strategy.alias.AddToEndSingle;
 public interface ExternalPlayerView extends MvpView {
 
-    String PLAYER_STATE = "player_state";
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
-    void showStopState();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
-    void showPlayState();
+    @AddToEndSingle
+    void showPlayerState(PlayerState state);
 
     @AddToEndSingle
     void displayComposition(UriCompositionSource source);

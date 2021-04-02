@@ -10,7 +10,7 @@ import moxy.viewstate.strategy.alias.OneExecution;
  * Created on 19.10.2017.
  */
 
-interface StartView extends MvpView {
+public interface StartView extends MvpView {
 
     String SCREEN_STATE = "screen_state";
 
