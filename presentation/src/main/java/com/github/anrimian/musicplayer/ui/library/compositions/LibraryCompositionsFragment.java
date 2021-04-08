@@ -130,9 +130,12 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
 //                getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
 //                presenter::onItemSwipedToDelete,
 //                ItemTouchHelper.START,
-                R.drawable.ic_share_variant,
-                R.string.share,
-                integer -> null);
+                R.drawable.ic_play_next,
+                R.string.play_next,
+                position -> {
+                    presenter.onPlayNextCompositionClicked(position);
+                    return null;
+                });
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 

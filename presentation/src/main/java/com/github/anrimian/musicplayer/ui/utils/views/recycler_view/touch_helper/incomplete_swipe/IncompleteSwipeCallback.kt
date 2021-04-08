@@ -12,6 +12,8 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
+import kotlin.math.abs
 
 fun createSwipeCallback(recyclerView: RecyclerView,
 //                      @ColorInt backgroundColor: Int,
@@ -34,6 +36,13 @@ fun createSwipeCallback(recyclerView: RecyclerView,
     )
 }
 
+//TODO refactoring constructor
+//TODO design
+//TODO animation
+
+const val SWIPE_BORDER_PERCENT = 0.33f
+const val SWIPE_ACTIVE_BORDER_PERCENT = 0.22f
+const val NO_POSITION = -1
 
 class IncompleteSwipeCallback(context: Context,
                               @DrawableRes iconRes: Int,
@@ -73,27 +82,13 @@ class IncompleteSwipeCallback(context: Context,
             false
     )
 
+    private var itemPositionToAction = NO_POSITION
 
-    override fun onMove(recyclerView: RecyclerView,
-                        viewHolder: RecyclerView.ViewHolder,
-                        target: RecyclerView.ViewHolder): Boolean {
-        return false
-    }
-
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        swipeCallback(viewHolder.adapterPosition)
-    }
-
-    override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
-        return defaultValue * 8
-    }
-
-    override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        return 0.33f
-    }
-
-    override fun getBoundingBoxMargin(): Int {
-        return 50
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        super.onSelectedChanged(viewHolder, actionState)
+        if (actionState == ItemTouchHelper.ACTION_STATE_IDLE && itemPositionToAction != NO_POSITION) {
+            swipeCallback(itemPositionToAction)
+        }
     }
 
     override fun onChildDraw(c: Canvas,
@@ -105,16 +100,26 @@ class IncompleteSwipeCallback(context: Context,
                              isCurrentlyActive: Boolean) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             val itemView = viewHolder.itemView
+
             val top = itemView.top.toFloat()
             val bottom = itemView.bottom.toFloat()
             val left = if (dX > 0) itemView.left.toFloat() else itemView.right + dX
             val right = if (dX > 0) dX else itemView.right.toFloat()
             val centerY = top + itemView.height / 2f
-            val centerX: Float = (panelWidth shr 1).toFloat()
+            val centerX = (panelWidth shr 1).toFloat()
 
-//            if (abs(dX) > itemView.width * getSwipeThreshold(viewHolder)) {
-//                return
-//            }
+            if (abs(dX) > itemView.width * SWIPE_ACTIVE_BORDER_PERCENT) {
+                if (itemPositionToAction == NO_POSITION) {
+                    AndroidUtils.playShortVibration(itemView.context)
+                    itemPositionToAction = viewHolder.bindingAdapterPosition
+                    //start appear animation
+                }
+            } else {
+                if (itemPositionToAction != NO_POSITION) {
+                    itemPositionToAction = NO_POSITION
+                    //start disappear animation
+                }
+            }
 
             //draw icon
             c.save()
@@ -126,7 +131,19 @@ class IncompleteSwipeCallback(context: Context,
             c.translate((itemView.right - (panelWidth + panelEndPadding)).toFloat(), centerY + textTopPadding)
             textStaticLayout.draw(c)
             c.restore()
+
+            if (abs(dX) > itemView.width * SWIPE_BORDER_PERCENT) {
+                return
+            }
         }
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
+
+    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false
+
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+    override fun getSwipeEscapeVelocity(defaultValue: Float) = defaultValue * 8f
+
+    override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder) = 2f//so we can't call onSwiped()
 }

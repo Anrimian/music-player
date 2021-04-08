@@ -6,10 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/data/music-player.data.iml" filepath="$PROJECT_DIR$/.idea/modules/data/music-player.data.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/music-player.domain.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/music-player.domain.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/presentation/music-player.presentation.iml" filepath="$PROJECT_DIR$/.idea/modules/presentation/music-player.presentation.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/music-player.iml" filepath="$PROJECT_DIR$/.idea/modules/music-player.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data/music-player.data.iml" filepath="$PROJECT_DIR$/.idea/modules/data/music-player.data.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/music-player.domain.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/music-player.domain.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/presentation/music-player.presentation.iml" filepath="$PROJECT_DIR$/.idea/modules/presentation/music-player.presentation.iml" />
     </modules>
   </component>
 </project>
