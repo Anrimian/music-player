@@ -161,7 +161,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter::onItemLongClick,
                 this::onFolderMenuClicked,
                 presenter::onCompositionIconClicked,
-                presenter::onCompositionMenuClick);
+                (position, musicFileSource) -> presenter.onCompositionMenuClick(musicFileSource));
         recyclerView.setAdapter(adapter);
 
         headerViewWrapper = new HeaderViewWrapper(viewBinding.headerContainer);

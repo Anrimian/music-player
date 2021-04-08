@@ -94,7 +94,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
     }
 
-    fun onCompositionMenuClick(position: Int, musicFileSource: CompositionFileSource) {
+    fun onCompositionMenuClick(musicFileSource: CompositionFileSource) {
         viewState.showCompositionActionDialog(musicFileSource.composition)
     }
 
