@@ -232,11 +232,11 @@ class PlayerPresenter(
         playerInteractor.fastSeekBackward()
     }
 
-    fun onDragStarted(position: Int) {
+    fun onDragStarted() {
         isDragging = true
     }
 
-    fun onDragEnded(position: Int) {
+    fun onDragEnded() {
         isDragging = false
     }
 

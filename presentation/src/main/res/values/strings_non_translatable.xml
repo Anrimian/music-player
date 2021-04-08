@@ -10,6 +10,14 @@
     <string name="app_name" translatable="false">Music Player</string>
     <string name="useless_image" translatable="false">Useless image</string>
 
+    <string name="system_media_store_system_error" translatable="false">Android system can\'t find the system media storage. This is very strange and rare issue on android 10. Try to restart app or reboot the device, perhaps it will solve this problem.</string>
+    <string name="empty_string" translatable="false"/>
+
+    <string name="widget_small_name" translatable="false">4x1: Small</string>
+    <string name="widget_small_ext_name" translatable="false">4x1: Small extended</string>
+    <string name="widget_medium_name" translatable="false">4x2: Medium</string>
+    <string name="playback_speed_template" translatable="false">%.2fX</string>
+
     <string name="about_app_text" translatable="false"><![CDATA[
         <big><b>What is this app?</b></big>
         <br/>This is a music player that I wrote for myself, in accordance with my vision of how a music player should look like.

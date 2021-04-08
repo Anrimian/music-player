@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="open_drawer">Відкрити бокове меню</string>
+    <string name="close_drawer">Закрити бокове меню</string>
+    <string name="try_again">Спробувати знову</string>
+    <string name="can_not_work_without_file_permission">Додаток не може працювати без дозволу до доступу до файлів</string>
+    <string name="close">Закрити</string>
+    <string name="library">Бібліотека</string>
+    <string name="settings">Налаштування</string>
+    <string name="internal_app_error">Внутрішня помилка додатку</string>
+    <string name="unexpected_error">Помилка: %s</string>
+    <string name="file_not_found">Файл не знайдено</string>
+    <string name="compositions_on_device_not_found">Композицій на пристрої не знайдено</string>
+    <string name="compositions_and_folders_for_search_not_found">Композицій і папок, відповідних до результатів пошуку, не знайдено</string>
+    <string name="compositions_for_search_not_found">Композицій, відповідних до результатів пошуку, не знайдено</string>
+    <string name="foreground_channel_description">Сповіщення про проигравання музики</string>
+    <string name="previous_track">Минулий трек</string>
+    <string name="next_track">Наступний трек</string>
+    <string name="folder">Папка</string>
+    <string name="content_description_menu">Відкрити меню поточної композициції</string>
+    <string name="content_description_menu_template">Відкрити меню композиції: %s</string>
+    <string name="share">Відправити</string>
+    <string name="content_description_repeat_mode">Меню режиму повтору</string>
+    <string name="content_description_shuffle">Перемішати композиції</string>
+    <string name="unknown_author">Невідомий виконавець</string>
+    <string name="delete">Видалити</string>
+    <string name="delete_folder">Видалити папку</string>
+    <string name="alphabetical_order">По алфавіту</string>
+    <string name="add_date_order">По даті додавання</string>
+    <string name="order">Сортування</string>
+    <string name="folders">Папки</string>
+    <string name="compositions">Композиції</string>
+    <string name="play_lists">Плейлисти</string>
+    <string name="play_lists_on_device_not_found">Плейлистів на пристрої не знайдено</string>
+    <string name="name">Назва</string>
+    <string name="create">Створити</string>
+    <string name="create_playlist">Створення плейлиста</string>
+    <string name="create_playlist_error_template">Не вдалось створити плейлист: %1$s</string>
+    <string name="change_playlist_name_error_template">Не вдалось змінити ім\'я плейлиста: %1$s</string>
+    <string name="name_can_not_be_empty">Ім\'я не може бути пустим</string>
+    <string name="create_progress">Створення…</string>
+    <string name="play_list_with_this_name_already_exists">Плейлист з таким ім\'ям вже існує</string>
+    <string name="add_to_playlist">Додати до плейлиста</string>
+    <string name="select_play_list">Виберіть плейлист</string>
+    <string name="add_to_playlist_error_template">Не вдалось додати композицію в плейлист: %1$s</string>
+    <string name="delete_composition_error_template">Не вдалось видалити композицію: %1$s</string>
+    <string name="add_to_playlist_success_template">Композиція \"%1$s\" додана до плейлиста \"%2$s\"</string>
+    <string name="play_list_is_empty">Плейлист пустий</string>
+    <string name="save_as_play_list">Зберегти як плейлист</string>
+    <string name="cancel">Скасування</string>
+    <string name="deleting">Видалення</string>
+    <string name="delete_composition_template">
+        Видалити композицію \"%1$s\"?
+        Цю дію буде неможливо відмінити.
+    </string>
+    <string name="delete_folder_template">Видалити %2$s з папки \"%1$s\"? Цю дію буде неможливо відмінити.</string>
+    <string name="delete_empty_folder">Видалити папку \"%s\"? Цю дію буде неможливо відмінити.</string>
+    <string name="delete_template">Видалити %1$s? Цю дію буде неможливо відмінити.</string>
+    <string name="delete_composition_success">Композиція \"%1$s\" видалена</string>
+    <string name="search">Пошук</string>
+    <string name="play_queue">Чегра відтворення</string>
+    <string name="pause">Пауза</string>
+    <string name="play">Грати</string>
+    <string name="play_all">Грати все</string>
+    <string name="repeat_playlist">Повторювати плейлист</string>
+    <string name="repeat_composition">Повторювати композицію</string>
+    <string name="do_not_repeat">Не повторювати</string>
+    <string name="delete_from_queue">Видалити з черги</string>
+    <string name="delete_from_play_list">Видалити з плейлиста</string>
+    <string name="add_item_to_playlist_error_template">Не вдалось додати композицію в плейлист: %1$s</string>
+    <string name="delete_from_playlist_success_template">Композиція \"%1$s\" видалена з плейлиста \"%2$s\"</string>
+    <string name="delete_playlist_template">Видалити плейлист \"%1$s\"?</string>
+    <string name="play_list_delete_error">Не вдалось видалити плейлист: %1$s </string>
+    <string name="play_not_exists">Плейлист не існує</string>
+    <string name="play_list_deleted">Плейлист \"%1$s\" видалено</string>
+    <string name="can_not_receive_file_for_send">Не вдалось отримати файли для відправки: %1$s</string>
+    <string name="position_template">Поточний час відтворення: %1$s</string>
+    <string name="now_playing_template">Зараз відтворюється: %1$s. Відкрити чергу відтворення.</string>
+    <string name="play_all_in_folder">Програти все в папці</string>
+    <string name="delete_playlist">Видалити плейлист</string>
+    <string name="storage_timeout_error_message">Медіа сховище пристрою не відповідає. Це дуже дивна і рідкісна помилка. Спробуйте перезавантажити пристрій, можливо, це вирішить цю проблему.</string>
+    <string name="select_all">Виділити все</string>
+    <string name="file_uri_extract_error">Не вдалось отримати системний шлях до композиції \"%s\" для відправки. Можливо, вона в закритій системній папці.</string>
+    <string name="loading_progress">Завантаження…</string>
+    <string name="alphabetical_order_desc_title">Я - А</string>
+    <string name="add_date_order_desc_title">Спочатку пізніші</string>
+    <string name="play_action">Програти</string>
+    <string name="play_next">Програти наступним</string>
+    <string name="add_to_play_queue">Додати до черги</string>
+    <string name="edit_name">Перейменувати</string>
+    <string name="change">Змінити</string>
+    <string name="no_current_composition">Немає поточної композиції</string>
+    <string name="show_covers">Показувати обкладинки</string>
+    <string name="show_covers_in_notification">Показувати обкладинку в сповіщенні</string>
+    <string name="colored_notification">Фарбувати сповіщення в кольори обкладинки</string>
+    <string name="show_covers_on_lock_screen">Показувати обкладинку на екрані блокування</string>
+    <string name="display">Відображення</string>
+    <string name="decrease_volume_on_notification">Зменшувати гучність при отриманні сповіщення</string>
+    <string name="playing">Програвання</string>
+    <string name="error_channel_description">Сповіщення про помилки</string>
+    <string name="playing_error">Помилка відтворення</string>
+    <string name="no_file_permission">Немає дозволу на доступ до файлів</string>
+    <string name="about_app">Про додаток</string>
+    <string name="version_template">Версія %1$s(Збірка %2$d)</string>
+    <string name="theme">Тема оформлення</string>
+    <string name="dark_theme">Темна</string>
+    <string name="edit">Редагувати</string>
+    <string name="edit_tags">Редагувати теги</string>
+    <string name="change_author_name">Змінити ім\'я виконавця</string>
+    <string name="change_title">Змінити назву</string>
+    <string name="title">Назва</string>
+    <string name="filename">Ім\'я файла</string>
+    <string name="artist">Виконавець</string>
+    <string name="change_file_name">Змінити ім\'я файла</string>
+    <string name="copied_message">Текст скопійований</string>
+    <string name="folder_name">Ім\'я папки</string>
+    <string name="rename_folder">Перейменувати папку</string>
+    <string name="cut">Вирізати</string>
+    <string name="copy">Копіювати</string>
+    <string name="paste">Вставити</string>
+    <string name="paste_in_new_folder">Вставити в нову папку</string>
+    <string name="move_in_the_same_folder_error">Цільова в вихідна папка співпадають</string>
+    <string name="file_already_exists">Файл з таким ім\'ям вже існує</string>
+    <string name="new_folder">Нова папка</string>
+    <string name="play_on_connect_bluetooth_device">Починати відтворення при підключенні Bluetooth гарнітури</string>
+    <string name="headset">Гарнітура</string>
+    <string name="scan_storage">Пересканувати системну бібліотеку</string>
+    <string name="auto_night_mode">Автоматична темна тема</string>
+    <string name="unsupported_format_hint">Непідтримуваний формат</string>
+    <string name="artists">Виконавці</string>
+    <string name="no_artists_in_library">Немає виконавців в бібліотеці</string>
+    <string name="albums">Альбоми</string>
+    <string name="no_albums_in_library">Немає альбомів в бібліотеці</string>
+    <string name="genres">Жанри</string>
+    <string name="no_genres_in_library">Немає жанрів в бібліотеці</string>
+    <string name="no_items_in_genre">Немає композицій у вибраному жанрі</string>
+    <string name="no_compositions">Немає композицій</string>
+    <string name="change_album_name">Змінити альбом</string>
+    <string name="album">Альбом</string>
+    <string name="genre">Жанр</string>
+    <string name="change_composition_genre">Змінити жанр композиції</string>
+    <string name="change_name">Змінити ім\'я</string>
+    <string name="rename_progress">Перейменування…</string>
+    <string name="album_artist">Автор альбому</string>
+    <string name="change_album_artist">Змінити автора альбому</string>
+    <string name="edit_album_tags">Редагувати теги альбому</string>
+    <string name="by_composition_count">По кількості композицій</string>
+    <string name="by_duration">По тривалості</string>
+    <string name="longest_first">Спершу довші</string>
+    <string name="more_first">Сперва більші</string>
+    <string name="artist_already_exists">Виконавець з таким ім\'ям вже існує</string>
+    <string name="album_already_exists">Альбом з таким ім\'ям вже існує</string>
+    <string name="genre_already_exists">Жанр з таким ім\'ям вже існує</string>
+    <string name="remove_genre">Видалити жанр</string>
+    <string name="add_composition_genre">Додати жанр</string>
+    <string name="add">Додати</string>
+    <string name="edit_genre">Змінити жанр</string>
+    <string name="genre_removed_message">Жанр \"%s\" прибраний</string>
+    <string name="exclude_from_scanning">Сховати</string>
+    <string name="ignored_folder_added">Папка \'%s\' додана до списку ігнорованих папок</string>
+    <string name="excluded_folders">Ігноровані папки</string>
+    <string name="remove_excluded_folder">Прибрати ігноровану папку</string>
+    <string name="ignored_folder_removed">Ігнорована папка прибрана</string>
+    <string name="moving_and_destination_folders_matches">Переміщувана та цільова папка співпадають</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Папка з таким ім\'ям вже існує в цільовій папці</string>
+    <string name="move_progress">Переміщення…</string>
+    <string name="delete_progress">Видалення…</string>
+    <string name="play_next_message_single">Композиція \"%s\" буде програна наступною</string>
+    <string name="added_to_queue_message_single">Композиція \"%s\" додана до кінця черги відтворення</string>
+    <string name="queue_item_removed">Елемент черги видалений</string>
+    <string name="by_size">По розміру</string>
+    <string name="largest_first">Спершу більші</string>
+    <string name="log_info_text">Відбулися деякі нефатальні помилки і інформація про них була записана в файл логів. Додаток не відсилає логи автоматично, але ви можете відіслати їх самостійно. Це допоможе покражити якість додатку. Поточний розмір файла логів: %d KB</string>
+    <string name="view_file">Продивитись файл</string>
+    <string name="send_file">Відправити файл</string>
+    <string name="delete_file">Видалити файл</string>
+    <string name="log_file_deleted">Файл видалено</string>
+    <string name="pick_email_app_to_send">Виберіть додаток email для відправки</string>
+    <string name="clear_play_queue">Очистити чергу відтворення</string>
+    <string name="no_excluded_folders">Папки, виключені з медіа сканера, будут з\'являтися тут</string>
+    <string name="keep_playing_after_window_close">Продовжувати відтворення після закриття вікна</string>
+    <string name="unknown_play_error">Невідома помилка відтворення</string>
+    <string name="equalizer">Еквалайзер</string>
+    <string name="system_equalizer">Системний еквалайзер</string>
+    <string name="no_equalizer">Не використовувати</string>
+    <string name="external_equalizer_description">Робота системного еквалайзера залежить від зовнішнього додатку-еквалайзера і може не працювати з деякими додатками</string>
+    <string name="external_equalizer_not_found">Зовнішній додаток-еквалайзер не знайдено</string>
+    <string name="open">Відкрити</string>
+    <string name="cover">Обкладинка</string>
+    <string name="change_cover">Змінити обкладинку</string>
+    <string name="pick_from_gallery">Вибрати з галереї</string>
+    <string name="remove_cover">Сховати обкладинку</string>
+    <string name="editor_timeout_error">Час очікування редактора тегів вичерпано. Можливо, формат файлу не підтримується</string>
+    <string name="change_lyrics">Змінити текст композиції</string>
+    <string name="lyrics">Текст композиції</string>
+    <string name="check_tags_error">Не вдалось перевірити теги композиції: %s</string>
+    <string name="changing_file_progress">Зміна файлу…</string>
+    <string name="android_r_edit_file_permission_denied">
+        Починаючи з Android 11 редагування та видалення файлів потребує явного дозволу системи
+    </string>
+    <string name="error_report">Звіт про помилку</string>
+    <string name="critical_error_report_message">Відбулась фатальна помилка і через це додаток не може запуститись. Поява таких помилок дуже небажана. Додаток не відсилає ніякої інформації автоматично, але ви можете відправити файл зі звітом про помилку вручну по пошті. Це допоможе виправити цю помилку.</string>
+    <string name="error_report_message">Відбулась фатальна помилка. Поява таких помилок дуже небажана. Додаток не відсилає ніякої інформації автоматично, але ви можете відправити файл зі звітом про помилку вручну по пошті. Це допоможе виправити цю помилку.</string>
+    <string name="show_error_report_dialog_on_start">Показувати звіт про помилку при запуску додатку після збоїв</string>
+    <string name="do_not_show_confirm_delete_dialog">Не показувати діалогове вікно підтверждення видалення</string>
+    <string name="app_equalizer">Еквалайзер додатку</string>
+    <string name="presets">Пресети</string>
+    <string name="playback_speed">Швидкість відтворення</string>
+    <string name="reset">Скинути</string>
+    <string name="apply">Застосувати</string>
+    <string name="sleep_timer">Таймер сну</string>
+    <string name="start">Старт</string>
+    <string name="resume">Відновити</string>
+    <string name="sleep_timer_message">Програвання буде зупинено через:</string>
+    <string name="stop">Стоп</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s композиція</item>
+        <item quantity="few">%1$s композицій</item>
+        <item quantity="many">%1$s композицій</item>
+        <item quantity="other">%1$s композиції</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s композицію</item>
+        <item quantity="few">%1$s композицій</item>
+        <item quantity="many">%1$s композицій</item>
+        <item quantity="other">%1$s композицій</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s файл</item>
+        <item quantity="few">%1$s файлів</item>
+        <item quantity="many">%1$s файлів</item>
+        <item quantity="other">%1$s файлів</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s композиція буде програна наступною</item>
+        <item quantity="few">%s композиції будуть програні наступними</item>
+        <item quantity="many">%s композицій будуть програними наступними</item>
+        <item quantity="other">%s композицій будуть програними наступними</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s композиція додана в кінець черги відтворення</item>
+        <item quantity="few">%s композиції додані в кінець черги відтворення</item>
+        <item quantity="many">%s композицій додано в кінець черги відтворення</item>
+        <item quantity="other">%s композицій додано в кінець черги відтворення</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d композиція додана в плейлист \"%2$s\"</item>
+        <item quantity="few">%1$d композиції додані в плейлист \"%2$s\"</item>
+        <item quantity="many">%1$d композицій додано в плейлист \"%2$s\"</item>
+        <item quantity="other">%1$d композицій додано в плейлист \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d композиція видалена з плейлиста \"%2$s\"</item>
+        <item quantity="few">%1$d композицій видалено з плейлиста \"%2$s\"</item>
+        <item quantity="many">%1$d композицій видалено з плейлиста \"%2$s\"</item>
+        <item quantity="other">%1$d композицій видалено з плейлиста \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d композиція видалена</item>
+        <item quantity="few">%1$d композиції видалено</item>
+        <item quantity="many">%1$d композицій видалено</item>
+        <item quantity="other">%1$d композицій видалено</item>
+    </plurals>
+
+</resources>

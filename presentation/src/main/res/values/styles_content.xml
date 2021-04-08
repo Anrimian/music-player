@@ -125,6 +125,7 @@
     </style>
 
     <style name="TextStyleSleepTime" parent="@style/TextStyleSpeedButton">
+        <item name="android:contentDescription">@string/sleep_timer</item>
     </style>
 
     <style name="TextStyle.Subtitle">
