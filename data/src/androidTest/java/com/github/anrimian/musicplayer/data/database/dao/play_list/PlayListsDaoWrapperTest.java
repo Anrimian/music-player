@@ -97,14 +97,14 @@ public class PlayListsDaoWrapperTest {
     public void testUpdatePlaylistNameThatAlreadyExists() {
         Date date = new Date();
         StoragePlayList playList1 = new StoragePlayList(1L, "test", date, date);
-        StoragePlayList playList2 = new StoragePlayList(2L, "test(1)", date, date);
-        StoragePlayList playList3 = new StoragePlayList(3L, "test(2)", date, date);
+        StoragePlayList playList2 = new StoragePlayList(2L, "test1", date, date);
+        StoragePlayList playList3 = new StoragePlayList(3L, "test2", date, date);
         daoWrapper.insertPlayList(playList1);
         daoWrapper.insertPlayList(playList2);
         daoWrapper.insertPlayList(playList3);
 
-        StoragePlayList duplicatePlayList = new StoragePlayList(3L, "test", date, date);
-        daoWrapper.applyChanges(emptyList(), asList(new Change<>(playList1, duplicatePlayList)));
+        StoragePlayList duplicatePlayList3 = new StoragePlayList(3L, "test", date, date);
+        daoWrapper.applyChanges(emptyList(), asList(new Change<>(playList3, duplicatePlayList3)));
 
         System.out.println("KEKAS" + daoWrapper.getPlayListsObservable().blockingFirst());
     }

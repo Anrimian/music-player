@@ -75,7 +75,10 @@ public class PopupMenuWindow {
         MenuAdapter menuAdapter = new MenuAdapter(menuItems, R.layout.item_popup_menu);
         menuAdapter.setOnItemClickListener(item -> {
             listener.call(item);
-            popupWindow.get().dismiss();
+            PopupWindow popup = popupWindow.get();
+            if (popup != null) {
+                popup.dismiss();
+            }
         });
         recyclerView.setAdapter(menuAdapter);
 
