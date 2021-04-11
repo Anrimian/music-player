@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
@@ -16,7 +17,6 @@ import android.view.KeyEvent;
 import androidx.annotation.Nullable;
 import androidx.media.session.MediaButtonReceiver;
 
-import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
@@ -28,7 +28,6 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
-import com.github.anrimian.musicplayer.utils.Permissions;
 
 import javax.annotation.Nonnull;
 
@@ -107,31 +106,31 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (!Permissions.hasFilePermission(this)) {
+        /*if (!Permissions.hasFilePermission(this)) {
             notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
             stopForeground(true);
             stopSelf();
             return;
-        }
+        }*/
 
         //reduce chance to show first notification without info
-        currentSource = playerInteractor().getCurrentSource();
-        notificationSetting = musicServiceInteractor().getNotificationSettings();
+//        currentSource = playerInteractor().getCurrentSource();
+//        notificationSetting = musicServiceInteractor().getNotificationSettings();
 
         //we must start foreground in onCreate, strange ANR otherwise
-        notificationsDisplayer().startForegroundNotification(this,
-                playerState == PlayerState.PLAY,
-                currentSource,
-                mediaSession(),
-                repeatMode,
-                notificationSetting,
-                true);
-        //update state that depends on current item and settings to keep it actual
-        if (currentSource != null) {
-            updateMediaSessionState();
-            updateMediaSessionMetadata();
-            updateMediaSessionAlbumArt();
-        }
+//        notificationsDisplayer().startForegroundNotification(this,
+//                playerState == PlayerState.PLAY,
+//                currentSource,
+//                mediaSession(),
+//                repeatMode,
+//                notificationSetting,
+//                true);
+//        //update state that depends on current item and settings to keep it actual
+//        if (currentSource != null) {
+//            updateMediaSessionState();
+//            updateMediaSessionMetadata();
+//            updateMediaSessionAlbumArt();
+//        }
 
         subscribeOnServiceState();
     }
@@ -145,13 +144,7 @@ public class MusicService extends Service {
         }
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
-            notificationsDisplayer().startForegroundNotification(this,
-                    playerState == PlayerState.PLAY,
-                    currentSource,
-                    mediaSession(),
-                    repeatMode,
-                    notificationSetting,
-                    false);
+            startForeground();
         }
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         if (requestCode != -1) {
@@ -168,7 +161,7 @@ public class MusicService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return new LocalBinder();
     }
 
     @Override
@@ -177,6 +170,30 @@ public class MusicService extends Service {
         mediaSession().setActive(false);
         mediaSession().release();
         serviceDisposable.dispose();
+    }
+
+    public void startForeground() {
+        //reduce chance to show first notification without info
+        boolean reloadCover = false;
+        if (notificationSetting == null) {
+            reloadCover = true;
+            currentSource = playerInteractor().getCurrentSource();
+            notificationSetting = musicServiceInteractor().getNotificationSettings();
+        }
+        //update state that depends on current item and settings to keep it actual
+        if (currentSource != null) {
+            updateMediaSessionState();
+            updateMediaSessionMetadata();
+            updateMediaSessionAlbumArt();
+        }
+
+        notificationsDisplayer().startForegroundNotification(this,
+                playerState == PlayerState.PLAY,
+                currentSource,
+                mediaSession(),
+                repeatMode,
+                notificationSetting,
+                reloadCover);
     }
 
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
@@ -619,4 +636,12 @@ public class MusicService extends Service {
             super.onRemoveQueueItem(description);
         }
     }
+
+    public class LocalBinder extends Binder {
+
+        public MusicService getService() {
+            return MusicService.this;
+        }
+    }
+
 }
