@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
+import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
@@ -73,8 +74,10 @@ public class PlayListsDaoWrapper {
                 }
                 String newName = newItem.getName();
                 if (!oldItem.getName().equals(newName)) {
-                    //TODO here we can get sqlite constraint exception by name, how?
-                    playListDao.updatePlayListNameByStorageId(id, getUniquePlayListName(newName));
+                    playListDao.updatePlayListNameByStorageId(
+                            id,
+                            getUniquePlayListName(newName, "-" + FileUtils.randomString(8))
+                    );
                 }
             }
         });
@@ -233,11 +236,15 @@ public class PlayListsDaoWrapper {
     }
 
     private String getUniquePlayListName(String name) {
+        return getUniquePlayListName(name, "");
+    }
+
+    private String getUniquePlayListName(String name, String salt) {
         String uniqueName = name;
         int i = 0;
         while (playListDao.isPlayListWithNameExists(uniqueName)) {
             i++;
-            uniqueName = name + "("+ i + ")";
+            uniqueName = name + "("+ i + ")" + salt;
         }
         return uniqueName;
     }
