@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.incomplete_swipe
+package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe
 
 import android.content.Context
 import android.graphics.Canvas
@@ -19,8 +19,8 @@ fun createSwipeCallback(recyclerView: RecyclerView,
 //                      @ColorInt backgroundColor: Int,
                         @DrawableRes iconRes: Int,
                         @StringRes textResId: Int,
-                        swipeCallback: (Int) -> Unit): IncompleteSwipeCallback {
-    return IncompleteSwipeCallback(
+                        swipeCallback: (Int) -> Unit): ShortSwipeCallback {
+    return ShortSwipeCallback(
 //            recyclerView,
 //            backgroundColor,
 //            swipeFlags,
@@ -39,20 +39,22 @@ fun createSwipeCallback(recyclerView: RecyclerView,
 //TODO refactoring constructor
 //TODO design
 //TODO animation
+//TODO dynamic threshold calculation?
+//TODO do not move divider
 
 const val SWIPE_BORDER_PERCENT = 0.33f
 const val SWIPE_ACTIVE_BORDER_PERCENT = 0.22f
 const val NO_POSITION = -1
 
-class IncompleteSwipeCallback(context: Context,
-                              @DrawableRes iconRes: Int,
-                              @StringRes textResId: Int,
-                              @DimenRes panelWidthRes: Int,
-                              @DimenRes panelEndPaddingRes: Int,
-                              @DimenRes textTopPaddingRes: Int,
-                              @DimenRes iconSizeRes: Int,
-                              @DimenRes textSizeRes: Int,
-                              private val swipeCallback: (Int) -> Unit
+class ShortSwipeCallback(context: Context,
+                         @DrawableRes iconRes: Int,
+                         @StringRes textResId: Int,
+                         @DimenRes panelWidthRes: Int,
+                         @DimenRes panelEndPaddingRes: Int,
+                         @DimenRes textTopPaddingRes: Int,
+                         @DimenRes iconSizeRes: Int,
+                         @DimenRes textSizeRes: Int,
+                         private val swipeCallback: (Int) -> Unit
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START) {
 
     private val panelWidth = context.resources.getDimensionPixelSize(panelWidthRes)
@@ -101,12 +103,16 @@ class IncompleteSwipeCallback(context: Context,
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             val itemView = viewHolder.itemView
 
+            val contentHeight = iconSize + textStaticLayout.height
+            val contentMarginTop = (itemView.height - contentHeight) / 2f
             val top = itemView.top.toFloat()
             val bottom = itemView.bottom.toFloat()
             val left = if (dX > 0) itemView.left.toFloat() else itemView.right + dX
             val right = if (dX > 0) dX else itemView.right.toFloat()
-            val centerY = top + itemView.height / 2f
-            val centerX = (panelWidth shr 1).toFloat()
+            val contentCenterY = top + contentMarginTop + contentHeight/2
+            val centerX = (panelWidth / 2).toFloat()
+            val iconTopY = top + contentMarginTop
+            val textTopY = iconTopY + iconSize + textTopPadding
 
             if (abs(dX) > itemView.width * SWIPE_ACTIVE_BORDER_PERCENT) {
                 if (itemPositionToAction == NO_POSITION) {
@@ -123,12 +129,12 @@ class IncompleteSwipeCallback(context: Context,
 
             //draw icon
             c.save()
-            c.translate(itemView.right - (centerX + panelEndPadding + (iconSize shr 1)), centerY - iconSize)
+            c.translate(itemView.right - (centerX + panelEndPadding + (iconSize / 2)), iconTopY)
             icon.draw(c)
             c.restore()
 
             //draw text
-            c.translate((itemView.right - (panelWidth + panelEndPadding)).toFloat(), centerY + textTopPadding)
+            c.translate((itemView.right - (panelWidth + panelEndPadding)).toFloat(), textTopY)
             textStaticLayout.draw(c)
             c.restore()
 
