@@ -6,8 +6,20 @@ import android.graphics.BitmapFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.SecureRandom;
 
 public class FileUtils {
+
+    private static final String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final SecureRandom RND = new SecureRandom();
+
+    public static String randomString(int len){
+        StringBuilder sb = new StringBuilder(len);
+        for(int i = 0; i < len; i++) {
+            sb.append(CHARS.charAt(RND.nextInt(CHARS.length())));
+        }
+        return sb.toString();
+    }
 
     public static byte[] toByteArray(InputStream is) throws IOException {
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
