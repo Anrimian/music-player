@@ -44,7 +44,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallbackKt;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Collection;
@@ -126,7 +125,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
                 presenter::onCompositionMenuClicked);
         recyclerView.setAdapter(adapter);
 
-        ShortSwipeCallback callback = ShortSwipeCallbackKt.createSwipeCallback(recyclerView,
+        ShortSwipeCallback callback = new ShortSwipeCallback(requireContext(),
 //                getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
 //                presenter::onItemSwipedToDelete,
 //                ItemTouchHelper.START,

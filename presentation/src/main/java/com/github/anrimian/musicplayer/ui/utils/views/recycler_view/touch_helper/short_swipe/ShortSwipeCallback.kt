@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.text.Layout
-import android.text.StaticLayout
 import android.text.TextPaint
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -13,30 +12,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
+import com.github.anrimian.musicplayer.ui.utils.createStaticLayout
+import com.github.anrimian.musicplayer.ui.utils.getDimensionPixelSize
+import com.github.anrimian.musicplayer.ui.utils.getDrawableCompat
 import kotlin.math.abs
 
-fun createSwipeCallback(recyclerView: RecyclerView,
-//                      @ColorInt backgroundColor: Int,
-                        @DrawableRes iconRes: Int,
-                        @StringRes textResId: Int,
-                        swipeCallback: (Int) -> Unit): ShortSwipeCallback {
-    return ShortSwipeCallback(
-//            recyclerView,
-//            backgroundColor,
-//            swipeFlags,
-            recyclerView.context,
-            iconRes,
-            textResId,
-            R.dimen.swipe_panel_width,
-            R.dimen.swipe_panel_padding_end,
-            R.dimen.swipe_panel_text_top_padding,
-            R.dimen.swipe_panel_icon_size,
-            R.dimen.swipe_panel_text_size,
-            swipeCallback,
-    )
-}
-
-//TODO refactoring constructor
 //TODO design
 //TODO animation
 //TODO dynamic threshold calculation?
@@ -46,24 +26,26 @@ const val SWIPE_BORDER_PERCENT = 0.33f
 const val SWIPE_ACTIVE_BORDER_PERCENT = 0.22f
 const val NO_POSITION = -1
 
-class ShortSwipeCallback(context: Context,
-                         @DrawableRes iconRes: Int,
-                         @StringRes textResId: Int,
-                         @DimenRes panelWidthRes: Int,
-                         @DimenRes panelEndPaddingRes: Int,
-                         @DimenRes textTopPaddingRes: Int,
-                         @DimenRes iconSizeRes: Int,
-                         @DimenRes textSizeRes: Int,
-                         private val swipeCallback: (Int) -> Unit
+//remove annotation after refactoring fragments to kotlin
+class ShortSwipeCallback @JvmOverloads constructor(
+        context: Context,
+        @DrawableRes iconRes: Int,
+        @StringRes textResId: Int,
+        @DimenRes panelWidthRes: Int = R.dimen.swipe_panel_width,
+        @DimenRes panelEndPaddingRes: Int = R.dimen.swipe_panel_padding_end,
+        @DimenRes textTopPaddingRes: Int = R.dimen.swipe_panel_text_top_padding,
+        @DimenRes iconSizeRes: Int = R.dimen.swipe_panel_icon_size,
+        @DimenRes textSizeRes: Int = R.dimen.swipe_panel_text_size,
+        private val swipeCallback: (Int) -> Unit
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START) {
 
-    private val panelWidth = context.resources.getDimensionPixelSize(panelWidthRes)
-    private val panelEndPadding = context.resources.getDimensionPixelSize(panelEndPaddingRes)
-    private val iconSize = context.resources.getDimensionPixelSize(iconSizeRes)
-    private val textTopPadding = context.resources.getDimensionPixelSize(textTopPaddingRes)
+    private val panelWidth = context.getDimensionPixelSize(panelWidthRes)
+    private val panelEndPadding = context.getDimensionPixelSize(panelEndPaddingRes)
+    private val iconSize = context.getDimensionPixelSize(iconSizeRes)
+    private val textTopPadding = context.getDimensionPixelSize(textTopPaddingRes)
     private val textColor = Color.WHITE
 
-    private val icon = context.resources.getDrawable(iconRes).apply {
+    private val icon = context.getDrawableCompat(iconRes).apply {
         setTint(textColor)
         setBounds(0, 0, iconSize, iconSize)
     }
@@ -74,14 +56,12 @@ class ShortSwipeCallback(context: Context,
         textSize = context.resources.getDimension(textSizeRes)
     }
 
-    private val textStaticLayout = StaticLayout(
+    private val textStaticLayout = createStaticLayout(
             context.getString(textResId),
             textPaint,
             panelWidth,
-            Layout.Alignment.ALIGN_CENTER,
-            1.0f,
-            0.0f,
-            false
+            4,
+            Layout.Alignment.ALIGN_CENTER
     )
 
     private var itemPositionToAction = NO_POSITION

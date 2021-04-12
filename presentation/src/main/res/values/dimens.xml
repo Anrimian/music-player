@@ -108,7 +108,7 @@
     <dimen name="swipe_panel_width">90dp</dimen>
     <dimen name="swipe_panel_padding_end">8dp</dimen>
     <dimen name="swipe_panel_text_top_padding">4dp</dimen>
-    <dimen name="swipe_panel_icon_size">28dp</dimen>
+    <dimen name="swipe_panel_icon_size">24dp</dimen>
     <dimen name="swipe_panel_text_size">11sp</dimen>
 
     <!--chips-->
