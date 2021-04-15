@@ -22,7 +22,7 @@ import static com.github.anrimian.musicplayer.data.repositories.equalizer.Equali
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
 //two instances of eq are not allowed?
-//release and nullify on detach?(likely not)
+//release and nullify on detach? - done
 //try to init twice?
 public class InternalEqualizer implements AppEqualizer {
 
@@ -59,6 +59,9 @@ public class InternalEqualizer implements AppEqualizer {
     public void detachEqualizer(int audioSessionId) {
         if (equalizer != null) {
             equalizer.setEnabled(false);
+            //should prevent UnsupportedOperationException - observe
+            equalizer.release();
+            equalizer = null;
         }
     }
 
