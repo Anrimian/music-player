@@ -21,6 +21,9 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
+//two instances of eq are not allowed?
+//release and nullify on detach? - done
+//try to init twice?
 public class InternalEqualizer implements AppEqualizer {
 
     private final EqualizerStateRepository equalizerStateRepository;
@@ -56,6 +59,9 @@ public class InternalEqualizer implements AppEqualizer {
     public void detachEqualizer(int audioSessionId) {
         if (equalizer != null) {
             equalizer.setEnabled(false);
+            //should prevent UnsupportedOperationException - observe
+            equalizer.release();
+            equalizer = null;
         }
     }
 
