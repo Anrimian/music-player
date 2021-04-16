@@ -111,6 +111,14 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         interactor.play(folderId, composition)
     }
 
+    fun onPlayNextSourceClicked(position: Int) {
+        val source = sourceList.elementAtOrNull(position) ?: return
+        when(source) {
+            is CompositionFileSource -> onPlayNextCompositionClicked(source.composition)
+            is FolderFileSource -> onPlayNextFolderClicked(source)
+        }
+    }
+
     fun onPlayNextCompositionClicked(composition: Composition) {
         addCompositionsToPlayNext(ListUtils.asList(composition))
     }

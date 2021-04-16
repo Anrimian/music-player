@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -55,6 +56,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLay
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -163,6 +165,16 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter::onCompositionIconClicked,
                 (position, musicFileSource) -> presenter.onCompositionMenuClick(musicFileSource));
         recyclerView.setAdapter(adapter);
+
+        ShortSwipeCallback callback = new ShortSwipeCallback(requireContext(),
+                R.drawable.ic_play_next,
+                R.string.play_next,
+                position -> {
+                    presenter.onPlayNextSourceClicked(position);
+                    return null;
+                });
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         headerViewWrapper = new HeaderViewWrapper(viewBinding.headerContainer);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());

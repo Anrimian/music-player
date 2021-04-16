@@ -28,7 +28,7 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
-import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragment;
+import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragmentKt;
 import com.github.anrimian.musicplayer.ui.library.artists.list.adapter.ArtistsAdapter;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
@@ -234,7 +234,7 @@ public class ArtistsListFragment extends LibraryFragment implements
 
     private void goToArtistScreen(Artist artist) {
         FragmentNavigation.from(getParentFragmentManager())
-                .addNewFragment(ArtistItemsFragment.newInstance(artist.getId()));
+                .addNewFragment(ArtistItemsFragmentKt.newInstance(artist.getId()));
     }
 
     private void onArtistLongClick(Artist artist) {

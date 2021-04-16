@@ -34,6 +34,7 @@ class ShortSwipeCallback @JvmOverloads constructor(
         @DimenRes textTopPaddingRes: Int = R.dimen.swipe_panel_text_top_padding,
         @DimenRes iconSizeRes: Int = R.dimen.swipe_panel_icon_size,
         @DimenRes textSizeRes: Int = R.dimen.swipe_panel_text_size,
+        private val shouldNotSwipeViewHolder: (RecyclerView.ViewHolder) -> Boolean = { false },
         private val swipeCallback: (Int) -> Unit
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START) {
 
@@ -76,6 +77,13 @@ class ShortSwipeCallback @JvmOverloads constructor(
         super.clearView(recyclerView, viewHolder)
         swipeEffectAnimator?.cancel()
         currentScale = APPEAR_ANIM_SCALE_START
+    }
+
+    override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+        if (shouldNotSwipeViewHolder(viewHolder)) {
+            return 0
+        }
+        return super.getSwipeDirs(recyclerView, viewHolder)
     }
 
     override fun onChildDraw(c: Canvas,
