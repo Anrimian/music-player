@@ -1,10 +1,13 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.text.Layout
 import android.text.TextPaint
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -17,14 +20,16 @@ import com.github.anrimian.musicplayer.ui.utils.getDimensionPixelSize
 import com.github.anrimian.musicplayer.ui.utils.getDrawableCompat
 import kotlin.math.abs
 
-//TODO design
-//TODO animation
-//TODO dynamic threshold calculation?
+//TODO design + colors
+//TODO dynamic threshold calculation
 //TODO do not move divider
 
-const val SWIPE_BORDER_PERCENT = 0.33f
-const val SWIPE_ACTIVE_BORDER_PERCENT = 0.22f
-const val NO_POSITION = -1
+private const val SWIPE_BORDER_PERCENT = 0.33f
+private const val SWIPE_ACTIVE_BORDER_PERCENT = 0.22f
+private const val NO_POSITION = -1
+private const val APPEAR_ANIM_SCALE_START = 0f
+private const val APPEAR_ANIM_SCALE_END = 1f
+private const val ANIMATION_DURATION = 120L
 
 //remove annotation after refactoring fragments to kotlin
 class ShortSwipeCallback @JvmOverloads constructor(
@@ -65,12 +70,20 @@ class ShortSwipeCallback @JvmOverloads constructor(
     )
 
     private var itemPositionToAction = NO_POSITION
+    private var swipeEffectAnimator: ValueAnimator? = null
+    private var currentScale = APPEAR_ANIM_SCALE_START
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         super.onSelectedChanged(viewHolder, actionState)
         if (actionState == ItemTouchHelper.ACTION_STATE_IDLE && itemPositionToAction != NO_POSITION) {
             swipeCallback(itemPositionToAction)
         }
+    }
+
+    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+        super.clearView(recyclerView, viewHolder)
+        swipeEffectAnimator?.cancel()
+        currentScale = APPEAR_ANIM_SCALE_START
     }
 
     override fun onChildDraw(c: Canvas,
@@ -94,29 +107,56 @@ class ShortSwipeCallback @JvmOverloads constructor(
             val iconTopY = top + contentMarginTop
             val textTopY = iconTopY + iconSize + textTopPadding
 
+            var startAnimation = false
+            var isInfoVisible = false
             if (abs(dX) > itemView.width * SWIPE_ACTIVE_BORDER_PERCENT) {
+                isInfoVisible = true
                 if (itemPositionToAction == NO_POSITION) {
                     AndroidUtils.playShortVibration(itemView.context)
                     itemPositionToAction = viewHolder.bindingAdapterPosition
-                    //start appear animation
+                    startAnimation = true
                 }
             } else {
                 if (itemPositionToAction != NO_POSITION) {
                     itemPositionToAction = NO_POSITION
-                    //start disappear animation
+                    startAnimation = true
+                }
+            }
+
+            if (startAnimation) {
+                var start = if (isInfoVisible) APPEAR_ANIM_SCALE_START else APPEAR_ANIM_SCALE_END
+                var animationDuration = ANIMATION_DURATION
+                val swipeEffectAnimator = this.swipeEffectAnimator
+                if (swipeEffectAnimator?.isRunning == true) {
+                    start = swipeEffectAnimator.animatedValue as Float
+                    animationDuration = swipeEffectAnimator.currentPlayTime
+                    swipeEffectAnimator.cancel()
+                }
+                val end = if (isInfoVisible) APPEAR_ANIM_SCALE_END else APPEAR_ANIM_SCALE_START
+                this.swipeEffectAnimator = ValueAnimator.ofFloat(start, end).also { animator ->
+                    animator.duration = animationDuration
+                    animator.addUpdateListener { anim ->
+                        currentScale = anim.animatedValue as Float
+                        recyclerView.invalidate()
+                    }
+                    animator.interpolator = if (isInfoVisible) AccelerateInterpolator() else DecelerateInterpolator()
+                    animator.start()
                 }
             }
 
             //draw icon
             c.save()
-            c.translate(itemView.right - (centerX + panelEndPadding + (iconSize / 2)), iconTopY)
+
+            c.translate((itemView.right - panelWidth).toFloat(), top)
+            c.translate(panelWidth / 2f - iconSize / 2f, contentMarginTop)
+            c.scale(currentScale, currentScale, iconSize / 2f, iconSize / 2f + textStaticLayout.height / 2)
             icon.draw(c)
-            c.restore()
 
             //draw text
-            c.translate((itemView.right - (panelWidth + panelEndPadding)).toFloat(), textTopY)
+            c.translate(iconSize / 2f - textStaticLayout.width / 2f, (iconSize + textTopPadding).toFloat())
             textStaticLayout.draw(c)
             c.restore()
+
 
             if (abs(dX) > itemView.width * SWIPE_BORDER_PERCENT) {
                 return
