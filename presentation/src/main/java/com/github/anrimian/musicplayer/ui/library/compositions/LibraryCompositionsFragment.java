@@ -126,9 +126,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
         recyclerView.setAdapter(adapter);
 
         ShortSwipeCallback callback = new ShortSwipeCallback(requireContext(),
-//                getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
-//                presenter::onItemSwipedToDelete,
-//                ItemTouchHelper.START,
                 R.drawable.ic_play_next,
                 R.string.play_next,
                 position -> {
