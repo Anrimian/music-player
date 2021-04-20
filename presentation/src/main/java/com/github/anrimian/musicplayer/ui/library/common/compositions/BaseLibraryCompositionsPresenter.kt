@@ -135,6 +135,13 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         deletePreparedCompositions()
     }
 
+    fun onPlayNextCompositionClicked(position: Int) {
+        val composition = compositions.elementAtOrNull(position)
+        if (composition != null) {
+            onPlayNextCompositionClicked(composition)
+        }
+    }
+
     fun onPlayNextCompositionClicked(composition: Composition) {
         addCompositionsToPlayNext(ListUtils.asList(composition))
     }

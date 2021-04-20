@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.data.models.composition.source.UriComposi
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
@@ -119,15 +120,14 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     }
 
     @Override
-    public void showStopState() {
-        AndroidUtils.setAnimatedVectorDrawable(viewBinding.ivPlayPause, R.drawable.anim_pause_to_play);
-        viewBinding.ivPlayPause.setContentDescription(getString(R.string.play));
-    }
-
-    @Override
-    public void showPlayState() {
-        AndroidUtils.setAnimatedVectorDrawable(viewBinding.ivPlayPause, R.drawable.anim_play_to_pause);
-        viewBinding.ivPlayPause.setContentDescription(getString(R.string.pause));
+    public void showPlayerState(PlayerState state) {
+        if (state == PlayerState.PLAY) {
+            AndroidUtils.setAnimatedVectorDrawable(viewBinding.ivPlayPause, R.drawable.anim_play_to_pause);
+            viewBinding.ivPlayPause.setContentDescription(getString(R.string.pause));
+        } else {
+            AndroidUtils.setAnimatedVectorDrawable(viewBinding.ivPlayPause, R.drawable.anim_pause_to_play);
+            viewBinding.ivPlayPause.setContentDescription(getString(R.string.play));
+        }
     }
 
     @Override

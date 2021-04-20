@@ -2,10 +2,10 @@ package com.github.anrimian.musicplayer.ui.player_screen;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
 
@@ -23,13 +23,8 @@ import moxy.viewstate.strategy.alias.Skip;
 
 public interface PlayerView extends MvpView {
 
-    String PLAYER_STATE = "player_state";
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
-    void showStopState();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PLAYER_STATE)
-    void showPlayState();
+    @AddToEndSingle
+    void showPlayerState(PlayerState state);
 
     @AddToEndSingle
     void setButtonPanelState(boolean expanded);

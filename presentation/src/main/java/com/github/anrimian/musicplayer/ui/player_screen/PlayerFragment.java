@@ -39,6 +39,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimer
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
@@ -307,8 +308,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 R.drawable.ic_remove_from_queue,
                 R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
-        callback.setOnStartDragListener(presenter::onDragStarted);
-        callback.setOnEndDragListener(presenter::onDragEnded);
+        callback.setOnStartDragListener(position -> presenter.onDragStarted());
+        callback.setOnEndDragListener(position -> presenter.onDragEnded());
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvPlayList);
 
@@ -492,19 +493,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showStopState() {
-        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
-        ivPlayPause.setContentDescription(getString(R.string.play));
-        ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
-        playQueueAdapter.showPlaying(false);
-    }
-
-    @Override
-    public void showPlayState() {
-        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
-        ivPlayPause.setContentDescription(getString(R.string.pause));
-        ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
-        playQueueAdapter.showPlaying(true);
+    public void showPlayerState(PlayerState state) {
+        if (state == PlayerState.PLAY) {
+            AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
+            ivPlayPause.setContentDescription(getString(R.string.pause));
+            ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
+            playQueueAdapter.showPlaying(true);
+        } else {
+            AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
+            ivPlayPause.setContentDescription(getString(R.string.play));
+            ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
+            playQueueAdapter.showPlaying(false);
+        }
     }
 
     @Override

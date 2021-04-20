@@ -91,4 +91,8 @@ public class LibraryFragment extends MvpAppCompatFragment implements FragmentLay
         }
     }
 
+    protected FragmentManager parentFragmentManager() {
+        return getParentFragmentManager();
+    }
+
 }

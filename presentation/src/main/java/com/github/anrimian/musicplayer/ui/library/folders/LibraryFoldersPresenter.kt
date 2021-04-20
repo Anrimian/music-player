@@ -94,7 +94,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
     }
 
-    fun onCompositionMenuClick(position: Int, musicFileSource: CompositionFileSource) {
+    fun onCompositionMenuClick(musicFileSource: CompositionFileSource) {
         viewState.showCompositionActionDialog(musicFileSource.composition)
     }
 
@@ -109,6 +109,14 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     fun onPlayActionSelected(composition: Composition?) {
         interactor.play(folderId, composition)
+    }
+
+    fun onPlayNextSourceClicked(position: Int) {
+        val source = sourceList.elementAtOrNull(position) ?: return
+        when(source) {
+            is CompositionFileSource -> onPlayNextCompositionClicked(source.composition)
+            is FolderFileSource -> onPlayNextFolderClicked(source)
+        }
     }
 
     fun onPlayNextCompositionClicked(composition: Composition) {
