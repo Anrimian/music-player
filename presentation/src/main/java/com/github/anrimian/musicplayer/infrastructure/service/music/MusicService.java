@@ -319,10 +319,12 @@ public class MusicService extends Service {
 
         MusicNotificationSetting newSettings = serviceState.settings;
         if (!newSettings.equals(this.notificationSetting)) {
-            if (notificationSetting.isCoversOnLockScreen() != newSettings.isCoversOnLockScreen()) {
+            if (notificationSetting == null
+                    || notificationSetting.isCoversOnLockScreen() != newSettings.isCoversOnLockScreen()) {
                 updateMediaSessionAlbumArt = true;
             }
-            if (notificationSetting.isShowCovers() != newSettings.isShowCovers()
+            if (notificationSetting == null
+                    || notificationSetting.isShowCovers() != newSettings.isShowCovers()
                     || notificationSetting.isColoredNotification() != newSettings.isColoredNotification()) {
                 updateNotification = true;
             }
